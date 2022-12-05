@@ -1,8 +1,8 @@
 {
-  "name": "hmpps-template-typescript",
+  "name": "hmpps-prisoner-profile",
   "version": "0.0.1",
-  "description": "HMPPS Typescript Template",
-  "repository": "git@github.com:ministryofjustice/hmpps-template-typescript.git",
+  "description": "Hmpps Prisoner Profile",
+  "repository": "git@github.com:ministryofjustice/hmpps-prisoner-profile.git",
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
