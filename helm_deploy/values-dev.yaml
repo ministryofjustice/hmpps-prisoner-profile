@@ -1,17 +1,17 @@
 ---
-# Per environment values which override defaults in hmpps-template-typescript/values.yaml
+# Per environment values which override defaults in hmpps-prisoner-profile/values.yaml
 
 generic-service:
   replicaCount: 2
 
   ingress:
-    host: hmpps-template-typescript-dev.hmpps.service.justice.gov.uk
+    host: hmpps-prisoner-profile-dev.hmpps.service.justice.gov.uk
     contextColour: green
     v1_2_enabled: true
     v0_47_enabled: false
 
   env:
-    INGRESS_URL: "https://hmpps-template-typescript-dev.hmpps.service.justice.gov.uk"
+    INGRESS_URL: "https://hmpps-prisoner-profile-dev.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
 
