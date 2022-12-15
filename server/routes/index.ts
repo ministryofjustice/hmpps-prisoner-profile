@@ -1,4 +1,5 @@
 import { type RequestHandler, Router } from 'express'
+import config from '../config'
 
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
@@ -8,8 +9,13 @@ export default function routes(service: Services): Router {
   const router = Router()
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  get('/', (req, res, next) => {
+  get('/prisoner/:prisonerNumber', (req, res, next) => {
     res.render('pages/index')
+  })
+
+  get('/', (req, res, next) => {
+    console.log(`TEST ${config.apis.dpsHomePageUrl}`)
+    res.redirect(config.apis.dpsHomePageUrl)
   })
 
   return router

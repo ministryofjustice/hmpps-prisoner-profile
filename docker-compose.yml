@@ -21,8 +21,61 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,nomis
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
+      - NOMIS_ENDPOINT_URL=http://localhost:8081
+
+  prisonApi:
+    image: quay.io/hmpps/prison-api:latest
+    container_name: prison-api
+    depends_on:
+      - hmpps-auth
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=nomis-hsqldb
+
+  nomis-user-roles-api:
+    image: quay.io/hmpps/nomis-user-roles-api:latest
+    container_name: nomis-user-roles-api
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health/ping"]
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_PROFILES_ACTIVE=dev
+
+  dpsHomepage:
+    image: quay.io/hmpps/digital-prison-services:latest
+    ports:
+      - '3002:3002'
+    depends_on:
+      - hmpps-auth
+      - prisonApi
+      # - whereaboutsapi
+      - redis
+    environment:
+      - UPDATE_ATTENDANCE_PRISONS='HLI,MDI,LEI'
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=3002
+
+  # whereaboutsapi:
+  #   image: 'quay.io/hmpps/whereabouts-api:latest'
+  #   container_name: whereaboutsapi
+  #   depends_on:
+  #     - oauth
+  #   ports:
+  #     - '8082:8082'
+  #   healthcheck:
+  #     test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+  #   environment:
+  #     - SERVER_PORT=8080
+  #     - SPRING_PROFILES_ACTIVE=dev,noqueue
 
   app:
     build: .
@@ -40,6 +93,7 @@ services:
       - API_CLIENT_SECRET=client-secret
       - SYSTEM_CLIENT_ID=system-client-id
       - SYSTEM_CLIENT_SECRET=system-client-secret
+      - SESSION_SECRET=session-secret
 
 networks:
   hmpps:

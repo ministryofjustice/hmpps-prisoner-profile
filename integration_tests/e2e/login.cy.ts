@@ -11,7 +11,7 @@ context('SignIn', () => {
   })
 
   it('Unauthenticated user directed to auth', () => {
-    cy.visit('/')
+    cy.visit('/prisoner/123')
     Page.verifyOnPage(AuthSignInPage)
   })
 
@@ -48,7 +48,7 @@ context('SignIn', () => {
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
-    cy.request('/').its('body').should('contain', 'Sign in')
+    cy.request('/prisoner/123').its('body').should('contain', 'Sign in')
   })
 
   it('Token verification failure clears user session', () => {
@@ -57,7 +57,7 @@ context('SignIn', () => {
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
-    cy.request('/').its('body').should('contain', 'Sign in')
+    cy.request('/prisoner/123').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
     cy.task('stubAuthUser', 'bobby brown')

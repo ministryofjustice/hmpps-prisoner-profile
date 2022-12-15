@@ -15,7 +15,7 @@ afterEach(() => {
 describe('GET 404', () => {
   it('should render content with stack in dev mode', () => {
     return request(app)
-      .get('/unknown')
+      .get('/unknown/a')
       .expect(404)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -26,7 +26,7 @@ describe('GET 404', () => {
 
   it('should render content without stack in production mode', () => {
     return request(appWithAllRoutes({ production: true }))
-      .get('/unknown')
+      .get('/unknown/b')
       .expect(404)
       .expect('Content-Type', /html/)
       .expect(res => {
