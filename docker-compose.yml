@@ -13,6 +13,8 @@ services:
 
   hmpps-auth:
     image: quay.io/hmpps/hmpps-auth:latest
+    depends_on:
+      - nomis-user-roles-api
     networks:
       - hmpps
     container_name: hmpps-auth
@@ -23,11 +25,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev,nomis
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
-      - NOMIS_ENDPOINT_URL=http://localhost:8081
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8081
 
   prisonApi:
     image: quay.io/hmpps/prison-api:latest
     container_name: prison-api
+    networks:
+      - hmpps
     depends_on:
       - hmpps-auth
     ports:
@@ -41,6 +45,8 @@ services:
   nomis-user-roles-api:
     image: quay.io/hmpps/nomis-user-roles-api:latest
     container_name: nomis-user-roles-api
+    networks:
+      - hmpps
     ports:
       - "8081:8081"
     healthcheck:
@@ -48,9 +54,12 @@ services:
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=dev
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
   dpsHomepage:
     image: quay.io/hmpps/digital-prison-services:latest
+    networks:
+      - hmpps
     ports:
       - '3002:3002'
     depends_on:
