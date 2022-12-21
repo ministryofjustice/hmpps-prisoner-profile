@@ -27,7 +27,7 @@ services:
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
       - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8081
 
-  prisonApi:
+  prison-api:
     image: quay.io/hmpps/prison-api:latest
     container_name: prison-api
     networks:
@@ -56,7 +56,7 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
-  dpsHomepage:
+  dps-homepage:
     image: quay.io/hmpps/digital-prison-services:latest
     networks:
       - hmpps
@@ -64,27 +64,15 @@ services:
       - '3002:3002'
     depends_on:
       - hmpps-auth
-      - prisonApi
-      # - whereaboutsapi
+      - prison-api
       - redis
     environment:
       - UPDATE_ATTENDANCE_PRISONS='HLI,MDI,LEI'
+      - OAUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth/
+      - OAUTH_ENDPOINT_UI_URL=http://localhost:9090/auth/
+      - API_ENDPOINT_URL=http://prison-api:8080/
       - REDIS_HOST=redis
-      - REDIS_PORT=6379
       - PORT=3002
-
-  # whereaboutsapi:
-  #   image: 'quay.io/hmpps/whereabouts-api:latest'
-  #   container_name: whereaboutsapi
-  #   depends_on:
-  #     - oauth
-  #   ports:
-  #     - '8082:8082'
-  #   healthcheck:
-  #     test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
-  #   environment:
-  #     - SERVER_PORT=8080
-  #     - SPRING_PROFILES_ACTIVE=dev,noqueue
 
   app:
     build: .
@@ -97,7 +85,6 @@ services:
       - REDIS_HOST=redis
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      # These will need to match new creds in the seed auth service auth
       - API_CLIENT_ID=client-id
       - API_CLIENT_SECRET=client-secret
       - SYSTEM_CLIENT_ID=system-client-id

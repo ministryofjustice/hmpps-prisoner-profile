@@ -14,7 +14,6 @@ export default function routes(service: Services): Router {
   })
 
   get('/', (req, res, next) => {
-    console.log(`TEST ${config.apis.dpsHomePageUrl}`)
     res.redirect(config.apis.dpsHomePageUrl)
   })
 
