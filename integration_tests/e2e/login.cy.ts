@@ -2,6 +2,7 @@ import IndexPage from '../pages/index'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
 import AuthManageDetailsPage from '../pages/authManageDetails'
+import DPSHomePage from '../pages/dpsHomePage'
 
 context('SignIn', () => {
   beforeEach(() => {
@@ -11,7 +12,7 @@ context('SignIn', () => {
   })
 
   it('Unauthenticated user directed to auth', () => {
-    cy.visit('/')
+    cy.visit('/prisoner/123')
     Page.verifyOnPage(AuthSignInPage)
   })
 
@@ -48,7 +49,7 @@ context('SignIn', () => {
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
-    cy.request('/').its('body').should('contain', 'Sign in')
+    cy.request('/prisoner/123').its('body').should('contain', 'Sign in')
   })
 
   it('Token verification failure clears user session', () => {
@@ -57,12 +58,19 @@ context('SignIn', () => {
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
-    cy.request('/').its('body').should('contain', 'Sign in')
+    cy.request('/prisoner/123').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
     cy.task('stubAuthUser', 'bobby brown')
     cy.signIn()
 
     indexPage.headerUserName().contains('B. Brown')
+  })
+
+  it('Root URL redirects to DPS home page', () => {
+    cy.task('stubDpsHomePage')
+    cy.signIn()
+    cy.visit('/')
+    Page.verifyOnPage(DPSHomePage)
   })
 })

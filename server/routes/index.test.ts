@@ -14,8 +14,12 @@ afterEach(() => {
 
 describe('GET /', () => {
   it('should render index page', () => {
+    return request(app).get('/').expect('Location', 'http://localhost:3001').expect(302)
+  })
+
+  it('should render index page', () => {
     return request(app)
-      .get('/')
+      .get('/prisoner/asfdf')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('This site is under construction...')

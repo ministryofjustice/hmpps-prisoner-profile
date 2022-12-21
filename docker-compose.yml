@@ -13,6 +13,8 @@ services:
 
   hmpps-auth:
     image: quay.io/hmpps/hmpps-auth:latest
+    depends_on:
+      - nomis-user-roles-api
     networks:
       - hmpps
     container_name: hmpps-auth
@@ -21,8 +23,56 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,nomis
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8081
+
+  prison-api:
+    image: quay.io/hmpps/prison-api:latest
+    container_name: prison-api
+    networks:
+      - hmpps
+    depends_on:
+      - hmpps-auth
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=nomis-hsqldb
+
+  nomis-user-roles-api:
+    image: quay.io/hmpps/nomis-user-roles-api:latest
+    container_name: nomis-user-roles-api
+    networks:
+      - hmpps
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health/ping"]
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_PROFILES_ACTIVE=dev
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
+
+  dps-homepage:
+    image: quay.io/hmpps/digital-prison-services:latest
+    networks:
+      - hmpps
+    ports:
+      - '3002:3002'
+    depends_on:
+      - hmpps-auth
+      - prison-api
+      - redis
+    environment:
+      - UPDATE_ATTENDANCE_PRISONS='HLI,MDI,LEI'
+      - OAUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth/
+      - OAUTH_ENDPOINT_UI_URL=http://localhost:9090/auth/
+      - API_ENDPOINT_URL=http://prison-api:8080/
+      - REDIS_HOST=redis
+      - PORT=3002
 
   app:
     build: .
@@ -35,11 +85,11 @@ services:
       - REDIS_HOST=redis
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      # These will need to match new creds in the seed auth service auth
       - API_CLIENT_ID=client-id
       - API_CLIENT_SECRET=client-secret
       - SYSTEM_CLIENT_ID=system-client-id
       - SYSTEM_CLIENT_SECRET=system-client-secret
+      - SESSION_SECRET=session-secret
 
 networks:
   hmpps:
