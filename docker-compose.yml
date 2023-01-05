@@ -83,7 +83,7 @@ services:
       - "3000:3000"
     environment:
       - REDIS_HOST=redis
-        SESSION_SECRET=session-secret
+      -  SESSION_SECRET=session-secret
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       - API_CLIENT_ID=client-id
