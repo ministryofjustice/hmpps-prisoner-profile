@@ -144,38 +144,146 @@
   }
 }
 
-.hmpps-profile-header {
+.hmpps-profile-banner {
   margin: 14px;
-  .hmpps-profile-header-top {
+  .hmpps-profile-banner-top {
     @include govuk-responsive-padding(4, 'top');
     @include govuk-responsive-padding(6, 'left');
     @include govuk-responsive-padding(5, 'right');
+
+
+    @media (min-width: 1153px) {
+      height: 124px;
+    }
+
+    @media (max-width: 1152px) {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 960px) and (max-width: 1152px) {
+      @include govuk-responsive-padding(4, 'bottom');
+    }
+
+    @media (min-width: 641px) and (max-width: 960px) {
+      padding-bottom: 0px;
+    }
+
+    @media (max-width: 640px) {
+      @include govuk-responsive-padding(4, 'bottom');
+      height: 260px;
+      overflow-y: hidden;
+    }
+
     background-color: govuk-colour('blue');
-    height: 124px;
     h2, p, h3 {
       color: govuk-colour('white');
     }
     h2 {
       margin-bottom: govuk-spacing(2);
+      @media (max-width: 1152px) {
+        margin-top: govuk-spacing(4);
+      }
     }
     .hmpps-profile-photo {
       margin-top: 8px;
     }
-    .hmpps-profile-header-top-nav-container {
+    .hmpps-profile-banner-top-nav-container {
+      .container {
+        @media (min-width: 961px) and (max-width: 1152px) {
+          margin-top: govuk-spacing(4);
+        }
+        @media (max-width: 640px) {
+          display: inline-grid!important;
+          grid-template-columns: 1fr 1fr;
+          padding-top: 20px;
+        }
+        @media (max-width: 640px) {
+          margin-top: govuk-spacing(3);
+        }
+      }
       @include govuk-responsive-padding(7, 'top');
+      @media (max-width: 1152px) {
+        padding-top: 0px;
+      }
       h3 {
         margin-bottom: 3px;
+      }
+      @media (min-width: 641px) and (max-width: 960px) {
+        h3 {
+          margin-top: 20px;
+        }
+      }
+      @media (min-width: 961px) and (max-width: 1152px) {
+        h3 {
+          margin-top: 20px;
+        }
+      }
+      @media (max-width: 640px) {
+        h3 {
+          margin-top: 40px;
+        }
+      }
+      @media (max-width: 640px) {
+        padding-left: govuk-spacing(6);  
+        top: -286px;
+        left: 150px;
+        position: relative;
       }
     }
     .govuk-grid-column-three-quarters {
       padding-left: govuk-spacing(4);
+      .hmpps-profile-prisoner-name {
+        margin-top: 2px;
+      }
+      @media (min-width: 961px) and (max-width: 1152px) {
+        margin-top: govuk-spacing(7);
+      }
+      @media (min-width: 641px) and (max-width: 960px) {
+        p {
+          padding-bottom: 0px;
+          margin-bottom: govuk-spacing(3);       
+        }
+      }
+    }
+
+    @media (min-width: 1181px) and (max-width: 1230px) {
+      .govuk-grid-column-three-quarters {
+        padding-left: 25px;
+      }
+    }
+  
+    @media (min-width: 1171px) and (max-width: 1180px)  {
+      .govuk-grid-column-three-quarters {
+        padding-left: 30px;
+      }
+    }
+  
+    @media (min-width: 1153px) and (max-width: 1170px) {
+      .govuk-grid-column-three-quarters {
+        padding-left: 35px;
+      }
     }
   }
-  .hmpps-profile-header-bottom {
+  .hmpps-profile-banner-bottom {
     @include govuk-responsive-padding(6, 'left');
+
+    @media (max-width: 640px) {
+      padding-left: 19px;
+    }
+
+    @media (max-width: 666px) {
+      @include govuk-responsive-padding(4, 'top');
+    }
+
+    @media (max-width: 640px) {
+      @include govuk-responsive-padding(4, 'top');
+    }
+
     @include govuk-responsive-padding(5, 'right');
     background-color: #f3f2f1;
-    height: 122px;
+
+    overflow: auto;
     hr {
       border: 1px solid govuk-colour('mid-grey');
     }
@@ -205,4 +313,39 @@
       }
     }
   }
+
+  @media (max-width: 1152px) {
+    .govuk-grid-column-one-half:nth-child(1) {
+      width: 40%;
+    }
+    .govuk-grid-column-one-half:nth-child(2) {
+      width: 55%;
+    }
+    .govuk-grid-column-one-quarter {
+      width: 145px;
+    }
+    .govuk-grid-column-three-quarters {
+      width: 55%;
+    }
+    .hmpps-profile-prisoner-name {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .govuk-grid-column-one-half:nth-child(1) {
+      width: 154px;
+    }
+    .govuk-grid-column-one-half:nth-child(2) {
+      width: 60%;
+    }
+    .govuk-grid-column-three-quarters {
+      padding-left: 28px!important;
+      width: 100%;
+    }
+    .hmpps-profile-prisoner-name {
+      font-size: 1.3rem;
+    }
+  }
+
 }

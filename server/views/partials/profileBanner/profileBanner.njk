@@ -1,0 +1,13 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+  {{ govukBackLink({
+      text: backLinkLabel,
+      href: "#",
+      classes: "govuk-back-link"
+    })
+  }}
+
+  <div data-test="hmpps-profile-banner-partial" class="hmpps-profile-banner">
+    {% include "../../partials/profileBanner/profileBannerTop.njk" %}
+    {% include "../../partials/profileBanner/profileBannerBottom.njk" %}
+  </div>

@@ -28,10 +28,17 @@
   
   .alerts-list {
     @extend %govuk-list;
-    margin-bottom: 0;
-    margin-top: 18px;
-    margin-bottom: 6px;
+    margin-top: -2px;
     margin-left: 150px;
+    margin-bottom: 0px;
+
+    @media (max-width: 1152px) {
+      margin-left: 16px;
+    }
+
+    @media (max-width: 640px) {
+      margin-top: 0px;
+    }
 
     @media screen {
       display: flex;
@@ -40,6 +47,9 @@
 
     li {
       padding: 0px 5px;
+      @include govuk-responsive-margin(4, 'bottom');
+      @include govuk-responsive-margin(4, 'top');
+      background-color: govuk-colour('white');
     }
   }
   
@@ -63,6 +73,46 @@
       @media print {
         display: none;
       }
+    }
+
+    &--care-leaver {
+      color: #00703C;
+      border-color: #00703C;   
+    }
+
+    &--ex-armed-forces {
+      color: #85994B;
+      border-color: #85994B;
+    }
+
+    &--medical {
+      color: #5694cA;
+      border-color: #5694cA;
+    }
+
+    &--other {
+      color: #D53880;
+      border-color: #D53880;
+    }
+
+    &--MAPPP-case {
+      color: #28A197;
+      border-color: #28A197;
+    }
+
+    &--security {
+      color: #003078;
+      border-color: #003078;
+    }
+
+    &--risk {
+      color: #D4351C;
+      border-color: #D4351C;
+    }
+
+    &--self-harm {
+      color: #F47738;
+      border-color: #F47738;
     }
   
     &--acct {
