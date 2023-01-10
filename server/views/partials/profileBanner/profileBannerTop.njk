@@ -1,0 +1,36 @@
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full hmpps-profile-banner-top">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">
+            <div  class="govuk-grid-row">
+              <div class="govuk-grid-column-one-quarter">
+                <img tabindex="0" class="hmpps-profile-photo position-relative" src="/assets/images/prisoner-profile-photo.png" alt="prisoner photo">
+              </div>
+              <div class="govuk-grid-column-three-quarters">
+                <div class="govuk-grid-row">
+                  <h2 tabindex="0" class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
+                </div>
+                <div class="govuk-grid-row">
+                  <p tabindex="0" class="govuk-body govuk-!-font-size-24">{{ prisonId }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="govuk-grid-column-one-half hmpps-profile-banner-top-nav-container">
+            <div class="govuk-grid-row container">
+              {% for link in  profileBannerTopLinks %}
+                <div class="govuk-grid-column-one-quarter {{ link.classes }}">
+                  <div class="govuk-grid-row">
+                    <h3 tabindex="0" class="govuk-heading-s">{{ link.heading }}</h3>
+                  </div>
+                  <div class="govuk-grid-row">
+                    <a href="#" class="govuk-link govuk-link--inverse">{{ link.info }}</a>
+                  </div>
+                </div>   
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="govuk-grid-row"></div>
+      </div>
+    </div>
