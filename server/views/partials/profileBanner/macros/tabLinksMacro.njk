@@ -1,0 +1,9 @@
+{% macro tabLinksMacro(tabLinks) %}
+    <ul class="hmpps-profile-tab-links">
+        {% for tabLink in tabLinks %}
+        <li class="{{ tabLink.classes }}">
+            <a href="#" class="govuk-link govuk-link--no-underline">{{ tabLink.label }}</a>
+        </li>                
+        {% endfor %}
+    </ul> 
+{% endmacro %}
