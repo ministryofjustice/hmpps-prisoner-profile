@@ -151,6 +151,9 @@
     @include govuk-responsive-padding(6, 'left');
     @include govuk-responsive-padding(5, 'right');
 
+    img {
+      width: 120px;
+    }
 
     @media (min-width: 1153px) {
       height: 124px;
