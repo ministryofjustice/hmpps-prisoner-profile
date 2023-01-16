@@ -30,7 +30,7 @@
   },
   "engines": {
     "node": "v18.12.1",
-    "npm": "9.3.0"
+    "npm": "9.2.0"
   },
   "jest": {
     "transform": {
