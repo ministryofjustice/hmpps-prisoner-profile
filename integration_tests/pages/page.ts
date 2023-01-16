@@ -5,6 +5,20 @@ export default abstract class Page {
     return new constructor()
   }
 
+  constructor(private readonly title: string) {
+    this.checkOnPage()
+  }
+
+  checkOnPage(): void {
+    cy.get('body').then($ele => {
+      if ($ele.find('h1').length > 0) {
+        cy.get('h1').contains(this.title)
+      } else {
+        // Do Something
+      }
+    })
+  }
+
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
 
   manageDetails = (): PageElement => cy.get('[data-qa=manageDetails]')
