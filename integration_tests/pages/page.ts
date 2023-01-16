@@ -10,11 +10,11 @@ export default abstract class Page {
   }
 
   checkOnPage(): void {
-    cy.get('body').then(($ele) => {
+    cy.get('body').then($ele => {
       if ($ele.find('h1').length > 0) {
         cy.get('h1').contains(this.title)
       } else {
-          //Do Something
+        // Do Something
       }
     })
   }
