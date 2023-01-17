@@ -39,6 +39,7 @@ context('SignIn', () => {
     const indexPage = Page.verifyOnPage(IndexPage)
 
     indexPage.manageDetails().get('a').invoke('removeAttr', 'target')
+    indexPage.manageDetails().click({ multiple: true })
     Page.verifyOnPage(AuthManageDetailsPage)
   })
 
