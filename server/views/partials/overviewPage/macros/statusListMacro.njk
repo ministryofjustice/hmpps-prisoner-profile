@@ -1,5 +1,5 @@
-{% macro statusesMacro(statuses) %}
-  <ul class="dps-prisoner-profile-status-list">
+{% macro statusList(statuses) %}
+  <ul class="hmpps-status-list">
     {% for status in statuses %}
       <li>
         <p>{{ status.label }}</p>

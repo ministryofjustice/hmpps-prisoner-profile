@@ -1,8 +1,10 @@
+{% from "./macros/statusListMacro.njk" import statusList %}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <div class="govuk-grid-row">
       <section class="govuk-grid-column-full" aria-label="Status List">
-        {% include "./status/statusList.njk" %}
+        {{ statusList(statuses) }}
       </section>
     </div>
     <div class="govuk-grid-row">
