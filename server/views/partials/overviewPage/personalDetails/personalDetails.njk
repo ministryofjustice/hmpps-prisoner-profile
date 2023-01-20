@@ -11,7 +11,7 @@
                 text: "Preferred name"
               },
               value: {
-                text: "Dave"
+                text: personalDetails.name
               }
             },
             {
@@ -19,7 +19,7 @@
                 text: "Date of birth"
               },
               value: {
-                text: "23 November 1979"
+                text: personalDetails.dateOfBirth | formatDate
               }
             },
             {
@@ -27,7 +27,7 @@
                 text: "Age"
               },
               value: {
-                text: "50"
+                text: personalDetails.age
               }
             },
             {
@@ -35,7 +35,7 @@
                 text: "Nationality"
               },
               value: {
-                text: "British"
+                text: personalDetails.nationality
               }
             },
             {
@@ -43,7 +43,7 @@
                 text: "Spoken language"
               },
               value: {
-                text: "English"
+                text: personalDetails.spokenLanguage
               }
             }
           ] }) }}
@@ -57,7 +57,7 @@
                 text: "CRO number"
               },
               value: {
-                html: "183490/90G"
+                text: personalDetails.croNumber
               }
             },
             {
@@ -65,7 +65,7 @@
                 text: "PNC number"
               },
               value: {
-                text: "90/183490P"
+                text: personalDetails.pncNumber
               }
             }
           ] }) }}

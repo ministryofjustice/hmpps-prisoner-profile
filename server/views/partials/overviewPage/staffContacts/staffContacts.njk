@@ -3,6 +3,13 @@
 {%- call summaryCard({title: "Staff contacts"}) -%}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      {% set keyWorkerHtml %}
+        <p class="govuk-body">
+          {{ staffContacts.keyWorker.name }}
+          - last session: {{ staffContacts.keyWorker.lastSession | formatDate }}
+        </p>
+      {% endset %}
+
       {{ govukSummaryList({
           classes: 'govuk-summary-list--no-border',
           rows: [
@@ -11,7 +18,7 @@
                 text: "Key worker"
               },
               value: {
-                text: "David Marks - last session: 14 September 2022"
+                html: keyWorkerHtml
               }
             },
             {
@@ -19,7 +26,7 @@
                 text: "Prison Offender Manager"
               },
               value: {
-                text: "Evan Smith"
+                text: staffContacts.prisonOffenderManager
               }
             },
             {
@@ -27,7 +34,7 @@
                 text: "Co-working Prison Offender Manager"
               },
               value: {
-                text: "Lianne Morgan"
+                text: staffContacts.coworkingPrisonOffenderManager
               }
             },
             {
@@ -35,7 +42,7 @@
                 text: "Community Offender Manager"
               },
               value: {
-                text: 'None assigned'
+                text: staffContacts.communityOffenderManager
               }
             }
           ] }) }}

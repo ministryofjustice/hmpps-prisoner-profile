@@ -2,7 +2,7 @@ import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import { miniSummaryParamGroupA, miniSummaryParamGroupB } from '../data/miniSummary/miniSummary'
 import { alerts, profileBannerData, profileBannerTopLinks, tabLinks } from '../data/profileBanner/profileBanner'
-import { statuses } from '../data/overviewPage'
+import { statuses, nonAssociationRows, personalDetails, staffContacts } from '../data/overviewPage'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 
@@ -22,6 +22,9 @@ export default function routes(service: Services): Router {
       miniSummaryParamGroupA,
       miniSummaryParamGroupB,
       statuses,
+      nonAssociationRows,
+      personalDetails,
+      staffContacts,
     })
   })
 
