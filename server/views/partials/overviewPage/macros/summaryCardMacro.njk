@@ -1,0 +1,242 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% macro summaryCard(params) %}
+  <div class="hmpps-summary-card govuk-!-margin-bottom-4">
+    <div class="hmpps-summary-card__header govuk-!-padding-left-4 govuk-!-padding-right-4">
+      <h2>{{ params.title }}</h2>
+    </div>
+    <div class="hmpps-summary-card__body govuk-!-padding-left-4 govuk-!-padding-right-4">
+      <div class="govuk-grid-row">
+        {% if params.layout == "summaryList" %}
+          {% if params.columns == 1 %}
+            <div class="govuk-grid-column-full">
+              {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "Key worker"
+              },
+              value: {
+                text: "David Marks - last session: 14 September 2022"
+              }
+            },
+            {
+              key: {
+                text: "Prison Offender Manager"
+              },
+              value: {
+                text: "Evan Smith"
+              }
+            },
+            {
+              key: {
+                text: "Co-working Prison Offender Manager"
+              },
+              value: {
+                text: "Lianne Morgan"
+              }
+            },
+            {
+              key: {
+                text: "Community Offender Manager"
+              },
+              value: {
+                text: 'None assigned'
+              }
+            }
+          ] }) }}
+            </div>
+          {% elif params.columns == 2 %}
+            <div class="govuk-grid-column-one-half">
+              {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "Preferred name"
+              },
+              value: {
+                text: "Dave"
+              }
+            },
+            {
+              key: {
+                text: "Date of birth"
+              },
+              value: {
+                text: "23 November 1979"
+              }
+            },
+            {
+              key: {
+                text: "Age"
+              },
+              value: {
+                text: "50"
+              }
+            },
+            {
+              key: {
+                text: "Nationality"
+              },
+              value: {
+                text: "British"
+              }
+            },
+            {
+              key: {
+                text: "Spoken language"
+              },
+              value: {
+                text: "English"
+              }
+            }
+          ] }) }}
+            </div>
+            <div class="govuk-grid-column-one-half">
+              {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "CRO number"
+              },
+              value: {
+                html: "183490/90G"
+              }
+            },
+            {
+              key: {
+                text: "PNC number"
+              },
+              value: {
+                text: "90/183490P"
+              }
+            }
+          ] }) }}
+            </div>
+          {% endif %}
+        {% elif params.layout=="schedule" %}
+          <div class="govuk-grid-column-full govuk-!-margin-top-3">
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-one-third">
+                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+                <p class="govuk-body">Thing<br />Time</p>
+              </div>
+              <div class="govuk-grid-column-one-third">
+                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+                <p class="govuk-body">Thing<br />Time</p>
+              </div>
+              <div class="govuk-grid-column-one-third">
+                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+                <p class="govuk-body">Thing<br />Time</p>
+              </div>
+            </div>
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-full">
+                <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
+              </div>
+            </div>
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-one-third">
+                <p class="govuk-body">Thing<br />Time</p>
+              </div>
+              <div class="govuk-grid-column-one-third">
+                <p class="govuk-body">Thing<br />Time</p>
+              </div>
+              <div class="govuk-grid-column-one-third">
+                <p class="govuk-body">Thing<br />Time</p>
+              </div>
+            </div>
+          </div>
+        {% elif params.layout=="nonAssociations" %}
+          <div class="govuk-grid-column-full">
+            {{ govukTable({
+  firstCellIsHeader: true,
+  head: [
+    {
+      text: "Name"
+    },
+    {
+      text: "Prison number"
+    },
+    {
+      text: "Location"
+    },
+    {
+      text: "Reciprocal reason"
+    }
+  ],
+  rows: [
+    [
+      {
+        text: "Broadstairs, Liam"
+      },
+      {
+        text: "A1141GB"
+      },
+      {
+        text: "H-1-003"
+      },
+      {
+        text: "Rival gang"
+      }
+    ],
+    [
+      {
+        text: "Dennison, Bruce"
+      },
+      {
+        text: "A6515HH"
+      },
+      {
+        text: "B-2-010"
+      },
+      {
+        text: "Perpetrator"
+      }
+    ],
+    [
+      {
+        text: "Gradus, Simon"
+      },
+      {
+        text: "A6784OP"
+      },
+      {
+        text: "A-3-010"
+      },
+      {
+        text: "Rival gang"
+      }
+    ],
+    [
+      {
+        text: "Norton, Stephan"
+      },
+      {
+        text: "A9585SD"
+      },
+      {
+        text: "C-2-009"
+      },
+      {
+        text: "Victim"
+      }
+    ]
+  ]
+}) }}
+          </div>
+        {% endif %}
+        {% if params.footer %}
+          <div class="govuk-grid-column-full">
+            <p class="govuk-body">
+              <a href="{{ params.footer.href }}">{{ params.footer.text }}</a>
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}

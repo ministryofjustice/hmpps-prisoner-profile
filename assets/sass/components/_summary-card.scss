@@ -1,0 +1,20 @@
+.hmpps-summary-card {
+  border: 1px solid black;
+  // margin-bottom: 10px;
+
+  .hmpps-summary-card__header {
+    // padding: 0 15px;
+    background-color: #F3F2F1;
+
+    h2 {
+      line-height: 50px;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+
+  .hmpps-summary-card__body {
+    // padding: 0 15px;
+  }
+}
