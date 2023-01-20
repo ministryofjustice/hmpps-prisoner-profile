@@ -1,4 +1,4 @@
-import { convertToTitleCase, initialiseName } from './utils'
+import { convertToTitleCase, initialiseName, formatDate } from './utils'
 
 describe('convert to title case', () => {
   it.each([
@@ -27,4 +27,20 @@ describe('initialise name', () => {
   ])('%s initialiseName(%s, %s)', (_: string, a: string, expected: string) => {
     expect(initialiseName(a)).toEqual(expected)
   })
+})
+
+describe('format date', () => {
+  it.each([
+    [null, null, undefined, ''],
+    ['[default]', '2023-01-20', undefined, '20 January 2023'],
+    ['long', '2023-01-20', 'long', '20 January 2023'],
+    ['short', '2023-01-20', 'short', '20/01/2023'],
+    ['full', '2023-01-20', 'full', 'Friday, 20 January 2023'],
+    ['medium', '2023-01-20', 'medium', '20 Jan 2023'],
+  ])(
+    '%s: formatDate(%s, %s)',
+    (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
+      expect(formatDate(a, b)).toEqual(expected)
+    },
+  )
 })
