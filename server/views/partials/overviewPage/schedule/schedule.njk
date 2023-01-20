@@ -1,0 +1,40 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{%- call summaryCard({title: "Today's schedule"}) -%}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+      <p class="govuk-body">Thing<br />Time</p>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+      <p class="govuk-body">Thing<br />Time</p>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+      <p class="govuk-body">Thing<br />Time</p>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+      <p class="govuk-body">Thing<br />Time</p>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <p class="govuk-body">Thing<br />Time</p>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <p class="govuk-body">Thing<br />Time</p>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">
+        <a href="#">View 7 day schedule</a>
+      </p>
+    </div>
+  </div>
+{%- endcall -%}

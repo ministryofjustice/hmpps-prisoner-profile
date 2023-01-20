@@ -15,24 +15,12 @@
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {{ summaryCard({
-                    title: "Staff contacts", 
-                    layout: "summaryList", 
-                    columns: 1,
-                    footer: {
-                        text: "View all professional contacts",
-                        href: "#"
-                    }
-                }) }}
+        {% include "./staffContacts/staffContacts.njk" %}
       </div>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {{ summaryCard({
-                    title: "Personal", 
-                    layout: "summaryList", 
-                    columns: 2
-                }) }}
+        {% include "./personalDetails/personalDetails.njk" %}
       </div>
     </div>
     <div class="govuk-grid-row">
@@ -42,26 +30,12 @@
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {{ summaryCard({
-                    title: "Today's schedule", 
-                    layout: "schedule",
-                    footer: {
-                        text: "View 7 day schedule",
-                        href: "#"
-                    }
-                }) }}
+        {% include "./schedule/schedule.njk" %}
       </div>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {{ summaryCard({
-                    title: "Non-associations in Birmingham (HMP)", 
-                    layout: "nonAssociations",
-                    footer: {
-                        text: "View all non-associations",
-                        href: "#"
-                    }
-                }) }}
+        {% include "./nonAssociations/nonAssociations.njk" %}
       </div>
     </div>
   </div>

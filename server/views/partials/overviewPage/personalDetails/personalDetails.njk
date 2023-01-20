@@ -1,0 +1,74 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Personal"}) -%}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "Preferred name"
+              },
+              value: {
+                text: "Dave"
+              }
+            },
+            {
+              key: {
+                text: "Date of birth"
+              },
+              value: {
+                text: "23 November 1979"
+              }
+            },
+            {
+              key: {
+                text: "Age"
+              },
+              value: {
+                text: "50"
+              }
+            },
+            {
+              key: {
+                text: "Nationality"
+              },
+              value: {
+                text: "British"
+              }
+            },
+            {
+              key: {
+                text: "Spoken language"
+              },
+              value: {
+                text: "English"
+              }
+            }
+          ] }) }}
+    </div>
+    <div class="govuk-grid-column-one-half">
+      {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "CRO number"
+              },
+              value: {
+                html: "183490/90G"
+              }
+            },
+            {
+              key: {
+                text: "PNC number"
+              },
+              value: {
+                text: "90/183490P"
+              }
+            }
+          ] }) }}
+    </div>
+  </div>
+{%- endcall -%}

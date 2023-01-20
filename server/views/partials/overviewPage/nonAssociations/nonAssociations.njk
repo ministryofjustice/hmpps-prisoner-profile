@@ -1,0 +1,88 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{%- call summaryCard({title: "Non-associations in Birmingham (HMP)"}) -%}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ govukTable({
+  firstCellIsHeader: true,
+  head: [
+    {
+      text: "Name"
+    },
+    {
+      text: "Prison number"
+    },
+    {
+      text: "Location"
+    },
+    {
+      text: "Reciprocal reason"
+    }
+  ],
+  rows: [
+    [
+      {
+        text: "Broadstairs, Liam"
+      },
+      {
+        text: "A1141GB"
+      },
+      {
+        text: "H-1-003"
+      },
+      {
+        text: "Rival gang"
+      }
+    ],
+    [
+      {
+        text: "Dennison, Bruce"
+      },
+      {
+        text: "A6515HH"
+      },
+      {
+        text: "B-2-010"
+      },
+      {
+        text: "Perpetrator"
+      }
+    ],
+    [
+      {
+        text: "Gradus, Simon"
+      },
+      {
+        text: "A6784OP"
+      },
+      {
+        text: "A-3-010"
+      },
+      {
+        text: "Rival gang"
+      }
+    ],
+    [
+      {
+        text: "Norton, Stephan"
+      },
+      {
+        text: "A9585SD"
+      },
+      {
+        text: "C-2-009"
+      },
+      {
+        text: "Victim"
+      }
+    ]
+  ]
+}) }}
+    </div>
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">
+        <a href="#">View all non-associations</a>
+      </p>
+    </div>
+  </div>
+{%- endcall -%}
