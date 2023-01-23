@@ -1,0 +1,10 @@
+{% macro statusList(statuses) %}
+  <ul class="hmpps-status-list">
+    {% for status in statuses %}
+      <li>
+        <p>{{ status.label }}</p>
+        <p>Last Updated: <time datetime="{{ status.date }}">{{ status.date | formatDate('short') }}</time></p>
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
