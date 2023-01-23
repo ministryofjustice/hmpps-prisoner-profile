@@ -13,7 +13,7 @@ type MiniSummaryParamType = {
     summaryTopType: string
     summaryBottomType: string
   }
-  contentType: any
+  contentType: object
   classes: string
 }
 
