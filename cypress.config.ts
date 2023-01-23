@@ -3,6 +3,7 @@ import { resetStubs } from './integration_tests/mockApis/wiremock'
 import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import dpsHomePage from './integration_tests/mockApis/dpsHomepage'
+import dpsOverviewPage from './integration_tests/mockApis/dpsOverviewPage'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -24,6 +25,7 @@ export default defineConfig({
         ...auth,
         ...tokenVerification,
         ...dpsHomePage,
+        ...dpsOverviewPage,
       })
     },
     baseUrl: 'http://localhost:3007',
