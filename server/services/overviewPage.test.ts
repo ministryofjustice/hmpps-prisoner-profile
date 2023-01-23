@@ -14,7 +14,7 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
-  it('should render money summary cards - box style 1', () => {
+  it('should render group a summary cards - box style 1', () => {
     return request(app)
       .get('/prisoner/111222')
       .expect('Content-Type', /html/)
@@ -28,7 +28,7 @@ describe('GET /', () => {
       })
   })
 
-  it('should render money summary cards - box style 2', () => {
+  it('should render group b summary cards - box style 2', () => {
     return request(app)
       .get('/prisoner/111222')
       .expect('Content-Type', /html/)
