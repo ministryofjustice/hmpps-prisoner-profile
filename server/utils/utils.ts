@@ -53,11 +53,22 @@ export const formatScheduleItem = (scheduleItem: ScheduleItem): string => {
 /**
  * Converts the personal details to the rows for a summary list component
  */
+export type SummaryListRowItem = {
+  text?: string
+  html?: string
+  classes?: string
+}
 
-// export const summaryListOneHalfWidth = (rows: []) => {
-//   return rows.map((row: any) => {
-//     row.key.classes = 'govuk-!width-one-half'
-//     row.value.classes = 'govuk-!-width-one-half'
-//     return row
-//   })
-// }
+export type SummaryListRow = {
+  key: SummaryListRowItem
+  value: SummaryListRowItem
+}
+
+export const summaryListOneHalfWidth = (rows: SummaryListRow[]) => {
+  return rows.map((row: SummaryListRow) => {
+    const { key, value } = row
+    key.classes = 'govuk-!-width-one-half'
+    value.classes = 'govuk-!-width-one-half'
+    return { key, value }
+  })
+}

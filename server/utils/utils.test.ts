@@ -1,4 +1,11 @@
-import { convertToTitleCase, initialiseName, formatDate, formatScheduleItem } from './utils'
+import {
+  convertToTitleCase,
+  initialiseName,
+  formatDate,
+  formatScheduleItem,
+  summaryListOneHalfWidth,
+  SummaryListRow,
+} from './utils'
 
 describe('convert to title case', () => {
   it.each([
@@ -52,5 +59,24 @@ describe('format schedule item', () => {
     [{ name: 'Item with no time' }, ''],
   ])('formatScheduleItem(%s)', (scheduleItem, expected) => {
     expect(formatScheduleItem(scheduleItem)).toEqual(expected)
+  })
+})
+
+describe('summary list one half width', () => {
+  it.each([
+    ['Empty list', 0],
+    ['List of one row', 1],
+    ['List of two rows', 2],
+  ])('%s: summaryListOneHalfWidth(%s rows)', (_, numberOfRows) => {
+    const rows: SummaryListRow[] = []
+    for (let i = 0; i < numberOfRows; i += 1) {
+      rows.push({ key: { text: i.toString() }, value: { text: i.toString() } })
+    }
+
+    const result = summaryListOneHalfWidth(rows)
+    result.forEach(row => {
+      expect(row.key.classes).toEqual('govuk-!-width-one-half')
+      expect(row.value.classes).toEqual('govuk-!-width-one-half')
+    })
   })
 })

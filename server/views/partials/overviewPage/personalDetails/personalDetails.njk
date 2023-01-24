@@ -46,7 +46,8 @@
                 text: personalDetails.spokenLanguage
               }
             }
-          ] }) }}
+          ] | summaryListOneHalfWidth
+        }) }}
     </div>
     <div class="govuk-grid-column-one-half">
       {{ govukSummaryList({
@@ -68,7 +69,8 @@
                 text: personalDetails.pncNumber
               }
             }
-          ] }) }}
+          ] | summaryListOneHalfWidth
+        }) }}
     </div>
   </div>
 {%- endcall -%}
