@@ -1,0 +1,57 @@
+.hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
+    @include govuk-responsive-padding(6, 'bottom');
+}
+.hmpps-card-heading-background {
+    h2 {
+        margin: 0px;
+    }
+    @include govuk-responsive-padding(2, 'top');
+    @include govuk-responsive-padding(2, 'bottom');
+    @include govuk-responsive-padding(3, 'left');
+    @include govuk-responsive-padding(3, 'right');
+}
+.hmpps-heading-light-grey {
+    background-color: govuk-colour("light-grey");
+}
+.card-body {
+    @include govuk-responsive-padding(3, 'left');
+    @include govuk-responsive-padding(3, 'right');
+    @include govuk-responsive-padding(0, 'top');
+    @include govuk-responsive-padding(3, 'bottom');
+    .card-label {
+       @include govuk-responsive-margin(1, 'bottom');
+       @include govuk-font($size: 19, $weight: 'bold');
+    }
+    .card-label-light {
+        color: govuk-colour("dark-grey");
+    }
+    .hmpps-miniSummaryType2 {
+        @include govuk-responsive-padding(3, 'bottom');
+    }
+    .hmpps-miniSummaryType3 {
+        @include govuk-responsive-margin(0, 'bottom');
+    }
+    .hmpps-miniSummaryType3.card-label-light {
+        @include govuk-responsive-margin(2, 'bottom');
+    }
+}
+.card__content {
+    border: 1px solid govuk-colour("dark-grey");
+    box-shadow: 0px 5px govuk-colour("mid-grey");
+}
+
+.boxStyle2 {
+    @include govuk-responsive-padding(4, 'top');
+}
+
+@media (max-width: 1180px) {
+    .hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
+      width: 50%;
+    }
+}
+
+@media (max-width: 751px) {
+    .hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
+      width: 100%;
+    }
+}

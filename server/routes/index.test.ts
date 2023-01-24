@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import { miniSummaryParamGroupA } from '../data/miniSummary/miniSummary'
 import { alerts, profileBannerData, profileBannerTopLinks, tabLinks } from '../data/profileBanner/profileBanner'
 
 import { appWithAllRoutes } from './testutils/appSetup'
@@ -86,6 +87,17 @@ describe('GET /', () => {
       .expect(res => {
         expect(res.text).toContain(profileBannerData.prisonerName)
         expect(res.text).toContain(profileBannerData.prisonId)
+      })
+  })
+
+  it('should render money summary card', () => {
+    return request(app)
+      .get('/prisoner/111222')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        miniSummaryParamGroupA.forEach(params => {
+          expect(res.text).toContain(params.data.heading)
+        })
       })
   })
 })
