@@ -1,0 +1,76 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Personal"}) -%}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "Preferred name"
+              },
+              value: {
+                text: personalDetails.name
+              }
+            },
+            {
+              key: {
+                text: "Date of birth"
+              },
+              value: {
+                text: personalDetails.dateOfBirth | formatDate
+              }
+            },
+            {
+              key: {
+                text: "Age"
+              },
+              value: {
+                text: personalDetails.age
+              }
+            },
+            {
+              key: {
+                text: "Nationality"
+              },
+              value: {
+                text: personalDetails.nationality
+              }
+            },
+            {
+              key: {
+                text: "Spoken language"
+              },
+              value: {
+                text: personalDetails.spokenLanguage
+              }
+            }
+          ] | summaryListOneHalfWidth
+        }) }}
+    </div>
+    <div class="govuk-grid-column-one-half">
+      {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "CRO number"
+              },
+              value: {
+                text: personalDetails.croNumber
+              }
+            },
+            {
+              key: {
+                text: "PNC number"
+              },
+              value: {
+                text: personalDetails.pncNumber
+              }
+            }
+          ] | summaryListOneHalfWidth
+        }) }}
+    </div>
+  </div>
+{%- endcall -%}

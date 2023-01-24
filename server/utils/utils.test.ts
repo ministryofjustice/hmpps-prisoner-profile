@@ -1,4 +1,11 @@
-import { convertToTitleCase, initialiseName, formatDate } from './utils'
+import {
+  convertToTitleCase,
+  initialiseName,
+  formatDate,
+  formatScheduleItem,
+  summaryListOneHalfWidth,
+  SummaryListRow,
+} from './utils'
 
 describe('convert to title case', () => {
   it.each([
@@ -43,4 +50,33 @@ describe('format date', () => {
       expect(formatDate(a, b)).toEqual(expected)
     },
   )
+})
+
+describe('format schedule item', () => {
+  it.each([
+    [{ name: 'Test item', startTime: '00:00', endTime: '12:00' }, '00:00 to 12:00'],
+    [{ name: 'Second test item', startTime: '12:34', endTime: '23:45' }, '12:34 to 23:45'],
+    [{ name: 'Item with no time' }, ''],
+  ])('formatScheduleItem(%s)', (scheduleItem, expected) => {
+    expect(formatScheduleItem(scheduleItem)).toEqual(expected)
+  })
+})
+
+describe('summary list one half width', () => {
+  it.each([
+    ['Empty list', 0],
+    ['List of one row', 1],
+    ['List of two rows', 2],
+  ])('%s: summaryListOneHalfWidth(%s rows)', (_, numberOfRows) => {
+    const rows: SummaryListRow[] = []
+    for (let i = 0; i < numberOfRows; i += 1) {
+      rows.push({ key: { text: i.toString() }, value: { text: i.toString() } })
+    }
+
+    const result = summaryListOneHalfWidth(rows)
+    result.forEach(row => {
+      expect(row.key.classes).toEqual('govuk-!-width-one-half')
+      expect(row.value.classes).toEqual('govuk-!-width-one-half')
+    })
+  })
 })

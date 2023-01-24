@@ -1,0 +1,59 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Staff contacts"}) -%}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% set keyWorkerHtml %}
+        <p class="govuk-body">
+          {{ staffContacts.keyWorker.name }}
+          - last session: {{ staffContacts.keyWorker.lastSession | formatDate }}
+        </p>
+      {% endset %}
+
+      {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "Key worker"
+              },
+              value: {
+                html: keyWorkerHtml
+              }
+            },
+            {
+              key: {
+                text: "Prison Offender Manager"
+              },
+              value: {
+                text: staffContacts.prisonOffenderManager
+              }
+            },
+            {
+              key: {
+                text: "Co-working Prison Offender Manager"
+              },
+              value: {
+                text: staffContacts.coworkingPrisonOffenderManager
+              }
+            },
+            {
+              key: {
+                text: "Community Offender Manager"
+              },
+              value: {
+                text: staffContacts.communityOffenderManager
+              }
+            }
+          ] | summaryListOneHalfWidth 
+        }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">
+        <a class="govuk-link" href="#">View all professional contacts</a>
+      </p>
+    </div>
+  </div>
+{%- endcall -%}

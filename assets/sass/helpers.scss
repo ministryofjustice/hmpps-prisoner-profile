@@ -1,20 +1,13 @@
 .remove-column-gutters {
-    padding-left: 0px;
-    padding-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 .remove-column-gutter-left {
-    padding-left: 0px;
+  padding-left: 0px;
 }
 .remove-column-gutter-right {
-    padding-right: 0px;
+  padding-right: 0px;
 }
 .position-relative {
-    position: relative;
-}
-.hmpps-three-quarters-responsive {
-    @media (max-width: 751px) {
-        .govuk-grid-column-three-quarters, .govuk-grid-column-one-quarter {
-            width: 50%;
-        }
-    }
+  position: relative;
 }
