@@ -1,4 +1,4 @@
-import { convertToTitleCase, initialiseName, formatDate } from './utils'
+import { convertToTitleCase, initialiseName, formatDate, formatScheduleItem } from './utils'
 
 describe('convert to title case', () => {
   it.each([
@@ -43,4 +43,14 @@ describe('format date', () => {
       expect(formatDate(a, b)).toEqual(expected)
     },
   )
+})
+
+describe('format schedule item', () => {
+  it.each([
+    [{ name: 'Test item', startTime: '00:00', endTime: '12:00' }, '00:00 to 12:00'],
+    [{ name: 'Second test item', startTime: '12:34', endTime: '23:45' }, '12:34 to 23:45'],
+    [{ name: 'Item with no time' }, ''],
+  ])('formatScheduleItem(%s)', (scheduleItem, expected) => {
+    expect(formatScheduleItem(scheduleItem)).toEqual(expected)
+  })
 })

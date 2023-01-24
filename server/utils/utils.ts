@@ -1,3 +1,5 @@
+import { ScheduleItem } from '../data/overviewPage'
+
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
 
@@ -36,3 +38,26 @@ export const formatDate = (isoDate: string, style: 'short' | 'full' | 'long' | '
 
   return new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
 }
+
+/**
+ * Converts a ScheduleItem into a string displaying the time in the format
+ * StartTime to EndTime
+ */
+export const formatScheduleItem = (scheduleItem: ScheduleItem): string => {
+  if (scheduleItem.startTime && scheduleItem.endTime) {
+    return `${scheduleItem.startTime} to ${scheduleItem.endTime}`
+  }
+  return ''
+}
+
+/**
+ * Converts the personal details to the rows for a summary list component
+ */
+
+// export const summaryListOneHalfWidth = (rows: []) => {
+//   return rows.map((row: any) => {
+//     row.key.classes = 'govuk-!width-one-half'
+//     row.value.classes = 'govuk-!-width-one-half'
+//     return row
+//   })
+// }

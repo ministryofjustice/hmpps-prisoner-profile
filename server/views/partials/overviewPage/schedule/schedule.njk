@@ -2,32 +2,68 @@
 {%- call summaryCard({title: "Today's schedule"}) -%}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-third">
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
-      <p class="govuk-body">Thing<br />Time</p>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
+          <p class="govuk-body">{{ schedule.morning[0].name }}<br />{{ schedule.morning[0] | formatScheduleItem }}</p>
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-body">
+            {{ schedule.morning[1].name }}<br />{{ schedule.morning[1] | formatScheduleItem }}
+          </p>
+        </div>
+      </div>
     </div>
     <div class="govuk-grid-column-one-third">
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
-      <p class="govuk-body">Thing<br />Time</p>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Afternoon</p>
+          <p class="govuk-body">
+            {{ schedule.afternoon[0].name }}<br />{{ schedule.afternoon[0] | formatScheduleItem }}
+          </p>
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-body">
+            {{ schedule.afternoon[1].name }}<br />{{ schedule.afternoon[1] | formatScheduleItem }}
+          </p>
+        </div>
+      </div>
     </div>
     <div class="govuk-grid-column-one-third">
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
-      <p class="govuk-body">Thing<br />Time</p>
-    </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
-    </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-third">
-      <p class="govuk-body">Thing<br />Time</p>
-    </div>
-    <div class="govuk-grid-column-one-third">
-      <p class="govuk-body">Thing<br />Time</p>
-    </div>
-    <div class="govuk-grid-column-one-third">
-      <p class="govuk-body">Thing<br />Time</p>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Evening</p>
+          <p class="govuk-body">
+            {{ schedule.evening[0].name }}<br />{{ schedule.evening[0] | formatScheduleItem }}
+          </p>
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-body">
+            {{ schedule.evening[1].name }}<br />{{ schedule.evening[1] | formatScheduleItem }}
+          </p>
+        </div>
+      </div>
     </div>
   </div>
   <div class="govuk-grid-row">
