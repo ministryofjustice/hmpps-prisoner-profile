@@ -1,10 +1,12 @@
 {% macro summaryCard(params) %}
-  <div class="hmpps-summary-card govuk-!-margin-bottom-4">
-    <div class="hmpps-summary-card__header govuk-!-padding-left-4 govuk-!-padding-right-4">
-      <h3>{{ params.title }}</h3>
-    </div>
-    <div class="hmpps-summary-card__body govuk-!-padding-left-4 govuk-!-padding-right-4">
-        {{ caller() }}
+  <div class="hmpps-summary-card">
+    {% if params.title %}
+      <div class="hmpps-summary-card__header">
+        <h3>{{ params.title }}</h3>
+      </div>
+    {% endif %}
+    <div class="hmpps-summary-card__body">
+      {{ caller() }}
     </div>
   </div>
 {% endmacro %}
