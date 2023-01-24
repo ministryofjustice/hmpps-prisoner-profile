@@ -11,14 +11,3 @@
 .position-relative {
   position: relative;
 }
-
-.hmpps-three-quarters-responsive {
-  @media (max-width: 751px) {
-    .govuk-grid-column-three-quarters,
-    .govuk-grid-column-one-quarter {
-      .hmpps-miniSummaryWrapper {
-        width: 50%;
-      }
-    }
-  }
-}

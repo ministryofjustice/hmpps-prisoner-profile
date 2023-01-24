@@ -55,3 +55,15 @@
       width: 100%;
     }
 }
+
+.hmpps-three-quarters-responsive {
+    @media (max-width: 751px) {
+      .hmpps-miniSummaryWrapper {
+          .govuk-grid-column-three-quarters,
+          .govuk-grid-column-one-quarter {
+              width: 50%;
+          }
+      }
+    }
+  }
+  
