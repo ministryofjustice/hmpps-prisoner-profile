@@ -1,0 +1,38 @@
+.hmpps-actions-block {
+  border: 1px solid govuk-colour('dark-grey');
+
+  h2 {
+    padding: 15px;
+    border-bottom: 2px solid govuk-colour('black');
+    margin: 0;
+  }
+}
+
+.hmpps-actions-block__list {
+  display: flex;
+  flex-direction: column;
+
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    margin: 0 15px;
+
+    img {
+      margin-right: 15px;
+    }
+
+    a {
+      font-weight: 700;
+    }
+  }
+
+  li:not(:last-of-type) {
+    border-bottom: 2px solid $govuk-border-colour;
+  }
+}
+
