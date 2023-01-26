@@ -1,16 +1,12 @@
 {% from "./macros/actionsBlockMacro.njk" import actionsBlock %}
 
 <div class="govuk-grid-row">
+  <aside class="govuk-grid-column-full">
+    {{ actionsBlock() }}
+  </aside>
+</div>
+<div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <div class="govuk-grid-row">
-      <aside class="govuk-grid-column-full">
-        {{ actionsBlock() }}
-      </aside>
-    </div>
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
-        {% include "./moreInfoBlock/moreInfoBlock.njk" %}
-      </div>
-    </div>
+    {% include "./moreInfoBlock/moreInfoBlock.njk" %}
   </div>
 </div>

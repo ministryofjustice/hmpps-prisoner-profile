@@ -17,7 +17,7 @@
   }
 
   @media print {
-    margin-bottom: 0px !important;
+    margin-bottom: 0 !important;
     font-size: 12px;
     color: black !important;
     border: none !important;
@@ -28,27 +28,26 @@
 
 .alerts-list {
   @extend %govuk-list;
-  margin-top: -2px;
+  padding-top: 15px;
   margin-left: 150px;
-  margin-bottom: 0px;
 
   @media (max-width: 1152px) {
     margin-left: 16px;
   }
 
   @media (max-width: 640px) {
-    margin-top: 0px;
+    margin-top: 0;
   }
 
   @media screen {
     display: flex;
     flex-wrap: wrap;
+    gap: 15px;
   }
 
   li {
-    padding: 0px 5px;
-    @include govuk-responsive-margin(4, 'bottom');
-    @include govuk-responsive-margin(4, 'top');
+    padding: 0 5px;
+    margin-bottom: 0;
     background-color: govuk-colour('white');
   }
 }
@@ -60,6 +59,7 @@
 
 .alert-status {
   @extend %status-style;
+  margin-right: 0;
 
   @media screen {
     text-transform: uppercase;

@@ -5,7 +5,7 @@
 
   .hmpps-header__link__main-text {
     color: govuk-colour('white');
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
   &__container {
     @include govuk-width-container;
@@ -169,7 +169,7 @@
     }
 
     @media (min-width: 641px) and (max-width: 960px) {
-      padding-bottom: 0px;
+      padding-bottom: 0;
     }
 
     @media (max-width: 640px) {
@@ -207,7 +207,7 @@
       }
       @include govuk-responsive-padding(7, 'top');
       @media (max-width: 1152px) {
-        padding-top: 0px;
+        padding-top: 0;
       }
       h3 {
         margin-bottom: 3px;
@@ -244,7 +244,7 @@
       }
       @media (min-width: 641px) and (max-width: 960px) {
         p {
-          padding-bottom: 0px;
+          padding-bottom: 0;
           margin-bottom: govuk-spacing(3);       
         }
       }
@@ -287,32 +287,40 @@
     background-color: #f3f2f1;
 
     overflow: auto;
+
     hr {
       border: 1px solid govuk-colour('mid-grey');
     }
+
     .hmpps-profile-tab-links {
-      margin: 0px;
-      padding: 0px;
+      display: flex;
+      flex-wrap: wrap;
+      row-gap: 15px;
+      margin: 0;
+      padding: 0;
+
       li {
-        float: left;
-        margin-right:  govuk-spacing(6);
-        padding-bottom: 0px;
+        margin: 0 govuk-spacing(6) 0 0;
         height: 32px;
         color: govuk-colour('blue');
       }
 
       .hmpps-profile-tab-link-selected {
         border-bottom: 4px solid govuk-colour('blue');
+
         a {
           color: govuk-colour('black');
         }
+
         a:visited {
           color: govuk-colour('black');
         }
       }
 
-      a:visited {
-        color: govuk-colour('blue');
+      a:hover, a:focus {
+        text-decoration-thickness: max(3px, .1875rem, .12em);
+        text-decoration-skip: none;
+        text-underline-offset: .1em;
       }
     }
   }

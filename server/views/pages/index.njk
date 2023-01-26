@@ -1,6 +1,14 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% extends "../partials/layout.njk" %}
 {% set pageTitle = applicationName + " - Home" %}
 {% set mainClasses = "app-container govuk-body" %}
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: backLinkLabel,
+    href: "#",
+    classes: "govuk-back-link"
+  }) }}
+{% endblock %}
 {% block content %}
   {% include "../partials/profileBanner/profileBanner.njk" %}
   {% include "./overviewPage.njk" %}
