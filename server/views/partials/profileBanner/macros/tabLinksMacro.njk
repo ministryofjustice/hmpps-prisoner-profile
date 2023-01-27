@@ -1,5 +1,8 @@
 {% macro tabLinksMacro(tabLinks) %}
   <ul class="hmpps-profile-tab-links">
+    <li class="govuk-heading-s hmpps-profile-tab-link-selected">
+      <span class="">Overview</span>
+    </li>
     {% for tabLink in tabLinks %}
       <li class="{{ tabLink.classes }}">
         <a href="#" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline">{{ tabLink.label }}</a>

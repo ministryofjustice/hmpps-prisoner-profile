@@ -15,7 +15,7 @@ export const profileBannerTopLinks = [
     classes: '',
   },
   {
-    heading: 'LCSRA',
+    heading: 'CSRA',
     info: 'Standard',
     classes: '',
   },
@@ -46,10 +46,6 @@ export const alerts = [
 ]
 
 export const tabLinks = [
-  {
-    label: 'Overview',
-    classes: 'govuk-heading-s hmpps-profile-tab-link-selected',
-  },
   {
     label: 'Personal',
     classes: 'govuk-heading-s',

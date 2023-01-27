@@ -47,6 +47,8 @@
     @include govuk-link-common;
     @include govuk-link-style-default;
 
+    text-underline-offset: .1em;
+
     &:link,
     &:visited,
     &:active {
@@ -189,7 +191,7 @@
       }
     }
     .hmpps-profile-photo {
-      margin-top: 8px;
+      margin-top: 5px;
     }
     .hmpps-profile-banner-top-nav-container {
       .container {
@@ -308,19 +310,13 @@
       .hmpps-profile-tab-link-selected {
         border-bottom: 4px solid govuk-colour('blue');
 
-        a {
-          color: govuk-colour('black');
-        }
-
-        a:visited {
+        span {
           color: govuk-colour('black');
         }
       }
 
       a:hover, a:focus {
         text-decoration-thickness: max(3px, .1875rem, .12em);
-        text-decoration-skip: none;
-        text-underline-offset: .1em;
       }
     }
   }
