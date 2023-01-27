@@ -41,4 +41,13 @@ describe('GET /', () => {
         })
       })
   })
+
+  it('should not render change location link (change caseload functionality)', () => {
+    return request(app)
+      .get('/prisoner/111222')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).not.toContain('Change location')
+      })
+  })
 })

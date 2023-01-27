@@ -46,6 +46,7 @@ context('SignIn', () => {
     cy.signIn()
     Page.verifyOnPage(OverviewPage)
     const overviewPage = Page.verifyOnPage(OverviewPage)
+    // The link text label is change location but the functionality is change caseload
     overviewPage.headerChangeLocation().should('not.exist')
   })
 })

@@ -1,4 +1,4 @@
-type Location = {
+export type Location = {
   locationId: number
   locationType: string
   description: string

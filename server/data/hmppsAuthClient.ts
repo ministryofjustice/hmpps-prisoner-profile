@@ -6,7 +6,8 @@ import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
 import RestClient from './restClient'
-import { LocationDummyDataB } from './localMockData/locations'
+import { Location, LocationDummyDataB } from './localMockData/locations'
+import { CaseLoad, CaseLoadsDummyDataA } from './localMockData/caseLoad'
 
 const timeoutSpec = config.apis.hmppsAuth.timeout
 const hmppsAuthUrl = config.apis.hmppsAuth.url
@@ -57,6 +58,17 @@ export default class HmppsAuthClient {
         }
         return err
       }) as Promise<Location[]>
+  }
+
+  getUserCaseLoads(token: string): Promise<CaseLoad[]> {
+    return HmppsAuthClient.restClient(token)
+      .get({ path: '/api/users/me/caseLoads' })
+      .catch(err => {
+        if (config.localMockData === 'true') {
+          return CaseLoadsDummyDataA
+        }
+        return err
+      }) as Promise<CaseLoad[]>
   }
 
   getUser(token: string): Promise<User> {
