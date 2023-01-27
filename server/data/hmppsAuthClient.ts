@@ -48,10 +48,6 @@ export default class HmppsAuthClient {
     return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
   }
 
-  getOffender(token: string, offenderId: string): Promise<string[]> {
-    return HmppsAuthClient.restClient(token).get({ path: `/api/prisoners/${offenderId}` }) as Promise<any>
-  }
-
   getUserLocations(token: string): Promise<string[]> {
     return HmppsAuthClient.restClient(token)
       .get({ path: '/api/users/me/locations' })
@@ -61,29 +57,6 @@ export default class HmppsAuthClient {
         }
         return err
       }) as Promise<any>
-  }
-
-  getUserCaseLoads(token: string): Promise<User> {
-    logger.info(`Getting case loads details: calling HMPPS Auth`)
-    return HmppsAuthClient.restClient(token).get({ path: '/global-search?size=1&page=1' }) as Promise<any>
-  }
-
-  getUserCaseNoteTypes(token: string): Promise<User> {
-    logger.info(`Getting case note types details: calling HMPPS Auth`)
-    return HmppsAuthClient.restClient(token).get({ path: '/casenotes/case-notes/types' }) as Promise<any>
-  }
-
-  postUserCaseNote(token: string): Promise<User> {
-    logger.info(`Post case note type details: calling HMPPS Auth`)
-    return HmppsAuthClient.restClient(token).post({
-      path: '/casenotes/case-notes/abcdef/123',
-      data: { test: 'test' },
-    }) as Promise<any>
-  }
-
-  getUserCaseNote(token: string): Promise<User> {
-    logger.info(`Get case note details: calling HMPPS Auth`)
-    return HmppsAuthClient.restClient(token).get({ path: '/casenotes/case-notes/abcdef/123' }) as Promise<any>
   }
 
   getUser(token: string): Promise<User> {
@@ -111,7 +84,3 @@ export default class HmppsAuthClient {
     return newToken.body.access_token
   }
 }
-
-// TODO
-// Get offender and populate first name and last name
-// https://api-dev.prison.service.justice.gov.uk/swagger-ui/index.html?configUrl=/api/api-docs#/v1/getOffender
