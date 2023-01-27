@@ -6,7 +6,6 @@ import { statuses, nonAssociationRows, personalDetails, staffContacts, schedule 
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 
-// import type TokenStore from '../data/tokenStore'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
   const router = Router()
