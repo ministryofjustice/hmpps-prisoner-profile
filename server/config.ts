@@ -1,4 +1,8 @@
 const production = process.env.NODE_ENV === 'production'
+const toNumber = (value: string | undefined): number | undefined => {
+  const result = parseInt(value, 10)
+  return Number.isSafeInteger(result) && result
+}
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name]) {
@@ -67,6 +71,39 @@ export default {
       enabled: get('TOKEN_VERIFICATION_ENABLED', 'false') === 'true',
     },
     dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
+    prisonApi: {
+      url: process.env.API_ENDPOINT_URL || 'http://localhost:8080/',
+      timeoutSeconds: toNumber(process.env.API_ENDPOINT_TIMEOUT_SECONDS) || 30,
+    },
+    oauth2: {
+      url: process.env.OAUTH_ENDPOINT_URL || 'http://localhost:9090/auth/',
+      ui_url: process.env.OAUTH_ENDPOINT_UI_URL || process.env.OAUTH_ENDPOINT_URL || 'http://localhost:9090/auth/',
+      timeoutSeconds: toNumber(process.env.API_ENDPOINT_TIMEOUT_SECONDS) || 30,
+      clientId: process.env.API_CLIENT_ID || 'prisonapiclient',
+      clientSecret: process.env.API_CLIENT_SECRET || 'clientsecret',
+      systemClientId: process.env.API_SYSTEM_CLIENT_ID || 'prisonstaffhubclient',
+      systemClientSecret: process.env.API_SYSTEM_CLIENT_SECRET || 'clientsecret',
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
+  app: {
+    port: process.env.PORT || 3002,
+    production: process.env.NODE_ENV === 'production',
+    disableWebpack: process.env.DISABLE_WEBPACK === 'true',
+    licencesUrl: process.env.LICENCES_URL || 'http://localhost:3003/',
+    mailTo: process.env.MAIL_TO || 'feedback@digital.justice.gov.uk',
+    tokenRefreshThresholdSeconds: toNumber(process.env.TOKEN_REFRESH_THRESHOLD_SECONDS) || 60,
+    url: process.env.PRISON_STAFF_HUB_UI_URL || `http://localhost:${process.env.PORT || 3002}/`,
+    maximumFileUploadSizeInMb: toNumber(process.env.MAXIMUM_FILE_UPLOAD_SIZE_IN_MB) || 200,
+    displayRetentionLink: process.env.DISPLAY_RETENTION_LINK === 'true' || false,
+    supportUrl: process.env.SUPPORT_URL || 'http://localhost:3000/',
+    contentfulSpaceId: process.env.CONTENTFUL_SPACE_ID || '1',
+    contentfulAccessToken: process.env.CONTENTFUL_ACCESS_TOKEN || '1',
+    esweEnabled: process.env.ESWE_ENABLED === 'true',
+    neurodiversityEnabledUsernames: process.env.NEURODIVERSITY_ENABLED_USERNAMES,
+    neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS,
+    disableRequestLimiter: process.env.DISABLE_REQUEST_LIMITER ? process.env.DISABLE_REQUEST_LIMITER === 'true' : false,
+    whereaboutsMaintenanceMode: process.env.WHEREABOUTS_MAINTENANCE_MODE === 'true' || false,
+  },
+  localMockData: get('LOCAL_MOCK_DATA', false),
 }

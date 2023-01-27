@@ -18,6 +18,7 @@ export default class TokenStore {
   }
 
   public async setToken(key: string, token: string, durationSeconds: number): Promise<void> {
+    console.log(`key ${key}`)
     await this.ensureConnected()
     await this.client.set(`${this.prefix}${key}`, token, { EX: durationSeconds })
   }

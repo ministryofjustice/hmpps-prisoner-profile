@@ -7,6 +7,8 @@ export default class OverviewPage extends Page {
 
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
 
+  headerChangeLocation = (): PageElement => cy.get('[data-qa=header-change-location]')
+
   miniSummaryListMacro = (): PageElement => cy.get('[data-qa=mini-summary-list-macro]')
 
   miniSummaryGroupA = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')

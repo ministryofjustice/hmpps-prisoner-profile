@@ -40,4 +40,12 @@ context('SignIn', () => {
     const overviewPage = Page.verifyOnPage(OverviewPage)
     overviewPage.miniSummaryGroupB_MacroHeader().should('not.exist')
   })
+
+  it('Should hide the change location link', () => {
+    cy.task('stubDpsOverviewPage')
+    cy.signIn()
+    Page.verifyOnPage(OverviewPage)
+    const overviewPage = Page.verifyOnPage(OverviewPage)
+    overviewPage.headerChangeLocation().should('not.exist')
+  })
 })
