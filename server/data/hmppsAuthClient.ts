@@ -48,7 +48,7 @@ export default class HmppsAuthClient {
     return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
   }
 
-  getUserLocations(token: string): Promise<string[]> {
+  getUserLocations(token: string): Promise<Location[]> {
     return HmppsAuthClient.restClient(token)
       .get({ path: '/api/users/me/locations' })
       .catch(err => {
@@ -56,7 +56,7 @@ export default class HmppsAuthClient {
           return LocationDummyDataB
         }
         return err
-      }) as Promise<any>
+      }) as Promise<Location[]>
   }
 
   getUser(token: string): Promise<User> {

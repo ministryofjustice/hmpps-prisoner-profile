@@ -14,13 +14,13 @@ export default class UserService {
     return { ...user, displayName: convertToTitleCase(user.name) }
   }
 
-  async getUserLocations(token: string): Promise<any> {
+  async getUserLocations(token: string): Promise<Location[]> {
     const locations = await this.hmppsAuthClient.getUserLocations(token)
-    return { locations }
+    return locations
   }
 
-  async getUserRoles(token: string): Promise<any> {
+  async getUserRoles(token: string): Promise<string[]> {
     const roles = await this.hmppsAuthClient.getUserRoles(token)
-    return { roles }
+    return roles
   }
 }
