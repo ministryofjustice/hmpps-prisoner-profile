@@ -1,7 +1,8 @@
 import { convertToTitleCase } from '../utils/utils'
 import type HmppsAuthClient from '../data/hmppsAuthClient'
-import { Location } from '../data/localMockData/locations'
-import { CaseLoad } from '../data/localMockData/caseLoad'
+
+import { CaseLoad } from '../interfaces/caseLoad'
+import { Location } from '../interfaces/location'
 
 interface UserDetails {
   name: string

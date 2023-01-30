@@ -8,8 +8,8 @@ export default function populateCurrentUser(userService: UserService): RequestHa
     try {
       if (res.locals.user) {
         const user = res.locals.user && (await userService.getUser(res.locals.user.token))
-        console.log(user)
         if (user) {
+          console.log(user)
           res.locals.user = { ...user, ...res.locals.user }
         } else {
           logger.info('No user available')
@@ -67,6 +67,7 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
       if (res.locals.user) {
         const caseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
         if (caseLoads) {
+          console.log(caseLoads)
           res.locals.user.caseLoads = caseLoads
         } else {
           logger.info('No user case loads available')
@@ -86,9 +87,7 @@ export function getUserActiveCaseLoad(userService: UserService): RequestHandler 
       if (res.locals.user.activeCaseLoadId) {
         const activeCaseLoad =
           res.locals.user &&
-          (await userService.getUserCaseLoads(res.locals.user.token)).map(
-            caseLoads => caseLoads[res.locals.user.activeCaseLoadId],
-          )
+          (await userService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
         if (activeCaseLoad) {
           res.locals.user.activeCaseLoad = activeCaseLoad
         } else {

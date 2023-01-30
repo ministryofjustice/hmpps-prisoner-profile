@@ -1,31 +1,25 @@
-export type CaseLoad = {
-  caseLoadId: string
-  description: string
-  type: string
-  caseloadFunction: string
-  currentlyActive: boolean
-}
+import { CaseLoad } from '../../interfaces/caseLoad'
 
 export const CaseLoadsDummyDataA: CaseLoad[] = [
   {
-    caseLoadId: 'MDI',
+    caseLoadId: 'BAI',
     description: 'Moorland Closed (HMP & YOI)',
     type: 'INST',
     caseloadFunction: 'GENERAL',
-    currentlyActive: false,
+    currentlyActive: true,
   },
 ]
 
 export const CaseLoadsDummyDataB: CaseLoad[] = [
   {
-    caseLoadId: 'MDI',
+    caseLoadId: 'BAI',
     description: 'Moorland Closed (HMP & YOI)',
     type: 'INST',
     caseloadFunction: 'GENERAL',
-    currentlyActive: false,
+    currentlyActive: true,
   },
   {
-    caseLoadId: 'ABC',
+    caseLoadId: 'BAI',
     description: 'Hyland Closed (HMP & YOI)',
     type: 'INST',
     caseloadFunction: 'GENERAL',

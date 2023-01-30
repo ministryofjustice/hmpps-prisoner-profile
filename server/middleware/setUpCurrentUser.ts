@@ -8,8 +8,6 @@ export default function setUpCurrentUser({ userService }: Services): Router {
   const router = Router({ mergeParams: true })
   router.use(auth.authenticationMiddleware(tokenVerifier))
   router.use(populateCurrentUser(userService))
-  router.use(getUserLocations(userService))
-  router.use(getUserCaseLoads(userService))
   router.use(getUserActiveCaseLoad(userService))
   return router
 }

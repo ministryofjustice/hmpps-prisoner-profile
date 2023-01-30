@@ -6,8 +6,10 @@ import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
 import RestClient from './restClient'
-import { Location, LocationDummyDataB } from './localMockData/locations'
-import { CaseLoad, CaseLoadsDummyDataA } from './localMockData/caseLoad'
+import { LocationDummyDataB } from './localMockData/locations'
+import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
+import { CaseLoad } from '../interfaces/caseLoad'
+import { Location } from '../interfaces/location'
 
 const timeoutSpec = config.apis.hmppsAuth.timeout
 const hmppsAuthUrl = config.apis.hmppsAuth.url
