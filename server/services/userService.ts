@@ -6,6 +6,8 @@ import { CaseLoad } from '../data/localMockData/caseLoad'
 interface UserDetails {
   name: string
   displayName: string
+  activeCaseLoadId?: string
+  activeCaseLoad?: CaseLoad
 }
 
 export default class UserService {

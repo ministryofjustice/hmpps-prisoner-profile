@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
+import config from '../config'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
@@ -7,6 +8,7 @@ export default function populateCurrentUser(userService: UserService): RequestHa
     try {
       if (res.locals.user) {
         const user = res.locals.user && (await userService.getUser(res.locals.user.token))
+        console.log(user)
         if (user) {
           res.locals.user = { ...user, ...res.locals.user }
         } else {
@@ -68,6 +70,29 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
           res.locals.user.caseLoads = caseLoads
         } else {
           logger.info('No user case loads available')
+        }
+      }
+      next()
+    } catch (error) {
+      logger.error(error, `Failed to retrieve case loads for: ${res.locals.user && res.locals.user.username}`)
+      next(error)
+    }
+  }
+}
+
+export function getUserActiveCaseLoad(userService: UserService): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      if (res.locals.user.activeCaseLoadId) {
+        const activeCaseLoad =
+          res.locals.user &&
+          (await userService.getUserCaseLoads(res.locals.user.token)).map(
+            caseLoads => caseLoads[res.locals.user.activeCaseLoadId],
+          )
+        if (activeCaseLoad) {
+          res.locals.user.activeCaseLoad = activeCaseLoad
+        } else {
+          logger.info('No user active case load id available')
         }
       }
       next()
