@@ -1,7 +1,7 @@
 {% macro summaryCard(params) %}
   <div class="hmpps-summary-card">
     {% if params.title %}
-      <div class="hmpps-summary-card__header">
+      <div class="hmpps-summary-card__header" data-qa="summary-header">
         <h3>{{ params.title }}</h3>
       </div>
     {% endif %}
