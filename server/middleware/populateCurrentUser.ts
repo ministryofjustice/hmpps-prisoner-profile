@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
-import config from '../config'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
@@ -9,7 +8,6 @@ export default function populateCurrentUser(userService: UserService): RequestHa
       if (res.locals.user) {
         const user = res.locals.user && (await userService.getUser(res.locals.user.token))
         if (user) {
-          console.log(user)
           res.locals.user = { ...user, ...res.locals.user }
         } else {
           logger.info('No user available')
@@ -67,7 +65,6 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
       if (res.locals.user) {
         const caseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
         if (caseLoads) {
-          console.log(caseLoads)
           res.locals.user.caseLoads = caseLoads
         } else {
           logger.info('No user case loads available')
