@@ -1,0 +1,14 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard() -%}
+  <div class="govuk-grid-row hmpps-more-info-block">
+    <div class="govuk-grid-column-full">
+      <h2>More Information</h2>
+      <ul>
+        <li><a href="#" class="govuk-link govuk-link--no-visited-state">Probation documents</a></li>
+        <li><a href="#" class="govuk-link govuk-link--no-visited-state">Pathfinder profile</a></li>
+        <li><a href="#" class="govuk-link govuk-link--no-visited-state">SOC profile</a></li>
+      </ul>
+    </div>
+  </div>
+{%- endcall -%}
