@@ -1,4 +1,8 @@
 const production = process.env.NODE_ENV === 'production'
+const toNumber = (value: string | undefined): number | undefined => {
+  const result = parseInt(value, 10)
+  return Number.isSafeInteger(result) && result
+}
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name]) {
@@ -67,6 +71,20 @@ export default {
       enabled: get('TOKEN_VERIFICATION_ENABLED', 'false') === 'true',
     },
     dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
+    prisonApi: {
+      url: process.env.API_ENDPOINT_URL || 'http://localhost:8080/',
+      timeoutSeconds: toNumber(process.env.API_ENDPOINT_TIMEOUT_SECONDS) || 30,
+    },
+    oauth2: {
+      url: process.env.OAUTH_ENDPOINT_URL || 'http://localhost:9090/auth/',
+      ui_url: process.env.OAUTH_ENDPOINT_UI_URL || process.env.OAUTH_ENDPOINT_URL || 'http://localhost:9090/auth/',
+      timeoutSeconds: toNumber(process.env.API_ENDPOINT_TIMEOUT_SECONDS) || 30,
+      clientId: process.env.API_CLIENT_ID || 'prisonapiclient',
+      clientSecret: process.env.API_CLIENT_SECRET || 'clientsecret',
+      systemClientId: process.env.API_SYSTEM_CLIENT_ID || 'prisonstaffhubclient',
+      systemClientSecret: process.env.API_SYSTEM_CLIENT_SECRET || 'clientsecret',
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
+  localMockData: get('LOCAL_MOCK_DATA', false),
 }
