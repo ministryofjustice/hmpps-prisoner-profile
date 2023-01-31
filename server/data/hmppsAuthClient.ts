@@ -64,7 +64,7 @@ export default class HmppsAuthClient {
 
   getUserCaseLoads(token: string): Promise<CaseLoad[]> {
     return HmppsAuthClient.restClient(token)
-      .get({ path: '/api/users/me/caseLoads' })
+      .get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
       .catch(err => {
         if (config.localMockData === 'true') {
           return CaseLoadsDummyDataA
