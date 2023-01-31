@@ -1,7 +1,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% extends "../partials/layout.njk" %}
 {% set pageTitle = applicationName + " - Home" %}
-{% set mainClasses = "app-container govuk-body" %}
+{% set mainClasses = "govuk-body" %}
 {% block beforeContent %}
   {{ govukBackLink({
     text: backLinkLabel,
