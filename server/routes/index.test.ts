@@ -106,9 +106,19 @@ describe('GET /', () => {
       .get('/prisoner/111222')
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('<div class="hmpps-actions-block">')
+        expect(res.text).toContain('<div class="hmpps-actions-block govuk-!-margin-bottom-5">')
         expect(res.text).toContain('<h2 class="govuk-heading-m">Actions</h2>')
         expect(res.text).toContain('<ul class="hmpps-actions-block__list">')
+      })
+  })
+
+  it('should render more info block', () => {
+    return request(app)
+      .get('/prisoner/111222')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('<div class="govuk-grid-row hmpps-more-info-block">')
+        expect(res.text).toContain('<h2>More Information</h2>')
       })
   })
 })

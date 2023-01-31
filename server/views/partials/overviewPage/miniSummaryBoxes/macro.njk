@@ -1,39 +1,41 @@
+{% from "../macros/summaryCardMacro.njk" import summaryCard %}
 {% macro miniSummaryMacro(params) %}
-    <div class="card card__content"  data-test="card-content">
-        {% if params.config.header === true %}
-            <div class="govuk-grid-row card-header" data-qa="overview-mini-summary-header">
-                <div class="govuk-grid-column-full">
-                    <h2 class="govuk-heading-m card__heading hmpps-card-heading-background hmpps-heading-light-grey">
-                        {{params.data.heading}}
-                    </h2>
-                </div>   
-            </div>
-        {% endif -%}
-        <div class="{{ params.classes }}">
-            <div class="govuk-grid-column-full">
-                {% if params.data.summaryTopLabel !== '' %}
-                    <p class="govuk-body card__description card-label govuk-!-font-size-16" data-hj-suppress>
-                        {{params.data.summaryTopLabel}}
-                    </p>
-                {% endif -%}
-                {% if params.data.summaryTopContent !== '' %}
-                    <p class="govuk-body govuk-!-font-size-36">{{params.data.summaryTopContent}}</p>
-                {% endif -%}
-                <p class="govuk-body card__description card-label govuk-!-font-size-16" data-hj-suppress>
-                    {{params.data.summaryBottomLabel}}
-                </p>
-                {% if params.config.summaryBottomType === params.contentType.type1 %}
-                    <p class="govuk-body govuk-!-font-size-36">{{params.data.summaryBottomContentType1}}</p>
-                {% endif -%}
-                {% if params.config.summaryBottomType === params.contentType.type2 %}
-                    <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType2">{{params.data.summaryBottomContentType2}}</p>
-                {% endif -%}
-                {% if params.config.summaryBottomType === params.contentType.type3 %}
-                    <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType3">{{params.data.summaryBottomContentType2}}</p>
-                    <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType3 card-label-light">{{params.data.summaryBottomContentType3}}</p>
-                {% endif -%}
-                <a href="{{params.data.linkHref}}" class="govuk-link govuk-link--no-visited-state">{{params.data.linkLabel}}</a>
-            </div>
-        </div>
+  {%- call summaryCard({title: params.data.heading}) -%}
+    <div class="{{ params.classes }}">
+      <div class="govuk-grid-column-full">
+        {% if params.data.summaryTopLabel !== '' %}
+          <p class="govuk-body card-label govuk-!-font-size-16" data-hj-suppress>
+            {{ params.data.summaryTopLabel }}
+          </p>
+        {%- endif -%}
+        {% if params.data.summaryTopContent !== '' %}
+          <p class="govuk-body govuk-!-font-size-36">{{ params.data.summaryTopContent }}</p>
+        {%- endif -%}
+        <p class="govuk-body card-label govuk-!-font-size-16" data-hj-suppress>
+          {{ params.data.summaryBottomLabel }}
+        </p>
+        {% if params.config.summaryBottomType === params.contentType.type1 %}
+          <p class="govuk-body govuk-!-font-size-36">{{ params.data.summaryBottomContentType1 }}</p>
+        {%- endif -%}
+        {% if params.config.summaryBottomType === params.contentType.type2 %}
+          <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType2">
+            {{ params.data.summaryBottomContentType2 }}
+          </p>
+        {%- endif -%}
+        {% if params.config.summaryBottomType === params.contentType.type3 %}
+          <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType3">
+            {{ params.data.summaryBottomContentType2 }}
+          </p>
+          <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType3 card-label-light">
+            {{ params.data.summaryBottomContentType3 }}
+          </p>
+        {%- endif -%}
+        <p class="govuk-body">
+          <a href="{{ params.data.linkHref }}" class="govuk-link govuk-link--no-visited-state">
+            {{ params.data.linkLabel }}
+          </a>
+        </p>
+      </div>
     </div>
+  {%- endcall -%}
 {% endmacro %}
