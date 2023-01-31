@@ -1,7 +1,6 @@
 import superagent from 'superagent'
 import { URLSearchParams } from 'url'
 
-import { query } from 'express'
 import type TokenStore from './tokenStore'
 import logger from '../../logger'
 import config from '../config'
