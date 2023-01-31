@@ -1,6 +1,7 @@
 import superagent from 'superagent'
 import { URLSearchParams } from 'url'
 
+import { query } from 'express'
 import type TokenStore from './tokenStore'
 import logger from '../../logger'
 import config from '../config'
@@ -64,7 +65,7 @@ export default class HmppsAuthClient {
 
   getUserCaseLoads(token: string): Promise<CaseLoad[]> {
     return HmppsAuthClient.restClient(token)
-      .get({ path: '/api/users/me/caseLoads' })
+      .get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
       .catch(err => {
         if (config.localMockData === 'true') {
           return CaseLoadsDummyDataA
