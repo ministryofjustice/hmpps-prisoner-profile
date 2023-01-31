@@ -8,16 +8,15 @@
     margin-left: 0;
     margin-right: 15px;
     margin-bottom: 5px;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 300;
     text-align: center;
     line-height: 1;
     min-width: 100px;
-    user-select: none;
   }
 
   @media print {
-    margin-bottom: 0px !important;
+    margin-bottom: 0 !important;
     font-size: 12px;
     color: black !important;
     border: none !important;
@@ -28,27 +27,19 @@
 
 .alerts-list {
   @extend %govuk-list;
-  margin-top: -2px;
-  margin-left: 150px;
-  margin-bottom: 0px;
+  margin: 17px 15px 10px 150px;
 
-  @media (max-width: 1152px) {
-    margin-left: 16px;
+  @media (max-width: 800px) {
+    margin-left: 15px;
   }
 
-  @media (max-width: 640px) {
-    margin-top: 0px;
-  }
-
-  @media screen {
-    display: flex;
-    flex-wrap: wrap;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
 
   li {
-    padding: 0px 5px;
-    @include govuk-responsive-margin(4, 'bottom');
-    @include govuk-responsive-margin(4, 'top');
+    padding: 0 5px;
+    margin-bottom: 0;
     background-color: govuk-colour('white');
   }
 }
@@ -60,163 +51,124 @@
 
 .alert-status {
   @extend %status-style;
+  margin-right: 0;
 
-  @media screen {
-    text-transform: uppercase;
-    min-height: 30px;
-  }
-
-  img {
-    height: 14px;
-    margin-right: 3px;
-
-    @media print {
-      display: none;
-    }
-  }
+  height: 26px;
+  color: govuk-colour('black');
 
   &--care-leaver {
-    color: #00703C;
-    border-color: #00703C;   
+    border-color: #00703c;
   }
 
   &--ex-armed-forces {
-    color: #85994B;
-    border-color: #85994B;
+    border-color: #85994b;
   }
 
   &--medical {
-    color: #5694cA;
-    border-color: #5694cA;
+    border-color: #5694ca;
   }
 
   &--other {
-    color: #D53880;
-    border-color: #D53880;
+    border-color: #d53880;
   }
 
   &--MAPPP-case {
-    color: #28A197;
-    border-color: #28A197;
+    border-color: #28a197;
   }
 
   &--security {
-    color: #003078;
     border-color: #003078;
   }
 
   &--risk {
-    color: #D4351C;
-    border-color: #D4351C;
+    border-color: #d4351c;
   }
 
   &--self-harm {
-    color: #F47738;
-    border-color: #F47738;
+    border-color: #f47738;
   }
 
   &--acct {
-    color: #d34700;
     border-color: #d34700;
   }
 
   &--assault {
-    color: #4c2c92;
     border-color: #4c2c92;
   }
 
   &--disability {
-    color: #2b88c8;
     border-color: #2b88c8;
   }
 
   &--arsonist {
-    color: #df3034;
     border-color: #df3034;
   }
 
   &--elist {
-    color: #28a197;
     border-color: #28a197;
   }
 
   &--risk-females {
-    color: #6f71af;
     border-color: #6f71af;
   }
 
   &--tact {
-    color: #d53880;
     border-color: #d53880;
   }
 
   &--corruptor {
-    color: #b10e1e;
     border-color: #b10e1e;
   }
 
   &--chemical-attacker {
-    color: #69831e;
     border-color: #69831e;
   }
 
   &--concerted-indiscipline {
-    color: #444;
     border-color: #444;
   }
 
   &--racist {
-    color: #8f5f11;
     border-color: #8f5f11;
   }
 
   &--risk-lgbt {
-    color: #912b88;
     border-color: #912b88;
   }
 
   &--hostage-taker {
-    color: #c6545f;
     border-color: #c6545f;
   }
 
   &--controlled-unlock {
-    color: #2e358b;
     border-color: #2e358b;
   }
 
   &--gang-member {
-    color: #005f9e;
     border-color: #005f9e;
   }
 
   &--csip {
-    color: #4c2c92;
     border-color: #4c2c92;
   }
 
   &--veteran {
-    color: #006435;
     border-color: #006435;
   }
 
   &--care-experienced {
-    color: #3f90ae;
     border-color: #3f90ae;
   }
 
   &--acct-post-closure {
-    color: #f47738;
     border: 3px dashed #f47738;
   }
 
   &--conflict {
-    color: #800000;
     border-color: #800000;
   }
 
   &--no-one-to-one {
-    color: #903;
     border-color: #903;
   }
 
@@ -251,25 +203,15 @@
   }
 
   &--risk-to-known-adults {
-    color: #003078;
     border-color: #003078;
   }
 
   &--isolated-prisoner {
-    color: #00753F;
-    border-color: #00753F;
+    border-color: #00753f;
   }
 
   &--visor {
-    color: #003078;
     border-color: #003078;
-  }
-}
-
-.alert-status--multicase {
-  @media screen {
-    text-transform: none;
-    min-height: 30px;
   }
 }
 
@@ -298,8 +240,8 @@
 .non-association {
   @extend %status-style;
 
-  background: lighten(#D4351C,40);
-  border-color: lighten(#D4351C,40);
+  background: lighten(#d4351c, 40);
+  border-color: lighten(#d4351c, 40);
   font-weight: bold;
-  color: #D4351C;
+  color: #d4351c;
 }

@@ -25,7 +25,7 @@ describe('GET /', () => {
       .get('/prisoner/123456')
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('<a href="#" class="govuk-back-link govuk-back-link">Back to search results</a>')
+        expect(res.text).toContain('<a href="#" class="govuk-back-link govuk-link">Back to search results</a>')
       })
   })
 

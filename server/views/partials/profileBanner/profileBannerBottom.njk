@@ -1,20 +1,20 @@
-{% from "../../partials/profileBanner/macros/alertsMacro.njk" import alertsMacro %}
-{% from "../../partials/profileBanner/macros/tabLinksMacro.njk" import tabLinksMacro %} 
-   
+{% from "./macros/alertsMacro.njk" import alertsMacro %}
+{% from "./macros/tabLinksMacro.njk" import tabLinksMacro %}
+
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full hmpps-profile-banner-bottom">
+  <div class="govuk-grid-column-full hmpps-profile-banner-bottom">
     <div class="govuk-grid-row">
-        {{ alertsMacro(alerts) }}
+      {{ alertsMacro(alerts) }}
     </div>
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <hr>
-        </div>
+      <div class="govuk-grid-column-full">
+        <hr />
+      </div>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+    <nav class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
         {{ tabLinksMacro(tabLinks) }}
-        </div>
-    </div>
-    </div>      
+      </div>
+    </nav>
+  </div>
 </div>

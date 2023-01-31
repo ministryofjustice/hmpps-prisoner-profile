@@ -1,36 +1,19 @@
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full hmpps-profile-banner-top">
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-half">
-            <div  class="govuk-grid-row">
-              <div class="govuk-grid-column-one-quarter">
-                <img tabindex="0" class="hmpps-profile-photo position-relative" src="/assets/images/prisoner-profile-photo.png" alt="prisoner photo">
-              </div>
-              <div class="govuk-grid-column-three-quarters">
-                <div class="govuk-grid-row">
-                  <h2 tabindex="0" class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
-                </div>
-                <div class="govuk-grid-row">
-                  <p tabindex="0" class="govuk-body govuk-!-font-size-24">{{ prisonId }}</p>
-                </div>
-              </div>
-            </div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full hmpps-profile-banner-top">
+    <img class="hmpps-profile-photo" src="/assets/images/prisoner-profile-photo.png" alt="{{ prisonerName }}" />
+    <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
+    <div class="info">
+      <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
+        {{ prisonId }}
+      </p>
+      <div class="info__links">
+        {% for link in  profileBannerTopLinks %}
+          <div class="{{ link.classes }}">
+            <h3 class="govuk-heading-s">{{ link.heading }}</h3>
+            <a href="#" class="govuk-link govuk-link--inverse">{{ link.info }}</a>
           </div>
-          <div class="govuk-grid-column-one-half hmpps-profile-banner-top-nav-container">
-            <div class="govuk-grid-row container">
-              {% for link in  profileBannerTopLinks %}
-                <div class="govuk-grid-column-one-quarter {{ link.classes }}">
-                  <div class="govuk-grid-row">
-                    <h3 tabindex="0" class="govuk-heading-s">{{ link.heading }}</h3>
-                  </div>
-                  <div class="govuk-grid-row">
-                    <a href="#" class="govuk-link govuk-link--inverse">{{ link.info }}</a>
-                  </div>
-                </div>   
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="govuk-grid-row"></div>
+        {% endfor %}
       </div>
     </div>
+  </div>
+</div>

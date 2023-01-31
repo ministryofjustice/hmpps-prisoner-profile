@@ -1,7 +1,7 @@
 {% macro alertsMacro(alerts) %}
-    <ul class="alerts-list" >
-        {% for alert in  alerts %}
-            <li tabindex="0" class="{{ alert.classes }}">{{ alert.label }}</li>  
-        {% endfor %}            
-    </ul>
+  <ul class="alerts-list">
+    {% for alert in  alerts %}
+      <li class="{{ alert.classes }}">{{ alert.label }}</li>
+    {% endfor %}
+  </ul>
 {% endmacro %}
