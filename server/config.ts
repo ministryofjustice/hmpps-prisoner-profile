@@ -73,7 +73,16 @@ export default {
     dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
     prisonApi: {
       url: process.env.API_ENDPOINT_URL || 'http://localhost:8080/',
-      timeoutSeconds: toNumber(process.env.API_ENDPOINT_TIMEOUT_SECONDS) || 30,
+      externalUrl: get('HMPPS_AUTH_EXTERNAL_URL', get('HMPPS_AUTH_URL', 'http://localhost:9090/auth')),
+      timeout: {
+        response: Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('HMPPS_AUTH_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 10000))),
+      apiClientId: get('API_CLIENT_ID', 'clientid', requiredInProduction),
+      apiClientSecret: get('API_CLIENT_SECRET', 'clientsecret', requiredInProduction),
+      systemClientId: get('SYSTEM_CLIENT_ID', 'clientid', requiredInProduction),
+      systemClientSecret: get('SYSTEM_CLIENT_SECRET', 'clientsecret', requiredInProduction),
     },
     oauth2: {
       url: process.env.OAUTH_ENDPOINT_URL || 'http://localhost:9090/auth/',

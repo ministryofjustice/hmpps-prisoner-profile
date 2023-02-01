@@ -1,5 +1,7 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
+import { CaseLoad } from '../interfaces/caseLoad'
+import PrisonApiService from '../services/prisonApiService'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
@@ -21,11 +23,11 @@ export default function populateCurrentUser(userService: UserService): RequestHa
   }
 }
 
-export function getUserLocations(userService: UserService): RequestHandler {
+export function getUserLocations(prisonApiService: PrisonApiService): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const locations = res.locals.user && (await userService.getUserLocations(res.locals.user.token))
+        const locations = res.locals.user && (await prisonApiService.getUserLocations(res.locals.user.token))
         if (locations) {
           res.locals.user.locations = locations
         } else {
@@ -59,13 +61,15 @@ export function getUserRoles(userService: UserService): RequestHandler {
   }
 }
 
-export function getUserCaseLoads(userService: UserService): RequestHandler {
+export function getUserCaseLoads(prisonApiService: PrisonApiService): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const caseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
-        if (caseLoads) {
-          res.locals.user.caseLoads = caseLoads
+        const caseLoads = res.locals.user && (await prisonApiService.getUserCaseLoads(res.locals.user.token))
+        const userCaseLoads = (context: any): CaseLoad[] => (context.authSource !== 'auth' ? caseLoads : [])
+
+        if (userCaseLoads.length > 0) {
+          res.locals.user.caseLoads = userCaseLoads(res.locals.user)
         } else {
           logger.info('No user case loads available')
         }
@@ -78,13 +82,13 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
   }
 }
 
-export function getUserActiveCaseLoad(userService: UserService): RequestHandler {
+export function getUserActiveCaseLoad(prisonApiService: PrisonApiService): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user.activeCaseLoadId) {
         const activeCaseLoad =
           res.locals.user &&
-          (await userService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
+          (await prisonApiService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
         if (activeCaseLoad) {
           res.locals.user.activeCaseLoad = activeCaseLoad
         } else {

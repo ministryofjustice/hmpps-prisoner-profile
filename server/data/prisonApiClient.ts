@@ -44,22 +44,33 @@ export interface UserRole {
   roleCode: string
 }
 
-export default class HmppsAuthClient {
+export default class PrisonApiClient {
   constructor(private readonly tokenStore: TokenStore) {}
 
   private static restClient(token: string): RestClient {
-    return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
+    return new RestClient('Prison API Client', config.apis.prisonApi, token)
   }
 
-  getUser(token: string): Promise<User> {
-    logger.info(`Getting user details: calling HMPPS Auth`)
-    return HmppsAuthClient.restClient(token).get({ path: '/api/user/me' }) as Promise<User>
+  getUserLocations(token: string): Promise<Location[]> {
+    return PrisonApiClient.restClient(token)
+      .get({ path: '/api/users/me/locations' })
+      .catch(err => {
+        if (config.localMockData === 'true') {
+          return LocationDummyDataB
+        }
+        return err
+      }) as Promise<Location[]>
   }
 
-  getUserRoles(token: string): Promise<string[]> {
-    return HmppsAuthClient.restClient(token)
-      .get({ path: '/api/user/me/roles' })
-      .then(roles => (<UserRole[]>roles).map(role => role.roleCode))
+  getUserCaseLoads(token: string): Promise<CaseLoad[]> {
+    return PrisonApiClient.restClient(token)
+      .get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
+      .catch(err => {
+        if (config.localMockData === 'true') {
+          return CaseLoadsDummyDataA
+        }
+        return err
+      }) as Promise<CaseLoad[]>
   }
 
   async getSystemClientToken(username?: string): Promise<string> {

@@ -9,6 +9,7 @@ initialiseAppInsights()
 buildAppInsightsClient()
 
 import HmppsAuthClient from './hmppsAuthClient'
+import PrisonApiClient from './prisonApiClient'
 import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
 
@@ -16,6 +17,10 @@ type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = () => ({
   hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient({ legacyMode: false }))),
+})
+
+export const prisonApiAccess = () => ({
+  prisonApiClient: new PrisonApiClient(new TokenStore(createRedisClient({ legacyMode: false }))),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>

@@ -4,10 +4,10 @@ import tokenVerifier from '../data/tokenVerification'
 import populateCurrentUser, { getUserActiveCaseLoad } from './populateCurrentUser'
 import type { Services } from '../services'
 
-export default function setUpCurrentUser({ userService }: Services): Router {
+export default function setUpCurrentUser({ userService, prisonApiService }: Services): Router {
   const router = Router({ mergeParams: true })
   router.use(auth.authenticationMiddleware(tokenVerifier))
   router.use(populateCurrentUser(userService))
-  router.use(getUserActiveCaseLoad(userService))
+  router.use(getUserActiveCaseLoad(prisonApiService))
   return router
 }
