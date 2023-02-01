@@ -2,38 +2,12 @@ import superagent from 'superagent'
 import { URLSearchParams } from 'url'
 
 import type TokenStore from './tokenStore'
-import logger from '../../logger'
 import config from '../config'
-import generateOauthClientToken from '../authentication/clientCredentials'
 import RestClient from './restClient'
 import { LocationDummyDataB } from './localMockData/locations'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
-
-const timeoutSpec = config.apis.hmppsAuth.timeout
-const hmppsAuthUrl = config.apis.hmppsAuth.url
-
-function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagent.Response> {
-  const clientToken = generateOauthClientToken(
-    config.apis.hmppsAuth.systemClientId,
-    config.apis.hmppsAuth.systemClientSecret,
-  )
-
-  const grantRequest = new URLSearchParams({
-    grant_type: 'client_credentials',
-    ...(username && { username }),
-  }).toString()
-
-  logger.info(`${grantRequest} HMPPS Auth request for client id '${config.apis.hmppsAuth.systemClientId}''`)
-
-  return superagent
-    .post(`${hmppsAuthUrl}/oauth/token`)
-    .set('Authorization', clientToken)
-    .set('content-type', 'application/x-www-form-urlencoded')
-    .send(grantRequest)
-    .timeout(timeoutSpec)
-}
 
 export interface User {
   name: string
@@ -45,45 +19,27 @@ export interface UserRole {
 }
 
 export default class PrisonApiClient {
-  constructor(private readonly tokenStore: TokenStore) {}
+  restClient: RestClient
 
-  private static restClient(token: string): RestClient {
-    return new RestClient('Prison API Client', config.apis.prisonApi, token)
+  constructor(token: string) {
+    this.restClient = new RestClient('Prison API', config.apis.prisonApi, token)
   }
 
-  getUserLocations(token: string): Promise<Location[]> {
-    return PrisonApiClient.restClient(token)
-      .get({ path: '/api/users/me/locations' })
-      .catch(err => {
-        if (config.localMockData === 'true') {
-          return LocationDummyDataB
-        }
-        return err
-      }) as Promise<Location[]>
+  getUserLocations(): Promise<Location[]> {
+    return this.restClient.get({ path: '/api/users/me/locations' }).catch(err => {
+      if (config.localMockData === 'true') {
+        return LocationDummyDataB
+      }
+      return err
+    }) as Promise<Location[]>
   }
 
-  getUserCaseLoads(token: string): Promise<CaseLoad[]> {
-    return PrisonApiClient.restClient(token)
-      .get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
-      .catch(err => {
-        if (config.localMockData === 'true') {
-          return CaseLoadsDummyDataA
-        }
-        return err
-      }) as Promise<CaseLoad[]>
-  }
-
-  async getSystemClientToken(username?: string): Promise<string> {
-    const key = username || '%ANONYMOUS%'
-    const token = await this.tokenStore.getToken(key)
-    if (token) {
-      return token
-    }
-
-    const newToken = await getSystemClientTokenFromHmppsAuth(username)
-    // set TTL slightly less than expiry of token. Async but no need to wait
-    await this.tokenStore.setToken(key, newToken.body.access_token, newToken.body.expires_in - 60)
-
-    return newToken.body.access_token
+  getUserCaseLoads(): Promise<CaseLoad[]> {
+    return this.restClient.get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' }).catch(err => {
+      if (config.localMockData === 'true') {
+        return CaseLoadsDummyDataA
+      }
+      return err
+    }) as Promise<CaseLoad[]>
   }
 }
