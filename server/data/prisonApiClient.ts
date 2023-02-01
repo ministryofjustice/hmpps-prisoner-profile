@@ -1,22 +1,9 @@
-import superagent from 'superagent'
-import { URLSearchParams } from 'url'
-
-import type TokenStore from './tokenStore'
 import config from '../config'
 import RestClient from './restClient'
 import { LocationDummyDataB } from './localMockData/locations'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
-
-export interface User {
-  name: string
-  activeCaseLoadId: string
-}
-
-export interface UserRole {
-  roleCode: string
-}
 
 export default class PrisonApiClient {
   restClient: RestClient

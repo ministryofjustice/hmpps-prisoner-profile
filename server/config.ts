@@ -1,8 +1,4 @@
 const production = process.env.NODE_ENV === 'production'
-const toNumber = (value: string | undefined): number | undefined => {
-  const result = parseInt(value, 10)
-  return Number.isSafeInteger(result) && result
-}
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name]) {

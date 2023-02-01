@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
+
 import { CaseLoad } from '../interfaces/caseLoad'
+import { Context } from '../interfaces/context'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
@@ -65,7 +67,7 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
     try {
       if (res.locals.user) {
         const caseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
-        const userCaseLoads = (context: any): CaseLoad[] => (context.authSource !== 'auth' ? caseLoads : [])
+        const userCaseLoads = (context: Context): CaseLoad[] => (context.authSource !== 'auth' ? caseLoads : [])
 
         if (userCaseLoads.length > 0) {
           res.locals.user.caseLoads = userCaseLoads(res.locals.user)

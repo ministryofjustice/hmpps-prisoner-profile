@@ -9,7 +9,6 @@ initialiseAppInsights()
 buildAppInsightsClient()
 
 import HmppsAuthClient from './hmppsAuthClient'
-import PrisonApiClient from './prisonApiClient'
 import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
 

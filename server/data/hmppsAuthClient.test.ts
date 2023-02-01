@@ -2,7 +2,6 @@ import nock from 'nock'
 
 import config from '../config'
 import HmppsAuthClient from './hmppsAuthClient'
-import { LocationDummyDataC } from './localMockData/locations'
 import TokenStore from './tokenStore'
 
 jest.mock('./tokenStore')
