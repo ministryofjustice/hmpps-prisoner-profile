@@ -19,10 +19,6 @@ export const dataAccess = () => ({
   hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient({ legacyMode: false }))),
 })
 
-export const prisonApiAccess = () => ({
-  prisonApiClient: new PrisonApiClient(new TokenStore(createRedisClient({ legacyMode: false }))),
-})
-
 export type DataAccess = ReturnType<typeof dataAccess>
 
 export { HmppsAuthClient, RestClientBuilder }

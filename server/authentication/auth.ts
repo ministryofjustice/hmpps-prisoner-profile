@@ -40,9 +40,8 @@ function init(): void {
       customHeaders: { Authorization: generateOauthClientToken() },
     },
     (token, refreshToken, params, profile, done) => {
-      console.log(token)
       return done(null, { token, username: params.user_name, authSource: params.auth_source })
-    },
+    }
   )
 
   passport.use(strategy)

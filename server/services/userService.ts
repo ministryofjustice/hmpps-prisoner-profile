@@ -2,6 +2,8 @@ import { convertToTitleCase } from '../utils/utils'
 import type HmppsAuthClient from '../data/hmppsAuthClient'
 
 import { CaseLoad } from '../interfaces/caseLoad'
+import { Location } from '../interfaces/location'
+import PrisonApiClient from '../data/prisonApiClient'
 
 interface UserDetails {
   name: string
@@ -18,8 +20,15 @@ export default class UserService {
     return { ...user, displayName: convertToTitleCase(user.name) }
   }
 
-  async getUserRoles(token: string): Promise<string[]> {
-    const roles = await this.hmppsAuthClient.getUserRoles(token)
-    return roles
+  getUserRoles(token: string): Promise<string[]> {
+    return this.hmppsAuthClient.getUserRoles(token)
+  }
+
+  getUserLocations(token: string): Promise<Location[]> {
+    return new PrisonApiClient(token).getUserLocations()
+  }
+
+  getUserCaseLoads(token: string): Promise<CaseLoad[]> {
+    return new PrisonApiClient(token).getUserCaseLoads()
   }
 }
