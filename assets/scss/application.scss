@@ -1,0 +1,18 @@
+$govuk-global-styles: true;
+$path: "/assets/images/";
+
+$moj-page-width: 1170px;
+$govuk-page-width: $moj-page-width;
+
+@import 'govuk/all';
+@import 'moj/all';
+
+@import './components/header-bar';
+@import './components/alerts';
+@import './components/miniSummary';
+@import './components/status';
+@import './components/summary-card';
+@import './components/actions-block';
+@import './components/more-info-block';
+@import 'assets/scss/local';
+@import './helpers';
