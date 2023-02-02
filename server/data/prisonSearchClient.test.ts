@@ -1,19 +1,19 @@
 import nock from 'nock'
 import config from '../config'
-import { PrisonerMockDataA, PrisonerMockDataB } from './localMockData/prisonSearch'
-import PrisonSearchClient from './prisonerSearchClient'
+import { PrisonerMockDataA, PrisonerMockDataB } from './localMockData/prisonerSearch'
+import PrisonerSearchClient from './prisonerSearchClient'
 
 jest.mock('./tokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
-describe('prisonSearchClient', () => {
-  let fakePrisonSearchApi: nock.Scope
-  let prisonSearchClient: PrisonSearchClient
+describe('prisonerSearchClient', () => {
+  let fakePrisonerSearchApi: nock.Scope
+  let prisonerSearchClient: PrisonerSearchClient
 
   beforeEach(() => {
-    fakePrisonSearchApi = nock(config.apis.prisonSearchApi.url)
-    prisonSearchClient = new PrisonSearchClient(token.access_token)
+    fakePrisonerSearchApi = nock(config.apis.prisonerSearchApi.url)
+    prisonerSearchClient = new PrisonerSearchClient(token.access_token)
   })
 
   afterEach(() => {
@@ -23,22 +23,22 @@ describe('prisonSearchClient', () => {
 
   describe('getPrisonerDetails', () => {
     it('should return data from api', async () => {
-      fakePrisonSearchApi
+      fakePrisonerSearchApi
         .get('/prisoner/123123')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, PrisonerMockDataA)
 
-      const output = await prisonSearchClient.getPrisonerDetails('123123')
+      const output = await prisonerSearchClient.getPrisonerDetails('123123')
       expect(output).toEqual(PrisonerMockDataA)
     })
 
     it('should not return data from api', async () => {
-      fakePrisonSearchApi
+      fakePrisonerSearchApi
         .get('/prisoner/abcdef')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, PrisonerMockDataB)
 
-      const output = await prisonSearchClient.getPrisonerDetails('123123')
+      const output = await prisonerSearchClient.getPrisonerDetails('123123')
       expect(output).not.toEqual(PrisonerMockDataB)
     })
   })

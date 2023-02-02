@@ -2,11 +2,11 @@ import config from '../config'
 import RestClient from './restClient'
 import { Prisoner } from '../interfaces/prisoner'
 
-export default class PrisonSearchClient {
+export default class PrisonerSearchClient {
   restClient: RestClient
 
   constructor(token: string) {
-    this.restClient = new RestClient('Prison Offender Search API', config.apis.prisonSearchApi, token)
+    this.restClient = new RestClient('Prison Offender Search API', config.apis.prisonerSearchApi, token)
   }
 
   getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {
