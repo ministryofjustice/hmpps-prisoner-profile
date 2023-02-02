@@ -51,18 +51,6 @@ describe('hmppsAuthClient', () => {
     })
   })
 
-  // describe('getUserLocations', () => {
-  //   it('should return data from api', async () => {
-  //     fakeHmppsAuthApi
-  //       .get('/api/users/me/locations')
-  //       .matchHeader('authorization', `Bearer ${token.access_token}`)
-  //       .reply(200, LocationDummyDataC)
-
-  //     const output = await hmppsAuthClient.getUserLocations(token.access_token)
-  //     expect(output).toEqual(LocationDummyDataC)
-  //   })
-  // })
-
   describe('getSystemClientToken', () => {
     it('should instantiate the redis client', async () => {
       tokenStore.getToken.mockResolvedValue(token.access_token)
