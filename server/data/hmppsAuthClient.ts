@@ -6,10 +6,6 @@ import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
 import RestClient from './restClient'
-import { LocationDummyDataB } from './localMockData/locations'
-import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
-import { CaseLoad } from '../interfaces/caseLoad'
-import { Location } from '../interfaces/location'
 
 const timeoutSpec = config.apis.hmppsAuth.timeout
 const hmppsAuthUrl = config.apis.hmppsAuth.url
@@ -49,28 +45,6 @@ export default class HmppsAuthClient {
 
   private static restClient(token: string): RestClient {
     return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
-  }
-
-  getUserLocations(token: string): Promise<Location[]> {
-    return HmppsAuthClient.restClient(token)
-      .get({ path: '/api/users/me/locations' })
-      .catch(err => {
-        if (config.localMockData === 'true') {
-          return LocationDummyDataB
-        }
-        return err
-      }) as Promise<Location[]>
-  }
-
-  getUserCaseLoads(token: string): Promise<CaseLoad[]> {
-    return HmppsAuthClient.restClient(token)
-      .get({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
-      .catch(err => {
-        if (config.localMockData === 'true') {
-          return CaseLoadsDummyDataA
-        }
-        return err
-      }) as Promise<CaseLoad[]>
   }
 
   getUser(token: string): Promise<User> {

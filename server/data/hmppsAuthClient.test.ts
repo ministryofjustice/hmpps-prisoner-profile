@@ -2,7 +2,6 @@ import nock from 'nock'
 
 import config from '../config'
 import HmppsAuthClient from './hmppsAuthClient'
-import { LocationDummyDataC } from './localMockData/locations'
 import TokenStore from './tokenStore'
 
 jest.mock('./tokenStore')
@@ -49,18 +48,6 @@ describe('hmppsAuthClient', () => {
 
       const output = await hmppsAuthClient.getUserRoles(token.access_token)
       expect(output).toEqual(['role1', 'role2'])
-    })
-  })
-
-  describe('getUserLocations', () => {
-    it('should return data from api', async () => {
-      fakeHmppsAuthApi
-        .get('/api/users/me/locations')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, LocationDummyDataC)
-
-      const output = await hmppsAuthClient.getUserLocations(token.access_token)
-      expect(output).toEqual(LocationDummyDataC)
     })
   })
 
