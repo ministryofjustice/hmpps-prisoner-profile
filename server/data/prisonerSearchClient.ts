@@ -9,8 +9,8 @@ export default class PrisonSearchClient {
     this.restClient = new RestClient('Prison Offender Search API', config.apis.prisonSearchApi, token)
   }
 
-  getPrisoner(): Promise<Prisoner> {
-    return this.restClient.get({ path: '/prisoner/G5897GP' }).catch(err => {
+  getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}` }).catch(err => {
       return err
     }) as Promise<Prisoner>
   }

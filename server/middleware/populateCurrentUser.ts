@@ -103,7 +103,8 @@ export function getPrisonerDetails(userService: UserService): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const prisonerDetails = res.locals.user && (await userService.getPrisonerDetails(res.locals.user.token))
+        const prisonerDetails =
+          res.locals.user && (await userService.getPrisonerDetails(res.locals.user.token, res.locals.prisonerNumber))
         if (prisonerDetails) {
           res.locals.user.userRoles = prisonerDetails
         } else {

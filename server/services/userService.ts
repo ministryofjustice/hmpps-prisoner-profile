@@ -34,7 +34,7 @@ export default class UserService {
     return new PrisonApiClient(token).getUserCaseLoads()
   }
 
-  getPrisonerDetails(token: string): Promise<Prisoner> {
-    return new PrisonSearchClient(token).getPrisoner()
+  getPrisonerDetails(token: string, prisonerNumber: string): Promise<Prisoner> {
+    return new PrisonSearchClient(token).getPrisonerDetails(prisonerNumber)
   }
 }
