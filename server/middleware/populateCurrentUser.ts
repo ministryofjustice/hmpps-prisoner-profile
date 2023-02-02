@@ -1,8 +1,5 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
-
-import { CaseLoad } from '../interfaces/caseLoad'
-import { Context } from '../interfaces/context'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
