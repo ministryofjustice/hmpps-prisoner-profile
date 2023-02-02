@@ -105,7 +105,6 @@ export function getPrisonerDetails(userService: UserService): RequestHandler {
       if (res.locals.user) {
         const prisonerDetails = res.locals.user && (await userService.getPrisonerDetails(res.locals.user.token))
         if (prisonerDetails) {
-          console.log(prisonerDetails)
           res.locals.user.userRoles = prisonerDetails
         } else {
           logger.info('No prisoner details available')
