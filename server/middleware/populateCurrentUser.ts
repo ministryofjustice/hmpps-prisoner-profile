@@ -3,6 +3,7 @@ import logger from '../../logger'
 
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Context } from '../interfaces/context'
+import { Prisoner } from '../interfaces/prisoner'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
@@ -99,6 +100,27 @@ export function getUserActiveCaseLoad(userService: UserService): RequestHandler 
       next()
     } catch (error) {
       logger.error(error, `Failed to retrieve case loads for: ${res.locals.user && res.locals.user.username}`)
+      next(error)
+    }
+  }
+}
+
+
+export function getPrisonerDetails(userService: UserService): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      if (res.locals.user) {
+        const prisonerDetails = res.locals.user && (await userService.getPrisonerDetails(res.locals.user.token))
+        if (prisonerDetails) {
+          console.log(prisonerDetails)
+          res.locals.user.userRoles = prisonerDetails
+        } else {
+          logger.info('No prisoner details available')
+        }
+      }
+      next()
+    } catch (error) {
+      logger.error(error, `Failed to retrieve prisoner details for: ${res.locals.user && res.locals.user.username}`)
       next(error)
     }
   }

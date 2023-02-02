@@ -74,6 +74,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_DEADLINE', 20000))),
     },
+    prisonSearchApi: {
+      url: get('OFFENDER_SEARCH_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('OFFENDER_SEARCH_API_TIMEOUT_SECONDS', 20000)),
+        deadline: Number(get('OFFENDER_SEARCH_API_TIMEOUT_SECONDS', 20000)),
+      },
+      agent: new AgentConfig(Number(get('OFFENDER_SEARCH_API_TIMEOUT_DEADLINE', 20000))),
+    },
     dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
