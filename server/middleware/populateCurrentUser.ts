@@ -66,11 +66,9 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const caseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
-        const userCaseLoads = (context: Context): CaseLoad[] => (context.authSource !== 'auth' ? caseLoads : [])
-
-        if (userCaseLoads.length > 0) {
-          res.locals.user.caseLoads = userCaseLoads(res.locals.user)
+        const userCaseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
+        if (userCaseLoads) {
+          res.locals.user.caseLoads = userCaseLoads
         } else {
           logger.info('No user case loads available')
         }
