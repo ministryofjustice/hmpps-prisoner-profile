@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
-import { PrisonerSearchService } from '../services'
 import UserService from '../services/userService'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
