@@ -1,7 +1,5 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { miniSummaryParamGroupA } from '../data/miniSummary/miniSummary'
-import { alerts, profileBannerData, profileBannerTopLinks, tabLinks } from '../data/profileBanner/profileBanner'
 
 import { appWithAllRoutes } from './testutils/appSetup'
 

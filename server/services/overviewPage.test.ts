@@ -1,6 +1,5 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { miniSummaryParamGroupA, miniSummaryParamGroupB } from '../data/miniSummary/miniSummary'
 import { appWithAllRoutes } from '../routes/testutils/appSetup'
 
 let app: Express
