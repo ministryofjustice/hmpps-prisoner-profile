@@ -99,26 +99,3 @@ export function getUserActiveCaseLoad(userService: UserService): RequestHandler 
     }
   }
 }
-
-export function getPrisonerDetails(
-  prisonerSearchService: PrisonerSearchService,
-  prisonerNumber: string,
-): RequestHandler {
-  return async (req, res, next) => {
-    try {
-      if (res.locals.user) {
-        const prisonerDetails =
-          res.locals.user && (await prisonerSearchService.getPrisonerDetails(res.locals.user.token, prisonerNumber))
-        if (prisonerDetails) {
-          res.locals.user.prisonerDetails = prisonerDetails
-        } else {
-          logger.info('No prisoner details available')
-        }
-      }
-      next()
-    } catch (error) {
-      logger.error(error, `Failed to retrieve prisoner details for: ${res.locals.user && res.locals.user.username}`)
-      next(error)
-    }
-  }
-}

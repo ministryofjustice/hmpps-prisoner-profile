@@ -13,7 +13,6 @@ export default function routes(service: Services): Router {
 
   get('/prisoner/:prisonerNumber', (req, res, next) => {
     service.prisonerSearchService.getPrisonerDetails(res.locals.user.token, req.params.prisonerNumber).then(data => {
-      res.locals.user.personalDetails = data
       res.render('pages/index', {
         backLinkLabel: 'Back to search results',
         prisonerName: profileBannerData.prisonerName,
