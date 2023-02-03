@@ -1,10 +1,12 @@
 import nock from 'nock'
 import config from '../config'
-import { PrisonerMockDataA, PrisonerMockDataB } from './localMockData/prisonerSearch'
+import { PrisonerMockDataA, PrisonerMockDataB } from './localMockData/prisoner'
 import PrisonerSearchClient from './prisonerSearchClient'
+import TokenStore from './tokenStore'
 
 jest.mock('./tokenStore')
 
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('prisonerSearchClient', () => {
@@ -13,7 +15,7 @@ describe('prisonerSearchClient', () => {
 
   beforeEach(() => {
     fakePrisonerSearchApi = nock(config.apis.prisonerSearchApi.url)
-    prisonerSearchClient = new PrisonerSearchClient(token.access_token)
+    prisonerSearchClient = new PrisonerSearchClient(tokenStore)
   })
 
   afterEach(() => {
@@ -28,7 +30,7 @@ describe('prisonerSearchClient', () => {
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, PrisonerMockDataA)
 
-      const output = await prisonerSearchClient.getPrisonerDetails('A8469DY')
+      const output = await prisonerSearchClient.getPrisonerDetails(token.access_token, 'A8469DY')
       expect(output).toEqual(PrisonerMockDataA)
     })
 
@@ -38,7 +40,7 @@ describe('prisonerSearchClient', () => {
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, PrisonerMockDataB)
 
-      const output = await prisonerSearchClient.getPrisonerDetails('123123')
+      const output = await prisonerSearchClient.getPrisonerDetails(token.access_token, '123123123')
       expect(output).not.toEqual(PrisonerMockDataB)
     })
   })

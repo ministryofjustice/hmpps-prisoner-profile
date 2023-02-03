@@ -1,11 +1,8 @@
 import { convertToTitleCase } from '../utils/utils'
 import type HmppsAuthClient from '../data/hmppsAuthClient'
-
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
 import PrisonApiClient from '../data/prisonApiClient'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
-import { Prisoner } from '../interfaces/prisoner'
 
 interface UserDetails {
   name: string
@@ -32,9 +29,5 @@ export default class UserService {
 
   getUserCaseLoads(token: string): Promise<CaseLoad[]> {
     return new PrisonApiClient(token).getUserCaseLoads()
-  }
-
-  getPrisonerDetails(token: string, prisonerNumber: string): Promise<Prisoner> {
-    return new PrisonerSearchClient(token).getPrisonerDetails(prisonerNumber)
   }
 }
