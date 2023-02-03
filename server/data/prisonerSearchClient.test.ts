@@ -24,17 +24,17 @@ describe('prisonerSearchClient', () => {
   describe('getPrisonerDetails', () => {
     it('should return data from api', async () => {
       fakePrisonerSearchApi
-        .get('/prisoner/123123')
+        .get('/prisoner/A8469DY')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, PrisonerMockDataA)
 
-      const output = await prisonerSearchClient.getPrisonerDetails('123123')
+      const output = await prisonerSearchClient.getPrisonerDetails('A8469DY')
       expect(output).toEqual(PrisonerMockDataA)
     })
 
     it('should not return data from api', async () => {
       fakePrisonerSearchApi
-        .get('/prisoner/abcdef')
+        .get('/prisoner/123123d')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, PrisonerMockDataB)
 

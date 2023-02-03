@@ -1,7 +1,7 @@
 import { Prisoner } from '../../interfaces/prisoner'
 
 export const PrisonerMockDataA: Prisoner = {
-  prisonerNumber: 'A1234AA',
+  prisonerNumber: 'A8469DY',
   pncNumber: '12/394773H',
   pncNumberCanonicalShort: '12/394773H',
   pncNumberCanonicalLong: '2012/394773H',
@@ -9,7 +9,7 @@ export const PrisonerMockDataA: Prisoner = {
 }
 
 export const PrisonerMockDataB: Prisoner = {
-  prisonerNumber: 'A1234BB',
+  prisonerNumber: 'A8469DY',
   pncNumber: '12/394773H',
   pncNumberCanonicalShort: '12/394773H',
   pncNumberCanonicalLong: '2012/394773H',

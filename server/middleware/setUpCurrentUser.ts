@@ -9,6 +9,5 @@ export default function setUpCurrentUser({ userService }: Services): Router {
   router.use(auth.authenticationMiddleware(tokenVerifier))
   router.use(populateCurrentUser(userService))
   router.use(getUserActiveCaseLoad(userService))
-  router.use(getPrisonerDetails(userService))
   return router
 }

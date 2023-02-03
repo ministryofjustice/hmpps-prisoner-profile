@@ -99,14 +99,15 @@ export function getUserActiveCaseLoad(userService: UserService): RequestHandler 
   }
 }
 
-export function getPrisonerDetails(userService: UserService): RequestHandler {
+export function getPrisonerDetails(userService: UserService, prisonerNumber: string): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
         const prisonerDetails =
-          res.locals.user && (await userService.getPrisonerDetails(res.locals.user.token, res.locals.prisonerNumber))
+          res.locals.user && (await userService.getPrisonerDetails(res.locals.user.token, prisonerNumber))
         if (prisonerDetails) {
-          res.locals.user.userRoles = prisonerDetails
+          // console.log(prisonerDetails);
+          res.locals.user.prisonerDetails = prisonerDetails
         } else {
           logger.info('No prisoner details available')
         }

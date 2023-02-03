@@ -12,7 +12,7 @@ export default function routes(service: Services): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/prisoner/:prisonerNumber', (req, res, next) => {
-    res.locals.prisonerNumber = req.params.prisonerNumber
+    service.userService.getPrisonerDetails(res.locals.user.token, req.params.prisonerNumber)
     res.render('pages/index', {
       backLinkLabel: 'Back to search results',
       prisonerName: profileBannerData.prisonerName,

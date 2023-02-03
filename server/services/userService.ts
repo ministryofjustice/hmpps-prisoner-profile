@@ -4,7 +4,7 @@ import type HmppsAuthClient from '../data/hmppsAuthClient'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
 import PrisonApiClient from '../data/prisonApiClient'
-import PrisonSearchClient from '../data/prisonerSearchClient'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
 import { Prisoner } from '../interfaces/prisoner'
 
 interface UserDetails {
@@ -35,6 +35,6 @@ export default class UserService {
   }
 
   getPrisonerDetails(token: string, prisonerNumber: string): Promise<Prisoner> {
-    return new PrisonSearchClient(token).getPrisonerDetails(prisonerNumber)
+    return new PrisonerSearchClient(token).getPrisonerDetails(prisonerNumber)
   }
 }
