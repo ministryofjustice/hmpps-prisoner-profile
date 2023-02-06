@@ -12,20 +12,22 @@ export default function routes(service: Services): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/prisoner/:prisonerNumber', (req, res, next) => {
-    res.render('pages/index', {
-      backLinkLabel: 'Back to search results',
-      prisonerName: profileBannerData.prisonerName,
-      prisonId: profileBannerData.prisonId,
-      profileBannerTopLinks,
-      alerts,
-      tabLinks,
-      miniSummaryParamGroupA,
-      miniSummaryParamGroupB,
-      statuses,
-      nonAssociationRows,
-      personalDetails,
-      staffContacts,
-      schedule,
+    service.prisonerSearchService.getPrisonerDetails(res.locals.user.token, req.params.prisonerNumber).then(() => {
+      res.render('pages/index', {
+        backLinkLabel: 'Back to search results',
+        prisonerName: profileBannerData.prisonerName,
+        prisonId: profileBannerData.prisonId,
+        profileBannerTopLinks,
+        alerts,
+        tabLinks,
+        miniSummaryParamGroupA,
+        miniSummaryParamGroupB,
+        statuses,
+        nonAssociationRows,
+        personalDetails,
+        staffContacts,
+        schedule,
+      })
     })
   })
 

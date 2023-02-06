@@ -1,6 +1,5 @@
 import { convertToTitleCase } from '../utils/utils'
 import type HmppsAuthClient from '../data/hmppsAuthClient'
-
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
 import PrisonApiClient from '../data/prisonApiClient'
