@@ -5,8 +5,8 @@
     <div class="govuk-grid-column-full">
       {% set keyWorkerHtml %}
         <p class="govuk-body">
-          {{ pageData.staffContacts.keyWorker.name }}
-          - last session: {{ pageData.staffContacts.keyWorker.lastSession | formatDate }}
+          {{ staffContacts.keyWorker.name }}
+          - last session: {{ staffContacts.keyWorker.lastSession | formatDate }}
         </p>
       {% endset %}
       {{ govukSummaryList({
@@ -25,7 +25,7 @@
                 text: "Prison Offender Manager"
               },
               value: {
-                text: pageData.staffContacts.prisonOffenderManager
+                text: staffContacts.prisonOffenderManager
               }
             },
             {
@@ -33,7 +33,7 @@
                 text: "Co-working Prison Offender Manager"
               },
               value: {
-                text: pageData.staffContacts.coworkingPrisonOffenderManager
+                text: staffContacts.coworkingPrisonOffenderManager
               }
             },
             {
@@ -41,7 +41,7 @@
                 text: "Community Offender Manager"
               },
               value: {
-                text: pageData.staffContacts.communityOffenderManager
+                text: staffContacts.communityOffenderManager
               }
             }
           ] | summaryListOneHalfWidth 

@@ -9,16 +9,17 @@ export default class PageService {
   renderPage(_res: Response, prisonerNumber: string, template: string, pageData: object) {
     const services = new PrisonerSearchClient(new TokenStore(createRedisClient({ legacyMode: false })))
     services.getPrisonerDetails(_res.locals.user.token, prisonerNumber).then((prisonerData: Prisoner) => {
+      const headerData = {
+        backLinkLabel: 'Back to search results',
+        prisonerName: `${prisonerData.lastName}, ${prisonerData.firstName}`,
+        prisonId: prisonerNumber,
+        profileBannerTopLinks,
+        alerts,
+        tabLinks,
+      }
       _res.render(template, {
-        headerData: {
-          backLinkLabel: 'Back to search results',
-          prisonerName: `${prisonerData.lastName}, ${prisonerData.firstName}`,
-          prisonId: prisonerNumber,
-          profileBannerTopLinks,
-          alerts,
-          tabLinks,
-        },
-        pageData,
+        ...headerData,
+        ...pageData,
       })
     })
   }
