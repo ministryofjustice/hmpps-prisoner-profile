@@ -1,4 +1,4 @@
-import { Response } from 'express-serve-static-core'
+import { Response } from 'express'
 import { Prisoner } from '../interfaces/prisoner'
 import { alerts, profileBannerTopLinks, tabLinks } from '../data/profileBanner/profileBanner'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
