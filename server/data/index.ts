@@ -20,7 +20,7 @@ export const dataAccess = () => ({
   hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient({ legacyMode: false }))),
 })
 
-export const prisonSearchAccess = () => ({
+export const prisonerSearchAccess = () => ({
   prisonerSearchClient: new PrisonerSearchClient(new TokenStore(createRedisClient({ legacyMode: false }))),
 })
 

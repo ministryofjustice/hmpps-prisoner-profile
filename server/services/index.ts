@@ -1,10 +1,10 @@
-import { dataAccess, prisonSearchAccess } from '../data'
+import { dataAccess, prisonerSearchAccess } from '../data'
 import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 
 export const services = () => {
   const { hmppsAuthClient } = dataAccess()
-  const { prisonerSearchClient } = prisonSearchAccess()
+  const { prisonerSearchClient } = prisonerSearchAccess()
   const userService = new UserService(hmppsAuthClient)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
 
