@@ -11,7 +11,7 @@
                 text: "Preferred name"
               },
               value: {
-                text: personalDetails.name
+                text: pageData.personalDetails.name
               }
             },
             {
@@ -19,7 +19,7 @@
                 text: "Date of birth"
               },
               value: {
-                text: personalDetails.dateOfBirth | formatDate
+                text: pageData.personalDetails.dateOfBirth | formatDate
               }
             },
             {
@@ -27,7 +27,7 @@
                 text: "Age"
               },
               value: {
-                text: personalDetails.age
+                text: pageData.personalDetails.age
               }
             },
             {
@@ -35,7 +35,7 @@
                 text: "Nationality"
               },
               value: {
-                text: personalDetails.nationality
+                text: pageData.personalDetails.nationality
               }
             },
             {
@@ -43,7 +43,7 @@
                 text: "Spoken language"
               },
               value: {
-                text: personalDetails.spokenLanguage
+                text: pageData.personalDetails.spokenLanguage
               }
             }
           ] | summaryListOneHalfWidth
@@ -58,7 +58,7 @@
                 text: "CRO number"
               },
               value: {
-                text: personalDetails.croNumber
+                text: pageData.personalDetails.croNumber
               }
             },
             {
@@ -66,7 +66,7 @@
                 text: "PNC number"
               },
               value: {
-                text: personalDetails.pncNumber
+                text: pageData.personalDetails.pncNumber
               }
             }
           ] | summaryListOneHalfWidth
