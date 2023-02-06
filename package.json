@@ -93,7 +93,6 @@
   },
   "dependencies": {
     "@ministryofjustice/frontend": "^1.6.4",
-    "@types/express-serve-static-core": "^4.17.33",
     "agentkeepalive": "^4.2.1",
     "applicationinsights": "^2.4.1",
     "body-parser": "^1.20.1",
