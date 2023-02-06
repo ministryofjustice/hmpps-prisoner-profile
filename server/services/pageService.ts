@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore'
 import { createRedisClient } from '../data/redisClient'
 
 export default class PageService {
-  renderPage(_res: Response, prisonerNumber: string, template: string, pageData: object) {
+  renderPage<T>(_res: Response, prisonerNumber: string, template: string, pageData: T) {
     const services = new PrisonerSearchClient(new TokenStore(createRedisClient({ legacyMode: false })))
     services.getPrisonerDetails(_res.locals.user.token, prisonerNumber).then((prisonerData: Prisoner) => {
       const headerData = {
