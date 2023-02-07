@@ -26,6 +26,8 @@
 }
 
 .alerts-list {
+
+  min-height: 50px;
   @extend %govuk-list;
   margin: 17px 15px 10px 150px;
 
