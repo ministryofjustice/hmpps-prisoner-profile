@@ -18,8 +18,8 @@ export default function routes(service: Services): Router {
 
   commonRoutes()
 
-  get('/prisoner/:prisonerNumber', (req, res, next) => {
-    OverviewPageService(req.params.prisonerNumber, res)
+  get('/prisoner/:prisonerNumber', async (req, res, next) => {
+    await OverviewPageService(req.params.prisonerNumber, res)
   })
 
   get('/', (req, res, next) => {

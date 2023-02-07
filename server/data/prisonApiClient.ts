@@ -4,6 +4,8 @@ import { LocationDummyDataB } from './localMockData/locations'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
+import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
+import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 
 export default class PrisonApiClient {
   restClient: RestClient
@@ -37,6 +39,20 @@ export default class PrisonApiClient {
       })
       return result as Readable
     } catch (err) {
+      return err
+    }
+  }
+
+  async getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails> {
+    try {
+      const result = await this.restClient.get({
+        path: `/api/offenders/${prisonerNumber}/non-association-details`,
+      })
+      return result as NonAssociationDetails
+    } catch (err) {
+      if (config.localMockData === 'true') {
+        return nonAssociationDetailsDummyData
+      }
       return err
     }
   }
