@@ -4,7 +4,7 @@ const ContentTypes = {
   type3: 'TYPE_THREE',
 }
 
-type MiniSummaryParamType = {
+export type MiniSummaryParamType = {
   data: MiniSummaryDataType
   config: {
     header: boolean

@@ -26,6 +26,8 @@
 }
 
 .alerts-list {
+
+  min-height: 50px;
   @extend %govuk-list;
   margin: 17px 15px 10px 150px;
 
@@ -88,6 +90,8 @@
     border-color: #f47738;
   }
 
+
+  
   &--acct {
     border-color: #d34700;
   }
@@ -173,31 +177,26 @@
   }
 
   &--quarantined {
-    color: #fff;
     border-color: #330;
     background-color: #330;
   }
 
   &--reverse-cohorting-unit {
-    color: #fff;
     border-color: mix(white, #00703c, 20%);
     background-color: mix(white, #00703c, 20%);
   }
 
   &--protective-isolation-unit {
-    color: #fff;
     border-color: #006637;
     background-color: #006637;
   }
 
   &--shielding-unit {
-    color: #fff;
     border-color: #004424;
     background-color: #004424;
   }
 
   &--refusing-to-shield {
-    color: #fff;
     border-color: #b58840;
     background-color: #b58840;
   }
