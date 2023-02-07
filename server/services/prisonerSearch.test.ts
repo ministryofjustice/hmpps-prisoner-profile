@@ -22,7 +22,7 @@ describe('Prisoner search service', () => {
 
       const result = await prisonSearchService.getPrisonerDetails(token, prisonerNumber)
 
-      expect(result.croNumber).toEqual('29906/12J')
+      expect(result.croNumber).toEqual('400862/08W')
     })
     it('Propagates error', async () => {
       prisonerSearchClient.getPrisonerDetails.mockRejectedValue(new Error('some error'))
