@@ -31,17 +31,14 @@ export default class PrisonApiClient {
     }) as Promise<CaseLoad[]>
   }
 
-  getOffender(offenderNumber: string): Promise<Offender> {
-    return this.restClient.get({ path: `/api/offenders/${offenderNumber}` }).catch(err => {
+  async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<string> {
+    try {
+      const result = await this.restClient.get({
+        path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
+      })
+      return result as string
+    } catch (err) {
       return err
-    }) as Promise<Offender>
-  }
-
-  getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<string> {
-    return this.restClient
-      .get({ path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}` })
-      .catch(err => {
-        return err
-      }) as Promise<string>
+    }
   }
 }
