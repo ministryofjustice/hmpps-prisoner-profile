@@ -4,7 +4,6 @@ import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
-export const subStr = 'localhost:3000'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner) {
   const profileBannerTopLinks = [
