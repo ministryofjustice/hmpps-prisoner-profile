@@ -3,6 +3,9 @@ import { tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
+export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
+export const subStr = 'localhost:3000'
+
 export function mapProfileBannerTopLinks(prisonerData: Prisoner) {
   const profileBannerTopLinks = [
     {
@@ -43,7 +46,7 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return alerts
 }
 
-export function mapHeaderData(prisonerData: Prisoner) {
+export function mapHeaderData(prisonerData: Prisoner, imagePath: string) {
   const headerData = {
     backLinkLabel: 'Back to search results',
     prisonerName: `${prisonerData.lastName}, ${prisonerData.firstName}`,
@@ -51,6 +54,7 @@ export function mapHeaderData(prisonerData: Prisoner) {
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks,
+    photoSrc: imagePath,
   }
   return headerData
 }
