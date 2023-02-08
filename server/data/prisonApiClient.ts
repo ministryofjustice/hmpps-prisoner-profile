@@ -4,7 +4,6 @@ import { LocationDummyDataB } from './localMockData/locations'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
-import { Offender } from '../interfaces/offender'
 
 export default class PrisonApiClient {
   restClient: RestClient
