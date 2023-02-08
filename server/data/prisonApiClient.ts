@@ -29,4 +29,15 @@ export default class PrisonApiClient {
       return err
     }) as Promise<CaseLoad[]>
   }
+
+  async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<string> {
+    try {
+      const result = await this.restClient.get({
+        path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
+      })
+      return result as string
+    } catch (err) {
+      return err
+    }
+  }
 }
