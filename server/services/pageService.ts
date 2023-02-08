@@ -1,15 +1,13 @@
 import { Response } from 'express'
 import { Prisoner } from '../interfaces/prisoner'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
-import TokenStore from '../data/tokenStore'
-import { createRedisClient } from '../data/redisClient'
 import { mapHeaderData, placeHolderImagePath, subStr } from '../mappers/headerMappers'
 import OffenderService from './offenderService'
 
 export default class PageService {
   async renderPage<T>(_res: Response, prisonerNumber: string, template: string, pageData: T) {
-    const prisonerSearch = new PrisonerSearchClient(new TokenStore(createRedisClient({ legacyMode: false })))
-    const prisonerData: Prisoner = await prisonerSearch.getPrisonerDetails(_res.locals.user.token, prisonerNumber)
+    const services = new PrisonerSearchClient(_res.locals.user.token)
+    const prisonerData: Prisoner = await services.getPrisonerDetails(prisonerNumber)
 
     let imagePath: string
     if (_res.req.rawHeaders[1].includes(subStr)) {
