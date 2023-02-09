@@ -6,9 +6,11 @@ context('SignIn', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
+    cy.task('stubNonAssociations', 'jdhf')
   })
 
   it('Overview page is displayed', () => {
+    cy.task('stubNonAssociations', '123')
     cy.task('stubDpsOverviewPage')
     cy.signIn()
     Page.verifyOnPage(OverviewPage)
