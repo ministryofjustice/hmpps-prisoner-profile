@@ -30,12 +30,12 @@ export default class PrisonApiClient {
     }) as Promise<CaseLoad[]>
   }
 
-  async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<string> {
+  async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Buffer> {
     try {
       const result = await this.restClient.get({
         path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
       })
-      return result as string
+      return result as Buffer
     } catch (err) {
       return err
     }
