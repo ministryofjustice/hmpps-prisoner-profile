@@ -1,7 +1,9 @@
 import { type RequestHandler, Router } from 'express'
 import config from '../config'
+import PrisonApiRestClient from '../data/prisonApiClient'
+import { OverviewPage } from '../interfaces/overviewPage'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import type { Services } from '../services'
+import { PageService, Services } from '../services'
 import OverviewPageService from '../services/overviewPageService'
 import CommonApiRoutes from './common/api'
 
@@ -19,7 +21,11 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    await OverviewPageService(req.params.prisonerNumber, res)
+    const pageService = new PageService()
+    const prisonApi = new PrisonApiRestClient(res.locals.user.token)
+    const overviewPageService = new OverviewPageService(prisonApi)
+    const overviewPage = await overviewPageService.get(req.params.prisonerNumber)
+    pageService.renderPage<OverviewPage>(res, req.params.prisonerNumber, 'pages/index', overviewPage)
   })
 
   get('/', (req, res, next) => {

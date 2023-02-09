@@ -1,32 +1,43 @@
-import { Response } from 'express'
-import { PageService } from '.'
 import { statuses, personalDetails, staffContacts, schedule } from '../data/overviewPage'
 import { miniSummaryParamGroupA, miniSummaryParamGroupB } from '../data/miniSummary/miniSummary'
-import { OverviewPage } from '../interfaces/overviewPage'
-import PrisonApiClient from '../data/prisonApiClient'
+import { OverviewPage, OverviewNonAssociation } from '../interfaces/overviewPage'
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 
-export default async function OverviewPageService(prisonerNumber: string, _res: Response) {
-  const pageService = new PageService()
-  const prisonApiClient = new PrisonApiClient(_res.locals.user.token)
-  const nonAssociations = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
-  const nonAssociationRows = nonAssociations.nonAssociations.map(nonAssocation => {
-    const row = []
-    const { offenderNonAssociation } = nonAssocation
-    const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
-    row.push({ text: nonAssociationName })
-    row.push({ text: offenderNonAssociation.offenderNo })
-    row.push({ text: offenderNonAssociation.assignedLivingUnitDescription })
-    row.push({ text: offenderNonAssociation.reasonDescription })
-    return row
-  })
+export default class OverviewPageService {
+  private prisonApiClient: PrisonApiClient
 
-  pageService.renderPage<OverviewPage>(_res, prisonerNumber, 'pages/index', {
-    miniSummaryParamGroupA,
-    miniSummaryParamGroupB,
-    statuses,
-    nonAssociationRows,
-    personalDetails,
-    staffContacts,
-    schedule,
-  })
+  constructor(prisonApiClient: PrisonApiClient) {
+    this.prisonApiClient = prisonApiClient
+  }
+
+  public async get(prisonerNumber: string): Promise<OverviewPage> {
+    const nonAssociationRows = await this.getNonAssociations(prisonerNumber)
+    return {
+      miniSummaryParamGroupA,
+      miniSummaryParamGroupB,
+      statuses,
+      nonAssociationRows,
+      personalDetails,
+      staffContacts,
+      schedule,
+    }
+  }
+
+  private async getNonAssociations(prisonerNumber: string): Promise<OverviewNonAssociation[]> {
+    const nonAssociations = await this.prisonApiClient.getNonAssociationDetails(prisonerNumber)
+    return nonAssociations.nonAssociations
+      .filter(nonassociation => {
+        return nonassociation.offenderNonAssociation.agencyDescription === nonAssociations.agencyDescription
+      })
+      .map(nonAssocation => {
+        const { offenderNonAssociation } = nonAssocation
+        const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
+        return {
+          name: nonAssociationName,
+          prisonNumber: offenderNonAssociation.offenderNo,
+          location: offenderNonAssociation.assignedLivingUnitDescription,
+          reciprocalReason: offenderNonAssociation.reasonDescription,
+        }
+      })
+  }
 }

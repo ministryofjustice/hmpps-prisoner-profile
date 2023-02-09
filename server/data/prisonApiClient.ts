@@ -6,8 +6,9 @@ import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
 import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
+import { PrisonApiClient } from './interfaces/prisonApiClient'
 
-export default class PrisonApiClient {
+export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
 
   constructor(token: string) {

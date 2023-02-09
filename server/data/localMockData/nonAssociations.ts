@@ -1,12 +1,12 @@
 import { NonAssociation, NonAssociationDetail, NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
 
 const nonAssociationA: NonAssociation = {
-  offenderNo: 'ABC1234',
+  offenderNo: 'ABC123',
   firstName: 'John',
   lastName: 'Doe',
   reasonCode: 'VIC',
   reasonDescription: 'Victim',
-  agencyDescription: 'NOTTINGHAM (HMP)',
+  agencyDescription: 'Moorland (HMP & YOI)',
   assignedLivingUnitDescription: 'NMI-RECP',
   assignedLivingUnitId: 1234,
 }
@@ -29,7 +29,7 @@ const nonAssociationB: NonAssociation = {
   lastName: 'Incognito',
   reasonCode: 'RIV',
   reasonDescription: 'Rival Gang',
-  agencyDescription: 'OUTSIDE',
+  agencyDescription: 'Moorland (HMP & YOI)',
   assignedLivingUnitDescription: 'NMI-RECP',
   assignedLivingUnitId: 1234,
 }
