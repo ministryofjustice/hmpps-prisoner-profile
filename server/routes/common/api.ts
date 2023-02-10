@@ -1,6 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
 import path from 'path'
-import { Readable } from 'stream'
 import OffenderService from '../../services/offenderService'
 
 const placeHolderImage = path.join(process.cwd(), '/assets/images/prisoner-profile-photo.png')
@@ -11,7 +10,7 @@ export default class CommonApiRoutes {
     const offenderService = new OffenderService()
     if (prisonerNumber !== 'placeholder') {
       offenderService
-        .getPrisonerImage<Readable>(res.locals.user.token, prisonerNumber)
+        .getPrisonerImage(res.locals.user.token, prisonerNumber)
         .then(data => {
           res.type('image/jpeg')
           data.pipe(res)

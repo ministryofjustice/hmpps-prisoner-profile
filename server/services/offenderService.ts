@@ -1,7 +1,8 @@
+import { Readable } from 'stream'
 import PrisonApiClient from '../data/prisonApiClient'
 
 export default class OffenderService {
-  getPrisonerImage<T>(token: string, offenderNumber: string): Promise<T> {
-    return new PrisonApiClient(token).getPrisonerImage<T>(offenderNumber, true)
+  getPrisonerImage(token: string, offenderNumber: string): Promise<Readable> {
+    return new PrisonApiClient(token).getPrisonerImage<Readable>(offenderNumber, true)
   }
 }
