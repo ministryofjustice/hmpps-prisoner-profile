@@ -19,17 +19,17 @@ describe('OverviewPageService', () => {
     it('Converts the non-associations into the correct rows', async () => {
       const overviewPageService = new OverviewPageService(prisonApiClient)
       const res = await overviewPageService.get('ABC123')
-      expect(res.nonAssociationRows.length).toEqual(2)
-      const associationRowOne = res.nonAssociationRows[0]
-      const associationRowTwo = res.nonAssociationRows[1]
-      expect(associationRowOne.name).toEqual('John Doe')
-      expect(associationRowOne.prisonNumber).toEqual('ABC123')
-      expect(associationRowOne.location).toEqual('NMI-RECP')
-      expect(associationRowOne.reciprocalReason).toEqual('Victim')
-      expect(associationRowTwo.name).toEqual('Guy Incognito')
-      expect(associationRowTwo.prisonNumber).toEqual('DEF321')
-      expect(associationRowTwo.location).toEqual('NMI-RECP')
-      expect(associationRowTwo.reciprocalReason).toEqual('Rival Gang')
+      expect(res.nonAssociations.length).toEqual(2)
+      const associationRowOne = res.nonAssociations[0]
+      const associationRowTwo = res.nonAssociations[1]
+      expect(associationRowOne[0].text).toEqual('John Doe')
+      expect(associationRowOne[1].text).toEqual('ABC123')
+      expect(associationRowOne[2].text).toEqual('NMI-RECP')
+      expect(associationRowOne[3].text).toEqual('Victim')
+      expect(associationRowTwo[0].text).toEqual('Guy Incognito')
+      expect(associationRowTwo[1].text).toEqual('DEF321')
+      expect(associationRowTwo[2].text).toEqual('NMI-RECP')
+      expect(associationRowTwo[3].text).toEqual('Rival Gang')
     })
 
     it('Only shows non associations that are part of the same prison', async () => {
@@ -39,8 +39,8 @@ describe('OverviewPageService', () => {
       const overviewPageService = new OverviewPageService(prisonApiClient)
       const res = await overviewPageService.get('ABC123')
       const expectedPrisonNumber = nonAssocations.nonAssociations[1].offenderNonAssociation.offenderNo
-      expect(res.nonAssociationRows.length).toEqual(1)
-      expect(res.nonAssociationRows[0].prisonNumber).toEqual(expectedPrisonNumber)
+      expect(res.nonAssociations.length).toEqual(1)
+      expect(res.nonAssociations[0][1].text).toEqual(expectedPrisonNumber)
     })
   })
 })

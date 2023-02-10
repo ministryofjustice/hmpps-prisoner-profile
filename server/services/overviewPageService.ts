@@ -11,12 +11,12 @@ export default class OverviewPageService {
   }
 
   public async get(prisonerNumber: string): Promise<OverviewPage> {
-    const nonAssociationRows = await this.getNonAssociations(prisonerNumber)
+    const nonAssociations = await this.getNonAssociations(prisonerNumber)
     return {
       miniSummaryParamGroupA,
       miniSummaryParamGroupB,
       statuses,
-      nonAssociationRows,
+      nonAssociations,
       personalDetails,
       staffContacts,
       schedule,
@@ -32,12 +32,12 @@ export default class OverviewPageService {
       .map(nonAssocation => {
         const { offenderNonAssociation } = nonAssocation
         const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
-        return {
-          name: nonAssociationName,
-          prisonNumber: offenderNonAssociation.offenderNo,
-          location: offenderNonAssociation.assignedLivingUnitDescription,
-          reciprocalReason: offenderNonAssociation.reasonDescription,
-        }
+        return [
+          { text: nonAssociationName },
+          { text: offenderNonAssociation.offenderNo },
+          { text: offenderNonAssociation.assignedLivingUnitDescription },
+          { text: offenderNonAssociation.reasonDescription },
+        ]
       })
   }
 }
