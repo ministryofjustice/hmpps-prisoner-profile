@@ -45,15 +45,14 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return alerts
 }
 
-export function mapHeaderData(prisonerData: Prisoner, imagePath: string) {
+export function mapHeaderData(prisonerData: Prisoner) {
   const headerData = {
     backLinkLabel: 'Back to search results',
     prisonerName: `${prisonerData.lastName}, ${prisonerData.firstName}`,
-    prisonId: prisonerData.prisonerNumber,
+    prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks,
-    photoSrc: imagePath,
   }
   return headerData
 }
