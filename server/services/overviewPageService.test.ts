@@ -42,5 +42,14 @@ describe('OverviewPageService', () => {
       expect(res.nonAssociations.length).toEqual(1)
       expect(res.nonAssociations[0][1].text).toEqual(expectedPrisonNumber)
     })
+
+    it('Returns an empty list if no non-associations are returned', async () => {
+      const nonAssocations = { ...nonAssociationDetailsDummyData }
+      nonAssocations.nonAssociations = []
+      prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssocations)
+      const overviewPageService = new OverviewPageService(prisonApiClient)
+      const res = await overviewPageService.get('ABC123')
+      expect(res.nonAssociations.length).toEqual(0)
+    })
   })
 })
