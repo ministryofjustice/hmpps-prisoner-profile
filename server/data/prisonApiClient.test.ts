@@ -2,6 +2,7 @@ import nock from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { LocationDummyDataC } from './localMockData/locations'
+import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
 
 jest.mock('./tokenStore')
@@ -43,6 +44,18 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getUserCaseLoads()
       expect(output).toEqual(CaseLoadsDummyDataA)
+    })
+  })
+
+  describe('getNonAssociations', () => {
+    it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
+      fakePrisonApi
+        .get(`/api/offenders/${prisonerNumber}/non-association-details`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, nonAssociationDetailsDummyData)
+
+      const output = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
+      expect(output).toEqual(nonAssociationDetailsDummyData)
     })
   })
 })

@@ -20,4 +20,18 @@ export default class OverviewPage extends Page {
 
   miniSummaryGroupB_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
+
+  nonAssociations = () => ({
+    table: (): PageElement => cy.get('[data-qa=non-associations-table]'),
+    rows: (): PageElement => this.nonAssociations().table().get('tr'),
+    row: (rowNumber: number) => {
+      const row = this.nonAssociations().table().find('tr').eq(rowNumber).find('th, td')
+      return {
+        prisonerName: (): PageElement => row.eq(0),
+        prisonNumber: (): PageElement => row.eq(1),
+        location: (): PageElement => row.eq(2),
+        reciprocalReason: (): PageElement => row.eq(3),
+      }
+    },
+  })
 }
