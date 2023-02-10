@@ -1,7 +1,7 @@
 import PrisonApiClient from '../data/prisonApiClient'
 
 export default class OffenderService {
-  getPrisonerImage(token: string, offenderNumber: string): Promise<Buffer> {
-    return new PrisonApiClient(token).getPrisonerImage(offenderNumber, true)
+  getPrisonerImage<T>(token: string, offenderNumber: string): Promise<T> {
+    return new PrisonApiClient(token).getPrisonerImage<T>(offenderNumber, true)
   }
 }
