@@ -118,7 +118,6 @@ dist
 
 
 assets/stylesheets/*.css
-assets/images/profile/*
 .idea
 .vscode
 build-info.json
