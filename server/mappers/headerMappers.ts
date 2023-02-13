@@ -9,21 +9,25 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner) {
   const profileBannerTopLinks = [
     {
       heading: 'Location',
+      hiddenLabel: 'View location details',
       info: prisonerData.cellLocation,
       classes: '',
     },
     {
       heading: 'Category',
-      info: prisonerData.category,
+      hiddenLabel: 'Manage category',
+      info: prisonerData.category === 'U' ? 'Unsentenced' : prisonerData.category,
       classes: '',
     },
     {
       heading: 'CSRA',
+      hiddenLabel: 'View CSRA history',
       info: prisonerData.csra,
       classes: '',
     },
     {
       heading: 'Incentive level',
+      hiddenLabel: 'View incentive level details',
       info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : '',
       classes: 'remove-column-gutter-right',
     },
