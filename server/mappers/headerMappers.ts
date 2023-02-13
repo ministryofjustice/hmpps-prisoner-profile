@@ -46,6 +46,7 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
 }
 
 export function mapHeaderData(prisonerData: Prisoner) {
+  const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const headerData = {
     backLinkLabel: 'Back to search results',
     prisonerName: `${prisonerData.lastName}, ${prisonerData.firstName}`,
@@ -53,6 +54,7 @@ export function mapHeaderData(prisonerData: Prisoner) {
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks,
+    photoType,
   }
   return headerData
 }
