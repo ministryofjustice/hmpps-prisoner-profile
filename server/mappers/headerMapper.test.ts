@@ -3,7 +3,7 @@ import { mapHeaderData } from './headerMappers'
 
 describe('HeaderMapping', () => {
   describe('Category A prisoner', () => {
-    it('Photo type should be photoWithheld for sucirity purposes', async () => {
+    it('Photo type should be photoWithheld for security purposes', async () => {
       const headerData = mapHeaderData(PrisonerMockDataA)
       expect(headerData.photoType).toBe('photoWithheld')
     })
