@@ -4,7 +4,7 @@ export type Prisoner = {
   pncNumberCanonicalShort: string
   pncNumberCanonicalLong: string
   croNumber: string
-  bookingId: string
+  bookingId: number
   bookNumber: string
   firstName: string
   lastName: string
@@ -66,4 +66,10 @@ export type Alert = {
   alertCode: string
   active: boolean
   expired: boolean
+}
+
+export interface Incentive {
+  level: { code: string; description: string }
+  dateTime: string
+  nextReviewDate: string
 }

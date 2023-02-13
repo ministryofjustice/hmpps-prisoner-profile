@@ -1,38 +1,36 @@
 {% from "../macros/summaryCardMacro.njk" import summaryCard %}
-{% macro miniSummaryMacro(params) %}
-  {%- call summaryCard({title: params.data.heading}) -%}
-    <div class="{{ params.classes }}">
+{% macro miniSummaryMacro(miniSummary) %}
+  {%- call summaryCard({title: miniSummary.data.heading}) -%}
+    <div class="{{ miniSummary.classes }} {{ 'hmpps-summary-card__no-header' if not miniSummary.data.heading }}">
       <div class="govuk-grid-column-full">
-        {% if params.data.summaryTopLabel !== '' %}
-          <p class="govuk-body card-label govuk-!-font-size-16" data-hj-suppress>
-            {{ params.data.summaryTopLabel }}
+        {% if miniSummary.data.topLabel %}
+          <p class="govuk-body card-label">
+            {{ miniSummary.data.topLabel }}
+          </p>
+        {% endif %}
+        {% if miniSummary.data.topContent !== undefined %}
+          <p
+            class="govuk-body hmpps-mini-card__{{ miniSummary.data.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.data.topClass === 'small' }}"
+          >
+            {{ miniSummary.data.topContent }}
           </p>
         {%- endif -%}
-        {% if params.data.summaryTopContent !== '' %}
-          <p class="govuk-body govuk-!-font-size-36">{{ params.data.summaryTopContent }}</p>
-        {%- endif -%}
-        <p class="govuk-body card-label govuk-!-font-size-16" data-hj-suppress>
-          {{ params.data.summaryBottomLabel }}
+        <p class="govuk-body card-label">
+          {{ miniSummary.data.bottomLabel }}
         </p>
-        {% if params.config.summaryBottomType === params.contentType.type1 %}
-          <p class="govuk-body govuk-!-font-size-36">{{ params.data.summaryBottomContentType1 }}</p>
-        {%- endif -%}
-        {% if params.config.summaryBottomType === params.contentType.type2 %}
-          <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType2">
-            {{ params.data.summaryBottomContentType2 }}
-          </p>
-        {%- endif -%}
-        {% if params.config.summaryBottomType === params.contentType.type3 %}
-          <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType3">
-            {{ params.data.summaryBottomContentType2 }}
-          </p>
-          <p class="govuk-body govuk-!-font-size-19 hmpps-miniSummaryType3 card-label-light">
-            {{ params.data.summaryBottomContentType3 }}
+        <p
+          class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }} {{ 'hmpps-mini-card__filler' if miniSummary.data.bottomContentLine2 === undefined and miniSummary.data.bottomClass === 'small' }}"
+        >
+          {{ miniSummary.data.bottomContentLine1 }}
+        </p>
+        {% if miniSummary.data.bottomContentLine2 !== undefined %}
+          <p class="govuk-body hmpps-mini-card__sub-text">
+            {{ miniSummary.data.bottomContentLine2 }}
           </p>
         {%- endif -%}
         <p class="govuk-body">
-          <a href="{{ params.data.linkHref }}" class="govuk-link govuk-link--no-visited-state">
-            {{ params.data.linkLabel }}
+          <a href="{{ miniSummary.data.linkHref }}" class="govuk-link govuk-link--no-visited-state">
+            {{ miniSummary.data.linkLabel }}
           </a>
         </p>
       </div>
