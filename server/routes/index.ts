@@ -1,5 +1,6 @@
 import { type RequestHandler, Router } from 'express'
 import config from '../config'
+import { DefaultPage, HideBanner } from '../data/pageConfig'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import { OverviewPage } from '../interfaces/overviewPage'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -24,8 +25,30 @@ export default function routes(service: Services): Router {
     const pageService = new PageService()
     const prisonApi = new PrisonApiRestClient(res.locals.user.token)
     const overviewPageService = new OverviewPageService(prisonApi)
-    const overviewPage = await overviewPageService.get(req.params.prisonerNumber)
-    pageService.renderPage<OverviewPage>(res, req.params.prisonerNumber, 'pages/index', overviewPage)
+    const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
+    pageService.renderPage<OverviewPage>(
+      res,
+      req.params.prisonerNumber,
+      'pages/index',
+      overviewPageData,
+      DefaultPage,
+      './overviewPage.njk',
+    )
+  })
+
+  get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
+    const pageService = new PageService()
+    const prisonApi = new PrisonApiRestClient(res.locals.user.token)
+    const overviewPageService = new OverviewPageService(prisonApi)
+    const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
+    pageService.renderPage<OverviewPage>(
+      res,
+      req.params.prisonerNumber,
+      'pages/index',
+      overviewPageData,
+      HideBanner,
+      './photoPage.njk',
+    )
   })
 
   get('/', (req, res, next) => {

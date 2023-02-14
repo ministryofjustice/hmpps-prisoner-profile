@@ -10,6 +10,8 @@
   }) }}
 {% endblock %}
 {% block content %}
-  {% include "../partials/profileBanner/profileBanner.njk" %}
-  {% include "./overviewPage.njk" %}
+  {% if displayBanner === true %}
+    {% include "../partials/profileBanner/profileBanner.njk" %}
+  {% endif%}
+  {% include pageBodyNjk %}
 {% endblock %}
