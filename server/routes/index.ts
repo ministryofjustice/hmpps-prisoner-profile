@@ -2,11 +2,15 @@ import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import { DefaultPage, HideBanner } from '../data/pageConfig'
 import PrisonApiRestClient from '../data/prisonApiClient'
-import { OverviewPage } from '../interfaces/overviewPage'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { PageService, Services } from '../services'
+import { Services } from '../services'
 import OverviewPageService from '../services/overviewPageService'
 import CommonApiRoutes from './common/api'
+import { Prisoner } from '../interfaces/prisoner'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
+
+import { mapHeaderData } from '../mappers/headerMappers'
+import { PageConfig } from '../interfaces/pageConfig'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -22,33 +26,37 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const pageService = new PageService()
     const prisonApi = new PrisonApiRestClient(res.locals.user.token)
     const overviewPageService = new OverviewPageService(prisonApi)
     const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
-    pageService.renderPage<OverviewPage>(
-      res,
-      req.params.prisonerNumber,
-      'pages/index',
-      overviewPageData,
-      DefaultPage,
-      './overviewPage.njk',
-    )
+    const services = new PrisonerSearchClient(res.locals.user.token)
+    const prisonerData: Prisoner = await services.getPrisonerDetails(req.params.prisonerNumber)
+    const pageConfig: PageConfig = DefaultPage
+    const pageBodyNjk = './overviewPage.njk'
+
+    res.render('pages/index', {
+      ...mapHeaderData(prisonerData),
+      ...overviewPageData,
+      ...pageConfig,
+      pageBodyNjk,
+    })
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
-    const pageService = new PageService()
     const prisonApi = new PrisonApiRestClient(res.locals.user.token)
     const overviewPageService = new OverviewPageService(prisonApi)
     const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
-    pageService.renderPage<OverviewPage>(
-      res,
-      req.params.prisonerNumber,
-      'pages/index',
-      overviewPageData,
-      HideBanner,
-      './photoPage.njk',
-    )
+    const services = new PrisonerSearchClient(res.locals.user.token)
+    const prisonerData: Prisoner = await services.getPrisonerDetails(req.params.prisonerNumber)
+    const pageConfig: PageConfig = HideBanner
+    const pageBodyNjk = './photoPage.njk'
+
+    res.render('pages/index', {
+      ...mapHeaderData(prisonerData),
+      ...overviewPageData,
+      ...pageConfig,
+      pageBodyNjk,
+    })
   })
 
   get('/', (req, res, next) => {
