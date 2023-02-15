@@ -13,6 +13,8 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/assessment'
+import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import dummyScheduledEvents from './localMockData/eventsForToday'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -107,6 +109,20 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       return await this.restClient.get<Assessment[]>({ path: `/api/bookings/${bookingId}/assessments` })
     } catch (error) {
       return error
+    }
+  }
+
+  async getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]> {
+    try {
+      const result = await this.restClient.get({
+        path: `/api/bookings/${bookingId}/events/today`,
+      })
+      return result as ScheduledEvent[]
+    } catch (err) {
+      if (config.localMockData === 'true') {
+        return dummyScheduledEvents
+      }
+      return err
     }
   }
 }

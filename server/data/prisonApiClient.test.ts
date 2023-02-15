@@ -1,6 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
+import dummyScheduledEvents from './localMockData/eventsForToday'
 import { LocationDummyDataC } from './localMockData/locations'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
@@ -56,7 +57,7 @@ describe('prisonApiClient', () => {
     it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
       mockSuccessfulPrisonApiCall(
         `/api/offenders/${prisonerNumber}/non-association-details`,
-        nonAssociationDetailsDummyData
+        nonAssociationDetailsDummyData,
       )
 
       const output = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
@@ -129,9 +130,12 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getEventsForToday', () => {
-    it.each(['123456', '654321'])('Should return data from the API', async bookingId => {
-      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/events/today`, {})
+  describe('getEventsScheduledForToday', () => {
+    it.each([123456, 654321])('Should return data from the API', async bookingId => {
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/events/today`, dummyScheduledEvents)
+
+      const output = await prisonApiClient.getEventsScheduledForToday(bookingId)
+      expect(output).toEqual(dummyScheduledEvents)
     })
   })
 })
