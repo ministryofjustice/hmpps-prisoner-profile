@@ -11,6 +11,7 @@ export type Prisoner = {
   dateOfBirth: string
   gender: string
   ethnicity: string
+  language: string
   youthOffender?: boolean
   maritalStatus?: string
   religion?: string
