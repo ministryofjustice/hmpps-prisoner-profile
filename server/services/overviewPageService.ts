@@ -60,7 +60,7 @@ export default class OverviewPageService {
           text: 'Age',
         },
         value: {
-          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+          text: prisonerData.age ? prisonerData.age : 'Not entered',
         },
       },
       {
