@@ -1,4 +1,4 @@
-# 2. Prefer 'Prisoner' Over 'Offender'
+# 1. Prefer 'Prisoner' Over 'Offender'
 
 Date: 2022-12-07
 
