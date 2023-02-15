@@ -1,4 +1,5 @@
 import { MiniSummary } from './miniSummary'
+import { PersonalDetails } from './personalDetails'
 
 export type OverviewNonAssociation = {
   text: string
@@ -9,7 +10,7 @@ export type OverviewPage = {
   miniSummaryGroupB: MiniSummary[]
   statuses: object
   nonAssociations: OverviewNonAssociation[]
-  personalDetails: object
+  personalDetails: PersonalDetails
   staffContacts: object
   schedule: object
 }

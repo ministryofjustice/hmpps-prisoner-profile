@@ -1,4 +1,4 @@
-import { personalDetails, schedule, staffContacts, statuses } from '../data/overviewPage'
+import { schedule, staffContacts, statuses } from '../data/overviewPage'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import { OverviewNonAssociation, OverviewPage } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
@@ -6,6 +6,7 @@ import { formatDate, formatMoney, formatPrivilegedVisitsSummary } from '../utils
 import { Assessment } from '../interfaces/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
+import { PersonalDetails } from '../interfaces/personalDetails'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -20,6 +21,7 @@ export default class OverviewPageService {
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
     const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
+    const personalDetails = this.getPersonalDetails(prisonerData)
 
     return {
       miniSummaryGroupA,
@@ -30,6 +32,75 @@ export default class OverviewPageService {
       staffContacts,
       schedule,
     }
+  }
+
+  private getPersonalDetails(prisonerData: Prisoner): PersonalDetails {
+    const personalDetailsMain = [
+      {
+        key: {
+          text: 'Preferred name',
+        },
+        value: {
+          text:
+            prisonerData.firstName || prisonerData.lastName
+              ? `${prisonerData.firstName} ${prisonerData.lastName}`
+              : 'None',
+        },
+      },
+      {
+        key: {
+          text: 'Date of birth',
+        },
+        value: {
+          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+        },
+      },
+      {
+        key: {
+          text: 'Age',
+        },
+        value: {
+          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+        },
+      },
+      {
+        key: {
+          text: 'Nationality',
+        },
+        value: {
+          text: prisonerData.nationality ? prisonerData.nationality : 'None',
+        },
+      },
+      {
+        key: {
+          text: 'Spoken language',
+        },
+        value: {
+          text: prisonerData.language ? prisonerData.language : 'No language entered',
+        },
+      },
+    ]
+
+    const personalDetailsSide = [
+      {
+        key: {
+          text: 'CRO number',
+        },
+        value: {
+          text: prisonerData.croNumber ? prisonerData.croNumber : 'None',
+        },
+      },
+      {
+        key: {
+          text: 'PNC number',
+        },
+        value: {
+          text: prisonerData.pncNumber ? prisonerData.pncNumber : 'None',
+        },
+      },
+    ]
+
+    return { personalDetailsMain, personalDetailsSide }
   }
 
   private async getMiniSummaryGroupA(prisonerNumber: string, bookingId: number): Promise<MiniSummary[]> {

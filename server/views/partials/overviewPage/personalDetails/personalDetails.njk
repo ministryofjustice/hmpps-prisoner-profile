@@ -5,71 +5,13 @@
     <div class="govuk-grid-column-one-half">
       {{ govukSummaryList({
           classes: 'govuk-summary-list--no-border',
-          rows: [
-            {
-              key: {
-                text: "Preferred name"
-              },
-              value: {
-                text: personalDetails.name
-              }
-            },
-            {
-              key: {
-                text: "Date of birth"
-              },
-              value: {
-                text: personalDetails.dateOfBirth | formatDate
-              }
-            },
-            {
-              key: {
-                text: "Age"
-              },
-              value: {
-                text: personalDetails.age
-              }
-            },
-            {
-              key: {
-                text: "Nationality"
-              },
-              value: {
-                text: personalDetails.nationality
-              }
-            },
-            {
-              key: {
-                text: "Spoken language"
-              },
-              value: {
-                text: personalDetails.spokenLanguage
-              }
-            }
-          ] | summaryListOneHalfWidth
+          rows: personalDetails.personalDetailsMain | summaryListOneHalfWidth
         }) }}
     </div>
     <div class="govuk-grid-column-one-half">
       {{ govukSummaryList({
           classes: 'govuk-summary-list--no-border',
-          rows: [
-            {
-              key: {
-                text: "CRO number"
-              },
-              value: {
-                text: personalDetails.croNumber
-              }
-            },
-            {
-              key: {
-                text: "PNC number"
-              },
-              value: {
-                text: personalDetails.pncNumber
-              }
-            }
-          ] | summaryListOneHalfWidth
+          rows: personalDetails.personalDetailsSide | summaryListOneHalfWidth
         }) }}
     </div>
   </div>
