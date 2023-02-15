@@ -1,6 +1,6 @@
 import { type RequestHandler, Router } from 'express'
 import config from '../config'
-import { DefaultPage, HideBanner } from '../data/pageConfig'
+import { DefaultPage, DisplayBanner } from '../data/pageConfig'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { Services } from '../services'
@@ -48,7 +48,7 @@ export default function routes(service: Services): Router {
     const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
     const services = new PrisonerSearchClient(res.locals.user.token)
     const prisonerData: Prisoner = await services.getPrisonerDetails(req.params.prisonerNumber)
-    const pageConfig: PageConfig = HideBanner
+    const pageConfig: PageConfig = DisplayBanner
     const pageBodyNjk = './photoPage.njk'
 
     res.render('pages/index', {

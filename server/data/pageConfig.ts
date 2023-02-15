@@ -4,6 +4,6 @@ export const DefaultPage: PageConfig = {
   displayBanner: true,
 }
 
-export const HideBanner: PageConfig = {
+export const DisplayBanner: PageConfig = {
   displayBanner: false,
 }
