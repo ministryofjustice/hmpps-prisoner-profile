@@ -36,11 +36,19 @@ export default function routes(service: Services): Router {
     const pageConfig: PageConfig = DisplayBanner
     const pageBodyNjk = './overviewPage.njk'
 
+    const breadCrumbs = [
+      {
+        text: 'Back to search results',
+        href: '#',
+      },
+    ]
+
     res.render('pages/index', {
       ...mapHeaderData(prisonerData),
       ...overviewPageData,
       ...pageConfig,
       pageBodyNjk,
+      breadCrumbs,
     })
   })
 
@@ -48,18 +56,25 @@ export default function routes(service: Services): Router {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
-    const prisonApi = new PrisonApiRestClient(res.locals.clientToken)
-    const overviewPageService = new OverviewPageService(prisonApi)
-    const overviewPageData = await overviewPageService.get(prisonerData)
-
     const pageConfig: PageConfig = HideBanner
     const pageBodyNjk = './photoPage.njk'
 
+    const breadCrumbs = [
+      {
+        text: 'Back to search results',
+        href: '#',
+      },
+      {
+        text: `${prisonerData.lastName} ,${prisonerData.firstName}`,
+        href: `/prisoner/${req.params.prisonerNumber}`,
+      },
+    ]
+
     res.render('pages/index', {
       ...mapHeaderData(prisonerData),
-      ...overviewPageData,
       ...pageConfig,
       pageBodyNjk,
+      breadCrumbs,
     })
   })
 
