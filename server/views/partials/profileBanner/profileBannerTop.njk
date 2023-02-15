@@ -1,6 +1,8 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full hmpps-profile-banner-top">
-    <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" />
+    <a href="/prisoner/{{ prisonerNumber }}/image" class="hmpps-clickable-image">
+      <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" />
+    </a>
     <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
     <div class="info">
       <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
