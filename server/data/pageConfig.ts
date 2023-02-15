@@ -1,9 +1,9 @@
 import { PageConfig } from '../interfaces/pageConfig'
 
-export const DefaultPage: PageConfig = {
+export const DisplayBanner: PageConfig = {
   displayBanner: true,
 }
 
-export const DisplayBanner: PageConfig = {
+export const HideBanner: PageConfig = {
   displayBanner: false,
 }
