@@ -1,11 +1,11 @@
-{% from "./macro.njk" import  miniSummaryMacro %} 
+{% from "./macro.njk" import  miniSummaryMacro %}
 
-{% macro miniSummaryListMacro(paramGroup) %}
+{% macro miniSummaryListMacro(miniSummaryGroup) %}
     <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
-        {% for params in paramGroup %}
+        {% for miniSummary in miniSummaryGroup %}
             <div class="govuk-grid-column-one-third">
-                {{miniSummaryMacro(params)}}
+                {{ miniSummaryMacro(miniSummary) }}
             </div>
-        {% endfor %}     
+        {% endfor %}
     </div>
 {% endmacro %}

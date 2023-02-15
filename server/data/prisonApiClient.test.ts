@@ -4,6 +4,13 @@ import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { LocationDummyDataC } from './localMockData/locations'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
+import {
+  accountBalancesMock,
+  adjudicationSummaryMock,
+  assessmentsMock,
+  visitBalancesMock,
+  visitSummaryMock,
+} from './localMockData/miniSummaryMock'
 
 jest.mock('./tokenStore')
 
@@ -56,6 +63,71 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
       expect(output).toEqual(nonAssociationDetailsDummyData)
+    })
+  })
+
+  describe('getAccountBalances', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      fakePrisonApi
+        .get(`/api/bookings/${bookingId}/balances`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, accountBalancesMock)
+
+      const output = await prisonApiClient.getAccountBalances(bookingId)
+      expect(output).toEqual(accountBalancesMock)
+    })
+  })
+
+  describe('getAdjudications', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      fakePrisonApi
+        .get(`/api/bookings/${bookingId}/adjudications`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, adjudicationSummaryMock)
+
+      const output = await prisonApiClient.getAdjudications(bookingId)
+      expect(output).toEqual(adjudicationSummaryMock)
+    })
+  })
+
+  describe('getVisitSummary', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      fakePrisonApi
+        .get(`/api/bookings/${bookingId}/visits/summary`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, visitSummaryMock)
+
+      const output = await prisonApiClient.getVisitSummary(bookingId)
+      expect(output).toEqual(visitSummaryMock)
+    })
+  })
+
+  describe('getVisitBalances', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'A1234BC'
+      fakePrisonApi
+        .get(`/api/bookings/offenderNo/${prisonerNumber}/visit/balances`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, visitBalancesMock)
+
+      const output = await prisonApiClient.getVisitBalances(prisonerNumber)
+      expect(output).toEqual(visitBalancesMock)
+    })
+  })
+
+  describe('getAssessments', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      fakePrisonApi
+        .get(`/api/bookings/${bookingId}/assessments`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, assessmentsMock)
+
+      const output = await prisonApiClient.getAssessments(bookingId)
+      expect(output).toEqual(assessmentsMock)
     })
   })
 })

@@ -3,7 +3,7 @@
   box-shadow: 0 5px govuk-colour('mid-grey');
   @include govuk-responsive-margin(4, 'bottom');
 
-  .hmpps-summary-card__header {
+  &__header {
     background-color: govuk-colour('light-grey');
     @include govuk-responsive-padding(3, 'left');
     @include govuk-responsive-padding(3, 'right');
@@ -18,8 +18,13 @@
     }
   }
 
-  .hmpps-summary-card__body {
+  &__no-header {
+    padding-top: 15px;
+  }
+
+  &__body {
     @include govuk-responsive-padding(3, 'left');
     @include govuk-responsive-padding(3, 'right');
   }
+
 }

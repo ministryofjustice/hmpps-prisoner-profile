@@ -9,12 +9,17 @@ context('SignIn', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-    cy.task('stubNonAssociations', 'jdhf')
-    cy.task('stubNonAssociations', '123')
+    cy.task('stubNonAssociations', 'G6123VU')
+    cy.task('stubPrisonerData', 'G6123VU')
+    cy.task('stubAccountBalances', '1102484')
+    cy.task('stubAdjudications', '1102484')
+    cy.task('stubVisitSummary', '1102484')
+    cy.task('stubVisitBalances', 'G6123VU')
+    cy.task('stubAssessments', '1102484')
   })
 
   it('Unauthenticated user directed to auth', () => {
-    cy.visit('/prisoner/123')
+    cy.visit('/prisoner/G6123VU')
     Page.verifyOnPage(AuthSignInPage)
   })
 
@@ -51,7 +56,7 @@ context('SignIn', () => {
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
-    cy.request('/prisoner/123').its('body').should('contain', 'Sign in')
+    cy.request('/prisoner/G6123VU').its('body').should('contain', 'Sign in')
   })
 
   it('Token verification failure clears user session', () => {
@@ -60,7 +65,7 @@ context('SignIn', () => {
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
-    cy.request('/prisoner/123').its('body').should('contain', 'Sign in')
+    cy.request('/prisoner/G6123VU').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
     cy.task('stubAuthUser', 'bobby brown')

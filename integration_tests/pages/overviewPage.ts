@@ -9,17 +9,45 @@ export default class OverviewPage extends Page {
 
   headerChangeLocation = (): PageElement => cy.get('[data-qa=header-change-location]')
 
-  miniSummaryListMacro = (): PageElement => cy.get('[data-qa=mini-summary-list-macro]')
+  // Common
+
+  header1 = (): PageElement => cy.get('h1')
+
+  header2 = (): PageElement => cy.get('h2')
+
+  header3 = (): PageElement => cy.get('h3')
+
+  // Mini Summary
 
   miniSummaryGroupA = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
 
   miniSummaryGroupA_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=summary-header]')
 
+  moneyCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
+
+  adjudicationsCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
+
+  visitsCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
+
   miniSummaryGroupB = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
 
   miniSummaryGroupB_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
+
+  categoryCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
+
+  incentivesCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
+
+  csraCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
+
+  // Non Associations
 
   nonAssociations = () => ({
     table: (): PageElement => cy.get('[data-qa=non-associations-table]'),

@@ -1,11 +1,13 @@
 import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import PrisonApiRestClient from '../data/prisonApiClient'
-import { OverviewPage } from '../interfaces/overviewPage'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { PageService, Services } from '../services'
+import { Services } from '../services'
 import OverviewPageService from '../services/overviewPageService'
 import CommonApiRoutes from './common/api'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
+import { Prisoner } from '../interfaces/prisoner'
+import { mapHeaderData } from '../mappers/headerMappers'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -21,11 +23,17 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const pageService = new PageService()
-    const prisonApi = new PrisonApiRestClient(res.locals.user.token)
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    const prisonApi = new PrisonApiRestClient(res.locals.clientToken)
     const overviewPageService = new OverviewPageService(prisonApi)
-    const overviewPage = await overviewPageService.get(req.params.prisonerNumber)
-    pageService.renderPage<OverviewPage>(res, req.params.prisonerNumber, 'pages/index', overviewPage)
+    const overviewPageData = await overviewPageService.get(prisonerData)
+
+    res.render('pages/index', {
+      ...mapHeaderData(prisonerData),
+      ...overviewPageData,
+    })
   })
 
   get('/', (req, res, next) => {

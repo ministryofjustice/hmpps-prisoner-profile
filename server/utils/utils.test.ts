@@ -5,6 +5,7 @@ import {
   formatScheduleItem,
   summaryListOneHalfWidth,
   SummaryListRow,
+  formatMoney,
 } from './utils'
 
 describe('convert to title case', () => {
@@ -78,5 +79,19 @@ describe('summary list one half width', () => {
       expect(row.key.classes).toEqual('govuk-!-width-one-half')
       expect(row.value.classes).toEqual('govuk-!-width-one-half')
     })
+  })
+})
+
+describe('format money', () => {
+  it.each([
+    [null, undefined, undefined, '£0.00'],
+    [null, 'Empty', undefined, 'Empty'],
+    [0, undefined, undefined, '£0.00'],
+    [1, undefined, undefined, '£1.00'],
+    [1.0, undefined, undefined, '£1.00'],
+    [2.3, undefined, undefined, '£2.30'],
+    [4.56, undefined, undefined, '£4.56'],
+  ])('%s: formatMoney(%s, %s, %s)', (val: number, emptyState: string, currencySymbol: string, expected: string) => {
+    expect(formatMoney(val, emptyState, currencySymbol)).toEqual(expected)
   })
 })

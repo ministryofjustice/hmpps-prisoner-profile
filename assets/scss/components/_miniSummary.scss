@@ -13,17 +13,22 @@
     @include govuk-responsive-margin(1, 'bottom');
     @include govuk-font($size: 19, $weight: 'bold');
   }
-  .card-label-light {
+
+  .hmpps-mini-card__big {
+    font-size: 36px;
+  }
+
+  .hmpps-mini-card__small {
+    margin-bottom: 5px;
+
+    &.hmpps-mini-card__filler {
+      margin-bottom: 42px;
+    }
+  }
+
+  .hmpps-mini-card__sub-text {
+    margin-bottom: 12px;
     color: govuk-colour('dark-grey');
-  }
-  .hmpps-miniSummaryType2 {
-    @include govuk-responsive-padding(3, 'bottom');
-  }
-  .hmpps-miniSummaryType3 {
-    @include govuk-responsive-margin(0, 'bottom');
-  }
-  .hmpps-miniSummaryType3.card-label-light {
-    @include govuk-responsive-margin(2, 'bottom');
   }
 }
 

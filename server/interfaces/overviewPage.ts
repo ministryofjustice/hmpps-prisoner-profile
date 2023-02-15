@@ -1,12 +1,12 @@
-import { MiniSummaryParamType } from '../data/miniSummary/miniSummary'
+import { MiniSummary } from './miniSummary'
 
 export type OverviewNonAssociation = {
   text: string
 }[]
 
 export type OverviewPage = {
-  miniSummaryParamGroupA: MiniSummaryParamType[]
-  miniSummaryParamGroupB: MiniSummaryParamType[]
+  miniSummaryGroupA: MiniSummary[]
+  miniSummaryGroupB: MiniSummary[]
   statuses: object
   nonAssociations: OverviewNonAssociation[]
   personalDetails: object

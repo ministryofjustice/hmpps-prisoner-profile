@@ -1,4 +1,11 @@
 import { stubFor } from './wiremock'
+import {
+  accountBalancesMock,
+  adjudicationSummaryMock,
+  assessmentsMock,
+  visitBalancesMock,
+  visitSummaryMock,
+} from '../../server/data/localMockData/miniSummaryMock'
 
 const nonAssociationA = {
   offenderNo: 'ABC123',
@@ -69,6 +76,81 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: nonAssociationDetailsDummyData,
+      },
+    })
+  },
+  stubAccountBalances: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/balances`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: accountBalancesMock,
+      },
+    })
+  },
+  stubAdjudications: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/adjudications`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: adjudicationSummaryMock,
+      },
+    })
+  },
+  stubVisitSummary: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/visits/summary`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: visitSummaryMock,
+      },
+    })
+  },
+  stubVisitBalances: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: visitBalancesMock,
+      },
+    })
+  },
+  stubAssessments: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/assessments`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: assessmentsMock,
       },
     })
   },
