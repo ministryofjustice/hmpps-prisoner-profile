@@ -5,6 +5,7 @@ import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import dpsHomePage from './integration_tests/mockApis/dpsHomepage'
 import dpsOverviewPage from './integration_tests/mockApis/dpsOverviewPage'
 import prisonApi from './integration_tests/mockApis/prison'
+import prisonerSearchApi from './integration_tests/mockApis/prisonerSearch'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -28,6 +29,7 @@ export default defineConfig({
         ...dpsHomePage,
         ...dpsOverviewPage,
         ...prisonApi,
+        ...prisonerSearchApi,
       })
     },
     baseUrl: 'http://localhost:3007',

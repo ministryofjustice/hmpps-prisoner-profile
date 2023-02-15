@@ -26,11 +26,13 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const prisonApi = new PrisonApiRestClient(res.locals.user.token)
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    const prisonApi = new PrisonApiRestClient(res.locals.clientToken)
     const overviewPageService = new OverviewPageService(prisonApi)
-    const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
-    const services = new PrisonerSearchClient(res.locals.user.token)
-    const prisonerData: Prisoner = await services.getPrisonerDetails(req.params.prisonerNumber)
+    const overviewPageData = await overviewPageService.get(prisonerData)
+
     const pageConfig: PageConfig = DisplayBanner
     const pageBodyNjk = './overviewPage.njk'
 
@@ -43,13 +45,15 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
-    const prisonApi = new PrisonApiRestClient(res.locals.user.token)
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    const prisonApi = new PrisonApiRestClient(res.locals.clientToken)
     const overviewPageService = new OverviewPageService(prisonApi)
-    const overviewPageData = await overviewPageService.get(req.params.prisonerNumber)
-    const services = new PrisonerSearchClient(res.locals.user.token)
-    const prisonerData: Prisoner = await services.getPrisonerDetails(req.params.prisonerNumber)
-    const pageConfig: PageConfig = HideBanner
-    const pageBodyNjk = './photoPage.njk'
+    const overviewPageData = await overviewPageService.get(prisonerData)
+
+    const pageConfig: PageConfig = DisplayBanner
+    const pageBodyNjk = './overviewPage.njk'
 
     res.render('pages/index', {
       ...mapHeaderData(prisonerData),

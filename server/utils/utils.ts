@@ -72,3 +72,25 @@ export const summaryListOneHalfWidth = (rows: SummaryListRow[]) => {
     return { key, value }
   })
 }
+
+/**
+ * Format a numeric value stored in decimal number format into a decimal string with currency symbol.
+ *
+ * @param val
+ * @param emptyState - defaults to '0.00'
+ * @param currencySymbol - defaults to '£'
+ */
+export const formatMoney = (val: number, emptyState: string = undefined, currencySymbol = '£'): string => {
+  if (!val && emptyState) return emptyState
+
+  return `${currencySymbol}${val?.toFixed(2) || '0.00'}`
+}
+
+/**
+ * Format a number of privileged visits into a summary string.
+ *
+ * @param count
+ */
+export const formatPrivilegedVisitsSummary = (count: number): string => {
+  return `Including ${count} privileged visits`
+}
