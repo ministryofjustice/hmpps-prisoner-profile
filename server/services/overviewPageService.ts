@@ -100,12 +100,10 @@ export default class OverviewPageService {
   private async getMiniSummaryGroupB(currentIncentive: Incentive, bookingId: number): Promise<MiniSummary[]> {
     const [assessments] = await Promise.all([this.prisonApiClient.getAssessments(bookingId)])
 
-    const category: Assessment = assessments?.find(
-      (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category,
-    )
-    const csra: Assessment = assessments?.find(
-      (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra,
-    )
+    const category: Assessment =
+      assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category) || null
+    const csra: Assessment =
+      assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) || null
 
     const categorySummaryData: MiniSummaryData = {
       bottomLabel: 'Category',
@@ -154,6 +152,8 @@ export default class OverviewPageService {
 
   private async getNonAssociations(prisonerNumber: string): Promise<OverviewNonAssociation[]> {
     const nonAssociations = await this.prisonApiClient.getNonAssociationDetails(prisonerNumber)
+    if (!nonAssociations?.nonAssociations) return []
+
     return nonAssociations.nonAssociations
       .filter(nonassociation => {
         return nonassociation.offenderNonAssociation.agencyDescription === nonAssociations.agencyDescription

@@ -24,7 +24,7 @@ const getSignInUrl = (): Promise<string> =>
   }).then(data => {
     const { requests } = data.body
     const stateValue = requests[requests.length - 1].queryParams.state.values[0]
-    return `/sign-in/callback?code=codexxxx&state=${stateValue}`
+    return `/sign-in/callback?code=codexxxx&state=${stateValue}&client_id=clientid`
   })
 
 const favicon = () =>
