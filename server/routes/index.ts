@@ -52,8 +52,8 @@ export default function routes(service: Services): Router {
     const overviewPageService = new OverviewPageService(prisonApi)
     const overviewPageData = await overviewPageService.get(prisonerData)
 
-    const pageConfig: PageConfig = DisplayBanner
-    const pageBodyNjk = './overviewPage.njk'
+    const pageConfig: PageConfig = HideBanner
+    const pageBodyNjk = './photoPage.njk'
 
     res.render('pages/index', {
       ...mapHeaderData(prisonerData),
