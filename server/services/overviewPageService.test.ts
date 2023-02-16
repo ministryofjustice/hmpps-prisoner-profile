@@ -134,15 +134,15 @@ describe('OverviewPageService', () => {
   describe('Schedule', () => {
     it('Gets events for today from the prison api', async () => {
       const overviewPageService = new OverviewPageService(prisonApiClient)
-      await overviewPageService.get({ ...PrisonerMockDataA })
-      expect(prisonApiClient.getEventsScheduledForToday).toBeCalledWith(1234)
+      await overviewPageService.get(PrisonerMockDataA)
+      expect(prisonApiClient.getEventsScheduledForToday).toBeCalledWith(PrisonerMockDataA.bookingId)
     })
 
     describe('Given empty schedule', () => {
       it('fills schedule with empty events', async () => {
         prisonApiClient.getEventsScheduledForToday = jest.fn(async () => [])
         const overviewPageService = new OverviewPageService(prisonApiClient)
-        const res = await overviewPageService.get({ ...PrisonerMockDataA })
+        const res = await overviewPageService.get(PrisonerMockDataA)
         const allEvents = [...res.schedule.morning, ...res.schedule.afternoon, ...res.schedule.evening]
         expect(allEvents.length).toEqual(6)
         allEvents.forEach(event => {
@@ -154,7 +154,7 @@ describe('OverviewPageService', () => {
     describe('Given a schedule with events', () => {
       it('Groups the events', async () => {
         const overviewPageService = new OverviewPageService(prisonApiClient)
-        const { schedule } = await overviewPageService.get({ ...PrisonerMockDataA })
+        const { schedule } = await overviewPageService.get(PrisonerMockDataA)
         const { morning, afternoon, evening } = schedule
         expect(morning.length).toEqual(2)
         expect(afternoon.length).toEqual(2)
@@ -167,14 +167,14 @@ describe('OverviewPageService', () => {
         events[0].eventSourceDesc = 'The event description'
         prisonApiClient.getEventsScheduledForToday = jest.fn(async () => events)
         const overviewPageService = new OverviewPageService(prisonApiClient)
-        const { schedule } = await overviewPageService.get({ ...PrisonerMockDataA })
+        const { schedule } = await overviewPageService.get(PrisonerMockDataA)
         const { morning } = schedule
         expect(morning[0].name).toEqual('The event description')
       })
 
       it('Creates the overview page schedule from the events', async () => {
         const overviewPageService = new OverviewPageService(prisonApiClient)
-        const { schedule } = await overviewPageService.get({ ...PrisonerMockDataA })
+        const { schedule } = await overviewPageService.get(PrisonerMockDataA)
         const { morning, afternoon, evening } = schedule
 
         expect(morning[0].name).toEqual('Joinery AM')

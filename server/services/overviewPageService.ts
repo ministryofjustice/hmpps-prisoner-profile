@@ -29,7 +29,7 @@ export default class OverviewPageService {
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
     const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
     const personalDetails = this.getPersonalDetails(prisonerData)
-    const schedule = await this.getSchedule(1234)
+    const schedule = await this.getSchedule(prisonerData.bookingId)
 
     return {
       miniSummaryGroupA,
