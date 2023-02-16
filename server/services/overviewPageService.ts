@@ -232,11 +232,6 @@ export default class OverviewPageService {
   }
 
   private async getSchedule(bookingId: number): Promise<OverviewSchedule> {
-    const fillWithEmptyEvents = (events: OverviewScheduleItem[]) => {
-      while (events.length < 2) events.push({ name: 'Nothing scheduled' })
-      return events
-    }
-
     const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
       const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
       const startTime = new Date(event.startTime)
@@ -252,14 +247,11 @@ export default class OverviewPageService {
 
     const scheduledEvents = await this.prisonApiClient.getEventsScheduledForToday(bookingId)
     const groupedEvents = groupEventsByPeriod(scheduledEvents)
-    const morningEvents = groupedEvents.morningEvents.map(formatEventForOverview)
-    const afternoonEvents = groupedEvents.afternoonEvents.map(formatEventForOverview)
-    const eveningEvents = groupedEvents.eveningEvents.map(formatEventForOverview)
 
     return {
-      morning: fillWithEmptyEvents(morningEvents),
-      afternoon: fillWithEmptyEvents(afternoonEvents),
-      evening: fillWithEmptyEvents(eveningEvents),
+      morning: groupedEvents.morningEvents.map(formatEventForOverview),
+      afternoon: groupedEvents.afternoonEvents.map(formatEventForOverview),
+      evening: groupedEvents.eveningEvents.map(formatEventForOverview),
     }
   }
 

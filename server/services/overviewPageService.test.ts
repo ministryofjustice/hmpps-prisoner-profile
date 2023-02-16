@@ -138,60 +138,45 @@ describe('OverviewPageService', () => {
       expect(prisonApiClient.getEventsScheduledForToday).toBeCalledWith(PrisonerMockDataA.bookingId)
     })
 
-    describe('Given empty schedule', () => {
-      it('fills schedule with empty events', async () => {
-        prisonApiClient.getEventsScheduledForToday = jest.fn(async () => [])
-        const overviewPageService = new OverviewPageService(prisonApiClient)
-        const res = await overviewPageService.get(PrisonerMockDataA)
-        const allEvents = [...res.schedule.morning, ...res.schedule.afternoon, ...res.schedule.evening]
-        expect(allEvents.length).toEqual(6)
-        allEvents.forEach(event => {
-          expect(event.name).toEqual('Nothing scheduled')
-        })
-      })
+    it('Groups the events', async () => {
+      const overviewPageService = new OverviewPageService(prisonApiClient)
+      const { schedule } = await overviewPageService.get(PrisonerMockDataA)
+      const { morning, afternoon, evening } = schedule
+      expect(morning.length).toEqual(1)
+      expect(afternoon.length).toEqual(1)
+      expect(evening.length).toEqual(2)
     })
 
-    describe('Given a schedule with events', () => {
-      it('Groups the events', async () => {
-        const overviewPageService = new OverviewPageService(prisonApiClient)
-        const { schedule } = await overviewPageService.get(PrisonerMockDataA)
-        const { morning, afternoon, evening } = schedule
-        expect(morning.length).toEqual(2)
-        expect(afternoon.length).toEqual(2)
-        expect(evening.length).toEqual(2)
-      })
+    it('Uses the event source description for PA sub types', async () => {
+      const events = [{ ...dummyScheduledEvents[0] }]
+      events[0].eventSubType = 'PA'
+      events[0].eventSourceDesc = 'The event description'
+      prisonApiClient.getEventsScheduledForToday = jest.fn(async () => events)
+      const overviewPageService = new OverviewPageService(prisonApiClient)
+      const { schedule } = await overviewPageService.get(PrisonerMockDataA)
+      const { morning } = schedule
+      expect(morning[0].name).toEqual('The event description')
+    })
 
-      it('Uses the event source description for PA sub types', async () => {
-        const events = [{ ...dummyScheduledEvents[0] }]
-        events[0].eventSubType = 'PA'
-        events[0].eventSourceDesc = 'The event description'
-        prisonApiClient.getEventsScheduledForToday = jest.fn(async () => events)
-        const overviewPageService = new OverviewPageService(prisonApiClient)
-        const { schedule } = await overviewPageService.get(PrisonerMockDataA)
-        const { morning } = schedule
-        expect(morning[0].name).toEqual('The event description')
-      })
+    it('Creates the overview page schedule from the events', async () => {
+      const overviewPageService = new OverviewPageService(prisonApiClient)
+      const { schedule } = await overviewPageService.get(PrisonerMockDataA)
+      const { morning, afternoon, evening } = schedule
 
-      it('Creates the overview page schedule from the events', async () => {
-        const overviewPageService = new OverviewPageService(prisonApiClient)
-        const { schedule } = await overviewPageService.get(PrisonerMockDataA)
-        const { morning, afternoon, evening } = schedule
+      expect(morning[0].name).toEqual('Joinery AM')
+      expect(morning[0].startTime).toEqual('08:30')
+      expect(morning[0].endTime).toEqual('11:45')
 
-        expect(morning[0].name).toEqual('Joinery AM')
-        expect(morning[0].startTime).toEqual('08:30')
-        expect(morning[0].endTime).toEqual('11:45')
+      expect(afternoon[0].name).toEqual('Joinery PM')
+      expect(afternoon[0].startTime).toEqual('13:15')
+      expect(afternoon[0].endTime).toEqual('16:15')
 
-        expect(afternoon[0].name).toEqual('Joinery PM')
-        expect(afternoon[0].startTime).toEqual('13:15')
-        expect(afternoon[0].endTime).toEqual('16:15')
-
-        expect(evening[0].name).toEqual('Gym - Football')
-        expect(evening[0].startTime).toEqual('18:00')
-        expect(evening[0].endTime).toEqual('19:00')
-        expect(evening[1].name).toEqual('VLB - Test')
-        expect(evening[1].startTime).toEqual('18:00')
-        expect(evening[1].endTime).toEqual('19:00')
-      })
+      expect(evening[0].name).toEqual('Gym - Football')
+      expect(evening[0].startTime).toEqual('18:00')
+      expect(evening[0].endTime).toEqual('19:00')
+      expect(evening[1].name).toEqual('VLB - Test')
+      expect(evening[1].startTime).toEqual('18:00')
+      expect(evening[1].endTime).toEqual('19:00')
     })
   })
 })
