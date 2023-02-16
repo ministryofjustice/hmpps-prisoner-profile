@@ -1,4 +1,4 @@
-export type ScheduledEvent = {
+export interface ScheduledEvent {
   agencyId?: string
   bookingId: number
   createUserId?: string

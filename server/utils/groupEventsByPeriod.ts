@@ -1,6 +1,6 @@
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 
-type filteredEvents = {
+interface filteredEvents {
   morningEvents: ScheduledEvent[]
   afternoonEvents: ScheduledEvent[]
   eveningEvents: ScheduledEvent[]
