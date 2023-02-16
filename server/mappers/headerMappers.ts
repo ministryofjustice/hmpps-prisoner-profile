@@ -2,6 +2,7 @@ import { Alert, Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
+import { convertToTitleCase } from '../utils/utils'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
@@ -22,13 +23,13 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner) {
     {
       heading: 'CSRA',
       hiddenLabel: 'View CSRA history',
-      info: prisonerData.csra,
+      info: prisonerData.csra ? prisonerData.csra : 'Not entered',
       classes: '',
     },
     {
       heading: 'Incentive level',
       hiddenLabel: 'View incentive level details',
-      info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : '',
+      info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : 'Not entered',
       classes: 'remove-column-gutter-right',
     },
   ]
@@ -53,7 +54,7 @@ export function mapHeaderData(prisonerData: Prisoner) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const headerData = {
     backLinkLabel: 'Back to search results',
-    prisonerName: `${prisonerData.lastName}, ${prisonerData.firstName}`,
+    prisonerName: `${convertToTitleCase(prisonerData.lastName)}, ${convertToTitleCase(prisonerData.firstName)}`,
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
     alerts: mapAlerts(prisonerData, alertFlagLabels),

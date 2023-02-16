@@ -62,4 +62,6 @@ export default class OverviewPage extends Page {
       }
     },
   })
+
+  personalDetails = (): PageElement => cy.get('[data-qa=personal-details]')
 }
