@@ -41,8 +41,7 @@ export default class OverviewPageService {
           text: 'Preferred name',
         },
         value: {
-          text:
-            prisonerData.firstName || prisonerData.lastName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
+          text: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
         },
       },
       {
