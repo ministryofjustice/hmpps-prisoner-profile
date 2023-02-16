@@ -3,7 +3,7 @@
   {% for scheduleItem in scheduledEvents %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <p class="govuk-body">{{ scheduleItem.name }}<br />{{ scheduleItem | formatScheduleItem }}</p>
+        <p class="govuk-body" data-qa="schedule-item">{{ scheduleItem.name }}<br />{{ scheduleItem | formatScheduleItem }}</p>
       </div>
     </div>
     {% if loop.index < scheduledEvents.length %}
@@ -17,7 +17,7 @@
   {% if scheduledEvents.length == 0 %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <p class="govuk-body">Nothing scheduled</p>
+        <p class="govuk-body" data-qa="empty-schedule-item">Nothing scheduled</p>
       </div>
     </div>
   {% endif %}
@@ -25,15 +25,15 @@
 
 {%- call summaryCard({title: "Today's schedule"}) -%}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-third">
+    <div class="govuk-grid-column-one-third" data-qa="morning-schedule">
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Morning</p>
       {{ scheduleColumn(schedule.morning) }}
     </div>
-    <div class="govuk-grid-column-one-third">
+    <div class="govuk-grid-column-one-third" data-qa="afternoon-schedule">
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Afternoon</p>
       {{ scheduleColumn(schedule.afternoon) }}
     </div>
-    <div class="govuk-grid-column-one-third">
+    <div class="govuk-grid-column-one-third" data-qa="evening-schedule">
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Evening</p>
       {{ scheduleColumn(schedule.evening) }}
     </div>

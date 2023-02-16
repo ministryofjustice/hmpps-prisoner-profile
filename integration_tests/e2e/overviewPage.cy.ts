@@ -1,6 +1,12 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 
+const visitOverviewPage = (): OverviewPage => {
+  cy.task('stubDpsOverviewPage')
+  cy.signIn()
+  return Page.verifyOnPage(OverviewPage)
+}
+
 context('SignIn', () => {
   beforeEach(() => {
     cy.task('reset')
@@ -13,6 +19,7 @@ context('SignIn', () => {
     cy.task('stubVisitSummary', '1102484')
     cy.task('stubVisitBalances', 'G6123VU')
     cy.task('stubAssessments', '1102484')
+    cy.task('stubEventsForToday', '1102484')
   })
 
   it('Overview page is displayed', () => {
@@ -153,6 +160,19 @@ context('SignIn', () => {
       cy.signIn()
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.personalDetails().should('exist')
+    })
+  })
+  context('Schedule', () => {
+    it('Displays the schedule on the page', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.schedule().morning().column().should('exist')
+      overviewPage.schedule().afternoon().column().should('exist')
+      overviewPage.schedule().evening().column().should('exist')
+
+      overviewPage.schedule().morning().item(0).should('include.text', 'Joinery AM')
+      overviewPage.schedule().afternoon().item(0).should('include.text', 'Joinery PM')
+      overviewPage.schedule().evening().item(0).should('include.text', 'Gym - Football')
+      overviewPage.schedule().evening().item(1).should('include.text', 'VLB - Test')
     })
   })
 })

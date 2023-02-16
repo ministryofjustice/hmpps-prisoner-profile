@@ -64,4 +64,22 @@ export default class OverviewPage extends Page {
   })
 
   personalDetails = (): PageElement => cy.get('[data-qa=personal-details]')
+
+  schedule = () => ({
+    morning: () => ({
+      column: (): PageElement => cy.get('[data-qa=morning-schedule]'),
+      item: (itemNumber: number): PageElement =>
+        this.schedule().morning().column().find('[data-qa=schedule-item]').eq(itemNumber),
+    }),
+    afternoon: () => ({
+      column: (): PageElement => cy.get('[data-qa=afternoon-schedule]'),
+      item: (itemNumber: number): PageElement =>
+        this.schedule().afternoon().column().find('[data-qa=schedule-item]').eq(itemNumber),
+    }),
+    evening: () => ({
+      column: (): PageElement => cy.get('[data-qa=evening-schedule]'),
+      item: (itemNumber: number): PageElement =>
+        this.schedule().evening().column().find('[data-qa=schedule-item]').eq(itemNumber),
+    }),
+  })
 }
