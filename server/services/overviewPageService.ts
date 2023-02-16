@@ -111,6 +111,13 @@ export default class OverviewPageService {
       this.prisonApiClient.getVisitBalances(prisonerNumber),
     ])
 
+    let privilegedVisitsDescription = ''
+    if (visitBalances.remainingPvo) {
+      privilegedVisitsDescription = formatPrivilegedVisitsSummary(visitBalances.remainingPvo)
+    } else if (visitBalances.remainingVo) {
+      privilegedVisitsDescription = 'No privileged visits'
+    }
+
     const moneySummaryData: MiniSummaryData = {
       heading: 'Money',
       topLabel: 'Spends',
@@ -143,11 +150,9 @@ export default class OverviewPageService {
       topContent: visitSummary.startDateTime ? formatDate(visitSummary.startDateTime, 'short') : 'None scheduled',
       topClass: visitSummary.startDateTime ? 'big' : 'small',
       bottomLabel: 'Remaining visits',
-      bottomContentLine1: visitBalances.remainingVo,
-      bottomContentLine2: visitBalances.remainingPvo
-        ? formatPrivilegedVisitsSummary(visitBalances.remainingPvo)
-        : 'No privileged visits',
-      bottomClass: 'small',
+      bottomContentLine1: visitBalances.remainingVo ? visitBalances.remainingVo : '0',
+      bottomContentLine2: privilegedVisitsDescription,
+      bottomClass: visitBalances.remainingVo ? 'small' : 'big',
       linkLabel: 'Visits details',
       linkHref: '#',
     }
