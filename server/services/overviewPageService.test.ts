@@ -11,7 +11,7 @@ import {
   visitBalancesMock,
   visitSummaryMock,
 } from '../data/localMockData/miniSummaryMock'
-import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
 
 describe('OverviewPageService', () => {
   const prisonApiClient: PrisonApiClient = {
@@ -111,6 +111,17 @@ describe('OverviewPageService', () => {
       const res = await overviewPageService.get({ ...PrisonerMockDataA, prisonerNumber, bookingId } as Prisoner)
 
       expect(res.miniSummaryGroupB).toEqual(miniSummaryGroupBMock)
+    })
+  })
+
+  describe('getPersonalDetails', () => {
+    it('should get the personal details for a prisoner', async () => {
+      const prisonerNumber = '123123'
+      const bookingId = 567567
+
+      const overviewPageService = new OverviewPageService(prisonApiClient)
+      const res = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId } as Prisoner)
+      expect(res.personalDetails).toEqual(overviewPageService.getPersonalDetails(PrisonerMockDataB))
     })
   })
 })

@@ -146,4 +146,13 @@ context('SignIn', () => {
       overviewPage.nonAssociations().row(2).reciprocalReason().should('have.text', 'Rival Gang')
     })
   })
+
+  context('Personal details', () => {
+    it('Displays the prisoner presonal details', () => {
+      cy.task('stubDpsOverviewPage')
+      cy.signIn()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.personalDetails().should('exist')
+    })
+  })
 })

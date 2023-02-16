@@ -21,4 +21,8 @@ describe('GET /', () => {
   it('should render index page', () => {
     return request(app).get('/prisoner/A8469DY').expect('Content-Type', /html/)
   })
+
+  it('should render photo page', () => {
+    return request(app).get('/prisoner/A8469DY/image').expect('Content-Type', /html/)
+  })
 })

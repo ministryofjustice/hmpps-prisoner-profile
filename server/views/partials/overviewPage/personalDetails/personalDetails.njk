@@ -1,7 +1,7 @@
 {% from "../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Personal"}) -%}
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half">
       {{ govukSummaryList({
           classes: 'govuk-summary-list--no-border',

@@ -2,7 +2,7 @@ import { schedule, staffContacts, statuses } from '../data/overviewPage'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import { OverviewNonAssociation, OverviewPage } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { formatDate, formatMoney, formatPrivilegedVisitsSummary } from '../utils/utils'
+import { convertToTitleCase, formatDate, formatMoney, formatPrivilegedVisitsSummary } from '../utils/utils'
 import { Assessment } from '../interfaces/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
@@ -34,7 +34,7 @@ export default class OverviewPageService {
     }
   }
 
-  private getPersonalDetails(prisonerData: Prisoner): PersonalDetails {
+  public getPersonalDetails(prisonerData: Prisoner): PersonalDetails {
     const personalDetailsMain = [
       {
         key: {
@@ -42,9 +42,7 @@ export default class OverviewPageService {
         },
         value: {
           text:
-            prisonerData.firstName || prisonerData.lastName
-              ? `${prisonerData.firstName} ${prisonerData.lastName}`
-              : 'None',
+            prisonerData.firstName || prisonerData.lastName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
         },
       },
       {
