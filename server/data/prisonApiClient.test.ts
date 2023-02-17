@@ -1,6 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
+import dummyScheduledEvents from './localMockData/eventsForToday'
 import { LocationDummyDataC } from './localMockData/locations'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
@@ -30,12 +31,13 @@ describe('prisonApiClient', () => {
     nock.cleanAll()
   })
 
+  const mockSuccessfulPrisonApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
+    fakePrisonApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
+  }
+
   describe('getUserLocations', () => {
     it('should return data from api', async () => {
-      fakePrisonApi
-        .get('/api/users/me/locations')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, LocationDummyDataC)
+      mockSuccessfulPrisonApiCall('/api/users/me/locations', LocationDummyDataC)
 
       const output = await prisonApiClient.getUserLocations()
       expect(output).toEqual(LocationDummyDataC)
@@ -44,10 +46,7 @@ describe('prisonApiClient', () => {
 
   describe('getCaseLoads', () => {
     it('should return data from api', async () => {
-      fakePrisonApi
-        .get('/api/users/me/caseLoads?allCaseloads=true')
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, CaseLoadsDummyDataA)
+      mockSuccessfulPrisonApiCall('/api/users/me/caseLoads?allCaseloads=true', CaseLoadsDummyDataA)
 
       const output = await prisonApiClient.getUserCaseLoads()
       expect(output).toEqual(CaseLoadsDummyDataA)
@@ -56,10 +55,10 @@ describe('prisonApiClient', () => {
 
   describe('getNonAssociations', () => {
     it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
-      fakePrisonApi
-        .get(`/api/offenders/${prisonerNumber}/non-association-details`)
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, nonAssociationDetailsDummyData)
+      mockSuccessfulPrisonApiCall(
+        `/api/offenders/${prisonerNumber}/non-association-details`,
+        nonAssociationDetailsDummyData,
+      )
 
       const output = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
       expect(output).toEqual(nonAssociationDetailsDummyData)
@@ -128,6 +127,15 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getAssessments(bookingId)
       expect(output).toEqual(assessmentsMock)
+    })
+  })
+
+  describe('getEventsScheduledForToday', () => {
+    it.each([123456, 654321])('Should return data from the API', async bookingId => {
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/events/today`, dummyScheduledEvents)
+
+      const output = await prisonApiClient.getEventsScheduledForToday(bookingId)
+      expect(output).toEqual(dummyScheduledEvents)
     })
   })
 })

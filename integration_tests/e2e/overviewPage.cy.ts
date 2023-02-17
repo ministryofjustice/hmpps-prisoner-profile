@@ -1,6 +1,12 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 
+const visitOverviewPage = (): OverviewPage => {
+  cy.task('stubDpsOverviewPage')
+  cy.signIn()
+  return Page.verifyOnPage(OverviewPage)
+}
+
 context('SignIn', () => {
   beforeEach(() => {
     cy.task('reset')
@@ -13,34 +19,27 @@ context('SignIn', () => {
     cy.task('stubVisitSummary', '1102484')
     cy.task('stubVisitBalances', 'G6123VU')
     cy.task('stubAssessments', '1102484')
+    cy.task('stubEventsForToday', '1102484')
   })
 
   it('Overview page is displayed', () => {
-    cy.task('stubDpsOverviewPage')
-    cy.signIn()
-    Page.verifyOnPage(OverviewPage)
+    visitOverviewPage()
     cy.request('/prisoner/G6123VU').its('body').should('contain', 'Overview')
   })
 
   context('Mini Summary A', () => {
     it('Mini summary list is displayed', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.miniSummaryGroupA().should('exist')
     })
 
     it('Mini summary Group A should display the macro header', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.miniSummaryGroupA_MacroHeader().should('exist')
     })
 
     it('Mini summary Group A should contain Money card with correct data', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.moneyCard().contains('h2', 'Money')
       overviewPage.moneyCard().contains('p', 'Spends')
       overviewPage.moneyCard().contains('p', '£240.51')
@@ -50,9 +49,7 @@ context('SignIn', () => {
     })
 
     it('Mini summary Group A should contain Adjudications card with correct data', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.adjudicationsCard().contains('h2', 'Adjudications')
       overviewPage.adjudicationsCard().contains('p', 'Proven in last 3 months')
       overviewPage.adjudicationsCard().contains('p', '4')
@@ -62,9 +59,7 @@ context('SignIn', () => {
     })
 
     it('Mini summary Group A should contain Visits card with correct data', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.visitsCard().contains('h2', 'Visits')
       overviewPage.visitsCard().contains('p', 'Next visit date')
       overviewPage.visitsCard().contains('p', '15/09/2023')
@@ -77,23 +72,17 @@ context('SignIn', () => {
 
   context('Mini Summary B', () => {
     it('Mini summary list is displayed', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.miniSummaryGroupB().should('exist')
     })
 
     it('Mini summary Group B should hide the macro header', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.miniSummaryGroupB_MacroHeader().should('not.exist')
     })
 
     it('Mini summary Group B should contain Category card with correct data', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.categoryCard().contains('p', 'Category')
       overviewPage.categoryCard().contains('p', 'B')
       overviewPage.categoryCard().contains('p', 'Next review: 19/02/2023')
@@ -101,9 +90,7 @@ context('SignIn', () => {
     })
 
     it('Mini summary Group B should contain Incentives card with correct data', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.incentivesCard().contains('p', 'Incentive level')
       overviewPage.incentivesCard().contains('p', 'Standard')
       overviewPage.incentivesCard().contains('p', 'Next review: 30/01/2024')
@@ -111,9 +98,7 @@ context('SignIn', () => {
     })
 
     it('Mini summary Group B should contain CSRA card with correct data', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.csraCard().contains('p', 'CSRA')
       overviewPage.csraCard().contains('p', 'Standard')
       overviewPage.csraCard().contains('p', 'Last review: 19/02/2021')
@@ -122,18 +107,14 @@ context('SignIn', () => {
   })
 
   it('Should hide the change location link', () => {
-    cy.task('stubDpsOverviewPage')
-    cy.signIn()
-    const overviewPage = Page.verifyOnPage(OverviewPage)
+    const overviewPage = visitOverviewPage()
     // The link text label is change location but the functionality is change caseload
     overviewPage.headerChangeLocation().should('not.exist')
   })
 
   context('Non-associations', () => {
     it('Displays the non associations on the page', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.nonAssociations().table().should('exist')
       overviewPage.nonAssociations().rows().should('have.length', 3)
       overviewPage.nonAssociations().row(1).prisonerName().should('have.text', 'John Doe')
@@ -149,10 +130,22 @@ context('SignIn', () => {
 
   context('Personal details', () => {
     it('Displays the prisoner presonal details', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.personalDetails().should('exist')
+    })
+  })
+
+  context('Schedule', () => {
+    it('Displays the schedule on the page', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.schedule().morning().column().should('exist')
+      overviewPage.schedule().afternoon().column().should('exist')
+      overviewPage.schedule().evening().column().should('exist')
+
+      overviewPage.schedule().morning().item(0).should('include.text', 'Joinery AM')
+      overviewPage.schedule().afternoon().item(0).should('include.text', 'Joinery PM')
+      overviewPage.schedule().evening().item(0).should('include.text', 'Gym - Football')
+      overviewPage.schedule().evening().item(1).should('include.text', 'VLB - Test')
     })
   })
 })
