@@ -23,26 +23,23 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     this.restClient = new RestClient('Prison API', config.apis.prisonApi, token)
   }
 
-  async getUserLocations(): Promise<Location[]> {
+  private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {
-      return await this.restClient.get<Location[]>({ path: '/api/users/me/locations' })
+      return await this.restClient.get<T>(args)
     } catch (error) {
-      if (config.localMockData === 'true') {
-        return LocationDummyDataB
+      if (config.localMockData === 'true' && localMockData) {
+        return localMockData
       }
       return error
     }
   }
 
+  async getUserLocations(): Promise<Location[]> {
+    return this.get<Location[]>({ path: '/api/users/me/locations' }, LocationDummyDataB)
+  }
+
   async getUserCaseLoads(): Promise<CaseLoad[]> {
-    try {
-      return await this.restClient.get<CaseLoad[]>({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
-    } catch (error) {
-      if (config.localMockData === 'true') {
-        return CaseLoadsDummyDataA
-      }
-      return error
-    }
+    return this.get<CaseLoad[]>({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' }, CaseLoadsDummyDataA)
   }
 
   async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
@@ -56,73 +53,42 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails> {
-    try {
-      return await this.restClient.get<NonAssociationDetails>({
-        path: `/api/offenders/${prisonerNumber}/non-association-details`,
-      })
-    } catch (err) {
-      if (config.localMockData === 'true') {
-        return nonAssociationDetailsDummyData
-      }
-      return err
-    }
+    return this.get<NonAssociationDetails>(
+      { path: `/api/offenders/${prisonerNumber}/non-association-details` },
+      nonAssociationDetailsDummyData,
+    )
   }
 
   async getAccountBalances(bookingId: number): Promise<AccountBalances> {
-    try {
-      return await this.restClient.get<AccountBalances>({
-        path: `/api/bookings/${bookingId}/balances`,
-      })
-    } catch (error) {
-      return error
-    }
+    return this.get<AccountBalances>({
+      path: `/api/bookings/${bookingId}/balances`,
+    })
   }
 
   async getAdjudications(bookingId: number): Promise<AdjudicationSummary> {
-    try {
-      return await this.restClient.get<AdjudicationSummary>({ path: `/api/bookings/${bookingId}/adjudications` })
-    } catch (error) {
-      return error
-    }
+    return this.get<AdjudicationSummary>({ path: `/api/bookings/${bookingId}/adjudications` })
   }
 
   async getVisitSummary(bookingId: number): Promise<VisitSummary> {
-    try {
-      return await this.restClient.get<VisitSummary>({ path: `/api/bookings/${bookingId}/visits/summary` })
-    } catch (error) {
-      return error
-    }
+    return this.get<VisitSummary>({ path: `/api/bookings/${bookingId}/visits/summary` })
   }
 
   async getVisitBalances(prisonerNumber: string): Promise<VisitBalances> {
-    try {
-      return await this.restClient.get<VisitBalances>({
-        path: `/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
-      })
-    } catch (error) {
-      return error
-    }
+    return this.get<VisitBalances>({
+      path: `/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
+    })
   }
 
   async getAssessments(bookingId: number): Promise<Assessment[]> {
-    try {
-      return await this.restClient.get<Assessment[]>({ path: `/api/bookings/${bookingId}/assessments` })
-    } catch (error) {
-      return error
-    }
+    return this.get<Assessment[]>({ path: `/api/bookings/${bookingId}/assessments` })
   }
 
   async getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]> {
-    try {
-      const result = await this.restClient.get({
+    return this.get<ScheduledEvent[]>(
+      {
         path: `/api/bookings/${bookingId}/events/today`,
-      })
-      return result as ScheduledEvent[]
-    } catch (err) {
-      if (config.localMockData === 'true') {
-        return dummyScheduledEvents
-      }
-      return err
-    }
+      },
+      dummyScheduledEvents,
+    )
   }
 }
