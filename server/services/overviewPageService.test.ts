@@ -13,6 +13,8 @@ import {
   visitSummaryMock,
 } from '../data/localMockData/miniSummaryMock'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
+import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 describe('OverviewPageService', () => {
   const prisonApiClient: PrisonApiClient = {
@@ -25,6 +27,8 @@ describe('OverviewPageService', () => {
     getAdjudications: jest.fn(async () => adjudicationSummaryMock),
     getAccountBalances: jest.fn(async () => accountBalancesMock),
     getAssessments: jest.fn(async () => assessmentsMock),
+    getPrisoner: jest.fn(async () => prisonerDetailMock),
+    getInmateDetail: jest.fn(async () => inmateDetailMock),
   }
 
   beforeEach(() => {
