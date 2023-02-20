@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { schedule, statuses } from '../data/overviewPage'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import { OverviewNonAssociation, OverviewPage } from '../interfaces/overviewPage'
@@ -62,7 +61,7 @@ export default class OverviewPageService {
       this.prisonApiClient.getOffenderContacts(prisonerData.bookingId),
       this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber).catch(() => undefined),
       this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
-      this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 36, bookingId }),
+      this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
     ])
 
     const communityOffenderManager = offenderContacts
@@ -93,10 +92,8 @@ export default class OverviewPageService {
             ? `${convertToTitleCase(offenderKeyWorker.firstName)} ${convertToTitleCase(offenderKeyWorker.lastName)}`
             : 'Not allocated',
         lastSession:
-          keyWorkerSessions !== undefined && keyWorkerSessions[0] !== undefined
-            ? keyWorkerSessions &&
-              keyWorkerSessions[0] &&
-              moment(keyWorkerSessions[0].latestCaseNote).format('D MMMM YYYY')
+          keyWorkerSessions !== undefined && keyWorkerSessions[0].latestCaseNote !== undefined
+            ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
             : '',
       },
       prisonOffenderManager:

@@ -7,7 +7,9 @@
         <p class="govuk-body">
           {{ staffContacts.keyWorker.name }}
           {% if(staffContacts.keyWorker.lastSession) %}
-            - last session: {{ staffContacts.keyWorker.lastSession | formatDate }}
+            - last session: {{ staffContacts.keyWorker.lastSession  }}
+          {% else %}
+             - No previous session
           {% endif %}
         </p>
       {% endset %}
