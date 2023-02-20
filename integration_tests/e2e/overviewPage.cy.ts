@@ -155,4 +155,13 @@ context('SignIn', () => {
       overviewPage.personalDetails().should('exist')
     })
   })
+
+  context('Staff contacts', () => {
+    it('Displays the offender staff contact details', () => {
+      cy.task('stubDpsOverviewPage')
+      cy.signIn()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.staffContacts().should('exist')
+    })
+  })
 })

@@ -64,4 +64,6 @@ export default class OverviewPage extends Page {
   })
 
   personalDetails = (): PageElement => cy.get('[data-qa=personal-details]')
+
+  staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
 }

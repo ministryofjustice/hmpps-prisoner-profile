@@ -12,7 +12,6 @@
     font-weight: 300;
     text-align: center;
     line-height: 1;
-    min-width: 100px;
   }
 
   @media print {
@@ -40,7 +39,7 @@
   gap: 15px;
 
   li {
-    padding: 0 5px;
+    padding: 0 10px;
     margin-bottom: 0;
     background-color: govuk-colour('white');
   }

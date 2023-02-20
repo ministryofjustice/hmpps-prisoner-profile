@@ -1,12 +1,14 @@
 {% from "../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Staff contacts"}) -%}
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row" data-qa="staff-contacts">
     <div class="govuk-grid-column-full">
       {% set keyWorkerHtml %}
         <p class="govuk-body">
           {{ staffContacts.keyWorker.name }}
-          - last session: {{ staffContacts.keyWorker.lastSession | formatDate }}
+          {% if(staffContacts.keyWorker.lastSession) %}
+            - last session: {{ staffContacts.keyWorker.lastSession | formatDate }}
+          {% endif %}
         </p>
       {% endset %}
       {{ govukSummaryList({
