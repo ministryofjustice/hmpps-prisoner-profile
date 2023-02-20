@@ -20,6 +20,10 @@ context('SignIn', () => {
     cy.task('stubVisitBalances', 'G6123VU')
     cy.task('stubAssessments', '1102484')
     cy.task('stubEventsForToday', '1102484')
+    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', caseLoadId: 'MDI' })
+    cy.task('stubKeyWorkerSessions',{ type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' })
+    cy.task('stubGetOffenderContacts','1102484')
   })
 
   it('Overview page is displayed', () => {
