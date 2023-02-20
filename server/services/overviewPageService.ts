@@ -1,6 +1,11 @@
-import { schedule, statuses } from '../data/overviewPage'
+import { statuses } from '../data/overviewPage'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
-import { OverviewNonAssociation, OverviewPage } from '../interfaces/overviewPage'
+import {
+  OverviewNonAssociation,
+  OverviewPage,
+  OverviewSchedule,
+  OverviewScheduleItem,
+} from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
   convertToTitleCase,
@@ -17,6 +22,8 @@ import { StaffContacts } from '../interfaces/staffContacts'
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { Pom } from '../interfaces/pom'
+import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -43,6 +50,7 @@ export default class OverviewPageService {
     const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
     const personalDetails = this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
+    const schedule = await this.getSchedule(prisonerData.bookingId)
 
     return {
       miniSummaryGroupA,
@@ -302,6 +310,30 @@ export default class OverviewPageService {
         classes: 'govuk-grid-row card-body',
       },
     ]
+  }
+
+  private async getSchedule(bookingId: number): Promise<OverviewSchedule> {
+    const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
+      const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
+      const startTime = new Date(event.startTime)
+      const endTime = new Date(event.endTime)
+      const padWithZero = (num: number) => (num.toString().length === 1 ? `0${num}` : `${num}`)
+
+      return {
+        name,
+        startTime: `${padWithZero(startTime.getHours())}:${padWithZero(startTime.getMinutes())}`,
+        endTime: `${padWithZero(endTime.getHours())}:${padWithZero(endTime.getMinutes())}`,
+      }
+    }
+
+    const scheduledEvents = await this.prisonApiClient.getEventsScheduledForToday(bookingId)
+    const groupedEvents = groupEventsByPeriod(scheduledEvents)
+
+    return {
+      morning: groupedEvents.morningEvents.map(formatEventForOverview),
+      afternoon: groupedEvents.afternoonEvents.map(formatEventForOverview),
+      evening: groupedEvents.eveningEvents.map(formatEventForOverview),
+    }
   }
 
   private async getNonAssociations(prisonerNumber: string): Promise<OverviewNonAssociation[]> {

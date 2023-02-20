@@ -16,6 +16,7 @@ context('SignIn', () => {
     cy.task('stubVisitSummary', '1102484')
     cy.task('stubVisitBalances', 'G6123VU')
     cy.task('stubAssessments', '1102484')
+    cy.task('stubEventsForToday', '1102484')
   })
 
   it('Unauthenticated user directed to auth', () => {

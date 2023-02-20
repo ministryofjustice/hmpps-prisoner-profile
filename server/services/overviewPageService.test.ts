@@ -1,4 +1,5 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 import nonAssociationDetailsDummyData from '../data/localMockData/nonAssociations'
 import OverviewPageService from './overviewPageService'
 import { Prisoner } from '../interfaces/prisoner'
@@ -21,7 +22,8 @@ import { StaffContactsMock } from '../data/localMockData/staffContacts'
 
 describe('OverviewPageService', () => {
   const prisonApiClient: PrisonApiClient = {
-    getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
+    getNonAssociationDetails: jest.fn(),
+    getEventsScheduledForToday: jest.fn(),
     getUserCaseLoads: jest.fn(),
     getUserLocations: jest.fn(),
     getVisitBalances: jest.fn(async () => visitBalancesMock),
@@ -40,6 +42,11 @@ describe('OverviewPageService', () => {
   const keyWorkerApiClient: KeyWorkerClient = {
     getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
   }
+
+  beforeEach(() => {
+    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+    prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
+  })
 
   describe('Non-associations', () => {
     it.each(['ABC123', 'DEF321'])('Gets the non-associations for the prisoner', async (prisonerNumber: string) => {
@@ -189,6 +196,70 @@ describe('OverviewPageService', () => {
       )
       const res = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId } as Prisoner)
       expect(res.staffContacts).toEqual(StaffContactsMock)
+    })
+  })
+  describe('Schedule', () => {
+    it('Gets events for today from the prison api', async () => {
+      const overviewPageService = new OverviewPageService(
+        prisonApiClient,
+        allocationManagerApiClient,
+        keyWorkerApiClient,
+      )
+      await overviewPageService.get(PrisonerMockDataA)
+      expect(prisonApiClient.getEventsScheduledForToday).toBeCalledWith(PrisonerMockDataA.bookingId)
+    })
+
+    it('Groups the events', async () => {
+      const overviewPageService = new OverviewPageService(
+        prisonApiClient,
+        allocationManagerApiClient,
+        keyWorkerApiClient,
+      )
+      const { schedule } = await overviewPageService.get(PrisonerMockDataA)
+      const { morning, afternoon, evening } = schedule
+      expect(morning.length).toEqual(1)
+      expect(afternoon.length).toEqual(1)
+      expect(evening.length).toEqual(2)
+    })
+
+    it('Uses the event source description for PA sub types', async () => {
+      const events = [{ ...dummyScheduledEvents[0] }]
+      events[0].eventSubType = 'PA'
+      events[0].eventSourceDesc = 'The event description'
+      prisonApiClient.getEventsScheduledForToday = jest.fn(async () => events)
+      const overviewPageService = new OverviewPageService(
+        prisonApiClient,
+        allocationManagerApiClient,
+        keyWorkerApiClient,
+      )
+      const { schedule } = await overviewPageService.get(PrisonerMockDataA)
+      const { morning } = schedule
+      expect(morning[0].name).toEqual('The event description')
+    })
+
+    it('Creates the overview page schedule from the events', async () => {
+      const overviewPageService = new OverviewPageService(
+        prisonApiClient,
+        allocationManagerApiClient,
+        keyWorkerApiClient,
+      )
+      const { schedule } = await overviewPageService.get(PrisonerMockDataA)
+      const { morning, afternoon, evening } = schedule
+
+      expect(morning[0].name).toEqual('Joinery AM')
+      expect(morning[0].startTime).toEqual('08:30')
+      expect(morning[0].endTime).toEqual('11:45')
+
+      expect(afternoon[0].name).toEqual('Joinery PM')
+      expect(afternoon[0].startTime).toEqual('13:15')
+      expect(afternoon[0].endTime).toEqual('16:15')
+
+      expect(evening[0].name).toEqual('Gym - Football')
+      expect(evening[0].startTime).toEqual('18:00')
+      expect(evening[0].endTime).toEqual('19:00')
+      expect(evening[1].name).toEqual('VLB - Test')
+      expect(evening[1].startTime).toEqual('18:00')
+      expect(evening[1].endTime).toEqual('19:00')
     })
   })
 })

@@ -8,6 +8,7 @@ import { VisitBalances } from '../../interfaces/visitBalances'
 import { Assessment } from '../../interfaces/assessment'
 import { OffenderContacts } from '../../interfaces/staffContacts'
 import { CaseNote } from '../../interfaces/caseNote'
+import { ScheduledEvent } from '../../interfaces/scheduledEvent'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -20,4 +21,5 @@ export interface PrisonApiClient {
   getAssessments(bookingId: number): Promise<Assessment[]>
   getOffenderContacts(bookingId: number): Promise<OffenderContacts>
   getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]>
+  getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
 }
