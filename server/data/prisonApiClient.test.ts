@@ -12,6 +12,7 @@ import {
   visitBalancesMock,
   visitSummaryMock,
 } from './localMockData/miniSummaryMock'
+import { prisonerDetailMock } from './localMockData/prisonerDetailMock'
 
 jest.mock('./tokenStore')
 
@@ -136,6 +137,19 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getEventsScheduledForToday(bookingId)
       expect(output).toEqual(dummyScheduledEvents)
+    })
+  })
+
+  describe('getPrisoner', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'A1234BC'
+      fakePrisonApi
+        .get(`/api/prisoners/${prisonerNumber}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, prisonerDetailMock)
+
+      const output = await prisonApiClient.getPrisoner(prisonerNumber)
+      expect(output).toEqual(prisonerDetailMock)
     })
   })
 })
