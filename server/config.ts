@@ -83,6 +83,22 @@ export default {
       agent: new AgentConfig(Number(get('PRISONER_SEARCH_API_TIMEOUT_DEADLINE', 20000))),
     },
     dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
+    allocationManager: {
+      url: process.env.ALLOCATION_MANAGER_ENDPOINT_URL || '',
+      timeout: {
+        response: Number(get('ALLOCATION_MANAGER_API_TIMEOUT_SECONDS', 20000)),
+        deadline: Number(get('ALLOCATION_MANAGER_API_TIMEOUT_SECONDS', 20000)),
+      },
+      agent: new AgentConfig(Number(get('ALLOCATION_MANAGER_API_TIMEOUT_DEADLINE', 20000))),
+    },
+    keyworker: {
+      url: process.env.KEYWORKER_API_URL || 'http://localhost:8081/',
+      timeout: {
+        response: Number(get('KEYWORKER_API_TIMEOUT_SECONDS', 20000)),
+        deadline: Number(get('AKEYWORKER_API_TIMEOUT_SECONDS', 20000)),
+      },
+      agent: new AgentConfig(Number(get('KEYWORKER_API_TIMEOUT_DEADLINE', 20000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),

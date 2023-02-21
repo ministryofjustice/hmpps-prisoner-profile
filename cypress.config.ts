@@ -6,6 +6,8 @@ import dpsHomePage from './integration_tests/mockApis/dpsHomepage'
 import dpsOverviewPage from './integration_tests/mockApis/dpsOverviewPage'
 import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearch'
+import pomApi from './integration_tests/mockApis/pom'
+import keyWorkerApi from './integration_tests/mockApis/keyWorker'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -30,6 +32,8 @@ export default defineConfig({
         ...dpsOverviewPage,
         ...prisonApi,
         ...prisonerSearchApi,
+        ...pomApi,
+        ...keyWorkerApi
       })
     },
     baseUrl: 'http://localhost:3007',

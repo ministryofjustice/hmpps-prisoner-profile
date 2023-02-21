@@ -20,6 +20,11 @@ context('SignIn', () => {
     cy.task('stubVisitBalances', 'G6123VU')
     cy.task('stubAssessments', '1102484')
     cy.task('stubEventsForToday', '1102484')
+    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', caseLoadId: 'MDI' })
+    cy.task('stubKeyWorkerSessions',{ type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' })
+    cy.task('stubGetOffenderContacts','1102484')
+    cy.task('stubEventsForProfileImage', 'G6123VU')
   })
 
   it('Overview page is displayed', () => {
@@ -146,6 +151,15 @@ context('SignIn', () => {
       overviewPage.schedule().afternoon().item(0).should('include.text', 'Joinery PM')
       overviewPage.schedule().evening().item(0).should('include.text', 'Gym - Football')
       overviewPage.schedule().evening().item(1).should('include.text', 'VLB - Test')
+    })
+  })
+
+  context('Staff contacts', () => {
+    it('Displays the offender staff contact details', () => {
+      cy.task('stubDpsOverviewPage')
+      cy.signIn()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.staffContacts().should('exist')
     })
   })
 })
