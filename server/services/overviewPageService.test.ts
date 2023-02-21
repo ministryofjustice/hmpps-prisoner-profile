@@ -13,6 +13,8 @@ import {
   visitSummaryMock,
 } from '../data/localMockData/miniSummaryMock'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
+import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
@@ -33,6 +35,8 @@ describe('OverviewPageService', () => {
     getAssessments: jest.fn(async () => assessmentsMock),
     getOffenderContacts: jest.fn(),
     getCaseNoteSummaryByTypes: jest.fn(),
+    getPrisoner: jest.fn(async () => prisonerDetailMock),
+    getInmateDetail: jest.fn(async () => inmateDetailMock),
   }
 
   const allocationManagerApiClient: AllocationManagerClient = {

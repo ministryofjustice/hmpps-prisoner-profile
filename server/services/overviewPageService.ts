@@ -1,4 +1,3 @@
-import { statuses } from '../data/overviewPage'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import {
   OverviewNonAssociation,
@@ -24,6 +23,9 @@ import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { Pom } from '../interfaces/pom'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
+import { Status } from '../interfaces/status'
+import { PrisonerDetail } from '../interfaces/prisonerDetail'
+import { getProfileInformationValue, InmateDetail, ProfileInformationType } from '../interfaces/inmateDetail'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -51,6 +53,7 @@ export default class OverviewPageService {
     const personalDetails = this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData.bookingId)
+    const statuses = await this.getStatuses(prisonerData)
 
     return {
       miniSummaryGroupA,
@@ -261,7 +264,7 @@ export default class OverviewPageService {
   }
 
   private async getMiniSummaryGroupB(currentIncentive: Incentive, bookingId: number): Promise<MiniSummary[]> {
-    const [assessments] = await Promise.all([this.prisonApiClient.getAssessments(bookingId)])
+    const assessments = await this.prisonApiClient.getAssessments(bookingId)
 
     const category: Assessment =
       assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category) || null
@@ -355,5 +358,61 @@ export default class OverviewPageService {
           { text: offenderNonAssociation.reasonDescription },
         ]
       })
+  }
+
+  private async getStatuses(prisonerData: Prisoner): Promise<Status[]> {
+    const statusList: Status[] = []
+
+    const prisonerDetail: PrisonerDetail = await this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber)
+    const inmateDetail: InmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
+
+    // Current Location
+    const inOutStatusDescription = (status: string) =>
+      ({
+        IN: 'In',
+        OUT: 'Out at',
+        TRN: 'Transferring',
+      }[status])
+
+    const inOutLocationDescription = (status: string) =>
+      ({
+        IN: prisonerData.locationDescription,
+        OUT: prisonerDetail.internalLocation,
+        TRN: prisonerData.locationDescription,
+      }[status])
+
+    statusList.push({
+      label: `${inOutStatusDescription(prisonerData.inOutStatus)} ${inOutLocationDescription(
+        prisonerData.inOutStatus,
+      )}`,
+      date: formatDate('2023-01-01', 'short'),
+    })
+
+    // Youth Offender
+    if (prisonerData.youthOffender) {
+      statusList.push({
+        label: 'Youth offender',
+        date: formatDate('2023-01-01', 'short'),
+      })
+    }
+
+    // Pregnant  TODO where to get this from?
+    // if () {
+    //   statusList.push({
+    //     label: 'Pregnant',
+    //     date: formatDate('2023-01-01', 'short'),
+    //   })
+    // }
+
+    // Listener
+    if (
+      getProfileInformationValue(ProfileInformationType.RecognisedListener, inmateDetail.profileInformation) === 'Yes'
+    ) {
+      statusList.push({
+        label: 'Recognised Listener',
+      })
+    }
+
+    return statusList
   }
 }
