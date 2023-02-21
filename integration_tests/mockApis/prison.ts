@@ -163,9 +163,8 @@ export default {
         headers: {
           'Content-Type': 'image/png',
         },
-        bodyFileName: placeHolderImagePath
+        bodyFileName: placeHolderImagePath,
       },
     })
   },
-
 }
