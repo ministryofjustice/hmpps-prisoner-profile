@@ -9,7 +9,7 @@ import {
 import dummyScheduledEvents from '../../server/data/localMockData/eventsForToday'
 import nonAssociationsDummyData from '../../server/data/localMockData/nonAssociations'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
-import { offenderContacts } from '../../server/data/localMockData/offenderContacts'
+import { offenderContact } from '../../server/data/localMockData/offenderContacts'
 import { mapToQueryString } from '../../server/utils/utils'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -124,7 +124,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/case-notes/summary?${mapToQueryString(params)}`,
+        urlPattern: `/prison/api/case-notes/summary\\?${mapToQueryString(params)}`,
       },
       response: {
         status: 200,
@@ -147,7 +147,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: offenderContacts,
+        jsonBody: offenderContact,
       },
     })
   },

@@ -7,14 +7,13 @@ export default class KeyWorkerClient {
 
   caseLoadId: string
 
-  constructor(token: string, caseLoadId: string) {
+  constructor(token: string) {
     this.restClient = new RestClient('KeyWorkers API', config.apis.keyworker, token)
-    this.caseLoadId = caseLoadId
   }
 
   async getOffendersKeyWorker(offenderNumber: string): Promise<KeyWorker> {
     try {
-      return await this.restClient.get<KeyWorker>({ path: `/key-worker/${this.caseLoadId}/offender/${offenderNumber}` })
+      return await this.restClient.get<KeyWorker>({ path: `/key-worker/offender/${offenderNumber}` })
     } catch (error) {
       return error
     }

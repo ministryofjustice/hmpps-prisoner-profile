@@ -72,14 +72,15 @@ export default class OverviewPageService {
       this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
     ])
 
-    const communityOffenderManager = offenderContacts
-      ? offenderContacts.otherContacts
-          .filter(contact => contact && contact.contactType === 'COM')
-          .map(contact => ({
-            firstName: contact ? contact?.firstName : undefined,
-            lastName: contact ? contact?.lastName : undefined,
-          }))
-      : []
+    const communityOffenderManager =
+      offenderContacts && offenderContacts.otherContacts !== undefined
+        ? offenderContacts.otherContacts
+            .filter(contact => contact && contact.relationship === 'COM')
+            .map(contact => ({
+              firstName: contact ? contact?.firstName : undefined,
+              lastName: contact ? contact?.lastName : undefined,
+            }))
+        : []
 
     const prisonOffenderManager =
       allocationManager &&

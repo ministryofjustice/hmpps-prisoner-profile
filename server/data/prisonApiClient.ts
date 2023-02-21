@@ -13,7 +13,7 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/assessment'
-import { OffenderContacts } from '../interfaces/staffContacts'
+import { OffenderContact, OffenderContacts } from '../interfaces/staffContacts'
 import { mapToQueryString } from '../utils/utils'
 import { CaseNote } from '../interfaces/caseNote'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
@@ -95,9 +95,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     )
   }
 
-  async getOffenderContacts(bookingId: number): Promise<OffenderContacts> {
+  async getOffenderContacts(bookingId: number): Promise<OffenderContact> {
     try {
-      return await this.restClient.get<OffenderContacts>({ path: `/api/bookings/${bookingId}/contacts` })
+      return await this.restClient.get<OffenderContact>({ path: `/api/bookings/${bookingId}/contacts` })
     } catch (error) {
       return error
     }

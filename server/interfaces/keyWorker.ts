@@ -4,8 +4,3 @@ export interface KeyWorker {
   lastName: string
   email: string
 }
-
-export interface KeyWorkerStub {
-  prisonerNumber: string
-  caseLoadId: string
-}

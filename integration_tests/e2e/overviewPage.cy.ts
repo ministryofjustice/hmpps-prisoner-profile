@@ -21,7 +21,7 @@ context('SignIn', () => {
     cy.task('stubAssessments', '1102484')
     cy.task('stubEventsForToday', '1102484')
     cy.task('stubPomData', 'G6123VU')
-    cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', caseLoadId: 'MDI' })
+    cy.task('stubKeyWorkerData', 'G6123VU')
     cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' })
     cy.task('stubGetOffenderContacts', '1102484')
     cy.task('stubEventsForProfileImage', 'G6123VU')

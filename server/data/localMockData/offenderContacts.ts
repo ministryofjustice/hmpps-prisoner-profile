@@ -1,49 +1,57 @@
-export const offenderContacts = {
-  offenderContacts: [
+import { OffenderContact } from '../../interfaces/staffContacts'
+
+export const offenderContact: OffenderContact = {
+  bookingId: 0,
+  nextOfKin: [
     {
-      lastName: 'Smith',
-      firstName: 'John',
-      middleName: 'Mark',
-      dateOfBirth: '1980-01-01',
-      contactType: 'COM',
+      lastName: 'SMITH',
+      firstName: 'JOHN',
+      middleName: 'MARK',
+      contactType: 'O',
       contactTypeDescription: 'Official',
-      relationshipCode: 'RO',
+      relationship: 'RO',
       relationshipDescription: 'Responsible Officer',
       commentText: 'Some additional information',
       emergencyContact: true,
       nextOfKin: false,
+      relationshipId: 10466277,
       personId: 5871791,
-      approvedVisitor: true,
+      activeFlag: true,
+      expiryDate: '2019-01-31',
+      approvedVisitorFlag: true,
+      canBeContactedFlag: false,
+      awareOfChargesFlag: true,
+      contactRootOffenderId: 5871791,
       bookingId: 2468081,
-      emails: [
-        {
-          email: 'string',
-        },
-      ],
-      phones: [
-        {
-          phoneId: 2234232,
-          number: '0114 2345678',
-          type: 'TEL',
-          ext: '123',
-        },
-      ],
-      restrictions: [
-        {
-          restrictionId: 0,
-          comment: 'string',
-          restrictionType: 'string',
-          restrictionTypeDescription: 'string',
-          startDate: '1980-01-01',
-          expiryDate: '1980-01-01',
-          globalRestriction: true,
-        },
-      ],
-      active: true,
+      createDateTime: '2021-07-05T10:35:17',
+    },
+  ],
+  otherContacts: [
+    {
+      lastName: 'SMITH',
+      firstName: 'JOHN',
+      middleName: 'MARK',
+      contactType: 'O',
+      contactTypeDescription: 'Official',
+      relationship: 'RO',
+      relationshipDescription: 'Responsible Officer',
+      commentText: 'Some additional information',
+      emergencyContact: true,
+      nextOfKin: false,
+      relationshipId: 10466277,
+      personId: 5871791,
+      activeFlag: true,
+      expiryDate: '2019-01-31',
+      approvedVisitorFlag: true,
+      canBeContactedFlag: false,
+      awareOfChargesFlag: true,
+      contactRootOffenderId: 5871791,
+      bookingId: 2468081,
+      createDateTime: '2021-07-05T10:35:17',
     },
   ],
 }
 
 export default {
-  offenderContacts,
+  offenderContact,
 }

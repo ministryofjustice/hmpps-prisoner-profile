@@ -32,7 +32,7 @@ export default function routes(service: Services): Router {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
     const allocationManagerClient = new AllocationManagerClient(res.locals.clientToken)
-    const keyWorkersClient = new KeyWorkersClient(res.locals.clientToken, res.locals.user.activeCaseLoadId)
+    const keyWorkersClient = new KeyWorkersClient(res.locals.clientToken)
 
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
