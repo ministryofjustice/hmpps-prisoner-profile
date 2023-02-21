@@ -1,16 +1,17 @@
-<div class="govuk-grid-row">
+{% extends "./index.njk" %}
+{% block body %}
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-        <h1>Overview</h1>
+      <h1>Overview</h1>
     </div>
-</div>
+  </div>
 
-<div class="govuk-grid-row hmpps-three-quarters-responsive">
+  <div class="govuk-grid-row hmpps-three-quarters-responsive">
     <div class="govuk-grid-column-three-quarters">
-        {% include "../partials/overviewPage/mainBody.njk" %}
+      {% include "../partials/overviewPage/mainBody.njk" %}
     </div>
     <div class="govuk-grid-column-one-quarter">
-        {% include "../partials/overviewPage/sideBar.njk" %}
+      {% include "../partials/overviewPage/sideBar.njk" %}
     </div>
-</div>
-
-
+  </div>
+{% endblock %}
