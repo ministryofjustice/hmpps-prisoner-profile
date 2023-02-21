@@ -33,7 +33,7 @@ export default defineConfig({
         ...prisonApi,
         ...prisonerSearchApi,
         ...pomApi,
-        ...keyWorkerApi
+        ...keyWorkerApi,
       })
     },
     baseUrl: 'http://localhost:3007',
