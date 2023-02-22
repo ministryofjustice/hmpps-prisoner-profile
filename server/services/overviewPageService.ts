@@ -78,7 +78,7 @@ export default class OverviewPageService {
     const communityOffenderManager =
       offenderContacts && offenderContacts.otherContacts !== undefined
         ? offenderContacts.otherContacts
-            .filter(contact => contact && contact.relationship === 'COM')
+            .filter(contact => contact && contact.contactType === 'COM')
             .map(contact => ({
               firstName: contact ? contact?.firstName : undefined,
               lastName: contact ? contact?.lastName : undefined,
