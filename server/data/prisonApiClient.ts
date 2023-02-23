@@ -13,6 +13,9 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/assessment'
+import { OffenderContact } from '../interfaces/staffContacts'
+import { mapToQueryString } from '../utils/utils'
+import { CaseNote } from '../interfaces/caseNote'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
@@ -94,6 +97,14 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     )
   }
 
+  async getOffenderContacts(bookingId: number): Promise<OffenderContact> {
+    try {
+      return await this.restClient.get<OffenderContact>({ path: `/api/bookings/${bookingId}/contacts` })
+    } catch (error) {
+      return error
+    }
+  }
+
   async getPrisoner(prisonerNumber: string): Promise<PrisonerDetail> {
     try {
       const prisoner = await this.restClient.get<PrisonerDetail>({ path: `/api/prisoners/${prisonerNumber}` })
@@ -102,6 +113,14 @@ export default class PrisonApiRestClient implements PrisonApiClient {
         return prisoner[0]
       }
       return prisoner
+    } catch (error) {
+      return error
+    }
+  }
+
+  async getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]> {
+    try {
+      return await this.restClient.get<CaseNote[]>({ path: `/api/case-notes/summary?${mapToQueryString(params)}` })
     } catch (error) {
       return error
     }

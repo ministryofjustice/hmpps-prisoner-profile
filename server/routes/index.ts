@@ -9,6 +9,8 @@ import { Prisoner } from '../interfaces/prisoner'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 
 import { mapHeaderData } from '../mappers/headerMappers'
+import AllocationManagerClient from '../data/allocationManagerApiClient'
+import KeyWorkersClient from '../data/keyWorkersApiClient'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -25,10 +27,13 @@ export default function routes(service: Services): Router {
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+    const allocationManagerClient = new AllocationManagerClient(res.locals.clientToken)
+    const keyWorkersClient = new KeyWorkersClient(res.locals.clientToken)
+
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
-    const prisonApi = new PrisonApiRestClient(res.locals.clientToken)
-    const overviewPageService = new OverviewPageService(prisonApi)
+    const overviewPageService = new OverviewPageService(prisonApiClient, allocationManagerClient, keyWorkersClient)
     const overviewPageData = await overviewPageService.get(prisonerData)
 
     res.render('pages/overviewPage', {

@@ -67,6 +67,8 @@ export default class OverviewPage extends Page {
 
   personalDetails = (): PageElement => cy.get('[data-qa=personal-details]')
 
+  staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
+
   schedule = () => ({
     morning: () => ({
       column: (): PageElement => cy.get('[data-qa=morning-schedule]'),
@@ -84,4 +86,6 @@ export default class OverviewPage extends Page {
         this.schedule().evening().column().find('[data-qa=schedule-item]').eq(itemNumber),
     }),
   })
+
+  prisonerPhotoLink = (): PageElement => cy.get('[data-qa=prisoner-photo-link]')
 }

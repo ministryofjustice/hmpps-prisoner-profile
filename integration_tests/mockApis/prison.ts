@@ -8,6 +8,11 @@ import {
 } from '../../server/data/localMockData/miniSummaryMock'
 import dummyScheduledEvents from '../../server/data/localMockData/eventsForToday'
 import nonAssociationsDummyData from '../../server/data/localMockData/nonAssociations'
+import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
+import { offenderContact } from '../../server/data/localMockData/offenderContacts'
+import { mapToQueryString } from '../../server/utils/utils'
+
+const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
   stubNonAssociations: (prisonerNumber: string) => {
@@ -112,6 +117,53 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: dummyScheduledEvents,
+      },
+    })
+  },
+  stubKeyWorkerSessions: (params: object) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/case-notes/summary\\?${mapToQueryString(params)}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: CaseNotesByTypeA,
+      },
+    })
+  },
+
+  stubGetOffenderContacts: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/contacts`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: offenderContact,
+      },
+    })
+  },
+
+  stubEventsForProfileImage: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/image/data\\?fullSizeImage=true`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+        },
+        bodyFileName: placeHolderImagePath,
       },
     })
   },
