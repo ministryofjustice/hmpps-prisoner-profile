@@ -1,0 +1,29 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
+  <div class="govuk-grid-row" data-qa="personal-details">
+    <div class="govuk-grid-column-full">
+      {{ govukSummaryList({
+          rows: [
+            { key: { text: "Name"}, value: { text: "David Jones"} },
+            { key: { text: "Date of birth"}, value: { text: "23 June 1972 (50 years old)"} },
+            { key: { text: "Place of birth"}, value: { text: "Wolverhampton"} },
+            { key: { text: "Nationality"}, value: { text: "British"} },
+            { key: { text: "Ethnic group"}, value: { text: "White: Eng./Welsh/Scot./N.Irish/British (W1)"} },
+            { key: { text: "Religion or belief"}, value: { text: "Christian"} },
+            { key: { text: "Sex"}, value: { text: "Male"} },
+            { key: { text: "Sexual orientation"}, value: { text: "Heterosexual"} },
+            { key: { text: "Marriage or civil partnership status"}, value: { text: "Single-not married/in civil partnership"} },
+            { key: { text: "Number of children"}, value: { text: "2"} },
+            { key: { text: "Languages"}, value: { text: "English (preferred)"} },
+            { key: { text: "Other languages"}, value: { text: "Spanish - speak and write"} },
+            { key: { text: "Type of diet"}, value: { text: "Religion - Muslim"} },
+            { key: { text: "Smoker or vaper"}, value: { text: "Vaper/NRT Only"} },
+            { key: { text: "Domestic abuse perpetrator"}, value: { text: "Yes"} },
+            { key: { text: "Domestic abuse victim"}, value: { text: "Yes"} },
+            { key: { text: "Social care needed"}, value: { text: "Yes"} }
+          ]
+      }) }}
+    </div>
+  </div>
+{%- endcall -%}

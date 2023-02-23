@@ -1,0 +1,29 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
+  <div class="govuk-grid-row" data-qa="personal-details">
+    <div class="govuk-grid-column-full">
+      <h3 class="govuk-heading-m">Physical characteristics</h3>
+      {{ govukSummaryList({
+          rows: [
+            {key: { text: "Height"}, value: { text: "1.88 m"} },
+            {key: { text: "Weight"}, value: { text: "80kg"} },
+            {key: { text: "Hair colour"}, value: { text: "Brown"} },
+            {key: { text: "Left eye colour"}, value: { text: "Brown"} },
+            {key: { text: "Right eye colour"}, value: { text: "Brown"} },
+            {key: { text: "Shape of face"}, value: { text: "Oval"} },
+            {key: { text: "Build"}, value: { text: "Small"} },
+            {key: { text: "Shoe size"}, value: { text: "10"} },
+            {key: { text: "Warned about tattooing"}, value: { text: "Yes"} },
+            {key: { text: "Warned not to change appearance"}, value: { text: "Yes"} }
+          ]
+      }) }}
+      <h3 class="govuk-heading-m">Distinguishing marks</h3>
+      {{ govukSummaryList({
+          rows: [
+            {key: { text: "Tattoo"}, value: { text: "Pleaceholder"} }
+          ]
+      }) }}
+    </div>
+  </div>
+{%- endcall -%}

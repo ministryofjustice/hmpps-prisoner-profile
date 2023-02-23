@@ -1,0 +1,16 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Care needs", id: "care-needs"}) -%}
+  <div class="govuk-grid-row" data-qa="personal-details">
+    <div class="govuk-grid-column-full">
+      {{ govukSummaryList({
+          rows: [
+            { key: { text: "Disability"}, value: { text: "A8469Y"} },
+            { key: { text: "Disability"}, value: { text: "90/183490P"} },
+            { key: { text: "Phsychological"}, value: { text: "183490/90G"} },
+            { key: { text: "Disability"}, value: { text: "X1234567"} }
+          ]
+      }) }}
+    </div>
+  </div>
+{%- endcall -%}

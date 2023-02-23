@@ -4,6 +4,7 @@ import OverviewPage from '../pages/overviewPage'
 const visitOverviewPage = (): OverviewPage => {
   cy.task('stubDpsOverviewPage')
   cy.signIn()
+  cy.visit('prisoner/G6123VU')
   return Page.verifyOnPage(OverviewPage)
 }
 
@@ -161,9 +162,7 @@ context('Overview Page', () => {
 
   context('Staff contacts', () => {
     it('Displays the offender staff contact details', () => {
-      cy.task('stubDpsOverviewPage')
-      cy.signIn()
-      const overviewPage = Page.verifyOnPage(OverviewPage)
+      const overviewPage = visitOverviewPage()
       overviewPage.staffContacts().should('exist')
     })
   })

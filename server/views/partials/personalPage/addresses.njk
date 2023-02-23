@@ -1,0 +1,19 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Addresses", id: "addresses"}) -%}
+  <div class="govuk-grid-row" data-qa="addresses">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">Primary Mail</p>
+      {{ govukSummaryList({
+          rows: [
+            { key: { text: "Address"}, value: { text: "Placeholder"} },
+            { key: { text: "Type of address"}, value: { text: "Placeholder"} },
+            { key: { text: "Phone"}, value: { text: "Placeholder"} },
+            { key: { text: "Comments"}, value: { text: "Placeholder"} }
+          ]
+      }) }}
+      <p class="govuk-body">Added on 26 May 2014</p>
+      <p class="govuk-body"><a class="govuk-link" href="#">View other addresses</a></p>
+    </div>
+  </div>
+{%- endcall -%}

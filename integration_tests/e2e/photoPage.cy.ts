@@ -5,7 +5,7 @@ context('Photo Page', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-    cy.task('stubNonAssociations', 'G6123VU')
+    cy.task('stubDpsOverviewPage')
     cy.task('stubPrisonerData', 'G6123VU')
     cy.task('stubAccountBalances', '1102484')
     cy.task('stubAdjudications', '1102484')
