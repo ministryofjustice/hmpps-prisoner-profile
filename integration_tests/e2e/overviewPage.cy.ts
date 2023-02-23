@@ -32,6 +32,11 @@ context('Overview Page', () => {
     cy.request('/prisoner/G6123VU').its('body').should('contain', 'Overview')
   })
 
+  it('Displays the overview tab as active', () => {
+    const overviewPage = visitOverviewPage()
+    overviewPage.activeTab().should('contain', 'Overview')
+  })
+
   context('Mini Summary A', () => {
     it('Mini summary list is displayed', () => {
       const overviewPage = visitOverviewPage()

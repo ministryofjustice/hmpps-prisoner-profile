@@ -5,6 +5,8 @@ export default class OverviewPage extends Page {
     super('Overview')
   }
 
+  activeTab = (): PageElement => cy.get('[data-qa=active-tab]')
+
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
 
   headerChangeLocation = (): PageElement => cy.get('[data-qa=header-change-location]')
