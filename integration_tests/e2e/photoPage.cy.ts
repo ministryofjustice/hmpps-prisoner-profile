@@ -1,6 +1,3 @@
-import IndexPage from '../pages/index'
-import AuthSignInPage from '../pages/authSignIn'
-import Page from '../pages/page'
 import PrisonerPhotoPage from '../pages/photoPage'
 
 context('Photo Page', () => {
