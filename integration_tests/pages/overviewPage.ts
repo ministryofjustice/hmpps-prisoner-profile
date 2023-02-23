@@ -84,4 +84,6 @@ export default class OverviewPage extends Page {
         this.schedule().evening().column().find('[data-qa=schedule-item]').eq(itemNumber),
     }),
   })
+
+  prisonerPhotoLink = (): PageElement => cy.get('[data-qa=prisoner-photo-link]')
 }

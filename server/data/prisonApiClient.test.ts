@@ -13,6 +13,8 @@ import {
   visitSummaryMock,
 } from './localMockData/miniSummaryMock'
 import { prisonerDetailMock } from './localMockData/prisonerDetailMock'
+import { mapToQueryString } from '../utils/utils'
+import { CaseNotesByTypeA } from './localMockData/caseNotes'
 
 jest.mock('./tokenStore')
 
@@ -150,6 +152,19 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getPrisoner(prisonerNumber)
       expect(output).toEqual(prisonerDetailMock)
+    })
+  })
+
+  describe('getCaseNoteSummaryByTypes', () => {
+    it('Should return data from the API', async () => {
+      const params = { type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' }
+      fakePrisonApi
+        .get(`/api/case-notes/summary?${mapToQueryString(params)}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, CaseNotesByTypeA)
+
+      const output = await prisonApiClient.getCaseNoteSummaryByTypes(params)
+      expect(output).toEqual(CaseNotesByTypeA)
     })
   })
 })

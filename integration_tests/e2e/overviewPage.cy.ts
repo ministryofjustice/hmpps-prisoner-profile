@@ -7,7 +7,7 @@ const visitOverviewPage = (): OverviewPage => {
   return Page.verifyOnPage(OverviewPage)
 }
 
-context('SignIn', () => {
+context('Overview Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -161,5 +161,13 @@ context('SignIn', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.staffContacts().should('exist')
     })
+  })
+
+  it('Click the prisoner profile and go to the stand alone photo page', () => {
+    const overviewPage = visitOverviewPage()
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
+    overviewPage.prisonerPhotoLink().should('exist')
+    overviewPage.prisonerPhotoLink().click({ force: true })
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')
   })
 })

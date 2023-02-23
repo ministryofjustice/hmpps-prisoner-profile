@@ -1,8 +1,9 @@
 import RestClient from './restClient'
 import config from '../config'
 import { Pom } from '../interfaces/pom'
+import AllocationManagerClient from './interfaces/allocationManagerClient'
 
-export default class AllocationManagerClient {
+export default class AllocationManagerApiClient implements AllocationManagerClient {
   restClient: RestClient
 
   constructor(token: string) {

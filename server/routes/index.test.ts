@@ -15,7 +15,7 @@ afterEach(() => {
 
 describe('GET /', () => {
   it('should render index page', () => {
-    return request(app).get('/').expect('Location', 'https://digital-dev.prison.service.justice.gov.uk').expect(302)
+    return request(app).get('/').expect('Location', 'http://localhost:3001').expect(302)
   })
 
   it('should render index page', () => {
