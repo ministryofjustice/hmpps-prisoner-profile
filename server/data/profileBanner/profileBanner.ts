@@ -45,25 +45,58 @@ export const alerts = [
   },
 ]
 
-export const tabLinks = [
-  {
-    label: 'Personal',
-    classes: 'govuk-heading-s',
-  },
-  {
-    label: 'Case notes',
-    classes: 'govuk-heading-s',
-  },
-  {
-    label: 'Alerts',
-    classes: 'govuk-heading-s',
-  },
-  {
-    label: 'Sentence',
-    classes: 'govuk-heading-s',
-  },
-  {
-    label: 'Work and skills',
-    classes: 'govuk-heading-s',
-  },
-]
+interface TabLink {
+  label: string
+  classes: string
+  id: string
+  href: string
+  active: boolean
+}
+
+export function tabLinks(prisonerNumber: string): TabLink[] {
+  const baseUrl = `/prisoner/${prisonerNumber}`
+  return [
+    {
+      label: 'Overview',
+      classes: 'govuk-heading-s',
+      id: 'overview',
+      href: baseUrl,
+      active: false,
+    },
+    {
+      label: 'Personal',
+      classes: 'govuk-heading-s',
+      id: 'personal-details',
+      href: `${baseUrl}/personal-details`,
+      active: false,
+    },
+    {
+      label: 'Case notes',
+      classes: 'govuk-heading-s',
+      id: 'case-notes',
+      active: false,
+      href: '#',
+    },
+    {
+      label: 'Alerts',
+      classes: 'govuk-heading-s',
+      id: 'alerts',
+      active: false,
+      href: '#',
+    },
+    {
+      label: 'Sentence',
+      classes: 'govuk-heading-s',
+      id: 'sentence',
+      href: '#',
+      active: false,
+    },
+    {
+      label: 'Work and skills',
+      classes: 'govuk-heading-s',
+      id: 'work-and-skills',
+      href: '#',
+      active: false,
+    },
+  ]
+}

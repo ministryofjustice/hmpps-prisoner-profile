@@ -1,10 +1,33 @@
-<div class="govuk-grid-row govuk-!-padding-top-9">
+{% set breadCrumbs = [
+  {
+    text: 'Back to search results',
+    href: '#'
+  },
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
+{% extends "../partials/layout.njk" %}
+{% block content %}
+  <div class="govuk-grid-row govuk-!-padding-top-9">
     <div class="govuk-grid-column-full center-content">
-        <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-padding-top-4">
-            <img src="/assets/images/printer_icon.svg" role="presentation" alt="" width="23px" height="20px" class="hmpps-icon" /> Print this image
-        </a>      
+      <img
+        class="hmpps-profile-photo"
+        src="/api/prisoner/{{ prisonerNumber or photoType }}/image"
+        alt="{{ prisonerName }}"
+      />
+      <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-padding-top-4">
+        <img
+          src="/assets/images/printer_icon.svg"
+          role="presentation"
+          alt=""
+          width="23px"
+          height="20px"
+          class="hmpps-icon"
+        />
+        Print this image
+      </a>
     </div>
-</div>
-
-
+  </div>
+{% endblock %}
