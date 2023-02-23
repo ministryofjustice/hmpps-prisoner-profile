@@ -23,29 +23,6 @@ context('Photo Page', () => {
     cy.task('stubEventsForProfileImage', 'G6123VU')
   })
 
-  it('Unauthenticated user directed to auth', () => {
-    cy.visit('/prisoner/G6123VU')
-    Page.verifyOnPage(AuthSignInPage)
-  })
-
-  it('Unauthenticated user navigating to sign in page directed to auth', () => {
-    cy.visit('/sign-in')
-    Page.verifyOnPage(AuthSignInPage)
-  })
-
-  it('User name visible in header', () => {
-    cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.headerUserName().should('contain.text', 'J. Smith')
-  })
-
-  it('User can log out', () => {
-    cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.signOut().click()
-    Page.verifyOnPage(AuthSignInPage)
-  })
-
   it('Display the photopage', () => {
     cy.signIn()
     cy.visit('/prisoner/G6123VU/image')
