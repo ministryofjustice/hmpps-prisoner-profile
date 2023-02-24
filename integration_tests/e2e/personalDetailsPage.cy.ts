@@ -2,9 +2,7 @@ import Page from '../pages/page'
 import PersonalDetailsPage from '../pages/personalDetailsPage'
 
 const visitPersonalDetailsPage = (): PersonalDetailsPage => {
-  cy.task('stubDpsOverviewPage')
-  cy.signIn()
-  cy.visit('prisoner/G6123VU/personal')
+  cy.signIn({ redirectPath: 'prisoner/G6123VU/personal' })
   return Page.verifyOnPage(PersonalDetailsPage)
 }
 
@@ -13,7 +11,7 @@ context('When signed in', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-    cy.task('stubPrisonerData', 'G6123VU')
+    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
   })
 
   it('displays the personal details page', () => {
