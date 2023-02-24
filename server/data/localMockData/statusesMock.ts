@@ -1,17 +1,25 @@
 import { Status } from '../../interfaces/status'
 
-// eslint-disable-next-line import/prefer-default-export
+export const currentLocationStatusMock: Status = {
+  label: 'In Moorland (HMP & YOI)',
+}
+
+export const pregnantStatusMock: Status = {
+  label: 'Pregnant',
+  date: '20/01/2023',
+}
+
+export const recognisedListenerStatusMock: Status = {
+  label: 'Recognised Listener',
+}
+
+export const suitableListenerStatusMock: Status = {
+  label: 'Suitable Listener',
+}
+
 export const statusesMock: Status[] = [
-  {
-    label: 'Unconvicted - remand',
-    date: '2023-01-19',
-  },
-  {
-    label: 'Out at court',
-    date: '2023-01-20',
-  },
-  {
-    label: 'First time in prison',
-    date: '2023-01-21',
-  },
+  currentLocationStatusMock,
+  pregnantStatusMock,
+  recognisedListenerStatusMock,
+  suitableListenerStatusMock,
 ]

@@ -1,5 +1,6 @@
 import { MiniSummary } from './miniSummary'
 import { PersonalDetails } from './personalDetails'
+import { Status } from './status'
 
 export interface OverviewScheduleItem {
   name: string
@@ -20,7 +21,7 @@ export type OverviewNonAssociation = {
 export interface OverviewPage {
   miniSummaryGroupA: MiniSummary[]
   miniSummaryGroupB: MiniSummary[]
-  statuses: object
+  statuses: Status[]
   nonAssociations: OverviewNonAssociation[]
   personalDetails: PersonalDetails
   staffContacts: object

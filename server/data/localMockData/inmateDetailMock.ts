@@ -1,12 +1,41 @@
-import { InmateDetail, ProfileInformationType } from '../../interfaces/inmateDetail'
+import { InmateDetail, ProfileInformation, ProfileInformationType } from '../../interfaces/inmateDetail'
 
-// eslint-disable-next-line import/prefer-default-export
+export const recognisedListenerYes: ProfileInformation = {
+  type: ProfileInformationType.RecognisedListener,
+  question: 'Recognised Listener?',
+  resultValue: 'Yes',
+}
+
+export const recognisedListenerNo: ProfileInformation = {
+  type: ProfileInformationType.RecognisedListener,
+  question: 'Recognised Listener?',
+  resultValue: 'No',
+}
+
+export const recognisedListenerBlank: ProfileInformation = {
+  type: ProfileInformationType.RecognisedListener,
+  question: 'Recognised Listener?',
+  resultValue: '',
+}
+
+export const suitableListenerYes: ProfileInformation = {
+  type: ProfileInformationType.SuitableListener,
+  question: 'Suitable Listener?',
+  resultValue: 'Yes',
+}
+
+export const suitableListenerNo: ProfileInformation = {
+  type: ProfileInformationType.SuitableListener,
+  question: 'Suitable Listener?',
+  resultValue: 'No',
+}
+
+export const suitableListenerBlank: ProfileInformation = {
+  type: ProfileInformationType.SuitableListener,
+  question: 'Suitable Listener?',
+  resultValue: '',
+}
+
 export const inmateDetailMock: InmateDetail = {
-  profileInformation: [
-    {
-      type: ProfileInformationType.RecognisedListener,
-      question: 'Recognised Listener?',
-      resultValue: 'Yes',
-    },
-  ],
+  profileInformation: [recognisedListenerYes],
 }

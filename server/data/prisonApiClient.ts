@@ -20,6 +20,7 @@ import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { InmateDetail } from '../interfaces/inmateDetail'
+import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -106,16 +107,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getPrisoner(prisonerNumber: string): Promise<PrisonerDetail> {
-    try {
-      const prisoner = await this.restClient.get<PrisonerDetail>({ path: `/api/prisoners/${prisonerNumber}` })
-      // API returns array with one entry, so extract this to return a single object
-      if (Array.isArray(prisoner)) {
-        return prisoner[0]
-      }
-      return prisoner
-    } catch (error) {
-      return error
+    const prisoner = await this.get<PrisonerDetail>({ path: `/api/prisoners/${prisonerNumber}` })
+    // API returns array with one entry, so extract this to return a single object
+    if (Array.isArray(prisoner)) {
+      return prisoner[0]
     }
+    return prisoner
   }
 
   async getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]> {
@@ -127,10 +124,14 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getInmateDetail(bookingId: number): Promise<InmateDetail> {
-    try {
-      return this.get<InmateDetail>({ path: `/api/bookings/${bookingId}` })
-    } catch (error) {
-      return error
+    return this.get<InmateDetail>({ path: `/api/bookings/${bookingId}` })
+  }
+
+  async getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
+    let query
+    if (types?.length) {
+      query = `type=${types.join('+')}`
     }
+    return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
   }
 }

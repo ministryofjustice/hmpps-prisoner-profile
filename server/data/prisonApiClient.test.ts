@@ -15,6 +15,8 @@ import {
 import { prisonerDetailMock } from './localMockData/prisonerDetailMock'
 import { mapToQueryString } from '../utils/utils'
 import { CaseNotesByTypeA } from './localMockData/caseNotes'
+import { inmateDetailMock } from './localMockData/inmateDetailMock'
+import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
 
 jest.mock('./tokenStore')
 
@@ -145,10 +147,7 @@ describe('prisonApiClient', () => {
   describe('getPrisoner', () => {
     it('Should return data from the API', async () => {
       const prisonerNumber = 'A1234BC'
-      fakePrisonApi
-        .get(`/api/prisoners/${prisonerNumber}`)
-        .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, prisonerDetailMock)
+      mockSuccessfulPrisonApiCall(`/api/prisoners/${prisonerNumber}`, prisonerDetailMock)
 
       const output = await prisonApiClient.getPrisoner(prisonerNumber)
       expect(output).toEqual(prisonerDetailMock)
@@ -165,6 +164,26 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getCaseNoteSummaryByTypes(params)
       expect(output).toEqual(CaseNotesByTypeA)
+    })
+  })
+
+  describe('getInmateDetail', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}`, inmateDetailMock)
+
+      const output = await prisonApiClient.getInmateDetail(bookingId)
+      expect(output).toEqual(inmateDetailMock)
+    })
+  })
+
+  describe('getPersonalCareNeeds', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/personal-care-needs?type=MATSTAT`, personalCareNeedsMock)
+
+      const output = await prisonApiClient.getPersonalCareNeeds(bookingId, ['MATSTAT'])
+      expect(output).toEqual(personalCareNeedsMock)
     })
   })
 })

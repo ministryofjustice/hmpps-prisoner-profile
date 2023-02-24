@@ -14,7 +14,22 @@ import {
 } from '../data/localMockData/miniSummaryMock'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import {
+  inmateDetailMock,
+  recognisedListenerBlank,
+  recognisedListenerNo,
+  recognisedListenerYes,
+  suitableListenerBlank,
+  suitableListenerNo,
+  suitableListenerYes,
+} from '../data/localMockData/inmateDetailMock'
+import {
+  notPregnantCareNeedMock,
+  personalCareNeedsMock,
+  pregnantCareNeedMock,
+} from '../data/localMockData/personalCareNeedsMock'
+import { ProblemType } from '../data/enums/problemType'
+import { InmateDetail, ProfileInformation } from '../interfaces/inmateDetail'
 
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
@@ -37,6 +52,7 @@ describe('OverviewPageService', () => {
     getCaseNoteSummaryByTypes: jest.fn(),
     getPrisoner: jest.fn(async () => prisonerDetailMock),
     getInmateDetail: jest.fn(async () => inmateDetailMock),
+    getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
   }
 
   const allocationManagerApiClient: AllocationManagerClient = {
@@ -166,6 +182,7 @@ describe('OverviewPageService', () => {
       expect(res.staffContacts).toEqual(StaffContactsMock)
     })
   })
+
   describe('Schedule', () => {
     it('Gets events for today from the prison api', async () => {
       const overviewPageService = overviewPageServiceConstruct()
@@ -212,6 +229,115 @@ describe('OverviewPageService', () => {
       expect(evening[1].name).toEqual('VLB - Test')
       expect(evening[1].startTime).toEqual('18:00')
       expect(evening[1].endTime).toEqual('19:00')
+    })
+  })
+
+  describe('getStatuses', () => {
+    it('should get statuses for Current Location, Pregnant, Recognised Listener and Suitable Listener', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      await overviewPageService.get({ prisonerNumber, bookingId } as Prisoner)
+      expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(bookingId)
+      expect(prisonApiClient.getPersonalCareNeeds).toHaveBeenCalledWith(bookingId, [ProblemType.MaternityStatus])
+    })
+
+    describe('should map api results into page data', () => {
+      it('should have "in" location if in prison', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          prisonerNumber,
+          bookingId,
+          inOutStatus: 'IN',
+          locationDescription: 'Moorland (HMP & YOI)',
+        } as Prisoner)
+
+        expect(res.statuses.some(status => status.label === 'In Moorland (HMP & YOI)')).toBeTruthy()
+        expect(res.statuses.some(status => status.label === 'Out from Moorland (HMP & YOI)')).toBeFalsy()
+      })
+
+      it('should have "out" location if out of prison', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          prisonerNumber,
+          bookingId,
+          inOutStatus: 'OUT',
+          locationDescription: 'Moorland (HMP & YOI)',
+        } as Prisoner)
+
+        expect(res.statuses.some(status => status.label === 'Out from Moorland (HMP & YOI)')).toBeTruthy()
+        expect(res.statuses.some(status => status.label === 'In Moorland (HMP & YOI)')).toBeFalsy()
+      })
+
+      it('should have pregnant status if care need is one of the pregnant types', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+        prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
+          offenderNo: prisonerNumber,
+          personalCareNeeds: [pregnantCareNeedMock],
+        }))
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({ prisonerNumber, bookingId } as Prisoner)
+
+        expect(res.statuses.some(status => status.label === 'Pregnant' && status.date === '21/06/2010')).toBeTruthy()
+      })
+
+      it('should not have pregnant status if care need is one of the not pregnant types', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+        prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
+          offenderNo: prisonerNumber,
+          personalCareNeeds: [notPregnantCareNeedMock],
+        }))
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({ prisonerNumber, bookingId } as Prisoner)
+
+        expect(res.statuses.some(status => status.label === 'Pregnant')).toBeFalsy()
+      })
+
+      it.each([
+        ['Suitable Blank/Recognised Blank', suitableListenerBlank, recognisedListenerBlank, false, false],
+        ['Suitable No/Recognised Blank', suitableListenerNo, recognisedListenerBlank, false, false],
+        ['Suitable No/Recognised No', suitableListenerNo, recognisedListenerNo, false, false],
+        ['Suitable Yes/Recognised Blank', suitableListenerYes, recognisedListenerBlank, true, false],
+        ['Suitable Yes/Recognised No', suitableListenerYes, recognisedListenerNo, true, true],
+        ['Suitable Yes/Recognised Yes', suitableListenerYes, recognisedListenerYes, false, true],
+        ['Suitable Blank/Recognised Yes', suitableListenerBlank, recognisedListenerYes, false, true],
+        ['Suitable No/Recognised Yes', suitableListenerNo, recognisedListenerYes, false, false],
+      ])(
+        'given %s should show correct suitable and/or recognised listener statuses',
+        async (
+          _: string,
+          suitableListener: ProfileInformation,
+          recognisedListener: ProfileInformation,
+          displaySuitable: boolean,
+          displayRecognised: boolean,
+        ) => {
+          const prisonerNumber = 'A1234BC'
+          const bookingId = 123456
+          prisonApiClient.getInmateDetail = jest.fn(
+            async () =>
+              ({
+                profileInformation: [suitableListener, recognisedListener],
+              } as InmateDetail),
+          )
+
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get({ prisonerNumber, bookingId } as Prisoner)
+
+          expect(res.statuses.some(status => status.label === 'Suitable Listener')).toEqual(displaySuitable)
+          expect(res.statuses.some(status => status.label === 'Recognised Listener')).toEqual(displayRecognised)
+        },
+      )
     })
   })
 })

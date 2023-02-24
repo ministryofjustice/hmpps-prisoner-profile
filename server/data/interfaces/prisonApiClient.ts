@@ -11,6 +11,7 @@ import { CaseNote } from '../../interfaces/caseNote'
 import { ScheduledEvent } from '../../interfaces/scheduledEvent'
 import { PrisonerDetail } from '../../interfaces/prisonerDetail'
 import { InmateDetail } from '../../interfaces/inmateDetail'
+import { PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -26,4 +27,5 @@ export interface PrisonApiClient {
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
   getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
   getInmateDetail(bookingId: number): Promise<InmateDetail>
+  getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds>
 }
