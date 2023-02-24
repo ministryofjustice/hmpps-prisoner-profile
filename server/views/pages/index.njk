@@ -1,17 +1,13 @@
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
-
 {% extends "../partials/layout.njk" %}
+{% set breadCrumbs = [
+  {
+    text: 'Back to search results',
+    href: '#'
+  }
+] %}
 {% set pageTitle = applicationName + " - Home" %}
 {% set mainClasses = "govuk-body" %}
-{% block beforeContent %}
-  {{ govukBreadcrumbs({
-    items: breadCrumbs 
-  }) }}
-{% endblock %}
 {% block content %}
-  {% if displayBanner === true %}
-    {% include "../partials/profileBanner/profileBanner.njk" %}
-  {% endif%}
-  {% include pageBodyNjk %}
+  {% include "../partials/profileBanner/profileBanner.njk" %}
+  {% block body %}{% endblock %}
 {% endblock %}

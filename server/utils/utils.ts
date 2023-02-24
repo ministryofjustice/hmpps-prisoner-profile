@@ -11,7 +11,7 @@ const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
  * @param name name to be converted.
  * @returns name converted to proper case.
  */
-const properCaseName = (name: string): string => (isBlank(name) ? '' : name.split('-').map(properCase).join('-'))
+export const properCaseName = (name: string): string => (isBlank(name) ? '' : name.split('-').map(properCase).join('-'))
 
 export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
@@ -94,3 +94,24 @@ export const formatMoney = (val: number, emptyState: string = undefined, currenc
 export const formatPrivilegedVisitsSummary = (count: number): string => {
   return `Including ${count} privileged visits`
 }
+
+export const arrayToQueryString = (array: string[] | number[] | boolean[], key: string): string =>
+  array && array.map(item => `${key}=${encodeURIComponent(item)}`).join('&')
+
+export const mapToQueryString = (params: Record<never, never>): string =>
+  Object.keys(params)
+    .filter(key => params[key])
+    .map(key => {
+      if (Array.isArray(params[key])) return arrayToQueryString(params[key], key)
+      return `${key}=${encodeURIComponent(params[key])}`
+    })
+    .join('&')
+
+export const getNamesFromString = (string: string): string[] =>
+  string &&
+  string
+    .split(', ')
+    .reverse()
+    .join(' ')
+    .split(' ')
+    .map(name => properCaseName(name))

@@ -50,15 +50,21 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return alerts
 }
 
-export function mapHeaderData(prisonerData: Prisoner) {
+export function mapHeaderData(prisonerData: Prisoner, pageId?: string) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
+  const tabs = tabLinks(prisonerData.prisonerNumber)
+
+  if (pageId) {
+    tabs.find(tab => tab.id === pageId).active = true
+  }
+
   const headerData = {
     backLinkLabel: 'Back to search results',
     prisonerName: `${convertToTitleCase(prisonerData.lastName)}, ${convertToTitleCase(prisonerData.firstName)}`,
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
-    tabLinks,
+    tabLinks: tabs,
     photoType,
   }
   return headerData

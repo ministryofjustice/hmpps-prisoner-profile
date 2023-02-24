@@ -7,7 +7,7 @@ const visitOverviewPage = (): OverviewPage => {
   return Page.verifyOnPage(OverviewPage)
 }
 
-context('SignIn', () => {
+context('Overview Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -20,11 +20,21 @@ context('SignIn', () => {
     cy.task('stubVisitBalances', 'G6123VU')
     cy.task('stubAssessments', '1102484')
     cy.task('stubEventsForToday', '1102484')
+    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubKeyWorkerData', 'G6123VU')
+    cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' })
+    cy.task('stubGetOffenderContacts', '1102484')
+    cy.task('stubEventsForProfileImage', 'G6123VU')
   })
 
   it('Overview page is displayed', () => {
     visitOverviewPage()
     cy.request('/prisoner/G6123VU').its('body').should('contain', 'Overview')
+  })
+
+  it('Displays the overview tab as active', () => {
+    const overviewPage = visitOverviewPage()
+    overviewPage.activeTab().should('contain', 'Overview')
   })
 
   context('Mini Summary A', () => {
@@ -147,5 +157,22 @@ context('SignIn', () => {
       overviewPage.schedule().evening().item(0).should('include.text', 'Gym - Football')
       overviewPage.schedule().evening().item(1).should('include.text', 'VLB - Test')
     })
+  })
+
+  context('Staff contacts', () => {
+    it('Displays the offender staff contact details', () => {
+      cy.task('stubDpsOverviewPage')
+      cy.signIn()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.staffContacts().should('exist')
+    })
+  })
+
+  it('Click the prisoner profile and go to the stand alone photo page', () => {
+    const overviewPage = visitOverviewPage()
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
+    overviewPage.prisonerPhotoLink().should('exist')
+    overviewPage.prisonerPhotoLink().click({ force: true })
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')
   })
 })

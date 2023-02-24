@@ -1,4 +1,3 @@
-import { staffContacts } from '../data/overviewPage'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import {
   OverviewNonAssociation,
@@ -7,11 +6,21 @@ import {
   OverviewScheduleItem,
 } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { convertToTitleCase, formatDate, formatMoney, formatPrivilegedVisitsSummary } from '../utils/utils'
+import {
+  convertToTitleCase,
+  formatDate,
+  formatMoney,
+  formatPrivilegedVisitsSummary,
+  getNamesFromString,
+} from '../utils/utils'
 import { Assessment } from '../interfaces/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
 import { PersonalDetails } from '../interfaces/personalDetails'
+import { StaffContacts } from '../interfaces/staffContacts'
+import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
+import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
+import { Pom } from '../interfaces/pom'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 import { Status } from '../interfaces/status'
@@ -21,8 +30,18 @@ import { getProfileInformationValue, InmateDetail, ProfileInformationType } from
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
 
-  constructor(prisonApiClient: PrisonApiClient) {
+  private allocationManagerClient: AllocationManagerClient
+
+  private keyWorkerClient: KeyWorkerClient
+
+  constructor(
+    prisonApiClient: PrisonApiClient,
+    allocationManagerClient: AllocationManagerClient,
+    keyWorkerClient: KeyWorkerClient,
+  ) {
     this.prisonApiClient = prisonApiClient
+    this.allocationManagerClient = allocationManagerClient
+    this.keyWorkerClient = keyWorkerClient
   }
 
   public async get(prisonerData: Prisoner): Promise<OverviewPage> {
@@ -32,6 +51,7 @@ export default class OverviewPageService {
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
     const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
     const personalDetails = this.getPersonalDetails(prisonerData)
+    const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData.bookingId)
     const statuses = await this.getStatuses(prisonerData)
 
@@ -44,6 +64,67 @@ export default class OverviewPageService {
       staffContacts,
       schedule,
     }
+  }
+
+  public async getStaffContacts(prisonerData: Prisoner): Promise<StaffContacts> {
+    const { bookingId } = prisonerData
+    const [offenderContacts, allocationManager, offenderKeyWorker, keyWorkerSessions] = await Promise.all([
+      this.prisonApiClient.getOffenderContacts(prisonerData.bookingId),
+      this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
+      this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
+      this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+    ])
+
+    const communityOffenderManager =
+      offenderContacts && offenderContacts.otherContacts !== undefined
+        ? offenderContacts.otherContacts
+            .filter(contact => contact && contact.contactType === 'COM')
+            .map(contact => ({
+              firstName: contact ? contact?.firstName : undefined,
+              lastName: contact ? contact?.lastName : undefined,
+            }))
+        : []
+
+    const prisonOffenderManager =
+      allocationManager &&
+      (allocationManager as Pom).primary_pom &&
+      (allocationManager as Pom).primary_pom.name &&
+      getNamesFromString((allocationManager as Pom).primary_pom.name)
+
+    const coworkingPrisonOffenderManager =
+      allocationManager &&
+      (allocationManager as Pom).secondary_pom &&
+      (allocationManager as Pom).secondary_pom.name &&
+      getNamesFromString((allocationManager as Pom).secondary_pom.name)
+
+    const staffContacts = {
+      keyWorker: {
+        name:
+          offenderKeyWorker && offenderKeyWorker.firstName
+            ? `${convertToTitleCase(offenderKeyWorker.firstName)} ${convertToTitleCase(offenderKeyWorker.lastName)}`
+            : 'Not allocated',
+        lastSession:
+          keyWorkerSessions !== undefined && keyWorkerSessions[0].latestCaseNote !== undefined
+            ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
+            : '',
+      },
+      prisonOffenderManager:
+        prisonOffenderManager !== undefined
+          ? `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`
+          : 'Not assigned',
+      coworkingPrisonOffenderManager:
+        coworkingPrisonOffenderManager !== undefined
+          ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
+          : 'Not assigned',
+      communityOffenderManager:
+        communityOffenderManager && communityOffenderManager[0] !== undefined
+          ? `${convertToTitleCase(communityOffenderManager[0].firstName)} ${convertToTitleCase(
+              communityOffenderManager[0].lastName,
+            )}`
+          : 'Not assigned',
+    }
+
+    return staffContacts
   }
 
   public getPersonalDetails(prisonerData: Prisoner): PersonalDetails {

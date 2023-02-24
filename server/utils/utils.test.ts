@@ -6,6 +6,10 @@ import {
   summaryListOneHalfWidth,
   SummaryListRow,
   formatMoney,
+  properCaseName,
+  mapToQueryString,
+  getNamesFromString,
+  arrayToQueryString,
 } from './utils'
 
 describe('convert to title case', () => {
@@ -93,5 +97,69 @@ describe('format money', () => {
     [4.56, undefined, undefined, '£4.56'],
   ])('%s: formatMoney(%s, %s, %s)', (val: number, emptyState: string, currencySymbol: string, expected: string) => {
     expect(formatMoney(val, emptyState, currencySymbol)).toEqual(expected)
+  })
+})
+
+describe('properCaseName', () => {
+  it('null string', () => {
+    expect(properCaseName(null)).toEqual('')
+  })
+  it('empty string', () => {
+    expect(properCaseName('')).toEqual('')
+  })
+  it('Lower Case', () => {
+    expect(properCaseName('bob')).toEqual('Bob')
+  })
+  it('Mixed Case', () => {
+    expect(properCaseName('GDgeHHdGr')).toEqual('Gdgehhdgr')
+  })
+  it('Multiple words', () => {
+    expect(properCaseName('BOB SMITH')).toEqual('Bob smith')
+  })
+  it('Hyphenated', () => {
+    expect(properCaseName('MONTGOMERY-FOSTER-SMYTH-WALLACE-BOB')).toEqual('Montgomery-Foster-Smyth-Wallace-Bob')
+  })
+})
+
+describe('mapToQueryParams', () => {
+  it('should handle empty maps', () => {
+    expect(mapToQueryString({})).toEqual('')
+  })
+
+  it('should handle single key values', () => {
+    expect(mapToQueryString({ key1: 'val' })).toEqual('key1=val')
+  })
+
+  it('should handle non-string, scalar values', () => {
+    expect(mapToQueryString({ key1: 1, key2: true })).toEqual('key1=1&key2=true')
+  })
+
+  it('should ignore null values', () => {
+    expect(mapToQueryString({ key1: 1, key2: null })).toEqual('key1=1')
+  })
+
+  it('should handle encode values', () => {
+    expect(mapToQueryString({ key1: "Hi, I'm here" })).toEqual("key1=Hi%2C%20I'm%20here")
+  })
+})
+
+describe('getNamesFromString()', () => {
+  it('should split correctly when name is in LAST_NAME, FIRST_NAME format', () => {
+    expect(getNamesFromString('SMITH, JOHN')).toEqual(['John', 'Smith'])
+  })
+
+  it('should split correctly when name is in FIRST_NAME LASTNAME format', () => {
+    expect(getNamesFromString('John smith')).toEqual(['John', 'Smith'])
+  })
+
+  it('should return undefined if nothing passed', () => {
+    // @ts-expect-error: Test requires invalid types passed in
+    expect(getNamesFromString()).toEqual(undefined)
+  })
+})
+
+describe('arrayToQueryString()', () => {
+  it('should split correctly when name is in LAST_NAME, FIRST_NAME format', () => {
+    expect(arrayToQueryString(['string'], 'key')).toEqual('key=string')
   })
 })

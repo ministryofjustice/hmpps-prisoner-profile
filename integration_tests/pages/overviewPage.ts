@@ -5,6 +5,8 @@ export default class OverviewPage extends Page {
     super('Overview')
   }
 
+  activeTab = (): PageElement => cy.get('[data-qa=active-tab]')
+
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
 
   headerChangeLocation = (): PageElement => cy.get('[data-qa=header-change-location]')
@@ -65,6 +67,8 @@ export default class OverviewPage extends Page {
 
   personalDetails = (): PageElement => cy.get('[data-qa=personal-details]')
 
+  staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
+
   schedule = () => ({
     morning: () => ({
       column: (): PageElement => cy.get('[data-qa=morning-schedule]'),
@@ -82,4 +86,6 @@ export default class OverviewPage extends Page {
         this.schedule().evening().column().find('[data-qa=schedule-item]').eq(itemNumber),
     }),
   })
+
+  prisonerPhotoLink = (): PageElement => cy.get('[data-qa=prisoner-photo-link]')
 }
