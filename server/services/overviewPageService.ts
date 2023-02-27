@@ -104,7 +104,7 @@ export default class OverviewPageService {
             ? `${convertToTitleCase(offenderKeyWorker.firstName)} ${convertToTitleCase(offenderKeyWorker.lastName)}`
             : 'Not allocated',
         lastSession:
-          keyWorkerSessions !== undefined && keyWorkerSessions[0].latestCaseNote !== undefined
+          keyWorkerSessions !== undefined && keyWorkerSessions[0] !== undefined
             ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
             : '',
       },
