@@ -1,4 +1,4 @@
-{% from "../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% macro miniSummaryMacro(miniSummary) %}
   {%- call summaryCard({title: miniSummary.data.heading}) -%}
     <div class="{{ miniSummary.classes }} {{ 'hmpps-summary-card__no-header' if not miniSummary.data.heading }}">

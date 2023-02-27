@@ -1,0 +1,67 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Emergency contacts and next of kin", id: "emergency-contacts"}) -%}
+  <div class="govuk-grid-row" data-qa="emergency-contacts">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">Emergency contact</p>
+      <p class="govuk-body">Next of kin</p>
+      <p class="govuk-body">Simon jones</p>
+      <p class="govuk-body">Brother</p>
+      <p class="govuk-body">01234 123123</p>
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">View details</span>
+        </summary>
+        <div class="govuk-details__text">
+          {{ govukSummaryList({
+            rows: [
+              { key: { text: "Email"}, value: { text: "Placeholder"} },
+              { key: { text: "Address"}, value: { text: "Placeholder"} },
+              { key: { text: "Address phone"}, value: { text: "Placeholder"} },
+              { key: { text: "Address type"}, value: { text: "Placeholder"} }
+            ]
+          }) }}
+        </div>
+      </details>
+      <p class="govuk-body">Emergency contact</p>
+      <p class="govuk-body">Next of kin</p>
+      <p class="govuk-body">Deborah jones</p>
+      <p class="govuk-body">Sister</p>
+      <p class="govuk-body">01234 123123</p>
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">View details</span>
+        </summary>
+        <div class="govuk-details__text">
+          {{ govukSummaryList({
+            rows: [
+              { key: { text: "Email"}, value: { text: "Placeholder"} },
+              { key: { text: "Address"}, value: { text: "Placeholder"} },
+              { key: { text: "Address phone"}, value: { text: "Placeholder"} },
+              { key: { text: "Address type"}, value: { text: "Placeholder"} }
+            ]
+          }) }}
+        </div>
+      </details>
+      <p class="govuk-body">Next of kin</p>
+      <p class="govuk-body">Laura Dearing</p>
+      <p class="govuk-body">Sister</p>
+      <p class="govuk-body">01234 123123</p>
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">View details</span>
+        </summary>
+        <div class="govuk-details__text">
+          {{ govukSummaryList({
+            rows: [
+              { key: { text: "Email"}, value: { text: "Placeholder"} },
+              { key: { text: "Address"}, value: { text: "Placeholder"} },
+              { key: { text: "Address phone"}, value: { text: "Placeholder"} },
+              { key: { text: "Address type"}, value: { text: "Placeholder"} }
+            ]
+          }) }}
+        </div>
+      </details>
+    </div>
+  </div>
+{%- endcall -%}

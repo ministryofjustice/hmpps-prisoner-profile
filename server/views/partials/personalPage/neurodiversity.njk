@@ -1,0 +1,16 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Neurodiversity", id: "neurodiversity"}) -%}
+  <div class="govuk-grid-row" data-qa="personal-details">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">
+        DPS currently includes neurodiversity information recorded for prisoners in HMPs Bristol, Lincoln, New Hall and
+        Swaleside.
+      </p>
+      <p class="govuk-body">
+        To check for neurodiversity information for someone in another prison, contact the education team in that
+        prison.
+      </p>
+    </div>
+  </div>
+{%- endcall -%}

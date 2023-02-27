@@ -1,0 +1,22 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Property", id: "property"}) -%}
+  <div class="govuk-grid-row" data-qa="property">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">Property: Bulk</p>
+      {{ govukSummaryList({
+          rows: [
+            { key: { text: "Seal mark"}, value: { text: "Placeholder"} },
+            { key: { text: "Location"}, value: { text: "Placeholder"} }
+          ]
+      }) }}
+      <p class="govuk-body">Property: For Destruction</p>
+      {{ govukSummaryList({
+          rows: [
+            { key: { text: "Seal mark"}, value: { text: "Placeholder"} },
+            { key: { text: "Location"}, value: { text: "Placeholder"} }
+          ]
+      }) }}
+    </div>
+  </div>
+{%- endcall -%}

@@ -1,0 +1,70 @@
+{% extends "./index.njk" %}
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h1>Personal</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <ul>
+        <li><a href="#personal-details">Personal details</a></li>
+        <li><a href="#identity-numbers">Identity numbers</a></li>
+        <li><a href="#care-needs">Care needs</a></li>
+        <li><a href="#neurodiversity">Neurodiversity</a></li>
+        <li><a href="#appearance">Appearance</a></li>
+        <li><a href="#addresses">Addresses</a></li>
+        <li><a href="#emergency-contacts">Emergency contacts and next of kin</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#property">Property</a></li>
+      </ul>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/personalDetails.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/identityNumbers.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/careNeeds.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/neurodiversity.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/appearance.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/addresses.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/emergencyContacts.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/security.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/personalPage/property.njk" %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
