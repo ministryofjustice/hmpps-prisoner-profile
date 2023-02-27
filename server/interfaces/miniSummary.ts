@@ -10,7 +10,8 @@ export interface MiniSummaryData {
   topClass?: string // 'big' | 'small'
   bottomLabel: string
   bottomContentLine1?: string | number
-  bottomContentLine2?: string | number // TODO need to implement a link for this as well (updated adjudications mini card - need new ticket)
+  bottomContentLine1Href?: string
+  bottomContentLine2?: string | number
   bottomClass: string // 'big' | 'small'
   linkLabel: string
   linkHref: string

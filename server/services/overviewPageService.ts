@@ -232,6 +232,7 @@ export default class OverviewPageService {
       bottomContentLine1: adjudicationSummary.awards?.length
         ? `${adjudicationSummary.awards.length} active punishments`
         : 'No active awards',
+      bottomContentLine1Href: adjudicationSummary.awards?.length ? '#' : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudications history',
       linkHref: '#',
