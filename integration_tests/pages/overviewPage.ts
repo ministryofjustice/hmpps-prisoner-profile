@@ -88,4 +88,8 @@ export default class OverviewPage extends Page {
   })
 
   prisonerPhotoLink = (): PageElement => cy.get('[data-qa=prisoner-photo-link]')
+
+  // Statuses
+
+  statusList = (): PageElement => cy.get('.hmpps-status-list')
 }

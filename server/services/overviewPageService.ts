@@ -24,8 +24,11 @@ import { Pom } from '../interfaces/pom'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 import { Status } from '../interfaces/status'
-import { PrisonerDetail } from '../interfaces/prisonerDetail'
-import { getProfileInformationValue, InmateDetail, ProfileInformationType } from '../interfaces/inmateDetail'
+import { getProfileInformationValue, ProfileInformationType } from '../interfaces/inmateDetail'
+import { ProblemType } from '../data/enums/problemType'
+import { ProblemStatus } from '../data/enums/problemStatus'
+import { pregnantProblemCodes } from '../data/constants'
+import { BooleanString } from '../data/enums/booleanString'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -266,6 +269,11 @@ export default class OverviewPageService {
   private async getMiniSummaryGroupB(currentIncentive: Incentive, bookingId: number): Promise<MiniSummary[]> {
     const assessments = await this.prisonApiClient.getAssessments(bookingId)
 
+    if (!Array.isArray(assessments)) {
+      // TODO handle api call returning error???
+      return null
+    }
+
     const category: Assessment =
       assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category) || null
     const csra: Assessment =
@@ -363,21 +371,23 @@ export default class OverviewPageService {
   private async getStatuses(prisonerData: Prisoner): Promise<Status[]> {
     const statusList: Status[] = []
 
-    const prisonerDetail: PrisonerDetail = await this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber)
-    const inmateDetail: InmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
+    const [inmateDetail, personalCareNeeds] = await Promise.all([
+      this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
+      this.prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, [ProblemType.MaternityStatus]),
+    ])
 
     // Current Location
     const inOutStatusDescription = (status: string) =>
       ({
         IN: 'In',
-        OUT: 'Out at',
-        TRN: 'Transferring',
+        OUT: 'Out from',
+        TRN: 'Transfer',
       }[status])
 
     const inOutLocationDescription = (status: string) =>
       ({
         IN: prisonerData.locationDescription,
-        OUT: prisonerDetail.internalLocation,
+        OUT: prisonerData.locationDescription,
         TRN: prisonerData.locationDescription,
       }[status])
 
@@ -385,29 +395,48 @@ export default class OverviewPageService {
       label: `${inOutStatusDescription(prisonerData.inOutStatus)} ${inOutLocationDescription(
         prisonerData.inOutStatus,
       )}`,
-      date: formatDate('2023-01-01', 'short'),
     })
 
-    // Youth Offender
-    if (prisonerData.youthOffender) {
-      statusList.push({
-        label: 'Youth offender',
-        date: formatDate('2023-01-01', 'short'),
-      })
-    }
-
-    // Pregnant  TODO where to get this from?
-    // if () {
+    // Youth Offender TODO
+    // if (prisonerData.youthOffender) {
     //   statusList.push({
-    //     label: 'Pregnant',
+    //     label: 'Youth offender',
     //     date: formatDate('2023-01-01', 'short'),
     //   })
     // }
 
-    // Listener
-    if (
-      getProfileInformationValue(ProfileInformationType.RecognisedListener, inmateDetail.profileInformation) === 'Yes'
-    ) {
+    // Pregnant
+    const pregnantNeed = personalCareNeeds?.personalCareNeeds?.find(
+      need =>
+        pregnantProblemCodes.includes(need.problemCode) &&
+        !need.endDate &&
+        need.problemStatus === ProblemStatus.Ongoing,
+    )
+
+    if (pregnantNeed) {
+      statusList.push({
+        label: 'Pregnant',
+        date: formatDate(pregnantNeed.startDate, 'short'),
+      })
+    }
+
+    // Listener - Recognised and Suitable
+    const recognised = getProfileInformationValue(
+      ProfileInformationType.RecognisedListener,
+      inmateDetail.profileInformation,
+    )
+    const suitable = getProfileInformationValue(
+      ProfileInformationType.SuitableListener,
+      inmateDetail.profileInformation,
+    )
+
+    if (suitable === BooleanString.Yes && recognised !== BooleanString.Yes) {
+      statusList.push({
+        label: 'Suitable Listener',
+      })
+    }
+
+    if ((recognised === BooleanString.Yes || recognised === BooleanString.No) && suitable !== BooleanString.No) {
       statusList.push({
         label: 'Recognised Listener',
       })

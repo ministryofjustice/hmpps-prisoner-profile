@@ -160,4 +160,12 @@ context('Overview Page', () => {
     overviewPage.prisonerPhotoLink().click({ force: true })
     cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')
   })
+
+  context('Statuses', () => {
+    it('Displays the status list', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.statusList().should('exist')
+      overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
+    })
+  })
 })
