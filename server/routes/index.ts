@@ -51,12 +51,12 @@ export default function routes(service: Services): Router {
     })
   })
 
-  get('/prisoner/:prisonerNumber/personal-details', async (req, res, next) => {
+  get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
-    res.render('pages/personalDetailsPage', {
-      ...mapHeaderData(prisonerData, 'personal-details'),
+    res.render('pages/personalPage', {
+      ...mapHeaderData(prisonerData, 'personal'),
     })
   })
 
