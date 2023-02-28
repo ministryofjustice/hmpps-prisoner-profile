@@ -29,8 +29,6 @@ import { ProblemType } from '../data/enums/problemType'
 import { ProblemStatus } from '../data/enums/problemStatus'
 import { pregnantProblemCodes } from '../data/constants'
 import { BooleanString } from '../data/enums/booleanString'
-import CuriousApiClient from '../data/interfaces/curiousApiClient'
-import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -38,8 +36,6 @@ export default class OverviewPageService {
   private allocationManagerClient: AllocationManagerClient
 
   private keyWorkerClient: KeyWorkerClient
-
-  private curiousApiClient: CuriousApiClient
 
   constructor(
     prisonApiClient: PrisonApiClient,
@@ -71,12 +67,6 @@ export default class OverviewPageService {
       staffContacts,
       schedule,
     }
-  }
-
-  public async getLearnerEmployabilitySkills(prisonerNumber: string): Promise<LearnerEmployabilitySkills> {
-    const skills = this.curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber)
-
-    return skills
   }
 
   public async getStaffContacts(prisonerData: Prisoner): Promise<StaffContacts> {
