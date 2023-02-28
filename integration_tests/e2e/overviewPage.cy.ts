@@ -51,7 +51,7 @@ context('Overview Page', () => {
       overviewPage.adjudicationsCard().contains('p', 'Proven in last 3 months')
       overviewPage.adjudicationsCard().contains('p', '4')
       overviewPage.adjudicationsCard().contains('p', 'Active')
-      overviewPage.adjudicationsCard().contains('p', 'No active awards')
+      overviewPage.adjudicationsCard().contains('p', 'No active punishments')
       overviewPage.adjudicationsCard().contains('a', 'Adjudications history')
     })
 

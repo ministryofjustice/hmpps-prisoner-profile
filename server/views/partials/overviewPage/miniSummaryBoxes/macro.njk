@@ -19,7 +19,13 @@
         <p
           class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }} {{ 'hmpps-mini-card__filler' if not miniSummary.data.bottomContentLine2 and miniSummary.data.bottomClass === 'small' }}"
         >
-          {{ miniSummary.data.bottomContentLine1 }}
+            {% if miniSummary.data.bottomContentLine1Href %}
+                <a href="{{ miniSummary.data.bottomContentLine1Href }}">
+                    {{ miniSummary.data.bottomContentLine1 }}
+                </a>
+            {% else %}
+                {{ miniSummary.data.bottomContentLine1 }}
+            {% endif %}
         </p>
         {% if miniSummary.data.bottomContentLine2 !== undefined %}
           <p class="govuk-body hmpps-mini-card__sub-text">
