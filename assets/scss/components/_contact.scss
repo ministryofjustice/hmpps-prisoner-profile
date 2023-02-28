@@ -1,0 +1,34 @@
+.hmpps-contact {
+  @include govuk-responsive-margin(2, 'top');
+
+  &:first-child {
+    @include govuk-responsive-margin(0, 'top');
+  }
+
+  .hmpps-contact__emergency-contact {
+    @include govuk-font($size: 16, $weight: 'bold');
+    @include govuk-responsive-margin(0, 'bottom');
+    color: govuk-colour('red');
+  }
+
+  .hmpps-contact__next-of-kin {
+    @include govuk-font($size: 16, $weight: 'bold');
+    @include govuk-responsive-margin(1, 'bottom');
+    color: govuk-colour('dark-grey');
+  }
+
+  .hmpps-contact__name {
+    @include govuk-font($size: 24, $weight: 'bold');
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+
+  .hmpps-contact__relationship {
+    @include govuk-font($size: 19);
+    @include govuk-responsive-margin(0, 'bottom');
+  }
+
+  .hmpps-contact__contact-number {
+    @include govuk-font($size: 19);
+    @include govuk-responsive-margin(0, 'bottom');
+  }
+}

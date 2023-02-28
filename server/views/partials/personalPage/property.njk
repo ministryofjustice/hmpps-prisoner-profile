@@ -1,22 +1,21 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% macro property(info) %}
+  <div class="hmpps-property">
+    <p class="hmpps-property__container-type">Property: {{ info.containerType }}</p>
+    {{ govukSummaryList({
+          rows: [
+            { key: { text: "Seal mark"}, value: { text: info.sealMark} },
+            { key: { text: "Location"}, value: { text: info.location} }
+          ]
+      }) }}
+  </div>
+{% endmacro %}
 {%- call summaryCard({title: "Property", id: "property"}) -%}
   <div class="govuk-grid-row" data-qa="property">
     <div class="govuk-grid-column-full">
-      <p class="govuk-body">Property: Bulk</p>
-      {{ govukSummaryList({
-          rows: [
-            { key: { text: "Seal mark"}, value: { text: "Placeholder"} },
-            { key: { text: "Location"}, value: { text: "Placeholder"} }
-          ]
-      }) }}
-      <p class="govuk-body">Property: For Destruction</p>
-      {{ govukSummaryList({
-          rows: [
-            { key: { text: "Seal mark"}, value: { text: "Placeholder"} },
-            { key: { text: "Location"}, value: { text: "Placeholder"} }
-          ]
-      }) }}
+      {{ property({containerType: "Bulk", sealMark: "MDI10", location: "Property Box 12"}) }}
+      {{ property({containerType: "For Destruction", sealMark: "MDI10", location: "Property Box 13"}) }}
     </div>
   </div>
 {%- endcall -%}
