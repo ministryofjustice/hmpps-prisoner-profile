@@ -65,7 +65,7 @@ const adjudicationsSummaryDataMock: MiniSummaryData = {
   topContent: 4,
   topClass: 'big',
   bottomLabel: 'Active',
-  bottomContentLine1: 'No active awards',
+  bottomContentLine1: 'No active punishments',
   bottomClass: 'small',
   linkLabel: 'Adjudications history',
   linkHref: '#',
