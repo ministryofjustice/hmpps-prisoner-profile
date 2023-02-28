@@ -99,6 +99,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('KEYWORKER_API_TIMEOUT_DEADLINE', 20000))),
     },
+    curiousApiUrl: {
+      url: process.env.CURIOUS_API_URL || 'http://localhost:8081/',
+      timeout: {
+        response: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 20000)),
+        deadline: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 20000)),
+      },
+      agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 20000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),
