@@ -1,11 +1,39 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
       {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-0',
           rows: [
-            { key: { text: "Name"}, value: { text: "David Jones"} },
+            { key: { text: "Name"}, value: { text: "David Jones"} }
+          ]
+      }) }}
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">View details</span>
+        </summary>
+        <div class="govuk-details__text">
+          {{ govukTable({
+            head: [
+              {
+                text: "Alias"
+              },
+              {
+                text: "Alias date of birth"
+              }
+            ],
+            rows: [
+              [{text: 'Jones, Dave'}, {text: '23 June 1972'}],
+              [{text: 'Jones, Davey'}, {text: '20 June 1972'}]
+            ]
+          }) }}
+        </div>
+      </details>
+      <hr class="govuk-section-break govuk-section-break--visible" />
+      {{ govukSummaryList({
+          rows: [
             { key: { text: "Date of birth"}, value: { text: "23 June 1972 (50 years old)"} },
             { key: { text: "Place of birth"}, value: { text: "Wolverhampton"} },
             { key: { text: "Nationality"}, value: { text: "British"} },
