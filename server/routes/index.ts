@@ -66,15 +66,17 @@ export default function routes(service: Services): Router {
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    
+
     const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
-    const employability: LearnerEmployabilitySkills = await curiousApiClient.getLearnerEmployabilitySkills(req.params.prisonerNumber)
+    const employability: LearnerEmployabilitySkills = await curiousApiClient.getLearnerEmployabilitySkills(
+      req.params.prisonerNumber,
+    )
     const learnerProfile: LearnerProfile[] = await curiousApiClient.getLearnerProfile(req.params.prisonerNumber)
 
     res.render('pages/workAndSkills', {
       ...mapHeaderData(prisonerData),
       ...employability,
-      ...learnerProfile
+      ...learnerProfile,
     })
   })
 
