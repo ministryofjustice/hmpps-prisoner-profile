@@ -3,7 +3,7 @@ import { LearnerEmployabilitySkills } from '../../interfaces/learnerEmployabilit
 export const learnerEmployabilitySkills: LearnerEmployabilitySkills = {
   content: [
     {
-      prn: 'string',
+      prn: 'G6123VU',
       establishmentId: 'string',
       establishmentName: 'string',
       employabilitySkill: 'string',
