@@ -1,7 +1,3 @@
-export interface InmateDetail {
-  profileInformation: ProfileInformation[]
-}
-
 export interface ProfileInformation {
   type: string
   question: string

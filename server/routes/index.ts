@@ -58,7 +58,7 @@ export default function routes(service: Services): Router {
     const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
     const personalPageService = new PersonalPageService(prisonApiClient)
-    const personalPageData = await personalPageService.get()
+    const personalPageData = await personalPageService.get(prisonerData)
 
     res.render('pages/personalPage', {
       ...mapHeaderData(prisonerData, 'personal'),

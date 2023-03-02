@@ -13,7 +13,7 @@ import {
   formatPrivilegedVisitsSummary,
   getNamesFromString,
 } from '../utils/utils'
-import { Assessment } from '../interfaces/assessment'
+import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
 import { PersonalDetails } from '../interfaces/personalDetails'
@@ -24,7 +24,7 @@ import { Pom } from '../interfaces/pom'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 import { Status } from '../interfaces/status'
-import { getProfileInformationValue, ProfileInformationType } from '../interfaces/inmateDetail'
+import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
 import { ProblemType } from '../data/enums/problemType'
 import { ProblemStatus } from '../data/enums/problemStatus'
 import { pregnantProblemCodes } from '../data/constants'

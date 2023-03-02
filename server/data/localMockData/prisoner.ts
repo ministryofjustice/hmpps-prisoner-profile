@@ -9,6 +9,7 @@ export const PrisonerMockDataA: Prisoner = {
   bookingId: 1102484,
   bookNumber: 'W21339',
   firstName: 'JOHN',
+  middleNames: 'MIDDLE NAMES',
   lastName: 'SAUNDERS',
   dateOfBirth: '1990-10-12',
   gender: 'Male',

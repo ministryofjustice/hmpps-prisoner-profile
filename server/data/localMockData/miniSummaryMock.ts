@@ -4,7 +4,7 @@ import { AccountBalances } from '../../interfaces/accountBalances'
 import { AdjudicationSummary } from '../../interfaces/adjudicationSummary'
 import { VisitSummary } from '../../interfaces/visitSummary'
 import { VisitBalances } from '../../interfaces/visitBalances'
-import { Assessment } from '../../interfaces/assessment'
+import { Assessment } from '../../interfaces/prisonApi/assessment'
 
 export const accountBalancesMock: AccountBalances = {
   spends: 240.51,
