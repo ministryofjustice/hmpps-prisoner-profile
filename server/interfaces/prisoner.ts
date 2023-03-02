@@ -7,6 +7,7 @@ export type Prisoner = {
   bookingId: number
   bookNumber: string
   firstName: string
+  middleNames?: string
   lastName: string
   dateOfBirth: string
   gender: string
@@ -23,7 +24,7 @@ export type Prisoner = {
   prisonId: string
   prisonName: string
   cellLocation?: string
-  aliases: Aliase[]
+  aliases: Alias[]
   alerts: Alert[]
   csra?: string
   category: string
@@ -53,7 +54,7 @@ export type Prisoner = {
   }
 }
 
-export type Aliase = {
+export interface Alias {
   firstName: string
   middleNames?: string
   lastName: string
@@ -62,7 +63,7 @@ export type Aliase = {
   ethnicity?: string
 }
 
-export type Alert = {
+export interface Alert {
   alertType: string
   alertCode: string
   active: boolean

@@ -67,7 +67,7 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       label: 'Personal',
       classes: 'govuk-heading-s',
       id: 'personal',
-      href: `${baseUrl}/personal-details`,
+      href: `${baseUrl}/personal`,
       active: false,
     },
     {
