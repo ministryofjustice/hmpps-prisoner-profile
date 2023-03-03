@@ -12,8 +12,7 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import AllocationManagerClient from '../data/allocationManagerApiClient'
 import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
-import { LearnerProfile } from '../interfaces/learnerProfile'
-import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
+import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -68,15 +67,12 @@ export default function routes(service: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
-    const employability: LearnerEmployabilitySkills = await curiousApiClient.getLearnerEmployabilitySkills(
-      req.params.prisonerNumber,
-    )
-    const learnerProfile: LearnerProfile[] = await curiousApiClient.getLearnerProfile(req.params.prisonerNumber)
+    const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient)
+    const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
 
     res.render('pages/workAndSkills', {
       ...mapHeaderData(prisonerData),
-      ...employability,
-      ...learnerProfile,
+      ...workAndSkillsPageData,
     })
   })
 
