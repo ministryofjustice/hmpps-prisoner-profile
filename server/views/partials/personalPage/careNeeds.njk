@@ -1,14 +1,45 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set disabilityOneHtml %}
+  <p class="govuk-body">Reduced Physical Capacity</p>
+  <p class="govuk-body">Disclosed On Admission @ WDI</p>
+  <p class="govuk-body-s hmpps-secondary-text">Added on 26 May 2016</p>
+{% endset %}
+{% set disabilityTwoHtml %}
+  <p class="govuk-body">Reduced Physical Capacity</p>
+  <p class="govuk-body">Disclosed On Admission @ WDI</p>
+  <p class="govuk-body-s hmpps-secondary-text">Added on 26 May 2016</p>
+{% endset %}
+{% set psychologicalHtml %}
+  <p class="govuk-body">Depression</p>
+  <p class="govuk-body">Woodhill checked 4/17</p>
+  <p class="govuk-body-s hmpps-secondary-text">Added on 26 April 2016</p>
+  <details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">Support given</span>
+    </summary>
+    <div class="govuk-details__text">
+      <p class="govuk-body govuk-!-margin-bottom-1">Dining Aids (Eating utensils or holders)</p>
+      <p class="govuk-body govuk-!-margin-bottom-1">Long handled food tray supplied</p>
+      <p class="govuk-body-s  hmpps-secondary-text govuk-!-margin-bottom-1">Added by Woodhill (HMP) on</p>
+      <p class="govuk-body-s hmpps-secondary-text">15 July 2016</p>
+    </div>
+  </details>
+{% endset %}
+{% set disabilityThreeHtml %}
+  <p class="govuk-body">Reduced Physical Capacity</p>
+  <p class="govuk-body">Disclosed On Admission @ WDI</p>
+  <p class="govuk-body-s hmpps-secondary-text">Added on 26 May 2016</p>
+{% endset %}
 {%- call summaryCard({title: "Care needs", id: "care-needs"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
       {{ govukSummaryList({
           rows: [
-            { key: { text: "Disability"}, value: { text: "A8469Y"} },
-            { key: { text: "Disability"}, value: { text: "90/183490P"} },
-            { key: { text: "Phsychological"}, value: { text: "183490/90G"} },
-            { key: { text: "Disability"}, value: { text: "X1234567"} }
+            { key: { text: "Disability"}, value: { html: disabilityOneHtml } },
+            { key: { text: "Disability"}, value: { html: disabilityTwoHtml } },
+            { key: { text: "Phsychological"}, value: { html: psychologicalHtml } },
+            { key: { text: "Disability"}, value: { html: disabilityThreeHtml } }
           ]
       }) }}
     </div>

@@ -13,7 +13,7 @@ import {
   formatPrivilegedVisitsSummary,
   getNamesFromString,
 } from '../utils/utils'
-import { Assessment } from '../interfaces/assessment'
+import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
 import { PersonalDetails } from '../interfaces/personalDetails'
@@ -24,11 +24,12 @@ import { Pom } from '../interfaces/pom'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 import { Status } from '../interfaces/status'
-import { getProfileInformationValue, ProfileInformationType } from '../interfaces/inmateDetail'
+import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
 import { ProblemType } from '../data/enums/problemType'
 import { ProblemStatus } from '../data/enums/problemStatus'
 import { pregnantProblemCodes } from '../data/constants'
 import { BooleanString } from '../data/enums/booleanString'
+import { pluralise } from '../utils/pluralise'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -229,9 +230,10 @@ export default class OverviewPageService {
       topContent: adjudicationSummary.adjudicationCount,
       topClass: 'big',
       bottomLabel: 'Active',
-      bottomContentLine1: adjudicationSummary.awards?.length
-        ? `${adjudicationSummary.awards.length} active punishments`
-        : 'No active awards',
+      bottomContentLine1: pluralise(adjudicationSummary.awards.length, 'active punishment', {
+        emptyMessage: 'No active punishments',
+      }),
+      bottomContentLine1Href: adjudicationSummary.awards?.length ? '#' : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudications history',
       linkHref: '#',

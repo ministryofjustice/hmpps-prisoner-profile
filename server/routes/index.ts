@@ -13,6 +13,7 @@ import AllocationManagerClient from '../data/allocationManagerApiClient'
 import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
+import PersonalPageService from '../services/personalPageService'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -56,9 +57,14 @@ export default function routes(service: Services): Router {
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const personalPageService = new PersonalPageService(prisonApiClient)
+    const personalPageData = await personalPageService.get(prisonerData)
 
     res.render('pages/personalPage', {
       ...mapHeaderData(prisonerData, 'personal'),
+      ...personalPageData,
     })
   })
 

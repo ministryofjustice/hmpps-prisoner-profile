@@ -1,5 +1,28 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set tattooOne %}
+  <p class="govuk-body">Arm</p>
+  <details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">View details</span>
+    </summary>
+    <div class="govuk-details__text">
+      <p class="govuk-body govuk-!-margin-bottom-1">
+        <span class="govuk-!-font-weight-bold">Side</span><br />
+        Left
+      </p>
+      <p class="govuk-body govuk-!-margin-bottom-1">
+        <span class="govuk-!-font-weight-bold">Orientation</span><br />
+        High
+      </p>
+      <p class="govuk-body govuk-!-margin-bottom-1">
+        <span class="govuk-!-font-weight-bold">Comment</span><br />
+        Native indian with red stripe across face
+      </p>
+      <p class="govuk-body">Picture</p>
+    </div>
+  </details>
+{% endset %}
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
@@ -21,7 +44,7 @@
       <h3 class="govuk-heading-m">Distinguishing marks</h3>
       {{ govukSummaryList({
           rows: [
-            {key: { text: "Tattoo"}, value: { text: "Pleaceholder"} }
+            {key: { text: "Tattoo"}, value: { html: tattooOne } }
           ]
       }) }}
     </div>

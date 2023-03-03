@@ -29,7 +29,8 @@ import {
   pregnantCareNeedMock,
 } from '../data/localMockData/personalCareNeedsMock'
 import { ProblemType } from '../data/enums/problemType'
-import { InmateDetail, ProfileInformation } from '../interfaces/inmateDetail'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import { ProfileInformation } from '../interfaces/prisonApi/profileInformation'
 
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'

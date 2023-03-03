@@ -1,0 +1,6 @@
+.hmpps-property {
+  .hmpps-property__container-type {
+    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+}
