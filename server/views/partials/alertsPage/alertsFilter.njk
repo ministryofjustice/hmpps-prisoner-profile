@@ -1,0 +1,62 @@
+{% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
+{% set options = {
+    title: 'Filter',
+    id: 'alerts-filter',
+    clearUrl: currentUrlPath.split('?')[0]
+} %}
+{% set alertTypes = [
+    {
+        code: 'ABC',
+        description: 'Hold against transfer',
+        count: 1,
+        checked: true
+    },
+    {
+        code: 'DEF',
+        description: 'Risk',
+        count: 2,
+        checked: false
+    },
+    {
+        code: 'GHI',
+        description: 'Security',
+        count: 3,
+        checked: true
+    }
+] %}
+{% set dateFrom = '2023-01-31' %}
+{% set dateTo = '' %}
+{%- call hmppsSideFilter(options) -%}
+    <div class="govuk-form-group">
+        {% if alertTypes.length %}
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                Alert type
+            </legend>
+            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+            {% for alertType in alertTypes %}
+                <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="{{ alertType.code }}" name="alertType"
+                           type="checkbox" value="{{ alertType.code }}" {{ 'checked' if alertType.checked }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="{{ alertType.code }}">
+                        {{ alertType.description }} <span class="hmpps-side-filter__alert-count">({{ alertType.count | pluralise('alert') }})</span>
+                    </label>
+                </div>
+            {% endfor %}
+            </div>
+        </fieldset>
+        {% endif %}
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--m" for="dateFrom">
+                Date from
+            </label>
+            <input class="govuk-input" id="dateFrom" name="dateFrom" type="text" value="{{ dateFrom }}">
+        </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--m" for="dateTo" value="{{ dateTo }}">
+                Date to
+            </label>
+            <input class="govuk-input" id="dateTo" name="dateTo" type="text">
+        </div>
+    </div>
+{%- endcall -%}

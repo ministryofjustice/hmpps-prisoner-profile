@@ -1,0 +1,16 @@
+{% macro alertCard(alert) %}
+<div class="hmpps-alert-card-list-item" role="listitem">
+    <div class="hmpps-alert-card-list-item__content">
+        <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertTypeDescription }}</div>
+        <div class="hmpps-alert-card-list-item__title">{{ alert.alertCodeDescription }}</div>
+        <div class="hmpps-alert-card-list-item__notes">{{ alert.comment }}</div>
+        <div class="hmpps-alert-card-list-item__metadata">Created: {{ alert.dateCreated | formatDate }} by {{ alert.addedByFirstName }} {{ alert.addedByLastName }} at Nottingham (HMP)</div>
+        {% if alert.dateUpdated !== alert.dateCreated %}
+        <div class="hmpps-alert-card-list-item__metadata">Updated: {{ alert.dateUpdated | formatDate }} by {{ alert.addedByFirstName }} {{ alert.addedByLastName }} at Nottingham (HMP)</div>
+        {% endif %}
+    </div>
+    <div class="hmpps-alert-card-list-item__link">
+        <a href="#{{ alert.alertId }}" class="govuk-link govuk-link--no-visited-state">Update or close</a>
+    </div>
+</div>
+{% endmacro %}

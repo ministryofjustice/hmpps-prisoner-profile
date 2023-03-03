@@ -1,0 +1,68 @@
+.hmpps-side-filter {
+  background-color: govuk-colour('light-grey');
+  padding: 30px 15px;
+
+  &__header {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+  }
+
+  fieldset {
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: block;
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 10px;
+
+    .hmpps-side-filter__alert-count {
+      white-space: nowrap;
+      display: inline-block;
+    }
+  }
+
+  .govuk-checkboxes__label:before {
+    background-color: govuk-colour('white');
+  }
+
+  .govuk-checkboxes__label {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 300;
+  }
+
+  .govuk-checkboxes--small .govuk-checkboxes__label {
+    padding: 10px 15px 0 1px;
+  }
+
+  .govuk-button {
+    margin-bottom: 24px;
+  }
+
+  &__reset-button {
+    font-size: 16px;
+    color: $govuk-link-colour;
+    text-decoration: underline;
+    text-underline-offset: .1em;
+    cursor: pointer;
+    padding: 0;
+    border: none;
+
+    &:hover {
+      color: $govuk-link-hover-colour;
+    }
+
+    &:focus, &:active {
+      outline: 3px solid rgba(0,0,0,0);
+      color: $govuk-focus-text-colour;
+      background-color: $govuk-focus-colour;
+      box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+      text-decoration: none;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  }
+}

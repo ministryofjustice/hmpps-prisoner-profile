@@ -1,0 +1,18 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% macro hmppsSideFilter(options) %}
+    <form class="hmpps-side-filter" id="{{options.id | default('')}}">
+        {% if options.title %}
+            <h3 class="hmpps-side-filter__header">{{ options.title }}</h3>
+        {% endif %}
+        <div class="hmpps-side-filter__content">
+            {{ caller() }}
+        </div>
+        {{ govukButton({
+            text: "Apply",
+            preventDoubleClick: true
+        }) }}
+        <div>
+            <a href="{{ options.clearUrl }}" class="govuk-link govuk-link--no-visited-state">Clear filters</a>
+        </div>
+    </form>
+{% endmacro %}

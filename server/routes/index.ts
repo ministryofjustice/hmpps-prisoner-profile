@@ -16,6 +16,14 @@ import PersonalPageService from '../services/personalPageService'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
   const router = Router()
+
+  router.use(async (req, res, next) => {
+    res.locals = {
+      ...res.locals,
+      currentUrlPath: req.baseUrl + req.path,
+    }
+    next()
+  })
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   const commonApiRoutes = new CommonApiRoutes()
@@ -63,6 +71,24 @@ export default function routes(service: Services): Router {
     res.render('pages/personalPage', {
       ...mapHeaderData(prisonerData, 'personal'),
       ...personalPageData,
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    res.render('pages/alertsPage', {
+      ...mapHeaderData(prisonerData, 'alerts'),
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    res.render('pages/alertsPage', {
+      ...mapHeaderData(prisonerData, 'alerts'),
     })
   })
 

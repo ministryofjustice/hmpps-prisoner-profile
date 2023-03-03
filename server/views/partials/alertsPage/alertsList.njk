@@ -1,0 +1,40 @@
+{% from '../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
+{% from '../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+{% from './macros/alertCard.njk' import alertCard %}
+
+{% set alerts = [
+    {
+        alertId: 100,
+        alertTypeDescription: 'Vulnerability',
+        alertCodeDescription: 'Poor coper',
+        comment: 'Mr Jones has few friends and is quite far from his family at present. Staff on wings to be made aware.',
+        addedByFirstName: 'Steve',
+        addedByLastName: 'Rogers',
+        dateCreated: '2023-01-01T10:11:12',
+        dateUpdated: '2023-01-01T10:11:12'
+    },
+    {
+        alertId: 101,
+        alertTypeDescription: 'Risk',
+        alertCodeDescription: 'Staff assaulter',
+        comment: 'Attempted to assault a member of staff by spitting at them July 2022',
+        addedByFirstName: 'Bruce',
+        addedByLastName: 'Banner',
+        dateCreated: '2023-02-01T10:11:12',
+        dateUpdated: '2023-03-01T13:14:15'
+    }
+] %}
+{% set options = { currentUrlPath: currentUrlPath, sortBy: 'createdDesc' } %}
+
+{{ hmppsPagedListHeader(options) }}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="hmpps-alert-card-list" role="list">
+            {% for alert in alerts %}
+                {{ alertCard(alert) }}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{{ hmppsPagedListFooter(options) }}
+
