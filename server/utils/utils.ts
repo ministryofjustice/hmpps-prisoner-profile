@@ -129,3 +129,25 @@ export const toFullName = ({
     .map(s => s && s.trim())
     .filter(s => s)
     .join(' ')
+
+export const yearsBetweenDateStrings = (start: string, end: string): number => {
+  const endDate = new Date(end)
+  const startDate = new Date(start)
+  const endMonth = endDate.getMonth()
+  const startMonth = startDate.getMonth()
+  let years: number = endDate.getFullYear() - startDate.getFullYear()
+
+  if (years === 0) {
+    return years
+  }
+
+  if (startMonth > endMonth) {
+    years -= 1
+  } else if (startMonth === endMonth) {
+    if (startDate.getDate() > endDate.getDate()) {
+      years -= 1
+    }
+  }
+
+  return years
+}

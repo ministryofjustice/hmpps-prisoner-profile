@@ -11,6 +11,7 @@ import {
   getNamesFromString,
   arrayToQueryString,
   toFullName,
+  yearsBetweenDateStrings,
 } from './utils'
 
 describe('convert to title case', () => {
@@ -179,5 +180,17 @@ describe('toFullName()', () => {
     [null, 'First last'],
   ])('generates a full name with middlename: %s', (middleNames: string, expectedFullName: string) => {
     expect(toFullName({ firstName: 'First', middleNames, lastName: 'last' })).toEqual(expectedFullName)
+  })
+})
+
+describe('dateStringToAge', () => {
+  it.each([
+    ['2020-01-10', '2023-10-31', 3],
+    ['2020-01-10', '2020-01-01', 0],
+    ['2020-01-10', '2023-01-11', 3],
+    ['2020-01-10', '2023-01-10', 3],
+    ['2020-01-10', '2023-01-09', 2],
+  ])('Number of years between %s and %s - %s', (startDate: string, endDate: string, expectedYears: number) => {
+    expect(yearsBetweenDateStrings(startDate, endDate)).toEqual(expectedYears)
   })
 })
