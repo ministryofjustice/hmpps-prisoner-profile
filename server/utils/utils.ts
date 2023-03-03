@@ -115,3 +115,17 @@ export const getNamesFromString = (string: string): string[] =>
     .join(' ')
     .split(' ')
     .map(name => properCaseName(name))
+
+export const toFullName = ({
+  firstName,
+  middleNames,
+  lastName,
+}: {
+  firstName: string
+  middleNames?: string
+  lastName: string
+}): string =>
+  [firstName, middleNames, lastName]
+    .map(s => s && s.trim())
+    .filter(s => s)
+    .join(' ')
