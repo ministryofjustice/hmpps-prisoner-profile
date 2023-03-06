@@ -82,7 +82,7 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       classes: 'govuk-heading-s',
       id: 'alerts',
       active: false,
-      href: '#',
+      href: `${baseUrl}/alerts/active`,
     },
     {
       label: 'Sentence',

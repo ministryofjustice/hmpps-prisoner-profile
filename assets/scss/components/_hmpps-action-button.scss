@@ -1,0 +1,24 @@
+.hmpps-action-button {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 10px;
+  border: 1px solid govuk-colour('dark-grey');
+  box-shadow: 0 5px govuk-colour('mid-grey');
+
+  img {
+    margin-right: 10px;
+
+    @media (max-width: 1000px) {
+      display: none;
+    }
+  }
+
+  a {
+    font-weight: 700;
+
+    @media (max-width: 1000px) {
+      font-size: 16px;
+    }
+  }
+}
