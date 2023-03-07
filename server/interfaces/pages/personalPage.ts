@@ -15,7 +15,9 @@ export interface PersonalPage {
     nationality: string
     numberOfChildren: string
     otherLanguages: string
+    otherNationalities: string
     placeOfBirth: string
+    preferredName: string
     religionOrBelief: string
     sex: string
     sexualOrientation: string

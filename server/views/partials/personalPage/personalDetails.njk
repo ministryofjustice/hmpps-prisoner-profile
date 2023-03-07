@@ -5,20 +5,33 @@
 {% for alias in personalDetails.aliases %}
   {% set aliases = (aliases.push([{text: alias.alias}, {text: alias.dateOfBirth}]), aliases) %}
 {% endfor %}
+{% set dateOfBirthText %}
+  {{ personalDetails.dateOfBirth }}
+  ({{ personalDetails.age }} years old)
+{% endset %}
+{% macro summaryListRow(key, value, id, options) %}
+  {% set hideIfEmpty = options.hideIfEmpty | default(false) %}
+  {% if hideIfEmpty and not value %}
+    <div data-qa="{{ id }}-empty" />
+  {% else %}
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">{{ key }}</dt>
+      <dd class="govuk-summary-list__value" data-qa="{{ id }}">{{ value }}</dd>
+    </div>
+  {% endif %}
+{% endmacro %}
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
-      {{ govukSummaryList({
-          classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-0',
-          rows: [
-            { key: { text: "Name"}, value: { text: personalDetails.fullName} }
-          ]
-      }) }}
+      <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
+        {{ summaryListRow("Full name", personalDetails.fullName | title, "full-name") }}
+      </dl>
+
       <details class="govuk-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
           <span class="govuk-details__summary-text">View aliases</span>
         </summary>
-        <div class="govuk-details__text">
+        <div class="govuk-details__text" data-qa="alias-list">
           {{ govukTable({
             head: [
               {
@@ -32,12 +45,34 @@
           }) }}
         </div>
       </details>
+
       <hr class="govuk-section-break govuk-section-break--visible" />
-      {{ govukSummaryList({
+      <dl class="govuk-summary-list">
+        {{ summaryListRow("Preferred name", personalDetails.preferredName, "preferred-name") }}
+        {{ summaryListRow("Date of birth", dateOfBirthText, "date-of-birth") }}
+        {{ summaryListRow("Place of birth", personalDetails.placeOfBirth, "place-of-birth") }}
+        {{ summaryListRow("Nationality", personalDetails.nationality, "nationality") }}
+        {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
+        {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
+        {{ summaryListRow("Religion or belief", personalDetails.religionOrBelief, "religion-or-belief") }}
+        {{ summaryListRow("Sex", personalDetails.sex, "sex") }}
+        {{ summaryListRow("Sexual orientation", personalDetails.sexualOrientation, "sexual-orientation") }}
+        {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
+        {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
+        {{ summaryListRow("Languages", personalDetails.languages, "languages") }}
+        {{ summaryListRow("Other languages", personalDetails.otherLanguages, "other-languages") }}
+        {{ summaryListRow("Types of diet", personalDetails.typeOfDiet, "type-of-diet") }}
+        {{ summaryListRow("Smoker of vaper", personalDetails.smokerOrVaper, "smoker-or-vaper") }}
+        {{ summaryListRow("Domestic abuse perpetrator", personalDetails.domesticAbusePerpetrator, "domestic-abuse-perpetrator", { hideIfEmpty: true }) }}
+        {{ summaryListRow("Domestic abuse victim", personalDetails.domesticAbuseVictim, "domestic-abuse-victim", { hideIfEmpty: true }) }}
+        {{ summaryListRow("Social care needed", personalDetails.socialCareNeeded, "social-care-needed", { hideIfEmpty: true }) }}
+      </dl>
+      {# {{ govukSummaryList({
           rows: [
-            { key: { text: "Date of birth"}, value: { text: personalDetails.dateOfBirth } },
+            { key: { text: "Date of birth"}, value: { text: dateOfBirthText } },
             { key: { text: "Place of birth"}, value: { text: personalDetails.placeOfBirth } },
             { key: { text: "Nationality"}, value: { text: personalDetails.nationality } },
+            { key: { text: "Other nationalities" }, value: { text: personalDetails.otherNationalities } },
             { key: { text: "Ethnic group"}, value: { text: personalDetails.ethnicGroup } },
             { key: { text: "Religion or belief"}, value: { text: personalDetails.religionOrBelief } },
             { key: { text: "Sex"}, value: { text: personalDetails.sex } },
@@ -52,7 +87,7 @@
             { key: { text: "Domestic abuse victim"}, value: { text: personalDetails.domesticAbuseVictim } },
             { key: { text: "Social care needed"}, value: { text: personalDetails.socialCareNeeded } }
           ]
-      }) }}
+      }) }} #}
     </div>
   </div>
 {%- endcall -%}

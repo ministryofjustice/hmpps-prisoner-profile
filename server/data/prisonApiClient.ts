@@ -21,6 +21,7 @@ import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
+import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
