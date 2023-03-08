@@ -11,6 +11,15 @@ export default class PersonalPage extends Page {
     const cardData = dataQa => cy.get('[data-qa=personal-details]').find(`[data-qa=${dataQa}]`)
     return {
       fullName: (): PageElement => cardData('full-name'),
+      aliases: () => ({
+        row: (rowNumber: number) => {
+          const row = cardData('alias-list').find('table').find('tr').eq(rowNumber).find('th, td')
+          return {
+            name: (): PageElement => row.eq(0),
+            dateOfBirth: (): PageElement => row.eq(1),
+          }
+        },
+      }),
       aliasList: (): PageElement => cardData('alias-list'),
       preferredName: (): PageElement => cardData('preferred-name'),
       dateOfBirth: () => cardData('date-of-birth'),

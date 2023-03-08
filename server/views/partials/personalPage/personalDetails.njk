@@ -3,7 +3,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set aliases = [] %}
 {% for alias in personalDetails.aliases %}
-  {% set aliases = (aliases.push([{text: alias.alias}, {text: alias.dateOfBirth}]), aliases) %}
+  {% set aliases = (aliases.push([{text: alias.alias | title}, {text: alias.dateOfBirth}]), aliases) %}
 {% endfor %}
 {% set dateOfBirthText %}
   {{ personalDetails.dateOfBirth }}
@@ -67,27 +67,6 @@
         {{ summaryListRow("Domestic abuse victim", personalDetails.domesticAbuseVictim, "domestic-abuse-victim", { hideIfEmpty: true }) }}
         {{ summaryListRow("Social care needed", personalDetails.socialCareNeeded, "social-care-needed", { hideIfEmpty: true }) }}
       </dl>
-      {# {{ govukSummaryList({
-          rows: [
-            { key: { text: "Date of birth"}, value: { text: dateOfBirthText } },
-            { key: { text: "Place of birth"}, value: { text: personalDetails.placeOfBirth } },
-            { key: { text: "Nationality"}, value: { text: personalDetails.nationality } },
-            { key: { text: "Other nationalities" }, value: { text: personalDetails.otherNationalities } },
-            { key: { text: "Ethnic group"}, value: { text: personalDetails.ethnicGroup } },
-            { key: { text: "Religion or belief"}, value: { text: personalDetails.religionOrBelief } },
-            { key: { text: "Sex"}, value: { text: personalDetails.sex } },
-            { key: { text: "Sexual orientation"}, value: { text: personalDetails.sexualOrientation } },
-            { key: { text: "Marriage or civil partnership status"}, value: { text: personalDetails.marriageOrCivilPartnership } },
-            { key: { text: "Number of children"}, value: { text: personalDetails.numberOfChildren } },
-            { key: { text: "Languages"}, value: { text: personalDetails.languages } },
-            { key: { text: "Other languages"}, value: { text: personalDetails.otherLanguages } },
-            { key: { text: "Type of diet"}, value: { text: personalDetails.typeOfDiet } },
-            { key: { text: "Smoker or vaper"}, value: { text: personalDetails.smokerOrVaper } },
-            { key: { text: "Domestic abuse perpetrator"}, value: { text: personalDetails.domesticAbusePerpetrator } },
-            { key: { text: "Domestic abuse victim"}, value: { text: personalDetails.domesticAbuseVictim } },
-            { key: { text: "Social care needed"}, value: { text: personalDetails.socialCareNeeded } }
-          ]
-      }) }} #}
     </div>
   </div>
 {%- endcall -%}
