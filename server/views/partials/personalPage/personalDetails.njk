@@ -5,10 +5,6 @@
 {% for alias in personalDetails.aliases %}
   {% set aliases = (aliases.push([{text: alias.alias | title}, {text: alias.dateOfBirth}]), aliases) %}
 {% endfor %}
-{% set dateOfBirthText %}
-  {{ personalDetails.dateOfBirth }}
-  ({{ personalDetails.age }} years old)
-{% endset %}
 {% macro summaryListRow(key, value, id, options) %}
   {% set hideIfEmpty = options.hideIfEmpty | default(false) %}
   {% if hideIfEmpty and not value %}
@@ -16,10 +12,59 @@
   {% else %}
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">{{ key }}</dt>
-      <dd class="govuk-summary-list__value" data-qa="{{ id }}">{{ value }}</dd>
+      {% if options.html %}
+        <dd class="govuk-summary-list__value" data-qa="{{ id }}">{{ value | safe }}</dd>
+      {% else %}
+        <dd class="govuk-summary-list__value" data-qa="{{ id }}">{{ value }}</dd>
+      {% endif %}
     </div>
   {% endif %}
 {% endmacro %}
+{% set dateOfBirthText %}
+  {{ personalDetails.dateOfBirth }}
+  ({{ personalDetails.age }} years old)
+{% endset %}
+{% macro otherLanguagesText(language) %}
+  {% if language.canSpeak and language.canWrite %}
+    writes and speaks only
+  {% elif language.canSpeak and language.canRead %}
+    reads and speaks only
+  {% elif language.canWrite and language.canRead %}
+    reads and writes only
+  {% elif language.canWrite %}
+    writes only
+  {% elif language.canRead %}
+    reads only
+  {% elif language.canSpeak %}
+    speaks only
+  {% endif %}
+{% endmacro %}
+{% set languagesHtml %}
+  <p class="govuk-body">
+    {% if personalDetails.languages.spoken %}
+      {{ personalDetails.languages.spoken }}
+      {{ "(interpreter required)" if personalDetails.languages.interpreterRequired }}
+    {% endif %}
+  </p>
+  <p class="govuk-body">
+    {% if personalDetails.languages.written and personalDetails.languages.written != personalDetails.languages.spoken %}
+      {{ personalDetails.languages.written }}
+      (written)
+    {% endif %}
+  </p>
+  <details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">View other languages</span>
+    </summary>
+    <div class="govuk-details__text" data-qa="other-languages-list">
+      <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
+        {% for language in personalDetails.otherLanguages %}
+          {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-" + language.language) }}
+        {% endfor %}
+      </dl>
+    </div>
+  </details>
+{% endset %}
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
@@ -59,8 +104,7 @@
         {{ summaryListRow("Sexual orientation", personalDetails.sexualOrientation, "sexual-orientation") }}
         {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
         {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
-        {{ summaryListRow("Languages", personalDetails.languages, "languages") }}
-        {{ summaryListRow("Other languages", personalDetails.otherLanguages, "other-languages") }}
+        {{ summaryListRow("Languages", languagesHtml, "languages", { html: true }) }}
         {{ summaryListRow("Types of diet", personalDetails.typeOfDiet, "type-of-diet") }}
         {{ summaryListRow("Smoker of vaper", personalDetails.smokerOrVaper, "smoker-or-vaper") }}
         {{ summaryListRow("Domestic abuse perpetrator", personalDetails.domesticAbusePerpetrator, "domestic-abuse-perpetrator", { hideIfEmpty: true }) }}

@@ -14,6 +14,7 @@ export default class PersonalPageService {
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
     const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
     const prisonerDetail = await this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber)
+    const secondaryLanguages = await this.prisonApiClient.getSecondaryLanguages(prisonerData.bookingId)
     const { profileInformation } = inmateDetail
 
     const aliases = prisonerData.aliases.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
@@ -39,12 +40,21 @@ export default class PersonalPageService {
           middleNames: prisonerData.middleNames,
           lastName: prisonerData.lastName,
         }),
-        languages: 'languages',
+        languages: {
+          written: inmateDetail.language,
+          spoken: inmateDetail.writtenLanguage,
+          interpreterRequired: inmateDetail.interpreterRequired,
+        },
         marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
         nationality: prisonerData.nationality,
         numberOfChildren:
           getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation) || 'Not entered',
-        otherLanguages: 'otherLanguages',
+        otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite }) => ({
+          language: description,
+          canRead,
+          canSpeak,
+          canWrite,
+        })),
         otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
         placeOfBirth: inmateDetail.birthPlace || 'Not entered',
         preferredName: toFullName({

@@ -15,6 +15,7 @@ context('When signed in', () => {
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.task('stubInmateDetail', 1102484)
     cy.task('stubPrisonerDetail', 'G6123VU')
+    cy.task('stubSecondaryLanguages', 1102484)
   })
 
   it('displays the personal details page', () => {

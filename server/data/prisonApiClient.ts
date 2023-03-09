@@ -135,4 +135,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     }
     return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
   }
+
+  async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
+    return this.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
+  }
 }
