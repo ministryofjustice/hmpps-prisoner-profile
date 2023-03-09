@@ -129,6 +129,7 @@ export const toFullName = ({
     .map(s => s && s.trim())
     .filter(s => s)
     .join(' ')
+    .trim()
 
 export const yearsBetweenDateStrings = (start: string, end: string): number => {
   const endDate = new Date(end)

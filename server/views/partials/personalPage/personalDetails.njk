@@ -12,7 +12,7 @@
 {% macro summaryListRow(key, value, id, options) %}
   {% set hideIfEmpty = options.hideIfEmpty | default(false) %}
   {% if hideIfEmpty and not value %}
-    <div data-qa="{{ id }}-empty" />
+    <div data-qa="{{ id }}-empty"></div>
   {% else %}
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">{{ key }}</dt>
@@ -48,9 +48,9 @@
 
       <hr class="govuk-section-break govuk-section-break--visible" />
       <dl class="govuk-summary-list">
-        {{ summaryListRow("Preferred name", personalDetails.preferredName, "preferred-name") }}
+        {{ summaryListRow("Preferred name", personalDetails.preferredName, "preferred-name", { hideIfEmpty: true }) }}
         {{ summaryListRow("Date of birth", dateOfBirthText, "date-of-birth") }}
-        {{ summaryListRow("Place of birth", personalDetails.placeOfBirth, "place-of-birth") }}
+        {{ summaryListRow("Place of birth", personalDetails.placeOfBirth | title, "place-of-birth") }}
         {{ summaryListRow("Nationality", personalDetails.nationality, "nationality") }}
         {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
         {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
