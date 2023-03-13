@@ -21,6 +21,7 @@ import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
+import { PagedAlerts, PagedAlertsOptions } from '../interfaces/prisonApi/pagedAlerts'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -133,5 +134,16 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       query = `type=${types.join('+')}`
     }
     return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
+  }
+
+  async getAlerts(bookingId: number, options?: PagedAlertsOptions): Promise<PagedAlerts> {
+    // Set default options
+    const queryParams: PagedAlertsOptions = {
+      alertStatus: 'ACTIVE',
+      size: 20,
+      sort: [['dateCreated', 'DESC']],
+      ...options,
+    }
+    return this.get<PagedAlerts>({ path: `/api/bookings/${bookingId}/alerts/v2`, query: mapToQueryString(queryParams) })
   }
 }

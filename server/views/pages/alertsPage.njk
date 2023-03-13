@@ -1,17 +1,17 @@
 {% from "../macros/hmppsActionButton.njk" import hmppsActionButton %}
 {% extends "./index.njk" %}
 {% block body %}
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 id="alerts">Alerts</h1>
+            <h1 id="alerts">{{ 'Active' if activeTab else 'Inactive' }} alerts</h1>
         </div>
     </div>
 
-    {% set activeCount = 8 %}
     {% set inactiveCount = 23 %}
     {% set tabs = [
-        { text: 'Active ('+activeCount+' alerts)', path: '/alerts/active', visible: true, testId: 'active' },
-        { text: 'Inactive ('+inactiveCount+' alerts)', path: '/alerts/inactive', visible: true, testId: 'inactive' }
+        { text: 'Active ('+activeAlertCount+' alerts)', path: '/alerts/active', visible: true, testId: 'active' },
+        { text: 'Inactive ('+inactiveAlertCount+' alerts)', path: '/alerts/inactive', visible: true, testId: 'inactive' }
     ]
     %}
 
@@ -20,8 +20,9 @@
             {% for tab in tabs %}
                 {% if tab.visible %}
                 {% set fullTabPath = '/prisoner/' + prisonerNumber + tab.path %}
-                {% set isSelected = ' govuk-tabs__list-item--selected' if currentUrlPath.split('?')[0].replace(r/\/$/, '') === fullTabPath %}
-                    <li class="{{'govuk-tabs__list-item' + isSelected }}">
+                {% set currentUrlPathNoQuery = (currentUrlPath.slice(0,-1) if currentUrlPath.endsWith('/') else currentUrlPath) %}
+                {% set isSelected = (' govuk-tabs__list-item--selected' if currentUrlPathNoQuery === fullTabPath) %}
+                    <li class="{{ 'govuk-tabs__list-item' + isSelected }}">
                         <a class="govuk-tabs__tab" href="{{ fullTabPath }}" data-qa="{{'alerts-tabs-' + tab.testId }}">
                             {{ tab.text }}
                         </a>
@@ -35,12 +36,12 @@
         <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
         <div class="govuk-grid-column-three-quarters">
             <div class="hmpps-action-header">
-                <h2>Active alerts</h2>
-                {{ hmppsActionButton({ text: 'Add alert', iconName: 'add-appointment', id: 'add-alert-action-button', url: '#' }) }}
+                {{ hmppsActionButton({ text: 'Add alert', iconName: 'add-alert', id: 'add-alert-action-button', url: '#' }) }}
             </div>
         </div>
     </div>
 
+    {% if (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">
             {% include '../partials/alertsPage/alertsFilter.njk' %}
@@ -49,4 +50,11 @@
             {% include '../partials/alertsPage/alertsList.njk' %}
         </div>
     </div>
+    {% else %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ fullName }} does not have any {{ 'active' if activeTab else 'inactive' }} alerts
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

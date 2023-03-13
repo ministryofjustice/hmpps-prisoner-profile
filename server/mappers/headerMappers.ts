@@ -2,7 +2,8 @@ import { Alert, Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
-import { convertToTitleCase } from '../utils/utils'
+import { formatName } from '../utils/utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
@@ -60,7 +61,9 @@ export function mapHeaderData(prisonerData: Prisoner, pageId?: string) {
 
   const headerData = {
     backLinkLabel: 'Back to search results',
-    prisonerName: `${convertToTitleCase(prisonerData.lastName)}, ${convertToTitleCase(prisonerData.firstName)}`,
+    prisonerName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
+      style: NameFormatStyle.lastCommaFirst,
+    }),
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
     alerts: mapAlerts(prisonerData, alertFlagLabels),

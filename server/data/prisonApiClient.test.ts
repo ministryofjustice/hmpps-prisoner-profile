@@ -17,6 +17,8 @@ import { mapToQueryString } from '../utils/utils'
 import { CaseNotesByTypeA } from './localMockData/caseNotes'
 import { inmateDetailMock } from './localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
+import { PagedAlertsOptions } from '../interfaces/prisonApi/pagedAlerts'
+import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 
 jest.mock('./tokenStore')
 
@@ -184,6 +186,20 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getPersonalCareNeeds(bookingId, ['MATSTAT'])
       expect(output).toEqual(personalCareNeedsMock)
+    })
+  })
+
+  describe('getAlerts', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      const options: PagedAlertsOptions = undefined
+      mockSuccessfulPrisonApiCall(
+        `/api/bookings/${bookingId}/alerts/v2?alertStatus=ACTIVE&size=20&sort=dateCreated%2CDESC`,
+        pagedActiveAlertsMock,
+      )
+
+      const output = await prisonApiClient.getAlerts(bookingId, options)
+      expect(output).toEqual(pagedActiveAlertsMock)
     })
   })
 })

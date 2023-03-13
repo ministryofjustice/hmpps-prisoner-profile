@@ -12,6 +12,7 @@ import { ScheduledEvent } from '../../interfaces/scheduledEvent'
 import { PrisonerDetail } from '../../interfaces/prisonerDetail'
 import { InmateDetail } from '../../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
+import { PagedAlerts, PagedAlertsOptions } from '../../interfaces/prisonApi/pagedAlerts'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -28,4 +29,5 @@ export interface PrisonApiClient {
   getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
   getInmateDetail(bookingId: number): Promise<InmateDetail>
   getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds>
+  getAlerts(bookingId: number, options: PagedAlertsOptions): Promise<PagedAlerts>
 }

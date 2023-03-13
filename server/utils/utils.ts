@@ -1,4 +1,5 @@
 import { ScheduleItem } from '../data/overviewPage'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -115,3 +116,37 @@ export const getNamesFromString = (string: string): string[] =>
     .join(' ')
     .split(' ')
     .map(name => properCaseName(name))
+
+/**
+ * Format a person's name with proper capitalisation
+ *
+ * Correctly handles names with apostrophes, hyphens and spaces
+ *
+ * Examples, "James O'Reilly", "Jane Smith-Doe", "Robert Henry Jones"
+ *
+ * @param firstName - first name
+ * @param middleNames - middle names as space separated list
+ * @param lastName - last name
+ * @param options
+ * @param options.style - format to use for output name, e.g. `NameStyleFormat.lastCommaFirst`
+ * @returns formatted name string
+ */
+export const formatName = (
+  firstName: string,
+  middleNames: string,
+  lastName: string,
+  options?: { style: NameFormatStyle },
+): string => {
+  const names = [firstName, middleNames, lastName]
+  if (options?.style === NameFormatStyle.lastCommaFirstMiddle) {
+    names.unshift(`${names.pop()},`)
+  } else if (options?.style === NameFormatStyle.lastCommaFirst) {
+    names.unshift(`${names.pop()},`)
+    names.pop() // Remove middleNames
+  }
+  return names
+    .filter(s => s)
+    .map(s => s.toLowerCase())
+    .join(' ')
+    .replace(/(^\w)|([\s'-]+\w)/g, letter => letter.toUpperCase())
+}

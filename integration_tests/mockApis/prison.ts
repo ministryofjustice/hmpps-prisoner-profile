@@ -11,6 +11,8 @@ import nonAssociationsDummyData from '../../server/data/localMockData/nonAssocia
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { offenderContact } from '../../server/data/localMockData/offenderContacts'
 import { mapToQueryString } from '../../server/utils/utils'
+import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../../server/data/localMockData/pagedAlertsMock'
+import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -164,6 +166,51 @@ export default {
           'Content-Type': 'image/png',
         },
         bodyFileName: placeHolderImagePath,
+      },
+    })
+  },
+  stubActiveAlerts: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?alertStatus=ACTIVE&size=20&sort=dateCreated%2CDESC`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedActiveAlertsMock,
+      },
+    })
+  },
+  stubInactiveAlerts: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?alertStatus=INACTIVE&size=20&sort=dateCreated%2CDESC`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedInactiveAlertsMock,
+      },
+    })
+  },
+  stubInmateDetail: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: { ...inmateDetailMock, activeAlertCount: 80, inactiveAlertCount: 80 },
       },
     })
   },
