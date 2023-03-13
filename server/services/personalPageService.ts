@@ -41,16 +41,17 @@ export default class PersonalPageService {
           lastName: prisonerData.lastName,
         }),
         languages: {
-          written: inmateDetail.language,
-          spoken: inmateDetail.writtenLanguage,
           interpreterRequired: inmateDetail.interpreterRequired,
+          spoken: inmateDetail.language,
+          written: inmateDetail.writtenLanguage,
         },
         marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
         nationality: prisonerData.nationality,
         numberOfChildren:
           getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation) || 'Not entered',
-        otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite }) => ({
+        otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
           language: description,
+          code,
           canRead,
           canSpeak,
           canWrite,

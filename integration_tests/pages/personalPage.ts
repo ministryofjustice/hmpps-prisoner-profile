@@ -20,6 +20,18 @@ export default class PersonalPage extends Page {
           }
         },
       }),
+      languages: () => ({
+        spoken: (): PageElement => cardData('languages').find('[data-qa=spoken-language]'),
+        written: (): PageElement => cardData('languages').find('[data-qa=written-language]'),
+        otherLanguages: (language: string) => ({
+          language: (): PageElement =>
+            cardData('languages')
+              .find('[data-qa=other-languages-list]')
+              .find(`[data-qa=other-language-${language}-key]`),
+          proficiency: (): PageElement =>
+            cardData('languages').find('[data-qa=other-languages-list]').find(`[data-qa=other-language-${language}]`),
+        }),
+      }),
       aliasList: (): PageElement => cardData('alias-list'),
       preferredName: (): PageElement => cardData('preferred-name'),
       dateOfBirth: () => cardData('date-of-birth'),
@@ -32,7 +44,6 @@ export default class PersonalPage extends Page {
       sexualOrientation: () => cardData('sexual-orientation'),
       marriageOrCivilPartnership: () => cardData('marriage-or-civil-partnership'),
       numberOfChildren: () => cardData('number-of-children'),
-      languages: () => cardData('languages'),
       otherLanguages: () => cardData('other-languages'),
       typeOfDiet: () => cardData('type-of-diet'),
       smokeOrVaper: () => cardData('smoker-or-vaper'),

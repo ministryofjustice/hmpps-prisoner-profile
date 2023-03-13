@@ -20,6 +20,7 @@ export interface PersonalPage {
     numberOfChildren: string
     otherLanguages: {
       language: string
+      code: string
       canRead: boolean
       canSpeak: boolean
       canWrite: boolean

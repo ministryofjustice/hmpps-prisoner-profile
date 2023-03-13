@@ -11,7 +11,7 @@
     <div data-qa="{{ id }}-empty"></div>
   {% else %}
     <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">{{ key }}</dt>
+      <dt class="govuk-summary-list__key" data-qa="{{ id }}-key">{{ key }}</dt>
       {% if options.html %}
         <dd class="govuk-summary-list__value" data-qa="{{ id }}">{{ value | safe }}</dd>
       {% else %}
@@ -40,13 +40,13 @@
   {% endif %}
 {% endmacro %}
 {% set languagesHtml %}
-  <p class="govuk-body">
+  <p class="govuk-body" data-qa="spoken-language">
     {% if personalDetails.languages.spoken %}
       {{ personalDetails.languages.spoken }}
       {{ "(interpreter required)" if personalDetails.languages.interpreterRequired }}
     {% endif %}
   </p>
-  <p class="govuk-body">
+  <p class="govuk-body" data-qa="written-language">
     {% if personalDetails.languages.written and personalDetails.languages.written != personalDetails.languages.spoken %}
       {{ personalDetails.languages.written }}
       (written)
@@ -59,7 +59,7 @@
     <div class="govuk-details__text" data-qa="other-languages-list">
       <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
         {% for language in personalDetails.otherLanguages %}
-          {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-" + language.language) }}
+          {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-" + language.code) }}
         {% endfor %}
       </dl>
     </div>

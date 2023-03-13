@@ -43,13 +43,40 @@ context('When signed in', () => {
       page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual / Straight')
       page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
       page.personalDetails().numberOfChildren().should('have.text', '2')
-      // Languages
-      // Other languages
       page.personalDetails().typeOfDiet().should('have.text', 'Voluntary - Pork Free/Fish Free')
       page.personalDetails().smokeOrVaper().should('have.text', 'No')
       page.personalDetails().domesticAbusePerpetrator().should('have.text', 'Not stated')
       page.personalDetails().domesticAbuseVictim().should('have.text', 'Not stated')
       page.personalDetails().socialCareNeeded().should('have.text', 'No')
+    })
+
+    it('Displays all the information from the API: Languages', () => {
+      const page = visitPersonalDetailsPage()
+      page.personalDetails().languages().spoken().should('include.text', 'Welsh')
+      page.personalDetails().languages().written().should('include.text', 'English').and('include.text', '(written)')
+      page.personalDetails().languages().otherLanguages('AZE').language().should('have.text', 'Azerbaijani')
+      page.personalDetails().languages().otherLanguages('BSL').language().should('have.text', 'British Sign Language')
+      page
+        .personalDetails()
+        .languages()
+        .otherLanguages('BSL')
+        .proficiency()
+        .should('include.text', 'reads and speaks only')
+      page
+        .personalDetails()
+        .languages()
+        .otherLanguages('GLA')
+        .language()
+        .should('include.text', 'Gaelic; Scottish Gaelic')
+      page
+        .personalDetails()
+        .languages()
+        .otherLanguages('GLA')
+        .proficiency()
+        .should('include.text', 'writes and speaks only')
+      page.personalDetails().languages().otherLanguages('MAN').language().should('include.text', 'Mandarin')
+      page.personalDetails().languages().otherLanguages('URD').language().should('include.text', 'Urdu')
+      page.personalDetails().languages().otherLanguages('URD').proficiency().should('include.text', 'reads only')
     })
   })
 })
