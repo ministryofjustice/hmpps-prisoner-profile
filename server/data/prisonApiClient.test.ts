@@ -17,6 +17,7 @@ import { mapToQueryString } from '../utils/utils'
 import { CaseNotesByTypeA } from './localMockData/caseNotes'
 import { inmateDetailMock } from './localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
+import { secondaryLanguagesMock } from './localMockData/secondaryLanguages'
 import { PagedAlertsOptions } from '../interfaces/prisonApi/pagedAlerts'
 import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 
@@ -186,6 +187,15 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getPersonalCareNeeds(bookingId, ['MATSTAT'])
       expect(output).toEqual(personalCareNeedsMock)
+    })
+  })
+
+  describe('getSecondaryLanguages', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/secondary-languages`, secondaryLanguagesMock)
+      const output = await prisonApiClient.getSecondaryLanguages(bookingId)
+      expect(output).toEqual(secondaryLanguagesMock)
     })
   })
 

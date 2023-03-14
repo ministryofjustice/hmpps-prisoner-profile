@@ -8,6 +8,9 @@ import {
 } from '../../server/data/localMockData/miniSummaryMock'
 import dummyScheduledEvents from '../../server/data/localMockData/eventsForToday'
 import nonAssociationsDummyData from '../../server/data/localMockData/nonAssociations'
+import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMock'
+import { prisonerDetailMock } from '../../server/data/localMockData/prisonerDetailMock'
+import { secondaryLanguagesMock } from '../../server/data/localMockData/secondaryLanguages'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { offenderContact } from '../../server/data/localMockData/offenderContacts'
 import { mapToQueryString } from '../../server/utils/utils'
@@ -16,7 +19,6 @@ import {
   pagedActiveAlertsMock,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
-import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -173,6 +175,39 @@ export default {
       },
     })
   },
+
+  stubPrisonerDetail: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/prisoners/${prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: prisonerDetailMock,
+      },
+    })
+  },
+
+  stubSecondaryLanguages: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/secondary-languages`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: secondaryLanguagesMock,
+      },
+    })
+  },
+
   stubActiveAlerts: (bookingId: number) => {
     let jsonResp
     if (bookingId === 1102484) {
@@ -194,6 +229,7 @@ export default {
       },
     })
   },
+
   stubInactiveAlerts: (bookingId: number) => {
     return stubFor({
       request: {
@@ -209,6 +245,7 @@ export default {
       },
     })
   },
+
   stubInmateDetail: (bookingId: number) => {
     let jsonResp
     if (bookingId === 1102484) {

@@ -117,6 +117,43 @@ export const getNamesFromString = (string: string): string[] =>
     .split(' ')
     .map(name => properCaseName(name))
 
+export const toFullName = ({
+  firstName,
+  middleNames,
+  lastName,
+}: {
+  firstName: string
+  middleNames?: string
+  lastName: string
+}): string =>
+  [firstName, middleNames, lastName]
+    .map(s => s && s.trim())
+    .filter(s => s)
+    .join(' ')
+    .trim()
+
+export const yearsBetweenDateStrings = (start: string, end: string): number => {
+  const endDate = new Date(end)
+  const startDate = new Date(start)
+  const endMonth = endDate.getMonth()
+  const startMonth = startDate.getMonth()
+  let years: number = endDate.getFullYear() - startDate.getFullYear()
+
+  if (years === 0) {
+    return years
+  }
+
+  if (startMonth > endMonth) {
+    years -= 1
+  } else if (startMonth === endMonth) {
+    if (startDate.getDate() > endDate.getDate()) {
+      years -= 1
+    }
+  }
+
+  return years
+}
+
 /**
  * Format a person's name with proper capitalisation
  *

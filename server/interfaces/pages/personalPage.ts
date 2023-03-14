@@ -10,12 +10,24 @@ export interface PersonalPage {
     domesticAbuseVictim: string
     ethnicGroup: string
     fullName: string
-    languages: string
+    languages: {
+      spoken: string
+      written: string
+      interpreterRequired: boolean
+    }
     marriageOrCivilPartnership: string
     nationality: string
     numberOfChildren: string
-    otherLanguages: string
+    otherLanguages: {
+      language: string
+      code: string
+      canRead: boolean
+      canSpeak: boolean
+      canWrite: boolean
+    }[]
+    otherNationalities: string
     placeOfBirth: string
+    preferredName: string
     religionOrBelief: string
     sex: string
     sexualOrientation: string
