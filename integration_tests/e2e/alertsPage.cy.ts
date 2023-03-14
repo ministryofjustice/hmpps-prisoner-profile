@@ -16,12 +16,16 @@ const visitInactiveAlertsPage = (): AlertsPage => {
   return Page.verifyOnPageWithTitle(AlertsPage, 'Inactive alerts')
 }
 
+const visitEmptyAlertsPage = (): AlertsPage => {
+  cy.signIn({ redirectPath: '/prisoner/A1234BC/alerts/active' })
+  return Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
+}
+
 context('Alerts Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-    cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })
 
   it('Active alerts page is displayed by default', () => {
@@ -32,6 +36,7 @@ context('Alerts Page', () => {
     let alertsPage
 
     beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       alertsPage = visitActiveAlertsPage()
     })
 
@@ -48,6 +53,7 @@ context('Alerts Page', () => {
     let alertsPage
 
     beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       alertsPage = visitInactiveAlertsPage()
     })
 
@@ -57,6 +63,24 @@ context('Alerts Page', () => {
 
     it('Displays the list with 20 items', () => {
       alertsPage.alertsList().children().should('have.length', 20)
+    })
+  })
+
+  context('No Active Alerts', () => {
+    let alertsPage
+
+    beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
+      alertsPage = visitEmptyAlertsPage()
+    })
+
+    it('Displays the active alerts tab selected with correct count', () => {
+      alertsPage.selectedTab().contains('a', 'Active (0 alerts)')
+    })
+
+    it('Displays the empty state message', () => {
+      alertsPage.alertsList().should('not.exist')
+      alertsPage.alertsEmptyState().should('contain', 'John Middle Names Saunders does not have any active alerts')
     })
   })
 })

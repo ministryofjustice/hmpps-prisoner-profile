@@ -639,3 +639,32 @@ export const pagedInactiveAlertsMock: PagedAlerts = {
   numberOfElements: 20,
   empty: false,
 }
+
+export const emptyAlertsMock: PagedAlerts = {
+  content: [],
+  pageable: {
+    sort: {
+      empty: false,
+      sorted: true,
+      unsorted: false,
+    },
+    offset: 0,
+    pageSize: 0,
+    pageNumber: 0,
+    paged: false,
+    unpaged: false,
+  },
+  totalPages: 0,
+  last: false,
+  totalElements: 0,
+  size: 0,
+  number: 0,
+  sort: {
+    empty: false,
+    sorted: true,
+    unsorted: false,
+  },
+  first: true,
+  numberOfElements: 0,
+  empty: true,
+}

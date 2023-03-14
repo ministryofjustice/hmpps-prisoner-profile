@@ -11,7 +11,11 @@ import nonAssociationsDummyData from '../../server/data/localMockData/nonAssocia
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { offenderContact } from '../../server/data/localMockData/offenderContacts'
 import { mapToQueryString } from '../../server/utils/utils'
-import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../../server/data/localMockData/pagedAlertsMock'
+import {
+  emptyAlertsMock,
+  pagedActiveAlertsMock,
+  pagedInactiveAlertsMock,
+} from '../../server/data/localMockData/pagedAlertsMock'
 import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -170,6 +174,12 @@ export default {
     })
   },
   stubActiveAlerts: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1102484) {
+      jsonResp = pagedActiveAlertsMock
+    } else if (bookingId === 1234567) {
+      jsonResp = emptyAlertsMock
+    }
     return stubFor({
       request: {
         method: 'GET',
@@ -180,7 +190,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedActiveAlertsMock,
+        jsonBody: jsonResp,
       },
     })
   },
@@ -200,6 +210,18 @@ export default {
     })
   },
   stubInmateDetail: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1102484) {
+      jsonResp = { ...inmateDetailMock, activeAlertCount: 80, inactiveAlertCount: 80 }
+    } else if (bookingId === 1234567) {
+      jsonResp = {
+        ...inmateDetailMock,
+        prisonerNumber: 'A1234BC',
+        bookingId: 1234567,
+        activeAlertCount: 0,
+        inactiveAlertCount: 0,
+      }
+    }
     return stubFor({
       request: {
         method: 'GET',
@@ -210,7 +232,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: { ...inmateDetailMock, activeAlertCount: 80, inactiveAlertCount: 80 },
+        jsonBody: jsonResp,
       },
     })
   },

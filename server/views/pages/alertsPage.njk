@@ -8,7 +8,6 @@
         </div>
     </div>
 
-    {% set inactiveCount = 23 %}
     {% set tabs = [
         { text: 'Active ('+activeAlertCount+' alerts)', path: '/alerts/active', visible: true, testId: 'active' },
         { text: 'Inactive ('+inactiveAlertCount+' alerts)', path: '/alerts/inactive', visible: true, testId: 'inactive' }
@@ -20,8 +19,7 @@
             {% for tab in tabs %}
                 {% if tab.visible %}
                 {% set fullTabPath = '/prisoner/' + prisonerNumber + tab.path %}
-                {% set currentUrlPathNoQuery = (currentUrlPath.slice(0,-1) if currentUrlPath.endsWith('/') else currentUrlPath) %}
-                {% set isSelected = (' govuk-tabs__list-item--selected' if currentUrlPathNoQuery === fullTabPath) %}
+                {% set isSelected = (' govuk-tabs__list-item--selected' if currentUrlPath === fullTabPath) %}
                     <li class="{{ 'govuk-tabs__list-item' + isSelected }}">
                         <a class="govuk-tabs__tab" href="{{ fullTabPath }}" data-qa="{{'alerts-tabs-' + tab.testId }}">
                             {{ tab.text }}
@@ -52,7 +50,7 @@
     </div>
     {% else %}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+        <div class="govuk-grid-column-full" data-qa="alerts-empty-state">
             {{ fullName }} does not have any {{ 'active' if activeTab else 'inactive' }} alerts
         </div>
     </div>

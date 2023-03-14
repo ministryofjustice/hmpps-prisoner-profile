@@ -6,4 +6,6 @@ export default class AlertsPage extends Page {
   selectedTab = (): PageElement => cy.get('.govuk-tabs__list-item.govuk-tabs__list-item--selected')
 
   alertsList = (): PageElement => cy.get('.hmpps-alert-card-list')
+
+  alertsEmptyState = (): PageElement => cy.get('[data-qa=alerts-empty-state]')
 }
