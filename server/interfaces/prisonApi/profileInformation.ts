@@ -4,7 +4,7 @@ export interface ProfileInformation {
   resultValue: string
 }
 
-export const getProfileInformationValue = (type: ProfileInformationType, array: ProfileInformation[]) => {
+export const getProfileInformationValue = (type: ProfileInformationType, array: ProfileInformation[]): string => {
   const value = Array.isArray(array) && array.length ? array.find(item => item.type === type) : null
 
   return value && value.resultValue
@@ -14,4 +14,12 @@ export const getProfileInformationValue = (type: ProfileInformationType, array: 
 export enum ProfileInformationType {
   RecognisedListener = 'LIST_REC',
   SuitableListener = 'LIST_SUIT',
+  TypesOfDiet = 'DIET',
+  SmokerOrVaper = 'SMOKE',
+  DomesticAbusePerpetrator = 'DOMESTIC',
+  DomesticAbuseVictim = 'DOMVIC',
+  SocialCareNeeded = 'PERSC',
+  NumberOfChildren = 'CHILD',
+  SexualOrientation = 'SEXO',
+  OtherNationalities = 'NATIO',
 }

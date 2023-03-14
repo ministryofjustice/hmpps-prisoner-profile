@@ -21,6 +21,7 @@ import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
+import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -133,5 +134,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       query = `type=${types.join('+')}`
     }
     return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
+  }
+
+  async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
+    return this.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
   }
 }

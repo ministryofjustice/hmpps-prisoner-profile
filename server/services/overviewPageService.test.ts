@@ -54,6 +54,7 @@ describe('OverviewPageService', () => {
     getPrisoner: jest.fn(async () => prisonerDetailMock),
     getInmateDetail: jest.fn(async () => inmateDetailMock),
     getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
+    getSecondaryLanguages: jest.fn(),
   }
 
   const allocationManagerApiClient: AllocationManagerClient = {
