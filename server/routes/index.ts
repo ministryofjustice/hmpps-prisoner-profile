@@ -12,6 +12,7 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import AllocationManagerClient from '../data/allocationManagerApiClient'
 import KeyWorkersClient from '../data/keyWorkersApiClient'
 import PersonalPageService from '../services/personalPageService'
+import AlertsPageService from '../services/alertsPageService'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -74,21 +75,37 @@ export default function routes(service: Services): Router {
     })
   })
 
+  get('/prisoner/:prisonerNumber/alerts', (req, res, next) => {
+    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+  })
+
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const alertsPageService = new AlertsPageService(prisonApiClient)
+    const alertsPageData = await alertsPageService.get(prisonerData, { alertStatus: 'ACTIVE' })
 
     res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),
+      ...alertsPageData,
+      activeTab: true,
     })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
     const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const alertsPageService = new AlertsPageService(prisonApiClient)
+    const alertsPageData = await alertsPageService.get(prisonerData, { alertStatus: 'INACTIVE' })
 
     res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),
+      ...alertsPageData,
+      activeTab: false,
     })
   })
 

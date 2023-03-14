@@ -27,6 +27,7 @@ describe('PersonalPageService', () => {
       getInmateDetail: jest.fn(async () => inmateDetailMock),
       getPersonalCareNeeds: jest.fn(),
       getSecondaryLanguages: jest.fn(async () => secondaryLanguagesMock),
+      getAlerts: jest.fn(),
     }
   })
 

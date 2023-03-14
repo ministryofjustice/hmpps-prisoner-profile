@@ -12,7 +12,9 @@ import {
   arrayToQueryString,
   toFullName,
   yearsBetweenDateStrings,
+  formatName,
 } from './utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 describe('convert to title case', () => {
   it.each([
@@ -193,4 +195,52 @@ describe('dateStringToAge', () => {
   ])('Number of years between %s and %s - %s', (startDate: string, endDate: string, expectedYears: number) => {
     expect(yearsBetweenDateStrings(startDate, endDate)).toEqual(expectedYears)
   })
+})
+
+describe('format name', () => {
+  it.each([
+    ['All names proper (no options)', 'John', 'James', 'Smith', undefined, 'John James Smith'],
+    ['All names lower (no options)', 'john', 'james', 'smith', undefined, 'John James Smith'],
+    ['All names upper (no options)', 'JOHN', 'JAMES', 'SMITH', undefined, 'John James Smith'],
+    ['No middle names (no options)', 'JOHN', undefined, 'Smith', undefined, 'John Smith'],
+    [
+      'Multiple middle names (no options)',
+      'John',
+      'James GORDON william',
+      'Smith',
+      undefined,
+      'John James Gordon William Smith',
+    ],
+    ['Hyphen (no options)', 'John', undefined, 'SMITH-JONES', undefined, 'John Smith-Jones'],
+    ['Apostrophe (no options)', 'JOHN', 'JAMES', "o'reilly", undefined, "John James O'Reilly"],
+    [
+      'All names (LastCommaFirstMiddle)',
+      'John',
+      'James',
+      'Smith',
+      { style: NameFormatStyle.lastCommaFirstMiddle },
+      'Smith, John James',
+    ],
+    [
+      'First and last names (LastCommaFirstMiddle)',
+      'John',
+      undefined,
+      'Smith',
+      { style: NameFormatStyle.lastCommaFirstMiddle },
+      'Smith, John',
+    ],
+    ['All names (LastCommaFirst)', 'John', 'James', 'Smith', { style: NameFormatStyle.lastCommaFirst }, 'Smith, John'],
+  ])(
+    '%s: formatName(%s, %s, %s, %s)',
+    (
+      _: string,
+      firstName: string,
+      middleNames: string,
+      lastName: string,
+      options: { style: NameFormatStyle },
+      expected: string,
+    ) => {
+      expect(formatName(firstName, middleNames, lastName, options)).toEqual(expected)
+    },
+  )
 })
