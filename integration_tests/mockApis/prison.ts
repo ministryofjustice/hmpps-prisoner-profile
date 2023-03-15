@@ -135,7 +135,6 @@ export default {
       },
     })
   },
-
   stubGetOffenderContacts: (bookingId: number) => {
     return stubFor({
       request: {
@@ -151,7 +150,6 @@ export default {
       },
     })
   },
-
   stubEventsForProfileImage: (prisonerNumber: string) => {
     return stubFor({
       request: {

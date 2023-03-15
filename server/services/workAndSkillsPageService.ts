@@ -1,21 +1,32 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import moment from 'moment'
+
 import CuriousApiClient from '../data/interfaces/curiousApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { GovSummaryGroup, GovSummaryItem } from '../interfaces/govSummaryItem'
 import { LearnerEducation } from '../interfaces/learnerEducation'
 import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
 import { LearnerGoals } from '../interfaces/learnerGoals'
 import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import { LearnerProfile } from '../interfaces/learnerProfile'
+import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
+import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 import { Prisoner } from '../interfaces/prisoner'
+import { formatDate, properCaseName } from '../utils/utils'
 
 export default class WorkAndSkillsPageService {
   private curiousApiClient: CuriousApiClient
 
-  constructor(curiousApiClient: CuriousApiClient) {
+  private prisonApiClient: PrisonApiClient
+
+  constructor(curiousApiClient: CuriousApiClient, prisonApiClient: PrisonApiClient) {
     this.curiousApiClient = curiousApiClient
+    this.prisonApiClient = prisonApiClient
   }
 
   public async get(prisonerData: Prisoner) {
-    const { prisonerNumber } = prisonerData
+    const { prisonerNumber, firstName, lastName } = prisonerData
 
     const learnerEmployabilitySkills = await this.getLearnerEmployabilitySkills(prisonerNumber)
     const learnerProfiles = await this.getLearnerProfiles(prisonerNumber)
@@ -23,6 +34,9 @@ export default class WorkAndSkillsPageService {
     const learnerLatestAssessments = await this.getLearnerLatestAssessments(prisonerNumber)
     const learnerGoals = await this.getLearnerGoals(prisonerNumber)
     const learnerNeurodivergence = await this.getLearnerNeurodivergence(prisonerNumber)
+    const prisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
+    const offenderActivitiesHistory = await this.getOffenderActivitiesHistory(prisonerNumber)
+    const unacceptableAbsences = await this.getOffenderAttendanceHistoryStats(prisonerNumber)
 
     return {
       learnerEmployabilitySkills,
@@ -31,7 +45,50 @@ export default class WorkAndSkillsPageService {
       learnerLatestAssessments,
       learnerGoals,
       learnerNeurodivergence,
+      prisonerName,
+      offenderActivitiesHistory,
+      unacceptableAbsences,
     }
+  }
+
+  private async getOffenderAttendanceHistoryStats(prisonerNumber: string) {
+    const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
+    const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
+    const oneMonthAgo = moment().startOf('day').subtract(1, 'month').format('YYYY-MM-DD')
+    const offenderAttendanceHistory: OffenderAttendanceHistory =
+      await this.prisonApiClient.getOffenderAttendanceHistory(prisonerNumber, sixMonthsAgo, todaysDate)
+
+    // UNACA means unacceptable absence
+    let UNACABLastSixMonths = 0
+    let UNACABLastMonth = 0
+
+    offenderAttendanceHistory.content.forEach(absence => {
+      if (absence.outcome !== undefined && absence.outcome === 'UNACAB') {
+        UNACABLastSixMonths += 1
+        if (absence.eventDate > oneMonthAgo) {
+          UNACABLastMonth += 1
+        }
+      }
+    })
+
+    return { UNACABLastSixMonths, UNACABLastMonth }
+  }
+
+  private async getOffenderActivitiesHistory(prisonerNumber: string) {
+    const oneYearAgo = moment().startOf('day').subtract(12, 'month').format('YYYY-MM-DD')
+    const offenderActivitiesHistory: OffenderActivitiesHistory =
+      await this.prisonApiClient.getOffenderActivitiesHistory(prisonerNumber, oneYearAgo)
+    const activitiesHistory: GovSummaryItem[] = []
+    if (offenderActivitiesHistory !== undefined) {
+      offenderActivitiesHistory.content.forEach(content => {
+        const item = {
+          key: { text: content.description },
+          value: { text: `Started on ${formatDate(content.startDate, 'long')}` },
+        }
+        activitiesHistory.push(item)
+      })
+    }
+    return { activitiesHistory }
   }
 
   private async getLearnerEmployabilitySkills(prisonerNumber: string) {
@@ -46,20 +103,71 @@ export default class WorkAndSkillsPageService {
   }
 
   private async getLearnerEducation(prisonerNumber: string) {
-    const learnerEducation: LearnerEducation[] = await this.curiousApiClient.getLearnerEducation(prisonerNumber)
-    return learnerEducation
+    const learnerEducation: LearnerEducation = await this.curiousApiClient.getLearnerEducation(prisonerNumber)
+    const coursesAndQualifications: GovSummaryItem[] = []
+    if (learnerEducation !== undefined) {
+      learnerEducation.content.forEach(content => {
+        const item = {
+          key: { text: content.courseName },
+          value: { text: `Planned end date on ${formatDate(content.learningPlannedEndDate, 'long')}` },
+        }
+        coursesAndQualifications.push(item)
+      })
+    }
+    return coursesAndQualifications
   }
 
   private async getLearnerLatestAssessments(prisonerNumber: string) {
     const learnerLatestAssessments: LearnerLatestAssessment[] = await this.curiousApiClient.getLearnerLatestAssessments(
       prisonerNumber,
     )
-    return learnerLatestAssessments
+
+    const multiListArray: GovSummaryGroup[][] = []
+
+    if (learnerLatestAssessments !== undefined) {
+      const list: GovSummaryGroup[] = []
+      learnerLatestAssessments[0].qualifications.forEach(content => {
+        const type = {
+          key: { text: content.qualification.qualificationType },
+          value: { text: content.qualification.qualificationGrade },
+        }
+        const date = {
+          key: { text: 'Assessment date' },
+          value: { text: formatDate(content.qualification.assessmentDate, 'long') },
+        }
+        const location = { key: { text: 'Assessment location' }, value: { text: content.establishmentName } }
+        list.push({ type, date, location })
+      })
+      multiListArray.push(list)
+    }
+
+    return multiListArray
   }
 
   private async getLearnerGoals(prisonerNumber: string) {
     const learnerGoals: LearnerGoals = await this.curiousApiClient.getLearnerGoals(prisonerNumber)
-    return learnerGoals
+
+    let employmentGoals: GovSummaryItem[] = []
+    let personalGoals: GovSummaryItem[] = []
+    let longTermGoals: GovSummaryItem[] = []
+    let shortTermGoals: GovSummaryItem[] = []
+
+    if (learnerGoals !== undefined) {
+      employmentGoals = this.strArrayToGovList(learnerGoals.employmentGoals)
+      personalGoals = this.strArrayToGovList(learnerGoals.personalGoals)
+      longTermGoals = this.strArrayToGovList(learnerGoals.longTermGoals)
+      shortTermGoals = this.strArrayToGovList(learnerGoals.shortTermGoals)
+    }
+    return { employmentGoals, personalGoals, longTermGoals, shortTermGoals }
+  }
+
+  private strArrayToGovList(goals: string[]) {
+    const govList: GovSummaryItem[] = []
+    goals.forEach(content => {
+      const item: GovSummaryItem = { key: { text: content }, value: { text: '' } }
+      govList.push(item)
+    })
+    return govList
   }
 
   private async getLearnerNeurodivergence(prisonerNumber: string) {

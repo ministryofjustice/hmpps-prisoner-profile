@@ -168,4 +168,12 @@ context('Overview Page', () => {
       overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
     })
   })
+
+  context('Click work and skills button', () => {
+    it('Displays the status list', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.statusList().should('exist')
+      overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
+    })
+  })
 })

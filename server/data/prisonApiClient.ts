@@ -21,6 +21,8 @@ import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
+import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
+import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -38,6 +40,16 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       }
       return error
     }
+  }
+
+  async getOffenderAttendanceHistory(
+    prisonerNumber: string,
+    fromDate: string,
+    toDate: string,
+  ): Promise<OffenderAttendanceHistory> {
+    return this.get<OffenderAttendanceHistory>({
+      path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=20`,
+    })
   }
 
   async getUserLocations(): Promise<Location[]> {
@@ -133,5 +145,18 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       query = `type=${types.join('+')}`
     }
     return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
+  }
+
+  async getOffenderActivitiesHistory(
+    prisonerNumber: string,
+    earliestEndDate: string,
+  ): Promise<OffenderActivitiesHistory> {
+    try {
+      return await this.restClient.get<OffenderActivitiesHistory>({
+        path: `/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=${earliestEndDate}`,
+      })
+    } catch (error) {
+      return error
+    }
   }
 }

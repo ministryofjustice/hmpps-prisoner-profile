@@ -16,8 +16,8 @@ export interface LearnerProfile {
   ]
   languageStatus: string
   plannedHours: number
-  rapidAssessmentDate: string
-  inDepthAssessmentDate: string
+  rapidAssessmentDate: string | null
+  inDepthAssessmentDate: string | null
   primaryLDDAndHealthProblem: string
   additionalLDDAndHealthProblems: string[]
 }

@@ -73,11 +73,13 @@ export default function routes(service: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
-    const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
     const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
 
     res.render('pages/workAndSkills', {
-      ...mapHeaderData(prisonerData),
+      ...mapHeaderData(prisonerData, 'work-and-skills'),
       ...workAndSkillsPageData,
     })
   })

@@ -8,7 +8,7 @@ import { LearnerProfile } from '../../interfaces/learnerProfile'
 export default interface CuriousApiClient {
   getLearnerEmployabilitySkills(prisonerNumber: string): Promise<LearnerEmployabilitySkills>
   getLearnerProfile(prisonerNumber: string): Promise<LearnerProfile[]>
-  getLearnerEducation(prisonerNumber: string): Promise<LearnerEducation[]>
+  getLearnerEducation(prisonerNumber: string): Promise<LearnerEducation>
   getLearnerLatestAssessments(prisonerNumber: string): Promise<LearnerLatestAssessment[]>
   getLearnerGoals(prisonerNumber: string): Promise<LearnerGoals>
   getLearnerNeurodivergence(prisonerNumber: string): Promise<LearnerNeurodivergence[]>
