@@ -26,6 +26,7 @@ import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
+import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 
 describe('WorkAndSkillsService', () => {
   const prisonApiClient: PrisonApiClient = {
@@ -45,6 +46,8 @@ describe('WorkAndSkillsService', () => {
     getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
     getOffenderActivitiesHistory: jest.fn(async () => OffenderActivitiesMock),
     getOffenderAttendanceHistory: jest.fn(async () => OffenderAttendanceHistoryMock),
+    getSecondaryLanguages: jest.fn(),
+    getAlerts: jest.fn(async () => pagedActiveAlertsMock),
   }
 
   const curiousApiClient: CuriousApiClient = {

@@ -14,6 +14,8 @@ import { InmateDetail } from '../../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../../interfaces/offenderAttendanceHistory'
+import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
+import { PagedAlerts, PagedAlertsOptions } from '../../interfaces/prisonApi/pagedAlerts'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -36,4 +38,6 @@ export interface PrisonApiClient {
     fromDate: string,
     toDate: string,
   ): Promise<OffenderAttendanceHistory>
+  getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
+  getAlerts(bookingId: number, options: PagedAlertsOptions): Promise<PagedAlerts>
 }

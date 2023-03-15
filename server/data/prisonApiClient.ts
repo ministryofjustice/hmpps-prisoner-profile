@@ -23,6 +23,8 @@ import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
+import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
+import { PagedAlerts, PagedAlertsOptions } from '../interfaces/prisonApi/pagedAlerts'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -158,5 +160,20 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     } catch (error) {
       return error
     }
+  }
+
+  async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
+    return this.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
+  }
+
+  async getAlerts(bookingId: number, options?: PagedAlertsOptions): Promise<PagedAlerts> {
+    // Set default options
+    const queryParams: PagedAlertsOptions = {
+      alertStatus: 'ACTIVE',
+      size: 20,
+      sort: [['dateCreated', 'DESC']],
+      ...options,
+    }
+    return this.get<PagedAlerts>({ path: `/api/bookings/${bookingId}/alerts/v2`, query: mapToQueryString(queryParams) })
   }
 }

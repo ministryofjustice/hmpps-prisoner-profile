@@ -1,6 +1,8 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { PersonalPage } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
+import { toFullName, yearsBetweenDateStrings } from '../utils/utils'
+import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -10,36 +12,64 @@ export default class PersonalPageService {
   }
 
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
-    // const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
-    const toFullName = (firstName: string, middleNames: string, lastName: string) =>
-      [firstName, middleNames, lastName].filter(s => s !== undefined).join(' ')
+    const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
+    const prisonerDetail = await this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber)
+    const secondaryLanguages = await this.prisonApiClient.getSecondaryLanguages(prisonerData.bookingId)
+    const { profileInformation } = inmateDetail
 
     const aliases = prisonerData.aliases.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
-      alias: toFullName(firstName, middleNames, lastName),
+      alias: toFullName({ firstName, middleNames, lastName }),
       dateOfBirth,
     }))
 
+    const todaysDateString = new Date().toISOString()
+
     return {
       personalDetails: {
-        age: '123',
+        age: (inmateDetail.age || yearsBetweenDateStrings(prisonerData.dateOfBirth, todaysDateString)).toString(),
         aliases,
         dateOfBirth: prisonerData.dateOfBirth,
-        domesticAbusePerpetrator: 'domesticAbusePerpetrator',
-        domesticAbuseVictim: 'domesticAbuseVictim',
-        ethnicGroup: prisonerData.ethnicity,
-        fullName: toFullName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
-        languages: 'languages',
-        marriageOrCivilPartnership: prisonerData.maritalStatus,
+        domesticAbusePerpetrator: getProfileInformationValue(
+          ProfileInformationType.DomesticAbusePerpetrator,
+          profileInformation,
+        ),
+        domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
+        ethnicGroup: prisonerData.ethnicity || 'Not entered',
+        fullName: toFullName({
+          firstName: prisonerData.firstName,
+          middleNames: prisonerData.middleNames,
+          lastName: prisonerData.lastName,
+        }),
+        languages: {
+          interpreterRequired: inmateDetail.interpreterRequired,
+          spoken: inmateDetail.language,
+          written: inmateDetail.writtenLanguage,
+        },
+        marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
         nationality: prisonerData.nationality,
-        numberOfChildren: 'numberOfChildren',
-        otherLanguages: 'otherLanguages',
-        placeOfBirth: 'placeOfBirth',
-        religionOrBelief: prisonerData.religion,
+        numberOfChildren:
+          getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation) || 'Not entered',
+        otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
+          language: description,
+          code,
+          canRead,
+          canSpeak,
+          canWrite,
+        })),
+        otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
+        placeOfBirth: inmateDetail.birthPlace || 'Not entered',
+        preferredName: toFullName({
+          firstName: prisonerDetail.currentWorkingFirstName,
+          lastName: prisonerDetail.currentWorkingLastName,
+        }),
+        religionOrBelief: prisonerData.religion || 'Not entered',
         sex: prisonerData.gender,
-        sexualOrientation: 'sexualOrientation',
-        smokerOrVaper: 'smokerOrVaper',
-        socialCareNeeded: 'socialCareNeeded',
-        typeOfDiet: 'typesOfDiet',
+        sexualOrientation:
+          getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
+        smokerOrVaper:
+          getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
+        socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
+        typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       },
     }
   }

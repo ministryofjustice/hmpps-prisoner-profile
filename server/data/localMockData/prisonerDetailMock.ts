@@ -3,11 +3,11 @@ import { PrisonerDetail } from '../../interfaces/prisonerDetail'
 // eslint-disable-next-line import/prefer-default-export
 export const prisonerDetailMock: PrisonerDetail = {
   birthCountry: '',
-  convictedStatus: '',
+  convictedStatus: 'Convicted',
   croNumber: '',
   currentWorkingBirthDate: '',
-  currentWorkingFirstName: '',
-  currentWorkingLastName: '',
+  currentWorkingFirstName: 'Working',
+  currentWorkingLastName: 'Name',
   currentlyInPrison: '',
   dateOfBirth: '',
   ethnicity: '',
@@ -21,7 +21,7 @@ export const prisonerDetailMock: PrisonerDetail = {
   latestBookingId: 0,
   latestLocation: '',
   latestLocationId: '',
-  legalStatus: '',
+  legalStatus: 'SENTENCED',
   maritalStatus: '',
   middleNames: '',
   nationalities: '',

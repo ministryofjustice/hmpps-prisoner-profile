@@ -37,6 +37,7 @@ import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { pomMock } from '../data/localMockData/pom'
 import { keyWorkerMock } from '../data/localMockData/keyWorker'
 import { StaffContactsMock } from '../data/localMockData/staffContacts'
+import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 
 describe('OverviewPageService', () => {
   const prisonApiClient: PrisonApiClient = {
@@ -56,6 +57,8 @@ describe('OverviewPageService', () => {
     getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
     getOffenderActivitiesHistory: jest.fn(),
     getOffenderAttendanceHistory: jest.fn(),
+    getSecondaryLanguages: jest.fn(),
+    getAlerts: jest.fn(async () => pagedActiveAlertsMock),
   }
 
   const allocationManagerApiClient: AllocationManagerClient = {

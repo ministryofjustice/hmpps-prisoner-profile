@@ -1,0 +1,96 @@
+.hmpps-action-header {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 30px 0;
+
+  h2 {
+    margin-bottom: -8px;
+    line-height: 1;
+  }
+}
+
+.hmpps-paged-list-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 30px;
+  border-bottom: 1px solid govuk-colour('dark-grey');
+  margin-bottom: 30px;
+
+  .moj-pagination {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p.moj-pagination__results {
+    margin-left: -5px;
+  }
+}
+
+.hmpps-paged-list-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  .moj-pagination {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p.moj-pagination__results {
+    margin-left: -5px;
+  }
+}
+
+.hmpps-alert-card-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-basis: min-content;
+  padding-bottom: 30px;
+  border-bottom: 1px solid govuk-colour('dark-grey');
+  margin-bottom: 30px;
+
+  &__content {
+    max-width: 670px;
+
+    @media (max-width: 1152px) {
+      max-width: 570px;
+    }
+  }
+
+  &__sub-title {
+    font-size: 16px;
+    font-weight: 300;
+    color: $govuk-secondary-text-colour;
+    margin-bottom: 15px;
+  }
+
+  &__title {
+    font-size: 19px;
+    font-weight: bold;
+    color: $govuk-text-colour;
+    margin-bottom: 15px;
+  }
+
+  &__notes {
+    font-size: 19px;
+    font-weight: 300;
+    color: $govuk-text-colour;
+    margin-bottom: 15px;
+  }
+
+  &__metadata {
+    font-size: 16px;
+    font-weight: 300;
+    color: $govuk-secondary-text-colour;
+  }
+
+  &__link {
+    white-space: nowrap;
+    margin-top: 36px;
+  }
+}

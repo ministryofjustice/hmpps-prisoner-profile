@@ -1,4 +1,5 @@
 import { ScheduleItem } from '../data/overviewPage'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -115,3 +116,74 @@ export const getNamesFromString = (string: string): string[] =>
     .join(' ')
     .split(' ')
     .map(name => properCaseName(name))
+
+export const toFullName = ({
+  firstName,
+  middleNames,
+  lastName,
+}: {
+  firstName: string
+  middleNames?: string
+  lastName: string
+}): string =>
+  [firstName, middleNames, lastName]
+    .map(s => s && s.trim())
+    .filter(s => s)
+    .join(' ')
+    .trim()
+
+export const yearsBetweenDateStrings = (start: string, end: string): number => {
+  const endDate = new Date(end)
+  const startDate = new Date(start)
+  const endMonth = endDate.getMonth()
+  const startMonth = startDate.getMonth()
+  let years: number = endDate.getFullYear() - startDate.getFullYear()
+
+  if (years === 0) {
+    return years
+  }
+
+  if (startMonth > endMonth) {
+    years -= 1
+  } else if (startMonth === endMonth) {
+    if (startDate.getDate() > endDate.getDate()) {
+      years -= 1
+    }
+  }
+
+  return years
+}
+
+/**
+ * Format a person's name with proper capitalisation
+ *
+ * Correctly handles names with apostrophes, hyphens and spaces
+ *
+ * Examples, "James O'Reilly", "Jane Smith-Doe", "Robert Henry Jones"
+ *
+ * @param firstName - first name
+ * @param middleNames - middle names as space separated list
+ * @param lastName - last name
+ * @param options
+ * @param options.style - format to use for output name, e.g. `NameStyleFormat.lastCommaFirst`
+ * @returns formatted name string
+ */
+export const formatName = (
+  firstName: string,
+  middleNames: string,
+  lastName: string,
+  options?: { style: NameFormatStyle },
+): string => {
+  const names = [firstName, middleNames, lastName]
+  if (options?.style === NameFormatStyle.lastCommaFirstMiddle) {
+    names.unshift(`${names.pop()},`)
+  } else if (options?.style === NameFormatStyle.lastCommaFirst) {
+    names.unshift(`${names.pop()},`)
+    names.pop() // Remove middleNames
+  }
+  return names
+    .filter(s => s)
+    .map(s => s.toLowerCase())
+    .join(' ')
+    .replace(/(^\w)|([\s'-]+\w)/g, letter => letter.toUpperCase())
+}

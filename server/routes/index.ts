@@ -14,10 +14,19 @@ import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
+import AlertsPageService from '../services/alertsPageService'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
   const router = Router()
+
+  router.use(async (req, res, next) => {
+    res.locals = {
+      ...res.locals,
+      currentUrlPath: req.baseUrl + req.path,
+    }
+    next()
+  })
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   const commonApiRoutes = new CommonApiRoutes()
@@ -81,6 +90,40 @@ export default function routes(service: Services): Router {
     res.render('pages/workAndSkills', {
       ...mapHeaderData(prisonerData, 'work-and-skills'),
       ...workAndSkillsPageData,
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/alerts', (req, res, next) => {
+    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+  })
+
+  get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const alertsPageService = new AlertsPageService(prisonApiClient)
+    const alertsPageData = await alertsPageService.get(prisonerData, { alertStatus: 'ACTIVE' })
+
+    res.render('pages/alertsPage', {
+      ...mapHeaderData(prisonerData, 'alerts'),
+      ...alertsPageData,
+      activeTab: true,
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const alertsPageService = new AlertsPageService(prisonApiClient)
+    const alertsPageData = await alertsPageService.get(prisonerData, { alertStatus: 'INACTIVE' })
+
+    res.render('pages/alertsPage', {
+      ...mapHeaderData(prisonerData, 'alerts'),
+      ...alertsPageData,
+      activeTab: false,
     })
   })
 

@@ -10,7 +10,11 @@ import {
   mapToQueryString,
   getNamesFromString,
   arrayToQueryString,
+  toFullName,
+  yearsBetweenDateStrings,
+  formatName,
 } from './utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 describe('convert to title case', () => {
   it.each([
@@ -162,4 +166,81 @@ describe('arrayToQueryString()', () => {
   it('should split correctly when name is in LAST_NAME, FIRST_NAME format', () => {
     expect(arrayToQueryString(['string'], 'key')).toEqual('key=string')
   })
+})
+
+describe('toFullName()', () => {
+  it('generates a full name including middle name', () => {
+    expect(toFullName({ firstName: 'First', middleNames: 'middle names', lastName: 'last' })).toEqual(
+      'First middle names last',
+    )
+  })
+
+  it.each([
+    ['middle names', 'First middle names last'],
+    [' ', 'First last'],
+    [undefined, 'First last'],
+    [null, 'First last'],
+  ])('generates a full name with middlename: %s', (middleNames: string, expectedFullName: string) => {
+    expect(toFullName({ firstName: 'First', middleNames, lastName: 'last' })).toEqual(expectedFullName)
+  })
+})
+
+describe('dateStringToAge', () => {
+  it.each([
+    ['2020-01-10', '2023-10-31', 3],
+    ['2020-01-10', '2020-01-01', 0],
+    ['2020-01-10', '2023-01-11', 3],
+    ['2020-01-10', '2023-01-10', 3],
+    ['2020-01-10', '2023-01-09', 2],
+  ])('Number of years between %s and %s - %s', (startDate: string, endDate: string, expectedYears: number) => {
+    expect(yearsBetweenDateStrings(startDate, endDate)).toEqual(expectedYears)
+  })
+})
+
+describe('format name', () => {
+  it.each([
+    ['All names proper (no options)', 'John', 'James', 'Smith', undefined, 'John James Smith'],
+    ['All names lower (no options)', 'john', 'james', 'smith', undefined, 'John James Smith'],
+    ['All names upper (no options)', 'JOHN', 'JAMES', 'SMITH', undefined, 'John James Smith'],
+    ['No middle names (no options)', 'JOHN', undefined, 'Smith', undefined, 'John Smith'],
+    [
+      'Multiple middle names (no options)',
+      'John',
+      'James GORDON william',
+      'Smith',
+      undefined,
+      'John James Gordon William Smith',
+    ],
+    ['Hyphen (no options)', 'John', undefined, 'SMITH-JONES', undefined, 'John Smith-Jones'],
+    ['Apostrophe (no options)', 'JOHN', 'JAMES', "o'reilly", undefined, "John James O'Reilly"],
+    [
+      'All names (LastCommaFirstMiddle)',
+      'John',
+      'James',
+      'Smith',
+      { style: NameFormatStyle.lastCommaFirstMiddle },
+      'Smith, John James',
+    ],
+    [
+      'First and last names (LastCommaFirstMiddle)',
+      'John',
+      undefined,
+      'Smith',
+      { style: NameFormatStyle.lastCommaFirstMiddle },
+      'Smith, John',
+    ],
+    ['All names (LastCommaFirst)', 'John', 'James', 'Smith', { style: NameFormatStyle.lastCommaFirst }, 'Smith, John'],
+  ])(
+    '%s: formatName(%s, %s, %s, %s)',
+    (
+      _: string,
+      firstName: string,
+      middleNames: string,
+      lastName: string,
+      options: { style: NameFormatStyle },
+      expected: string,
+    ) => {
+      expect(formatName(firstName, middleNames, lastName, options)).toEqual(expected)
+    },
+  )
 })

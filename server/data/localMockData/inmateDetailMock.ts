@@ -144,7 +144,103 @@ export const inmateDetailMock: InmateDetail = {
       detail: '10',
     },
   ],
-  profileInformation: [recognisedListenerYes],
+  profileInformation: [
+    {
+      type: 'YOUTH',
+      question: 'Youth Offender?',
+      resultValue: 'Yes',
+    },
+    {
+      type: 'MARITAL',
+      question: 'Domestic Status',
+      resultValue: 'No',
+    },
+    {
+      type: 'CHILD',
+      question: 'Number of Children?',
+      resultValue: '2',
+    },
+    {
+      type: 'DISABILITY',
+      question: 'Does The Prisoner Have a Disability?',
+      resultValue: 'YES',
+    },
+    {
+      type: 'DOMESTIC',
+      question: 'Domestic Abuse Perpetrator?',
+      resultValue: 'Not stated',
+    },
+    {
+      type: 'DOMVIC',
+      question: 'Domestic Violence Victim?',
+      resultValue: 'Not stated',
+    },
+    {
+      type: 'SMOKE',
+      question: 'Is the Offender a smoker?',
+      resultValue: 'No',
+    },
+    {
+      type: 'TAT',
+      question: 'Warned about tattooing?',
+      resultValue: 'Yes',
+    },
+    {
+      type: 'APPEAR',
+      question: 'Warned not to change appearance?',
+      resultValue: 'Yes',
+    },
+    {
+      type: 'DNA',
+      question: 'DNA Required?',
+      resultValue: 'No',
+    },
+    {
+      type: 'IMM',
+      question: 'Interest to Immigration?',
+      resultValue: 'Yes',
+    },
+    {
+      type: 'DIET',
+      question: 'Type of diet?',
+      resultValue: 'Voluntary - Pork Free/Fish Free',
+    },
+    {
+      type: 'LIST_REC',
+      question: 'Listener - Recognised?',
+      resultValue: 'Yes',
+    },
+    {
+      type: 'SEXO',
+      question: 'Sexual Orientation',
+      resultValue: 'Heterosexual / Straight',
+    },
+    {
+      type: 'RELF',
+      question: 'Religion',
+      resultValue: 'Celestial Church of God',
+    },
+    {
+      type: 'NAT',
+      question: 'Nationality?',
+      resultValue: 'Stateless',
+    },
+    {
+      type: 'NATIO',
+      question: 'Multiple Nationalities - Add Details',
+      resultValue: 'multiple nationalities field',
+    },
+    {
+      type: 'TRAVEL',
+      question: 'Are there any travel restrictions?',
+      resultValue: 'some travel restrictions',
+    },
+    {
+      type: 'PERSC',
+      question: 'Social Care Needed?',
+      resultValue: 'No',
+    },
+  ],
   physicalMarks: [
     {
       type: 'Tattoo',
