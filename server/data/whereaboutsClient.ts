@@ -29,7 +29,7 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     page: PageableQuery,
   ): Promise<UnacceptableAbsences> {
     return this.get<UnacceptableAbsences>({
-      path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}&size=1&sort=string`,
+      path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
     })
   }
 }

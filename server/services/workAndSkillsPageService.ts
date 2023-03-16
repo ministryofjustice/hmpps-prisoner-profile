@@ -27,16 +27,27 @@ export default class WorkAndSkillsPageService {
 
   public async get(prisonerData: Prisoner) {
     const { prisonerNumber, firstName, lastName } = prisonerData
-
-    const learnerEmployabilitySkills = await this.getLearnerEmployabilitySkills(prisonerNumber)
-    const learnerProfiles = await this.getLearnerProfiles(prisonerNumber)
-    const learnerEducation = await this.getLearnerEducation(prisonerNumber)
-    const learnerLatestAssessments = await this.getLearnerLatestAssessments(prisonerNumber)
-    const learnerGoals = await this.getLearnerGoals(prisonerNumber)
-    const learnerNeurodivergence = await this.getLearnerNeurodivergence(prisonerNumber)
     const prisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
-    const offenderActivitiesHistory = await this.getOffenderActivitiesHistory(prisonerNumber)
-    const unacceptableAbsences = await this.getOffenderAttendanceHistoryStats(prisonerNumber)
+
+    const [
+      learnerEmployabilitySkills,
+      learnerProfiles,
+      learnerEducation,
+      learnerLatestAssessments,
+      learnerGoals,
+      learnerNeurodivergence,
+      offenderActivitiesHistory,
+      unacceptableAbsences,
+    ] = await Promise.all([
+      this.getLearnerEmployabilitySkills(prisonerNumber),
+      this.getLearnerProfiles(prisonerNumber),
+      this.getLearnerEducation(prisonerNumber),
+      this.getLearnerLatestAssessments(prisonerNumber),
+      this.getLearnerGoals(prisonerNumber),
+      this.getLearnerNeurodivergence(prisonerNumber),
+      this.getOffenderActivitiesHistory(prisonerNumber),
+      this.getOffenderAttendanceHistoryStats(prisonerNumber),
+    ])
 
     return {
       learnerEmployabilitySkills,

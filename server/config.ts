@@ -84,7 +84,7 @@ export default {
     },
     dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
     allocationManager: {
-      url: process.env.ALLOCATION_MANAGER_ENDPOINT_URL || 'http://localhost:8082',
+      url: get('ALLOCATION_MANAGER_ENDPOINT_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('ALLOCATION_MANAGER_API_TIMEOUT_SECONDS', 20000)),
         deadline: Number(get('ALLOCATION_MANAGER_API_TIMEOUT_SECONDS', 20000)),
