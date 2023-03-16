@@ -1,3 +1,8 @@
+export const getOffenderIdentifierValue = (type: OffenderIdentifierType, array: OffenderIdentifier[]): string => {
+  const value = Array.isArray(array) && array.length ? array.find(item => item.type === type) : null
+
+  return value && value.value
+}
 export interface OffenderIdentifier {
   type: string
   value: string
@@ -7,4 +12,11 @@ export interface OffenderIdentifier {
   issuedDate?: string
   caseloadType?: string
   whenCreated?: string
+}
+
+// eslint-disable-next-line no-shadow
+export enum OffenderIdentifierType {
+  HomeOfficeReferenceNumber = 'HOREF',
+  NationalInsuranceNumber = 'NINO',
+  DrivingLicenseNumber = 'DL',
 }

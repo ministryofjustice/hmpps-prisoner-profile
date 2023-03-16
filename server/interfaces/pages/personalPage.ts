@@ -1,38 +1,48 @@
-export interface PersonalPage {
-  personalDetails: {
-    age: string
-    aliases: {
-      alias: string
-      dateOfBirth: string
-    }[]
+export interface PersonalDetails {
+  age: string
+  aliases: {
+    alias: string
     dateOfBirth: string
-    domesticAbusePerpetrator: string
-    domesticAbuseVictim: string
-    ethnicGroup: string
-    fullName: string
-    languages: {
-      spoken: string
-      written: string
-      interpreterRequired: boolean
-    }
-    marriageOrCivilPartnership: string
-    nationality: string
-    numberOfChildren: string
-    otherLanguages: {
-      language: string
-      code: string
-      canRead: boolean
-      canSpeak: boolean
-      canWrite: boolean
-    }[]
-    otherNationalities: string
-    placeOfBirth: string
-    preferredName: string
-    religionOrBelief: string
-    sex: string
-    sexualOrientation: string
-    smokerOrVaper: string
-    socialCareNeeded: string
-    typeOfDiet: string
+  }[]
+  dateOfBirth: string
+  domesticAbusePerpetrator: string
+  domesticAbuseVictim: string
+  ethnicGroup: string
+  fullName: string
+  languages: {
+    spoken: string
+    written: string
+    interpreterRequired: boolean
   }
+  marriageOrCivilPartnership: string
+  nationality: string
+  numberOfChildren: string
+  otherLanguages: {
+    language: string
+    code: string
+    canRead: boolean
+    canSpeak: boolean
+    canWrite: boolean
+  }[]
+  otherNationalities: string
+  placeOfBirth: string
+  preferredName: string
+  religionOrBelief: string
+  sex: string
+  sexualOrientation: string
+  smokerOrVaper: string
+  socialCareNeeded: string
+  typeOfDiet: string
+}
+export interface IdentityNumbers {
+  croNumber: string
+  drivingLicenceNumber: string
+  homeOfficeReferenceNumber: string
+  nationalInsuranceNumber: string
+  pncNumber: string
+  prisonNumber: string
+}
+export interface PersonalPage {
+  personalDetails: PersonalDetails
+  identityNumbers: IdentityNumbers
 }

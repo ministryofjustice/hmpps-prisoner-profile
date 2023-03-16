@@ -1,18 +1,17 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Identity numbers", id: "identity-numbers"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
-      {{ govukSummaryList({
-          rows: [
-            { key: { text: "Prison number"}, value: { text: "A8469Y"} },
-            { key: { text: "PNC number"}, value: { text: "90/183490P"} },
-            { key: { text: "CRO number"}, value: { text: "183490/90G"} },
-            { key: { text: "Home Office reference number"}, value: { text: "X1234567"} },
-            { key: { text: "National Insurance number"}, value: { text: "JR145155GV"} },
-            { key: { text: "Driving licence number"}, value: { text: "JONES849339TS8AD"} }
-          ]
-      }) }}
+      <dl class="govuk-summary-list">
+        {{ summaryListRow("Prison number", identityNumbers.prisonNumber, "prison-number") }}
+        {{ summaryListRow("PNC number", identityNumbers.pncNumber, "pnc-number") }}
+        {{ summaryListRow("CRO number", identityNumbers.croNumber, "cro-number") }}
+        {{ summaryListRow("Home Office reference number", identityNumbers.homeOfficeReferenceNumber, "home-office-reference-number", { hideIfEmpty: true }) }}
+        {{ summaryListRow("National Insurance number", identityNumbers.nationalInsuranceNumber, "national-insurance-number", { hideIfEmpty: true }) }}
+        {{ summaryListRow("Driving licence number", identityNumbers.drivingLicenceNumber, "driving-licence-number", { hideIfEmpty: true }) }}
+      </dl>
     </div>
   </div>
 {%- endcall -%}

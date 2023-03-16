@@ -3,6 +3,7 @@ import { PersonalPage } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
+import { getOffenderIdentifierValue, OffenderIdentifierType } from '../interfaces/prisonApi/offenderIdentifier'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -70,6 +71,23 @@ export default class PersonalPageService {
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
         socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
         typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
+      },
+      identityNumbers: {
+        croNumber: prisonerData.croNumber || 'Not entered',
+        drivingLicenceNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.DrivingLicenseNumber,
+          inmateDetail.identifiers,
+        ),
+        homeOfficeReferenceNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.HomeOfficeReferenceNumber,
+          inmateDetail.identifiers,
+        ),
+        nationalInsuranceNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.NationalInsuranceNumber,
+          inmateDetail.identifiers,
+        ),
+        pncNumber: prisonerData.pncNumber || 'Not entered',
+        prisonNumber: prisonerData.prisonerNumber,
       },
     }
   }

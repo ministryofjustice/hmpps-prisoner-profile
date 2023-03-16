@@ -349,6 +349,30 @@ export const inmateDetailMock: InmateDetail = {
       caseloadType: 'INST',
       whenCreated: '2012-02-13T13:48:43.636262',
     },
+    {
+      type: 'DL',
+      value: 'ABCD/123456/AB9DE',
+      offenderNo: 'G6123VU',
+      issuedDate: '2016-09-08',
+      caseloadType: 'INST',
+      whenCreated: '2016-09-08T09:15:32.160802',
+    },
+    {
+      type: 'NINO',
+      value: 'AB123456A',
+      offenderNo: 'G6123VU',
+      issuedDate: '2014-06-25',
+      caseloadType: 'INST',
+      whenCreated: '2014-06-25T10:36:35.515111',
+    },
+    {
+      type: 'HOREF',
+      value: 'A1234567',
+      offenderNo: 'G6123VU',
+      issuedDate: '2016-11-17',
+      caseloadType: 'INST',
+      whenCreated: '2016-11-17T14:21:20.88026',
+    },
   ],
   personalCareNeeds: [
     {
