@@ -1,0 +1,23 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{%- call summaryCard({title: "Employability skills", id: "employability-skills"}) -%}
+    <h3 class="govuk-heading-s">Most recent levels</h3>
+
+    {% for item in learnerEmployabilitySkills.content %}
+        <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4" />
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third">
+                <p class="govuk-body">
+                    <a class="govuk-link--no-visited-state" href="#">{{ item.employabilitySkill }}</a>
+                </p>         
+            </div>
+            <div class="govuk-grid-column-two-thirds govuk-!-padding-left-0">
+                {% if(item.reviews) %}
+                    <p>{{ item.reviews[0].currentProgression }}</p>
+                {% else %}
+                  <p>Not assessed</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+{%- endcall -%}

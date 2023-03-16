@@ -1,5 +1,8 @@
+.hmpps-sidebar li {
+  @include govuk-responsive-margin(5, 'bottom');
+}
 .hmpps-sidebar li::before {
   list-style-type: none;
   content: "—";
-  margin-right: 10px;
+  @include govuk-responsive-margin(2, 'right');
 }

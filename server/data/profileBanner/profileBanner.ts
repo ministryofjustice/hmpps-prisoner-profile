@@ -95,7 +95,7 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       label: 'Work and skills',
       classes: 'govuk-heading-s',
       id: 'work-and-skills',
-      href: '#',
+      href: `${baseUrl}/work-and-skills`,
       active: false,
     },
   ]

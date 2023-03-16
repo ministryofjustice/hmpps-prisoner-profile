@@ -55,6 +55,8 @@ describe('OverviewPageService', () => {
     getPrisoner: jest.fn(async () => prisonerDetailMock),
     getInmateDetail: jest.fn(async () => inmateDetailMock),
     getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
+    getOffenderActivitiesHistory: jest.fn(),
+    getOffenderAttendanceHistory: jest.fn(),
     getSecondaryLanguages: jest.fn(),
     getAlerts: jest.fn(async () => pagedActiveAlertsMock),
   }

@@ -1,0 +1,34 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Work and activities", id: "work-and-activities" }) -%}
+    <p>This includes anything that’s logged as an activity using NOMIS.</p>
+    <h3 class="govuk-heading-s">Current activities</h3>
+    {% if(offenderActivitiesHistory.activitiesHistory.length > 0) %}
+        <hr class="govuk-section-break govuk-section-break--visible" />
+        {{ govukSummaryList({
+            classes: "hmpps-font-weight-normal",
+            rows: offenderActivitiesHistory.activitiesHistory 
+        }) }}
+    {% endif %}
+    <p class="govuk-body">
+        <a class="govuk-link--no-visited-state" href="#">View work and activities for the last 12 months</a>
+    </p>  
+    <p class="govuk-body">
+        <a class="govuk-link--no-visited-state" href="#">View 7 day schedule</a>
+    </p>
+    <h3 class="govuk-heading-s">Unacceptable absences</h3>
+    
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+            <h3 class="govuk-heading-s">Last 30 days</h3>       
+        </div>
+        <div class="govuk-grid-column-two-thirds govuk-!-padding-left-0">
+            {{ unacceptableAbsences.UNACABLastMonth }}
+        </div>
+    </div>
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
+    {% if(unacceptableAbsences.UNACABLastSixMonths === 0) %}
+        <p>{{ prisonerName }} has no unacceptable absences in the last 6 months.</p>
+    {% endif %}
+{%- endcall -%}

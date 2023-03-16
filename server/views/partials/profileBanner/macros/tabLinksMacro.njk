@@ -9,6 +9,7 @@
         <a
           href="{{ tabLink.href | default('#') }}"
           class="govuk-link govuk-link--no-visited-state govuk-link--no-underline"
+          data-qa="{{tabLink.label}}"
           >{{ tabLink.label }}</a
         >
       </li>

@@ -11,6 +11,8 @@ import PrisonerSearchClient from '../data/prisonerSearchClient'
 import { mapHeaderData } from '../mappers/headerMappers'
 import AllocationManagerClient from '../data/allocationManagerApiClient'
 import KeyWorkersClient from '../data/keyWorkersApiClient'
+import CuriousApiClient from '../data/curiousApiClient'
+import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
 import AlertsPageService from '../services/alertsPageService'
 
@@ -72,6 +74,22 @@ export default function routes(service: Services): Router {
     res.render('pages/personalPage', {
       ...mapHeaderData(prisonerData, 'personal'),
       ...personalPageData,
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+
+    const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
+    const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
+
+    res.render('pages/workAndSkills', {
+      ...mapHeaderData(prisonerData, 'work-and-skills'),
+      ...workAndSkillsPageData,
     })
   })
 

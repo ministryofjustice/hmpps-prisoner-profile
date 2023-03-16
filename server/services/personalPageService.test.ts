@@ -28,6 +28,8 @@ describe('PersonalPageService', () => {
       getPersonalCareNeeds: jest.fn(),
       getSecondaryLanguages: jest.fn(async () => secondaryLanguagesMock),
       getAlerts: jest.fn(),
+      getOffenderActivitiesHistory: jest.fn(),
+      getOffenderAttendanceHistory: jest.fn(),
     }
   })
 
