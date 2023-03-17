@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import config from '../config'
 
 import { appWithAllRoutes } from './testutils/appSetup'
 
@@ -15,7 +16,7 @@ afterEach(() => {
 
 describe('GET /', () => {
   it('should render index page', () => {
-    return request(app).get('/').expect('Location', 'http://localhost:3001').expect(302)
+    return request(app).get('/').expect('Location', config.apis.dpsHomePageUrl).expect(302)
   })
 
   it('should render index page', () => {
