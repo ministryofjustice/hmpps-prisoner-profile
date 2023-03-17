@@ -170,5 +170,10 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.0.5",
     "typescript": "^5.0.2"
+  },
+  "overrides": {
+    "jest-html-reporter": {
+      "typescript": "$typescript"
+    }
   }
 }
