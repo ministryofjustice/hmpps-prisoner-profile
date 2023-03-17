@@ -118,6 +118,7 @@
     "prom-client": "^14.1.1",
     "redis": "^4.6.4",
     "superagent": "^8.0.9",
+    "typescript-legacy": "npm:typescript@^4.9.5",
     "url-value-parser": "^2.2.0",
     "uuid": "^9.0.0"
   },
