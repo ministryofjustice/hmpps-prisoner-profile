@@ -102,8 +102,16 @@ export default function routes(service: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
     const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
+    // Parse query params for paging, sorting and filtering data
+    const queryParams = {
+      page: req.query.page ? +req.query.page - 1 : undefined, // Change page to zero based for API query
+      sort: req.query.sort ? (req.query.sort as string) : undefined,
+    }
     const alertsPageService = new AlertsPageService(prisonApiClient)
-    const alertsPageData = await alertsPageService.get(prisonerData, { alertStatus: 'ACTIVE' })
+    const alertsPageData = await alertsPageService.get(prisonerData, {
+      ...queryParams,
+      alertStatus: 'ACTIVE',
+    })
 
     res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),
@@ -117,8 +125,16 @@ export default function routes(service: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
     const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
+    // Parse query params for paging, sorting and filtering data
+    const queryParams = {
+      page: req.query.page ? +req.query.page - 1 : undefined, // Change page to zero based for API query
+      sort: req.query.sort ? (req.query.sort as string) : undefined,
+    }
     const alertsPageService = new AlertsPageService(prisonApiClient)
-    const alertsPageData = await alertsPageService.get(prisonerData, { alertStatus: 'INACTIVE' })
+    const alertsPageData = await alertsPageService.get(prisonerData, {
+      ...queryParams,
+      alertStatus: 'INACTIVE',
+    })
 
     res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),

@@ -1,0 +1,31 @@
+{% macro hmppsPagination(params) %}
+{% if params.totalPages > 1 %}
+<nav class="moj-pagination {{- ' ' + params.classes if params.classes}}" aria-label="Pagination navigation">
+    <ul class="moj-pagination__list">
+        {%- if params.previous %}
+            <li class="moj-pagination__item  moj-pagination__item--prev">
+                <a class="moj-pagination__link" href="{{ params.previous.href }}">{{ params.previous.text }}<span class="govuk-visually-hidden"> page</span></a>
+            </li>
+        {% endif -%}
+
+        {%- for page in params.pages %}
+            {%- if page.type == 'dots' %}
+                <li class="moj-pagination__item moj-pagination__item--dots">…</li>
+            {% else %}
+                {%- if page.selected %}
+                    <li class="moj-pagination__item moj-pagination__item--active" aria-label="Page {{ page.text }} of {{ params.totalPages }}" aria-current="page">{{ page.text }}</li>
+                {% else %}
+                    <li class="moj-pagination__item"><a class="moj-pagination__link" href="{{ page.href }}" aria-label="Page {{ page.text }} of {{ params.totalPages }}">{{ page.text }}</a></li>
+                {% endif -%}
+            {% endif -%}
+        {% endfor -%}
+
+        {%- if params.next %}
+            <li class="moj-pagination__item  moj-pagination__item--next">
+                <a class="moj-pagination__link" href="{{ params.next.href }}">{{ params.next.text }}<span class="govuk-visually-hidden"> page</span></a>
+            </li>
+        {% endif -%}
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,3 @@
+{% macro hmppsPaginationSummary(params) %}
+    <p class="moj-pagination__results">Showing <b>{{ params.offset+1 }}</b> to <b>{{ params.offset+params.elementsOnPage }}</b> of <b>{{ params.totalElements }}</b> {{ params.itemDescription }}</p>
+{% endmacro %}

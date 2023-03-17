@@ -216,7 +216,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?alertStatus=ACTIVE&size=20&sort=dateCreated%2CDESC`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=ACTIVE`,
       },
       response: {
         status: 200,
@@ -232,7 +232,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?alertStatus=INACTIVE&size=20&sort=dateCreated%2CDESC`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=INACTIVE`,
       },
       response: {
         status: 200,

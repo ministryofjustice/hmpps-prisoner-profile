@@ -1,6 +1,6 @@
-import { PagedAlerts } from '../../interfaces/prisonApi/pagedAlerts'
+import { PagedList } from '../../interfaces/prisonApi/pagedList'
 
-export const pagedActiveAlertsMock: PagedAlerts = {
+export const pagedActiveAlertsMock: PagedList = {
   content: [
     {
       alertId: 2113,
@@ -290,7 +290,7 @@ export const pagedActiveAlertsMock: PagedAlerts = {
   empty: false,
 }
 
-export const pagedInactiveAlertsMock: PagedAlerts = {
+export const pagedInactiveAlertsMock: PagedList = {
   content: [
     {
       alertId: 113,
@@ -640,7 +640,7 @@ export const pagedInactiveAlertsMock: PagedAlerts = {
   empty: false,
 }
 
-export const emptyAlertsMock: PagedAlerts = {
+export const emptyAlertsMock: PagedList = {
   content: [],
   pageable: {
     sort: {

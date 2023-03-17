@@ -1,5 +1,7 @@
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { PagedList } from '../interfaces/prisonApi/pagedList'
+import { ListMetadata } from '../interfaces/pages/alertsPageData'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -171,4 +173,58 @@ export const formatName = (
     .map(s => s.toLowerCase())
     .join(' ')
     .replace(/(^\w)|([\s'-]+\w)/g, letter => letter.toUpperCase())
+}
+
+/**
+ * Generate metadata for list pages, including pagination, sorting, filtering
+ *
+ * For the current page and pages array, the value is incremented by 1 as the API uses a zero based array
+ * but users expect page numbers in url, etc to be one based.
+ *
+ * @param pagedList
+ * @param itemDescription
+ */
+export const generateListMetadata = (pagedList: PagedList, itemDescription: string): ListMetadata => {
+  const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
+  const pages =
+    pagedList?.totalPages > 1
+      ? [...Array(pagedList.totalPages).keys()].map(page => {
+          const url = `?page=${page + 1}`
+          return {
+            text: `${page + 1}`,
+            href: url,
+            selected: currentPage === page + 1,
+          }
+        })
+      : []
+
+  const next = pagedList?.last
+    ? undefined
+    : {
+        href: `?page=${currentPage + 1}`,
+        text: 'Next',
+      }
+
+  const previous = pagedList?.first
+    ? undefined
+    : {
+        href: `?page=${currentPage - 1}`,
+        text: 'Previous',
+      }
+
+  return {
+    sort: 'created,Desc',
+    pagination: {
+      itemDescription,
+      previous,
+      next,
+      page: currentPage,
+      offset: pagedList?.pageable?.offset,
+      pageSize: pagedList?.size,
+      totalPages: pagedList?.totalPages,
+      totalElements: pagedList?.totalElements,
+      elementsOnPage: pagedList?.numberOfElements,
+      pages,
+    },
+  }
 }

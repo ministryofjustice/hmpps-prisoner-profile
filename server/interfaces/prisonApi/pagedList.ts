@@ -1,8 +1,8 @@
 import { Alert } from './alert'
 
-export interface PagedAlerts {
-  content: Alert[]
-  pageable: {
+export interface PagedList {
+  content: Alert[] // TODO add other interfaces here as required, e.g. CaseNote
+  pageable?: {
     sort: {
       empty: boolean
       sorted: boolean
@@ -29,8 +29,9 @@ export interface PagedAlerts {
   empty: boolean
 }
 
-export interface PagedAlertsOptions {
+export interface PagedListQueryParams {
+  page?: number
   alertStatus?: 'ACTIVE' | 'INACTIVE'
   size?: number
-  sort?: [string, string][]
+  sort?: string
 }
