@@ -10,7 +10,6 @@ import {
   mapToQueryString,
   getNamesFromString,
   arrayToQueryString,
-  toFullName,
   yearsBetweenDateStrings,
   formatName,
 } from './utils'
@@ -165,23 +164,6 @@ describe('getNamesFromString()', () => {
 describe('arrayToQueryString()', () => {
   it('should split correctly when name is in LAST_NAME, FIRST_NAME format', () => {
     expect(arrayToQueryString(['string'], 'key')).toEqual('key=string')
-  })
-})
-
-describe('toFullName()', () => {
-  it('generates a full name including middle name', () => {
-    expect(toFullName({ firstName: 'First', middleNames: 'middle names', lastName: 'last' })).toEqual(
-      'First middle names last',
-    )
-  })
-
-  it.each([
-    ['middle names', 'First middle names last'],
-    [' ', 'First last'],
-    [undefined, 'First last'],
-    [null, 'First last'],
-  ])('generates a full name with middlename: %s', (middleNames: string, expectedFullName: string) => {
-    expect(toFullName({ firstName: 'First', middleNames, lastName: 'last' })).toEqual(expectedFullName)
   })
 })
 

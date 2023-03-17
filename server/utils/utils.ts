@@ -117,21 +117,6 @@ export const getNamesFromString = (string: string): string[] =>
     .split(' ')
     .map(name => properCaseName(name))
 
-export const toFullName = ({
-  firstName,
-  middleNames,
-  lastName,
-}: {
-  firstName: string
-  middleNames?: string
-  lastName: string
-}): string =>
-  [firstName, middleNames, lastName]
-    .map(s => s && s.trim())
-    .filter(s => s)
-    .join(' ')
-    .trim()
-
 export const yearsBetweenDateStrings = (start: string, end: string): number => {
   const endDate = new Date(end)
   const startDate = new Date(start)

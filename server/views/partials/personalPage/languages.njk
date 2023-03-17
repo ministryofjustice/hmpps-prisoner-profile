@@ -1,6 +1,8 @@
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% macro otherLanguagesText(language) %}
-  {% if language.canSpeak and language.canWrite %}
+  {% if language.canSpeak and language.canWrite and language.canRead %}
+  {# Intentionally blank #}
+  {% elif language.canSpeak and language.canWrite %}
     writes and speaks only
   {% elif language.canSpeak and language.canRead %}
     reads and speaks only

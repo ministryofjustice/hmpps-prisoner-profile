@@ -1,8 +1,9 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { PersonalPage } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
-import { toFullName, yearsBetweenDateStrings } from '../utils/utils'
+import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
+import { getOffenderIdentifierValue, OffenderIdentifierType } from '../interfaces/prisonApi/offenderIdentifier'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -12,13 +13,16 @@ export default class PersonalPageService {
   }
 
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
-    const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
-    const prisonerDetail = await this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber)
-    const secondaryLanguages = await this.prisonApiClient.getSecondaryLanguages(prisonerData.bookingId)
+    const [inmateDetail, prisonerDetail, secondaryLanguages] = await Promise.all([
+      this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
+      this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber),
+      this.prisonApiClient.getSecondaryLanguages(prisonerData.bookingId),
+    ])
+
     const { profileInformation } = inmateDetail
 
     const aliases = prisonerData.aliases.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
-      alias: toFullName({ firstName, middleNames, lastName }),
+      alias: formatName(firstName, middleNames, lastName),
       dateOfBirth,
     }))
 
@@ -35,11 +39,7 @@ export default class PersonalPageService {
         ),
         domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
         ethnicGroup: prisonerData.ethnicity || 'Not entered',
-        fullName: toFullName({
-          firstName: prisonerData.firstName,
-          middleNames: prisonerData.middleNames,
-          lastName: prisonerData.lastName,
-        }),
+        fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
         languages: {
           interpreterRequired: inmateDetail.interpreterRequired,
           spoken: inmateDetail.language,
@@ -58,10 +58,11 @@ export default class PersonalPageService {
         })),
         otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
         placeOfBirth: inmateDetail.birthPlace || 'Not entered',
-        preferredName: toFullName({
-          firstName: prisonerDetail.currentWorkingFirstName,
-          lastName: prisonerDetail.currentWorkingLastName,
-        }),
+        preferredName: formatName(
+          prisonerDetail.currentWorkingFirstName,
+          undefined,
+          prisonerDetail.currentWorkingLastName,
+        ),
         religionOrBelief: prisonerData.religion || 'Not entered',
         sex: prisonerData.gender,
         sexualOrientation:
@@ -70,6 +71,23 @@ export default class PersonalPageService {
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
         socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
         typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
+      },
+      identityNumbers: {
+        croNumber: prisonerData.croNumber || 'Not entered',
+        drivingLicenceNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.DrivingLicenseNumber,
+          inmateDetail.identifiers,
+        ),
+        homeOfficeReferenceNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.HomeOfficeReferenceNumber,
+          inmateDetail.identifiers,
+        ),
+        nationalInsuranceNumber: getOffenderIdentifierValue(
+          OffenderIdentifierType.NationalInsuranceNumber,
+          inmateDetail.identifiers,
+        ),
+        pncNumber: prisonerData.pncNumber || 'Not entered',
+        prisonNumber: prisonerData.prisonerNumber,
       },
     }
   }

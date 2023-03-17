@@ -4,7 +4,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { Alias } from '../interfaces/prisoner'
-import { toFullName, yearsBetweenDateStrings } from '../utils/utils'
+import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 
 describe('PersonalPageService', () => {
@@ -90,7 +90,7 @@ describe('PersonalPageService', () => {
           { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
         ])
         expect(response.personalDetails.aliases[0]).toEqual({
-          alias: 'First name Last name',
+          alias: 'First Name Last Name',
           dateOfBirth: '2022-01-01',
         })
         expect(response.personalDetails.aliases[1]).toEqual({
@@ -186,24 +186,29 @@ describe('PersonalPageService', () => {
         expect(personalDetails.dateOfBirth).toEqual(PrisonerMockDataA.dateOfBirth)
         expect(personalDetails.ethnicGroup).toEqual(PrisonerMockDataA.ethnicity)
         expect(personalDetails.fullName).toEqual(
-          toFullName({
-            firstName: PrisonerMockDataA.firstName,
-            middleNames: PrisonerMockDataA.middleNames,
-            lastName: PrisonerMockDataA.lastName,
-          }),
+          formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),
         )
         expect(personalDetails.marriageOrCivilPartnership).toEqual(PrisonerMockDataA.maritalStatus)
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
         expect(personalDetails.placeOfBirth).toEqual(inmateDetailMock.birthPlace)
         expect(personalDetails.preferredName).toEqual(
-          toFullName({
-            firstName: prisonerDetailMock.currentWorkingFirstName,
-            lastName: prisonerDetailMock.currentWorkingLastName,
-          }),
+          formatName(prisonerDetailMock.currentWorkingFirstName, undefined, prisonerDetailMock.currentWorkingLastName),
         )
         expect(personalDetails.religionOrBelief).toEqual(PrisonerMockDataA.religion)
         expect(personalDetails.sex).toEqual(PrisonerMockDataA.gender)
       })
+    })
+  })
+
+  describe('Identity numbers', () => {
+    it('Maps the data from the API', async () => {
+      const { identityNumbers } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(identityNumbers.croNumber).toEqual(PrisonerMockDataA.croNumber)
+      expect(identityNumbers.drivingLicenceNumber).toEqual('ABCD/123456/AB9DE')
+      expect(identityNumbers.homeOfficeReferenceNumber).toEqual('A1234567')
+      expect(identityNumbers.nationalInsuranceNumber).toEqual('AB123456A')
+      expect(identityNumbers.pncNumber).toEqual(PrisonerMockDataA.pncNumber)
+      expect(identityNumbers.prisonNumber).toEqual(PrisonerMockDataA.prisonerNumber)
     })
   })
 })
