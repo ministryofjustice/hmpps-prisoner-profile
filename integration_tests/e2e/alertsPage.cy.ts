@@ -47,6 +47,19 @@ context('Alerts Page', () => {
     it('Displays the list with 20 items', () => {
       alertsPage.alertsList().children().should('have.length', 20)
     })
+
+    it('Displays the pagination correctly', () => {
+      alertsPage.paginationPreviousLink().should('not.exist')
+      alertsPage.paginationCurrentPage().contains('1')
+      alertsPage.paginationNextLink().should('exist')
+      alertsPage.paginationHeaderPageLink().should('have.length', 3)
+      alertsPage.paginationFooterPageLink().should('have.length', 3)
+    })
+
+    it('Displays the pagination summary correctly', () => {
+      alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
+      alertsPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 alerts')
+    })
   })
 
   context('Inactive Alerts', () => {
@@ -63,6 +76,19 @@ context('Alerts Page', () => {
 
     it('Displays the list with 20 items', () => {
       alertsPage.alertsList().children().should('have.length', 20)
+    })
+
+    it('Displays the pagination correctly', () => {
+      alertsPage.paginationPreviousLink().should('not.exist')
+      alertsPage.paginationCurrentPage().contains('1')
+      alertsPage.paginationNextLink().should('exist')
+      alertsPage.paginationHeaderPageLink().should('have.length', 3)
+      alertsPage.paginationFooterPageLink().should('have.length', 3)
+    })
+
+    it('Displays the pagination summary correctly', () => {
+      alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
+      alertsPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 alerts')
     })
   })
 
@@ -81,6 +107,13 @@ context('Alerts Page', () => {
     it('Displays the empty state message', () => {
       alertsPage.alertsList().should('not.exist')
       alertsPage.alertsEmptyState().should('contain', 'John Middle Names Saunders does not have any active alerts')
+    })
+
+    it('Displays no pagination or pagination summary', () => {
+      alertsPage.paginationHeader().should('not.exist')
+      alertsPage.paginationFooter().should('not.exist')
+      alertsPage.paginationSummaryHeader().should('not.exist')
+      alertsPage.paginationSummaryFooter().should('not.exist')
     })
   })
 })
