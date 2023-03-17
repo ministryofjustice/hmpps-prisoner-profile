@@ -19,6 +19,7 @@
   margin-bottom: 30px;
 
   .moj-pagination {
+    margin-top: 30px;
     margin-left: 0;
     margin-right: 0;
   }
@@ -34,6 +35,10 @@
   align-items: flex-end;
   justify-content: space-between;
   margin-bottom: 30px;
+
+  &__no-pagination {
+    justify-content: flex-end;
+  }
 
   .moj-pagination {
     margin-left: 0;

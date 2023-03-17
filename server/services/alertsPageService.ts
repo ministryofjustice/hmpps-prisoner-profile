@@ -1,8 +1,8 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { PagedAlerts, PagedAlertsOptions } from '../interfaces/prisonApi/pagedAlerts'
 import { AlertsPageData } from '../interfaces/pages/alertsPageData'
 import { Prisoner } from '../interfaces/prisoner'
-import { formatName } from '../utils/utils'
+import { formatName, generateListMetadata } from '../utils/utils'
+import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 
 export default class AlertsPageService {
   private prisonApiClient: PrisonApiClient
@@ -11,21 +11,21 @@ export default class AlertsPageService {
     this.prisonApiClient = prisonApiClient
   }
 
-  public async get(prisonerData: Prisoner, options?: PagedAlertsOptions): Promise<AlertsPageData> {
+  public async get(prisonerData: Prisoner, queryParams: PagedListQueryParams): Promise<AlertsPageData> {
     const { alertsCodes, activeAlertCount, inactiveAlertCount } = await this.prisonApiClient.getInmateDetail(
       prisonerData.bookingId,
     )
-    let pagedAlerts: PagedAlerts
+    let pagedAlerts: PagedList
     if (
-      (activeAlertCount && !options) ||
-      (activeAlertCount && options?.alertStatus === 'ACTIVE') ||
-      (inactiveAlertCount && options?.alertStatus === 'INACTIVE')
+      (activeAlertCount && queryParams?.alertStatus === 'ACTIVE') ||
+      (inactiveAlertCount && queryParams?.alertStatus === 'INACTIVE')
     ) {
-      pagedAlerts = await this.prisonApiClient.getAlerts(prisonerData.bookingId, options)
+      pagedAlerts = await this.prisonApiClient.getAlerts(prisonerData.bookingId, queryParams)
     }
 
     return {
       pagedAlerts,
+      listMetadata: generateListMetadata(pagedAlerts, 'alerts'),
       alertsCodes,
       activeAlertCount,
       inactiveAlertCount,

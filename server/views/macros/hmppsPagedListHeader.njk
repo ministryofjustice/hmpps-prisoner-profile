@@ -1,39 +1,27 @@
-{% macro hmppsPagedListHeader(options) %}
+{%- from './hmppsPagination.njk' import hmppsPagination -%}
+{%- from './hmppsPaginationSummary.njk' import hmppsPaginationSummary -%}
+
+{% macro hmppsPagedListHeader(listMetadata) %}
 <div class="hmpps-paged-list-header">
     <div>
-        <div class="govuk-form-group">
-            <label class="govuk-label" for="sortBy">Sort by</label>
+        <div>
+            <label class="govuk-label" for="sort">Sort by</label>
             <select
                     class="govuk-select"
-                    id="sortBy"
-                    name="sortBy"
-                    value={{ sortBy }}
+                    id="sort"
+                    name="sort"
+                    value={{ listMetadata.sort }}
             >
-                <option value="createdDesc" {{ 'selected' if sortBy === 'createdDesc' }}>Created (most recent)</option>
-                <option value="createdAsc" {{ 'selected' if sortBy === 'createdAsc' }}>Created (oldest)</option>
-                <option value="updatedDesc" {{ 'selected' if sortBy === 'updatedDesc' }}>Last updated (most recent)</option>
-                <option value="updatedAsc" {{ 'selected' if sortBy === 'updatedAsc' }}>Last updated (oldest)</option>
+                <option value="created,Desc" {{ 'selected' if listMetadata.sort === 'created,Desc' }}>Created (most recent)</option>
+                <option value="created,Asc" {{ 'selected' if listMetadata.sort === 'created,Asc' }}>Created (oldest)</option>
+                <option value="updated,Desc" {{ 'selected' if listMetadata.sort === 'updated,Desc' }}>Last updated (most recent)</option>
+                <option value="updated,Asc" {{ 'selected' if listMetadata.sort === 'updated,Asc' }}>Last updated (oldest)</option>
             </select>
         </div>
-        <nav class="moj-pagination" aria-label="Pagination navigation">
-            <ul class="moj-pagination__list">
-                {#                            <li class="moj-pagination__item  moj-pagination__item--prev">#}
-                {#                                <a class="moj-pagination__link" href="">Previous<span class="govuk-visually-hidden"> page</span></a>#}
-                {#                            </li>#}
-                <li class="moj-pagination__item moj-pagination__item--active" aria-label="Page 1 of 2" aria-current="page">1</li>
-                <li class="moj-pagination__item"><a class="moj-pagination__link" href="{{ options.currentUrlPath }}" aria-label="Page 2 of 2">2</a></li>
-                {#                            <li class="moj-pagination__item"><a class="moj-pagination__link" href="{{ currentUrlPath+'&page=3' }}" aria-label="Page 3 of 30">3</a></li>#}
-                {#                            <li class="moj-pagination__item moj-pagination__item--dots">…</li>#}
-                {#                            <li class="moj-pagination__item"><a class="moj-pagination__link" href="{{ currentUrlPath+'&page=5' }}" aria-label="Page 5 of 30">5</a></li>#}
-                <li class="moj-pagination__item  moj-pagination__item--next">
-                    <a class="moj-pagination__link" href="">Next<span class="govuk-visually-hidden"> page</span></a>
-                </li>
-            </ul>
-        </nav>
-
+        {{ hmppsPagination(listMetadata.pagination) }}
     </div>
     <div>
-        <p class="moj-pagination__results">Showing <b>1</b> to <b>20</b> of <b>23</b> alerts</p>
+        {{ hmppsPaginationSummary(listMetadata.pagination) }}
     </div>
 </div>
 {% endmacro %}
