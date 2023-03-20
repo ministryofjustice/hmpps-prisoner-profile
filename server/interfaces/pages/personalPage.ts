@@ -42,7 +42,15 @@ export interface IdentityNumbers {
   pncNumber: string
   prisonNumber: string
 }
+
+export interface PropertyItem {
+  containerType: string
+  sealMark: string
+  location: string
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
+  property: PropertyItem[]
 }

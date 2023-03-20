@@ -54,7 +54,7 @@ export default class PersonalPage extends Page {
   }
 
   identityNumbers = () => {
-    const cardData = dataQa => cy.get('[data-qa=personal-details]').find(`[data-qa=${dataQa}]`)
+    const cardData = dataQa => cy.get('[data-qa=identity-numbers]').find(`[data-qa=${dataQa}]`)
     return {
       prisonNumber: () => cardData('prison-number'),
       pncNumber: () => cardData('pnc-number'),
@@ -62,6 +62,18 @@ export default class PersonalPage extends Page {
       homeOfficeReferenceNumber: () => cardData('home-office-reference-number'),
       nationalInsuranceNumber: () => cardData('national-insurance-number'),
       drivingLicenceNumber: () => cardData('driving-licence-number'),
+    }
+  }
+
+  property = () => {
+    const cardData = dataQa => cy.get('[data-qa=property]').find(`[data-qa=${dataQa}]`)
+    const propertyItem = itemNumber => cardData('property-item').eq(itemNumber)
+    return {
+      item: itemNumber => ({
+        containerType: () => propertyItem(itemNumber).find('[data-qa=container-type]'),
+        sealMark: () => propertyItem(itemNumber).find('.govuk-summary-list__value').eq(0),
+        location: () => propertyItem(itemNumber).find('.govuk-summary-list__value').eq(1),
+      }),
     }
   }
 }

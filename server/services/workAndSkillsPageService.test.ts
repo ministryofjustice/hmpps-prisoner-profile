@@ -48,6 +48,7 @@ describe('WorkAndSkillsService', () => {
     getOffenderAttendanceHistory: jest.fn(async () => OffenderAttendanceHistoryMock),
     getSecondaryLanguages: jest.fn(),
     getAlerts: jest.fn(async () => pagedActiveAlertsMock),
+    getProperty: jest.fn(),
   }
 
   const curiousApiClient: CuriousApiClient = {
