@@ -73,14 +73,16 @@ export default class WorkAndSkillsPageService {
     let UNACABLastSixMonths = 0
     let UNACABLastMonth = 0
 
-    offenderAttendanceHistory.content.forEach(absence => {
-      if (absence.outcome !== undefined && absence.outcome === 'UNACAB') {
-        UNACABLastSixMonths += 1
-        if (absence.eventDate > oneMonthAgo) {
-          UNACABLastMonth += 1
+    if (offenderAttendanceHistory !== undefined && offenderAttendanceHistory.content.length) {
+      offenderAttendanceHistory.content.forEach(absence => {
+        if (absence.outcome !== undefined && absence.outcome === 'UNACAB') {
+          UNACABLastSixMonths += 1
+          if (absence.eventDate > oneMonthAgo) {
+            UNACABLastMonth += 1
+          }
         }
-      }
-    })
+      })
+    }
 
     return { UNACABLastSixMonths, UNACABLastMonth }
   }
@@ -90,7 +92,7 @@ export default class WorkAndSkillsPageService {
     const offenderActivitiesHistory: OffenderActivitiesHistory =
       await this.prisonApiClient.getOffenderActivitiesHistory(prisonerNumber, oneYearAgo)
     const activitiesHistory: GovSummaryItem[] = []
-    if (offenderActivitiesHistory !== undefined) {
+    if (offenderActivitiesHistory !== undefined && offenderActivitiesHistory.content.length) {
       offenderActivitiesHistory.content.forEach(content => {
         const item = {
           key: { text: content.description },
