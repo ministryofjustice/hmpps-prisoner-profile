@@ -25,6 +25,7 @@ import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHisto
 import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -173,5 +174,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       ...queryParams,
     }
     return this.get<PagedList>({ path: `/api/bookings/${bookingId}/alerts/v2`, query: mapToQueryString(params) })
+  }
+
+  async getProperty(bookingId: number): Promise<PropertyContainer[]> {
+    return this.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` })
   }
 }

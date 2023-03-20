@@ -6,6 +6,7 @@ import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { Alias } from '../interfaces/prisoner'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
+import { propertyMock } from '../data/localMockData/property'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -30,6 +31,7 @@ describe('PersonalPageService', () => {
       getAlerts: jest.fn(),
       getOffenderActivitiesHistory: jest.fn(),
       getOffenderAttendanceHistory: jest.fn(),
+      getProperty: jest.fn(async () => propertyMock),
     }
   })
 
@@ -209,6 +211,18 @@ describe('PersonalPageService', () => {
       expect(identityNumbers.nationalInsuranceNumber).toEqual('AB123456A')
       expect(identityNumbers.pncNumber).toEqual(PrisonerMockDataA.pncNumber)
       expect(identityNumbers.prisonNumber).toEqual(PrisonerMockDataA.prisonerNumber)
+    })
+  })
+
+  describe('Property', () => {
+    it('Maps the data from the API', async () => {
+      const { property } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(property[0].containerType).toEqual('Valuables')
+      expect(property[0].sealMark).toEqual('MDA646165646')
+      expect(property[0].location).toEqual('Property Box 14')
+      expect(property[1].containerType).toEqual('Confiscated')
+      expect(property[1].sealMark).toEqual('Not entered')
+      expect(property[1].location).toEqual('Property Box 15')
     })
   })
 })
