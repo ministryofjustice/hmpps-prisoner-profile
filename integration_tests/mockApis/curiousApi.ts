@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import moment from 'moment'
+
 import { stubFor } from './wiremock'
 import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
 import { learnerEducation } from '../../server/data/localMockData/learnerEducation'
@@ -100,10 +103,13 @@ export default {
     })
   },
   stubGetOffenderAttendanceHistory: (prisonerNumber: string) => {
+    const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
+    const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
+
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/attendance-history\\?fromDate=2022-09-13&toDate=2022-12-13&page=0&size=20`,
+        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/attendance-history\\?fromDate=${sixMonthsAgo}&toDate=${todaysDate}&page=0&size=20`,
       },
       response: {
         status: 200,
@@ -115,10 +121,11 @@ export default {
     })
   },
   stubGetOffenderActivities: (prisonerNumber: string) => {
+    const oneYearAgo = moment().startOf('day').subtract(12, 'month').format('YYYY-MM-DD')
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/activities-history\\?earliestEndDate=2022-03-20`,
+        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/activities-history\\?earliestEndDate=${oneYearAgo}`,
       },
       response: {
         status: 200,
