@@ -16,6 +16,7 @@ context('When signed in', () => {
     cy.task('stubInmateDetail', 1102484)
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubSecondaryLanguages', 1102484)
+    cy.task('stubProperty', 1102484)
   })
 
   it('displays the personal details page', () => {
@@ -89,6 +90,21 @@ context('When signed in', () => {
       page.identityNumbers().homeOfficeReferenceNumber().should('include.text', 'A1234567')
       page.identityNumbers().nationalInsuranceNumber().should('include.text', 'AB123456A')
       page.identityNumbers().drivingLicenceNumber().should('include.text', 'ABCD/123456/AB9DE')
+    })
+  })
+
+  context('Property card', () => {
+    it('Displays the prisoners property', () => {
+      const page = visitPersonalDetailsPage()
+      page.property().item(0).containerType().should('include.text', 'Valuables')
+      page.property().item(0).sealMark().should('include.text', 'MDA646165646')
+      page.property().item(0).location().should('include.text', 'Property Box 14')
+      page.property().item(1).containerType().should('include.text', 'Confiscated')
+      page.property().item(1).sealMark().should('include.text', '')
+      page.property().item(1).location().should('include.text', 'Property Box 15')
+      page.property().item(2).containerType().should('include.text', 'Branston Storage')
+      page.property().item(2).sealMark().should('include.text', 'BOB')
+      page.property().item(2).location().should('include.text', 'Property Box 3')
     })
   })
 })

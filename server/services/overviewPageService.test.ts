@@ -59,6 +59,7 @@ describe('OverviewPageService', () => {
     getOffenderAttendanceHistory: jest.fn(),
     getSecondaryLanguages: jest.fn(),
     getAlerts: jest.fn(async () => pagedActiveAlertsMock),
+    getProperty: jest.fn(),
   }
 
   const allocationManagerApiClient: AllocationManagerClient = {

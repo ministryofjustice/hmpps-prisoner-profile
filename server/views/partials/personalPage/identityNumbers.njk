@@ -2,7 +2,7 @@
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Identity numbers", id: "identity-numbers"}) -%}
-  <div class="govuk-grid-row" data-qa="personal-details">
+  <div class="govuk-grid-row" data-qa="identity-numbers">
     <div class="govuk-grid-column-full">
       <dl class="govuk-summary-list">
         {{ summaryListRow("Prison number", identityNumbers.prisonNumber, "prison-number") }}

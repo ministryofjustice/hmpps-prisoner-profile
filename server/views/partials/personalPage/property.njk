@@ -1,8 +1,8 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% macro property(info) %}
-  <div class="hmpps-property">
-    <p class="hmpps-property__container-type">Property: {{ info.containerType }}</p>
+{% macro propertyItem(info) %}
+  <div class="hmpps-property" data-qa="property-item">
+    <p class="hmpps-property__container-type" data-qa="container-type">Property: {{ info.containerType }}</p>
     {{ govukSummaryList({
           rows: [
             { key: { text: "Seal mark"}, value: { text: info.sealMark} },
@@ -14,8 +14,9 @@
 {%- call summaryCard({title: "Property", id: "property"}) -%}
   <div class="govuk-grid-row" data-qa="property">
     <div class="govuk-grid-column-full">
-      {{ property({containerType: "Bulk", sealMark: "MDI10", location: "Property Box 12"}) }}
-      {{ property({containerType: "For Destruction", sealMark: "MDI10", location: "Property Box 13"}) }}
+      {% for item in property %}
+        {{ propertyItem({containerType: item.containerType, sealMark: item.sealMark, location: item.location}) }}
+      {% endfor %}
     </div>
   </div>
 {%- endcall -%}

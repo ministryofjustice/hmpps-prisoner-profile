@@ -13,10 +13,12 @@ export default class PersonalPageService {
   }
 
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
-    const [inmateDetail, prisonerDetail, secondaryLanguages] = await Promise.all([
-      this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
-      this.prisonApiClient.getPrisoner(prisonerData.prisonerNumber),
-      this.prisonApiClient.getSecondaryLanguages(prisonerData.bookingId),
+    const { bookingId, prisonerNumber } = prisonerData
+    const [inmateDetail, prisonerDetail, secondaryLanguages, property] = await Promise.all([
+      this.prisonApiClient.getInmateDetail(bookingId),
+      this.prisonApiClient.getPrisoner(prisonerNumber),
+      this.prisonApiClient.getSecondaryLanguages(bookingId),
+      this.prisonApiClient.getProperty(bookingId),
     ])
 
     const { profileInformation } = inmateDetail
@@ -89,6 +91,11 @@ export default class PersonalPageService {
         pncNumber: prisonerData.pncNumber || 'Not entered',
         prisonNumber: prisonerData.prisonerNumber,
       },
+      property: property.map(({ location, containerType, sealMark }) => ({
+        containerType,
+        sealMark: sealMark || 'Not entered',
+        location: location?.userDescription || 'Not entered',
+      })),
     }
   }
 }
