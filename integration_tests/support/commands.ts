@@ -26,6 +26,7 @@ Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber }) =
 })
 
 Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber }) => {
+  cy.task('stubEventsForProfileImage', prisonerNumber)
   cy.task('stubPrisonerData', prisonerNumber)
   cy.task('stubActiveAlerts', bookingId)
   cy.task('stubInactiveAlerts', bookingId)

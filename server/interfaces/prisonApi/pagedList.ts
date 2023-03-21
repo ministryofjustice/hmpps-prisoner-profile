@@ -31,7 +31,10 @@ export interface PagedList {
 
 export interface PagedListQueryParams {
   page?: number
-  alertStatus?: 'ACTIVE' | 'INACTIVE'
   size?: number
   sort?: string
+  from?: string
+  to?: string
+  alertStatus?: 'ACTIVE' | 'INACTIVE'
+  alertType?: string
 }

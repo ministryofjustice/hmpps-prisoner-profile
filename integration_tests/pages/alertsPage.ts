@@ -17,7 +17,7 @@ export default class AlertsPage extends Page {
 
   paginationSummaryFooter = (): PageElement => cy.get('.hmpps-paged-list-footer .moj-pagination__results')
 
-  paginationPreviousLink = (): PageElement => cy.get('.moj-pagination__item.moj-pagination__item--previous')
+  paginationPreviousLink = (): PageElement => cy.get('.moj-pagination__item.moj-pagination__item--prev')
 
   paginationNextLink = (): PageElement => cy.get('.moj-pagination__item.moj-pagination__item--next')
 
@@ -25,11 +25,11 @@ export default class AlertsPage extends Page {
 
   paginationHeaderPageLink = (): PageElement =>
     cy.get(
-      '.hmpps-paged-list-header .moj-pagination__item:not(.moj-pagination__item--active):not(.moj-pagination__item--previous):not(.moj-pagination__item--next)',
+      '.hmpps-paged-list-header .moj-pagination__item:not(.moj-pagination__item--active):not(.moj-pagination__item--prev):not(.moj-pagination__item--next)',
     )
 
   paginationFooterPageLink = (): PageElement =>
     cy.get(
-      '.hmpps-paged-list-footer .moj-pagination__item:not(.moj-pagination__item--active):not(.moj-pagination__item--previous):not(.moj-pagination__item--next)',
+      '.hmpps-paged-list-footer .moj-pagination__item:not(.moj-pagination__item--active):not(.moj-pagination__item--prev):not(.moj-pagination__item--next)',
     )
 }

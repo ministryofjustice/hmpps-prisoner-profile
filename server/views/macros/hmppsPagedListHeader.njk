@@ -1,23 +1,11 @@
 {%- from './hmppsPagination.njk' import hmppsPagination -%}
 {%- from './hmppsPaginationSummary.njk' import hmppsPaginationSummary -%}
+{%- from './hmppsSortSelector.njk' import hmppsSortSelector -%}
 
 {% macro hmppsPagedListHeader(listMetadata) %}
 <div class="hmpps-paged-list-header">
     <div>
-        <div>
-            <label class="govuk-label" for="sort">Sort by</label>
-            <select
-                    class="govuk-select"
-                    id="sort"
-                    name="sort"
-                    value={{ listMetadata.sort }}
-            >
-                <option value="created,Desc" {{ 'selected' if listMetadata.sort === 'created,Desc' }}>Created (most recent)</option>
-                <option value="created,Asc" {{ 'selected' if listMetadata.sort === 'created,Asc' }}>Created (oldest)</option>
-                <option value="updated,Desc" {{ 'selected' if listMetadata.sort === 'updated,Desc' }}>Last updated (most recent)</option>
-                <option value="updated,Asc" {{ 'selected' if listMetadata.sort === 'updated,Asc' }}>Last updated (oldest)</option>
-            </select>
-        </div>
+        {{ hmppsSortSelector(listMetadata.sorting) }}
         {{ hmppsPagination(listMetadata.pagination) }}
     </div>
     <div>

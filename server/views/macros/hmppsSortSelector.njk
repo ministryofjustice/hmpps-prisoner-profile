@@ -1,0 +1,27 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro hmppsSortSelector(params) %}
+<div>
+    <form id="{{ params.formId | default('sortForm')}}">
+        <label class="govuk-label" for="{{ params.id }}">{{ params.label }}</label>
+        <select
+                class="govuk-select hmpps-sort-selector__select"
+                id="{{ params.id }}"
+                name="{{ params.id }}"
+                value={{ params.sort }}
+        >
+            {% for option in params.options %}
+                <option value="{{ option.value }}" {{ 'selected' if params.sort === option.value }}>{{ option.description }}</option>
+            {% endfor %}
+        </select>
+        {{ govukButton({
+            text: "Sort",
+            classes: "hmpps-sort-selector__sort-button",
+            preventDoubleClick: true
+        }) }}
+    </form>
+</div>
+    {% block pageScripts %}
+        <script src="/assets/js/hmppsSortSelector.js" nonce="{{ cspNonce }}"></script>
+    {% endblock %}
+{%  endmacro %}

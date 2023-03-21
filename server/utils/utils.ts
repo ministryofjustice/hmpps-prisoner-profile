@@ -1,7 +1,8 @@
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { PagedList } from '../interfaces/prisonApi/pagedList'
+import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { ListMetadata } from '../interfaces/pages/alertsPageData'
+import { SortOption } from '../interfaces/sortSelector'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -182,17 +183,27 @@ export const formatName = (
  * but users expect page numbers in url, etc to be one based.
  *
  * @param pagedList
+ * @param queryParams
  * @param itemDescription
+ * @param sortOptions
+ * @param sortLabel
  */
-export const generateListMetadata = (pagedList: PagedList, itemDescription: string): ListMetadata => {
+export const generateListMetadata = (
+  pagedList: PagedList,
+  queryParams: PagedListQueryParams,
+  itemDescription: string,
+  sortOptions: SortOption[],
+  sortLabel: string,
+): ListMetadata => {
+  const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
+
   const pages =
     pagedList?.totalPages > 1
       ? [...Array(pagedList.totalPages).keys()].map(page => {
-          const url = `?page=${page + 1}`
           return {
             text: `${page + 1}`,
-            href: url,
+            href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
             selected: currentPage === page + 1,
           }
         })
@@ -201,19 +212,24 @@ export const generateListMetadata = (pagedList: PagedList, itemDescription: stri
   const next = pagedList?.last
     ? undefined
     : {
-        href: `?page=${currentPage + 1}`,
+        href: [`?page=${currentPage + 1}`, query].filter(Boolean).join('&'),
         text: 'Next',
       }
 
   const previous = pagedList?.first
     ? undefined
     : {
-        href: `?page=${currentPage - 1}`,
+        href: [`?page=${currentPage - 1}`, query].filter(Boolean).join('&'),
         text: 'Previous',
       }
 
-  return {
-    sort: 'created,Desc',
+  return <ListMetadata>{
+    sorting: {
+      id: 'sort',
+      label: sortLabel,
+      options: sortOptions,
+      sort: queryParams.sort,
+    },
     pagination: {
       itemDescription,
       previous,

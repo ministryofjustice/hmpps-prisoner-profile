@@ -232,7 +232,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=INACTIVE`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&alertStatus=INACTIVE`,
       },
       response: {
         status: 200,
