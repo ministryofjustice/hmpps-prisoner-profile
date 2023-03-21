@@ -1,0 +1,4 @@
+// Hide 'Sort' button if JavaScript is enabled - we attach onChange listener to the sort dropdown so don't need button
+.js-enabled .hmpps-sort-selector__sort-button {
+  display: none;
+}

@@ -1,8 +1,8 @@
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
 {% set options = {
     title: 'Filter',
-    id: 'alerts-filter',
-    clearUrl: currentUrlPath.split('?')[0]
+    id: 'alertsFilter',
+    currentUrlPath: currentUrlPath
 } %}
 {% set alertTypes = [
     {
@@ -53,10 +53,10 @@
             <input class="govuk-input" id="dateFrom" name="dateFrom" type="text" value="{{ dateFrom }}">
         </div>
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="dateTo" value="{{ dateTo }}">
+            <label class="govuk-label govuk-label--m" for="dateTo">
                 Date to
             </label>
-            <input class="govuk-input" id="dateTo" name="dateTo" type="text">
+            <input class="govuk-input" id="dateTo" name="dateTo" type="text" value="{{ dateTo }}">
         </div>
     </div>
 {%- endcall -%}

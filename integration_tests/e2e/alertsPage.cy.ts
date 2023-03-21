@@ -12,7 +12,7 @@ const visitActiveAlertsPage = (): AlertsPage => {
 }
 
 const visitInactiveAlertsPage = (): AlertsPage => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/inactive' })
+  cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/inactive?page=2' })
   return Page.verifyOnPageWithTitle(AlertsPage, 'Inactive alerts')
 }
 
@@ -79,16 +79,16 @@ context('Alerts Page', () => {
     })
 
     it('Displays the pagination correctly', () => {
-      alertsPage.paginationPreviousLink().should('not.exist')
-      alertsPage.paginationCurrentPage().contains('1')
+      alertsPage.paginationPreviousLink().should('exist')
+      alertsPage.paginationCurrentPage().contains('2')
       alertsPage.paginationNextLink().should('exist')
       alertsPage.paginationHeaderPageLink().should('have.length', 3)
       alertsPage.paginationFooterPageLink().should('have.length', 3)
     })
 
     it('Displays the pagination summary correctly', () => {
-      alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
-      alertsPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 alerts')
+      alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
+      alertsPage.paginationSummaryFooter().contains('Showing 21 to 40 of 80 alerts')
     })
   })
 

@@ -1,4 +1,5 @@
 import { PagedList } from '../prisonApi/pagedList'
+import { SortParams } from '../sortSelector'
 
 export interface AlertsPageData {
   pagedAlerts: PagedList
@@ -10,7 +11,7 @@ export interface AlertsPageData {
 }
 
 export interface ListMetadata {
-  sort: string
+  sorting: SortParams
   pagination: {
     itemDescription: string
     previous: { href: string; text: string }
