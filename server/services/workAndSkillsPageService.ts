@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import moment from 'moment'
-
+import { format, startOfToday, sub } from 'date-fns'
+import { AbsenceOutcomeCodes } from '../data/enums/absenceOutcomeCodes'
 import CuriousApiClient from '../data/interfaces/curiousApiClient'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { GovSummaryGroup, GovSummaryItem } from '../interfaces/govSummaryItem'
@@ -63,34 +62,35 @@ export default class WorkAndSkillsPageService {
   }
 
   private async getOffenderAttendanceHistoryStats(prisonerNumber: string) {
-    const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
-    const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
-    const oneMonthAgo = moment().startOf('day').subtract(1, 'month').format('YYYY-MM-DD')
+    const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
+    const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
+    const oneMonthAgo = format(sub(startOfToday(), { months: 1 }), 'yyyy-MM-dd')
     const offenderAttendanceHistory: OffenderAttendanceHistory =
       await this.prisonApiClient.getOffenderAttendanceHistory(prisonerNumber, sixMonthsAgo, todaysDate)
 
-    // UNACA means unacceptable absence
-    let UNACABLastSixMonths = 0
-    let UNACABLastMonth = 0
+    let unacceptableAbsenceLastSixMonths = 0
+    let unacceptableAbsenceLastMonth = 0
 
-    offenderAttendanceHistory.content.forEach(absence => {
-      if (absence.outcome !== undefined && absence.outcome === 'UNACAB') {
-        UNACABLastSixMonths += 1
-        if (absence.eventDate > oneMonthAgo) {
-          UNACABLastMonth += 1
+    if (offenderAttendanceHistory !== undefined && offenderAttendanceHistory.content.length) {
+      offenderAttendanceHistory.content.forEach(absence => {
+        if (absence.outcome !== undefined && absence.outcome === AbsenceOutcomeCodes.UNACAB) {
+          unacceptableAbsenceLastSixMonths += 1
+          if (absence.eventDate > oneMonthAgo) {
+            unacceptableAbsenceLastMonth += 1
+          }
         }
-      }
-    })
+      })
+    }
 
-    return { UNACABLastSixMonths, UNACABLastMonth }
+    return { unacceptableAbsenceLastSixMonths, unacceptableAbsenceLastMonth }
   }
 
   private async getOffenderActivitiesHistory(prisonerNumber: string) {
-    const oneYearAgo = moment().startOf('day').subtract(12, 'month').format('YYYY-MM-DD')
+    const oneYearAgo = format(sub(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
     const offenderActivitiesHistory: OffenderActivitiesHistory =
       await this.prisonApiClient.getOffenderActivitiesHistory(prisonerNumber, oneYearAgo)
     const activitiesHistory: GovSummaryItem[] = []
-    if (offenderActivitiesHistory !== undefined) {
+    if (offenderActivitiesHistory !== undefined && offenderActivitiesHistory.content.length) {
       offenderActivitiesHistory.content.forEach(content => {
         const item = {
           key: { text: content.description },

@@ -4,7 +4,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
   content: [
     {
       bookingId: 1102484,
-      eventDate: '2022-09-13',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -12,7 +12,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-13',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -20,7 +20,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-14',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -28,7 +28,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-14',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -36,7 +36,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-15',
+      eventDate: '2023-09-20',
       outcome: 'ATT',
       code: 'BRICK-AM',
       description: 'Bricks AM',
@@ -45,7 +45,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-15',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -53,7 +53,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-16',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -61,7 +61,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-16',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -69,7 +69,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-19',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -77,7 +77,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-19',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -85,7 +85,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-20',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -93,7 +93,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-20',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -101,7 +101,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-21',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -109,7 +109,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-21',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -117,7 +117,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-22',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -125,7 +125,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-22',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -133,7 +133,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-23',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -141,7 +141,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-23',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',
@@ -149,7 +149,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-26',
+      eventDate: '2023-09-20',
       code: 'BRICK-AM',
       description: 'Bricks AM',
       prisonId: 'MDI',
@@ -157,7 +157,7 @@ export const OffenderAttendanceHistoryMock: OffenderAttendanceHistory = {
     },
     {
       bookingId: 1102484,
-      eventDate: '2022-09-26',
+      eventDate: '2023-09-20',
       code: 'WASTE.AM',
       description: 'Waste Management AM',
       prisonId: 'MDI',

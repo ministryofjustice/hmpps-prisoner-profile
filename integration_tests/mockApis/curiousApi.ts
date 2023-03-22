@@ -1,3 +1,4 @@
+import { format, startOfToday, sub } from 'date-fns'
 import { stubFor } from './wiremock'
 import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
 import { learnerEducation } from '../../server/data/localMockData/learnerEducation'
@@ -9,7 +10,7 @@ import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/o
 import { OffenderActivitiesMock } from '../../server/data/localMockData/offenderActivitiesMock'
 
 export default {
-  stubGetLearnerEmployabilitySkills: (prisonerNumber: number) => {
+  stubGetLearnerEmployabilitySkills: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -24,7 +25,7 @@ export default {
       },
     })
   },
-  stubGetLearnerEducation: (prisonerNumber: number) => {
+  stubGetLearnerEducation: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -39,7 +40,7 @@ export default {
       },
     })
   },
-  stubGetLearnerProfile: (prisonerNumber: number) => {
+  stubGetLearnerProfile: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -54,7 +55,7 @@ export default {
       },
     })
   },
-  stubGetLearnerLatestAssessments: (prisonerNumber: number) => {
+  stubGetLearnerLatestAssessments: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -69,7 +70,7 @@ export default {
       },
     })
   },
-  stubGetLearnerGoals: (prisonerNumber: number) => {
+  stubGetLearnerGoals: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -84,7 +85,7 @@ export default {
       },
     })
   },
-  stubGetLearnerNeurodivergence: (prisonerNumber: number) => {
+  stubGetLearnerNeurodivergence: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -99,11 +100,13 @@ export default {
       },
     })
   },
-  stubGetOffenderAttendanceHistory: (prisonerNumber: number, fromDate: string, toDate: string) => {
+  stubGetOffenderAttendanceHistory: (prisonerNumber: string) => {
+    const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
+    const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
     return stubFor({
       request: {
         method: 'GET',
-        urlPathPattern: `/prison/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=20`,
+        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/attendance-history\\?fromDate=${sixMonthsAgo}&toDate=${todaysDate}&page=0&size=20`,
       },
       response: {
         status: 200,
@@ -114,11 +117,12 @@ export default {
       },
     })
   },
-  stubGetOffenderActivities: (prisonerNumber: number) => {
+  stubGetOffenderActivities: (prisonerNumber: string) => {
+    const oneYearAgo = format(sub(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
     return stubFor({
       request: {
         method: 'GET',
-        urlPathPattern: `/prison/api/offender-activities/${prisonerNumber}/activities-history?earliestEndDate=1980-01-02`,
+        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/activities-history\\?earliestEndDate=${oneYearAgo}`,
       },
       response: {
         status: 200,

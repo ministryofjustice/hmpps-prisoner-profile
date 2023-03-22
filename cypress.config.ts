@@ -8,6 +8,7 @@ import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearch'
 import pomApi from './integration_tests/mockApis/pom'
 import keyWorkerApi from './integration_tests/mockApis/keyWorker'
+import curiousApi from './integration_tests/mockApis/curiousApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -35,6 +36,7 @@ export default defineConfig({
         ...prisonerSearchApi,
         ...pomApi,
         ...keyWorkerApi,
+        ...curiousApi,
       })
     },
     baseUrl: 'http://localhost:3007',
