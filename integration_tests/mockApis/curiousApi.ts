@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import moment from 'moment'
-
+import { format, startOfToday, sub } from 'date-fns'
 import { stubFor } from './wiremock'
 import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
 import { learnerEducation } from '../../server/data/localMockData/learnerEducation'
@@ -103,9 +101,8 @@ export default {
     })
   },
   stubGetOffenderAttendanceHistory: (prisonerNumber: string) => {
-    const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
-    const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
-
+    const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
+    const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
     return stubFor({
       request: {
         method: 'GET',
@@ -121,7 +118,7 @@ export default {
     })
   },
   stubGetOffenderActivities: (prisonerNumber: string) => {
-    const oneYearAgo = moment().startOf('day').subtract(12, 'month').format('YYYY-MM-DD')
+    const oneYearAgo = format(sub(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
     return stubFor({
       request: {
         method: 'GET',

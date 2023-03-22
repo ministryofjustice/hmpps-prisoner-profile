@@ -24,11 +24,11 @@
             <h3 class="govuk-heading-s">Last 30 days</h3>       
         </div>
         <div class="govuk-grid-column-two-thirds govuk-!-padding-left-0">
-            {{ unacceptableAbsences.UNACABLastMonth }}
+            {{ unacceptableAbsences.unacceptableAbsenceLastMonth }}
         </div>
     </div>
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
-    {% if(unacceptableAbsences.UNACABLastSixMonths === 0) %}
+    {% if(unacceptableAbsences.unacceptableAbsenceLastSixMonths === 0) %}
         <p>{{ prisonerName }} has no unacceptable absences in the last 6 months.</p>
     {% endif %}
 {%- endcall -%}
