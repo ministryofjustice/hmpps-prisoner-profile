@@ -17,6 +17,7 @@ import { OffenderAttendanceHistory } from '../../interfaces/offenderAttendanceHi
 import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
+import { Address } from '../../interfaces/prisonApi/address'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -42,4 +43,5 @@ export interface PrisonApiClient {
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
   getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
+  getAddresses(bookingId: number): Promise<Address[]>
 }

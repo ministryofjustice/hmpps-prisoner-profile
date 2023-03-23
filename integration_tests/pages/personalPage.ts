@@ -76,4 +76,16 @@ export default class PersonalPage extends Page {
       }),
     }
   }
+
+  addresess = () => {
+    const cardData = () => cy.get('[data-qa=addresses]')
+    const summaryListValues = () => cardData().find('.govuk-summary-list__value')
+    return {
+      address: () => summaryListValues().eq(0),
+      addressTypes: () => summaryListValues().eq(1),
+      phoneNumbers: () => summaryListValues().eq(2),
+      comments: () => summaryListValues().eq(3),
+      addedOn: () => cardData().find('[data-qa=address-added-on]'),
+    }
+  }
 }

@@ -21,6 +21,7 @@ import { secondaryLanguagesMock } from './localMockData/secondaryLanguages'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
+import { mockAddresses } from './localMockData/addresses'
 
 jest.mock('./tokenStore')
 
@@ -220,6 +221,15 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/property`, propertyMock)
       const output = await prisonApiClient.getProperty(bookingId)
       expect(output).toEqual(propertyMock)
+    })
+  })
+
+  describe('getAddresses', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/addresses`, mockAddresses)
+      const output = await prisonApiClient.getAddresses(bookingId)
+      expect(output).toEqual(mockAddresses)
     })
   })
 })

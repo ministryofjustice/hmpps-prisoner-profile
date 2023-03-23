@@ -49,8 +49,28 @@ export interface PropertyItem {
   location: string
 }
 
+export interface Address {
+  flat?: string
+  premise?: string
+  street?: string
+  locality?: string
+  town?: string
+  postalCode?: string
+  county?: string
+  country?: string
+}
+
+export interface Addresses {
+  address: Address
+  comment: string
+  addressTypes: string[]
+  phones: string[]
+  addedOn: string
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
+  addresses: Addresses
 }

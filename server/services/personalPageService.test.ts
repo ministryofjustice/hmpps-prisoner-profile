@@ -7,6 +7,7 @@ import { Alias } from '../interfaces/prisoner'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
+import { mockAddresses } from '../data/localMockData/addresses'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -32,6 +33,7 @@ describe('PersonalPageService', () => {
       getOffenderActivitiesHistory: jest.fn(),
       getOffenderAttendanceHistory: jest.fn(),
       getProperty: jest.fn(async () => propertyMock),
+      getAddresses: jest.fn(async () => mockAddresses),
     }
   })
 
@@ -223,6 +225,31 @@ describe('PersonalPageService', () => {
       expect(property[1].containerType).toEqual('Confiscated')
       expect(property[1].sealMark).toEqual('Not entered')
       expect(property[1].location).toEqual('Property Box 15')
+    })
+  })
+
+  describe('Addresses', () => {
+    it('Maps the data from the API for the primary address', async () => {
+      const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const expectedAddress = mockAddresses[0]
+      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
+      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
+
+      expect(addresses.addedOn).toEqual(expectedAddress.startDate)
+      expect(addresses.comment).toEqual(expectedAddress.comment)
+      expect(addresses.phones).toEqual(expectedPhones)
+      expect(addresses.addressTypes).toEqual(expectedTypes)
+
+      const { country, county, flat, locality, postalCode, premise, street, town } = addresses.address
+
+      expect(country).toEqual(expectedAddress.country)
+      expect(county).toEqual(expectedAddress.county)
+      expect(flat).toEqual(expectedAddress.flat)
+      expect(locality).toEqual(expectedAddress.locality)
+      expect(postalCode).toEqual(expectedAddress.postalCode)
+      expect(premise).toEqual(expectedAddress.premise)
+      expect(street).toEqual(expectedAddress.street)
+      expect(town).toEqual(expectedAddress.town)
     })
   })
 })

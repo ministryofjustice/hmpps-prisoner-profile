@@ -12,6 +12,7 @@ import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMo
 import { prisonerDetailMock } from '../../server/data/localMockData/prisonerDetailMock'
 import { secondaryLanguagesMock } from '../../server/data/localMockData/secondaryLanguages'
 import { propertyMock } from '../../server/data/localMockData/property'
+import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { offenderContact } from '../../server/data/localMockData/offenderContacts'
 import { mapToQueryString } from '../../server/utils/utils'
@@ -219,6 +220,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: propertyMock,
+      },
+    })
+  },
+
+  stubAddresses: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/addresses`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockAddresses,
       },
     })
   },
