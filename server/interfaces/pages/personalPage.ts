@@ -1,3 +1,5 @@
+import { Address } from '../address'
+
 export interface PersonalDetails {
   age: string
   aliases: {
@@ -47,17 +49,6 @@ export interface PropertyItem {
   containerType: string
   sealMark: string
   location: string
-}
-
-export interface Address {
-  flat?: string
-  premise?: string
-  street?: string
-  locality?: string
-  town?: string
-  postalCode?: string
-  county?: string
-  country?: string
 }
 
 export interface Addresses {

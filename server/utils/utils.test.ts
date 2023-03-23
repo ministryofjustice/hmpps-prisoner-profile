@@ -15,7 +15,7 @@ import {
   addressToLines,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { Address } from '../interfaces/pages/personalPage'
+import { Address } from '../interfaces/address'
 
 describe('convert to title case', () => {
   it.each([

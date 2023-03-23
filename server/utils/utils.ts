@@ -3,7 +3,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { ListMetadata } from '../interfaces/pages/alertsPageData'
 import { SortOption } from '../interfaces/sortSelector'
-import { Address } from '../interfaces/pages/personalPage'
+import { Address } from '../interfaces/address'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
