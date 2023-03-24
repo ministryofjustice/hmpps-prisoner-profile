@@ -12,8 +12,10 @@ import {
   arrayToQueryString,
   yearsBetweenDateStrings,
   formatName,
+  addressToLines,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { Address } from '../interfaces/address'
 
 describe('convert to title case', () => {
   it.each([
@@ -225,4 +227,41 @@ describe('format name', () => {
       expect(formatName(firstName, middleNames, lastName, options)).toEqual(expected)
     },
   )
+})
+
+describe('Address to lines', () => {
+  it('Maps a full address', () => {
+    const address: Address = {
+      flat: '7',
+      premise: 'premises address',
+      street: 'street field',
+      locality: 'locality field',
+      town: 'Leeds',
+      postalCode: 'LS1 AAA',
+      county: 'West Yorkshire',
+      country: 'England',
+    }
+
+    const lines = addressToLines(address)
+    expect(lines[0]).toEqual('Flat 7, premises address, street field')
+    expect(lines[1]).toEqual('Leeds')
+    expect(lines[2]).toEqual('LS1 AAA')
+    expect(lines[3]).toEqual('England')
+  })
+
+  it('Maps a partial address', () => {
+    const address: Address = {
+      premise: 'premises address',
+      street: 'street field',
+      locality: 'locality field',
+      postalCode: 'LS1 AAA',
+      county: 'West Yorkshire',
+      country: 'England',
+    }
+
+    const lines = addressToLines(address)
+    expect(lines[0]).toEqual('premises address, street field')
+    expect(lines[1]).toEqual('LS1 AAA')
+    expect(lines[2]).toEqual('England')
+  })
 })

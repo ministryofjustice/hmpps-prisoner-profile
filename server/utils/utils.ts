@@ -3,6 +3,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { ListMetadata } from '../interfaces/pages/alertsPageData'
 import { SortOption } from '../interfaces/sortSelector'
+import { Address } from '../interfaces/address'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -243,4 +244,12 @@ export const generateListMetadata = (
       pages,
     },
   }
+}
+
+export const addressToLines = ({ flat, premise, street, town, postalCode, country }: Address): string[] => {
+  let lineOne = [premise, street].filter(s => s).join(', ')
+  if (flat) {
+    lineOne = `Flat ${flat}, ${lineOne}`
+  }
+  return [lineOne, town, postalCode, country].filter(s => s)
 }

@@ -14,11 +14,12 @@ export default class PersonalPageService {
 
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
     const { bookingId, prisonerNumber } = prisonerData
-    const [inmateDetail, prisonerDetail, secondaryLanguages, property] = await Promise.all([
+    const [inmateDetail, prisonerDetail, secondaryLanguages, property, addresses] = await Promise.all([
       this.prisonApiClient.getInmateDetail(bookingId),
       this.prisonApiClient.getPrisoner(prisonerNumber),
       this.prisonApiClient.getSecondaryLanguages(bookingId),
       this.prisonApiClient.getProperty(bookingId),
+      this.prisonApiClient.getAddresses(bookingId),
     ])
 
     const { profileInformation } = inmateDetail
@@ -29,6 +30,8 @@ export default class PersonalPageService {
     }))
 
     const todaysDateString = new Date().toISOString()
+
+    const primaryAddress = addresses.find(address => address.primary)
 
     return {
       personalDetails: {
@@ -96,6 +99,24 @@ export default class PersonalPageService {
         sealMark: sealMark || 'Not entered',
         location: location?.userDescription || 'Not entered',
       })),
+      addresses: {
+        comment: primaryAddress.comment,
+        phones: primaryAddress.phones.map(phone => phone.number),
+        addressTypes: primaryAddress.addressUsages
+          .filter(usage => usage.activeFlag && usage.activeFlag)
+          .map(usage => usage.addressUsageDescription),
+        address: {
+          country: primaryAddress.country,
+          county: primaryAddress.county,
+          flat: primaryAddress.flat,
+          locality: primaryAddress.locality,
+          postalCode: primaryAddress.postalCode,
+          premise: primaryAddress.premise,
+          street: primaryAddress.street,
+          town: primaryAddress.town,
+        },
+        addedOn: primaryAddress.startDate,
+      },
     }
   }
 }

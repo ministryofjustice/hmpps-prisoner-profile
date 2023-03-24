@@ -1,3 +1,4 @@
+import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { yearsBetweenDateStrings } from '../../server/utils/utils'
 import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
@@ -17,6 +18,7 @@ context('When signed in', () => {
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubSecondaryLanguages', 1102484)
     cy.task('stubProperty', 1102484)
+    cy.task('stubAddresses', 1102484)
   })
 
   it('displays the personal details page', () => {
@@ -105,6 +107,28 @@ context('When signed in', () => {
       page.property().item(2).containerType().should('include.text', 'Branston Storage')
       page.property().item(2).sealMark().should('include.text', 'BOB')
       page.property().item(2).location().should('include.text', 'Property Box 3')
+    })
+  })
+
+  context('Addresses', () => {
+    it('Displays the prisoners address', () => {
+      const page = visitPersonalDetailsPage()
+      page.addresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.addresess().address().should('include.text', 'Leeds')
+      page.addresess().address().should('include.text', 'LS1 AAA')
+      page.addresess().address().should('include.text', 'England')
+
+      page.addresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
+      page.addresess().addressTypes().should('include.text', 'HDC Address')
+      page.addresess().addressTypes().should('include.text', 'Other')
+
+      page.addresess().phoneNumbers().should('include.text', '4444555566')
+      page.addresess().phoneNumbers().should('include.text', '0113444444')
+      page.addresess().phoneNumbers().should('include.text', '0113 333444')
+      page.addresess().phoneNumbers().should('include.text', '0800 222333')
+
+      page.addresess().comments().should('include.text', mockAddresses[0].comment)
+      page.addresess().addedOn().should('include.text', '1 May 2020')
     })
   })
 })
