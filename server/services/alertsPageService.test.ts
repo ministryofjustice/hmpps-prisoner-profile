@@ -39,7 +39,7 @@ describe('Alerts Page', () => {
       expect(getAlertsSpy).toHaveBeenCalledWith(prisonerData.bookingId, queryParams)
 
       expect(alertsPageData.pagedAlerts).toEqual(pagedActiveAlertsMock)
-      expect(alertsPageData.alertsCodes).toEqual(inmateDetailMock.alertsCodes)
+      // expect(alertsPageData.alertsCodes).toEqual(inmateDetailMock.alertsCodes)
       expect(alertsPageData.activeAlertCount).toEqual(80)
       expect(alertsPageData.inactiveAlertCount).toEqual(0)
       expect(alertsPageData.fullName).toEqual('John Smith')
@@ -60,7 +60,7 @@ describe('Alerts Page', () => {
       expect(getAlertsSpy).toHaveBeenCalledWith(prisonerData.bookingId, queryParams)
 
       expect(alertsPageData.pagedAlerts).toEqual(pagedInactiveAlertsMock)
-      expect(alertsPageData.alertsCodes).toEqual(inmateDetailMock.alertsCodes)
+      // expect(alertsPageData.alertsCodes).toEqual(inmateDetailMock.alertsCodes)
       expect(alertsPageData.activeAlertCount).toEqual(0)
       expect(alertsPageData.inactiveAlertCount).toEqual(80)
       expect(alertsPageData.fullName).toEqual('John Smith')

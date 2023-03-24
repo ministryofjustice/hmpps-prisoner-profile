@@ -1,16 +1,22 @@
 import { PagedList } from '../prisonApi/pagedList'
 import { SortParams } from '../sortSelector'
+import { AlertTypeFilter } from '../alertsMetadata'
 
 export interface AlertsPageData {
   pagedAlerts: PagedList
   listMetadata: ListMetadata
-  alertsCodes: string[]
+  alertTypes: AlertTypeFilter[]
   activeAlertCount: number
   inactiveAlertCount: number
   fullName: string
 }
 
 export interface ListMetadata {
+  filtering: {
+    from: string
+    to: string
+    queryParams?: { [key: string]: string | number }
+  }
   sorting: SortParams
   pagination: {
     itemDescription: string

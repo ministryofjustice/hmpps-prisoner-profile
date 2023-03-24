@@ -8,4 +8,5 @@ export interface SortParams {
   label: string
   options: SortOption[]
   sort: string
+  queryParams: { [key: string]: string | number }
 }

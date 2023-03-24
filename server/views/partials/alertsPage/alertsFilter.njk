@@ -2,30 +2,9 @@
 {% set options = {
     title: 'Filter',
     id: 'alertsFilter',
-    currentUrlPath: currentUrlPath
+    currentUrlPath: currentUrlPath,
+    queryParams: listMetadata.filtering.queryParams
 } %}
-{% set alertTypes = [
-    {
-        code: 'ABC',
-        description: 'Hold against transfer',
-        count: 1,
-        checked: true
-    },
-    {
-        code: 'DEF',
-        description: 'Risk',
-        count: 2,
-        checked: false
-    },
-    {
-        code: 'GHI',
-        description: 'Security',
-        count: 3,
-        checked: true
-    }
-] %}
-{% set dateFrom = '2023-01-31' %}
-{% set dateTo = '' %}
 {%- call hmppsSideFilter(options) -%}
     <div class="govuk-form-group">
         {% if alertTypes.length %}
@@ -47,16 +26,16 @@
         </fieldset>
         {% endif %}
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="dateFrom">
+            <label class="govuk-label govuk-label--m" for="from">
                 Date from
             </label>
-            <input class="govuk-input" id="dateFrom" name="dateFrom" type="text" value="{{ dateFrom }}">
+            <input class="govuk-input" id="from" name="from" type="text" value="{{ listMetadata.filtering.from }}">
         </div>
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="dateTo">
+            <label class="govuk-label govuk-label--m" for="to">
                 Date to
             </label>
-            <input class="govuk-input" id="dateTo" name="dateTo" type="text" value="{{ dateTo }}">
+            <input class="govuk-input" id="to" name="to" type="text" value="{{ listMetadata.filtering.to }}">
         </div>
     </div>
 {%- endcall -%}

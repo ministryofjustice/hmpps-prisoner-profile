@@ -225,11 +225,17 @@ export const generateListMetadata = (
       }
 
   return <ListMetadata>{
+    filtering: {
+      from: queryParams.from,
+      to: queryParams.to,
+      queryParams: { sort: queryParams.sort },
+    },
     sorting: {
       id: 'sort',
       label: sortLabel,
       options: sortOptions,
       sort: queryParams.sort,
+      queryParams: { alertType: queryParams.alertType, from: queryParams.from, to: queryParams.to },
     },
     pagination: {
       itemDescription,

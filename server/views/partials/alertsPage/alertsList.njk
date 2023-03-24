@@ -10,6 +10,17 @@
                 {{ alertCard(alert) }}
             {% endfor %}
         </div>
+        {% if not listMetadata.pagination.totalElements %}
+            <div>
+                <p>No {{ 'active' if activeTab else 'inactive' }} alerts have been found for the chosen dates.</p>
+                <p>You can:</p>
+                <ul>
+                    <li>choose different dates</li>
+                    <li>select different types of alert</li>
+                    <li>clear filters to view all {{ 'active' if activeTab else 'inactive' }} alerts</li>
+                </ul>
+            </div>
+        {% endif %}
     </div>
 </div>
 {{ hmppsPagedListFooter(listMetadata) }}

@@ -15,6 +15,7 @@ import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
 import AlertsPageService from '../services/alertsPageService'
+import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -103,10 +104,13 @@ export default function routes(service: Services): Router {
     const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
     // Parse query params for paging, sorting and filtering data
-    const queryParams = {
-      page: req.query.page ? +req.query.page - 1 : undefined, // Change page to zero based for API query
-      sort: req.query.sort ? (req.query.sort as string) : undefined,
-    }
+    const queryParams: PagedListQueryParams = {}
+    if (req.query.page) queryParams.page = +req.query.page - 1 // Change page to zero based for API query
+    if (req.query.sort) queryParams.sort = req.query.sort as string
+    if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
+    if (req.query.from) queryParams.from = req.query.from as string
+    if (req.query.to) queryParams.to = req.query.to as string
+
     const alertsPageService = new AlertsPageService(prisonApiClient)
     const alertsPageData = await alertsPageService.get(prisonerData, {
       ...queryParams,
@@ -126,10 +130,13 @@ export default function routes(service: Services): Router {
     const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
     // Parse query params for paging, sorting and filtering data
-    const queryParams = {
-      page: req.query.page ? +req.query.page - 1 : undefined, // Change page to zero based for API query
-      sort: req.query.sort ? (req.query.sort as string) : undefined,
-    }
+    const queryParams: PagedListQueryParams = {}
+    if (req.query.page) queryParams.page = +req.query.page - 1 // Change page to zero based for API query
+    if (req.query.sort) queryParams.sort = req.query.sort as string
+    if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
+    if (req.query.from) queryParams.from = req.query.from as string
+    if (req.query.to) queryParams.to = req.query.to as string
+
     const alertsPageService = new AlertsPageService(prisonApiClient)
     const alertsPageData = await alertsPageService.get(prisonerData, {
       ...queryParams,

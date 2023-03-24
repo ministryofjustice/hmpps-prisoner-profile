@@ -14,6 +14,15 @@
                 <option value="{{ option.value }}" {{ 'selected' if params.sort === option.value }}>{{ option.description }}</option>
             {% endfor %}
         </select>
+        {% for key, val in params.queryParams %}
+            {% if val and val is iterable and val is not string %}
+                {% for i in val %}
+                    <input type="hidden" name="{{ key }}" value="{{ i }}">
+                {% endfor %}
+            {% elseif val %}
+                <input type="hidden" name="{{ key }}" value="{{ val }}">
+            {% endif %}
+        {% endfor %}
         {{ govukButton({
             text: "Sort",
             classes: "hmpps-sort-selector__sort-button",

@@ -4,9 +4,9 @@
         <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertTypeDescription }}</div>
         <div class="hmpps-alert-card-list-item__title">{{ alert.alertCodeDescription }}</div>
         <div class="hmpps-alert-card-list-item__notes">{{ alert.comment }}</div>
-        <div class="hmpps-alert-card-list-item__metadata">Created: {{ alert.dateCreated | formatDate }} by {{ alert.addedByFirstName }} {{ alert.addedByLastName }}</div>
+        <div class="hmpps-alert-card-list-item__metadata">Created: {{ alert.dateCreated | formatDate }} by {{ alert.addedByFullName }}</div>
         {% if not alert.active %}
-        <div class="hmpps-alert-card-list-item__metadata">Closed: {{ alert.dateExpires | formatDate }} by {{ alert.expiredByFirstName }} {{ alert.expiredByLastName }}</div>
+        <div class="hmpps-alert-card-list-item__metadata">Closed: {{ alert.dateExpires | formatDate }} by {{ alert.expiredByFullName }}</div>
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">
