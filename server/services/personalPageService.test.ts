@@ -34,7 +34,8 @@ describe('PersonalPageService', () => {
       getOffenderAttendanceHistory: jest.fn(),
       getProperty: jest.fn(async () => propertyMock),
       getAddresses: jest.fn(async () => mockAddresses),
-      getAddressForPerson: jest.fn(),
+      getAddressesForPerson: jest.fn(),
+      getOffenderContacts: jest.fn(),
     }
   })
 

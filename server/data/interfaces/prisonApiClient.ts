@@ -18,6 +18,7 @@ import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
 import { Address } from '../../interfaces/prisonApi/address'
+import { OffenderContacts } from '../../interfaces/prisonApi/offenderContacts'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -44,5 +45,6 @@ export interface PrisonApiClient {
   getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
   getAddresses(bookingId: number): Promise<Address[]>
-  getAddressForPerson(personId: number): Promise<Address[]>
+  getAddressesForPerson(personId: number): Promise<Address[]>
+  getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
 }

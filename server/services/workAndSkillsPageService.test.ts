@@ -50,7 +50,8 @@ describe('WorkAndSkillsService', () => {
     getAlerts: jest.fn(async () => pagedActiveAlertsMock),
     getProperty: jest.fn(),
     getAddresses: jest.fn(),
-    getAddressForPerson: jest.fn(),
+    getAddressesForPerson: jest.fn(),
+    getOffenderContacts: jest.fn(),
   }
 
   const curiousApiClient: CuriousApiClient = {

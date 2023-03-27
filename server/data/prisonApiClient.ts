@@ -27,6 +27,7 @@ import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { Address } from '../interfaces/prisonApi/address'
+import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -185,7 +186,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<Address[]>({ path: `/api/bookings/${bookingId}/addresses` })
   }
 
-  async getAddressForPerson(personId: number): Promise<Address[]> {
+  async getAddressesForPerson(personId: number): Promise<Address[]> {
     return this.get<Address[]>({ path: `/api/persons/${personId}/addresses` })
+  }
+
+  getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
+    return this.get<OffenderContacts>({ path: `/api/offenders/${prisonerNumber}/contacts` })
   }
 }
