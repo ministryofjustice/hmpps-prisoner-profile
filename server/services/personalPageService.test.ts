@@ -23,7 +23,7 @@ describe('PersonalPageService', () => {
       getAdjudications: jest.fn(),
       getAccountBalances: jest.fn(),
       getAssessments: jest.fn(),
-      getOffenderContacts: jest.fn(),
+      getBookingContacts: jest.fn(),
       getCaseNoteSummaryByTypes: jest.fn(),
       getPrisoner: jest.fn(async () => prisonerDetailMock),
       getInmateDetail: jest.fn(async () => inmateDetailMock),
@@ -34,6 +34,7 @@ describe('PersonalPageService', () => {
       getOffenderAttendanceHistory: jest.fn(),
       getProperty: jest.fn(async () => propertyMock),
       getAddresses: jest.fn(async () => mockAddresses),
+      getAddressForPerson: jest.fn(),
     }
   })
 

@@ -13,7 +13,7 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/prisonApi/assessment'
-import { OffenderContact } from '../interfaces/staffContacts'
+import { ContactDetail } from '../interfaces/staffContacts'
 import { mapToQueryString } from '../utils/utils'
 import { CaseNote } from '../interfaces/caseNote'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
@@ -114,9 +114,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     )
   }
 
-  async getOffenderContacts(bookingId: number): Promise<OffenderContact> {
+  async getBookingContacts(bookingId: number): Promise<ContactDetail> {
     try {
-      return await this.restClient.get<OffenderContact>({ path: `/api/bookings/${bookingId}/contacts` })
+      return await this.restClient.get<ContactDetail>({ path: `/api/bookings/${bookingId}/contacts` })
     } catch (error) {
       return error
     }
@@ -183,5 +183,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getAddresses(bookingId: number): Promise<Address[]> {
     return this.get<Address[]>({ path: `/api/bookings/${bookingId}/addresses` })
+  }
+
+  async getAddressForPerson(personId: number): Promise<Address[]> {
+    return this.get<Address[]>({ path: `/api/persons/${personId}/addresses` })
   }
 }

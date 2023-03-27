@@ -14,7 +14,7 @@ import { secondaryLanguagesMock } from '../../server/data/localMockData/secondar
 import { propertyMock } from '../../server/data/localMockData/property'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
-import { offenderContact } from '../../server/data/localMockData/offenderContacts'
+import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import {
   emptyAlertsMock,
@@ -156,7 +156,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: offenderContact,
+        jsonBody: mockContactDetail,
       },
     })
   },

@@ -6,7 +6,7 @@ import { AdjudicationSummary } from '../../interfaces/adjudicationSummary'
 import { VisitSummary } from '../../interfaces/visitSummary'
 import { VisitBalances } from '../../interfaces/visitBalances'
 import { Assessment } from '../../interfaces/prisonApi/assessment'
-import { OffenderContact } from '../../interfaces/staffContacts'
+import { ContactDetail } from '../../interfaces/staffContacts'
 import { CaseNote } from '../../interfaces/caseNote'
 import { ScheduledEvent } from '../../interfaces/scheduledEvent'
 import { PrisonerDetail } from '../../interfaces/prisonerDetail'
@@ -28,7 +28,7 @@ export interface PrisonApiClient {
   getVisitSummary(bookingId: number): Promise<VisitSummary>
   getVisitBalances(prisonerNumber: string): Promise<VisitBalances>
   getAssessments(bookingId: number): Promise<Assessment[]>
-  getOffenderContacts(bookingId: number): Promise<OffenderContact>
+  getBookingContacts(bookingId: number): Promise<ContactDetail>
   getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]>
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
   getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
@@ -44,4 +44,5 @@ export interface PrisonApiClient {
   getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
   getAddresses(bookingId: number): Promise<Address[]>
+  getAddressForPerson(personId: number): Promise<Address[]>
 }

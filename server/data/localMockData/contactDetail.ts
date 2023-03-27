@@ -1,6 +1,6 @@
-import { OffenderContact } from '../../interfaces/staffContacts'
+import { ContactDetail } from '../../interfaces/staffContacts'
 
-export const offenderContact: OffenderContact = {
+export const mockContactDetail: ContactDetail = {
   bookingId: 0,
   nextOfKin: [
     {
@@ -53,5 +53,5 @@ export const offenderContact: OffenderContact = {
 }
 
 export default {
-  offenderContact,
+  offenderContact: mockContactDetail,
 }
