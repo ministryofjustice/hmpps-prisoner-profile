@@ -137,22 +137,23 @@ export default class PersonalPageService {
   private addresses(addresses: Address[]): Addresses {
     const primaryAddress = addresses.find(address => address.primary)
     return {
-      comment: primaryAddress.comment,
-      phones: primaryAddress.phones.map(phone => phone.number),
-      addressTypes: primaryAddress.addressUsages
-        .filter(usage => usage.activeFlag && usage.activeFlag)
-        .map(usage => usage.addressUsageDescription),
+      comment: primaryAddress?.comment || '',
+      phones: primaryAddress?.phones.map(phone => phone.number) || [],
+      addressTypes:
+        primaryAddress?.addressUsages
+          .filter(usage => usage.activeFlag && usage.activeFlag)
+          .map(usage => usage.addressUsageDescription) || [],
       address: {
-        country: primaryAddress.country,
-        county: primaryAddress.county,
-        flat: primaryAddress.flat,
-        locality: primaryAddress.locality,
-        postalCode: primaryAddress.postalCode,
-        premise: primaryAddress.premise,
-        street: primaryAddress.street,
-        town: primaryAddress.town,
+        country: primaryAddress?.country || '',
+        county: primaryAddress?.county || '',
+        flat: primaryAddress?.flat || '',
+        locality: primaryAddress?.locality || '',
+        postalCode: primaryAddress?.postalCode || '',
+        premise: primaryAddress?.premise || '',
+        street: primaryAddress?.street || '',
+        town: primaryAddress?.town || '',
       },
-      addedOn: primaryAddress.startDate,
+      addedOn: primaryAddress?.startDate || '',
     }
   }
 

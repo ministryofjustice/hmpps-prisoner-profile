@@ -341,5 +341,48 @@ describe('PersonalPageService', () => {
       expect(contact.emergencyContact).toEqual(true)
       expect(contact.relationship).toEqual('Relationship description')
     })
+
+    it('Handles no addresses defined for the contact', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
   })
 })

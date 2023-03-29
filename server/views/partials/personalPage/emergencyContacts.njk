@@ -1,29 +1,7 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/arrayToLines.njk" import arrayToLines %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro prisonerContact(contactInfo) %}
-  {% set emailHtml %}
-    {% if contactInfo.emails.length == 0 %}
-      Not entered
-    {% endif %}
-    {% for email in contactInfo.emails %}
-      {{ email }}<br />
-    {% endfor %}
-    {% set addressHtml %}
-      {% for line in contactInfo.address.address | addressToLines %}
-        {{ line }}<br />
-      {% endfor %}
-    {% endset %}
-    {% set addressPhoneHtml %}
-      {% for number in contactInfo.address.phones %}
-        {{ number }}<br />
-      {% endfor %}
-    {% endset %}
-    {% set addressTypesHtml %}
-      {% for type in contactInfo.address.addressTypes %}
-        {{ type }}<br />
-      {% endfor %}
-    {% endset %}
-  {% endset %}
   <div class="hmpps-contact" data-qa="emergency-contact">
     {% if contactInfo.emergencyContact | default(false) %}
       <p class="hmpps-contact__emergency-contact" data-qa="contact-emergency-contact">Emergency contact</p>
@@ -43,10 +21,10 @@
       <div class="govuk-details__text" data-qa="contact-details">
         {{ govukSummaryList({
         rows: [
-          { key: { text: "Email"}, value: { html: emailHtml} },
-          { key: { text: "Address"}, value: { html: addressHtml} },
-          { key: { text: "Address phone"}, value: { html: addressPhoneHtml} },
-          { key: { text: "Address type"}, value: { html: addressTypesHtml} }
+          { key: { text: "Email"}, value: { html: arrayToLines(contactInfo.emails, "Not entered")} },
+          { key: { text: "Address"}, value: { html: arrayToLines(contactInfo.address.address | addressToLines, "Not entered")} },
+          { key: { text: "Address phone"}, value: { html: arrayToLines(contactInfo.address.phones, "Not entered")} },
+          { key: { text: "Address type"}, value: { html: arrayToLines(contactInfo.address.addressTypes, "Not entered")} }
         ]
       }) }}
       </div>
