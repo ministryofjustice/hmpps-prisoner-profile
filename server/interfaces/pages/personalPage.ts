@@ -59,9 +59,20 @@ export interface Addresses {
   addedOn: string
 }
 
+export interface NextOfKin {
+  emergencyContact: boolean
+  nextOfKin: boolean
+  name: string
+  relationship: string
+  emails: string[]
+  phones: string[]
+  address: Addresses
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
   addresses: Addresses
+  nextOfKin: NextOfKin[]
 }

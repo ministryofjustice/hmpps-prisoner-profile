@@ -1,25 +1,52 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% macro contact(contactInfo) %}
-  <div class="hmpps-contact">
+{% macro prisonerContact(contactInfo) %}
+  {% set emailHtml %}
+    {% if contactInfo.emails.length == 0 %}
+      Not entered
+    {% endif %}
+    {% for email in contactInfo.emails %}
+      {{ email }}<br />
+    {% endfor %}
+    {% set addressHtml %}
+      {% for line in contactInfo.address.address | addressToLines %}
+        {{ line }}<br />
+      {% endfor %}
+    {% endset %}
+    {% set addressPhoneHtml %}
+      {% for number in contactInfo.address.phones %}
+        {{ number }}<br />
+      {% endfor %}
+    {% endset %}
+    {% set addressTypesHtml %}
+      {% for type in contactInfo.address.addressTypes %}
+        {{ type }}<br />
+      {% endfor %}
+    {% endset %}
+  {% endset %}
+  <div class="hmpps-contact" data-qa="emergency-contact">
     {% if contactInfo.emergencyContact | default(false) %}
-      <p class="hmpps-contact__emergency-contact">Emergency contact</p>
+      <p class="hmpps-contact__emergency-contact" data-qa="contact-emergency-contact">Emergency contact</p>
     {% endif %}
     <p class="hmpps-contact__next-of-kin">Next of kin</p>
-    <p class="hmpps-contact__name">{{ contactInfo.name }}</p>
-    <p class="hmpps-contact__relationship">{{ contactInfo.relationship }}</p>
-    <p class="hmpps-contact__contact-number">{{ contactInfo.phoneNumber }}</p>
+    <p class="hmpps-contact__name" data-qa="contact-name">{{ contactInfo.name }}</p>
+    <p class="hmpps-contact__relationship" data-qa="contact-relationship">{{ contactInfo.relationship }}</p>
+    <p class="hmpps-contact__contact-number" data-qa="contact-numbers">
+      {% for phone in contactInfo.phoneNumbers %}
+        {{ phone }} <br />
+      {% endfor %}
+    </p>
     <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">View details</span>
       </summary>
-      <div class="govuk-details__text">
+      <div class="govuk-details__text" data-qa="contact-details">
         {{ govukSummaryList({
         rows: [
-          { key: { text: "Email"}, value: { text: "Placeholder"} },
-          { key: { text: "Address"}, value: { text: "Placeholder"} },
-          { key: { text: "Address phone"}, value: { text: "Placeholder"} },
-          { key: { text: "Address type"}, value: { text: "Placeholder"} }
+          { key: { text: "Email"}, value: { html: emailHtml} },
+          { key: { text: "Address"}, value: { html: addressHtml} },
+          { key: { text: "Address phone"}, value: { html: addressPhoneHtml} },
+          { key: { text: "Address type"}, value: { html: addressTypesHtml} }
         ]
       }) }}
       </div>
@@ -29,11 +56,17 @@
 {%- call summaryCard({title: "Emergency contacts and next of kin", id: "emergency-contacts"}) -%}
   <div class="govuk-grid-row" data-qa="emergency-contacts">
     <div class="govuk-grid-column-full">
-      {{ contact({emergencyContact: true, name: "Simon Jones", relationship: "Brother", phoneNumber: "01234 123123"}) }}
-      <hr class="govuk-section-break govuk-section-break--visible" />
-      {{ contact({emergencyContact: true, name: "Deborah Jones", relationship: "Sister", phoneNumber: "01234 123123"}) }}
-      <hr class="govuk-section-break govuk-section-break--visible" />
-      {{ contact({name: "Laura Dearing", relationship: "Sister", phoneNumber: "01234 123123"}) }}
+      {% for contact in nextOfKin %}
+        {{ prisonerContact({
+          emergencyContact: contact.emergencyContact,
+          name: contact.name,
+          relationship: contact.relationship,
+          phoneNumbers: contact.phones,
+          emails: contact.emails,
+          address: contact.address
+        }) }}
+        <hr class="govuk-section-break govuk-section-break--visible" />
+      {% endfor %}
     </div>
   </div>
 {%- endcall -%}

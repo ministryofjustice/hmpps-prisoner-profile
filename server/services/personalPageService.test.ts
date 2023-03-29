@@ -8,6 +8,8 @@ import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
 import { mockAddresses } from '../data/localMockData/addresses'
+import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
+import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -34,8 +36,8 @@ describe('PersonalPageService', () => {
       getOffenderAttendanceHistory: jest.fn(),
       getProperty: jest.fn(async () => propertyMock),
       getAddresses: jest.fn(async () => mockAddresses),
-      getAddressesForPerson: jest.fn(),
-      getOffenderContacts: jest.fn(),
+      getAddressesForPerson: jest.fn(async () => mockAddresses),
+      getOffenderContacts: jest.fn(async () => mockOffenderContacts),
     }
   })
 
@@ -252,6 +254,92 @@ describe('PersonalPageService', () => {
       expect(premise).toEqual(expectedAddress.premise)
       expect(street).toEqual(expectedAddress.street)
       expect(town).toEqual(expectedAddress.town)
+    })
+  })
+
+  describe('Next of kin', () => {
+    it('Only maps the active next of kin', async () => {
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(nextOfKin.length).toEqual(3)
+    })
+
+    it('Gets the addresses for each active next of kin', async () => {
+      await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledTimes(3)
+
+      const expectedPersonIds = mockOffenderContacts.offenderContacts
+        .filter(contact => contact.active && contact.nextOfKin)
+        .map(({ personId }) => personId)
+
+      expectedPersonIds.forEach(personId =>
+        expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledWith(personId),
+      )
+    })
+
+    it('Maps the primary address for the contact', async () => {
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const expectedAddress = mockAddresses[0]
+      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
+      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
+
+      nextOfKin.forEach(contact => {
+        const { address } = contact
+
+        expect(address.phones).toEqual(expectedPhones)
+        expect(address.addressTypes).toEqual(expectedTypes)
+        const { country, county, flat, locality, postalCode, premise, street, town } = address.address
+
+        expect(country).toEqual(expectedAddress.country)
+        expect(county).toEqual(expectedAddress.county)
+        expect(flat).toEqual(expectedAddress.flat)
+        expect(locality).toEqual(expectedAddress.locality)
+        expect(postalCode).toEqual(expectedAddress.postalCode)
+        expect(premise).toEqual(expectedAddress.premise)
+        expect(street).toEqual(expectedAddress.street)
+        expect(town).toEqual(expectedAddress.town)
+      })
+    })
+
+    it('Maps the data for the contact from the API', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
     })
   })
 })
