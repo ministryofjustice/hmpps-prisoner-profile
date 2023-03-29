@@ -49,22 +49,22 @@ export default class AlertsPageService {
       }))
     }
 
-    // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
-    const cleanedQueryParams: PagedListQueryParams = { ...queryParams }
-    delete cleanedQueryParams.page
-    delete cleanedQueryParams.alertStatus
-
     // Determine sort options
     const sortOptions: SortOption[] = [
       { value: 'dateCreated,DESC', description: 'Created (most recent)' },
       { value: 'dateCreated,ASC', description: 'Created (oldest)' },
     ]
-    if (queryParams.alertStatus === 'INACTIVE') {
+    if (!isActiveAlertsQuery) {
       sortOptions.push(
         { value: 'dateExpires,DESC', description: 'Closed (most recent)' },
         { value: 'dateExpires,ASC', description: 'Closed (oldest)' },
       )
     }
+
+    // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
+    const cleanedQueryParams: PagedListQueryParams = { ...queryParams }
+    delete cleanedQueryParams.page
+    delete cleanedQueryParams.alertStatus
 
     return {
       pagedAlerts,

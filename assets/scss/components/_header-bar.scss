@@ -147,7 +147,7 @@
 }
 
 .hmpps-profile-banner {
-  margin: 20 14px;
+  padding: 0 15px;
 
   .hmpps-profile-banner-top {
     padding: 30px 30px 15px 30px;
@@ -290,7 +290,7 @@
       padding-left: 19px;
     }
 
-    @include govuk-responsive-padding(5, 'right');
+    @include govuk-responsive-padding(6, 'right');
     background-color: #f3f2f1;
 
     overflow: auto;

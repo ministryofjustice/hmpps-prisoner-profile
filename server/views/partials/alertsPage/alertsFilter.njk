@@ -1,3 +1,4 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
 {% set options = {
     title: 'Filter',
@@ -26,16 +27,28 @@
         </fieldset>
         {% endif %}
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="from">
-                Date from
-            </label>
-            <input class="govuk-input" id="from" name="from" type="text" value="{{ listMetadata.filtering.from }}">
+            {{ govukInput({
+                label: {
+                    text: "Date from",
+                    classes: "govuk-label--m"
+                },
+                id: "from",
+                name: "from",
+                errorMessage: errors | findError('from'),
+                value: listMetadata.filtering.from
+            }) }}
         </div>
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="to">
-                Date to
-            </label>
-            <input class="govuk-input" id="to" name="to" type="text" value="{{ listMetadata.filtering.to }}">
+            {{ govukInput({
+                label: {
+                    text: "Date to",
+                    classes: "govuk-label--m"
+                },
+                id: "to",
+                name: "to",
+                errorMessage: errors | findError('to'),
+                value: listMetadata.filtering.to
+            }) }}
         </div>
     </div>
 {%- endcall -%}
