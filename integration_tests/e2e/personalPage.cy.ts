@@ -18,7 +18,7 @@ context('When signed in', () => {
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubSecondaryLanguages', 1102484)
     cy.task('stubProperty', 1102484)
-    cy.task('stubAddresses', 1102484)
+    cy.task('stubAddresses', 'G6123VU')
     cy.task('stubOffenderContacts', 'G6123VU')
     cy.task('stubPersonAddresses')
   })

@@ -227,9 +227,9 @@ describe('prisonApiClient', () => {
 
   describe('getAddresses', () => {
     it('Should return data from the API', async () => {
-      const bookingId = 123456
-      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/addresses`, mockAddresses)
-      const output = await prisonApiClient.getAddresses(bookingId)
+      const prisonerNumber = 'ABC123'
+      mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/addresses`, mockAddresses)
+      const output = await prisonApiClient.getAddresses(prisonerNumber)
       expect(output).toEqual(mockAddresses)
     })
   })

@@ -44,7 +44,7 @@ export interface PrisonApiClient {
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
   getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
-  getAddresses(bookingId: number): Promise<Address[]>
+  getAddresses(prisonerNumber: string): Promise<Address[]>
   getAddressesForPerson(personId: number): Promise<Address[]>
   getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
 }

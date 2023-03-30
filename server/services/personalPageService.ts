@@ -33,7 +33,7 @@ export default class PersonalPageService {
       this.prisonApiClient.getPrisoner(prisonerNumber),
       this.prisonApiClient.getSecondaryLanguages(bookingId),
       this.prisonApiClient.getProperty(bookingId),
-      this.prisonApiClient.getAddresses(bookingId),
+      this.prisonApiClient.getAddresses(prisonerNumber),
       this.prisonApiClient.getOffenderContacts(prisonerNumber),
     ])
 

@@ -225,11 +225,11 @@ export default {
     })
   },
 
-  stubAddresses: (bookingId: number) => {
+  stubAddresses: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/addresses`,
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/addresses`,
       },
       response: {
         status: 200,

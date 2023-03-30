@@ -182,8 +182,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` })
   }
 
-  async getAddresses(bookingId: number): Promise<Address[]> {
-    return this.get<Address[]>({ path: `/api/bookings/${bookingId}/addresses` })
+  async getAddresses(prisonerNumber: string): Promise<Address[]> {
+    return this.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses` })
   }
 
   async getAddressesForPerson(personId: number): Promise<Address[]> {
