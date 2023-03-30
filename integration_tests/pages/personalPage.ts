@@ -88,4 +88,25 @@ export default class PersonalPage extends Page {
       addedOn: () => cardData().find('[data-qa=address-added-on]'),
     }
   }
+
+  contacts = () => {
+    const cardData = () => cy.get('[data-qa=emergency-contacts]')
+    return {
+      contact: contactNumber => {
+        const contactData = () => cardData().find('[data-qa=emergency-contact]').eq(contactNumber)
+        const details = () => contactData().find('[data-qa=contact-details]').find('.govuk-summary-list__value')
+
+        return {
+          name: () => contactData().find('[data-qa=contact-name]'),
+          relationship: () => contactData().find('[data-qa=contact-relationship]'),
+          emergencyContact: () => contactData().find('[data-qa=contact-emergency-contact]'),
+          phones: () => contactData().find('[data-qa=contact-numbers]'),
+          emails: () => details().eq(0),
+          address: () => details().eq(1),
+          addressPhones: () => details().eq(2),
+          addressTypes: () => details().eq(3),
+        }
+      },
+    }
+  }
 }

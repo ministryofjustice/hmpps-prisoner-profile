@@ -22,6 +22,7 @@ import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
 import { mockAddresses } from './localMockData/addresses'
+import { mockOffenderContacts } from './localMockData/offenderContacts'
 
 jest.mock('./tokenStore')
 
@@ -226,10 +227,28 @@ describe('prisonApiClient', () => {
 
   describe('getAddresses', () => {
     it('Should return data from the API', async () => {
-      const bookingId = 123456
-      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/addresses`, mockAddresses)
-      const output = await prisonApiClient.getAddresses(bookingId)
+      const prisonerNumber = 'ABC123'
+      mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/addresses`, mockAddresses)
+      const output = await prisonApiClient.getAddresses(prisonerNumber)
       expect(output).toEqual(mockAddresses)
+    })
+  })
+
+  describe('getAddressesForPerson', () => {
+    it('Should return data from the API', async () => {
+      const personId = 123456
+      mockSuccessfulPrisonApiCall(`/api/persons/${personId}/addresses`, mockAddresses)
+      const output = await prisonApiClient.getAddressesForPerson(personId)
+      expect(output).toEqual(mockAddresses)
+    })
+  })
+
+  describe('getOffenderContacts', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'ABC123'
+      mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/contacts`, mockOffenderContacts)
+      const output = await prisonApiClient.getOffenderContacts(prisonerNumber)
+      expect(output).toEqual(mockOffenderContacts)
     })
   })
 })

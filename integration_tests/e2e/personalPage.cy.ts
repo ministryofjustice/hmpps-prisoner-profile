@@ -18,7 +18,9 @@ context('When signed in', () => {
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubSecondaryLanguages', 1102484)
     cy.task('stubProperty', 1102484)
-    cy.task('stubAddresses', 1102484)
+    cy.task('stubAddresses', 'G6123VU')
+    cy.task('stubOffenderContacts', 'G6123VU')
+    cy.task('stubPersonAddresses')
   })
 
   it('displays the personal details page', () => {
@@ -129,6 +131,53 @@ context('When signed in', () => {
 
       page.addresess().comments().should('include.text', mockAddresses[0].comment)
       page.addresess().addedOn().should('include.text', '1 May 2020')
+    })
+  })
+
+  context('Emergency contacts and next of kin', () => {
+    it('Displays the contacts', () => {
+      const page = visitPersonalDetailsPage()
+
+      const addressShouldIncludeCorrectText = contact => {
+        contact.address().should('include.text', 'Flat 7, premises address, street field')
+        contact.address().should('include.text', 'Leeds')
+        contact.address().should('include.text', 'LS1 AAA')
+        contact.address().should('include.text', 'England')
+
+        contact.addressTypes().should('include.text', 'Discharge - Permanent Housing')
+        contact.addressTypes().should('include.text', 'HDC Address')
+        contact.addressTypes().should('include.text', 'Other')
+
+        contact.addressPhones().should('include.text', '4444555566')
+        contact.addressPhones().should('include.text', '0113444444')
+        contact.addressPhones().should('include.text', '0113 333444')
+        contact.addressPhones().should('include.text', '0800 222333')
+      }
+
+      const firstContact = page.contacts().contact(0)
+      addressShouldIncludeCorrectText(firstContact)
+      firstContact.name().should('include.text', 'First Name Middle Name Surname')
+      firstContact.emergencyContact().should('be.visible')
+      firstContact.relationship().should('include.text', 'Grandson')
+      firstContact.emails().should('include.text', 'Not entered')
+
+      const secondContact = page.contacts().contact(1)
+      addressShouldIncludeCorrectText(secondContact)
+      secondContact.name().should('include.text', 'First Name Middle Name Bob')
+      secondContact.emergencyContact().should('be.visible')
+      secondContact.relationship().should('include.text', 'Cousin')
+      secondContact.emails().should('include.text', 'Not entered')
+      secondContact.phones().should('include.text', '555555 6666666')
+
+      const thirdContact = page.contacts().contact(2)
+      addressShouldIncludeCorrectText(thirdContact)
+      thirdContact.name().should('include.text', 'Dom Bull')
+      thirdContact.relationship().should('include.text', 'Grandfather')
+      thirdContact.emails().should('include.text', 'email@addressgoeshere.com')
+      thirdContact.emails().should('include.text', 'email2@address.com')
+      thirdContact.phones().should('include.text', '0113222333')
+      thirdContact.phones().should('include.text', '0113333444')
+      thirdContact.phones().should('include.text', '07711333444')
     })
   })
 })

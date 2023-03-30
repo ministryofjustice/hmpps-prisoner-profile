@@ -13,7 +13,7 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/prisonApi/assessment'
-import { OffenderContact } from '../interfaces/staffContacts'
+import { ContactDetail } from '../interfaces/staffContacts'
 import { mapToQueryString } from '../utils/utils'
 import { CaseNote } from '../interfaces/caseNote'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
@@ -27,6 +27,7 @@ import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { Address } from '../interfaces/prisonApi/address'
+import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -114,9 +115,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     )
   }
 
-  async getOffenderContacts(bookingId: number): Promise<OffenderContact> {
+  async getBookingContacts(bookingId: number): Promise<ContactDetail> {
     try {
-      return await this.restClient.get<OffenderContact>({ path: `/api/bookings/${bookingId}/contacts` })
+      return await this.restClient.get<ContactDetail>({ path: `/api/bookings/${bookingId}/contacts` })
     } catch (error) {
       return error
     }
@@ -181,7 +182,15 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` })
   }
 
-  async getAddresses(bookingId: number): Promise<Address[]> {
-    return this.get<Address[]>({ path: `/api/bookings/${bookingId}/addresses` })
+  async getAddresses(prisonerNumber: string): Promise<Address[]> {
+    return this.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses` })
+  }
+
+  async getAddressesForPerson(personId: number): Promise<Address[]> {
+    return this.get<Address[]>({ path: `/api/persons/${personId}/addresses` })
+  }
+
+  getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
+    return this.get<OffenderContacts>({ path: `/api/offenders/${prisonerNumber}/contacts` })
   }
 }

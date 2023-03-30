@@ -13,8 +13,9 @@ import { prisonerDetailMock } from '../../server/data/localMockData/prisonerDeta
 import { secondaryLanguagesMock } from '../../server/data/localMockData/secondaryLanguages'
 import { propertyMock } from '../../server/data/localMockData/property'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
+import { mockOffenderContacts } from '../../server/data/localMockData/offenderContacts'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
-import { offenderContact } from '../../server/data/localMockData/offenderContacts'
+import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import {
   emptyAlertsMock,
@@ -156,7 +157,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: offenderContact,
+        jsonBody: mockContactDetail,
       },
     })
   },
@@ -224,11 +225,43 @@ export default {
     })
   },
 
-  stubAddresses: (bookingId: number) => {
+  stubAddresses: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/addresses`,
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/addresses`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockAddresses,
+      },
+    })
+  },
+
+  stubOffenderContacts: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/contacts`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockOffenderContacts,
+      },
+    })
+  },
+
+  stubPersonAddresses: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prison/api/persons/(\\d*)/addresses',
       },
       response: {
         status: 200,
