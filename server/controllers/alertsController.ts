@@ -1,17 +1,14 @@
 import { Request, Response } from 'express'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
-import { Prisoner } from '../interfaces/prisoner'
-import PrisonApiRestClient from '../data/prisonApiClient'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import AlertsPageService from '../services/alertsPageService'
 import { mapHeaderData } from '../mappers/headerMappers'
+import { PrisonerSearchService } from '../services'
 
+/**
+ * Parse request for alerts page and orchestrate response
+ */
 export const alertsController = () => {
   const displayAlerts = async (req: Request, res: Response) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-
     // Parse query params for paging, sorting and filtering data
     const queryParams: PagedListQueryParams = {}
     if (req.query.page) queryParams.page = +req.query.page
@@ -22,9 +19,15 @@ export const alertsController = () => {
     if (req.path.includes('/active')) queryParams.alertStatus = 'ACTIVE'
     if (req.path.includes('/inactive')) queryParams.alertStatus = 'INACTIVE'
 
-    const alertsPageService = new AlertsPageService(prisonApiClient)
+    // Get prisoner data for banner and for use in alerts generation
+    const prisonerSearchService = new PrisonerSearchService(res.locals.clientToken)
+    const prisonerData = await prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
+
+    // Get alerts based on given query params
+    const alertsPageService = new AlertsPageService(res.locals.clientToken)
     const alertsPageData = await alertsPageService.get(prisonerData, queryParams)
 
+    // Render page
     return res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),
       ...alertsPageData,

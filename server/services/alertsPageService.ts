@@ -8,14 +8,24 @@ import { SortOption } from '../interfaces/sortSelector'
 import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
+import PrisonApiRestClient from '../data/prisonApiClient'
 
 export default class AlertsPageService {
   private prisonApiClient: PrisonApiClient
 
-  constructor(prisonApiClient: PrisonApiClient) {
-    this.prisonApiClient = prisonApiClient
+  constructor(clientToken: string) {
+    this.prisonApiClient = new PrisonApiRestClient(clientToken)
   }
 
+  /**
+   * Validate alert filters and return errors if appropriate
+   *
+   * Only `Date from` and `Date to` can be in error
+   *
+   * @param from
+   * @param to
+   * @private
+   */
   private validateFilters(from: string, to: string) {
     const errors: HmppsError[] = []
 
@@ -50,6 +60,12 @@ export default class AlertsPageService {
     return apiParams
   }
 
+  /**
+   * Handle request for alerts
+   *
+   * @param prisonerData
+   * @param queryParams
+   */
   public async get(prisonerData: Prisoner, queryParams: PagedListQueryParams): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
 
