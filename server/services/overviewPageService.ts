@@ -6,13 +6,7 @@ import {
   OverviewScheduleItem,
 } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import {
-  convertToTitleCase,
-  formatDate,
-  formatMoney,
-  formatPrivilegedVisitsSummary,
-  getNamesFromString,
-} from '../utils/utils'
+import { convertToTitleCase, formatMoney, formatPrivilegedVisitsSummary, getNamesFromString } from '../utils/utils'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
@@ -30,6 +24,7 @@ import { ProblemStatus } from '../data/enums/problemStatus'
 import { pregnantProblemCodes } from '../data/constants'
 import { BooleanString } from '../data/enums/booleanString'
 import { pluralise } from '../utils/pluralise'
+import { formatDate } from '../utils/dateHelpers'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient

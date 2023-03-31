@@ -1,5 +1,4 @@
 import { type RequestHandler, Router } from 'express'
-import { formatISO, parse } from 'date-fns'
 import config from '../config'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -15,9 +14,7 @@ import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
-import AlertsPageService from '../services/alertsPageService'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { AlertsPageData } from '../interfaces/pages/alertsPageData'
+import { alertsController } from '../controllers/alertsController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -100,92 +97,9 @@ export default function routes(service: Services): Router {
     res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
   })
 
-  get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-    const errors = []
+  get('/prisoner/:prisonerNumber/alerts/active', alertsController().displayAlerts)
 
-    // Parse query params for paging, sorting and filtering data
-    const queryParams: PagedListQueryParams = {}
-    if (req.query.page) queryParams.page = +req.query.page - 1 // Change page to zero based for API query
-    if (req.query.sort) queryParams.sort = req.query.sort as string
-    if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
-    if (req.query.from) queryParams.from = req.query.from as string
-    if (req.query.to) queryParams.to = req.query.to as string
-
-    // Parse filter dates into ISO-8601 format (date only)
-    const dateFormatPattern = /(\d{1,2})[-/,. ](\d{1,2})[-/,. ](\d{4})/
-    if (queryParams.from) {
-      try {
-        if (dateFormatPattern.test(queryParams.from)) {
-          queryParams.from = formatISO(parse(queryParams.from, 'dd/MM/yyyy', new Date()), {
-            representation: 'date',
-          })
-        } else {
-          errors.push({ text: 'Date from must be a real date', href: '#from' })
-        }
-      } catch (error) {
-        errors.push({ text: `Date from must be a real date`, href: '#from' })
-      }
-    }
-    if (queryParams.to) {
-      try {
-        if (dateFormatPattern.test(queryParams.from)) {
-          queryParams.to = formatISO(parse(queryParams.to, 'dd/MM/yyyy', new Date()), { representation: 'date' })
-        } else {
-          errors.push({ text: 'Date to must be a real date', href: '#to' })
-        }
-      } catch (error) {
-        errors.push({ text: `Date to must be a real date`, href: '#to' })
-      }
-    }
-
-    let alertsPageData: AlertsPageData = {} as AlertsPageData
-    if (errors.length) {
-      ;(req as any).flash('errors', errors)
-      return res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
-    }
-
-    const alertsPageService = new AlertsPageService(prisonApiClient)
-    alertsPageData = await alertsPageService.get(prisonerData, {
-      ...queryParams,
-      alertStatus: 'ACTIVE',
-    })
-
-    return res.render('pages/alertsPage', {
-      ...mapHeaderData(prisonerData, 'alerts'),
-      ...alertsPageData,
-      errors: [...req.flash('errors')],
-      activeTab: true,
-    })
-  })
-
-  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-
-    // Parse query params for paging, sorting and filtering data
-    const queryParams: PagedListQueryParams = {}
-    if (req.query.page) queryParams.page = +req.query.page - 1 // Change page to zero based for API query
-    if (req.query.sort) queryParams.sort = req.query.sort as string
-    if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
-    if (req.query.from) queryParams.from = req.query.from as string
-    if (req.query.to) queryParams.to = req.query.to as string
-
-    const alertsPageService = new AlertsPageService(prisonApiClient)
-    const alertsPageData = await alertsPageService.get(prisonerData, {
-      ...queryParams,
-      alertStatus: 'INACTIVE',
-    })
-
-    res.render('pages/alertsPage', {
-      ...mapHeaderData(prisonerData, 'alerts'),
-      ...alertsPageData,
-      activeTab: false,
-    })
-  })
+  get('/prisoner/:prisonerNumber/alerts/inactive', alertsController().displayAlerts)
 
   get('/', (req, res, next) => {
     res.redirect(config.apis.dpsHomePageUrl)

@@ -1,7 +1,6 @@
 import {
   convertToTitleCase,
   initialiseName,
-  formatDate,
   formatScheduleItem,
   summaryListOneHalfWidth,
   SummaryListRow,
@@ -16,6 +15,7 @@ import {
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
+import { formatDate } from './dateHelpers'
 
 describe('convert to title case', () => {
   it.each([

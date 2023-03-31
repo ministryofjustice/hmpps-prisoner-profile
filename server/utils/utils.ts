@@ -4,6 +4,7 @@ import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedLi
 import { ListMetadata } from '../interfaces/pages/alertsPageData'
 import { SortOption } from '../interfaces/sortSelector'
 import { Address } from '../interfaces/address'
+import { HmppsError } from '../interfaces/hmppsError'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -27,21 +28,6 @@ export const initialiseName = (fullName?: string): string | null => {
 
   const array = fullName.split(' ')
   return `${array[0][0]}. ${array.reverse()[0]}`
-}
-
-/**
- * Formats an ISO-8601 date string to standard gov.uk display format, e.g. 20 January 2023
- * Also supports passing in an optional style string to output other standard formats:
- * short, full and medium - e.g. '20/01/2023', 'Friday, 20 January 2023' and '20 Jan 2023'
- *
- * @param isoDate ISO-8601 format date string
- * @param style formatting style to use - long (default), short, full, medium
- * @returns formatted date string
- */
-export const formatDate = (isoDate: string, style: 'short' | 'full' | 'long' | 'medium' = 'long'): string => {
-  if (!isoDate) return ''
-
-  return new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
 }
 
 /**
@@ -258,4 +244,25 @@ export const addressToLines = ({ flat, premise, street, town, postalCode, countr
     lineOne = `Flat ${flat}, ${lineOne}`
   }
   return [lineOne, town, postalCode, country].filter(s => s)
+}
+
+/**
+ * Find error related to given form field and return error message
+ *
+ * Allows `govukInput` (etc) form input components to render an error message on the form field by using the `errorMessage` param,
+ *
+ * e.g. `errorMessage: errors | findError('from')`
+ *
+ * @param errors
+ * @param formFieldId
+ */
+export const findError = (errors: HmppsError[], formFieldId: string) => {
+  if (!errors) return null
+  const item = errors.find((error: HmppsError) => error.href === `#${formFieldId}`)
+  if (item) {
+    return {
+      text: item.text,
+    }
+  }
+  return null
 }

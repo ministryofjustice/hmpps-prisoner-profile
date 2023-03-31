@@ -1,6 +1,7 @@
 import { PagedList } from '../prisonApi/pagedList'
 import { SortParams } from '../sortSelector'
 import { AlertTypeFilter } from '../alertsMetadata'
+import { HmppsError } from '../hmppsError'
 
 export interface AlertsPageData {
   pagedAlerts: PagedList
@@ -9,6 +10,7 @@ export interface AlertsPageData {
   activeAlertCount: number
   inactiveAlertCount: number
   fullName: string
+  errors: HmppsError[]
 }
 
 export interface ListMetadata {

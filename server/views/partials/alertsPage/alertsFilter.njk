@@ -35,7 +35,8 @@
                 id: "from",
                 name: "from",
                 errorMessage: errors | findError('from'),
-                value: listMetadata.filtering.from
+                value: listMetadata.filtering.from,
+                autocomplete: "off"
             }) }}
         </div>
         <div class="govuk-form-group">
@@ -47,7 +48,8 @@
                 id: "to",
                 name: "to",
                 errorMessage: errors | findError('to'),
-                value: listMetadata.filtering.to
+                value: listMetadata.filtering.to,
+                autocomplete: "off"
             }) }}
         </div>
     </div>
