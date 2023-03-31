@@ -22,6 +22,7 @@
     "lint": "eslint . --cache --max-warnings 0",
     "typecheck": "tsc && tsc -p integration_tests",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test:ci": "jest --runInBand",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
@@ -33,6 +34,10 @@
     "npm": "^9"
   },
   "jest": {
+    "coverageReporters": [
+      "lcov"
+    ],
+    "coverageDirectory": "coverage",
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
