@@ -127,7 +127,6 @@
     "@types/bunyan-format": "^0.2.5",
     "@types/compression": "^1.7.2",
     "@types/connect-flash": "0.0.37",
-    "@types/connect-redis": "^0.0.20",
     "@types/cookie-session": "^2.0.44",
     "@types/csurf": "^1.11.2",
     "@types/express-session": "^1.17.7",
