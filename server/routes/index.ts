@@ -14,7 +14,7 @@ import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
-import { alertsController } from '../controllers/alertsController'
+import AlertsController from '../controllers/alertsController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -97,10 +97,15 @@ export default function routes(service: Services): Router {
     res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
   })
 
-  get('/prisoner/:prisonerNumber/alerts/active', alertsController().displayAlerts)
+  get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
+    const alertsController = new AlertsController(res.locals.clientToken)
+    return alertsController.displayAlerts(req, res)
+  })
 
-  get('/prisoner/:prisonerNumber/alerts/inactive', alertsController().displayAlerts)
-
+  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
+    const alertsController = new AlertsController(res.locals.clientToken)
+    return alertsController.displayAlerts(req, res)
+  })
   get('/', (req, res, next) => {
     res.redirect(config.apis.dpsHomePageUrl)
   })

@@ -1,4 +1,5 @@
 import { formatISO, isValid, parse } from 'date-fns'
+import logger from '../../logger'
 
 /**
  * Format a Date object as an ISO-8601 string, rendering only the date part.
@@ -8,7 +9,13 @@ import { formatISO, isValid, parse } from 'date-fns'
  * @param date
  */
 export const formatDateISO = (date: Date): string => {
-  return formatISO(date, { representation: 'date' })
+  let dateStr
+  try {
+    dateStr = formatISO(date, { representation: 'date' })
+  } catch (error) {
+    logger.error(`Error: formatDateISO - ${error.message}`)
+  }
+  return dateStr
 }
 
 /**
@@ -22,6 +29,9 @@ export const formatDateISO = (date: Date): string => {
  */
 export const parseDate = (date: string): Date => {
   const dateFormatPattern = /(\d{1,2})([-/,. ])(\d{1,2})[-/,. ](\d{4})/
+
+  if (!isRealDate(date)) return new Date(NaN)
+
   const separator = date.match(dateFormatPattern)[2]
   return parse(date, `dd${separator}MM${separator}yyyy`, new Date())
 }
