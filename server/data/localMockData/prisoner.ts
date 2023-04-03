@@ -137,6 +137,15 @@ export const PrisonerMockDataA: Prisoner = {
     dateTime: '2023-01-30T14:46:01',
     nextReviewDate: '2024-01-30',
   },
+  build: 'Proportional',
+  facialHair: 'Clean Shaven',
+  hairColour: 'Brown',
+  heightCentimetres: 188,
+  weightKilograms: 86,
+  leftEyeColour: 'Blue',
+  rightEyeColour: 'Blue',
+  shapeOfFace: 'Angular',
+  shoeSize: 10,
 }
 
 export const PrisonerMockDataB: Prisoner = {
@@ -193,4 +202,13 @@ export const PrisonerMockDataB: Prisoner = {
     dateTime: '2022-10-17T14:09:15',
     nextReviewDate: '2023-10-17',
   },
+  build: 'Proportional',
+  facialHair: 'Clean Shaven',
+  hairColour: 'Brown',
+  heightCentimetres: 188,
+  weightKilograms: 86,
+  leftEyeColour: 'Blue',
+  rightEyeColour: 'Blue',
+  shapeOfFace: 'Angular',
+  shoeSize: 10,
 }

@@ -1,52 +1,65 @@
+{% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% set tattooOne %}
-  <p class="govuk-body">Arm</p>
+{% macro mark(info) %}
+  <p class="govuk-body">meow{{ info | dump }}</p>
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">View details</span>
     </summary>
     <div class="govuk-details__text">
-      <p class="govuk-body govuk-!-margin-bottom-1">
-        <span class="govuk-!-font-weight-bold">Side</span><br />
-        Left
-      </p>
-      <p class="govuk-body govuk-!-margin-bottom-1">
-        <span class="govuk-!-font-weight-bold">Orientation</span><br />
-        High
-      </p>
-      <p class="govuk-body govuk-!-margin-bottom-1">
-        <span class="govuk-!-font-weight-bold">Comment</span><br />
-        Native indian with red stripe across face
-      </p>
-      <p class="govuk-body">Picture</p>
+      {% if info.side %}
+        <p class="govuk-body govuk-!-margin-bottom-1">
+          <span class="govuk-!-font-weight-bold">Side</span><br />
+          {{ info.side }}
+        </p>
+      {% endif %}
+      {% if info.orientation %}
+        <p class="govuk-body govuk-!-margin-bottom-1">
+          <span class="govuk-!-font-weight-bold">Orientation</span><br />
+          {{ info.orientation }}
+        </p>
+      {% endif %}
+      {% if info.comment %}
+        <p class="govuk-body govuk-!-margin-bottom-1">
+          <span class="govuk-!-font-weight-bold">Comment</span><br />
+          {{ info.comment }}
+        </p>
+      {% endif %}
+      {% if info.imageId %}
+        <p class="govuk-body">Picture {{ info.imageId }}</p>
+      {% endif %}
     </div>
   </details>
-{% endset %}
+{% endmacro %}
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
       <h3 class="govuk-heading-m">Physical characteristics</h3>
-      {{ govukSummaryList({
-          rows: [
-            {key: { text: "Height"}, value: { text: "1.88 m"} },
-            {key: { text: "Weight"}, value: { text: "80kg"} },
-            {key: { text: "Hair colour"}, value: { text: "Brown"} },
-            {key: { text: "Left eye colour"}, value: { text: "Brown"} },
-            {key: { text: "Right eye colour"}, value: { text: "Brown"} },
-            {key: { text: "Shape of face"}, value: { text: "Oval"} },
-            {key: { text: "Build"}, value: { text: "Small"} },
-            {key: { text: "Shoe size"}, value: { text: "10"} },
-            {key: { text: "Warned about tattooing"}, value: { text: "Yes"} },
-            {key: { text: "Warned not to change appearance"}, value: { text: "Yes"} }
-          ]
-      }) }}
-      <h3 class="govuk-heading-m">Distinguishing marks</h3>
-      {{ govukSummaryList({
-          rows: [
-            {key: { text: "Tattoo"}, value: { html: tattooOne } }
-          ]
-      }) }}
+      {{
+        govukSummaryList({
+        rows: [
+        {key: { text: "Height"}, value: { text: [physicalCharacteristics.height / 100, "m"] | join } },
+        {key: { text: "Weight"}, value: { text: [physicalCharacteristics.weight, "kg"] | join } },
+        {key: { text: "Hair colour"}, value: { text: physicalCharacteristics.hairColour } },
+        {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
+        {key: { text: "Right eye colour"}, value: { text: physicalCharacteristics.rightEyeColour } },
+        {key: { text: "Shape of face"}, value: { text: physicalCharacteristics.shapeOfFace } },
+        {key: { text: "Build"}, value: { text: physicalCharacteristics.build } },
+        {key: { text: "Shoe size"}, value: { text: physicalCharacteristics.shoeSize } },
+        {key: { text: "Warned about tattooing"}, value: { text: physicalCharacteristics.warnedAboutTattooing } },
+        {key: { text: "Warned not to change appearance"}, value: { text: physicalCharacteristics.warnedNotToChangeAppearance } }
+        ]
+        })
+      }}
+      {% if physicalCharacteristics.distinguishingMarks.length > 0 %}
+        <h3 class="govuk-heading-m">Distinguishing marks</h3>
+        <dl class="govuk-summary-list">
+          {% for m in physicalCharacteristics.distinguishingMarks %}
+            {{ summaryListRow(m.type, mark(m), ["mark-", m.imageId] | join) }}
+          {% endfor %}
+        </dl>
+      {% endif %}
     </div>
   </div>
 {%- endcall -%}
