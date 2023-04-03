@@ -68,7 +68,7 @@ export default class OverviewPageService {
   public async getStaffContacts(prisonerData: Prisoner): Promise<StaffContacts> {
     const { bookingId } = prisonerData
     const [offenderContacts, allocationManager, offenderKeyWorker, keyWorkerSessions] = await Promise.all([
-      this.prisonApiClient.getOffenderContacts(prisonerData.bookingId),
+      this.prisonApiClient.getBookingContacts(prisonerData.bookingId),
       this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
       this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
       this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),

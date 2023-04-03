@@ -50,7 +50,7 @@ describe('OverviewPageService', () => {
     getAdjudications: jest.fn(async () => adjudicationSummaryMock),
     getAccountBalances: jest.fn(async () => accountBalancesMock),
     getAssessments: jest.fn(async () => assessmentsMock),
-    getOffenderContacts: jest.fn(),
+    getBookingContacts: jest.fn(),
     getCaseNoteSummaryByTypes: jest.fn(),
     getPrisoner: jest.fn(async () => prisonerDetailMock),
     getInmateDetail: jest.fn(async () => inmateDetailMock),
@@ -61,6 +61,8 @@ describe('OverviewPageService', () => {
     getAlerts: jest.fn(async () => pagedActiveAlertsMock),
     getProperty: jest.fn(),
     getAddresses: jest.fn(),
+    getAddressesForPerson: jest.fn(),
+    getOffenderContacts: jest.fn(),
   }
 
   const allocationManagerApiClient: AllocationManagerClient = {
