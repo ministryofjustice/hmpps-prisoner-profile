@@ -2,7 +2,6 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro mark(info) %}
-  <p class="govuk-body">meow{{ info | dump }}</p>
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">View details</span>
@@ -28,6 +27,7 @@
       {% endif %}
       {% if info.imageId %}
         <p class="govuk-body">Picture {{ info.imageId }}</p>
+        <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" />
       {% endif %}
     </div>
   </details>

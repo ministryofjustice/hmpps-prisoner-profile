@@ -33,6 +33,7 @@ export default function routes(service: Services): Router {
 
   const commonRoutes = () => {
     get('/api/prisoner/:prisonerNumber/image', commonApiRoutes.prisonerImage)
+    get('/api/image/:imageId', commonApiRoutes.prisonerImage)
   }
 
   commonRoutes()

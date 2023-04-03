@@ -21,6 +21,7 @@ context('When signed in', () => {
     cy.task('stubAddresses', 'G6123VU')
     cy.task('stubOffenderContacts', 'G6123VU')
     cy.task('stubPersonAddresses')
+    cy.task('stubImages')
   })
 
   it('displays the personal details page', () => {

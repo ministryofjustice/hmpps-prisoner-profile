@@ -190,7 +190,17 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<Address[]>({ path: `/api/persons/${personId}/addresses` })
   }
 
-  getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
+  async getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
     return this.get<OffenderContacts>({ path: `/api/offenders/${prisonerNumber}/contacts` })
+  }
+
+  async getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
+    try {
+      return await this.restClient.stream({
+        path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
+      })
+    } catch (error) {
+      return error
+    }
   }
 }
