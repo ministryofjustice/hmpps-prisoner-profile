@@ -35,7 +35,7 @@ export default class CommonApiRoutes {
       res.sendFile(placeHolderImage)
     } else {
       offenderService
-        .getPrisonerImage(res.locals.user.token, imageId)
+        .getImage(res.locals.user.token, imageId)
         .then(data => {
           res.type('image/jpeg')
           data.pipe(res)
