@@ -1,11 +1,6 @@
 import Page from '../pages/page'
 import AlertsPage from '../pages/alertsPage'
 
-const visitAlertsPage = (): AlertsPage => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts' })
-  return Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
-}
-
 const visitActiveAlertsPage = (): AlertsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/active' })
   return Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
@@ -26,10 +21,6 @@ context('Alerts Page', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-  })
-
-  it('Active alerts page is displayed by default', () => {
-    visitAlertsPage()
   })
 
   context('Active Alerts', () => {
@@ -114,6 +105,66 @@ context('Alerts Page', () => {
       alertsPage.paginationFooter().should('not.exist')
       alertsPage.paginationSummaryHeader().should('not.exist')
       alertsPage.paginationSummaryFooter().should('not.exist')
+    })
+  })
+
+  context('Paging', () => {
+    let alertsPage
+
+    beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      alertsPage = visitActiveAlertsPage()
+    })
+
+    it('Displays the active alerts tab selected with page 1 selected', () => {
+      alertsPage.paginationCurrentPage().contains('1')
+    })
+
+    it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
+      alertsPage.paginationNextLink().first().click()
+      alertsPage.paginationCurrentPage().contains('2')
+      alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
+
+      alertsPage.paginationPreviousLink().first().click()
+      alertsPage.paginationCurrentPage().contains('1')
+      alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
+    })
+  })
+
+  context('Sorting', () => {
+    let alertsPage
+
+    beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      alertsPage = visitActiveAlertsPage()
+    })
+
+    it('Displays the active alerts tab and sorts results by Created (oldest)', () => {
+      alertsPage.sort().invoke('attr', 'value').should('eq', '') // Default sort - Created (most recent)
+      alertsPage.alertsListItem().first().contains('Created: 24 October 2022 by James T Kirk')
+
+      alertsPage.sort().select('Created (oldest)')
+
+      alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,ASC')
+      alertsPage.alertsListItem().first().contains('Created: 10 June 2020 by Dom Bull')
+    })
+  })
+
+  context('Filtering', () => {
+    let alertsPage
+
+    beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      alertsPage = visitActiveAlertsPage()
+    })
+
+    it('Displays the active alerts tab and filters results', () => {
+      alertsPage.alertsList().children().should('have.length', 20)
+
+      alertsPage.filterCheckbox().click()
+      alertsPage.filterApplyButton().click()
+
+      alertsPage.alertsList().children().should('have.length', 1)
     })
   })
 })

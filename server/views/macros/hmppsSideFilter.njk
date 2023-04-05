@@ -18,7 +18,8 @@
         {% endfor %}
         {{ govukButton({
             text: "Apply",
-            preventDoubleClick: true
+            preventDoubleClick: true,
+            attributes: { "data-qa": "apply-filter-button" }
         }) }}
         <div>
             <a href="{{ options.currentUrlPath }}" class="govuk-link govuk-link--no-visited-state">Clear filters</a>

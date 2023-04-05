@@ -7,6 +7,8 @@ export default class AlertsPage extends Page {
 
   alertsList = (): PageElement => cy.get('.hmpps-alert-card-list')
 
+  alertsListItem = (): PageElement => cy.get('.hmpps-alert-card-list .hmpps-alert-card-list-item')
+
   alertsEmptyState = (): PageElement => cy.get('[data-qa=alerts-empty-state]')
 
   paginationHeader = (): PageElement => cy.get('.hmpps-paged-list-header .moj-pagination')
@@ -32,4 +34,10 @@ export default class AlertsPage extends Page {
     cy.get(
       '.hmpps-paged-list-footer .moj-pagination__item:not(.moj-pagination__item--active):not(.moj-pagination__item--prev):not(.moj-pagination__item--next)',
     )
+
+  sort = (): PageElement => cy.get('#sort')
+
+  filterCheckbox = (): PageElement => cy.get('.hmpps-side-filter .govuk-checkboxes__item').first().find('input')
+
+  filterApplyButton = (): PageElement => cy.get('[data-qa=apply-filter-button]')
 }

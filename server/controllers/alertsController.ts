@@ -38,7 +38,7 @@ export default class AlertsController {
     return res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),
       ...alertsPageData,
-      activeTab: true,
+      activeTab: queryParams.alertStatus === 'ACTIVE',
     })
   }
 }
