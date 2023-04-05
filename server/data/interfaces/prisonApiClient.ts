@@ -1,3 +1,4 @@
+import { Readable } from 'stream'
 import { CaseLoad } from '../../interfaces/caseLoad'
 import { Location } from '../../interfaces/location'
 import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
@@ -47,4 +48,5 @@ export interface PrisonApiClient {
   getAddresses(prisonerNumber: string): Promise<Address[]>
   getAddressesForPerson(personId: number): Promise<Address[]>
   getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
+  getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable>
 }

@@ -5,6 +5,7 @@ import {
   NextOfKin,
   PersonalDetails,
   PersonalPage,
+  PhysicalCharacteristics,
   PropertyItem,
 } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
@@ -43,6 +44,7 @@ export default class PersonalPageService {
       property: this.property(property),
       addresses: this.addresses(addresses),
       nextOfKin: await this.nextOfKin(contacts),
+      physicalCharacteristics: this.physicalCharacteristics(prisonerData, inmateDetail),
     }
   }
 
@@ -183,5 +185,36 @@ export default class PersonalPageService {
   private async addressForPerson(personId: number): Promise<{ personId: number; addresses: Address[] }> {
     const addresses = await this.prisonApiClient.getAddressesForPerson(personId)
     return { personId, addresses }
+  }
+
+  private physicalCharacteristics(prisonerData: Prisoner, inmateDetail: InmateDetail): PhysicalCharacteristics {
+    return {
+      build: prisonerData.build || 'Not entered',
+      distinguishingMarks:
+        inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
+          bodyPart,
+          comment,
+          imageId,
+          side,
+          orientation: orentiation,
+          type,
+        })) || [],
+      facialHair: prisonerData.facialHair || 'Not entered',
+      hairColour: prisonerData.hairColour || 'Not entered',
+      height: (prisonerData.heightCentimetres / 100).toString() || 'Not entered',
+      leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
+      rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
+      shapeOfFace: prisonerData.shapeOfFace || 'Not entered',
+      shoeSize: prisonerData.shoeSize.toString() || 'Not entered',
+      warnedAboutTattooing:
+        getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
+        'Needs to be warned',
+      warnedNotToChangeAppearance:
+        getProfileInformationValue(
+          ProfileInformationType.WarnedNotToChangeAppearance,
+          inmateDetail.profileInformation,
+        ) || 'Needs to be warned',
+      weight: prisonerData.weightKilograms.toString() || 'Not entered',
+    }
   }
 }

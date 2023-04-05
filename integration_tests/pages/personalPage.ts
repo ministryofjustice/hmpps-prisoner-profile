@@ -90,7 +90,7 @@ export default class PersonalPage extends Page {
   }
 
   contacts = () => {
-    const cardData = () => cy.get('[data-qa=emergency-contacts]')
+    const cardData = () => cy.getDataQa('emergency-contacts')
     return {
       contact: contactNumber => {
         const contactData = () => cardData().find('[data-qa=emergency-contact]').eq(contactNumber)
@@ -105,6 +105,34 @@ export default class PersonalPage extends Page {
           address: () => details().eq(1),
           addressPhones: () => details().eq(2),
           addressTypes: () => details().eq(3),
+        }
+      },
+    }
+  }
+
+  appearance = () => {
+    const cardData = () => cy.getDataQa('appearance')
+    const physicalCharacteristic = (row: number) =>
+      cardData().getDataQa('physical-characteristics').find('.govuk-summary-list__value').eq(row)
+    return {
+      height: () => physicalCharacteristic(0),
+      weight: () => physicalCharacteristic(1),
+      hairColour: () => physicalCharacteristic(2),
+      leftEyeColour: () => physicalCharacteristic(3),
+      rightEyeColour: () => physicalCharacteristic(4),
+      shapeOfFace: () => physicalCharacteristic(5),
+      build: () => physicalCharacteristic(6),
+      shoeSize: () => physicalCharacteristic(7),
+      warnedAboutTattooing: () => physicalCharacteristic(8),
+      warnedNotTochangeAppearance: () => physicalCharacteristic(9),
+      distinguishingMarks: (row: number) => {
+        const mark = () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-row').eq(row)
+        return {
+          type: () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-key').eq(row),
+          side: () => mark().findDataQa('mark-side'),
+          orientation: () => mark().findDataQa('mark-orientation'),
+          comment: () => mark().findDataQa('mark-comment'),
+          image: () => mark().findDataQa('mark-image'),
         }
       },
     }

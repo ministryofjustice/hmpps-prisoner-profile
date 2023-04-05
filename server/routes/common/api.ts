@@ -26,4 +26,23 @@ export default class CommonApiRoutes {
         })
     }
   }
+
+  public image: RequestHandler = (req: Request, res: Response) => {
+    const { imageId } = req.params
+    const offenderService = new OffenderService()
+
+    if (imageId === 'placeholder') {
+      res.sendFile(placeHolderImage)
+    } else {
+      offenderService
+        .getImage(res.locals.user.token, imageId)
+        .then(data => {
+          res.type('image/jpeg')
+          data.pipe(res)
+        })
+        .catch(_error => {
+          res.sendFile(placeHolderImage)
+        })
+    }
+  }
 }
