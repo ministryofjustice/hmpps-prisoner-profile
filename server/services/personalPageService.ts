@@ -201,7 +201,7 @@ export default class PersonalPageService {
         })) || [],
       facialHair: prisonerData.facialHair || 'Not entered',
       hairColour: prisonerData.hairColour || 'Not entered',
-      height: prisonerData.heightCentimetres.toString() || 'Not entered',
+      height: (prisonerData.heightCentimetres / 100).toString() || 'Not entered',
       leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
       rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
       shapeOfFace: prisonerData.shapeOfFace || 'Not entered',

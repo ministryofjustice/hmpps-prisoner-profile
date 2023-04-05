@@ -2,44 +2,46 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro mark(info) %}
-  <details class="govuk-details" data-module="govuk-details">
+  <details class="govuk-details" data-module="govuk-details" data-qa="distinguishing-mark">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">View details</span>
     </summary>
     <div class="govuk-details__text">
       {% if info.side %}
-        <p class="govuk-body govuk-!-margin-bottom-1">
+        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
           <span class="govuk-!-font-weight-bold">Side</span><br />
           {{ info.side }}
         </p>
       {% endif %}
       {% if info.orientation %}
-        <p class="govuk-body govuk-!-margin-bottom-1">
+        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
           <span class="govuk-!-font-weight-bold">Orientation</span><br />
           {{ info.orientation }}
         </p>
       {% endif %}
       {% if info.comment %}
-        <p class="govuk-body govuk-!-margin-bottom-1">
+        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
           <span class="govuk-!-font-weight-bold">Comment</span><br />
           {{ info.comment }}
         </p>
       {% endif %}
       {% if info.imageId %}
-        <p class="govuk-body">Picture {{ info.imageId }}</p>
-        <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" />
+        <p class="govuk-body">
+          Picture {{ info.imageId }}
+          <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
+        </p>
       {% endif %}
     </div>
   </details>
 {% endmacro %}
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
-  <div class="govuk-grid-row" data-qa="personal-details">
-    <div class="govuk-grid-column-full">
+  <div class="govuk-grid-row" data-qa="appearance">
+    <div class="govuk-grid-column-full" data-qa="physical-characteristics">
       <h3 class="govuk-heading-m">Physical characteristics</h3>
       {{
         govukSummaryList({
         rows: [
-        {key: { text: "Height"}, value: { text: [physicalCharacteristics.height / 100, "m"] | join } },
+        {key: { text: "Height"}, value: { text: [physicalCharacteristics.height, "m"] | join } },
         {key: { text: "Weight"}, value: { text: [physicalCharacteristics.weight, "kg"] | join } },
         {key: { text: "Hair colour"}, value: { text: physicalCharacteristics.hairColour } },
         {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
@@ -54,9 +56,9 @@
       }}
       {% if physicalCharacteristics.distinguishingMarks.length > 0 %}
         <h3 class="govuk-heading-m">Distinguishing marks</h3>
-        <dl class="govuk-summary-list">
+        <dl class="govuk-summary-list" data-qa="distinguishing-marks">
           {% for m in physicalCharacteristics.distinguishingMarks %}
-            {{ summaryListRow(m.type, mark(m), ["mark-", m.imageId] | join) }}
+            {{ summaryListRow(m.type, mark(m), "distinguishing-mark") }}
           {% endfor %}
         </dl>
       {% endif %}
