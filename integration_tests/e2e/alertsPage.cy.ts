@@ -119,6 +119,7 @@ context('Alerts Page', () => {
     it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
       alertsPage.paginationCurrentPage().contains('1')
       alertsPage.paginationNextLink().first().click()
+      cy.url().should('include', 'page=2')
       alertsPage.paginationCurrentPage().contains('2')
       alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
 
