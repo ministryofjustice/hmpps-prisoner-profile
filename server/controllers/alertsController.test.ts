@@ -1,5 +1,5 @@
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
-import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 
@@ -7,24 +7,8 @@ let req: any
 let res: any
 let controller: any
 
-jest.mock('../services/prisonerSearch.ts', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getPrisonerDetails: () => {
-        return prisonerDetailMock
-      },
-    }
-  })
-})
-jest.mock('../services/alertsPageService.ts', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      get: () => {
-        return pagedActiveAlertsMock
-      },
-    }
-  })
-})
+jest.mock('../services/prisonerSearch.ts')
+jest.mock('../services/alertsPageService.ts')
 
 describe('Alerts Controller', () => {
   beforeEach(() => {
@@ -72,7 +56,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(prisonerDetailMock)
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
+      .mockResolvedValue(pagedInactiveAlertsMock)
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
     await controller.displayAlerts(req, res)
