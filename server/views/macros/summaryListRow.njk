@@ -3,7 +3,7 @@
   {% if hideIfEmpty and not value %}
     <div data-qa="{{ id }}-empty"></div>
   {% else %}
-    <div class="govuk-summary-list__row">
+    <div class="govuk-summary-list__row" data-qa="{{ id }}-row">
       <dt class="govuk-summary-list__key" data-qa="{{ id }}-key">{{ key }}</dt>
       {% if options.html %}
         <dd class="govuk-summary-list__value" data-qa="{{ id }}">{{ value | safe }}</dd>

@@ -407,4 +407,20 @@ export default {
       },
     })
   },
+
+  stubImages: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/images/(\\d*)/data\\?fullSizeImage=true`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+        },
+        bodyFileName: placeHolderImagePath,
+      },
+    })
+  },
 }

@@ -10,35 +10,20 @@ import { propertyMock } from '../data/localMockData/property'
 import { mockAddresses } from '../data/localMockData/addresses'
 import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
 import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
 
   beforeEach(() => {
-    prisonApiClient = {
-      getNonAssociationDetails: jest.fn(),
-      getEventsScheduledForToday: jest.fn(),
-      getUserCaseLoads: jest.fn(),
-      getUserLocations: jest.fn(),
-      getVisitBalances: jest.fn(),
-      getVisitSummary: jest.fn(),
-      getAdjudications: jest.fn(),
-      getAccountBalances: jest.fn(),
-      getAssessments: jest.fn(),
-      getBookingContacts: jest.fn(),
-      getCaseNoteSummaryByTypes: jest.fn(),
-      getPrisoner: jest.fn(async () => prisonerDetailMock),
-      getInmateDetail: jest.fn(async () => inmateDetailMock),
-      getPersonalCareNeeds: jest.fn(),
-      getSecondaryLanguages: jest.fn(async () => secondaryLanguagesMock),
-      getAlerts: jest.fn(),
-      getOffenderActivitiesHistory: jest.fn(),
-      getOffenderAttendanceHistory: jest.fn(),
-      getProperty: jest.fn(async () => propertyMock),
-      getAddresses: jest.fn(async () => mockAddresses),
-      getAddressesForPerson: jest.fn(async () => mockAddresses),
-      getOffenderContacts: jest.fn(async () => mockOffenderContacts),
-    }
+    prisonApiClient = prisonApiClientMock()
+    prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
+    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+    prisonApiClient.getSecondaryLanguages = jest.fn(async () => secondaryLanguagesMock)
+    prisonApiClient.getProperty = jest.fn(async () => propertyMock)
+    prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
+    prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
+    prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
   })
 
   describe('Getting information from the Prison API', () => {
@@ -383,6 +368,41 @@ describe('PersonalPageService', () => {
       expect(contact.nextOfKin).toEqual(true)
       expect(contact.emergencyContact).toEqual(true)
       expect(contact.relationship).toEqual('Relationship description')
+    })
+  })
+
+  describe('Appearance', () => {
+    it('Maps the data from the API', async () => {
+      const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(physicalCharacteristics.height).toEqual('1.88')
+      expect(physicalCharacteristics.weight).toEqual('86')
+      expect(physicalCharacteristics.hairColour).toEqual('Brown')
+      expect(physicalCharacteristics.leftEyeColour).toEqual('Blue')
+      expect(physicalCharacteristics.rightEyeColour).toEqual('Blue')
+      expect(physicalCharacteristics.shapeOfFace).toEqual('Angular')
+      expect(physicalCharacteristics.build).toEqual('Proportional')
+      expect(physicalCharacteristics.shoeSize).toEqual('10')
+      expect(physicalCharacteristics.warnedAboutTattooing).toEqual('Yes')
+      expect(physicalCharacteristics.warnedNotToChangeAppearance).toEqual('Yes')
+
+      const { distinguishingMarks } = physicalCharacteristics
+      expect(distinguishingMarks.length).toEqual(4)
+
+      expect(distinguishingMarks[0].type).toEqual('Tattoo')
+      expect(distinguishingMarks[0].side).toEqual('Left')
+      expect(distinguishingMarks[0].comment).toEqual('Red bull Logo')
+      expect(distinguishingMarks[0].imageId).toEqual(1413021)
+
+      expect(distinguishingMarks[1].type).toEqual('Tattoo')
+      expect(distinguishingMarks[1].side).toEqual('Front')
+      expect(distinguishingMarks[1].comment).toEqual('ARC reactor image')
+      expect(distinguishingMarks[1].imageId).toEqual(1413020)
+
+      expect(distinguishingMarks[2].type).toEqual('Tattoo')
+      expect(distinguishingMarks[2].side).toEqual('Right')
+      expect(distinguishingMarks[2].comment).toEqual('Monster drink logo')
+      expect(distinguishingMarks[2].orientation).toEqual('Facing')
+      expect(distinguishingMarks[2].imageId).toEqual(1413022)
     })
   })
 })

@@ -21,6 +21,7 @@ context('When signed in', () => {
     cy.task('stubAddresses', 'G6123VU')
     cy.task('stubOffenderContacts', 'G6123VU')
     cy.task('stubPersonAddresses')
+    cy.task('stubImages')
   })
 
   it('displays the personal details page', () => {
@@ -178,6 +179,38 @@ context('When signed in', () => {
       thirdContact.phones().should('include.text', '0113222333')
       thirdContact.phones().should('include.text', '0113333444')
       thirdContact.phones().should('include.text', '07711333444')
+    })
+  })
+
+  context('Appearance', () => {
+    it('Displays the appearance information', () => {
+      const page = visitPersonalDetailsPage()
+      page.appearance().height().should('include.text', '1.88m')
+      page.appearance().weight().should('include.text', '86kg')
+      page.appearance().hairColour().should('include.text', 'Brown')
+      page.appearance().leftEyeColour().should('include.text', 'Blue')
+      page.appearance().rightEyeColour().should('include.text', 'Blue')
+      page.appearance().shapeOfFace().should('include.text', 'Angular')
+      page.appearance().build().should('include.text', 'Proportional')
+      page.appearance().shoeSize().should('include.text', '10')
+      page.appearance().warnedAboutTattooing().should('include.text', 'Yes')
+      page.appearance().warnedNotTochangeAppearance().should('include.text', 'Yes')
+
+      page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
+      page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
+      page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
+
+      page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
+      page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
+      page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
+
+      page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
+      page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
+      page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
+      page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
     })
   })
 })

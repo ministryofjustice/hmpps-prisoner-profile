@@ -52,6 +52,15 @@ export type Prisoner = {
     dateTime: string
     nextReviewDate: string
   }
+  heightCentimetres: number
+  weightKilograms: number
+  hairColour: string
+  rightEyeColour: string
+  leftEyeColour: string
+  facialHair: string
+  shapeOfFace: string
+  build: string
+  shoeSize: number
 }
 
 export interface Alias {

@@ -69,10 +69,34 @@ export interface NextOfKin {
   address: Addresses
 }
 
+export interface DistinguishingMark {
+  bodyPart: string
+  type: string
+  side: string
+  orientation: string
+  comment: string
+  imageId: number
+}
+export interface PhysicalCharacteristics {
+  height: string
+  weight: string
+  hairColour: string
+  leftEyeColour: string
+  rightEyeColour: string
+  facialHair: string
+  shapeOfFace: string
+  build: string
+  shoeSize: string
+  warnedAboutTattooing: string
+  warnedNotToChangeAppearance: string
+  distinguishingMarks: DistinguishingMark[]
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
   addresses: Addresses
   nextOfKin: NextOfKin[]
+  physicalCharacteristics: PhysicalCharacteristics
 }
