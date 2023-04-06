@@ -3,6 +3,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { ListMetadata } from '../interfaces/pages/alertsPageData'
 import { SortOption } from '../interfaces/sortSelector'
+import moment from 'moment';
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -243,4 +244,23 @@ export const generateListMetadata = (
       pages,
     },
   }
+}
+
+
+export const formatCurrency = (number: number, currency: string): string =>
+  typeof number === 'number' ? number.toLocaleString('en-GB', { style: 'currency', currency: currency || 'GBP' }) : ''
+
+
+
+export const readableDateFormat = (displayDate: moment.MomentInput, fromFormat = 'DD/MM/YYYY'): moment.MomentInput => {
+  if (displayDate) {
+    return moment(displayDate, fromFormat).format('D MMMM YYYY')
+  }
+  return displayDate
+}
+
+export const sortByEarliestDate = (left: any, right: any) => {
+  const leftDate = moment(left.value, 'D MMMM YYYY')
+  const rightDate = moment(right.value, 'D MMMM YYYY')
+  return leftDate.diff(rightDate)
 }

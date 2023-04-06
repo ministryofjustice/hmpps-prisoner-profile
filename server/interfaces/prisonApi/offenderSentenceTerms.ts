@@ -17,3 +17,14 @@ export interface OffenderSentenceTerms {
   lineSeq: number
   sentenceStartDate: string
 }
+
+export interface SentenceTermUI {
+  sentenceHeader: string
+  sentenceTypeDescription: string
+  summaryDetailRows: SummaryDetailRow[]
+}
+
+interface SummaryDetailRow {
+  label: string
+  value: string
+}

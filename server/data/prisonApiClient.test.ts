@@ -21,6 +21,9 @@ import { secondaryLanguagesMock } from './localMockData/secondaryLanguages'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
+import CourtCasesMock from './localMockData/courtCaseMock'
+import OffenceHistoryMock from './localMockData/offenceHistoryMock'
+import SentenceTermsMock from './localMockData/sentenceTermsMock'
 
 jest.mock('./tokenStore')
 
@@ -220,6 +223,33 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/property`, propertyMock)
       const output = await prisonApiClient.getProperty(bookingId)
       expect(output).toEqual(propertyMock)
+    })
+  })
+
+  describe('getCourtCases', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/court-cases`, CourtCasesMock)
+      const output = await prisonApiClient.getCourtCases(bookingId)
+      expect(output).toEqual(CourtCasesMock)
+    })
+  })
+
+  describe('getOffenceHistory', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = '123456'
+      mockSuccessfulPrisonApiCall(`/api/bookings/offenderNo/${prisonerNumber}/offenceHistory`, OffenceHistoryMock)
+      const output = await prisonApiClient.getOffenceHistory(prisonerNumber)
+      expect(output).toEqual(OffenceHistoryMock)
+    })
+  })
+
+  describe('getSentenceTerms', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`, SentenceTermsMock)
+      const output = await prisonApiClient.getSentenceTerms(bookingId)
+      expect(output).toEqual(SentenceTermsMock)
     })
   })
 })

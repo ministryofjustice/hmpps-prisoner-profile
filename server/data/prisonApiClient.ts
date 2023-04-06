@@ -26,6 +26,10 @@ import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHisto
 import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
+import { CourtCase } from '../interfaces/prisonApi/courtCase'
+import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
+import { OffenderSentenceTerms } from '../interfaces/prisonApi/offenderSentenceTerms'
+import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -178,5 +182,21 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getProperty(bookingId: number): Promise<PropertyContainer[]> {
     return this.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` })
+  }
+
+  async getCourtCases(bookingId: number): Promise<CourtCase[]> {
+    return this.get<CourtCase[]>({ path: `/api/bookings/${bookingId}/court-cases` })
+  }
+
+  async getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]> {
+    return this.get<OffenceHistoryDetail[]>({ path: `/api/bookings/offenderNo/${prisonerNumber}/offenceHistory` })
+  }
+
+  async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms> {
+    return this.get<OffenderSentenceTerms>({ path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC` })
+  }
+
+  async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
+    return this.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences`})
   }
 }

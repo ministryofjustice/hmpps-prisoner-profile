@@ -15,6 +15,7 @@ import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
 import AlertsPageService from '../services/alertsPageService'
+import OffencesPageService from '../services/offencesPageService'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -140,6 +141,22 @@ export default function routes(service: Services): Router {
       ...mapHeaderData(prisonerData, 'alerts'),
       ...alertsPageData,
       activeTab: false,
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+    const offencesPageService = new OffencesPageService(prisonApiClient)
+    const offencesPageData = await offencesPageService.get(prisonerData)
+
+    console.log(offencesPageData.courtCaseData)
+
+    res.render('pages/offences', {
+      ...mapHeaderData(prisonerData, 'offences'),
+      ...offencesPageData,
+      activeTab: true,
     })
   })
 

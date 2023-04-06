@@ -85,10 +85,10 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       href: `${baseUrl}/alerts/active`,
     },
     {
-      label: 'Sentence',
+      label: 'Offences',
       classes: 'govuk-heading-s',
-      id: 'sentence',
-      href: '#',
+      id: 'offences',
+      href: `${baseUrl}/offences`,
       active: false,
     },
     {
@@ -97,6 +97,6 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       id: 'work-and-skills',
       href: `${baseUrl}/work-and-skills`,
       active: false,
-    },
+    }
   ]
 }
