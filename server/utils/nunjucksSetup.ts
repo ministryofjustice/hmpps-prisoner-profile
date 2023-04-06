@@ -2,8 +2,9 @@
 import nunjucks from 'nunjucks'
 import express from 'express'
 import * as pathModule from 'path'
-import { addressToLines, formatDate, formatScheduleItem, initialiseName, summaryListOneHalfWidth } from './utils'
+import { addressToLines, findError, formatScheduleItem, initialiseName, summaryListOneHalfWidth } from './utils'
 import { pluralise } from './pluralise'
+import { formatDate } from './dateHelpers'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -45,4 +46,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
   njkEnv.addFilter('addressToLines', addressToLines)
+  njkEnv.addFilter('findError', findError)
 }

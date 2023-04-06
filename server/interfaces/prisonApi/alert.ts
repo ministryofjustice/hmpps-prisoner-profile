@@ -14,6 +14,8 @@ export interface Alert {
   active: boolean
   addedByFirstName?: string
   addedByLastName?: string
+  addedByFullName?: string
   expiredByFirstName?: string
   expiredByLastName?: string
+  expiredByFullName?: string
 }

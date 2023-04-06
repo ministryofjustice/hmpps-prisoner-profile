@@ -1,6 +1,16 @@
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "../macros/hmppsActionButton.njk" import hmppsActionButton %}
 {% extends "./index.njk" %}
 {% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })
+        }}
+    {% endif %}
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">

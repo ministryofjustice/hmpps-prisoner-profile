@@ -20,6 +20,9 @@ import { mapToQueryString } from '../../server/utils/utils'
 import {
   emptyAlertsMock,
   pagedActiveAlertsMock,
+  pagedActiveAlertsMockFiltered,
+  pagedActiveAlertsMockPage2,
+  pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
 
@@ -284,6 +287,72 @@ export default {
       request: {
         method: 'GET',
         urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=ACTIVE`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubActiveAlertsPage2: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1102484) {
+      jsonResp = pagedActiveAlertsMockPage2
+    } else if (bookingId === 1234567) {
+      jsonResp = emptyAlertsMock
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&alertStatus=ACTIVE`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubActiveAlertsSorted: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1102484) {
+      jsonResp = pagedActiveAlertsMockSorted
+    } else if (bookingId === 1234567) {
+      jsonResp = emptyAlertsMock
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&sort=dateCreated%2CASC&alertStatus=ACTIVE`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubActiveAlertsFiltered: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1102484) {
+      jsonResp = pagedActiveAlertsMockFiltered
+    } else if (bookingId === 1234567) {
+      jsonResp = emptyAlertsMock
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertType=R&alertStatus=ACTIVE`,
       },
       response: {
         status: 200,

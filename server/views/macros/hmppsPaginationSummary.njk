@@ -1,3 +1,7 @@
 {% macro hmppsPaginationSummary(params) %}
-    <p class="moj-pagination__results">Showing <b>{{ params.offset+1 }}</b> to <b>{{ params.offset+params.elementsOnPage }}</b> of <b>{{ params.totalElements }}</b> {{ params.itemDescription }}</p>
+    {% if params.totalElements %}
+        <p class="moj-pagination__results">Showing <b>{{ params.offset+1 }}</b> to <b>{{ params.offset+params.elementsOnPage }}</b> of <b>{{ params.totalElements }}</b> {{ params.itemDescription }}</p>
+    {% else %}
+        <p class="moj-pagination__results"><b>0</b> {{ params.itemDescription }}</p>
+    {% endif %}
 {% endmacro %}

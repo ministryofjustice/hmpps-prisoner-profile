@@ -36,5 +36,5 @@ export interface PagedListQueryParams {
   from?: string
   to?: string
   alertStatus?: 'ACTIVE' | 'INACTIVE'
-  alertType?: string
+  alertType?: string | string[]
 }

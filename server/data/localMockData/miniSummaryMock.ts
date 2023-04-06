@@ -1,10 +1,11 @@
-import { formatDate, formatMoney, formatPrivilegedVisitsSummary } from '../../utils/utils'
+import { formatMoney, formatPrivilegedVisitsSummary } from '../../utils/utils'
 import { MiniSummary, MiniSummaryData } from '../../interfaces/miniSummary'
 import { AccountBalances } from '../../interfaces/accountBalances'
 import { AdjudicationSummary } from '../../interfaces/adjudicationSummary'
 import { VisitSummary } from '../../interfaces/visitSummary'
 import { VisitBalances } from '../../interfaces/visitBalances'
 import { Assessment } from '../../interfaces/prisonApi/assessment'
+import { formatDate } from '../../utils/dateHelpers'
 
 export const accountBalancesMock: AccountBalances = {
   spends: 240.51,

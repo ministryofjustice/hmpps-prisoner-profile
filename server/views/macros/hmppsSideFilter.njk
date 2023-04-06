@@ -2,14 +2,24 @@
 {% macro hmppsSideFilter(options) %}
     <form class="hmpps-side-filter" id="{{options.id | default('filterForm')}}">
         {% if options.title %}
-            <h3 class="hmpps-side-filter__header">{{ options.title }}</h3>
+            <h2 class="hmpps-side-filter__header">{{ options.title }}</h2>
         {% endif %}
         <div class="hmpps-side-filter__content">
             {{ caller() }}
         </div>
+        {% for key, val in options.queryParams %}
+            {% if val and val is iterable and val is not string %}
+                {% for i in val %}
+                    <input type="hidden" name="{{ key }}" value="{{ i }}">
+                {% endfor %}
+            {% elseif val %}
+                <input type="hidden" name="{{ key }}" value="{{ val }}">
+            {% endif %}
+        {% endfor %}
         {{ govukButton({
             text: "Apply",
-            preventDoubleClick: true
+            preventDoubleClick: true,
+            attributes: { "data-qa": "apply-filter-button" }
         }) }}
         <div>
             <a href="{{ options.currentUrlPath }}" class="govuk-link govuk-link--no-visited-state">Clear filters</a>
