@@ -1,7 +1,7 @@
-import { OffenceHistoryDetail } from "../../interfaces/prisonApi/offenceHistoryDetail"
+import { OffenceHistoryDetail } from '../../interfaces/prisonApi/offenceHistoryDetail'
 
 const OffenceHistoryMock: OffenceHistoryDetail[] = [
-    {
+  {
     bookingId: 580596,
     offenceDate: '2011-02-16',
     offenceDescription: 'Burglary dwelling and theft  - no violence',
@@ -13,9 +13,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2012-02-15',
-    caseId: 669502
-    },
-    {
+    caseId: 669502,
+  },
+  {
     bookingId: 401267,
     offenceDate: '2011-02-26',
     offenceDescription: 'Breaching probation order',
@@ -27,9 +27,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2011-05-18',
-    caseId: 462833
-    },
-    {
+    caseId: 462833,
+  },
+  {
     bookingId: 580596,
     offenceDate: '2011-03-20',
     offenceDescription: 'Breach of a community punishment order',
@@ -41,9 +41,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2012-02-15',
-    caseId: 669502
-    },
-    {
+    caseId: 669502,
+  },
+  {
     bookingId: 401267,
     offenceDate: '2011-03-25',
     offenceDescription: 'Burglary dwelling and theft  - no violence',
@@ -55,9 +55,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2011-05-18',
-    caseId: 462833
-    },
-    {
+    caseId: 462833,
+  },
+  {
     bookingId: 580596,
     offenceDate: '2012-02-26',
     offenceDescription: 'Burglary dwelling and theft  - no violence',
@@ -69,9 +69,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2013-07-10',
-    caseId: 666929
-    },
-    {
+    caseId: 666929,
+  },
+  {
     bookingId: 580596,
     offenceDate: '2012-03-05',
     offenceDescription: 'Breach of an anti-social behaviour order',
@@ -83,9 +83,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2012-05-04',
-    caseId: 666929
-    },
-    {
+    caseId: 666929,
+  },
+  {
     bookingId: 580596,
     offenceDate: '2012-03-11',
     offenceDescription: 'Breaching probation order',
@@ -97,9 +97,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2013-07-10',
-    caseId: 666929
-    },
-    {
+    caseId: 666929,
+  },
+  {
     bookingId: 580596,
     offenceDate: '2013-08-14',
     offenceDescription: 'Theft in dwelling other than an automatic machine or meter',
@@ -111,9 +111,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2015-02-11',
-    caseId: 955236
-    },
-    {
+    caseId: 955236,
+  },
+  {
     bookingId: 580596,
     offenceDate: '2013-08-18',
     offenceRangeDate: '2013-07-10',
@@ -126,9 +126,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2015-02-11',
-    caseId: 955236
-    },
-    {
+    caseId: 955236,
+  },
+  {
     bookingId: 1102484,
     offenceDate: '2016-07-14',
     offenceDescription: 'Burglary dwelling - with intent to steal',
@@ -140,9 +140,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2020-06-18',
-    caseId: 1434365
-    },
-    {
+    caseId: 1434365,
+  },
+  {
     bookingId: 1102484,
     offenceDate: '2016-07-17',
     offenceRangeDate: '2016-05-29',
@@ -155,9 +155,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2017-01-10',
-    caseId: 1507172
-    },
-    {
+    caseId: 1507172,
+  },
+  {
     bookingId: 1102484,
     offenceDescription: 'Behave in an indecent / disorderly manner within Manchester International Airport',
     offenceCode: 'MA55026',
@@ -168,9 +168,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2020-07-01',
-    caseId: 1563198
-    },
-    {
+    caseId: 1563198,
+  },
+  {
     bookingId: 580596,
     offenceDescription: 'Breach of personal licence condition - Gambling Act 2005',
     offenceCode: 'GA05046',
@@ -181,9 +181,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2012-02-15',
-    caseId: 669502
-    },
-    {
+    caseId: 669502,
+  },
+  {
     bookingId: 1102484,
     offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
     offenceCode: 'TR68132',
@@ -194,9 +194,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2020-03-02',
-    caseId: 1563148
-    },
-    {
+    caseId: 1563148,
+  },
+  {
     bookingId: 1102484,
     offenceDescription: 'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
     offenceCode: 'WE13097',
@@ -207,9 +207,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2020-03-02',
-    caseId: 1563148
-    },
-    {
+    caseId: 1563148,
+  },
+  {
     bookingId: 1102484,
     offenceDescription: 'Import nuclear material with intent to evade a prohibition / restriction',
     offenceCode: 'CE79245',
@@ -220,9 +220,9 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2020-03-02',
-    caseId: 1563148
-    },
-    {
+    caseId: 1563148,
+  },
+  {
     bookingId: 1102484,
     offenceDescription: 'Accept private hire booking while not holder of PHV operators licence - London',
     offenceCode: 'PH98001',
@@ -233,8 +233,8 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
     primaryResultConviction: true,
     secondaryResultConviction: false,
     courtDate: '2020-07-13',
-    caseId: 1563201
-    }
+    caseId: 1563201,
+  },
 ]
 
 export default OffenceHistoryMock

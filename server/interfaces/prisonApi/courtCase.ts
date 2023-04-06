@@ -1,5 +1,5 @@
-import { Agency } from "./agency"
-import { CourtHearing } from "./courtHearing"
+import { Agency } from './agency'
+import { CourtHearing } from './courtHearing'
 
 export interface CourtCase {
   id: number

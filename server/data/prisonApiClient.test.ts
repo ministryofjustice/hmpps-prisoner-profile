@@ -247,7 +247,10 @@ describe('prisonApiClient', () => {
   describe('getSentenceTerms', () => {
     it('Should return data from the API', async () => {
       const bookingId = 123456
-      mockSuccessfulPrisonApiCall(`/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`, SentenceTermsMock)
+      mockSuccessfulPrisonApiCall(
+        `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
+        SentenceTermsMock,
+      )
       const output = await prisonApiClient.getSentenceTerms(bookingId)
       expect(output).toEqual(SentenceTermsMock)
     })

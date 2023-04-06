@@ -97,6 +97,6 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       id: 'work-and-skills',
       href: `${baseUrl}/work-and-skills`,
       active: false,
-    }
+    },
   ]
 }

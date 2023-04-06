@@ -193,10 +193,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms> {
-    return this.get<OffenderSentenceTerms>({ path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC` })
+    return this.get<OffenderSentenceTerms>({
+      path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
+    })
   }
 
   async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
-    return this.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences`})
+    return this.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences` })
   }
 }
