@@ -45,6 +45,16 @@ export default class PersonalPageService {
       addresses: this.addresses(addresses),
       nextOfKin: await this.nextOfKin(contacts),
       physicalCharacteristics: this.physicalCharacteristics(prisonerData, inmateDetail),
+      security: {
+        interestToImmigration: getProfileInformationValue(
+          ProfileInformationType.InterestToImmigration,
+          inmateDetail.profileInformation,
+        ),
+        travelRestrictions: getProfileInformationValue(
+          ProfileInformationType.TravelRestrictions,
+          inmateDetail.profileInformation,
+        ),
+      },
     }
   }
 

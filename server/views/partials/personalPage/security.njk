@@ -4,14 +4,30 @@
 {%- call summaryCard({title: "Security", id: "security"}) -%}
   <div class="govuk-grid-row" data-qa="security">
     <div class="govuk-grid-column-full">
-      {{ govukWarningText({
-        text: "Interest to immigration",
-        iconFallbackText: "Warning"
-      }) }}
-      {{ govukWarningText({
-        text: "Travel restrictions",
-        iconFallbackText: "Warning"
-      }) }}
+      {% if security.interestToImmigration == "Yes" %}
+        <div class="govuk-warning-text" data-qa="interest-to-immigration">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <div class="govuk-warning-text__text">
+            <strong>
+              <span class="govuk-warning-text__assistive">Warning</span>
+              Interest to immigration
+            </strong>
+          </div>
+        </div>
+      {% endif %}
+      {% if security.travelRestrictions %}
+        <div class="govuk-warning-text" data-qa="travel-restrictions">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <div class="govuk-warning-text__text">
+            <strong>
+              <span class="govuk-warning-text__assistive">Warning</span>
+              Travel restrictions
+            </strong>
+            <br />
+            {{ security.travelRestrictions }}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 {%- endcall -%}
