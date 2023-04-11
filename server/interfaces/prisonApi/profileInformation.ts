@@ -24,4 +24,6 @@ export enum ProfileInformationType {
   OtherNationalities = 'NATIO',
   WarnedAboutTattooing = 'TAT',
   WarnedNotToChangeAppearance = 'APPEAR',
+  InterestToImmigration = 'IMM',
+  TravelRestrictions = 'TRAVEL',
 }

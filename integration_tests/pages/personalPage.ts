@@ -137,4 +137,12 @@ export default class PersonalPage extends Page {
       },
     }
   }
+
+  security = () => {
+    const cardData = () => cy.getDataQa('security')
+    return {
+      interestToImmigration: () => cardData().findDataQa('interest-to-immigration'),
+      travelRestrictions: () => cardData().findDataQa('travel-restrictions'),
+    }
+  }
 }

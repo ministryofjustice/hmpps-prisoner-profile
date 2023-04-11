@@ -92,6 +92,11 @@ export interface PhysicalCharacteristics {
   distinguishingMarks: DistinguishingMark[]
 }
 
+export interface Security {
+  interestToImmigration: string
+  travelRestrictions: string
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
@@ -99,4 +104,5 @@ export interface PersonalPage {
   addresses: Addresses
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
+  security: Security
 }

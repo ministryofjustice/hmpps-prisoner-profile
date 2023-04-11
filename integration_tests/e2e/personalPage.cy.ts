@@ -213,4 +213,13 @@ context('When signed in', () => {
       page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
     })
   })
+
+  context('Security', () => {
+    it('Displays the security warnings', () => {
+      const page = visitPersonalDetailsPage()
+      page.security().interestToImmigration().should('be.visible')
+      page.security().travelRestrictions().should('be.visible')
+      page.security().travelRestrictions().should('include.text', 'some travel restrictions')
+    })
+  })
 })
