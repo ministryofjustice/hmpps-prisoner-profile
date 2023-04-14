@@ -1,0 +1,26 @@
+---
+# Per environment values which override defaults in hmpps-prisoner-profile/values.yaml
+
+generic-service:
+  replicaCount: 2
+
+  ingress:
+    host: prisoner.digital.prison.service.justice.gov.uk
+    contextColour: green
+    v1_2_enabled: true
+    v0_47_enabled: false
+
+  env:
+    INGRESS_URL: "https://prisoner.digital.prison.service.justice.gov.uk"
+    HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
+    TOKEN_VERIFICATION_API_URL: "https://token-verification-api.prison.service.justice.gov.uk"
+    DPS_HOME_PAGE_URL: "https://digital.prison.service.justice.gov.uk"
+    PRISONER_SEARCH_API_URL: "https://prisoner-offender-search.prison.service.justice.gov.uk"
+    PRISON_API_URL: "https://api.prison.service.justice.gov.uk"
+    ALLOCATION_MANAGER_ENDPOINT_URL: "https://moic.service.justice.gov.uk"
+    KEYWORKER_API_URL: "https://keyworker-api.prison.service.justice.gov.uk"
+    CURIOUS_API_URL: "https://liveservices.sequation.com"
+    WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
+
+generic-prometheus-alerts:
+  alertSeverity: digital-prison-service
