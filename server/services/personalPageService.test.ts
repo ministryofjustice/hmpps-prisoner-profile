@@ -11,6 +11,9 @@ import { mockAddresses } from '../data/localMockData/addresses'
 import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
 import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { PersonalCareNeed } from '../interfaces/personalCareNeeds'
+import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
+import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -24,6 +27,8 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
+    prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => [])
+    prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
   })
 
   describe('Getting information from the Prison API', () => {
@@ -419,6 +424,110 @@ describe('PersonalPageService', () => {
       const { security } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
       expect(security.interestToImmigration).toEqual('Yes')
       expect(security.travelRestrictions).toEqual('some travel restrictions')
+    })
+  })
+
+  describe('Care needs', () => {
+    const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
+      const inmateDetail = { ...inmateDetailMock }
+      inmateDetail.personalCareNeeds = careNeeds
+      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
+    }
+
+    const setCodeReferences = (referenceCodes: ReferenceCode[]) => {
+      prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
+    }
+
+    it('Handles empty personal care needs', async () => {
+      setPersonalCareNeeds([])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(0)
+    })
+
+    it('Maps the personal care needs', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'code',
+          problemStatus: 'status',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(1)
+      expect(careNeeds.personalCareNeeds[0].description).toEqual('problem description')
+      expect(careNeeds.personalCareNeeds[0].startDate).toEqual('start date')
+      expect(careNeeds.personalCareNeeds[0].type).toEqual('Code reference description')
+      expect(careNeeds.personalCareNeeds[0].comment).toEqual('Comment text')
+    })
+
+    it('Gets the reasonable adjustments for the domain types', async () => {
+      prisonApiClient.getReferenceCodesByDomain = jest.fn(
+        async () =>
+          [
+            {
+              domain: 'HEALTH_TREAT',
+              code: 'AC',
+              description: 'Accessible Cell',
+              activeFlag: 'Y',
+              listSeq: 99,
+              systemDataFlag: 'N',
+              subCodes: [],
+            },
+            {
+              domain: 'HEALTH_TREAT',
+              code: 'AMP TEL',
+              description: 'Amplified telephone',
+              activeFlag: 'Y',
+              listSeq: 99,
+              systemDataFlag: 'N',
+              subCodes: [],
+            },
+          ] as ReferenceCode[],
+      )
+      await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(prisonApiClient.getReasonableAdjustments).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, [
+        'AC',
+        'AMP TEL',
+      ])
+    })
+
+    it('Maps the reasonable adjustments', async () => {
+      prisonApiClient.getReasonableAdjustments = jest.fn(async () => ({
+        reasonableAdjustments: [
+          {
+            treatmentCode: 'BEH/BODY LAN',
+            commentText: 'psych care type adjustment comment goes here',
+            startDate: '1999-06-09',
+            agencyId: 'MDI',
+            agencyDescription: 'Moorland (HMP & YOI)',
+            treatmentDescription: 'Behavioural responses/Body language',
+          },
+        ],
+      }))
+
+      const {
+        careNeeds: { reasonableAdjustments },
+      } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+
+      expect(reasonableAdjustments.length).toEqual(1)
+      expect(reasonableAdjustments[0].description).toEqual('Behavioural responses/Body language')
+      expect(reasonableAdjustments[0].comment).toEqual('psych care type adjustment comment goes here')
+      expect(reasonableAdjustments[0].startDate).toEqual('1999-06-09')
+      expect(reasonableAdjustments[0].agency).toEqual('Moorland (HMP & YOI)')
     })
   })
 })

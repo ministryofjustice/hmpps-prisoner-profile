@@ -22,6 +22,9 @@ context('When signed in', () => {
     cy.task('stubOffenderContacts', 'G6123VU')
     cy.task('stubPersonAddresses')
     cy.task('stubImages')
+    cy.task('stubHealthReferenceDomain')
+    cy.task('stubHealthTreatmentReferenceDomain')
+    cy.task('stubReasonableAdjustments', 1102484)
   })
 
   it('displays the personal details page', () => {
@@ -220,6 +223,37 @@ context('When signed in', () => {
       page.security().interestToImmigration().should('be.visible')
       page.security().travelRestrictions().should('be.visible')
       page.security().travelRestrictions().should('include.text', 'some travel restrictions')
+    })
+  })
+
+  context('Care needs', () => {
+    it('Displays the care needs', () => {
+      const page = visitPersonalDetailsPage()
+      page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Medical')
+      page.careNeeds().personalCareNeeds(0).description().should('include.text', 'False Limbs')
+      page.careNeeds().personalCareNeeds(0).comment().should('include.text', 'description goes here')
+      page.careNeeds().personalCareNeeds(0).addedOn().should('include.text', '19 May 2020')
+      page.careNeeds().personalCareNeeds(1).type().should('include.text', 'Psychological')
+      page.careNeeds().personalCareNeeds(1).description().should('include.text', 'Depression')
+      page.careNeeds().personalCareNeeds(1).comment().should('include.text', 'depression comment')
+      page.careNeeds().personalCareNeeds(1).addedOn().should('include.text', '1 June 2000')
+
+      page
+        .careNeeds()
+        .reasonableAdjustments(0)
+        .description()
+        .should('include.text', 'Behavioural responses/Body language')
+      page
+        .careNeeds()
+        .reasonableAdjustments(0)
+        .comment()
+        .should('include.text', 'psych care type adjustment comment goes here')
+      page.careNeeds().reasonableAdjustments(0).addedOn().should('include.text', '9 June 1999')
+      page.careNeeds().reasonableAdjustments(0).addedOn().should('include.text', 'Moorland (HMP & YOI)')
+
+      page.careNeeds().reasonableAdjustments(1).description().should('include.text', 'Comfort and Dressing Aids')
+      page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', '9 June 2020')
+      page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', 'Moorland (HMP & YOI)')
     })
   })
 })

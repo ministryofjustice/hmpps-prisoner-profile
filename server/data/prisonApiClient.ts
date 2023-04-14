@@ -28,6 +28,8 @@ import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedLi
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { Address } from '../interfaces/prisonApi/address'
 import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
+import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
+import { ReasonableAdjustments } from '../interfaces/prisonApi/reasonableAdjustment'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -202,5 +204,15 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     } catch (error) {
       return error
     }
+  }
+
+  async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {
+    return this.get<ReferenceCode[]>({ path: `/api/reference-domains/domains/${domain}` })
+  }
+
+  async getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
+    return this.get<ReasonableAdjustments>({
+      path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join(',')}`,
+    })
   }
 }

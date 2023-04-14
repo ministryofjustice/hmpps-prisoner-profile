@@ -20,6 +20,8 @@ import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/page
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
 import { Address } from '../../interfaces/prisonApi/address'
 import { OffenderContacts } from '../../interfaces/prisonApi/offenderContacts'
+import { ReferenceCode, ReferenceCodeDomain } from '../../interfaces/prisonApi/referenceCode'
+import { ReasonableAdjustments } from '../../interfaces/prisonApi/reasonableAdjustment'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -49,4 +51,6 @@ export interface PrisonApiClient {
   getAddressesForPerson(personId: number): Promise<Address[]>
   getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
   getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable>
+  getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]>
+  getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments>
 }

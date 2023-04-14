@@ -1,47 +1,26 @@
+{% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% set disabilityOneHtml %}
-  <p class="govuk-body">Reduced Physical Capacity</p>
-  <p class="govuk-body">Disclosed On Admission @ WDI</p>
-  <p class="govuk-body-s hmpps-secondary-text">Added on 26 May 2016</p>
-{% endset %}
-{% set disabilityTwoHtml %}
-  <p class="govuk-body">Reduced Physical Capacity</p>
-  <p class="govuk-body">Disclosed On Admission @ WDI</p>
-  <p class="govuk-body-s hmpps-secondary-text">Added on 26 May 2016</p>
-{% endset %}
-{% set psychologicalHtml %}
-  <p class="govuk-body">Depression</p>
-  <p class="govuk-body">Woodhill checked 4/17</p>
-  <p class="govuk-body-s hmpps-secondary-text">Added on 26 April 2016</p>
-  <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">Support given</span>
-    </summary>
-    <div class="govuk-details__text">
-      <p class="govuk-body govuk-!-margin-bottom-1">Dining Aids (Eating utensils or holders)</p>
-      <p class="govuk-body govuk-!-margin-bottom-1">Long handled food tray supplied</p>
-      <p class="govuk-body-s  hmpps-secondary-text govuk-!-margin-bottom-1">Added by Woodhill (HMP) on</p>
-      <p class="govuk-body-s hmpps-secondary-text">15 July 2016</p>
-    </div>
-  </details>
-{% endset %}
-{% set disabilityThreeHtml %}
-  <p class="govuk-body">Reduced Physical Capacity</p>
-  <p class="govuk-body">Disclosed On Admission @ WDI</p>
-  <p class="govuk-body-s hmpps-secondary-text">Added on 26 May 2016</p>
-{% endset %}
+{% macro careNeed(info) %}
+  <p class="govuk-body" data-qa="description">{{ info.description }}</p>
+  <p class="govuk-body" data-qa="comment">{{ info.comment }}</p>
+  {% if info.agency %}
+    <p class="govuk-body-s hmpps-secondary-text" data-qa="added-on">Added on {{ info.startDate | formatDate }} at {{ info.agency }}</p>
+  {% else %}
+    <p class="govuk-body-s hmpps-secondary-text" data-qa="added-on">Added on {{ info.startDate | formatDate }}</p>
+  {% endif %}
+{% endmacro %}
 {%- call summaryCard({title: "Care needs", id: "care-needs"}) -%}
-  <div class="govuk-grid-row" data-qa="personal-details">
+  <div class="govuk-grid-row" data-qa="care-needs">
     <div class="govuk-grid-column-full">
-      {{ govukSummaryList({
-          rows: [
-            { key: { text: "Disability"}, value: { html: disabilityOneHtml } },
-            { key: { text: "Disability"}, value: { html: disabilityTwoHtml } },
-            { key: { text: "Phsychological"}, value: { html: psychologicalHtml } },
-            { key: { text: "Disability"}, value: { html: disabilityThreeHtml } }
-          ]
-      }) }}
+      <dl class="govuk-summary-list" data-qa="care-needs-list">
+        {% for need in careNeeds.personalCareNeeds %}
+          {{ summaryListRow(need.type, careNeed(need), "care-need") }}
+        {% endfor %}
+        {% for need in careNeeds.reasonableAdjustments %}
+          {{ summaryListRow(need.type, careNeed(need), "reasonable-adjustment") }}
+        {% endfor %}
+      </dl>
     </div>
   </div>
 {%- endcall -%}
