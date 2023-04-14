@@ -26,31 +26,19 @@
             </div>
         </fieldset>
         {% endif %}
-        <div class="govuk-form-group">
-            {{ govukInput({
-                label: {
-                    text: "Date from",
-                    classes: "govuk-label--m"
-                },
-                id: "from",
-                name: "from",
-                errorMessage: errors | findError('from'),
-                value: listMetadata.filtering.from,
-                autocomplete: "off"
-            }) }}
+        <div class="govuk-form-group ds_datepicker" data-module="ds-datepicker">
+            <label class="govuk-label--m" for="from">Date from</label>
+            <div class="govuk-hint">For example, 31/3/2023.</div>
+            <div class="ds_input__wrapper">
+                <input class="govuk-input" id="from" name="from" type="text" autocomplete="off" value="{{ listMetadata.filtering.from }}">
+            </div>
         </div>
-        <div class="govuk-form-group">
-            {{ govukInput({
-                label: {
-                    text: "Date to",
-                    classes: "govuk-label--m"
-                },
-                id: "to",
-                name: "to",
-                errorMessage: errors | findError('to'),
-                value: listMetadata.filtering.to,
-                autocomplete: "off"
-            }) }}
+        <div class="govuk-form-group ds_datepicker" data-module="ds-datepicker">
+            <label class="govuk-label--m" for="to">Date to</label>
+            <div class="govuk-hint">For example, 31/3/2023.</div>
+            <div class="ds_input__wrapper">
+                <input class="govuk-input" id="to" name="to" type="text" autocomplete="off" value="{{ listMetadata.filtering.to }}">
+            </div>
         </div>
     </div>
 {%- endcall -%}
