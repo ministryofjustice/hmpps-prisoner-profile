@@ -43,3 +43,10 @@ Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber }) => {
   cy.task('stubGetOffenderAttendanceHistory', prisonerNumber)
   cy.task('stubGetOffenderActivities', prisonerNumber)
 })
+
+Cypress.Commands.add('setupOffencesPageStubs', ({ prisonerNumber, bookingId }) => {
+  cy.task('stubGetCourtCases', bookingId)
+  cy.task('stubGetOffenceHistory', prisonerNumber)
+  cy.task('stubGetSentenceTerms', bookingId)
+  cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
+})

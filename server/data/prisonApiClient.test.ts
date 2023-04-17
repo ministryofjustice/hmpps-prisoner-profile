@@ -23,7 +23,7 @@ import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
 import CourtCasesMock from './localMockData/courtCaseMock'
 import OffenceHistoryMock from './localMockData/offenceHistoryMock'
-import SentenceTermsMock from './localMockData/sentenceTermsMock'
+import SentenceTermsMock from './localMockData/SentenceTermsMock'
 
 jest.mock('./tokenStore')
 

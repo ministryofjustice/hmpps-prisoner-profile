@@ -1,16 +1,21 @@
+import { format, startOfToday } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
-import moment from 'moment'
-import { formatCurrency, formatDate, readableDateFormat, sortByEarliestDate } from '../utils/utils'
+import { formatCurrency, formatDate } from '../utils/utils'
 import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
 import { CourtHearing } from '../interfaces/prisonApi/courtHearing'
-import { format, startOfToday, sub } from 'date-fns'
+import { FindConsecutiveSentence, Licence, OffenderSentenceTerms } from '../interfaces/prisonApi/offenderSentenceTerms'
+import { GroupedSentence } from '../interfaces/groupSentencesBySequence'
+import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
+import { Charge } from '../data/enums/chargeCodes'
 
 export default class OffencesPageService {
   private prisonApiClient: PrisonApiClient
+
   constructor(prisonApiClient: PrisonApiClient) {
     this.prisonApiClient = prisonApiClient
   }
+
   public async get(prisonerData: Prisoner) {
     const { prisonerNumber, bookingId } = prisonerData
     const [courtCaseData, releaseDates] = await Promise.all([
@@ -21,8 +26,6 @@ export default class OffencesPageService {
     const courtCasesSentenceDetailsId =
       releaseDates.dates.length > 0 ? 'court-cases-sentence-details' : 'court-cases-upcoming-appearances'
 
-    console.log(courtCaseData[0].courtHearings)
-
     return {
       courtCaseData,
       releaseDates,
@@ -30,115 +33,98 @@ export default class OffencesPageService {
     }
   }
 
-  private async getCourtCasesData(bookingId: number, prisonerNumber: string) {
-    const onlyValidValues = (value: any) => Boolean(value)
+  getLengthTextLabels(data: Licence | OffenderSentenceTerms) {
+    const { years, months, weeks, days } = data
+    const yearsLabel = years > 0 && `${years} ${years === 1 ? 'year' : 'years'}`
+    const monthsLabel = months > 0 && `${months} ${months === 1 ? 'month' : 'months'}`
+    const weeksLabel = weeks > 0 && `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`
+    const daysLabel = days > 0 && `${days} ${days === 1 ? 'day' : 'days'}`
+    return [yearsLabel, monthsLabel, weeksLabel, daysLabel].filter(label => label).join(', ')
+  }
 
-    const getLengthTextLabels = (data: any) => {
-      const { years, months, weeks, days } = data
-
-      const yearsLabel = years > 0 && `${years} ${years === 1 ? 'year' : 'years'}`
-      const monthsLabel = months > 0 && `${months} ${months === 1 ? 'month' : 'months'}`
-      const weeksLabel = weeks > 0 && `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`
-      const daysLabel = days > 0 && `${days} ${days === 1 ? 'day' : 'days'}`
-
-      return [yearsLabel, monthsLabel, weeksLabel, daysLabel].filter(label => label).join(', ')
-    }
-
-    const mergeMostRecentLicenceTerm = (sentences: any) =>
-      sentences.reduce((result: any, current: any) => {
-        if (current.sentenceTermCode === 'IMP' && !result) return current
-        if (current.sentenceTermCode === 'LIC' && !result?.licence) {
-          return {
-            licence: {
-              years: current.years,
-              months: current.months,
-              weeks: current.weeks,
-              days: current.days,
-            },
-            ...result,
-          }
+  mergeMostRecentLicenceTerm(sentences: OffenderSentenceTerms[]) {
+    return sentences.reduce((result: OffenderSentenceTerms, current: OffenderSentenceTerms) => {
+      if (current.sentenceTermCode === 'IMP' && !result) return current
+      if (current.sentenceTermCode === 'LIC' && !result?.licence) {
+        return {
+          licence: {
+            years: current.years,
+            months: current.months,
+            weeks: current.weeks,
+            days: current.days,
+          },
+          ...result,
         }
+      }
+      return result
+    }, null)
+  }
 
-        return result
-      }, null)
+  groupSentencesBySequence(sentences: OffenderSentenceTerms[]) {
+    return sentences.reduce((result: GroupedSentence[], current: OffenderSentenceTerms) => {
+      const key = current.lineSeq
+      const existing = result.find((groupedSentence: GroupedSentence) => groupedSentence.key === key)
 
-    const groupSentencesBySequence = (sentences: any) =>
-      sentences.reduce((result: any, current: any) => {
-        const key = current.lineSeq
-        const existing = result.find((sentence: any) => sentence.key === key)
+      if (existing) {
+        return [
+          { ...existing, items: [...existing.items, current] },
+          ...result.filter((entry: GroupedSentence) => entry.key !== key),
+        ]
+      }
+      return [{ key, caseId: current.caseId, items: [current], summaryListRows: [] }, ...result]
+    }, [])
+  }
 
-        if (existing) {
-          return [
-            { ...existing, items: [...existing.items, current] },
-            ...result.filter((entry: any) => entry.key !== key),
-          ]
-        }
-        return [{ key, caseId: current.caseId, items: [current] }, ...result]
-      }, [])
+  findConsecutiveSentence({ sentences, consecutiveTo }: FindConsecutiveSentence) {
+    const sentence: OffenderSentenceTerms = sentences.find(
+      // eslint-disable-next-line no-shadow
+      (sentences: OffenderSentenceTerms) => sentences.sentenceSequence === consecutiveTo,
+    )
+    return sentence && sentence.lineSeq
+  }
 
-    const sortBySentenceDateThenByImprisonmentLength = (left: any, right: any) => {
-      const startDateLeft = moment(left.sentenceStartDate, 'YYYY-MM-DD')
-      const startDateRight = moment(right.sentenceStartDate, 'YYYY-MM-DD')
+  chargeCodesFilter(offenceHistory: OffenceHistoryDetail[]) {
+    return offenceHistory
+      .filter(offence =>
+        [
+          Charge.Code_1002.toString(),
+          Charge.Code_1501.toString(),
+          Charge.Code_1510.toString(),
+          Charge.Code_1024.toString(),
+          Charge.Code_3045.toString(),
+          Charge.Code_1046.toString(),
+          Charge.Code_1081.toString(),
+          Charge.Code_1003.toString(),
+          Charge.Code_2003.toString(),
+        ].includes(offence.primaryResultCode),
+      )
+      .map(offence => offence.caseId)
+  }
 
-      if (startDateLeft.isAfter(startDateRight)) return 1
-      if (startDateLeft.isBefore(startDateRight)) return -1
-
-      if (left.years < right.years) return 1
-      if (left.years > right.years) return -1
-
-      if (left.months < right.months) return 1
-      if (left.months > right.months) return -1
-
-      if (left.weeks < right.weeks) return 1
-      if (left.weeks > right.weeks) return -1
-
-      return right.days - left.days
-    }
-
-    const findConsecutiveSentence = ({ sentences, consecutiveTo }: any) => {
-      const sentence: any = sentences.find((s: any) => s.sentenceSequence === consecutiveTo)
-      return sentence && sentence.lineSeq
-    }
-
+  async getCourtCasesData(bookingId: number, prisonerNumber: string) {
     const [courtCaseData, offenceHistory, sentenceTermsData] = await Promise.all([
       this.prisonApiClient.getCourtCases(bookingId),
       this.prisonApiClient.getOffenceHistory(prisonerNumber),
       this.prisonApiClient.getSentenceTerms(bookingId),
     ])
 
-    console.log(courtCaseData[0].courtHearings)
-
-    const caseIds = [
-      // Only show charge codes of Imprisonment (1002 & 1510), Recall (1501) and YOI (1024)
-      ...new Set(
-        offenceHistory
-          .filter(offence =>
-            ['1002', '1501', '1510', '1024', '3045', '1046', '1081', '1003', '2003'].includes(
-              offence.primaryResultCode,
-            ),
-          )
-          .map(offence => offence.caseId),
-      ),
-    ]
+    const caseIds = [...new Set(this.chargeCodesFilter(offenceHistory))]
 
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
     return courtCaseData
       .filter(courtCase => caseIds.includes(courtCase.id))
       .map(courtCase => ({
-        courtHearings: courtCase.courtHearings
-          .sort(sortByEarliestDate)
-          .filter(
-            (courtHearing: CourtHearing, index: number) =>
-              index === courtCase.courtHearings.length - 1 && courtCase.courtHearings[index].dateTime > todaysDate,
-          ),
+        courtHearings: courtCase.courtHearings.filter(
+          (courtHearing: CourtHearing, index: number) =>
+            index === courtCase.courtHearings.length - 1 && courtHearing.dateTime > todaysDate,
+        ),
         caseInfoNumber: courtCase.caseInfoNumber || 'Not entered',
         courtName: courtCase.agency && courtCase.agency.description,
-        sentenceTerms: groupSentencesBySequence(sentenceTermsData)
-          .filter((group: any) => Number(group.caseId) === courtCase.id)
-          .map((groupedSentence: any) => mergeMostRecentLicenceTerm(groupedSentence.items))
-          .sort(sortBySentenceDateThenByImprisonmentLength)
-          .map((sentence: any) => ({
+        sentenceTerms: this.groupSentencesBySequence(sentenceTermsData)
+          .filter((group: GroupedSentence) => Number(group.caseId) === courtCase.id)
+          .map((groupedSentence: GroupedSentence) => this.mergeMostRecentLicenceTerm(groupedSentence.items))
+          .map((sentence: OffenderSentenceTerms) => ({
             sentenceHeader: `Sentence ${sentence.lineSeq}`,
             sentenceTypeDescription: sentence.sentenceTypeDescription,
             summaryDetailRows: [
@@ -147,45 +133,45 @@ export default class OffencesPageService {
                 value: formatDate(sentence.sentenceStartDate && sentence.sentenceStartDate, 'long'),
               },
               {
-                label: 'Imprisonment',
-                value: getLengthTextLabels(sentence),
+                label: 'Length',
+                value: this.getLengthTextLabels(sentence),
               },
-              sentence.consecutiveTo && {
+              {
                 label: 'Consecutive to',
-                value: findConsecutiveSentence({ sentences: sentenceTermsData, consecutiveTo: sentence.consecutiveTo }),
+                value: this.findConsecutiveSentence({
+                  sentences: sentenceTermsData,
+                  consecutiveTo: sentence.consecutiveTo,
+                }),
               },
               // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
               sentence.fineAmount && { label: 'Fine', value: formatCurrency(sentence.fineAmount) },
               sentence.licence && {
                 label: 'Licence',
-                value: getLengthTextLabels(sentence.licence),
+                value: this.getLengthTextLabels(sentence.licence),
               },
-            ].filter(onlyValidValues),
+            ],
           })),
         offences: [
           ...new Set(
             offenceHistory
               .filter(offence => offence.caseId === courtCase.id)
               .map(offence => offence.offenceDescription)
-              .filter(onlyValidValues)
               .sort((left, right) => left.localeCompare(right)),
           ),
         ],
       }))
       .filter(courtCase => courtCase.sentenceTerms.length)
       .map(courtCase => {
-        const sentenceDateRow = courtCase.sentenceTerms[0].summaryDetailRows.find(
-          (st: any) => st.label === 'Start date',
-        )
+        const sentenceDateRow = courtCase.sentenceTerms[0].summaryDetailRows[0].value
 
         return {
           ...courtCase,
-          sentenceDate: formatDate(sentenceDateRow && sentenceDateRow.value, 'long'),
+          sentenceDate: typeof sentenceDateRow === 'string' ? formatDate(sentenceDateRow, 'long') : null,
         }
       })
   }
 
-  private async getReleaseDates(prisonerNumber: string) {
+  async getReleaseDates(prisonerNumber: string) {
     const releaseDates: PrisonerSentenceDetails = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
 
     const sentenceDetails = releaseDates.sentenceDetail
@@ -198,7 +184,6 @@ export default class OffencesPageService {
     const detentionTrainingOrderPostRecallDate =
       sentenceDetails.dtoPostRecallReleaseDateOverride || sentenceDetails.dtoPostRecallReleaseDate
 
-    // return {dates:[]}
     return {
       dates: [
         ...(sentenceDetails.homeDetentionCurfewActualDate
@@ -208,7 +193,7 @@ export default class OffencesPageService {
                   text: 'Approved for home detention curfew',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.homeDetentionCurfewActualDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.homeDetentionCurfewActualDate, 'long'),
                 },
               },
             ]
@@ -220,7 +205,7 @@ export default class OffencesPageService {
                   text: 'Conditional release',
                 },
                 value: {
-                  text: readableDateFormat(conditionalRelease, 'YYYY-MM-DD'),
+                  text: formatDate(conditionalRelease, 'long'),
                 },
               },
             ]
@@ -232,7 +217,7 @@ export default class OffencesPageService {
                   text: 'Post recall release',
                 },
                 value: {
-                  text: readableDateFormat(postRecallDate, 'YYYY-MM-DD'),
+                  text: formatDate(postRecallDate, 'long'),
                 },
               },
             ]
@@ -244,7 +229,7 @@ export default class OffencesPageService {
                   text: 'Mid transfer',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.midTermDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.midTermDate, 'long'),
                 },
               },
             ]
@@ -256,7 +241,7 @@ export default class OffencesPageService {
                   text: 'Automatic release',
                 },
                 value: {
-                  text: readableDateFormat(automaticReleaseDate, 'YYYY-MM-DD'),
+                  text: formatDate(automaticReleaseDate, 'long'),
                 },
               },
             ]
@@ -268,7 +253,7 @@ export default class OffencesPageService {
                   text: 'Non parole',
                 },
                 value: {
-                  text: readableDateFormat(nonParoleDate, 'YYYY-MM-DD'),
+                  text: formatDate(nonParoleDate, 'long'),
                 },
               },
             ]
@@ -280,7 +265,7 @@ export default class OffencesPageService {
                   text: 'Detention training post recall',
                 },
                 value: {
-                  text: readableDateFormat(detentionTrainingOrderPostRecallDate, 'YYYY-MM-DD'),
+                  text: formatDate(detentionTrainingOrderPostRecallDate, 'long'),
                 },
               },
             ]
@@ -292,7 +277,7 @@ export default class OffencesPageService {
                   text: 'Parole eligibility',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.paroleEligibilityDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.paroleEligibilityDate, 'long'),
                 },
               },
             ]
@@ -304,7 +289,7 @@ export default class OffencesPageService {
                   text: 'Home detention curfew',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.homeDetentionCurfewEligibilityDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.homeDetentionCurfewEligibilityDate, 'long'),
                 },
               },
             ]
@@ -316,7 +301,7 @@ export default class OffencesPageService {
                   text: 'Release on temporary licence',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.releaseOnTemporaryLicenceDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.releaseOnTemporaryLicenceDate, 'long'),
                 },
               },
             ]
@@ -328,7 +313,7 @@ export default class OffencesPageService {
                   text: 'Early removal scheme',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'long'),
                 },
               },
             ]
@@ -340,7 +325,7 @@ export default class OffencesPageService {
                   text: 'Tariff early removal scheme',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate, 'long'),
                 },
               },
             ]
@@ -352,7 +337,7 @@ export default class OffencesPageService {
                   text: 'Approved for parole',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.actualParoleDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.actualParoleDate, 'long'),
                 },
               },
             ]
@@ -364,7 +349,7 @@ export default class OffencesPageService {
                   text: 'Early transfer',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.earlyTermDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.earlyTermDate, 'long'),
                 },
               },
             ]
@@ -376,7 +361,7 @@ export default class OffencesPageService {
                   text: 'Licence expiry',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.licenceExpiryDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.licenceExpiryDate, 'long'),
                 },
               },
             ]
@@ -388,7 +373,7 @@ export default class OffencesPageService {
                   text: 'Sentence expiry',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.sentenceExpiryDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.sentenceExpiryDate, 'long'),
                 },
               },
             ]
@@ -400,7 +385,7 @@ export default class OffencesPageService {
                   text: 'Top up supervision expiry',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.topupSupervisionExpiryDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.topupSupervisionExpiryDate, 'long'),
                 },
               },
             ]
@@ -412,7 +397,7 @@ export default class OffencesPageService {
                   text: 'Late transfer',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.lateTermDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.lateTermDate, 'long'),
                 },
               },
             ]
@@ -424,12 +409,12 @@ export default class OffencesPageService {
                   text: 'Tariff',
                 },
                 value: {
-                  text: readableDateFormat(sentenceDetails.tariffDate, 'YYYY-MM-DD'),
+                  text: formatDate(sentenceDetails.tariffDate, 'long'),
                 },
               },
             ]
           : []),
-      ].sort(sortByEarliestDate),
+      ],
     }
   }
 }

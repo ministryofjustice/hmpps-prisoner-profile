@@ -192,8 +192,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<OffenceHistoryDetail[]>({ path: `/api/bookings/offenderNo/${prisonerNumber}/offenceHistory` })
   }
 
-  async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms> {
-    return this.get<OffenderSentenceTerms>({
+  async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]> {
+    return this.get<OffenderSentenceTerms[]>({
       path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
     })
   }

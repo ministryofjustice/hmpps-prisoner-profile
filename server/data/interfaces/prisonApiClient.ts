@@ -48,6 +48,6 @@ export interface PrisonApiClient {
   getProperty(bookingId: number): Promise<PropertyContainer[]>
   getCourtCases(bookingId: number): Promise<CourtCase[]>
   getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]>
-  getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms>
+  getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]>
   getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails>
 }

@@ -21,40 +21,70 @@
             </li>
         {% endfor %}
     </ul>
+
     {% if courtCase.sentenceTerms.length > 0 %}
-        <h3 class="govuk-!-margin-top-9">Sentences</h3>
+        <h3>Sentences</h3>
         {% for sentence in courtCase.sentenceTerms %}
             <h4>{{ sentence.sentenceHeader}}</h4>
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full govuk-!-static-padding-left-9">
-                    {{ govukSummaryList({
-                        rows: [
-                            {
-                                key: {
-                                    text: "Type"
-                                },
-                                value: {
-                                    text: sentence.sentenceTypeDescription
-                                }
-                            },
-                            {
-                                key: {
-                                    text: "Start date"
-                                },
-                                value: {
-                                    text: sentence.summaryDetailRows[0].value
-                                }
-                            },
-                            {
-                                key: {
-                                    text: "Length"
-                                },
-                                value: {
-                                    text: sentence.summaryDetailRows[1].value
-                                }
-                            }
-                        ]
-                    }) }}
+                    <dl class="govuk-summary-list">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Type
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                            {{ sentence.sentenceTypeDescription }}
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                            {{ sentence.summaryDetailRows[0].label }}
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                            {{ sentence.summaryDetailRows[0].value }}
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                            {{ sentence.summaryDetailRows[1].label }}
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                            {{ sentence.summaryDetailRows[1].value }}
+                            </dd>
+                        </div>
+                        
+                        {% if (sentence.summaryDetailRows[2].value) and (sentence.summaryDetailRows[2].value !== null) %}
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                {{ sentence.summaryDetailRows[2].label }}
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                {{ sentence.summaryDetailRows[2].value }}
+                                </dd>
+                            </div>
+                        {% endif %}
+                        {% if (sentence.summaryDetailRows[3].value) and (sentence.summaryDetailRows[3].value !== null) %}
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                {{ sentence.summaryDetailRows[3].label }}
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                {{ sentence.summaryDetailRows[3].value }}
+                                </dd>
+                            </div>
+                        {% endif %}
+                        {% if (sentence.summaryDetailRows[4].value) and (sentence.summaryDetailRows[4].value !== null)  %}
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                {{ sentence.summaryDetailRows[4].label }}
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                {{ sentence.summaryDetailRows[4].value }}
+                                </dd>
+                            </div>   
+                        {% endif %}                
+                    </dl>
                 </div>
             </div>    
         {% endfor %}

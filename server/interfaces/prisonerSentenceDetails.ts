@@ -6,40 +6,40 @@ export interface PrisonerSentenceDetails {
   agencyLocationId: string
   mostRecentActiveBooking: boolean
   sentenceDetail: {
-    tariffDate: any
-    lateTermDate: any
-    topupSupervisionExpiryDate: any
-    earlyTermDate: any
-    actualParoleDate: any
-    tariffEarlyRemovalSchemeEligibilityDate: any
-    earlyRemovalSchemeEligibilityDate: any
-    releaseOnTemporaryLicenceDate: any
-    homeDetentionCurfewEligibilityDate: any
-    midTermDate: any
-    homeDetentionCurfewActualDate: any
-    dtoPostRecallReleaseDateOverride: any
-    dtoPostRecallReleaseDate: any
-    nonParoleOverrideDate: any
-    nonParoleDate: any
-    automaticReleaseDate: any
-    postRecallReleaseDate: string
-    automaticReleaseOverrideDate: any
-    conditionalReleaseOverrideDate: string
-    sentenceExpiryDate: string
-    conditionalReleaseDate: string
-    licenceExpiryDate: string
-    paroleEligibilityDate: string
-    effectiveSentenceEndDate: string
-    bookingId: number
-    sentenceStartDate: string
-    postRecallReleaseOverrideDate: string
-    nonDtoReleaseDate: string
-    sentenceExpiryCalculatedDate: string
-    licenceExpiryCalculatedDate: string
-    paroleEligibilityOverrideDate: string
-    nonDtoReleaseDateType: string
-    confirmedReleaseDate: string
-    releaseDate: string
+    tariffDate?: string
+    lateTermDate?: string
+    topupSupervisionExpiryDate?: string
+    earlyTermDate?: string
+    actualParoleDate?: string
+    tariffEarlyRemovalSchemeEligibilityDate?: string
+    earlyRemovalSchemeEligibilityDate?: string
+    releaseOnTemporaryLicenceDate?: string
+    homeDetentionCurfewEligibilityDate?: string
+    midTermDate?: string
+    homeDetentionCurfewActualDate?: string
+    dtoPostRecallReleaseDateOverride?: string
+    dtoPostRecallReleaseDate?: string
+    nonParoleOverrideDate?: string
+    nonParoleDate?: string
+    automaticReleaseDate?: string
+    postRecallReleaseDate?: string
+    automaticReleaseOverrideDate?: string
+    conditionalReleaseOverrideDate?: string
+    sentenceExpiryDate?: string
+    conditionalReleaseDate?: string
+    licenceExpiryDate?: string
+    paroleEligibilityDate?: string
+    effectiveSentenceEndDate?: string
+    bookingId?: number
+    sentenceStartDate?: string
+    postRecallReleaseOverrideDate?: string
+    nonDtoReleaseDate?: string
+    sentenceExpiryCalculatedDate?: string
+    licenceExpiryCalculatedDate?: string
+    paroleEligibilityOverrideDate?: string
+    nonDtoReleaseDateType?: string
+    confirmedReleaseDate?: string
+    releaseDate?: string
   }
   dateOfBirth: string
   agencyLocationDesc: string

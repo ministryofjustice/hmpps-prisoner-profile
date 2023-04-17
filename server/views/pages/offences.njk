@@ -4,7 +4,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <h1>Offences</h1>
-      {% if releaseDates.dates.length == 0 %}
+      {% if courtCase.sentenceTerms.length == 0 %}
         {{ govukWarningText({
           text: "This person is currently being held on remand.",
           iconFallbackText: "Warning"
@@ -14,7 +14,7 @@
   </div>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
-      {% if releaseDates.dates.length == 0 %}
+      {% if courtCase.sentenceTerms.length == 0 %}
         <div class="hmpps-sidebar-single-link">
           <h4 class="govuk-!-margin-top-0">Court cases and offences</h4>
         </div>

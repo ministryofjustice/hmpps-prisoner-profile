@@ -151,8 +151,6 @@ export default function routes(service: Services): Router {
     const offencesPageService = new OffencesPageService(prisonApiClient)
     const offencesPageData = await offencesPageService.get(prisonerData)
 
-    console.log(offencesPageData.courtCaseData)
-
     res.render('pages/offences', {
       ...mapHeaderData(prisonerData, 'offences'),
       ...offencesPageData,

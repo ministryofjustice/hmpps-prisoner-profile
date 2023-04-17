@@ -1,3 +1,5 @@
+import { SummaryListRow } from '../../utils/utils'
+
 export interface OffenderSentenceTerms {
   bookingId: number
   sentenceSequence: number
@@ -16,6 +18,8 @@ export interface OffenderSentenceTerms {
   sentenceTermCode: string
   lineSeq: number
   sentenceStartDate: string
+  licence?: Licence
+  summaryListRow?: SummaryListRow[]
 }
 
 export interface SentenceTermUI {
@@ -27,4 +31,16 @@ export interface SentenceTermUI {
 interface SummaryDetailRow {
   label: string
   value: string
+}
+
+export interface Licence {
+  years: number
+  months: number
+  weeks: number
+  days: number
+}
+
+export interface FindConsecutiveSentence {
+  sentences: OffenderSentenceTerms[]
+  consecutiveTo: string | number
 }

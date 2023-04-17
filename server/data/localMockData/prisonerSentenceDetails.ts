@@ -1,6 +1,6 @@
 import { PrisonerSentenceDetails } from '../../interfaces/prisonerSentenceDetails'
 
-export const prisonerSentenceMock: PrisonerSentenceDetails = {
+export const prisonerSentenceDetailsMock: PrisonerSentenceDetails = {
   bookingId: 1102484,
   offenderNo: 'G6123VU',
   firstName: 'JOHN',
@@ -29,3 +29,5 @@ export const prisonerSentenceMock: PrisonerSentenceDetails = {
   internalLocationDesc: '3-3-028',
   facialImageId: 1413311,
 }
+
+export default prisonerSentenceDetailsMock
