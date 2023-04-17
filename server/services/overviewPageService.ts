@@ -49,7 +49,7 @@ export default class OverviewPageService {
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
     const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
-    const personalDetails = this.getPersonalDetails(prisonerData)
+    const personalDetails = await this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData.bookingId)
     const statuses = await this.getStatuses(prisonerData)
@@ -126,7 +126,9 @@ export default class OverviewPageService {
     return staffContacts
   }
 
-  public getPersonalDetails(prisonerData: Prisoner): PersonalDetails {
+  public async getPersonalDetails(prisonerData: Prisoner): Promise<PersonalDetails> {
+    const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
+
     const personalDetailsMain = [
       {
         key: {
@@ -149,7 +151,7 @@ export default class OverviewPageService {
           text: 'Age',
         },
         value: {
-          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+          text: inmateDetail.age ? inmateDetail.age.toString() : 'None',
         },
       },
       {
@@ -165,7 +167,7 @@ export default class OverviewPageService {
           text: 'Spoken language',
         },
         value: {
-          text: prisonerData.language ? prisonerData.language : 'No language entered',
+          text: inmateDetail.language ? inmateDetail.language : 'No language entered',
         },
       },
     ]

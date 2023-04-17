@@ -39,6 +39,8 @@ import { keyWorkerMock } from '../data/localMockData/keyWorker'
 import { StaffContactsMock } from '../data/localMockData/staffContacts'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { formatDate } from '../utils/dateHelpers'
+import { convertToTitleCase } from '../utils/utils'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -165,8 +167,18 @@ describe('OverviewPageService', () => {
       const bookingId = 567567
 
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId } as Prisoner)
-      expect(res.personalDetails).toEqual(overviewPageService.getPersonalDetails(PrisonerMockDataB))
+      const {
+        personalDetails: { personalDetailsMain, personalDetailsSide },
+      } = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId })
+
+      expect(personalDetailsMain[0].value.text).toEqual(convertToTitleCase(PrisonerMockDataB.firstName))
+      expect(personalDetailsMain[1].value.text).toEqual(formatDate(PrisonerMockDataB.dateOfBirth, 'short'))
+      expect(personalDetailsMain[2].value.text).toEqual(inmateDetailMock.age.toString())
+      expect(personalDetailsMain[3].value.text).toEqual(PrisonerMockDataB.nationality)
+      expect(personalDetailsMain[4].value.text).toEqual(inmateDetailMock.language)
+
+      expect(personalDetailsSide[0].value.text).toEqual(PrisonerMockDataB.croNumber)
+      expect(personalDetailsSide[1].value.text).toEqual(PrisonerMockDataB.pncNumber)
     })
   })
 
