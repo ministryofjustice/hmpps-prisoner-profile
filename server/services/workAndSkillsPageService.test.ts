@@ -27,33 +27,10 @@ import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLates
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('WorkAndSkillsService', () => {
-  const prisonApiClient: PrisonApiClient = {
-    getNonAssociationDetails: jest.fn(),
-    getEventsScheduledForToday: jest.fn(),
-    getUserCaseLoads: jest.fn(),
-    getUserLocations: jest.fn(),
-    getVisitBalances: jest.fn(async () => visitBalancesMock),
-    getVisitSummary: jest.fn(async () => visitSummaryMock),
-    getAdjudications: jest.fn(async () => adjudicationSummaryMock),
-    getAccountBalances: jest.fn(async () => accountBalancesMock),
-    getAssessments: jest.fn(async () => assessmentsMock),
-    getOffenderContacts: jest.fn(),
-    getCaseNoteSummaryByTypes: jest.fn(),
-    getPrisoner: jest.fn(async () => prisonerDetailMock),
-    getInmateDetail: jest.fn(async () => inmateDetailMock),
-    getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
-    getOffenderActivitiesHistory: jest.fn(async () => OffenderActivitiesMock),
-    getOffenderAttendanceHistory: jest.fn(async () => OffenderAttendanceHistoryMock),
-    getSecondaryLanguages: jest.fn(),
-    getAlerts: jest.fn(async () => pagedActiveAlertsMock),
-    getProperty: jest.fn(),
-    getCourtCases: jest.fn(),
-    getOffenceHistory: jest.fn(),
-    getSentenceTerms: jest.fn(),
-    getPrisonerSentenceDetails: jest.fn(),
-  }
+  let prisonApiClient: PrisonApiClient
 
   const curiousApiClient: CuriousApiClient = {
     getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
@@ -69,8 +46,20 @@ describe('WorkAndSkillsService', () => {
   })
 
   beforeEach(() => {
-    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+    prisonApiClient = prisonApiClientMock()
+    prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
+    prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
+    prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+    prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
     prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
+    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+    prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
+    prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock)
+    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
+    prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
+    prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
+    prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
   })
 
   describe('Work and Skills', () => {

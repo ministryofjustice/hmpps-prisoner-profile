@@ -1,3 +1,4 @@
+import { Readable } from 'stream'
 import { CaseLoad } from '../../interfaces/caseLoad'
 import { Location } from '../../interfaces/location'
 import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
@@ -6,7 +7,7 @@ import { AdjudicationSummary } from '../../interfaces/adjudicationSummary'
 import { VisitSummary } from '../../interfaces/visitSummary'
 import { VisitBalances } from '../../interfaces/visitBalances'
 import { Assessment } from '../../interfaces/prisonApi/assessment'
-import { OffenderContact } from '../../interfaces/staffContacts'
+import { ContactDetail } from '../../interfaces/staffContacts'
 import { CaseNote } from '../../interfaces/caseNote'
 import { ScheduledEvent } from '../../interfaces/scheduledEvent'
 import { PrisonerDetail } from '../../interfaces/prisonerDetail'
@@ -21,6 +22,8 @@ import { CourtCase } from '../../interfaces/prisonApi/courtCase'
 import { OffenderSentenceTerms } from '../../interfaces/prisonApi/offenderSentenceTerms'
 import { OffenceHistoryDetail } from '../../interfaces/prisonApi/offenceHistoryDetail'
 import { PrisonerSentenceDetails } from '../../interfaces/prisonerSentenceDetails'
+import { Address } from '../../interfaces/prisonApi/address'
+import { OffenderContacts } from '../../interfaces/prisonApi/offenderContacts'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -31,7 +34,7 @@ export interface PrisonApiClient {
   getVisitSummary(bookingId: number): Promise<VisitSummary>
   getVisitBalances(prisonerNumber: string): Promise<VisitBalances>
   getAssessments(bookingId: number): Promise<Assessment[]>
-  getOffenderContacts(bookingId: number): Promise<OffenderContact>
+  getBookingContacts(bookingId: number): Promise<ContactDetail>
   getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]>
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
   getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
@@ -50,4 +53,8 @@ export interface PrisonApiClient {
   getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]>
   getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]>
   getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails>
+  getAddresses(prisonerNumber: string): Promise<Address[]>
+  getAddressesForPerson(personId: number): Promise<Address[]>
+  getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
+  getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable>
 }

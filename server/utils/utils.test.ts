@@ -1,19 +1,22 @@
 import {
+  addressToLines,
+  arrayToQueryString,
   convertToTitleCase,
-  initialiseName,
-  formatDate,
+  findError,
+  formatMoney,
+  formatName,
   formatScheduleItem,
+  getNamesFromString,
+  initialiseName,
+  mapToQueryString,
+  properCaseName,
   summaryListOneHalfWidth,
   SummaryListRow,
-  formatMoney,
-  properCaseName,
-  mapToQueryString,
-  getNamesFromString,
-  arrayToQueryString,
   yearsBetweenDateStrings,
-  formatName,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { Address } from '../interfaces/address'
+import { HmppsError } from '../interfaces/hmppsError'
 
 describe('convert to title case', () => {
   it.each([
@@ -42,22 +45,6 @@ describe('initialise name', () => {
   ])('%s initialiseName(%s, %s)', (_: string, a: string, expected: string) => {
     expect(initialiseName(a)).toEqual(expected)
   })
-})
-
-describe('format date', () => {
-  it.each([
-    [null, null, undefined, ''],
-    ['[default]', '2023-01-20', undefined, '20 January 2023'],
-    ['long', '2023-01-20', 'long', '20 January 2023'],
-    ['short', '2023-01-20', 'short', '20/01/2023'],
-    ['full', '2023-01-20', 'full', 'Friday, 20 January 2023'],
-    ['medium', '2023-01-20', 'medium', '20 Jan 2023'],
-  ])(
-    '%s: formatDate(%s, %s)',
-    (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
-      expect(formatDate(a, b)).toEqual(expected)
-    },
-  )
 })
 
 describe('format schedule item', () => {
@@ -225,4 +212,67 @@ describe('format name', () => {
       expect(formatName(firstName, middleNames, lastName, options)).toEqual(expected)
     },
   )
+})
+
+describe('Address to lines', () => {
+  it('Maps a full address', () => {
+    const address: Address = {
+      flat: '7',
+      premise: 'premises address',
+      street: 'street field',
+      locality: 'locality field',
+      town: 'Leeds',
+      postalCode: 'LS1 AAA',
+      county: 'West Yorkshire',
+      country: 'England',
+    }
+
+    const lines = addressToLines(address)
+    expect(lines[0]).toEqual('Flat 7, premises address, street field')
+    expect(lines[1]).toEqual('Leeds')
+    expect(lines[2]).toEqual('LS1 AAA')
+    expect(lines[3]).toEqual('England')
+  })
+
+  it('Maps a partial address', () => {
+    const address: Address = {
+      premise: 'premises address',
+      street: 'street field',
+      locality: 'locality field',
+      postalCode: 'LS1 AAA',
+      county: 'West Yorkshire',
+      country: 'England',
+    }
+
+    const lines = addressToLines(address)
+    expect(lines[0]).toEqual('premises address, street field')
+    expect(lines[1]).toEqual('LS1 AAA')
+    expect(lines[2]).toEqual('England')
+  })
+})
+
+describe('findError', () => {
+  it('should return an error from a list of errors', () => {
+    const errors: HmppsError[] = [
+      { text: 'My error', href: '#myError' },
+      { text: 'Some other error', href: '#otherError' },
+    ]
+    const error = findError(errors, 'myError')
+    expect(error.text).toEqual('My error')
+  })
+
+  it('should return null if error is not in a list of errors', () => {
+    const errors: HmppsError[] = [
+      { text: 'My error', href: '#myError' },
+      { text: 'Some other error', href: '#otherError' },
+    ]
+    const error = findError(errors, 'nonExistentError')
+    expect(error).toBeNull()
+  })
+
+  it('should return null if there are no errors', () => {
+    const errors: HmppsError[] = null
+    const error = findError(errors, 'myError')
+    expect(error).toBeNull()
+  })
 })

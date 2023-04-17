@@ -14,8 +14,8 @@ import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
-import AlertsPageService from '../services/alertsPageService'
 import OffencesPageService from '../services/offencesPageService'
+import AlertsController from '../controllers/alertsController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -34,6 +34,7 @@ export default function routes(service: Services): Router {
 
   const commonRoutes = () => {
     get('/api/prisoner/:prisonerNumber/image', commonApiRoutes.prisonerImage)
+    get('/api/image/:imageId', commonApiRoutes.image)
   }
 
   commonRoutes()
@@ -98,50 +99,14 @@ export default function routes(service: Services): Router {
     res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
   })
 
-  get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-
-    // Parse query params for paging, sorting and filtering data
-    const queryParams = {
-      page: req.query.page ? +req.query.page - 1 : undefined, // Change page to zero based for API query
-      sort: req.query.sort ? (req.query.sort as string) : undefined,
-    }
-    const alertsPageService = new AlertsPageService(prisonApiClient)
-    const alertsPageData = await alertsPageService.get(prisonerData, {
-      ...queryParams,
-      alertStatus: 'ACTIVE',
-    })
-
-    res.render('pages/alertsPage', {
-      ...mapHeaderData(prisonerData, 'alerts'),
-      ...alertsPageData,
-      activeTab: true,
-    })
+  get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
+    const alertsController = new AlertsController(res.locals.clientToken)
+    return alertsController.displayAlerts(req, res)
   })
 
-  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-
-    // Parse query params for paging, sorting and filtering data
-    const queryParams = {
-      page: req.query.page ? +req.query.page - 1 : undefined, // Change page to zero based for API query
-      sort: req.query.sort ? (req.query.sort as string) : undefined,
-    }
-    const alertsPageService = new AlertsPageService(prisonApiClient)
-    const alertsPageData = await alertsPageService.get(prisonerData, {
-      ...queryParams,
-      alertStatus: 'INACTIVE',
-    })
-
-    res.render('pages/alertsPage', {
-      ...mapHeaderData(prisonerData, 'alerts'),
-      ...alertsPageData,
-      activeTab: false,
-    })
+  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
+    const alertsController = new AlertsController(res.locals.clientToken)
+    return alertsController.displayAlerts(req, res)
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {

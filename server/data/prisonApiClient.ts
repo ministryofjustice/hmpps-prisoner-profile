@@ -13,7 +13,7 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/prisonApi/assessment'
-import { OffenderContact } from '../interfaces/staffContacts'
+import { ContactDetail } from '../interfaces/staffContacts'
 import { mapToQueryString } from '../utils/utils'
 import { CaseNote } from '../interfaces/caseNote'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
@@ -30,6 +30,8 @@ import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
 import { OffenderSentenceTerms } from '../interfaces/prisonApi/offenderSentenceTerms'
 import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
+import { Address } from '../interfaces/prisonApi/address'
+import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -117,9 +119,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     )
   }
 
-  async getOffenderContacts(bookingId: number): Promise<OffenderContact> {
+  async getBookingContacts(bookingId: number): Promise<ContactDetail> {
     try {
-      return await this.restClient.get<OffenderContact>({ path: `/api/bookings/${bookingId}/contacts` })
+      return await this.restClient.get<ContactDetail>({ path: `/api/bookings/${bookingId}/contacts` })
     } catch (error) {
       return error
     }
@@ -200,5 +202,27 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
     return this.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences` })
+  }
+
+  async getAddresses(prisonerNumber: string): Promise<Address[]> {
+    return this.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses` })
+  }
+
+  async getAddressesForPerson(personId: number): Promise<Address[]> {
+    return this.get<Address[]>({ path: `/api/persons/${personId}/addresses` })
+  }
+
+  async getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts> {
+    return this.get<OffenderContacts>({ path: `/api/offenders/${prisonerNumber}/contacts` })
+  }
+
+  async getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
+    try {
+      return await this.restClient.stream({
+        path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
+      })
+    } catch (error) {
+      return error
+    }
   }
 }

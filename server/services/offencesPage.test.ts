@@ -1,16 +1,5 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
-import {
-  accountBalancesMock,
-  adjudicationSummaryMock,
-  assessmentsMock,
-  visitBalancesMock,
-  visitSummaryMock,
-} from '../data/localMockData/miniSummaryMock'
-import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
-import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import OffencesPageService from './offencesPageService'
 import CourtCasesMock from '../data/localMockData/courtCaseMock'
 import OffenceHistoryMock from '../data/localMockData/offenceHistoryMock'
@@ -23,39 +12,17 @@ import {
   MergeMostRecentLicenseTermMock,
   OffencesPageMockSentences,
 } from '../data/localMockData/offencesPageMock'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('OffencesPageService', () => {
-  const prisonApiClient: PrisonApiClient = {
-    getNonAssociationDetails: jest.fn(),
-    getEventsScheduledForToday: jest.fn(),
-    getUserCaseLoads: jest.fn(),
-    getUserLocations: jest.fn(),
-    getVisitBalances: jest.fn(async () => visitBalancesMock),
-    getVisitSummary: jest.fn(async () => visitSummaryMock),
-    getAdjudications: jest.fn(async () => adjudicationSummaryMock),
-    getAccountBalances: jest.fn(async () => accountBalancesMock),
-    getAssessments: jest.fn(async () => assessmentsMock),
-    getOffenderContacts: jest.fn(),
-    getCaseNoteSummaryByTypes: jest.fn(),
-    getPrisoner: jest.fn(async () => prisonerDetailMock),
-    getInmateDetail: jest.fn(async () => inmateDetailMock),
-    getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
-    getOffenderActivitiesHistory: jest.fn(),
-    getOffenderAttendanceHistory: jest.fn(),
-    getSecondaryLanguages: jest.fn(),
-    getAlerts: jest.fn(async () => pagedActiveAlertsMock),
-    getProperty: jest.fn(),
-    getCourtCases: jest.fn(async () => CourtCasesMock),
-    getOffenceHistory: jest.fn(async () => OffenceHistoryMock),
-    getSentenceTerms: jest.fn(async () => SentenceTermsMock),
-    getPrisonerSentenceDetails: jest.fn(async () => prisonerSentenceDetailsMock),
-  }
+  let prisonApiClient: PrisonApiClient
 
   const offencesPageServiceConstruct = jest.fn(() => {
     return new OffencesPageService(prisonApiClient)
   })
 
   beforeEach(() => {
+    prisonApiClient = prisonApiClientMock()
     prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
     prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
     prisonApiClient.getSentenceTerms = jest.fn(async () => SentenceTermsMock)

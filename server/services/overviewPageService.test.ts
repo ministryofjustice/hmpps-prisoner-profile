@@ -38,33 +38,12 @@ import { pomMock } from '../data/localMockData/pom'
 import { keyWorkerMock } from '../data/localMockData/keyWorker'
 import { StaffContactsMock } from '../data/localMockData/staffContacts'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { formatDate } from '../utils/dateHelpers'
+import { convertToTitleCase } from '../utils/utils'
 
 describe('OverviewPageService', () => {
-  const prisonApiClient: PrisonApiClient = {
-    getNonAssociationDetails: jest.fn(),
-    getEventsScheduledForToday: jest.fn(),
-    getUserCaseLoads: jest.fn(),
-    getUserLocations: jest.fn(),
-    getVisitBalances: jest.fn(async () => visitBalancesMock),
-    getVisitSummary: jest.fn(async () => visitSummaryMock),
-    getAdjudications: jest.fn(async () => adjudicationSummaryMock),
-    getAccountBalances: jest.fn(async () => accountBalancesMock),
-    getAssessments: jest.fn(async () => assessmentsMock),
-    getOffenderContacts: jest.fn(),
-    getCaseNoteSummaryByTypes: jest.fn(),
-    getPrisoner: jest.fn(async () => prisonerDetailMock),
-    getInmateDetail: jest.fn(async () => inmateDetailMock),
-    getPersonalCareNeeds: jest.fn(async () => personalCareNeedsMock),
-    getOffenderActivitiesHistory: jest.fn(),
-    getOffenderAttendanceHistory: jest.fn(),
-    getSecondaryLanguages: jest.fn(),
-    getAlerts: jest.fn(async () => pagedActiveAlertsMock),
-    getProperty: jest.fn(),
-    getCourtCases: jest.fn(),
-    getOffenceHistory: jest.fn(),
-    getSentenceTerms: jest.fn(),
-    getPrisonerSentenceDetails: jest.fn(),
-  }
+  let prisonApiClient: PrisonApiClient
 
   const allocationManagerApiClient: AllocationManagerClient = {
     getPomByOffenderNo: jest.fn(async () => pomMock),
@@ -79,8 +58,18 @@ describe('OverviewPageService', () => {
   })
 
   beforeEach(() => {
-    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+    prisonApiClient = prisonApiClientMock()
+    prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
+    prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
+    prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+    prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
     prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
+    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
+    prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
+    prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
+    prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
   })
 
   describe('Non-associations', () => {
@@ -178,8 +167,18 @@ describe('OverviewPageService', () => {
       const bookingId = 567567
 
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId } as Prisoner)
-      expect(res.personalDetails).toEqual(overviewPageService.getPersonalDetails(PrisonerMockDataB))
+      const {
+        personalDetails: { personalDetailsMain, personalDetailsSide },
+      } = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId })
+
+      expect(personalDetailsMain[0].value.text).toEqual(convertToTitleCase(PrisonerMockDataB.firstName))
+      expect(personalDetailsMain[1].value.text).toEqual(formatDate(PrisonerMockDataB.dateOfBirth, 'short'))
+      expect(personalDetailsMain[2].value.text).toEqual(inmateDetailMock.age.toString())
+      expect(personalDetailsMain[3].value.text).toEqual(PrisonerMockDataB.nationality)
+      expect(personalDetailsMain[4].value.text).toEqual(inmateDetailMock.language)
+
+      expect(personalDetailsSide[0].value.text).toEqual(PrisonerMockDataB.croNumber)
+      expect(personalDetailsSide[1].value.text).toEqual(PrisonerMockDataB.pncNumber)
     })
   })
 

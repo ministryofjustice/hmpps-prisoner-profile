@@ -1,3 +1,5 @@
+import { Address } from '../address'
+
 export interface PersonalDetails {
   age: string
   aliases: {
@@ -49,8 +51,58 @@ export interface PropertyItem {
   location: string
 }
 
+export interface Addresses {
+  address: Address
+  comment: string
+  addressTypes: string[]
+  phones: string[]
+  addedOn: string
+}
+
+export interface NextOfKin {
+  emergencyContact: boolean
+  nextOfKin: boolean
+  name: string
+  relationship: string
+  emails: string[]
+  phones: string[]
+  address: Addresses
+}
+
+export interface DistinguishingMark {
+  bodyPart: string
+  type: string
+  side: string
+  orientation: string
+  comment: string
+  imageId: number
+}
+export interface PhysicalCharacteristics {
+  height: string
+  weight: string
+  hairColour: string
+  leftEyeColour: string
+  rightEyeColour: string
+  facialHair: string
+  shapeOfFace: string
+  build: string
+  shoeSize: string
+  warnedAboutTattooing: string
+  warnedNotToChangeAppearance: string
+  distinguishingMarks: DistinguishingMark[]
+}
+
+export interface Security {
+  interestToImmigration: string
+  travelRestrictions: string
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
+  addresses: Addresses
+  nextOfKin: NextOfKin[]
+  physicalCharacteristics: PhysicalCharacteristics
+  security: Security
 }

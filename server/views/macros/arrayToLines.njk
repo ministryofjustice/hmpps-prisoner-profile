@@ -1,0 +1,9 @@
+{% macro arrayToLines(arr, emptyText="Empty") %}
+  {% if arr.length == 0 %}
+    {{ emptyText }}
+  {% else %}
+    {% for item in arr %}
+      {{ item }}<br />
+    {% endfor %}
+  {% endif %}
+{% endmacro %}

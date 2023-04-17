@@ -12,7 +12,8 @@ import { LearnerProfile } from '../interfaces/learnerProfile'
 import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 import { Prisoner } from '../interfaces/prisoner'
-import { formatDate, properCaseName } from '../utils/utils'
+import { properCaseName } from '../utils/utils'
+import { formatDate } from '../utils/dateHelpers'
 
 export default class WorkAndSkillsPageService {
   private curiousApiClient: CuriousApiClient

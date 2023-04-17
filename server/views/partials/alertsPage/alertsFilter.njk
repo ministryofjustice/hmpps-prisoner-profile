@@ -1,31 +1,11 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
 {% set options = {
     title: 'Filter',
     id: 'alertsFilter',
-    currentUrlPath: currentUrlPath
+    currentUrlPath: currentUrlPath,
+    queryParams: listMetadata.filtering.queryParams
 } %}
-{% set alertTypes = [
-    {
-        code: 'ABC',
-        description: 'Hold against transfer',
-        count: 1,
-        checked: true
-    },
-    {
-        code: 'DEF',
-        description: 'Risk',
-        count: 2,
-        checked: false
-    },
-    {
-        code: 'GHI',
-        description: 'Security',
-        count: 3,
-        checked: true
-    }
-] %}
-{% set dateFrom = '2023-01-31' %}
-{% set dateTo = '' %}
 {%- call hmppsSideFilter(options) -%}
     <div class="govuk-form-group">
         {% if alertTypes.length %}
@@ -47,16 +27,30 @@
         </fieldset>
         {% endif %}
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="dateFrom">
-                Date from
-            </label>
-            <input class="govuk-input" id="dateFrom" name="dateFrom" type="text" value="{{ dateFrom }}">
+            {{ govukInput({
+                label: {
+                    text: "Date from",
+                    classes: "govuk-label--m"
+                },
+                id: "from",
+                name: "from",
+                errorMessage: errors | findError('from'),
+                value: listMetadata.filtering.from,
+                autocomplete: "off"
+            }) }}
         </div>
         <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="dateTo">
-                Date to
-            </label>
-            <input class="govuk-input" id="dateTo" name="dateTo" type="text" value="{{ dateTo }}">
+            {{ govukInput({
+                label: {
+                    text: "Date to",
+                    classes: "govuk-label--m"
+                },
+                id: "to",
+                name: "to",
+                errorMessage: errors | findError('to'),
+                value: listMetadata.filtering.to,
+                autocomplete: "off"
+            }) }}
         </div>
     </div>
 {%- endcall -%}

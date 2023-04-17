@@ -2,8 +2,10 @@
 {%- from './hmppsPaginationSummary.njk' import hmppsPaginationSummary -%}
 
 {% macro hmppsPagedListFooter(listMetadata) %}
-<div class="hmpps-paged-list-footer {{ 'hmpps-paged-list-footer__no-pagination' if listMetadata.pagination.totalPages === 1 }}">
-    {{ hmppsPagination(listMetadata.pagination) }}
-    {{ hmppsPaginationSummary(listMetadata.pagination) }}
-</div>
+    {% if listMetadata.pagination.totalElements %}
+        <div class="hmpps-paged-list-footer {{ 'hmpps-paged-list-footer__no-pagination' if listMetadata.pagination.totalPages === 1 }}">
+            {{ hmppsPagination(listMetadata.pagination) }}
+            {{ hmppsPaginationSummary(listMetadata.pagination) }}
+        </div>
+    {% endif %}
 {% endmacro %}

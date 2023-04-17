@@ -29,6 +29,9 @@ Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber }) => 
   cy.task('stubEventsForProfileImage', prisonerNumber)
   cy.task('stubPrisonerData', prisonerNumber)
   cy.task('stubActiveAlerts', bookingId)
+  cy.task('stubActiveAlertsPage2', bookingId)
+  cy.task('stubActiveAlertsSorted', bookingId)
+  cy.task('stubActiveAlertsFiltered', bookingId)
   cy.task('stubInactiveAlerts', bookingId)
   cy.task('stubInmateDetail', bookingId)
 })
@@ -42,6 +45,14 @@ Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber }) => {
   cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
   cy.task('stubGetOffenderAttendanceHistory', prisonerNumber)
   cy.task('stubGetOffenderActivities', prisonerNumber)
+})
+
+Cypress.Commands.add('getDataQa', id => {
+  return cy.get(`[data-qa=${id}]`)
+})
+
+Cypress.Commands.add('findDataQa', { prevSubject: true }, (subject, id) => {
+  return subject.find(`[data-qa=${id}]`)
 })
 
 Cypress.Commands.add('setupOffencesPageStubs', ({ prisonerNumber, bookingId }) => {

@@ -7,36 +7,23 @@ import { Alias } from '../interfaces/prisoner'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
+import { mockAddresses } from '../data/localMockData/addresses'
+import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
+import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
 
   beforeEach(() => {
-    prisonApiClient = {
-      getNonAssociationDetails: jest.fn(),
-      getEventsScheduledForToday: jest.fn(),
-      getUserCaseLoads: jest.fn(),
-      getUserLocations: jest.fn(),
-      getVisitBalances: jest.fn(),
-      getVisitSummary: jest.fn(),
-      getAdjudications: jest.fn(),
-      getAccountBalances: jest.fn(),
-      getAssessments: jest.fn(),
-      getOffenderContacts: jest.fn(),
-      getCaseNoteSummaryByTypes: jest.fn(),
-      getPrisoner: jest.fn(async () => prisonerDetailMock),
-      getInmateDetail: jest.fn(async () => inmateDetailMock),
-      getPersonalCareNeeds: jest.fn(),
-      getSecondaryLanguages: jest.fn(async () => secondaryLanguagesMock),
-      getAlerts: jest.fn(),
-      getOffenderActivitiesHistory: jest.fn(),
-      getOffenderAttendanceHistory: jest.fn(),
-      getProperty: jest.fn(async () => propertyMock),
-      getCourtCases: jest.fn(),
-      getOffenceHistory: jest.fn(),
-      getSentenceTerms: jest.fn(),
-      getPrisonerSentenceDetails: jest.fn(),
-    }
+    prisonApiClient = prisonApiClientMock()
+    prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
+    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+    prisonApiClient.getSecondaryLanguages = jest.fn(async () => secondaryLanguagesMock)
+    prisonApiClient.getProperty = jest.fn(async () => propertyMock)
+    prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
+    prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
+    prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
   })
 
   describe('Getting information from the Prison API', () => {
@@ -227,6 +214,211 @@ describe('PersonalPageService', () => {
       expect(property[1].containerType).toEqual('Confiscated')
       expect(property[1].sealMark).toEqual('Not entered')
       expect(property[1].location).toEqual('Property Box 15')
+    })
+  })
+
+  describe('Addresses', () => {
+    it('Maps the data from the API for the primary address', async () => {
+      const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const expectedAddress = mockAddresses[0]
+      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
+      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
+
+      expect(addresses.addedOn).toEqual(expectedAddress.startDate)
+      expect(addresses.comment).toEqual(expectedAddress.comment)
+      expect(addresses.phones).toEqual(expectedPhones)
+      expect(addresses.addressTypes).toEqual(expectedTypes)
+
+      const { country, county, flat, locality, postalCode, premise, street, town } = addresses.address
+
+      expect(country).toEqual(expectedAddress.country)
+      expect(county).toEqual(expectedAddress.county)
+      expect(flat).toEqual(expectedAddress.flat)
+      expect(locality).toEqual(expectedAddress.locality)
+      expect(postalCode).toEqual(expectedAddress.postalCode)
+      expect(premise).toEqual(expectedAddress.premise)
+      expect(street).toEqual(expectedAddress.street)
+      expect(town).toEqual(expectedAddress.town)
+    })
+  })
+
+  describe('Next of kin', () => {
+    it('Only maps the active next of kin', async () => {
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(nextOfKin.length).toEqual(3)
+    })
+
+    it('Gets the addresses for each active next of kin', async () => {
+      await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledTimes(3)
+
+      const expectedPersonIds = mockOffenderContacts.offenderContacts
+        .filter(contact => contact.active && contact.nextOfKin)
+        .map(({ personId }) => personId)
+
+      expectedPersonIds.forEach(personId =>
+        expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledWith(personId),
+      )
+    })
+
+    it('Maps the primary address for the contact', async () => {
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const expectedAddress = mockAddresses[0]
+      const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
+      const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
+
+      nextOfKin.forEach(contact => {
+        const { address } = contact
+
+        expect(address.phones).toEqual(expectedPhones)
+        expect(address.addressTypes).toEqual(expectedTypes)
+        const { country, county, flat, locality, postalCode, premise, street, town } = address.address
+
+        expect(country).toEqual(expectedAddress.country)
+        expect(county).toEqual(expectedAddress.county)
+        expect(flat).toEqual(expectedAddress.flat)
+        expect(locality).toEqual(expectedAddress.locality)
+        expect(postalCode).toEqual(expectedAddress.postalCode)
+        expect(premise).toEqual(expectedAddress.premise)
+        expect(street).toEqual(expectedAddress.street)
+        expect(town).toEqual(expectedAddress.town)
+      })
+    })
+
+    it('Maps the data for the contact from the API', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
+
+    it('Handles no addresses defined for the contact', async () => {
+      const offenderContacts: OffenderContacts = {
+        offenderContacts: [
+          {
+            bookingId: 12345,
+            approvedVisitor: true,
+            contactType: 'Person',
+            active: true,
+            nextOfKin: true,
+            emergencyContact: true,
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            relationshipCode: 'CODE',
+            relationshipDescription: 'Relationship description',
+            phones: [
+              {
+                number: '12345',
+                type: 'MOB',
+              },
+              {
+                number: '54321',
+                type: 'MOB',
+              },
+            ],
+            emails: [{ email: 'example@one.com' }, { email: 'example@two.com' }],
+          },
+        ],
+      }
+      prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
+      prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
+      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const contact = nextOfKin[0]
+
+      expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
+      expect(contact.phones).toEqual(['12345', '54321'])
+
+      expect(contact.name).toEqual('First Middle Last')
+      expect(contact.nextOfKin).toEqual(true)
+      expect(contact.emergencyContact).toEqual(true)
+      expect(contact.relationship).toEqual('Relationship description')
+    })
+  })
+
+  describe('Appearance', () => {
+    it('Maps the data from the API', async () => {
+      const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(physicalCharacteristics.height).toEqual('1.88')
+      expect(physicalCharacteristics.weight).toEqual('86')
+      expect(physicalCharacteristics.hairColour).toEqual('Brown')
+      expect(physicalCharacteristics.leftEyeColour).toEqual('Blue')
+      expect(physicalCharacteristics.rightEyeColour).toEqual('Blue')
+      expect(physicalCharacteristics.shapeOfFace).toEqual('Angular')
+      expect(physicalCharacteristics.build).toEqual('Proportional')
+      expect(physicalCharacteristics.shoeSize).toEqual('10')
+      expect(physicalCharacteristics.warnedAboutTattooing).toEqual('Yes')
+      expect(physicalCharacteristics.warnedNotToChangeAppearance).toEqual('Yes')
+
+      const { distinguishingMarks } = physicalCharacteristics
+      expect(distinguishingMarks.length).toEqual(4)
+
+      expect(distinguishingMarks[0].type).toEqual('Tattoo')
+      expect(distinguishingMarks[0].side).toEqual('Left')
+      expect(distinguishingMarks[0].comment).toEqual('Red bull Logo')
+      expect(distinguishingMarks[0].imageId).toEqual(1413021)
+
+      expect(distinguishingMarks[1].type).toEqual('Tattoo')
+      expect(distinguishingMarks[1].side).toEqual('Front')
+      expect(distinguishingMarks[1].comment).toEqual('ARC reactor image')
+      expect(distinguishingMarks[1].imageId).toEqual(1413020)
+
+      expect(distinguishingMarks[2].type).toEqual('Tattoo')
+      expect(distinguishingMarks[2].side).toEqual('Right')
+      expect(distinguishingMarks[2].comment).toEqual('Monster drink logo')
+      expect(distinguishingMarks[2].orientation).toEqual('Facing')
+      expect(distinguishingMarks[2].imageId).toEqual(1413022)
+    })
+
+    it('Handles no physical marks', async () => {
+      const inmateDetail = { ...inmateDetailMock }
+      inmateDetail.physicalMarks = []
+      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
+      const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(physicalCharacteristics.distinguishingMarks.length).toEqual(0)
+    })
+  })
+
+  describe('Security', () => {
+    it('Maps the data from the API', async () => {
+      const { security } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(security.interestToImmigration).toEqual('Yes')
+      expect(security.travelRestrictions).toEqual('some travel restrictions')
     })
   })
 })

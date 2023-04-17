@@ -76,4 +76,73 @@ export default class PersonalPage extends Page {
       }),
     }
   }
+
+  addresess = () => {
+    const cardData = () => cy.get('[data-qa=addresses]')
+    const summaryListValues = () => cardData().find('.govuk-summary-list__value')
+    return {
+      address: () => summaryListValues().eq(0),
+      addressTypes: () => summaryListValues().eq(1),
+      phoneNumbers: () => summaryListValues().eq(2),
+      comments: () => summaryListValues().eq(3),
+      addedOn: () => cardData().find('[data-qa=address-added-on]'),
+    }
+  }
+
+  contacts = () => {
+    const cardData = () => cy.getDataQa('emergency-contacts')
+    return {
+      contact: contactNumber => {
+        const contactData = () => cardData().find('[data-qa=emergency-contact]').eq(contactNumber)
+        const details = () => contactData().find('[data-qa=contact-details]').find('.govuk-summary-list__value')
+
+        return {
+          name: () => contactData().find('[data-qa=contact-name]'),
+          relationship: () => contactData().find('[data-qa=contact-relationship]'),
+          emergencyContact: () => contactData().find('[data-qa=contact-emergency-contact]'),
+          phones: () => contactData().find('[data-qa=contact-numbers]'),
+          emails: () => details().eq(0),
+          address: () => details().eq(1),
+          addressPhones: () => details().eq(2),
+          addressTypes: () => details().eq(3),
+        }
+      },
+    }
+  }
+
+  appearance = () => {
+    const cardData = () => cy.getDataQa('appearance')
+    const physicalCharacteristic = (row: number) =>
+      cardData().getDataQa('physical-characteristics').find('.govuk-summary-list__value').eq(row)
+    return {
+      height: () => physicalCharacteristic(0),
+      weight: () => physicalCharacteristic(1),
+      hairColour: () => physicalCharacteristic(2),
+      leftEyeColour: () => physicalCharacteristic(3),
+      rightEyeColour: () => physicalCharacteristic(4),
+      shapeOfFace: () => physicalCharacteristic(5),
+      build: () => physicalCharacteristic(6),
+      shoeSize: () => physicalCharacteristic(7),
+      warnedAboutTattooing: () => physicalCharacteristic(8),
+      warnedNotTochangeAppearance: () => physicalCharacteristic(9),
+      distinguishingMarks: (row: number) => {
+        const mark = () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-row').eq(row)
+        return {
+          type: () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-key').eq(row),
+          side: () => mark().findDataQa('mark-side'),
+          orientation: () => mark().findDataQa('mark-orientation'),
+          comment: () => mark().findDataQa('mark-comment'),
+          image: () => mark().findDataQa('mark-image'),
+        }
+      },
+    }
+  }
+
+  security = () => {
+    const cardData = () => cy.getDataQa('security')
+    return {
+      interestToImmigration: () => cardData().findDataQa('interest-to-immigration'),
+      travelRestrictions: () => cardData().findDataQa('travel-restrictions'),
+    }
+  }
 }

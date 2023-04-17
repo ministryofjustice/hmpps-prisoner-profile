@@ -1,4 +1,3 @@
-import PrisonerSearchClient from '../data/prisonerSearchClient'
 import PrisonerSearchService from './prisonerSearch'
 import { Prisoner } from '../interfaces/prisoner'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -8,25 +7,28 @@ jest.mock('../data/prisonerSearchClient')
 const prisonerNumber = '123123'
 
 describe('Prisoner search service', () => {
-  let prisonerSearchClient: jest.Mocked<PrisonerSearchClient>
-  let prisonSearchService: PrisonerSearchService
+  let prisonerSearchService: PrisonerSearchService
 
   describe('getUser', () => {
     beforeEach(() => {
-      prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
-      prisonSearchService = new PrisonerSearchService(prisonerSearchClient)
+      prisonerSearchService = new PrisonerSearchService(null)
     })
-    it('Retrieves prisoner', async () => {
-      prisonerSearchClient.getPrisonerDetails.mockResolvedValue(PrisonerMockDataA as Prisoner)
 
-      const result = await prisonSearchService.getPrisonerDetails(prisonerNumber)
+    it('Retrieves prisoner', async () => {
+      jest
+        .spyOn<any, string>(prisonerSearchService['prisonerSearchClient'], 'getPrisonerDetails')
+        .mockReturnValue(PrisonerMockDataA as Prisoner)
+      const result = await prisonerSearchService.getPrisonerDetails(prisonerNumber)
 
       expect(result.croNumber).toEqual('400862/08W')
     })
-    it('Propagates error', async () => {
-      prisonerSearchClient.getPrisonerDetails.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonSearchService.getPrisonerDetails(prisonerNumber)).rejects.toEqual(new Error('some error'))
+    it('Propagates error', async () => {
+      jest
+        .spyOn<any, string>(prisonerSearchService['prisonerSearchClient'], 'getPrisonerDetails')
+        .mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerSearchService.getPrisonerDetails(prisonerNumber)).rejects.toEqual(new Error('some error'))
     })
   })
 })

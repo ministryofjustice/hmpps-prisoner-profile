@@ -6,13 +6,7 @@ import {
   OverviewScheduleItem,
 } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import {
-  convertToTitleCase,
-  formatDate,
-  formatMoney,
-  formatPrivilegedVisitsSummary,
-  getNamesFromString,
-} from '../utils/utils'
+import { convertToTitleCase, formatMoney, formatPrivilegedVisitsSummary, getNamesFromString } from '../utils/utils'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Incentive, Prisoner } from '../interfaces/prisoner'
@@ -30,6 +24,7 @@ import { ProblemStatus } from '../data/enums/problemStatus'
 import { pregnantProblemCodes } from '../data/constants'
 import { BooleanString } from '../data/enums/booleanString'
 import { pluralise } from '../utils/pluralise'
+import { formatDate } from '../utils/dateHelpers'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -54,7 +49,7 @@ export default class OverviewPageService {
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
     const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
-    const personalDetails = this.getPersonalDetails(prisonerData)
+    const personalDetails = await this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData.bookingId)
     const statuses = await this.getStatuses(prisonerData)
@@ -73,7 +68,7 @@ export default class OverviewPageService {
   public async getStaffContacts(prisonerData: Prisoner): Promise<StaffContacts> {
     const { bookingId } = prisonerData
     const [offenderContacts, allocationManager, offenderKeyWorker, keyWorkerSessions] = await Promise.all([
-      this.prisonApiClient.getOffenderContacts(prisonerData.bookingId),
+      this.prisonApiClient.getBookingContacts(prisonerData.bookingId),
       this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
       this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
       this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
@@ -131,7 +126,9 @@ export default class OverviewPageService {
     return staffContacts
   }
 
-  public getPersonalDetails(prisonerData: Prisoner): PersonalDetails {
+  public async getPersonalDetails(prisonerData: Prisoner): Promise<PersonalDetails> {
+    const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
+
     const personalDetailsMain = [
       {
         key: {
@@ -154,7 +151,7 @@ export default class OverviewPageService {
           text: 'Age',
         },
         value: {
-          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+          text: inmateDetail.age ? inmateDetail.age.toString() : 'None',
         },
       },
       {
@@ -170,7 +167,7 @@ export default class OverviewPageService {
           text: 'Spoken language',
         },
         value: {
-          text: prisonerData.language ? prisonerData.language : 'No language entered',
+          text: inmateDetail.language ? inmateDetail.language : 'No language entered',
         },
       },
     ]

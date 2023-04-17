@@ -10,7 +10,7 @@ export interface KeyWorkerUI {
   lastSession: string
 }
 
-export interface OffenderContact {
+export interface ContactDetail {
   bookingId: number
   nextOfKin: [
     {
@@ -60,8 +60,4 @@ export interface OffenderContact {
       createDateTime: string
     },
   ]
-}
-
-export interface OffenderContacts {
-  otherContacts: OffenderContact[]
 }

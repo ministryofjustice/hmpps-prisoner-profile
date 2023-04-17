@@ -1,0 +1,32 @@
+import { PrisonApiClient } from '../../server/data/interfaces/prisonApiClient'
+
+// eslint-disable-next-line import/prefer-default-export
+export const prisonApiClientMock = (): PrisonApiClient => ({
+  getNonAssociationDetails: jest.fn(),
+  getEventsScheduledForToday: jest.fn(),
+  getUserCaseLoads: jest.fn(),
+  getUserLocations: jest.fn(),
+  getVisitBalances: jest.fn(),
+  getVisitSummary: jest.fn(),
+  getAdjudications: jest.fn(),
+  getAccountBalances: jest.fn(),
+  getAssessments: jest.fn(),
+  getBookingContacts: jest.fn(),
+  getCaseNoteSummaryByTypes: jest.fn(),
+  getPrisoner: jest.fn(),
+  getInmateDetail: jest.fn(),
+  getPersonalCareNeeds: jest.fn(),
+  getSecondaryLanguages: jest.fn(),
+  getAlerts: jest.fn(),
+  getOffenderActivitiesHistory: jest.fn(),
+  getOffenderAttendanceHistory: jest.fn(),
+  getProperty: jest.fn(),
+  getAddresses: jest.fn(),
+  getAddressesForPerson: jest.fn(),
+  getOffenderContacts: jest.fn(),
+  getImage: jest.fn(),
+  getCourtCases: jest.fn(),
+  getOffenceHistory: jest.fn(),
+  getSentenceTerms: jest.fn(),
+  getPrisonerSentenceDetails: jest.fn(),
+})

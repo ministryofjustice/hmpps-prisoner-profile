@@ -1,3 +1,4 @@
+import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { yearsBetweenDateStrings } from '../../server/utils/utils'
 import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
@@ -17,6 +18,10 @@ context('When signed in', () => {
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubSecondaryLanguages', 1102484)
     cy.task('stubProperty', 1102484)
+    cy.task('stubAddresses', 'G6123VU')
+    cy.task('stubOffenderContacts', 'G6123VU')
+    cy.task('stubPersonAddresses')
+    cy.task('stubImages')
   })
 
   it('displays the personal details page', () => {
@@ -105,6 +110,116 @@ context('When signed in', () => {
       page.property().item(2).containerType().should('include.text', 'Branston Storage')
       page.property().item(2).sealMark().should('include.text', 'BOB')
       page.property().item(2).location().should('include.text', 'Property Box 3')
+    })
+  })
+
+  context('Addresses', () => {
+    it('Displays the prisoners address', () => {
+      const page = visitPersonalDetailsPage()
+      page.addresess().address().should('include.text', 'Flat 7, premises address, street field')
+      page.addresess().address().should('include.text', 'Leeds')
+      page.addresess().address().should('include.text', 'LS1 AAA')
+      page.addresess().address().should('include.text', 'England')
+
+      page.addresess().addressTypes().should('include.text', 'Discharge - Permanent Housing')
+      page.addresess().addressTypes().should('include.text', 'HDC Address')
+      page.addresess().addressTypes().should('include.text', 'Other')
+
+      page.addresess().phoneNumbers().should('include.text', '4444555566')
+      page.addresess().phoneNumbers().should('include.text', '0113444444')
+      page.addresess().phoneNumbers().should('include.text', '0113 333444')
+      page.addresess().phoneNumbers().should('include.text', '0800 222333')
+
+      page.addresess().comments().should('include.text', mockAddresses[0].comment)
+      page.addresess().addedOn().should('include.text', '1 May 2020')
+    })
+  })
+
+  context('Emergency contacts and next of kin', () => {
+    it('Displays the contacts', () => {
+      const page = visitPersonalDetailsPage()
+
+      const addressShouldIncludeCorrectText = contact => {
+        contact.address().should('include.text', 'Flat 7, premises address, street field')
+        contact.address().should('include.text', 'Leeds')
+        contact.address().should('include.text', 'LS1 AAA')
+        contact.address().should('include.text', 'England')
+
+        contact.addressTypes().should('include.text', 'Discharge - Permanent Housing')
+        contact.addressTypes().should('include.text', 'HDC Address')
+        contact.addressTypes().should('include.text', 'Other')
+
+        contact.addressPhones().should('include.text', '4444555566')
+        contact.addressPhones().should('include.text', '0113444444')
+        contact.addressPhones().should('include.text', '0113 333444')
+        contact.addressPhones().should('include.text', '0800 222333')
+      }
+
+      const firstContact = page.contacts().contact(0)
+      addressShouldIncludeCorrectText(firstContact)
+      firstContact.name().should('include.text', 'First Name Middle Name Surname')
+      firstContact.emergencyContact().should('be.visible')
+      firstContact.relationship().should('include.text', 'Grandson')
+      firstContact.emails().should('include.text', 'Not entered')
+
+      const secondContact = page.contacts().contact(1)
+      addressShouldIncludeCorrectText(secondContact)
+      secondContact.name().should('include.text', 'First Name Middle Name Bob')
+      secondContact.emergencyContact().should('be.visible')
+      secondContact.relationship().should('include.text', 'Cousin')
+      secondContact.emails().should('include.text', 'Not entered')
+      secondContact.phones().should('include.text', '555555 6666666')
+
+      const thirdContact = page.contacts().contact(2)
+      addressShouldIncludeCorrectText(thirdContact)
+      thirdContact.name().should('include.text', 'Dom Bull')
+      thirdContact.relationship().should('include.text', 'Grandfather')
+      thirdContact.emails().should('include.text', 'email@addressgoeshere.com')
+      thirdContact.emails().should('include.text', 'email2@address.com')
+      thirdContact.phones().should('include.text', '0113222333')
+      thirdContact.phones().should('include.text', '0113333444')
+      thirdContact.phones().should('include.text', '07711333444')
+    })
+  })
+
+  context('Appearance', () => {
+    it('Displays the appearance information', () => {
+      const page = visitPersonalDetailsPage()
+      page.appearance().height().should('include.text', '1.88m')
+      page.appearance().weight().should('include.text', '86kg')
+      page.appearance().hairColour().should('include.text', 'Brown')
+      page.appearance().leftEyeColour().should('include.text', 'Blue')
+      page.appearance().rightEyeColour().should('include.text', 'Blue')
+      page.appearance().shapeOfFace().should('include.text', 'Angular')
+      page.appearance().build().should('include.text', 'Proportional')
+      page.appearance().shoeSize().should('include.text', '10')
+      page.appearance().warnedAboutTattooing().should('include.text', 'Yes')
+      page.appearance().warnedNotTochangeAppearance().should('include.text', 'Yes')
+
+      page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
+      page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
+      page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
+
+      page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
+      page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
+      page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
+
+      page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
+      page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
+      page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
+      page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
+    })
+  })
+
+  context('Security', () => {
+    it('Displays the security warnings', () => {
+      const page = visitPersonalDetailsPage()
+      page.security().interestToImmigration().should('be.visible')
+      page.security().travelRestrictions().should('be.visible')
+      page.security().travelRestrictions().should('include.text', 'some travel restrictions')
     })
   })
 })
