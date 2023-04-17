@@ -23,7 +23,7 @@ import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
 import CourtCasesMock from './localMockData/courtCaseMock'
 import OffenceHistoryMock from './localMockData/offenceHistoryMock'
-import SentenceTermsMock from './localMockData/SentenceTermsMock'
+import sentenceTermsMock from './localMockData/sentenceTermsMock'
 import { mockAddresses } from './localMockData/addresses'
 import { mockOffenderContacts } from './localMockData/offenderContacts'
 
@@ -251,10 +251,10 @@ describe('prisonApiClient', () => {
       const bookingId = 123456
       mockSuccessfulPrisonApiCall(
         `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
-        SentenceTermsMock,
+        sentenceTermsMock,
       )
       const output = await prisonApiClient.getSentenceTerms(bookingId)
-      expect(output).toEqual(SentenceTermsMock)
+      expect(output).toEqual(sentenceTermsMock)
     })
   })
 

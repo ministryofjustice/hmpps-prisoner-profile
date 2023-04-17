@@ -1,6 +1,6 @@
 import { SentenceTerm } from '../../interfaces/prisonApi/sentenceTerms'
 
-const SentenceTermsMock: SentenceTerm[] = [
+const sentenceTermsMock: SentenceTerm[] = [
   {
     bookingId: 1102484,
     sentenceSequence: 4,
@@ -74,4 +74,4 @@ const SentenceTermsMock: SentenceTerm[] = [
   },
 ]
 
-export default SentenceTermsMock
+export default sentenceTermsMock

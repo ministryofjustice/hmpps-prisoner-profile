@@ -3,7 +3,7 @@ import { Prisoner } from '../interfaces/prisoner'
 import OffencesPageService from './offencesPageService'
 import CourtCasesMock from '../data/localMockData/courtCaseMock'
 import OffenceHistoryMock from '../data/localMockData/offenceHistoryMock'
-import SentenceTermsMock from '../data/localMockData/SentenceTermsMock'
+import sentenceTermsMock from '../data/localMockData/sentenceTermsMock'
 import { prisonerSentenceDetailsMock } from '../data/localMockData/prisonerSentenceDetails'
 import {
   GetCourtCaseData,
@@ -25,7 +25,7 @@ describe('OffencesPageService', () => {
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
     prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
-    prisonApiClient.getSentenceTerms = jest.fn(async () => SentenceTermsMock)
+    prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
     prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
   })
 
@@ -37,24 +37,24 @@ describe('OffencesPageService', () => {
     })
     it('Get length text labels', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const sentence1 = await offencesPageService.getLengthTextLabels(SentenceTermsMock[0])
-      const sentence2 = await offencesPageService.getLengthTextLabels(SentenceTermsMock[1])
+      const sentence1 = await offencesPageService.getLengthTextLabels(sentenceTermsMock[0])
+      const sentence2 = await offencesPageService.getLengthTextLabels(sentenceTermsMock[1])
       expect(sentence1).toEqual('100 years')
       expect(sentence2).toEqual('10 years')
     })
     it('Merge most recent licence term', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.mergeMostRecentLicenceTerm(SentenceTermsMock)
+      const res = await offencesPageService.mergeMostRecentLicenceTerm(sentenceTermsMock)
       expect(res).toEqual(MergeMostRecentLicenseTermMock)
     })
     it('Group sentences by sequence', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.groupSentencesBySequence(SentenceTermsMock)
+      const res = await offencesPageService.groupSentencesBySequence(sentenceTermsMock)
       expect(res).toEqual(GroupedSentencesMock)
     })
     it('Find consecutive sentences', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.findConsecutiveSentence({ sentences: SentenceTermsMock, consecutiveTo: 4 })
+      const res = await offencesPageService.findConsecutiveSentence({ sentences: sentenceTermsMock, consecutiveTo: 4 })
       expect(res).toEqual(4)
     })
     it('Apply charge code filter', async () => {

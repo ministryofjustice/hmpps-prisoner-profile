@@ -27,7 +27,7 @@ import {
 } from '../../server/data/localMockData/pagedAlertsMock'
 import CourtCasesMock from '../../server/data/localMockData/courtCaseMock'
 import OffenceHistoryMock from '../../server/data/localMockData/offenceHistoryMock'
-import SentenceTermsMock from '../../server/data/localMockData/SentenceTermsMock'
+import sentenceTermsMock from '../../server/data/localMockData/sentenceTermsMock'
 import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/prisonerSentenceDetails'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -471,7 +471,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: SentenceTermsMock,
+        jsonBody: sentenceTermsMock,
       },
     })
   },
