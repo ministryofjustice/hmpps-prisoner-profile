@@ -90,7 +90,7 @@ export default class PersonalPageService {
         written: inmateDetail.writtenLanguage,
       },
       marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
-      nationality: prisonerData.nationality,
+      nationality: prisonerData.nationality || 'Not entered',
       numberOfChildren:
         getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation) || 'Not entered',
       otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
@@ -186,7 +186,7 @@ export default class PersonalPageService {
           emergencyContact: contact.emergencyContact,
           name: formatName(contact.firstName, contact.middleName, contact.lastName),
           nextOfKin: contact.nextOfKin,
-          phones: contact.phones.map(({ number }) => number),
+          phones: contact.phones?.map(({ number }) => number),
           relationship: contact.relationshipDescription,
         }
       })
@@ -211,11 +211,11 @@ export default class PersonalPageService {
         })) || [],
       facialHair: prisonerData.facialHair || 'Not entered',
       hairColour: prisonerData.hairColour || 'Not entered',
-      height: (prisonerData.heightCentimetres / 100).toString() || 'Not entered',
+      height: prisonerData.heightCentimetres ? (prisonerData.heightCentimetres / 100).toString() : 'Not entered',
       leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
       rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
       shapeOfFace: prisonerData.shapeOfFace || 'Not entered',
-      shoeSize: prisonerData.shoeSize.toString() || 'Not entered',
+      shoeSize: prisonerData.shoeSize ? prisonerData.shoeSize.toString() : 'Not entered',
       warnedAboutTattooing:
         getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
         'Needs to be warned',
@@ -224,7 +224,7 @@ export default class PersonalPageService {
           ProfileInformationType.WarnedNotToChangeAppearance,
           inmateDetail.profileInformation,
         ) || 'Needs to be warned',
-      weight: prisonerData.weightKilograms.toString() || 'Not entered',
+      weight: prisonerData.weightKilograms ? prisonerData.weightKilograms.toString() : 'Not entered',
     }
   }
 }
