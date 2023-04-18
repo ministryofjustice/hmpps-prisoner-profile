@@ -97,6 +97,26 @@ export interface Security {
   travelRestrictions: string
 }
 
+export interface CareNeed {
+  type: string
+  description: string
+  comment: string
+  startDate: string
+}
+
+export interface ReasonableAdjustment {
+  type: string
+  description: string
+  comment: string
+  startDate: string
+  agency: string
+}
+
+export interface CareNeeds {
+  personalCareNeeds: CareNeed[]
+  reasonableAdjustments: ReasonableAdjustment[]
+}
+
 export interface PersonalPage {
   personalDetails: PersonalDetails
   identityNumbers: IdentityNumbers
@@ -105,4 +125,5 @@ export interface PersonalPage {
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
+  careNeeds: CareNeeds
 }

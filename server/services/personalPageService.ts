@@ -7,6 +7,7 @@ import {
   PersonalPage,
   PhysicalCharacteristics,
   PropertyItem,
+  CareNeeds,
 } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
@@ -18,6 +19,7 @@ import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
+import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -29,13 +31,24 @@ export default class PersonalPageService {
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
     const { bookingId, prisonerNumber } = prisonerData
 
-    const [inmateDetail, prisonerDetail, secondaryLanguages, property, addresses, contacts] = await Promise.all([
+    const [
+      inmateDetail,
+      prisonerDetail,
+      secondaryLanguages,
+      property,
+      addresses,
+      contacts,
+      healthReferenceCodes,
+      healthTreatmentReferenceCodes,
+    ] = await Promise.all([
       this.prisonApiClient.getInmateDetail(bookingId),
       this.prisonApiClient.getPrisoner(prisonerNumber),
       this.prisonApiClient.getSecondaryLanguages(bookingId),
       this.prisonApiClient.getProperty(bookingId),
       this.prisonApiClient.getAddresses(prisonerNumber),
       this.prisonApiClient.getOffenderContacts(prisonerNumber),
+      this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
+      this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
     ])
 
     return {
@@ -55,6 +68,7 @@ export default class PersonalPageService {
           inmateDetail.profileInformation,
         ),
       },
+      careNeeds: await this.careNeeds(inmateDetail, healthReferenceCodes, healthTreatmentReferenceCodes),
     }
   }
 
@@ -225,6 +239,40 @@ export default class PersonalPageService {
           inmateDetail.profileInformation,
         ) || 'Needs to be warned',
       weight: prisonerData.weightKilograms ? prisonerData.weightKilograms.toString() : 'Not entered',
+    }
+  }
+
+  private async careNeeds(
+    inmateDetail: InmateDetail,
+    healthReferenceCodes: ReferenceCode[],
+    healthTreatmentReferenceCodes: ReferenceCode[],
+  ): Promise<CareNeeds> {
+    const careNeedType = (problemType: string) => {
+      return healthReferenceCodes.find(code => code.code === problemType)?.description || problemType
+    }
+
+    const treatmentCodes = healthTreatmentReferenceCodes.map(code => code.code)
+
+    const { reasonableAdjustments } = await this.prisonApiClient.getReasonableAdjustments(
+      inmateDetail.bookingId,
+      treatmentCodes,
+    )
+
+    return {
+      personalCareNeeds:
+        inmateDetail.personalCareNeeds?.map(careNeed => ({
+          comment: careNeed.commentText,
+          startDate: careNeed.startDate,
+          type: careNeedType(careNeed.problemType),
+          description: careNeed.problemDescription,
+        })) || [],
+      reasonableAdjustments: reasonableAdjustments.map(adjustment => ({
+        type: 'Support needed',
+        description: adjustment.treatmentDescription,
+        startDate: adjustment.startDate,
+        comment: adjustment.commentText,
+        agency: adjustment.agencyDescription,
+      })),
     }
   }
 }

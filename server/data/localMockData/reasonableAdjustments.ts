@@ -1,0 +1,43 @@
+import { ReasonableAdjustments } from '../../interfaces/prisonApi/reasonableAdjustment'
+
+// eslint-disable-next-line import/prefer-default-export
+export const mockReasonableAdjustments: ReasonableAdjustments = {
+  reasonableAdjustments: [
+    {
+      treatmentCode: 'BEH/BODY LAN',
+      commentText: 'psych care type adjustment comment goes here',
+      startDate: '1999-06-09',
+      endDate: null,
+      agencyId: 'MDI',
+      agencyDescription: 'Moorland (HMP & YOI)',
+      treatmentDescription: 'Behavioural responses/Body language',
+    },
+    {
+      treatmentCode: 'CDA',
+      commentText: null,
+      startDate: '2020-06-09',
+      endDate: null,
+      agencyId: 'MDI',
+      agencyDescription: 'Moorland (HMP & YOI)',
+      treatmentDescription: 'Comfort and Dressing Aids',
+    },
+    {
+      treatmentCode: 'AC',
+      commentText: 'maternity care type adjustment comment goes here',
+      startDate: '2020-06-09',
+      endDate: null,
+      agencyId: 'MDI',
+      agencyDescription: 'Moorland (HMP & YOI)',
+      treatmentDescription: 'Accessible Cell',
+    },
+    {
+      treatmentCode: 'AUD/VISUAL',
+      commentText: 'visual impairment disability adjustment comment goes here',
+      startDate: '1996-06-09',
+      endDate: null,
+      agencyId: 'MDI',
+      agencyDescription: 'Moorland (HMP & YOI)',
+      treatmentDescription: 'Audio/visual aids',
+    },
+  ],
+}
