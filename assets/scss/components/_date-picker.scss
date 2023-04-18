@@ -1,6 +1,3 @@
-/*------------------------------------*\
-    DATE PICKER
-\*------------------------------------*/
 @mixin ds_colwidth($columns: 1, $total: 12, $gutter: 32px) {
   width: calc(100% * #{calc($columns/$total)} - #{$gutter});
 }
@@ -101,12 +98,12 @@
         }
 
         &:hover {
-            background-color: rgba(govuk-colour('yellow'), .5);
+          background-color: rgba(govuk-colour('yellow'), .5);
         }
 
         &:focus {
-            background-color: $govuk-focus-colour;
-            border-bottom: 4px solid govuk-colour('black');
+          background-color: $govuk-focus-colour;
+          border-bottom: 4px solid govuk-colour('black');
         }
       }
     }
@@ -241,9 +238,9 @@
 }
 
 .ds_input__wrapper {
-  display: block;
+  display: flex;
   margin-bottom: 24px;
-  overflow: auto;
+  overflow: visible;
 
   .ds_input {
     float: left;
@@ -260,12 +257,9 @@
   > .ds_button {
     margin: 0;
   }
-}
 
-@supports (display: flex) {
-  .ds_input__wrapper {
-    display: flex;
-    overflow: visible;
+  .govuk-form-group {
+    width: 100%;
   }
 }
 
@@ -301,5 +295,9 @@
     background-color: $govuk-focus-colour;
     fill: $govuk-focus-text-colour;
     border-bottom: 4px solid govuk-colour('black');
+  }
+
+  @media (max-width: 768px) {
+    bottom: unset;
   }
 }

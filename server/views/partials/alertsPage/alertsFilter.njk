@@ -1,5 +1,6 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 {% set options = {
     title: 'Filter',
     id: 'alertsFilter',
@@ -26,19 +27,31 @@
             </div>
         </fieldset>
         {% endif %}
-        <div class="govuk-form-group ds_datepicker" data-module="ds-datepicker">
-            <label class="govuk-label--m" for="from">Date from</label>
-            <div class="govuk-hint">For example, 31/3/2023.</div>
-            <div class="ds_input__wrapper">
-                <input class="govuk-input" id="from" name="from" type="text" autocomplete="off" value="{{ listMetadata.filtering.from }}">
-            </div>
-        </div>
-        <div class="govuk-form-group ds_datepicker" data-module="ds-datepicker">
-            <label class="govuk-label--m" for="to">Date to</label>
-            <div class="govuk-hint">For example, 31/3/2023.</div>
-            <div class="ds_input__wrapper">
-                <input class="govuk-input" id="to" name="to" type="text" autocomplete="off" value="{{ listMetadata.filtering.to }}">
-            </div>
-        </div>
+        {{ hmppsDatepicker({
+            id: "from",
+            name: "from",
+            label: {
+                text: "Date from",
+                classes: "govuk-label--m"
+            },
+            hint: {
+              text: "For example, 31/3/2023."
+            },
+            errorMessage: errors | findError('from'),
+            value: listMetadata.filtering.from
+        }) }}
+        {{ hmppsDatepicker({
+            id: "to",
+            name: "to",
+            label: {
+                text: "Date to",
+                classes: "govuk-label--m"
+            },
+            hint: {
+                text: "For example, 31/3/2023."
+            },
+            errorMessage: errors | findError('to'),
+            value: listMetadata.filtering.to
+        }) }}
     </div>
 {%- endcall -%}

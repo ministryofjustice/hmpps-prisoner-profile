@@ -19,6 +19,14 @@
     "typeRoots": ["./server/@types", "./node_modules/@types"],
     "ignoreDeprecations": "5.0"
   },
-  "exclude": ["node_modules", "assets/**/*.js", "integration_tests", "dist", "cypress.config.ts", "coverage"],
+  "exclude": [
+    "node_modules",
+    "assets/**/*.js",
+    "integration_tests",
+    "dist",
+    "cypress.config.ts",
+    "coverage",
+    "server/views/components"
+  ],
   "include": ["**/*.js", "**/*.ts"]
 }
