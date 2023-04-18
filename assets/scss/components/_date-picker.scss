@@ -1,33 +1,4 @@
-@mixin ds_colwidth($columns: 1, $total: 12, $gutter: 32px) {
-  width: calc(100% * #{calc($columns/$total)} - #{$gutter});
-}
-
-@mixin ds_layout($gutter: 32px, $sub: false) {
-  @if $sub {} @else {
-    margin-right: #{$gutter * -1};
-  }
-  overflow: hidden;
-
-  > * {
-    margin-right: $gutter;
-  }
-
-  @supports (display: grid) {
-    display: grid;
-    grid-gap: 0 $gutter;
-    margin-right: 0;
-    overflow: visible;
-
-    > * {
-      margin-left: 0;
-      margin-right: 0;
-      width: auto !important;
-    }
-  }
-}
-
-
-.ds_datepicker {
+.hmpps-datepicker {
   position: relative;
 
   &__dialog {
@@ -90,7 +61,7 @@
         cursor: pointer;
         outline: none;
 
-        .ds_icon {
+        .hmpps-datepicker-icon {
           height: 32px;
           padding: 0;
           position: static;
@@ -165,13 +136,13 @@
           color: $govuk-text-colour;
         }
 
-        &.ds_datepicker__current {
-          $dp-current-outline-width: 2px;
-          outline: $dp-current-outline-width solid govuk-colour('black') !important;
-          outline-offset: #{$dp-current-outline-width * -1};
+        &.hmpps-datepicker__current {
+          $hmpps-current-outline-width: 2px;
+          outline: $hmpps-current-outline-width solid govuk-colour('black') !important;
+          outline-offset: #{$hmpps-current-outline-width * -1};
         }
 
-        &.ds_datepicker__current[tabindex="-1"] {
+        &.hmpps-datepicker__current[tabindex="-1"] {
           background: transparent;
           color: currentColor;
 
@@ -181,7 +152,7 @@
           }
         }
 
-        &.ds_datepicker__today {
+        &.hmpps-datepicker__today {
           font-weight: 700;
 
           &::after {
@@ -196,7 +167,7 @@
           }
         }
 
-        &.ds_selected:not(:focus) {
+        &.hmpps-datepicker-selected:not(:focus) {
           background-color: govuk-colour('black');
           color: govuk-colour('white');
         }
@@ -211,19 +182,20 @@
     }
 
     &__buttongroup {
-      @include ds_layout(8px);
+      display: grid;
+      grid-gap: 0 8px;
+      margin-right: 0;
       overflow: visible;
+      grid-template-columns: 1fr 1fr;
 
-      // non-grid
-      button {
-        @include ds_colwidth(1,2,8px);
-        display: block;
-        float: left;
-        margin: 0;
+      > * {
+        margin-left: 0;
+        margin-right: 0;
+        width: auto !important;
       }
 
-      @supports (display: grid) {
-        grid-template-columns: 1fr 1fr;
+      .govuk-button {
+        margin-bottom: 0;
       }
     }
   }
@@ -237,25 +209,21 @@
   }
 }
 
-.ds_input__wrapper {
+.hmpps-datepicker-input__wrapper {
   display: flex;
   margin-bottom: 24px;
   overflow: visible;
 
-  .ds_input {
+  .govukInput {
     float: left;
     margin-bottom: 0;
     margin-right: -48px;
     padding-right: 56px;
   }
 
-  .ds_icon {
+  .hmpps-datepicker-icon {
     height: 24px;
     width: 32px;
-  }
-
-  > .ds_button {
-    margin: 0;
   }
 
   .govuk-form-group {
@@ -264,7 +232,7 @@
 }
 
 @media (min-width: 768px) {
-  .ds_datepicker {
+  .hmpps-datepicker {
     &__dialog {
       position: absolute;
       width: auto;

@@ -3,7 +3,7 @@
 {% from "govuk/components/hint/macro.njk" import govukHint %}
 {% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 
-<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} ds_datepicker js-initialised" data-module="ds-datepicker">
+<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} hmpps-datepicker" data-module="hmpps-datepicker">
   {{ govukLabel({
     html: params.label.html,
     text: params.label.text,
@@ -35,7 +35,7 @@
       visuallyHiddenText: params.errorMessage.visuallyHiddenText
     }) | indent(2) | trim }}
   {% endif %}
-  <div class="ds_input__wrapper ds_input__wrapper--has-icon">
+  <div class="hmpps-datepicker-input__wrapper">
     {{ govukInput({
       classes: "govuk-input hmpps-js-datepicker-input",
       id: params.id,
@@ -50,7 +50,7 @@
     }) }}
     <button class="hmpps-datepicker-button hmpps-js-datepicker-button" data-button="datepicker-{{ params.name }}-toggle">
       <span class="govuk-visually-hidden">Choose date.</span>
-      <svg focusable="false" class="ds_icon" aria-hidden="true" role="img" viewBox="0 0 22 22">
+      <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img" viewBox="0 0 22 22">
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"

@@ -1,4 +1,18 @@
 /**
+ * Datepicker config
+ *
+ * @typedef {object} DatepickerConfig
+ *
+ * @property {string} [imagePath] - The path to image assets.
+ * @property {string} [id] - .
+ * @property {string} [name] - .
+ * @property {string} [label] - .
+ * @property {string} [hint] - .
+ * @property {string} [minDate] - .
+ * @property {string} [maxDate] - .
+ */
+
+/**
  * Datepicker component
  *
  * @param {HTMLElement} $module - HTML element
@@ -72,7 +86,7 @@ Datepicker.prototype.initControls = function () {
   const titleId = `datepicker-title-${this.$input.id}`
   const dialog = document.createElement('div')
   dialog.id = `datepicker-${this.$input.id}`
-  dialog.setAttribute('class', 'ds_datepicker__dialog  datepickerDialog')
+  dialog.setAttribute('class', 'hmpps-datepicker__dialog  datepickerDialog')
   dialog.setAttribute('role', 'dialog')
   dialog.setAttribute('aria-modal', 'true')
   dialog.setAttribute('aria-labelledby', titleId)
@@ -139,41 +153,39 @@ Datepicker.prototype.initControls = function () {
 
   // populates calendar with initial dates, avoids Wave errors about null buttons
   this.updateCalendar()
-
-  this.$module.classList.add('js-initialised') // TODO remove???
 }
 
 Datepicker.prototype.createDialogMarkup = function (titleId) {
-  return `<div class="ds_datepicker__dialog__header ">
-        <div class="ds_datepicker__dialog__navbuttons">
-            <button class="ds_button  ds_button--icon-only  js-datepicker-prev-year" aria-label="previous year" data-button="button-datepicker-prevyear">
+  return `<div class="hmpps-datepicker__dialog__header ">
+        <div class="hmpps-datepicker__dialog__navbuttons">
+            <button class="js-datepicker-prev-year" aria-label="previous year" data-button="button-datepicker-prevyear">
                 <span class="govuk-visually-hidden">Previous year</span>
-                <svg focusable="false" class="ds_icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_left"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_left"></use></svg>
             </button>
 
-            <button class="ds_button  ds_button--icon-only  js-datepicker-prev-month" aria-label="previous month" data-button="button-datepicker-prevmonth">
+            <button class="js-datepicker-prev-month" aria-label="previous month" data-button="button-datepicker-prevmonth">
                 <span class="govuk-visually-hidden">Previous month</span>
-                <svg focusable="false" class="ds_icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_left"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_left"></use></svg>
             </button>
         </div>
 
-        <h2 id="${titleId}" class="ds_datepicker__dialog__title  js-datepicker-month-year" aria-live="polite">June 2020</h2>
+        <h2 id="${titleId}" class="hmpps-datepicker__dialog__title  js-datepicker-month-year" aria-live="polite">June 2020</h2>
 
-        <div class="ds_datepicker__dialog__navbuttons">
-            <button class="ds_button  ds_button--icon-only  js-datepicker-next-month" aria-label="next month" data-button="button-datepicker-nextmonth">
+        <div class="hmpps-datepicker__dialog__navbuttons">
+            <button class="js-datepicker-next-month" aria-label="next month" data-button="button-datepicker-nextmonth">
                 <span class="govuk-visually-hidden">Next month</span>
-                <svg focusable="false" class="ds_icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_right"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_right"></use></svg>
             </button>
 
-            <button class="ds_button  ds_button--icon-only  js-datepicker-next-year" aria-label="next year" data-button="button-datepicker-nextyear">
+            <button class="js-datepicker-next-year" aria-label="next year" data-button="button-datepicker-nextyear">
                 <span class="govuk-visually-hidden">Next year</span>
-                <svg focusable="false" class="ds_icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_right"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_right"></use></svg>
             </button>
         </div>
       </div>
 
-      <table class="ds_datepicker__dialog__table  js-datepicker-grid" role="grid" aria-labelledby="${titleId}">
-      <caption class="ds_datepicker__dialog__table-caption">You can use the arrow keys to select a date</caption>
+      <table class="hmpps-datepicker__dialog__table  js-datepicker-grid" role="grid" aria-labelledby="${titleId}">
+      <caption class="hmpps-datepicker__dialog__table-caption">You can use the arrow keys to select a date</caption>
       <thead>
           <tr>
           <th scope="col" abbr="Monday">Mo</th>
@@ -189,7 +201,7 @@ Datepicker.prototype.createDialogMarkup = function (titleId) {
       <tbody></tbody>
       </table>
 
-      <div class="ds_datepicker__dialog__buttongroup">
+      <div class="hmpps-datepicker__dialog__buttongroup">
       <button type="button" class="govuk-button js-datepicker-ok" value="ok" data-button="button-datepicker-ok">Select</button>
       <button type="button" class="govuk-button govuk-button--secondary js-datepicker-cancel" value="cancel" data-button="button-datepicker-cancel">Cancel</button>
       </div>`
@@ -203,14 +215,6 @@ Datepicker.prototype.leadingZeroes = function (value, length = 2) {
   }
 
   return ret
-}
-
-Datepicker.prototype.setMinDate = function (date) {
-  this.$input.dataset.mindate = this.formattedDateFromDate(date)
-}
-
-Datepicker.prototype.setMaxDate = function (date) {
-  this.$input.dataset.maxdate = this.formattedDateFromDate(date)
 }
 
 Datepicker.prototype.setMinAndMaxDatesOnCalendar = function () {
@@ -319,7 +323,7 @@ Datepicker.prototype.setCurrentDate = function (focus = true) {
 
   this.calendarDays.forEach(calendarDay => {
     calendarDay.button.setAttribute('tabindex', -1)
-    calendarDay.button.classList.remove('ds_selected')
+    calendarDay.button.classList.remove('hmpps-datepicker-selected')
     const calendarDayDate = calendarDay.date
     calendarDayDate.setHours(0, 0, 0, 0)
 
@@ -330,22 +334,22 @@ Datepicker.prototype.setCurrentDate = function (focus = true) {
       if (focus) {
         calendarDay.button.setAttribute('tabindex', 0)
         calendarDay.button.focus()
-        calendarDay.button.classList.add('ds_selected')
+        calendarDay.button.classList.add('hmpps-datepicker-selected')
       }
     }
 
     if (this.inputDate && calendarDayDate.getTime() === this.inputDate.getTime()) {
-      calendarDay.button.classList.add('ds_datepicker__current')
+      calendarDay.button.classList.add('hmpps-datepicker__current')
       calendarDay.button.setAttribute('aria-selected', true)
     } else {
-      calendarDay.button.classList.remove('ds_datepicker__current')
+      calendarDay.button.classList.remove('hmpps-datepicker__current')
       calendarDay.button.removeAttribute('aria-selected')
     }
 
     if (calendarDayDate.getTime() === today.getTime()) {
-      calendarDay.button.classList.add('ds_datepicker__today')
+      calendarDay.button.classList.add('hmpps-datepicker__today')
     } else {
-      calendarDay.button.classList.remove('ds_datepicker__today')
+      calendarDay.button.classList.remove('hmpps-datepicker__today')
     }
   })
 
@@ -374,7 +378,7 @@ Datepicker.prototype.selectDate = function (date) {
 }
 
 Datepicker.prototype.isOpen = function () {
-  return this.dialogElement.classList.contains('ds_datepicker__dialog--open')
+  return this.dialogElement.classList.contains('hmpps-datepicker__dialog--open')
 }
 
 Datepicker.prototype.toggleDialog = function (event) {
@@ -390,7 +394,7 @@ Datepicker.prototype.toggleDialog = function (event) {
 Datepicker.prototype.openDialog = function () {
   // display the dialog
   this.dialogElement.style.display = 'block'
-  this.dialogElement.classList.add('ds_datepicker__dialog--open')
+  this.dialogElement.classList.add('hmpps-datepicker__dialog--open')
 
   // position the dialog
   this.dialogElement.style.left = `${this.$input.offsetWidth + 16}px`
@@ -407,7 +411,7 @@ Datepicker.prototype.openDialog = function () {
 
 Datepicker.prototype.closeDialog = function () {
   this.dialogElement.style.display = 'none'
-  this.dialogElement.classList.remove('ds_datepicker__dialog--open')
+  this.dialogElement.classList.remove('hmpps-datepicker__dialog--open')
   this.$calendarButton.focus()
 }
 
@@ -589,30 +593,16 @@ DSCalendarDay.prototype.keyPress = function (event) {
   }
 }
 
-/**
- * Datepicker config
- *
- * @typedef {object} DatepickerConfig
- *
- * @property {string} [imagePath] - The path to image assets.
- * @property {string} [id] - .
- * @property {string} [name] - .
- * @property {string} [label] - .
- * @property {string} [hint] - .
- * @property {string} [minDate] - .
- * @property {string} [maxDate] - .
- */
-
 function nodeListForEach(nodes, callback) {
   if (window.NodeList.prototype.forEach) {
     return nodes.forEach(callback)
   }
-  for (var i = 0; i < nodes.length; i++) {
+  for (let i = 0; i < nodes.length; i++) {
     callback.call(window, nodes[i], i, nodes)
   }
 }
 
-const $datepickers = document.querySelectorAll('[data-module="ds-datepicker"]')
+const $datepickers = document.querySelectorAll('[data-module="hmpps-datepicker"]')
 nodeListForEach($datepickers, function ($datepicker) {
   new Datepicker($datepicker, {}).init()
 })
