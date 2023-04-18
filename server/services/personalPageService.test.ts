@@ -404,5 +404,21 @@ describe('PersonalPageService', () => {
       expect(distinguishingMarks[2].orientation).toEqual('Facing')
       expect(distinguishingMarks[2].imageId).toEqual(1413022)
     })
+
+    it('Handles no physical marks', async () => {
+      const inmateDetail = { ...inmateDetailMock }
+      inmateDetail.physicalMarks = []
+      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
+      const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(physicalCharacteristics.distinguishingMarks.length).toEqual(0)
+    })
+  })
+
+  describe('Security', () => {
+    it('Maps the data from the API', async () => {
+      const { security } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(security.interestToImmigration).toEqual('Yes')
+      expect(security.travelRestrictions).toEqual('some travel restrictions')
+    })
   })
 })

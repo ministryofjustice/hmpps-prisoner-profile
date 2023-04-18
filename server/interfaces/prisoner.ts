@@ -1,66 +1,123 @@
-export type Prisoner = {
+export interface Prisoner {
   prisonerNumber: string
-  pncNumber: string
-  pncNumberCanonicalShort: string
-  pncNumberCanonicalLong: string
-  croNumber: string
-  bookingId: number
-  bookNumber: string
+  pncNumber?: string
+  pncNumberCanonicalShort?: string
+  pncNumberCanonicalLong?: string
+  croNumber?: string
+  bookingId?: number
+  bookNumber?: string
   firstName: string
   middleNames?: string
   lastName: string
   dateOfBirth: string
   gender: string
   ethnicity: string
-  language: string
-  youthOffender?: boolean
-  maritalStatus?: string
-  religion?: string
+  youthOffender: boolean
+  maritalStatus: string
+  religion: string
   nationality: string
-  status?: string
+  status: string
   lastMovementTypeCode?: string
   lastMovementReasonCode?: string
-  inOutStatus?: string
-  prisonId: string
-  prisonName: string
+  inOutStatus?: 'IN' | 'OUT'
+  prisonId?: string
+  prisonName?: string
   cellLocation?: string
-  aliases: Alias[]
-  alerts: Alert[]
+  aliases?: Alias[]
+  alerts?: Alert[]
   csra?: string
-  category: string
-  legalStatus: string
-  imprisonmentStatus: string
-  imprisonmentStatusDescription: string
+  category?: string
+  legalStatus?:
+    | 'RECALL'
+    | 'DEAD'
+    | 'INDETERMINATE_SENTENCE'
+    | 'SENTENCED'
+    | 'CONVICTED_UNSENTENCED'
+    | 'CIVIL_PRISONER'
+    | 'IMMIGRATION_DETAINEE'
+    | 'REMAND'
+    | 'UNKNOWN'
+    | 'OTHER'
+  imprisonmentStatus?: string
+  imprisonmentStatusDescription?: string
   mostSeriousOffence: string
-  recall: boolean
-  indeterminateSentence: boolean
-  sentenceStartDate: string
+  recall?: boolean
+  indeterminateSentence?: boolean
+  sentenceStartDate?: string
+  releaseDate?: string
   confirmedReleaseDate?: string
-  releaseDate: string
-  sentenceExpiryDate: string
-  licenceExpiryDate: string
-  nonDtoReleaseDate: string
-  nonDtoReleaseDateType: string
-  receptionDate: string
+  sentenceExpiryDate?: string
+  licenceExpiryDate?: string
+  homeDetentionCurfewEligibilityDate?: string
+  homeDetentionCurfewActualDate?: string
+  homeDetentionCurfewEndDate?: string
+  topupSupervisionStartDate?: string
+  topupSupervisionExpiryDate?: string
+  additionalDaysAwarded?: number
+  nonDtoReleaseDate?: string
+  nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
+  receptionDate?: string
   paroleEligibilityDate?: string
+  automaticReleaseDate?: string
   postRecallReleaseDate?: string
-  conditionalReleaseDate: string
-  locationDescription: string
+  conditionalReleaseDate?: string
+  actualParoleDate?: string
+  tariffDate?: string
+  locationDescription?: string
   restrictedPatient: boolean
-  currentIncentive?: {
-    level: { code: string; description: string }
-    dateTime: string
-    nextReviewDate: string
-  }
-  heightCentimetres: number
-  weightKilograms: number
-  hairColour: string
-  rightEyeColour: string
-  leftEyeColour: string
-  facialHair: string
-  shapeOfFace: string
-  build: string
-  shoeSize: number
+  supportingPrisonId?: string
+  dischargedHospitalId?: string
+  dischargedHospitalDescription?: string
+  dischargeDate?: string
+  dischargeDetails?: string
+  currentIncentive?: Incentive
+  heightCentimetres?: number
+  weightKilograms?: number
+  hairColour?:
+    | 'Bald'
+    | 'Balding'
+    | 'Black'
+    | 'Blonde'
+    | 'Brown'
+    | 'Brunette'
+    | 'Dark'
+    | 'Dyed'
+    | 'Ginger'
+    | 'Grey'
+    | 'Light'
+    | 'Mouse'
+    | 'Multi-coloured'
+    | 'Red'
+    | 'White'
+  rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+  leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+  facialHair?:
+    | 'Full Beard'
+    | 'Clean Shaven'
+    | 'Goatee Beard'
+    | 'Moustache Only'
+    | 'Not Applicable (Female Offender)'
+    | 'No Facial Hair'
+    | 'Sideburns'
+  shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular'
+  build?:
+    | 'Fat'
+    | 'Frail'
+    | 'Heavy'
+    | 'Medium'
+    | 'Muscular'
+    | 'Obese'
+    | 'Proportional'
+    | 'Slight'
+    | 'Small'
+    | 'Stocky'
+    | 'Stooped'
+    | 'Thin'
+  shoeSize?: number
+  tattoos?: BodyPartDetail[]
+  scars?: BodyPartDetail[]
+  marks?: BodyPartDetail[]
+  otherMarks?: BodyPartDetail[]
 }
 
 export interface Alias {
@@ -83,4 +140,28 @@ export interface Incentive {
   level: { code: string; description: string }
   dateTime: string
   nextReviewDate: string
+}
+
+export interface BodyPartDetail {
+  bodyPart?:
+    | 'Ankle'
+    | 'Arm'
+    | 'Ear'
+    | 'Elbow'
+    | 'Face'
+    | 'Finger'
+    | 'Foot'
+    | 'Hand'
+    | 'Head'
+    | 'Knee'
+    | 'Leg'
+    | 'Lip'
+    | 'Neck'
+    | 'Nose'
+    | 'Shoulder'
+    | 'Thigh'
+    | 'Toe'
+    | 'Torso'
+
+  comment?: string
 }
