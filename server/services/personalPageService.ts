@@ -251,16 +251,17 @@ export default class PersonalPageService {
       return healthReferenceCodes.find(code => code.code === problemType)?.description || problemType
     }
 
+    const healthCodes = healthReferenceCodes.map(code => code.code)
     const treatmentCodes = healthTreatmentReferenceCodes.map(code => code.code)
 
-    const { reasonableAdjustments } = await this.prisonApiClient.getReasonableAdjustments(
-      inmateDetail.bookingId,
-      treatmentCodes,
-    )
+    const [{ personalCareNeeds }, { reasonableAdjustments }] = await Promise.all([
+      this.prisonApiClient.getPersonalCareNeeds(inmateDetail.bookingId, healthCodes),
+      this.prisonApiClient.getReasonableAdjustments(inmateDetail.bookingId, treatmentCodes),
+    ])
 
     return {
       personalCareNeeds:
-        inmateDetail.personalCareNeeds?.map(careNeed => ({
+        personalCareNeeds?.map(careNeed => ({
           comment: careNeed.commentText,
           startDate: careNeed.startDate,
           type: careNeedType(careNeed.problemType),
