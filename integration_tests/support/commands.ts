@@ -36,12 +36,12 @@ Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber }) => 
   cy.task('stubInmateDetail', bookingId)
 })
 
-Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber }) => {
+Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStates }) => {
   cy.task('stubGetLearnerEmployabilitySkills', prisonerNumber)
   cy.task('stubGetLearnerEducation', prisonerNumber)
   cy.task('stubGetLearnerProfile', prisonerNumber)
   cy.task('stubGetLearnerLatestAssessments', prisonerNumber)
-  cy.task('stubGetLearnerGoals', prisonerNumber)
+  cy.task('stubGetLearnerGoals', { prisonerNumber, emptyStates })
   cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
   cy.task('stubGetOffenderAttendanceHistory', prisonerNumber)
   cy.task('stubGetOffenderActivities', prisonerNumber)

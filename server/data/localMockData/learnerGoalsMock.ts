@@ -8,6 +8,13 @@ export const LearnerGoalsMock: LearnerGoals = {
   shortTermGoals: ['string'],
 }
 
+export const LearnerGoalsMockB: LearnerGoals = {
+  employmentGoals: [] as string[],
+  personalGoals: [] as string[],
+  longTermGoals: [] as string[],
+  shortTermGoals: [] as string[],
+}
+
 export default {
   LearnerGoalsMock,
 }

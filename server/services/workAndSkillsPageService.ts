@@ -156,7 +156,7 @@ export default class WorkAndSkillsPageService {
     return multiListArray
   }
 
-  private async getLearnerGoals(prisonerNumber: string) {
+  async getLearnerGoals(prisonerNumber: string) {
     const learnerGoals: LearnerGoals = await this.curiousApiClient.getLearnerGoals(prisonerNumber)
 
     let employmentGoals: GovSummaryItem[] = []
