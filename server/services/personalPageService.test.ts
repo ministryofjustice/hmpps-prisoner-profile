@@ -14,6 +14,7 @@ import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PersonalCareNeed } from '../interfaces/personalCareNeeds'
 import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
+import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -28,6 +29,7 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => [])
+    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
   })
 
@@ -429,9 +431,10 @@ describe('PersonalPageService', () => {
 
   describe('Care needs', () => {
     const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
-      const inmateDetail = { ...inmateDetailMock }
-      inmateDetail.personalCareNeeds = careNeeds
-      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
+      prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
+        offenderNo: 'AB1234',
+        personalCareNeeds: careNeeds,
+      }))
     }
 
     const setCodeReferences = (referenceCodes: ReferenceCode[]) => {

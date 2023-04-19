@@ -149,7 +149,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
     let query
     if (types?.length) {
-      query = `type=${types.join('+')}`
+      query = `type=${types.join()}`
     }
     return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
   }
@@ -207,12 +207,15 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {
-    return this.get<ReferenceCode[]>({ path: `/api/reference-domains/domains/${domain}` })
+    return this.get<ReferenceCode[]>({
+      path: `/api/reference-domains/domains/${domain}`,
+      headers: { 'page-limit': '1000' },
+    })
   }
 
   async getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
     return this.get<ReasonableAdjustments>({
-      path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join(',')}`,
+      path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join()}`,
     })
   }
 }

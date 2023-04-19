@@ -25,6 +25,7 @@ context('When signed in', () => {
     cy.task('stubHealthReferenceDomain')
     cy.task('stubHealthTreatmentReferenceDomain')
     cy.task('stubReasonableAdjustments', 1102484)
+    cy.task('stubPersonalCareNeeds', 1102484)
   })
 
   it('displays the personal details page', () => {
@@ -229,14 +230,10 @@ context('When signed in', () => {
   context('Care needs', () => {
     it('Displays the care needs', () => {
       const page = visitPersonalDetailsPage()
-      page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Medical')
-      page.careNeeds().personalCareNeeds(0).description().should('include.text', 'False Limbs')
-      page.careNeeds().personalCareNeeds(0).comment().should('include.text', 'description goes here')
-      page.careNeeds().personalCareNeeds(0).addedOn().should('include.text', '19 May 2020')
-      page.careNeeds().personalCareNeeds(1).type().should('include.text', 'Psychological')
-      page.careNeeds().personalCareNeeds(1).description().should('include.text', 'Depression')
-      page.careNeeds().personalCareNeeds(1).comment().should('include.text', 'depression comment')
-      page.careNeeds().personalCareNeeds(1).addedOn().should('include.text', '1 June 2000')
+      page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Maternity Status')
+      page.careNeeds().personalCareNeeds(0).description().should('include.text', 'Preg, acc under 9mths')
+      page.careNeeds().personalCareNeeds(0).comment().should('include.text', 'a comment')
+      page.careNeeds().personalCareNeeds(0).addedOn().should('include.text', '21 June 2010')
 
       page
         .careNeeds()
