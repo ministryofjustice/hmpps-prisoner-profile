@@ -448,11 +448,94 @@ describe('PersonalPageService', () => {
       expect(careNeeds.personalCareNeeds.length).toEqual(0)
     })
 
+    it('Only maps care needs with problem status ON', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'code',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+        {
+          problemCode: 'code',
+          problemStatus: 'OFF',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(1)
+    })
+
+    it('Doesnt map care needs without matching health codes', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'code',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'A',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(0)
+    })
+
+    it('Doesnt map care needs with problem code NR', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'NR',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(0)
+    })
+
     it('Maps the personal care needs', async () => {
       setPersonalCareNeeds([
         {
           problemCode: 'code',
-          problemStatus: 'status',
+          problemStatus: 'ON',
           commentText: 'Comment text',
           problemType: 'TYPE',
           startDate: 'start date',
