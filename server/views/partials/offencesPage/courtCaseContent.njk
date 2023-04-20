@@ -3,18 +3,18 @@
 
 <div class="govuk-accordion__section ">
     <div class="govuk-accordion__section-header">
-      <h2 class="govuk-accordion__section-heading">
+      <h3 class="govuk-accordion__section-heading">
         <span class="govuk-accordion__section-button" id="accordion-with-summary-sections-heading-1">
           {{courtCase.courtName}}
         </span>
-      </h2>
+      </h3>
       <div class="govuk-accordion__section-summary govuk-body" id="accordion-with-summary-sections-summary-1">
         {{courtCase.sentenceDate}}
       </div>
     </div>
     <div id="accordion-with-summary-sections-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-with-summary-sections-heading-1">
     <h3>Offences</h3>
-    <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+    <ul class="govuk-list govuk-list--bullet govuk-list--spaced govuk-!-static-margin-bottom-9">
         {% for offence in courtCase.offences %}
             <li>
                 {{offence}}
@@ -92,7 +92,6 @@
         <h3 class="govuk-!-margin-top-9">Next court appearance</h3>
         <p>{% if courtCase.courtHearings.length > 0 %}{{courtCase.courtHearings[0].dateTime | formatDate}}{% else%} There are no upcoming court hearings{% endif %}</p>
     {% endif %}
-
     </div>
 </div>
 {% endmacro %}
