@@ -164,12 +164,19 @@ export default class WorkAndSkillsPageService {
     let longTermGoals: GovSummaryItem[] = []
     let shortTermGoals: GovSummaryItem[] = []
 
-    if (learnerGoals !== undefined) {
+    if (learnerGoals.employmentGoals) {
       employmentGoals = this.strArrayToGovList(learnerGoals.employmentGoals)
+    }
+    if (learnerGoals.personalGoals) {
       personalGoals = this.strArrayToGovList(learnerGoals.personalGoals)
+    }
+    if (learnerGoals.longTermGoals) {
       longTermGoals = this.strArrayToGovList(learnerGoals.longTermGoals)
+    }
+    if (learnerGoals.shortTermGoals) {
       shortTermGoals = this.strArrayToGovList(learnerGoals.shortTermGoals)
     }
+
     return { employmentGoals, personalGoals, longTermGoals, shortTermGoals }
   }
 

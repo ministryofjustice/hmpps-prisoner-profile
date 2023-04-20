@@ -22,6 +22,10 @@ context('When signed in', () => {
     cy.task('stubOffenderContacts', 'G6123VU')
     cy.task('stubPersonAddresses')
     cy.task('stubImages')
+    cy.task('stubHealthReferenceDomain')
+    cy.task('stubHealthTreatmentReferenceDomain')
+    cy.task('stubReasonableAdjustments', 1102484)
+    cy.task('stubPersonalCareNeeds', 1102484)
   })
 
   it('displays the personal details page', () => {
@@ -220,6 +224,33 @@ context('When signed in', () => {
       page.security().interestToImmigration().should('be.visible')
       page.security().travelRestrictions().should('be.visible')
       page.security().travelRestrictions().should('include.text', 'some travel restrictions')
+    })
+  })
+
+  context('Care needs', () => {
+    it('Displays the care needs', () => {
+      const page = visitPersonalDetailsPage()
+      page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Maternity Status')
+      page.careNeeds().personalCareNeeds(0).description().should('include.text', 'Preg, acc under 9mths')
+      page.careNeeds().personalCareNeeds(0).comment().should('include.text', 'a comment')
+      page.careNeeds().personalCareNeeds(0).addedOn().should('include.text', '21 June 2010')
+
+      page
+        .careNeeds()
+        .reasonableAdjustments(0)
+        .description()
+        .should('include.text', 'Behavioural responses/Body language')
+      page
+        .careNeeds()
+        .reasonableAdjustments(0)
+        .comment()
+        .should('include.text', 'psych care type adjustment comment goes here')
+      page.careNeeds().reasonableAdjustments(0).addedOn().should('include.text', '9 June 1999')
+      page.careNeeds().reasonableAdjustments(0).addedOn().should('include.text', 'Moorland (HMP & YOI)')
+
+      page.careNeeds().reasonableAdjustments(1).description().should('include.text', 'Comfort and Dressing Aids')
+      page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', '9 June 2020')
+      page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', 'Moorland (HMP & YOI)')
     })
   })
 })

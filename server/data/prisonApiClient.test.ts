@@ -26,6 +26,9 @@ import OffenceHistoryMock from './localMockData/offenceHistoryMock'
 import sentenceTermsMock from './localMockData/sentenceTermsMock'
 import { mockAddresses } from './localMockData/addresses'
 import { mockOffenderContacts } from './localMockData/offenderContacts'
+import { mockReferenceDomains } from './localMockData/referenceDomains'
+import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments'
+import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 
 jest.mock('./tokenStore')
 
@@ -282,6 +285,25 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/contacts`, mockOffenderContacts)
       const output = await prisonApiClient.getOffenderContacts(prisonerNumber)
       expect(output).toEqual(mockOffenderContacts)
+    })
+  })
+
+  describe('getReferenceCodesByDomain', () => {
+    it.each([ReferenceCodeDomain.Health, ReferenceCodeDomain.HealthTreatments])(
+      'Should return data from the API',
+      async (domain: ReferenceCodeDomain) => {
+        mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/${domain}`, mockReferenceDomains.health)
+        const output = await prisonApiClient.getReferenceCodesByDomain(domain)
+        expect(output).toEqual(mockReferenceDomains.health)
+      },
+    )
+  })
+
+  describe('getReasonableAdjustments', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulPrisonApiCall('/api/bookings/12345/reasonable-adjustments?type=A,B,C', mockReasonableAdjustments)
+      const output = await prisonApiClient.getReasonableAdjustments(12345, ['A', 'B', 'C'])
+      expect(output).toEqual(mockReasonableAdjustments)
     })
   })
 })

@@ -17,6 +17,9 @@ import { mockOffenderContacts } from '../../server/data/localMockData/offenderCo
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
+import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
+import { personalCareNeedsMock } from '../../server/data/localMockData/personalCareNeedsMock'
+import { mockReasonableAdjustments } from '../../server/data/localMockData/reasonableAdjustments'
 import {
   emptyAlertsMock,
   pagedActiveAlertsMock,
@@ -424,6 +427,70 @@ export default {
           'Content-Type': 'image/png',
         },
         bodyFileName: placeHolderImagePath,
+      },
+    })
+  },
+
+  stubHealthReferenceDomain: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/reference-domains/domains/HEALTH`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockReferenceDomains.health,
+      },
+    })
+  },
+
+  stubHealthTreatmentReferenceDomain: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/reference-domains/domains/HEALTH_TREAT`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockReferenceDomains.healthTreatment,
+      },
+    })
+  },
+
+  stubReasonableAdjustments: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/reasonable-adjustments\\?type=(.*)`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockReasonableAdjustments,
+      },
+    })
+  },
+
+  stubPersonalCareNeeds: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/personal-care-needs\\?type=(.*)`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: personalCareNeedsMock,
       },
     })
   },
