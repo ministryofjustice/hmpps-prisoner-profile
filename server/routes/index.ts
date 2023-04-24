@@ -15,6 +15,7 @@ import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
 import AlertsController from '../controllers/alertsController'
+import CaseNotesController from '../controllers/caseNotesController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -107,6 +108,12 @@ export default function routes(service: Services): Router {
     const alertsController = new AlertsController(res.locals.clientToken)
     return alertsController.displayAlerts(req, res)
   })
+
+  get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
+    const caseNotesController = new CaseNotesController(res.locals.clientToken)
+    return caseNotesController.displayCaseNotes(req, res)
+  })
+
   get('/', (req, res, next) => {
     res.redirect(config.apis.dpsHomePageUrl)
   })

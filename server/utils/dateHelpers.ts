@@ -19,6 +19,34 @@ export const formatDateISO = (date: Date): string => {
 }
 
 /**
+ * Format a Date object as an ISO-8601 string, optionally setting the time to 00:00 or 23:59
+ *
+ * @param date
+ * @param options
+ */
+export const formatDateTimeISO = (date: Date, options?: { startOfDay?: boolean; endOfDay?: boolean }): string => {
+  let dateStr
+  const adjustedDate = date
+  if (options.startOfDay) {
+    adjustedDate.setHours(0)
+    adjustedDate.setMinutes(0)
+    adjustedDate.setSeconds(0)
+    adjustedDate.setMilliseconds(0)
+  } else if (options.endOfDay) {
+    adjustedDate.setHours(23)
+    adjustedDate.setMinutes(59)
+    adjustedDate.setSeconds(59)
+    adjustedDate.setMilliseconds(999)
+  }
+  try {
+    dateStr = formatISO(adjustedDate, { representation: 'complete' })
+  } catch (error) {
+    logger.error(`Error: formatDateISO - ${error.message}`)
+  }
+  return dateStr
+}
+
+/**
  * Parse date string to a Date object
  *
  * Valid date strings are in day/month/year format, with either 1 or 2 digits for day and month, and 4 digits for year
@@ -53,6 +81,7 @@ export const isRealDate = (date: string): boolean => {
 
 /**
  * Formats an ISO-8601 date string to standard gov.uk display format, e.g. 20 January 2023
+ *
  * Also supports passing in an optional style string to output other standard formats:
  * short, full and medium - e.g. '20/01/2023', 'Friday, 20 January 2023' and '20 Jan 2023'
  *
@@ -64,4 +93,27 @@ export const formatDate = (isoDate: string, style: 'short' | 'full' | 'long' | '
   if (!isoDate) return ''
 
   return new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
+}
+
+/**
+ * Formats an ISO-8601 datetime string to a human readable string, e.g. 20 January 2023 at 16:27
+ *
+ * Also supports passing in an optional style string to output other standard formats:
+ * short, full and medium - e.g. '20/01/2023 16:27', 'Friday, 20 January 2023 at 16:27' and '20 Jan 2023 at 16:27'
+ *
+ * @param isoDate ISO-8601 format date string
+ * @param style formatting style to use - long (default), short, full, medium
+ * @returns formatted datetime string
+ */
+export const formatDateTime = (isoDate: string, style: 'short' | 'full' | 'long' | 'medium' = 'long'): string => {
+  if (!isoDate) return ''
+
+  let datetimeStr = new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
+  if (style === 'short') {
+    datetimeStr += ' '
+  } else {
+    datetimeStr += ' at '
+  }
+  datetimeStr += new Date(isoDate).toLocaleTimeString('en-gb', { hour: '2-digit', minute: '2-digit' })
+  return datetimeStr
 }

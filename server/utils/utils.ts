@@ -164,6 +164,17 @@ export const formatName = (
 }
 
 /**
+ * Convert name in 'Last, First' format to 'First Last'
+ *
+ * @param name
+ */
+export const convertNameCommaToHuman = (name: string): string => {
+  if (!name) return ''
+
+  return name.split(', ').reverse().join(' ')
+}
+
+/**
  * Generate metadata for list pages, including pagination, sorting, filtering
  *
  * For the current page and pages array, the value is incremented by 1 as the API uses a zero based array
@@ -185,16 +196,65 @@ export const generateListMetadata = (
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
 
-  const pages =
-    pagedList?.totalPages > 1
-      ? [...Array(pagedList.totalPages).keys()].map(page => {
-          return {
-            text: `${page + 1}`,
-            href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
-            selected: currentPage === page + 1,
-          }
+  let pages = []
+
+  if (pagedList?.totalPages > 1 && pagedList?.totalPages < 8) {
+    pages = [...Array(pagedList.totalPages).keys()].map(page => {
+      return {
+        text: `${page + 1}`,
+        href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
+        selected: currentPage === page + 1,
+      }
+    })
+  } else if (pagedList?.totalPages > 7) {
+    pages.push({
+      text: '1',
+      href: [`?page=1`, query].filter(Boolean).join('&'),
+      selected: currentPage === 1,
+    })
+
+    const pageRange = [currentPage - 1, currentPage, currentPage + 1]
+    let preDots = false
+    let postDots = false
+    // eslint-disable-next-line no-plusplus
+    for (let i = 2; i < pagedList.totalPages; i++) {
+      if (pageRange.includes(i)) {
+        pages.push({
+          text: `${i}`,
+          href: [`?page=${i}`, query].filter(Boolean).join('&'),
+          selected: currentPage === i,
         })
-      : []
+      } else if (i < pageRange[0] && !preDots) {
+        pages.push({
+          text: '...',
+          type: 'dots',
+        })
+        preDots = true
+      } else if (i > pageRange[2] && !postDots) {
+        pages.push({
+          text: '...',
+          type: 'dots',
+        })
+        postDots = true
+      }
+    }
+
+    pages.push({
+      text: `${pagedList.totalPages}`,
+      href: [`?page=${pagedList.totalPages}`, query].filter(Boolean).join('&'),
+      selected: currentPage === pagedList.totalPages,
+    })
+  }
+  // const pages =
+  //   pagedList?.totalPages > 1
+  //     ? [...Array(pagedList.totalPages).keys()].map(page => {
+  //         return {
+  //           text: `${page + 1}`,
+  //           href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
+  //           selected: currentPage === page + 1,
+  //         }
+  //       })
+  //     : []
 
   const next = pagedList?.last
     ? undefined
@@ -212,16 +272,29 @@ export const generateListMetadata = (
 
   return <ListMetadata>{
     filtering: {
-      from: queryParams.from,
+      from: queryParams.from, // TODO make generic
       to: queryParams.to,
-      queryParams: { sort: queryParams.sort },
+      startDate: queryParams.startDate,
+      endDate: queryParams.endDate,
+      type: queryParams.type,
+      subType: queryParams.subType,
+      queryParams: { sort: queryParams.sort }, // TODO make generic
     },
     sorting: {
       id: 'sort',
       label: sortLabel,
       options: sortOptions,
       sort: queryParams.sort,
-      queryParams: { alertType: queryParams.alertType, from: queryParams.from, to: queryParams.to },
+      queryParams: {
+        // TODO make generic
+        alertType: queryParams.alertType,
+        from: queryParams.from,
+        to: queryParams.to,
+        startDate: queryParams.startDate,
+        endDate: queryParams.endDate,
+        type: queryParams.type,
+        subType: queryParams.subType,
+      },
     },
     pagination: {
       itemDescription,

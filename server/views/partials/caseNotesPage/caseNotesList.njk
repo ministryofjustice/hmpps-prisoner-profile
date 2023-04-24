@@ -1,0 +1,27 @@
+{% from '../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
+{% from '../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+{% from './macros/caseNoteCard.njk' import caseNoteCard %}
+
+{{ hmppsPagedListHeader(listMetadata) }}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="hmpps-case-note-card-list" role="list">
+            {% for caseNote in pagedCaseNotes.content %}
+                {{ caseNoteCard(caseNote, staffId) }}
+            {% endfor %}
+        </div>
+        {% if not listMetadata.pagination.totalElements %}
+            <div>
+                <p>No case notes have been found for the chosen dates.</p>
+                <p>You can:</p>
+                <ul>
+                    <li>choose different dates</li>
+                    <li>select different types and/or sub types</li>
+                    <li>clear filters to view all case notes</li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{{ hmppsPagedListFooter(listMetadata) }}
+

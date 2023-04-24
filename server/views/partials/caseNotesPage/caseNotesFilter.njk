@@ -1,0 +1,61 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from '../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% set options = {
+    title: 'Filter',
+    id: 'caseNotesFilter',
+    currentUrlPath: currentUrlPath,
+    queryParams: listMetadata.filtering.queryParams
+} %}
+{%- call hmppsSideFilter(options) -%}
+    <div class="govuk-form-group">
+        {{ govukSelect({
+            id: "type",
+            name: "type",
+            label: {
+                text: "Type"
+            },
+            items: types | addDefaultSelectedValue('Choose type') | setSelected(listMetadata.filtering.type)
+        }) }}
+        {{ govukSelect({
+            id: "subType",
+            name: "subType",
+            label: {
+                text: "Sub-type"
+            },
+            items: subTypes | addDefaultSelectedValue('Choose sub-type') | setSelected(listMetadata.filtering.subType)
+        }) }}
+        {{ hmppsDatepicker({
+            id: "startDate",
+            name: "startDate",
+            label: {
+                text: "Date from",
+                classes: "govuk-label--m"
+            },
+            hint: {
+                text: "For example, 31/3/2023."
+            },
+            errorMessage: errors | findError('startDate'),
+            value: listMetadata.filtering.startDate
+        }) }}
+        {{ hmppsDatepicker({
+            id: "endDate",
+            name: "endDate",
+            label: {
+                text: "Date from",
+                classes: "govuk-label--m"
+            },
+            hint: {
+                text: "For example, 31/3/2023."
+            },
+            errorMessage: errors | findError('endDate'),
+            value: listMetadata.filtering.endDate
+        }) }}
+    </div>
+{%- endcall -%}
+
+{% block pageScripts %}
+    <script id="typeData" type="application/json">{{ typeSubTypeMap | dump | safe }}</script>
+    <script src="/assets/js/caseNotes.js"></script>
+{% endblock %}

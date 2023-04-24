@@ -22,6 +22,7 @@ import { Address } from '../../interfaces/prisonApi/address'
 import { OffenderContacts } from '../../interfaces/prisonApi/offenderContacts'
 import { ReferenceCode, ReferenceCodeDomain } from '../../interfaces/prisonApi/referenceCode'
 import { ReasonableAdjustments } from '../../interfaces/prisonApi/reasonableAdjustment'
+import { CaseNoteUsage } from '../../interfaces/prisonApi/caseNoteUsage'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -53,4 +54,5 @@ export interface PrisonApiClient {
   getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable>
   getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]>
   getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments>
+  getCaseNotesUsage(offenderNumber: string): Promise<CaseNoteUsage[]>
 }
