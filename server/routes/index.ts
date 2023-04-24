@@ -14,6 +14,7 @@ import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
+import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -107,6 +108,21 @@ export default function routes(service: Services): Router {
     const alertsController = new AlertsController(res.locals.clientToken)
     return alertsController.displayAlerts(req, res)
   })
+
+  get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+    const offencesPageService = new OffencesPageService(prisonApiClient)
+    const offencesPageData = await offencesPageService.get(prisonerData)
+
+    res.render('pages/offences', {
+      ...mapHeaderData(prisonerData, 'offences'),
+      ...offencesPageData,
+      activeTab: true,
+    })
+  })
+
   get('/', (req, res, next) => {
     res.redirect(config.apis.dpsHomePageUrl)
   })

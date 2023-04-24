@@ -54,3 +54,10 @@ Cypress.Commands.add('getDataQa', id => {
 Cypress.Commands.add('findDataQa', { prevSubject: true }, (subject, id) => {
   return subject.find(`[data-qa=${id}]`)
 })
+
+Cypress.Commands.add('setupOffencesPageStubs', ({ prisonerNumber, bookingId }) => {
+  cy.task('stubGetCourtCases', bookingId)
+  cy.task('stubGetOffenceHistory', prisonerNumber)
+  cy.task('stubGetSentenceTerms', bookingId)
+  cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
+})

@@ -1,0 +1,7 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Release dates", id: "release-dates"}) -%}
+    {{ govukSummaryList({
+        rows: releaseDates.dates
+    }) }}
+{%- endcall -%}
