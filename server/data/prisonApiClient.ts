@@ -26,6 +26,10 @@ import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHisto
 import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
+import { CourtCase } from '../interfaces/prisonApi/courtCase'
+import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
+import { OffenderSentenceTerms } from '../interfaces/prisonApi/offenderSentenceTerms'
+import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
 import { Address } from '../interfaces/prisonApi/address'
 import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
@@ -149,7 +153,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds> {
     let query
     if (types?.length) {
-      query = `type=${types.join('+')}`
+      query = `type=${types.join()}`
     }
     return this.get<PersonalCareNeeds>({ path: `/api/bookings/${bookingId}/personal-care-needs`, query })
   }
@@ -184,6 +188,24 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<PropertyContainer[]>({ path: `/api/bookings/${bookingId}/property` })
   }
 
+  async getCourtCases(bookingId: number): Promise<CourtCase[]> {
+    return this.get<CourtCase[]>({ path: `/api/bookings/${bookingId}/court-cases` })
+  }
+
+  async getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]> {
+    return this.get<OffenceHistoryDetail[]>({ path: `/api/bookings/offenderNo/${prisonerNumber}/offenceHistory` })
+  }
+
+  async getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]> {
+    return this.get<OffenderSentenceTerms[]>({
+      path: `/api/offender-sentences/booking/${bookingId}/sentenceTerms?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
+    })
+  }
+
+  async getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails> {
+    return this.get<PrisonerSentenceDetails>({ path: `/api/offenders/${prisonerNumber}/sentences` })
+  }
+
   async getAddresses(prisonerNumber: string): Promise<Address[]> {
     return this.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses` })
   }
@@ -207,12 +229,15 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {
-    return this.get<ReferenceCode[]>({ path: `/api/reference-domains/domains/${domain}` })
+    return this.get<ReferenceCode[]>({
+      path: `/api/reference-domains/domains/${domain}`,
+      headers: { 'page-limit': '1000' },
+    })
   }
 
   async getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments> {
     return this.get<ReasonableAdjustments>({
-      path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join(',')}`,
+      path: `/api/bookings/${bookingId}/reasonable-adjustments?type=${treatmentCodes.join()}`,
     })
   }
 }

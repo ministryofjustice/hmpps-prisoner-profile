@@ -1,0 +1,61 @@
+#court-cases-sentence-details {
+    .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
+        visibility: hidden;
+    }
+}
+
+#court-cases-sentence-details button[aria-expanded="false"] .govuk-accordion__show-all-text:before {
+    content:'Show all offences and sentence details'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+#court-cases-sentence-details button[aria-expanded="true"] .govuk-accordion__show-all-text:before {
+    content:'Hide all offences and sentence details'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+#court-cases-sentence-details button[aria-expanded="false"] .govuk-accordion__section-toggle-text:before {
+    content:'Show offences and sentence details'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+#court-cases-sentence-details button[aria-expanded="true"] .govuk-accordion__section-toggle-text:before {
+    content:'Hide offences and sentence details'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+#court-cases-upcoming-appearances {
+    .govuk-accordion__show-all-text, .govuk-accordion__section-toggle-text {
+        visibility: hidden;
+    }
+}
+
+#court-cases-upcoming-appearances button[aria-expanded="false"] .govuk-accordion__show-all-text:before {
+    content:'Show all offences and upcoming court appearances'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+#court-cases-upcoming-appearances button[aria-expanded="true"] .govuk-accordion__show-all-text:before {
+    content:'Hide all offences and upcoming court appearances'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+
+#court-cases-upcoming-appearances button[aria-expanded="false"] .govuk-accordion__section-toggle-text:before {
+    content:'Show offences and upcoming court appearances'; 
+    visibility: hidden;
+    visibility: visible;
+}
+
+#court-cases-upcoming-appearances button[aria-expanded="true"] .govuk-accordion__section-toggle-text:before {
+    content:'Hide offences and upcoming court appearances'; 
+    visibility: hidden;
+    visibility: visible;
+}
+

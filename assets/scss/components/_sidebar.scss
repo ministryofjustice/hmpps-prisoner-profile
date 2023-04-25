@@ -1,8 +1,19 @@
 .hmpps-sidebar li {
   @include govuk-responsive-margin(5, 'bottom');
 }
+
 .hmpps-sidebar li::before {
   list-style-type: none;
   content: "—";
   @include govuk-responsive-margin(2, 'right');
+}
+
+.hmpps-sidebar-single-link {
+  background-color: govuk-colour("light-grey");
+  border-left: 4px solid $govuk-link-colour;
+  h2 {
+    padding: 14px 10px 12px 20px;
+    color: $govuk-link-colour;
+    font-size: 18px;
+  }
 }

@@ -14,6 +14,7 @@ import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PersonalCareNeed } from '../interfaces/personalCareNeeds'
 import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
+import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -28,6 +29,7 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => [])
+    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
   })
 
@@ -429,9 +431,10 @@ describe('PersonalPageService', () => {
 
   describe('Care needs', () => {
     const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
-      const inmateDetail = { ...inmateDetailMock }
-      inmateDetail.personalCareNeeds = careNeeds
-      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
+      prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
+        offenderNo: 'AB1234',
+        personalCareNeeds: careNeeds,
+      }))
     }
 
     const setCodeReferences = (referenceCodes: ReferenceCode[]) => {
@@ -445,11 +448,94 @@ describe('PersonalPageService', () => {
       expect(careNeeds.personalCareNeeds.length).toEqual(0)
     })
 
+    it('Only maps care needs with problem status ON', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'code',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+        {
+          problemCode: 'code',
+          problemStatus: 'OFF',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(1)
+    })
+
+    it('Doesnt map care needs without matching health codes', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'code',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'A',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(0)
+    })
+
+    it('Doesnt map care needs with problem code NR', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'NR',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(0)
+    })
+
     it('Maps the personal care needs', async () => {
       setPersonalCareNeeds([
         {
           problemCode: 'code',
-          problemStatus: 'status',
+          problemStatus: 'ON',
           commentText: 'Comment text',
           problemType: 'TYPE',
           startDate: 'start date',
