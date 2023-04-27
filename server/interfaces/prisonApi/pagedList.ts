@@ -38,12 +38,12 @@ export interface PagedListQueryParams {
   page?: number
   size?: number
   sort?: string
-  // TODO separate into Alerts
+
   from?: string
   to?: string
   alertStatus?: 'ACTIVE' | 'INACTIVE'
   alertType?: string | string[]
-  // TODO separate into Case Notes
+
   type?: string
   subType?: string
   startDate?: string

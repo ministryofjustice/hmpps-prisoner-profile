@@ -1,7 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PagedListQueryParams, PagedList } from '../interfaces/prisonApi/pagedList'
 import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import { CaseNoteReferenceCode } from '../interfaces/caseNotesApi/CaseNoteReferenceCode'
 

@@ -26,6 +26,8 @@ import { mockOffenderContacts } from './localMockData/offenderContacts'
 import { mockReferenceDomains } from './localMockData/referenceDomains'
 import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments'
 import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
+import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
+import { formatDateISO } from '../utils/dateHelpers'
 
 jest.mock('./tokenStore')
 
@@ -271,6 +273,19 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall('/api/bookings/12345/reasonable-adjustments?type=A,B,C', mockReasonableAdjustments)
       const output = await prisonApiClient.getReasonableAdjustments(12345, ['A', 'B', 'C'])
       expect(output).toEqual(mockReasonableAdjustments)
+    })
+  })
+
+  describe('getCaseNoteUsage', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      const today = formatDateISO(new Date())
+      mockSuccessfulPrisonApiCall(
+        `/api/case-notes/usage?offenderNo=AB1234C&toDate=${today}&numMonths=1200`,
+        caseNoteUsageMock,
+      )
+      const output = await prisonApiClient.getCaseNotesUsage(prisonerNumber)
+      expect(output).toEqual(caseNoteUsageMock)
     })
   })
 })

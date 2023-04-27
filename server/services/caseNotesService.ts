@@ -1,24 +1,19 @@
 import { isBefore, isFuture } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
 import { formatDateTimeISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import PrisonApiRestClient from '../data/prisonApiClient'
 import CaseNotesApiRestClient from '../data/caseNotesApiClient'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
 import { CaseNote, CaseNoteAmendment } from '../interfaces/caseNotesApi/caseNote'
 
 export default class CaseNotesService {
-  private prisonApiClient: PrisonApiClient
-
   private caseNotesApiClient: CaseNotesApiClient
 
   constructor(clientToken: string) {
-    this.prisonApiClient = new PrisonApiRestClient(clientToken)
     this.caseNotesApiClient = new CaseNotesApiRestClient(clientToken)
   }
 
@@ -58,9 +53,12 @@ export default class CaseNotesService {
   private mapToApiParams(queryParams: PagedListQueryParams) {
     const apiParams = { ...queryParams }
 
-    apiParams.startDate = apiParams.startDate && formatDateTimeISO(parseDate(apiParams.startDate), { startOfDay: true })
-    apiParams.endDate = apiParams.endDate && formatDateTimeISO(parseDate(apiParams.endDate), { endOfDay: true })
-    apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
+    if (apiParams.startDate)
+      apiParams.startDate =
+        apiParams.startDate && formatDateTimeISO(parseDate(apiParams.startDate), { startOfDay: true })
+    if (apiParams.endDate)
+      apiParams.endDate = apiParams.endDate && formatDateTimeISO(parseDate(apiParams.endDate), { endOfDay: true })
+    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
 
     return apiParams
   }
@@ -88,14 +86,14 @@ export default class CaseNotesService {
 
     if (!errors.length) {
       const caseNoteTypes = await this.caseNotesApiClient.getCaseNoteTypes()
-      types = caseNoteTypes.map(type => ({ value: type.code, text: type.description }))
+      types = caseNoteTypes?.map(type => ({ value: type.code, text: type.description }))
       caseNoteTypes.forEach(type => {
-        typeSubTypeMap[type.code] = type.subCodes.map(s => ({ value: s.code, text: s.description }))
+        typeSubTypeMap[type.code] = type.subCodes?.map(s => ({ value: s.code, text: s.description }))
       })
       if (queryParams.type) {
         const selectedType = caseNoteTypes.find(type => type.code === queryParams.type)
         if (selectedType) {
-          subTypes = selectedType.subCodes.map(subType => ({
+          subTypes = selectedType.subCodes?.map(subType => ({
             value: subType.code,
             text: subType.description,
           }))
@@ -106,10 +104,10 @@ export default class CaseNotesService {
         prisonerData.prisonerNumber,
         this.mapToApiParams(queryParams),
       )
-      pagedCaseNotes.content = pagedCaseNotes.content.map((caseNote: CaseNote) => ({
+      pagedCaseNotes.content = pagedCaseNotes.content?.map((caseNote: CaseNote) => ({
         ...caseNote,
         authorName: convertNameCommaToHuman(caseNote.authorName),
-        amendments: caseNote.amendments.map((amendment: CaseNoteAmendment) => ({
+        amendments: caseNote.amendments?.map((amendment: CaseNoteAmendment) => ({
           ...amendment,
           authorName: convertNameCommaToHuman(amendment.authorName),
         })),

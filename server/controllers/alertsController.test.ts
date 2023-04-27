@@ -23,7 +23,7 @@ describe('Alerts Controller', () => {
       },
       render: jest.fn(),
     }
-    controller = new AlertsController(res.locals.clientToken)
+    controller = new AlertsController(res.locals.clientToken, true)
   })
 
   it('should get active alerts', async () => {
@@ -50,6 +50,7 @@ describe('Alerts Controller', () => {
 
   it('should get inactive alerts', async () => {
     req.path = 'alerts/inactive'
+    controller['isActive'] = false
 
     const getPrisonerDetailsSpy = jest
       .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')

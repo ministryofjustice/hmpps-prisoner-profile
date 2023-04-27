@@ -28,6 +28,7 @@ import {
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
+import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -487,6 +488,28 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: personalCareNeedsMock,
+      },
+    })
+  },
+
+  stubGetCaseNotesUsage: (prisonerNumber: string) => {
+    let jsonResp
+    if (prisonerNumber === 'G6123VU') {
+      jsonResp = caseNoteUsageMock
+    } else if (prisonerNumber === 'A1234BC') {
+      jsonResp = []
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/case-notes/usage\\?offenderNo=${prisonerNumber}&(.*)`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
       },
     })
   },

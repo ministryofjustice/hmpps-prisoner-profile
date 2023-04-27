@@ -100,12 +100,12 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken)
+    const alertsController = new AlertsController(res.locals.clientToken, true)
     return alertsController.displayAlerts(req, res)
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken)
+    const alertsController = new AlertsController(res.locals.clientToken, false)
     return alertsController.displayAlerts(req, res)
   })
 

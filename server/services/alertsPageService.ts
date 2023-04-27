@@ -54,9 +54,9 @@ export default class AlertsPageService {
   private mapToApiParams(queryParams: PagedListQueryParams) {
     const apiParams = { ...queryParams }
 
-    apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
-    apiParams.to = apiParams.to && formatDateISO(parseDate(apiParams.to))
-    apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
+    if (apiParams.from) apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
+    if (apiParams.to) apiParams.to = apiParams.to && formatDateISO(parseDate(apiParams.to))
+    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
 
     return apiParams
   }
@@ -120,15 +120,14 @@ export default class AlertsPageService {
       }
     }
 
+    // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
+    const params = queryParams
+    delete params.page
+    delete params.alertStatus
+
     return {
       pagedAlerts,
-      listMetadata: generateListMetadata(
-        pagedAlerts,
-        { ...queryParams, page: undefined, alertStatus: undefined }, // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
-        'alerts',
-        sortOptions,
-        'Sort by',
-      ),
+      listMetadata: generateListMetadata(pagedAlerts, { ...params }, 'alerts', sortOptions, 'Sort by'),
       alertTypes,
       activeAlertCount,
       inactiveAlertCount,

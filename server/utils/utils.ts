@@ -1,10 +1,10 @@
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { ListMetadata } from '../interfaces/pages/alertsPageData'
 import { SortOption } from '../interfaces/sortSelector'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
+import { ListMetadata } from '../interfaces/listMetadata'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -245,16 +245,6 @@ export const generateListMetadata = (
       selected: currentPage === pagedList.totalPages,
     })
   }
-  // const pages =
-  //   pagedList?.totalPages > 1
-  //     ? [...Array(pagedList.totalPages).keys()].map(page => {
-  //         return {
-  //           text: `${page + 1}`,
-  //           href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
-  //           selected: currentPage === page + 1,
-  //         }
-  //       })
-  //     : []
 
   const next = pagedList?.last
     ? undefined
@@ -272,13 +262,8 @@ export const generateListMetadata = (
 
   return <ListMetadata>{
     filtering: {
-      from: queryParams.from, // TODO make generic
-      to: queryParams.to,
-      startDate: queryParams.startDate,
-      endDate: queryParams.endDate,
-      type: queryParams.type,
-      subType: queryParams.subType,
-      queryParams: { sort: queryParams.sort }, // TODO make generic
+      ...queryParams,
+      queryParams: { sort: queryParams.sort },
     },
     sorting: {
       id: 'sort',
@@ -286,14 +271,7 @@ export const generateListMetadata = (
       options: sortOptions,
       sort: queryParams.sort,
       queryParams: {
-        // TODO make generic
-        alertType: queryParams.alertType,
-        from: queryParams.from,
-        to: queryParams.to,
-        startDate: queryParams.startDate,
-        endDate: queryParams.endDate,
-        type: queryParams.type,
-        subType: queryParams.subType,
+        ...queryParams,
       },
     },
     pagination: {

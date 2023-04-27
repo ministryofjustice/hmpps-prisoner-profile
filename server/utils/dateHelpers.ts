@@ -27,12 +27,12 @@ export const formatDateISO = (date: Date): string => {
 export const formatDateTimeISO = (date: Date, options?: { startOfDay?: boolean; endOfDay?: boolean }): string => {
   let dateStr
   const adjustedDate = date
-  if (options.startOfDay) {
+  if (options?.startOfDay) {
     adjustedDate.setHours(0)
     adjustedDate.setMinutes(0)
     adjustedDate.setSeconds(0)
     adjustedDate.setMilliseconds(0)
-  } else if (options.endOfDay) {
+  } else if (options?.endOfDay) {
     adjustedDate.setHours(23)
     adjustedDate.setMinutes(59)
     adjustedDate.setSeconds(59)
@@ -41,7 +41,7 @@ export const formatDateTimeISO = (date: Date, options?: { startOfDay?: boolean; 
   try {
     dateStr = formatISO(adjustedDate, { representation: 'complete' })
   } catch (error) {
-    logger.error(`Error: formatDateISO - ${error.message}`)
+    logger.error(`Error: formatDateTimeISO - ${error.message}`)
   }
   return dateStr
 }

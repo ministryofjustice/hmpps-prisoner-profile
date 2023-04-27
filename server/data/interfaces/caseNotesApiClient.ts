@@ -1,4 +1,4 @@
-import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/pagedList'
+import { PagedListQueryParams, PagedList } from '../../interfaces/prisonApi/pagedList'
 import { CaseNoteReferenceCode } from '../../interfaces/caseNotesApi/CaseNoteReferenceCode'
 
 export interface CaseNotesApiClient {
