@@ -28,6 +28,10 @@ import {
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
+import CourtCasesMock from '../../server/data/localMockData/courtCaseMock'
+import OffenceHistoryMock from '../../server/data/localMockData/offenceHistoryMock'
+import sentenceTermsMock from '../../server/data/localMockData/sentenceTermsMock'
+import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/prisonerSentenceDetails'
 import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -488,6 +492,70 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: personalCareNeedsMock,
+      },
+    })
+  },
+
+  stubGetCourtCases: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/court-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: CourtCasesMock,
+      },
+    })
+  },
+
+  stubGetOffenceHistory: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/offenceHistory`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: OffenceHistoryMock,
+      },
+    })
+  },
+
+  stubGetSentenceTerms: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offender-sentences/booking/${bookingId}/sentenceTerms\\?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: sentenceTermsMock,
+      },
+    })
+  },
+
+  stubGetPrisonerSentenceDetails: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/sentences`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: prisonerSentenceDetailsMock,
       },
     })
   },

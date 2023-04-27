@@ -261,12 +261,19 @@ export default class PersonalPageService {
 
     return {
       personalCareNeeds:
-        personalCareNeeds?.map(careNeed => ({
-          comment: careNeed.commentText,
-          startDate: careNeed.startDate,
-          type: careNeedType(careNeed.problemType),
-          description: careNeed.problemDescription,
-        })) || [],
+        personalCareNeeds
+          ?.filter(
+            careNeed =>
+              careNeed.problemStatus === 'ON' &&
+              healthCodes.includes(careNeed.problemType) &&
+              careNeed.problemCode !== 'NR',
+          )
+          .map(careNeed => ({
+            comment: careNeed.commentText,
+            startDate: careNeed.startDate,
+            type: careNeedType(careNeed.problemType),
+            description: careNeed.problemDescription,
+          })) || [],
       reasonableAdjustments: reasonableAdjustments.map(adjustment => ({
         type: 'Support needed',
         description: adjustment.treatmentDescription,

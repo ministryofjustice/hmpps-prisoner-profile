@@ -1,0 +1,17 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "./courtCaseContent.njk" import courtCaseContent %}
+
+{%- call summaryCard({title: "Court cases and offences", id: courtCasesSentenceDetailsId }) -%}
+
+{% if courtCaseData.length > 0 %}
+<div class="govuk-accordion {% if courtCase.sentenceTerms.length > 0 %} .court-cases-sentence-details {% else %} .court-cases-upcoming-appearances {% endif %}" data-module="govuk-accordion"  id="accordion-with-summary-sections">
+    {% for courtCase in courtCaseData %}
+        {{ courtCaseContent(courtCase) }}
+    {% endfor %}
+</div>
+{% else%}
+<p>There are no current sentence details for this prisoner.</p>
+{% endif %}
+{%- endcall -%}
