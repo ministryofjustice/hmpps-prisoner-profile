@@ -53,7 +53,7 @@ const moneySummaryDataMock: MiniSummaryData = {
   topLabel: 'Spends',
   topContent: formatMoney(240.51),
   topClass: 'big',
-  bottomLabel: 'Private Cash',
+  bottomLabel: 'Private cash',
   bottomContentLine1: formatMoney(0),
   bottomClass: 'big',
   linkLabel: 'Transactions and savings',
