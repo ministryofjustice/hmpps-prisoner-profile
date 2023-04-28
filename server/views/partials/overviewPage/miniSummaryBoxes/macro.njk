@@ -8,11 +8,13 @@
             {{ miniSummary.data.topLabel }}
           </p>
         {% endif %}
+        {% if miniSummary.data.topContent %}
           <p
             class="govuk-body hmpps-mini-card__{{ miniSummary.data.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.data.topClass === 'small' }}"
           >
             {{ miniSummary.data.topContent if miniSummary.data.topContent else '&nbsp;' | safe }}
           </p>
+        {% endif %}
         <p class="govuk-body card-label">
           {{ miniSummary.data.bottomLabel }}
         </p>

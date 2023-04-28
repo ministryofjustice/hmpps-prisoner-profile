@@ -214,7 +214,7 @@ export default class OverviewPageService {
       topLabel: 'Spends',
       topContent: formatMoney(accountBalances.spends),
       topClass: 'big',
-      bottomLabel: 'Private Cash',
+      bottomLabel: 'Private cash',
       bottomContentLine1: formatMoney(accountBalances.cash),
       bottomClass: 'big',
       linkLabel: 'Transactions and savings',
@@ -395,14 +395,6 @@ export default class OverviewPageService {
         prisonerData.inOutStatus,
       )}`,
     })
-
-    // Youth Offender TODO
-    // if (prisonerData.youthOffender) {
-    //   statusList.push({
-    //     label: 'Youth offender',
-    //     date: formatDate('2023-01-01', 'short'),
-    //   })
-    // }
 
     // Pregnant
     const pregnantNeed = personalCareNeeds?.personalCareNeeds?.find(

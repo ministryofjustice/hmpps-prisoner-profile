@@ -12,9 +12,12 @@ export default class AlertsController {
 
   private alertsPageService: AlertsPageService
 
-  constructor(clientToken: string) {
+  private isActive: boolean
+
+  constructor(clientToken: string, isActive: boolean) {
     this.prisonerSearchService = new PrisonerSearchService(clientToken)
     this.alertsPageService = new AlertsPageService(clientToken)
+    this.isActive = isActive
   }
 
   public async displayAlerts(req: Request, res: Response) {
@@ -25,8 +28,8 @@ export default class AlertsController {
     if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
     if (req.query.from) queryParams.from = req.query.from as string
     if (req.query.to) queryParams.to = req.query.to as string
-    if (req.path.includes('/active')) queryParams.alertStatus = 'ACTIVE'
-    if (req.path.includes('/inactive')) queryParams.alertStatus = 'INACTIVE'
+    if (this.isActive) queryParams.alertStatus = 'ACTIVE'
+    if (!this.isActive) queryParams.alertStatus = 'INACTIVE'
 
     // Get prisoner data for banner and for use in alerts generation
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
@@ -38,7 +41,7 @@ export default class AlertsController {
     return res.render('pages/alertsPage', {
       ...mapHeaderData(prisonerData, 'alerts'),
       ...alertsPageData,
-      activeTab: queryParams.alertStatus === 'ACTIVE',
+      activeTab: this.isActive,
     })
   }
 }

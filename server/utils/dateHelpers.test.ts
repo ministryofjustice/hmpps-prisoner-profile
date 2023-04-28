@@ -1,4 +1,4 @@
-import { formatDate, formatDateISO, isRealDate, parseDate } from './dateHelpers'
+import { formatDate, formatDateISO, formatDateTime, formatDateTimeISO, isRealDate, parseDate } from './dateHelpers'
 
 describe('formatDateISO', () => {
   it('should return an ISO-8601 date string given a valid date', () => {
@@ -8,6 +8,28 @@ describe('formatDateISO', () => {
 
   it('should return undefined given an invalid date', () => {
     const dateStr = formatDateISO(null)
+    expect(dateStr).toBeUndefined()
+  })
+})
+
+describe('formatDateTimeISO', () => {
+  it('should return an ISO-8601 datetime string given a valid date', () => {
+    const dateStr = formatDateTimeISO(new Date(2023, 0, 1, 11, 12, 13)) // 1 Jan 2023
+    expect(dateStr).toEqual('2023-01-01T11:12:13Z')
+  })
+
+  it('should return an ISO-8601 datetime string with time set to 00:00:00 if startOfDay flag is true', () => {
+    const dateStr = formatDateTimeISO(new Date(2023, 0, 1, 11, 12, 13), { startOfDay: true }) // 1 Jan 2023
+    expect(dateStr).toEqual('2023-01-01T00:00:00Z')
+  })
+
+  it('should return an ISO-8601 datetime string with time set to 23:59:59 if endOfDay flag is true', () => {
+    const dateStr = formatDateTimeISO(new Date(2023, 0, 1, 11, 12, 13), { endOfDay: true }) // 1 Jan 2023
+    expect(dateStr).toEqual('2023-01-01T23:59:59Z')
+  })
+
+  it('should return undefined given an invalid date', () => {
+    const dateStr = formatDateTimeISO(null)
     expect(dateStr).toBeUndefined()
   })
 })
@@ -70,6 +92,22 @@ describe('format date', () => {
     '%s: formatDate(%s, %s)',
     (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
       expect(formatDate(a, b)).toEqual(expected)
+    },
+  )
+})
+
+describe('format datetime', () => {
+  it.each([
+    [null, null, undefined, ''],
+    ['[default]', '2023-01-20T12:13:14', undefined, '20 January 2023 at 12:13'],
+    ['long', '2023-01-20T12:13:14', 'long', '20 January 2023 at 12:13'],
+    ['short', '2023-01-20T12:13:14', 'short', '20/01/2023 12:13'],
+    ['full', '2023-01-20T12:13:14', 'full', 'Friday, 20 January 2023 at 12:13'],
+    ['medium', '2023-01-20T12:13:14', 'medium', '20 Jan 2023 at 12:13'],
+  ])(
+    '%s: formatDateTime(%s, %s)',
+    (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
+      expect(formatDateTime(a, b)).toEqual(expected)
     },
   )
 })

@@ -1,0 +1,123 @@
+.hmpps-action-header {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 30px 0;
+
+  h2 {
+    margin-bottom: -8px;
+    line-height: 1;
+  }
+}
+
+.hmpps-paged-list-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 30px;
+  border-bottom: 1px solid govuk-colour('dark-grey');
+  margin-bottom: 30px;
+
+  .moj-pagination {
+    margin-top: 30px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p.moj-pagination__results {
+    margin-left: -5px;
+  }
+}
+
+.hmpps-paged-list-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  &__no-pagination {
+    justify-content: flex-end;
+  }
+
+  .moj-pagination {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p.moj-pagination__results {
+    margin-left: -5px;
+  }
+}
+
+.hmpps-case-note-card-list-item {
+  padding-bottom: 30px;
+  border-bottom: 1px solid govuk-colour('dark-grey');
+  margin-bottom: 30px;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-basis: min-content;
+  }
+
+  &__content {
+  }
+
+  &__sub-title {
+    font-size: 16px;
+    font-weight: 300;
+    color: $govuk-secondary-text-colour;
+    margin-bottom: 15px;
+  }
+
+  &__title {
+    font-size: 19px;
+    font-weight: bold;
+    color: $govuk-text-colour;
+    margin-bottom: 15px;
+  }
+
+  &__amendments-header {
+    font-size: 16px;
+    font-weight: bold;
+    color: govuk-colour('dark-grey');
+    margin-top: 15px;
+  }
+
+  &__amendment {
+    margin-top: 15px;
+
+    &:not(:last-of-type) {
+      padding-bottom: 15px;
+      border-bottom: 1px dashed govuk-colour('dark-grey');
+    }
+  }
+
+  &__notes {
+    font-size: 19px;
+    font-weight: 300;
+    color: $govuk-text-colour;
+    margin-bottom: 15px;
+    max-width: 670px;
+    overflow-wrap: break-word;
+
+    @media (max-width: 1152px) {
+      max-width: 570px;
+    }
+    @media (max-width: 1000px) {
+      max-width: 380px;
+    }
+  }
+
+  &__metadata {
+    font-size: 16px;
+    font-weight: 300;
+    color: $govuk-secondary-text-colour;
+  }
+
+  &__link {
+    white-space: nowrap;
+  }
+}

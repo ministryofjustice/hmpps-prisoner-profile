@@ -9,6 +9,7 @@ import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
 import PrisonApiRestClient from '../data/prisonApiClient'
+import { Alert } from '../interfaces/prisonApi/alert'
 
 export default class AlertsPageService {
   private prisonApiClient: PrisonApiClient
@@ -53,9 +54,9 @@ export default class AlertsPageService {
   private mapToApiParams(queryParams: PagedListQueryParams) {
     const apiParams = { ...queryParams }
 
-    apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
-    apiParams.to = apiParams.to && formatDateISO(parseDate(apiParams.to))
-    apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
+    if (apiParams.from) apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
+    if (apiParams.to) apiParams.to = apiParams.to && formatDateISO(parseDate(apiParams.to))
+    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
 
     return apiParams
   }
@@ -111,7 +112,7 @@ export default class AlertsPageService {
     if (!errors.length) {
       if ((activeAlertCount && isActiveAlertsQuery) || (inactiveAlertCount && !isActiveAlertsQuery)) {
         pagedAlerts = await this.prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
-        pagedAlerts.content = pagedAlerts.content.map(alert => ({
+        pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
           ...alert,
           addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
           expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
@@ -119,15 +120,14 @@ export default class AlertsPageService {
       }
     }
 
+    // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
+    const params = queryParams
+    delete params.page
+    delete params.alertStatus
+
     return {
       pagedAlerts,
-      listMetadata: generateListMetadata(
-        pagedAlerts,
-        { ...queryParams, page: undefined, alertStatus: undefined }, // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
-        'alerts',
-        sortOptions,
-        'Sort by',
-      ),
+      listMetadata: generateListMetadata(pagedAlerts, { ...params }, 'alerts', sortOptions, 'Sort by'),
       alertTypes,
       activeAlertCount,
       inactiveAlertCount,

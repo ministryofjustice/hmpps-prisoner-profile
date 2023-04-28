@@ -75,7 +75,7 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       classes: 'govuk-heading-s',
       id: 'case-notes',
       active: false,
-      href: '#',
+      href: `${baseUrl}/case-notes`,
     },
     {
       label: 'Alerts',
