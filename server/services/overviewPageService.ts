@@ -214,7 +214,7 @@ export default class OverviewPageService {
       topLabel: 'Spends',
       topContent: formatMoney(accountBalances.spends),
       topClass: 'big',
-      bottomLabel: 'Private Cash',
+      bottomLabel: 'Private cash',
       bottomContentLine1: formatMoney(accountBalances.cash),
       bottomClass: 'big',
       linkLabel: 'Transactions and savings',
