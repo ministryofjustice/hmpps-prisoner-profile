@@ -1,10 +1,10 @@
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { ListMetadata } from '../interfaces/pages/alertsPageData'
 import { SortOption } from '../interfaces/sortSelector'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
+import { ListMetadata } from '../interfaces/listMetadata'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -164,6 +164,17 @@ export const formatName = (
 }
 
 /**
+ * Convert name in 'Last, First' format to 'First Last'
+ *
+ * @param name
+ */
+export const convertNameCommaToHuman = (name: string): string => {
+  if (!name) return ''
+
+  return name.split(', ').reverse().join(' ')
+}
+
+/**
  * Generate metadata for list pages, including pagination, sorting, filtering
  *
  * For the current page and pages array, the value is incremented by 1 as the API uses a zero based array
@@ -185,16 +196,55 @@ export const generateListMetadata = (
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
 
-  const pages =
-    pagedList?.totalPages > 1
-      ? [...Array(pagedList.totalPages).keys()].map(page => {
-          return {
-            text: `${page + 1}`,
-            href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
-            selected: currentPage === page + 1,
-          }
+  let pages = []
+
+  if (pagedList?.totalPages > 1 && pagedList?.totalPages < 8) {
+    pages = [...Array(pagedList.totalPages).keys()].map(page => {
+      return {
+        text: `${page + 1}`,
+        href: [`?page=${page + 1}`, query].filter(Boolean).join('&'),
+        selected: currentPage === page + 1,
+      }
+    })
+  } else if (pagedList?.totalPages > 7) {
+    pages.push({
+      text: '1',
+      href: [`?page=1`, query].filter(Boolean).join('&'),
+      selected: currentPage === 1,
+    })
+
+    const pageRange = [currentPage - 1, currentPage, currentPage + 1]
+    let preDots = false
+    let postDots = false
+    // eslint-disable-next-line no-plusplus
+    for (let i = 2; i < pagedList.totalPages; i++) {
+      if (pageRange.includes(i)) {
+        pages.push({
+          text: `${i}`,
+          href: [`?page=${i}`, query].filter(Boolean).join('&'),
+          selected: currentPage === i,
         })
-      : []
+      } else if (i < pageRange[0] && !preDots) {
+        pages.push({
+          text: '...',
+          type: 'dots',
+        })
+        preDots = true
+      } else if (i > pageRange[2] && !postDots) {
+        pages.push({
+          text: '...',
+          type: 'dots',
+        })
+        postDots = true
+      }
+    }
+
+    pages.push({
+      text: `${pagedList.totalPages}`,
+      href: [`?page=${pagedList.totalPages}`, query].filter(Boolean).join('&'),
+      selected: currentPage === pagedList.totalPages,
+    })
+  }
 
   const next = pagedList?.last
     ? undefined
@@ -212,8 +262,7 @@ export const generateListMetadata = (
 
   return <ListMetadata>{
     filtering: {
-      from: queryParams.from,
-      to: queryParams.to,
+      ...queryParams,
       queryParams: { sort: queryParams.sort },
     },
     sorting: {
@@ -221,7 +270,9 @@ export const generateListMetadata = (
       label: sortLabel,
       options: sortOptions,
       sort: queryParams.sort,
-      queryParams: { alertType: queryParams.alertType, from: queryParams.from, to: queryParams.to },
+      queryParams: {
+        ...queryParams,
+      },
     },
     pagination: {
       itemDescription,

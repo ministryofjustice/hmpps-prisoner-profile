@@ -1,4 +1,6 @@
-export interface Alert {
+import { PagedListItem } from './pagedList'
+
+export interface Alert extends PagedListItem {
   alertId: number
   // These two aren't returned in the API but are defined in the API docs
   // bookingId: number

@@ -109,25 +109,25 @@ context('Alerts Page', () => {
   })
 
   // TODO investigate why this fails in pipeline but passes locally
-  // context('Paging', () => {
-  //   let alertsPage
-  //
-  //   beforeEach(() => {
-  //     cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-  //     alertsPage = visitActiveAlertsPage()
-  //   })
-  //
-  //   it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
-  //     alertsPage.paginationCurrentPage().contains('1')
-  //     alertsPage.paginationNextLink().first().click()
-  //     alertsPage.paginationCurrentPage().contains('2')
-  //     alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
-  //
-  //     alertsPage.paginationPreviousLink().first().click()
-  //     alertsPage.paginationCurrentPage().contains('1')
-  //     alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
-  //   })
-  // })
+  context.skip('Paging', () => {
+    let alertsPage
+
+    beforeEach(() => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      alertsPage = visitActiveAlertsPage()
+    })
+
+    it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
+      alertsPage.paginationCurrentPage().contains('1')
+      alertsPage.paginationNextLink().first().click()
+      alertsPage.paginationCurrentPage().contains('2')
+      alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
+
+      alertsPage.paginationPreviousLink().first().click()
+      alertsPage.paginationCurrentPage().contains('1')
+      alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
+    })
+  })
 
   context('Sorting', () => {
     let alertsPage

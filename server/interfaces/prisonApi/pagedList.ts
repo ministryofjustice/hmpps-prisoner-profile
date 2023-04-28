@@ -1,7 +1,12 @@
-import { Alert } from './alert'
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface PagedListItem {
+  // Extended by:
+  // Alert
+  // CaseNote
+}
 
 export interface PagedList {
-  content: Alert[] // TODO add other interfaces here as required, e.g. CaseNote
+  content: PagedListItem[]
   pageable?: {
     sort: {
       empty: boolean
@@ -33,8 +38,14 @@ export interface PagedListQueryParams {
   page?: number
   size?: number
   sort?: string
+
   from?: string
   to?: string
   alertStatus?: 'ACTIVE' | 'INACTIVE'
   alertType?: string | string[]
+
+  type?: string
+  subType?: string
+  startDate?: string
+  endDate?: string
 }

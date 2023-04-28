@@ -115,6 +115,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_URL_TIMEOUT_DEADLINE', 20000))),
     },
+    caseNotesApi: {
+      url: get('CASE_NOTES_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('CASE_NOTES_API_TIMEOUT_RESPONSE', 20000)),
+        deadline: Number(get('CASE_NOTES_API_TIMEOUT_DEADLINE', 20000)),
+      },
+      agent: new AgentConfig(Number(get('CASE_NOTES_API_TIMEOUT_DEADLINE', 20000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),

@@ -396,14 +396,6 @@ export default class OverviewPageService {
       )}`,
     })
 
-    // Youth Offender TODO
-    // if (prisonerData.youthOffender) {
-    //   statusList.push({
-    //     label: 'Youth offender',
-    //     date: formatDate('2023-01-01', 'short'),
-    //   })
-    // }
-
     // Pregnant
     const pregnantNeed = personalCareNeeds?.personalCareNeeds?.find(
       need =>

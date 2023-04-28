@@ -16,6 +16,7 @@ import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
 import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
+import CaseNotesController from '../controllers/caseNotesController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -100,12 +101,12 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken)
+    const alertsController = new AlertsController(res.locals.clientToken, true)
     return alertsController.displayAlerts(req, res)
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken)
+    const alertsController = new AlertsController(res.locals.clientToken, false)
     return alertsController.displayAlerts(req, res)
   })
 
@@ -121,6 +122,11 @@ export default function routes(service: Services): Router {
       ...offencesPageData,
       activeTab: true,
     })
+  })
+
+  get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
+    const caseNotesController = new CaseNotesController(res.locals.clientToken)
+    return caseNotesController.displayCaseNotes(req, res)
   })
 
   get('/', (req, res, next) => {
