@@ -27,4 +27,8 @@
     @include govuk-responsive-padding(3, 'right');
   }
 
+  dl {
+    margin-bottom: 15px;
+  }
+
 }
