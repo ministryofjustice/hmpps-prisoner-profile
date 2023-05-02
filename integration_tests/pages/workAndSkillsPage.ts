@@ -99,19 +99,19 @@ export default class WorkAndSkillsPage extends Page {
 
   GoalsEmploymentLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(2)')
 
-  GoalsEmploymentText = (): PageElement => cy.get(':nth-child(3) > .govuk-summary-list__row > .govuk-summary-list__key')
+  GoalsEmploymentText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(3)')
 
   GoalsPersonalLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(4)')
 
-  GoalsPersonalText = (): PageElement => cy.get(':nth-child(5) > .govuk-summary-list__row > .govuk-summary-list__key')
+  GoalsPersonalText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(5)')
 
   GoalsShortTermLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(6)')
 
-  GoalsShortTermText = (): PageElement => cy.get(':nth-child(7) > .govuk-summary-list__row > .govuk-summary-list__key')
+  GoalsShortTermText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(7)')
 
   GoalsLongTermLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(8)')
 
-  GoalsLongTermText = (): PageElement => cy.get(':nth-child(9) > .govuk-summary-list__row > .govuk-summary-list__key')
+  GoalsLongTermText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(9)')
 
   // FSL = Functional skills level
   FSL_card = (): PageElement => cy.get('#functional-skills-level')

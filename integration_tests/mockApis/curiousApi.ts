@@ -4,10 +4,11 @@ import { learnerEmployabilitySkills } from '../../server/data/localMockData/lear
 import { learnerEducation } from '../../server/data/localMockData/learnerEducation'
 import { LearnerProfiles } from '../../server/data/localMockData/learnerProfiles'
 import { LearnerLatestAssessmentsMock } from '../../server/data/localMockData/learnerLatestAssessmentsMock'
-import { LearnerGoalsMock } from '../../server/data/localMockData/learnerGoalsMock'
+import { LearnerGoalsMock, LearnerGoalsMockB } from '../../server/data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../../server/data/localMockData/learnerNeurodivergenceMock'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import { OffenderActivitiesMock } from '../../server/data/localMockData/offenderActivitiesMock'
+import { LearnerGoalsTestParams } from '../../server/interfaces/learnerGoals'
 
 export default {
   stubGetLearnerEmployabilitySkills: (prisonerNumber: string) => {
@@ -70,18 +71,24 @@ export default {
       },
     })
   },
-  stubGetLearnerGoals: (prisonerNumber: string) => {
+  stubGetLearnerGoals: (params: LearnerGoalsTestParams) => {
+    let jsonResp
+    if (params.emptyStates === false) {
+      jsonResp = LearnerGoalsMock
+    } else if (params.emptyStates === true) {
+      jsonResp = LearnerGoalsMockB
+    }
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/curiousApi/learnerGoals/${prisonerNumber}`,
+        urlPattern: `/curiousApi/learnerGoals/${params.prisonerNumber}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: LearnerGoalsMock,
+        jsonBody: jsonResp,
       },
     })
   },

@@ -24,152 +24,189 @@ import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmploya
 import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
 import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
-import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
+import { LearnerGoalsMock, LearnerGoalsMockB } from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('WorkAndSkillsService', () => {
-  let prisonApiClient: PrisonApiClient
+  describe('Scenario A', () => {
+    let prisonApiClient: PrisonApiClient
 
-  const curiousApiClient: CuriousApiClient = {
-    getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
-    getLearnerProfile: jest.fn(async () => LearnerProfiles),
-    getLearnerEducation: jest.fn(async () => learnerEducation),
-    getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
-    getLearnerGoals: jest.fn(async () => LearnerGoalsMock),
-    getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
-  }
+    const curiousApiClient: CuriousApiClient = {
+      getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
+      getLearnerProfile: jest.fn(async () => LearnerProfiles),
+      getLearnerEducation: jest.fn(async () => learnerEducation),
+      getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
+      getLearnerGoals: jest.fn(async () => LearnerGoalsMock),
+      getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
+    }
 
-  const workAndSkillsPageServiceConstruct = jest.fn(() => {
-    return new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
-  })
-
-  beforeEach(() => {
-    prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
-    prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
-    prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
-    prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
-    prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
-    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
-    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
-    prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
-    prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock)
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-    prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
-    prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
-    prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
-  })
-
-  describe('Work and Skills', () => {
-    it.each(['ABC123', 'DEF321'])('Gets the activities history for the prisoner', async (prisonerNumber: string) => {
-      const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-      await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+    const workAndSkillsPageServiceConstruct = jest.fn(() => {
+      return new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
     })
 
-    it.each(['ABC123', 'DEF321'])('Gets the attendance history for the prisoner', async (prisonerNumber: string) => {
-      const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-      const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
-      const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
-      const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
-      expect(prisonApiClient.getOffenderAttendanceHistory).toHaveBeenCalledWith(
-        prisonerNumber,
-        sixMonthsAgo,
-        todaysDate,
-      )
-      expect(res.learnerEducation).toEqual([
-        { key: { text: 'string' }, value: { text: 'Planned end date on 1 March 2023' } },
-      ])
+    beforeEach(() => {
+      prisonApiClient = prisonApiClientMock()
+      prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
+      prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
+      prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+      prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
+      prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
+      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+      prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+      prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
+      prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock)
+      prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
+      prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
+      prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
+      prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
     })
 
-    it.each(['ABC123', 'DEF321'])(
-      'Gets the courses and qualifications for the prisoner',
-      async (prisonerNumber: string) => {
+    describe('Work and Skills', () => {
+      it.each(['ABC123', 'DEF321'])('Gets the activities history for the prisoner', async (prisonerNumber: string) => {
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+        await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+      })
+
+      it.each(['ABC123', 'DEF321'])('Gets the attendance history for the prisoner', async (prisonerNumber: string) => {
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+        const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
+        const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
         const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
-        expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonerNumber)
+        expect(prisonApiClient.getOffenderAttendanceHistory).toHaveBeenCalledWith(
+          prisonerNumber,
+          sixMonthsAgo,
+          todaysDate,
+        )
         expect(res.learnerEducation).toEqual([
           { key: { text: 'string' }, value: { text: 'Planned end date on 1 March 2023' } },
         ])
-      },
-    )
-
-    it.each(['ABC123', 'DEF321'])('Gets the employability skills for the prisoner', async (prisonerNumber: string) => {
-      const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-      const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
-      expect(curiousApiClient.getLearnerEmployabilitySkills).toHaveBeenCalledWith(prisonerNumber)
-      expect(res.learnerEmployabilitySkills).toEqual({
-        content: [
-          {
-            activityEndDate: '2023-02-28',
-            activityLocation: 'string',
-            activityStartDate: '2023-02-28',
-            deliveryLocationPostCode: 'string',
-            deliveryMethodType: 'string',
-            employabilitySkill: 'string',
-            establishmentId: 'string',
-            establishmentName: 'string',
-            prn: 'G6123VU',
-            reviews: [{ comment: 'string', currentProgression: 'string', reviewDate: '2023-02-28' }],
-          },
-        ],
-        empty: true,
-        first: true,
-        last: true,
-        number: 0,
-        numberOfElements: 0,
-        pageable: {
-          offset: 0,
-          pageNumber: 0,
-          pageSize: 0,
-          paged: true,
-          sort: { empty: true, sorted: true, unsorted: true },
-          unpaged: true,
-        },
-        size: 0,
-        sort: { empty: true, sorted: true, unsorted: true },
-        totalElements: 0,
-        totalPages: 0,
       })
+
+      it.each(['ABC123', 'DEF321'])(
+        'Gets the courses and qualifications for the prisoner',
+        async (prisonerNumber: string) => {
+          const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+          const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+          expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonerNumber)
+          expect(res.learnerEducation).toEqual([
+            { key: { text: 'string' }, value: { text: 'Planned end date on 1 March 2023' } },
+          ])
+        },
+      )
+
+      it.each(['ABC123', 'DEF321'])(
+        'Gets the employability skills for the prisoner',
+        async (prisonerNumber: string) => {
+          const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+          const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+          expect(curiousApiClient.getLearnerEmployabilitySkills).toHaveBeenCalledWith(prisonerNumber)
+          expect(res.learnerEmployabilitySkills).toEqual({
+            content: [
+              {
+                activityEndDate: '2023-02-28',
+                activityLocation: 'string',
+                activityStartDate: '2023-02-28',
+                deliveryLocationPostCode: 'string',
+                deliveryMethodType: 'string',
+                employabilitySkill: 'string',
+                establishmentId: 'string',
+                establishmentName: 'string',
+                prn: 'G6123VU',
+                reviews: [{ comment: 'string', currentProgression: 'string', reviewDate: '2023-02-28' }],
+              },
+            ],
+            empty: true,
+            first: true,
+            last: true,
+            number: 0,
+            numberOfElements: 0,
+            pageable: {
+              offset: 0,
+              pageNumber: 0,
+              pageSize: 0,
+              paged: true,
+              sort: { empty: true, sorted: true, unsorted: true },
+              unpaged: true,
+            },
+            size: 0,
+            sort: { empty: true, sorted: true, unsorted: true },
+            totalElements: 0,
+            totalPages: 0,
+          })
+        },
+      )
+
+      it.each(['ABC123', 'DEF321'])(
+        'Gets the employability skills for the prisoner',
+        async (prisonerNumber: string) => {
+          const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+          const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+          expect(curiousApiClient.getLearnerProfile).toHaveBeenCalledWith(prisonerNumber)
+          expect(res.learnerEmployabilitySkills).toEqual({
+            content: [
+              {
+                activityEndDate: '2023-02-28',
+                activityLocation: 'string',
+                activityStartDate: '2023-02-28',
+                deliveryLocationPostCode: 'string',
+                deliveryMethodType: 'string',
+                employabilitySkill: 'string',
+                establishmentId: 'string',
+                establishmentName: 'string',
+                prn: 'G6123VU',
+                reviews: [{ comment: 'string', currentProgression: 'string', reviewDate: '2023-02-28' }],
+              },
+            ],
+            empty: true,
+            first: true,
+            last: true,
+            number: 0,
+            numberOfElements: 0,
+            pageable: {
+              offset: 0,
+              pageNumber: 0,
+              pageSize: 0,
+              paged: true,
+              sort: { empty: true, sorted: true, unsorted: true },
+              unpaged: true,
+            },
+            size: 0,
+            sort: { empty: true, sorted: true, unsorted: true },
+            totalElements: 0,
+            totalPages: 0,
+          })
+        },
+      )
+    })
+  })
+
+  describe('Scenario B', () => {
+    let prisonApiClient: PrisonApiClient
+    const curiousApiClient: CuriousApiClient = {
+      getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
+      getLearnerProfile: jest.fn(async () => LearnerProfiles),
+      getLearnerEducation: jest.fn(async () => learnerEducation),
+      getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
+      getLearnerGoals: jest.fn(async () => LearnerGoalsMockB),
+      getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
+    }
+
+    const workAndSkillsPageServiceConstruct = jest.fn(() => {
+      return new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
     })
 
-    it.each(['ABC123', 'DEF321'])('Gets the employability skills for the prisoner', async (prisonerNumber: string) => {
-      const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-      const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
-      expect(curiousApiClient.getLearnerProfile).toHaveBeenCalledWith(prisonerNumber)
-      expect(res.learnerEmployabilitySkills).toEqual({
-        content: [
-          {
-            activityEndDate: '2023-02-28',
-            activityLocation: 'string',
-            activityStartDate: '2023-02-28',
-            deliveryLocationPostCode: 'string',
-            deliveryMethodType: 'string',
-            employabilitySkill: 'string',
-            establishmentId: 'string',
-            establishmentName: 'string',
-            prn: 'G6123VU',
-            reviews: [{ comment: 'string', currentProgression: 'string', reviewDate: '2023-02-28' }],
-          },
-        ],
-        empty: true,
-        first: true,
-        last: true,
-        number: 0,
-        numberOfElements: 0,
-        pageable: {
-          offset: 0,
-          pageNumber: 0,
-          pageSize: 0,
-          paged: true,
-          sort: { empty: true, sorted: true, unsorted: true },
-          unpaged: true,
-        },
-        size: 0,
-        sort: { empty: true, sorted: true, unsorted: true },
-        totalElements: 0,
-        totalPages: 0,
+    beforeEach(() => {
+      prisonApiClient = prisonApiClientMock()
+    })
+
+    describe('Work and Skills', () => {
+      it('Prisoner without learner goals', async () => {
+        const prisonerNumber = '123123'
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+        const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+        expect(res.learnerGoals).toEqual(LearnerGoalsMockB)
       })
     })
   })
