@@ -8,18 +8,18 @@
             {{ miniSummary.data.topLabel }}
           </p>
         {% endif %}
-        {% if miniSummary.data.topContent %}
+        {% if miniSummary.data.topContent !== undefined %}
           <p
             class="govuk-body hmpps-mini-card__{{ miniSummary.data.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.data.topClass === 'small' }}"
           >
-            {{ miniSummary.data.topContent if miniSummary.data.topContent else '&nbsp;' | safe }}
+            {{ miniSummary.data.topContent if miniSummary.data.topContent !== undefined else '&nbsp;' | safe }}
           </p>
         {% endif %}
         <p class="govuk-body card-label">
           {{ miniSummary.data.bottomLabel }}
         </p>
         <p
-          class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }} {{ 'hmpps-mini-card__filler' if not miniSummary.data.bottomContentLine2 and miniSummary.data.bottomClass === 'small' }}"
+          class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }}"
         >
             {% if miniSummary.data.bottomContentLine1Href %}
                 <a href="{{ miniSummary.data.bottomContentLine1Href }}">
@@ -30,11 +30,23 @@
             {% endif %}
         </p>
         {% if miniSummary.data.bottomContentLine2 !== undefined %}
-          <p class="govuk-body hmpps-mini-card__sub-text">
+        <p
+          class="govuk-body hmpps-mini-card__{{ miniSummary.data.bottomClass }}"
+        >
             {{ miniSummary.data.bottomContentLine2 }}
+        </p>
+        {% endif %}
+        {% if miniSummary.data.bottomContentLine3 !== undefined %}
+          <p class="govuk-body hmpps-mini-card__sub-text">
+            {{ miniSummary.data.bottomContentLine3 }}
           </p>
         {%- endif -%}
-        <p class="govuk-body">
+          {% if miniSummary.data.bottomContentError !== undefined %}
+              <p class="govuk-body hmpps-mini-card__error">
+                  {{ miniSummary.data.bottomContentError }}
+              </p>
+          {%- endif -%}
+        <p class="govuk-body hmpps-mini-card__link">
           <a href="{{ miniSummary.data.linkHref }}" class="govuk-link govuk-link--no-visited-state">
             {{ miniSummary.data.linkLabel }}
           </a>
