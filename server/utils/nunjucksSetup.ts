@@ -5,6 +5,7 @@ import * as pathModule from 'path'
 import { addressToLines, findError, formatScheduleItem, initialiseName, summaryListOneHalfWidth } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
+import config from '../config'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -39,6 +40,12 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       express: app,
     },
   )
+
+  // Expose the google tag manager container ID to the nunjucks environment
+  const {
+    analytics: { tagManagerContainerId },
+  } = config
+  njkEnv.addGlobal('tagManagerContainerId', tagManagerContainerId.trim())
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatDate', formatDate)

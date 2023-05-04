@@ -124,6 +124,9 @@ export default {
       agent: new AgentConfig(Number(get('CASE_NOTES_API_TIMEOUT_DEADLINE', 20000))),
     },
   },
+  analytics: {
+    tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
+  },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),
 }

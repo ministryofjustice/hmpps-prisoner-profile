@@ -22,6 +22,7 @@ generic-service:
     CURIOUS_API_URL: "https://testservices.sequation.net/sequation-virtual-campus2-api"
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     CASE_NOTES_API_URL: "https://dev.offender-case-notes.service.justice.gov.uk"
+    TAG_MANAGER_CONTAINER_ID: "GTM-ND58HJP"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
