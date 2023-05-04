@@ -10,6 +10,7 @@ import pomApi from './integration_tests/mockApis/pom'
 import keyWorkerApi from './integration_tests/mockApis/keyWorker'
 import curiousApi from './integration_tests/mockApis/curiousApi'
 import caseNotesApi from './integration_tests/mockApis/caseNotesApi'
+import incentivesMockApi from './integration_tests/mockApis/incentivesMockApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -39,6 +40,7 @@ export default defineConfig({
         ...keyWorkerApi,
         ...curiousApi,
         ...caseNotesApi,
+        ...incentivesMockApi,
       })
     },
     baseUrl: 'http://localhost:3007',

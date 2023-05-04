@@ -33,6 +33,7 @@ import OffenceHistoryMock from '../../server/data/localMockData/offenceHistoryMo
 import sentenceTermsMock from '../../server/data/localMockData/sentenceTermsMock'
 import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/prisonerSentenceDetails'
 import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
+import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -578,6 +579,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubGetCaseNoteCount: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/caseNotes/(.*)`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: caseNoteCountMock,
       },
     })
   },

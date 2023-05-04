@@ -88,9 +88,10 @@ context('Overview Page', () => {
 
     it('Mini summary Group B should contain Incentives card with correct data', () => {
       const overviewPage = visitOverviewPage()
-      overviewPage.incentivesCard().contains('p', 'Incentive level')
-      overviewPage.incentivesCard().contains('p', 'Standard')
-      overviewPage.incentivesCard().contains('p', 'Next review: 30/01/2024')
+      overviewPage.incentivesCard().contains('p', 'Incentives: since last review')
+      overviewPage.incentivesCard().contains('p', 'Positive behaviours: 1')
+      overviewPage.incentivesCard().contains('p', 'Negative behaviours: 1')
+      overviewPage.incentivesCard().contains('p', 'Next review by: 01/01/2024')
       overviewPage.incentivesCard().contains('a', 'Incentive level details')
     })
 
