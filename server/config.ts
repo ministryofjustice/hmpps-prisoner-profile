@@ -135,9 +135,6 @@ export default {
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
   },
-  analytics: {
-    tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
-  },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),
 }
