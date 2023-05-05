@@ -1,3 +1,4 @@
+import { differenceInDays, isAfter } from 'date-fns'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import {
   OverviewNonAssociation,
@@ -9,7 +10,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { convertToTitleCase, formatMoney, formatPrivilegedVisitsSummary, getNamesFromString } from '../utils/utils'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
-import { Incentive, Prisoner } from '../interfaces/prisoner'
+import { Prisoner } from '../interfaces/prisoner'
 import { PersonalDetails } from '../interfaces/personalDetails'
 import { StaffContacts } from '../interfaces/staffContacts'
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
@@ -24,7 +25,10 @@ import { ProblemStatus } from '../data/enums/problemStatus'
 import { pregnantProblemCodes } from '../data/constants'
 import { BooleanString } from '../data/enums/booleanString'
 import { pluralise } from '../utils/pluralise'
-import { formatDate } from '../utils/dateHelpers'
+import { formatDate, formatDateISO } from '../utils/dateHelpers'
+import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
+import { IncentiveReviews } from '../interfaces/IncentivesApi/incentiveReviews'
+import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -33,22 +37,26 @@ export default class OverviewPageService {
 
   private keyWorkerClient: KeyWorkerClient
 
+  private incentivesApiClient: IncentivesApiClient
+
   constructor(
     prisonApiClient: PrisonApiClient,
     allocationManagerClient: AllocationManagerClient,
     keyWorkerClient: KeyWorkerClient,
+    incentivesApiClient: IncentivesApiClient,
   ) {
     this.prisonApiClient = prisonApiClient
     this.allocationManagerClient = allocationManagerClient
     this.keyWorkerClient = keyWorkerClient
+    this.incentivesApiClient = incentivesApiClient
   }
 
   public async get(prisonerData: Prisoner): Promise<OverviewPage> {
-    const { bookingId, currentIncentive, prisonerNumber } = prisonerData
+    const { bookingId, prisonerNumber } = prisonerData
 
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
-    const miniSummaryGroupB = await this.getMiniSummaryGroupB(currentIncentive, bookingId)
+    const miniSummaryGroupB = await this.getMiniSummaryGroupB(bookingId)
     const personalDetails = await this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData.bookingId)
@@ -243,7 +251,7 @@ export default class OverviewPageService {
       topClass: visitSummary.startDateTime ? 'big' : 'small',
       bottomLabel: 'Remaining visits',
       bottomContentLine1: visitBalances.remainingVo ? visitBalances.remainingVo : '0',
-      bottomContentLine2: privilegedVisitsDescription,
+      bottomContentLine3: privilegedVisitsDescription,
       bottomClass: visitBalances.remainingVo ? 'small' : 'big',
       linkLabel: 'Visits details',
       linkHref: '#',
@@ -265,8 +273,25 @@ export default class OverviewPageService {
     ]
   }
 
-  private async getMiniSummaryGroupB(currentIncentive: Incentive, bookingId: number): Promise<MiniSummary[]> {
+  private async getMiniSummaryGroupB(bookingId: number): Promise<MiniSummary[]> {
     const assessments = await this.prisonApiClient.getAssessments(bookingId)
+
+    const incentiveReviews: IncentiveReviews = await this.incentivesApiClient.getReviews(bookingId)
+
+    const positiveBehaviourCount = await this.prisonApiClient.getCaseNoteCount(
+      bookingId,
+      CaseNoteType.PositiveBehaviour,
+      CaseNoteSubType.IncentiveEncouragement,
+      incentiveReviews.iepDate,
+      formatDateISO(new Date()),
+    )
+    const negativeBehaviourCount = await this.prisonApiClient.getCaseNoteCount(
+      bookingId,
+      CaseNoteType.NegativeBehaviour,
+      CaseNoteSubType.IncentiveWarning,
+      incentiveReviews.iepDate,
+      formatDateISO(new Date()),
+    )
 
     if (!Array.isArray(assessments)) {
       // TODO handle api call returning error???
@@ -281,18 +306,20 @@ export default class OverviewPageService {
     const categorySummaryData: MiniSummaryData = {
       bottomLabel: 'Category',
       bottomContentLine1: category ? category.classificationCode : 'Not entered',
-      bottomContentLine2: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
+      bottomContentLine3: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
       bottomClass: 'small',
       linkLabel: 'Manage category',
       linkHref: '#',
     }
 
     const incentiveSummaryData: MiniSummaryData = {
-      bottomLabel: 'Incentive level',
-      bottomContentLine1: currentIncentive ? currentIncentive.level.description : 'Not entered',
-      bottomContentLine2: currentIncentive
-        ? `Next review: ${formatDate(currentIncentive.nextReviewDate, 'short')}`
-        : '',
+      bottomLabel: 'Incentives: since last review',
+      bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
+      bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
+      bottomContentLine3: `Next review by: ${formatDate(incentiveReviews.nextReviewDate, 'short')}`,
+      bottomContentError: isAfter(new Date(), new Date(incentiveReviews.nextReviewDate))
+        ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews.nextReviewDate)), 'day')} overdue`
+        : undefined,
       bottomClass: 'small',
       linkLabel: 'Incentive level details',
       linkHref: '#',
@@ -301,7 +328,7 @@ export default class OverviewPageService {
     const csraSummaryData: MiniSummaryData = {
       bottomLabel: 'CSRA',
       bottomContentLine1: csra ? csra.classification : 'Not entered',
-      bottomContentLine2: csra ? `Last review: ${formatDate(csra.assessmentDate, 'short')}` : '',
+      bottomContentLine3: csra ? `Last review: ${formatDate(csra.assessmentDate, 'short')}` : '',
       bottomClass: 'small',
       linkLabel: 'CSRA history',
       linkHref: '#',

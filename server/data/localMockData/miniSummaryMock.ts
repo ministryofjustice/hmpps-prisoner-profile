@@ -79,7 +79,7 @@ const visitsSummaryDataMock: MiniSummaryData = {
   topClass: 'big',
   bottomLabel: 'Remaining visits',
   bottomContentLine1: 6,
-  bottomContentLine2: formatPrivilegedVisitsSummary(2),
+  bottomContentLine3: formatPrivilegedVisitsSummary(2),
   bottomClass: 'small',
   linkLabel: 'Visits details',
   linkHref: '#',
@@ -88,16 +88,17 @@ const visitsSummaryDataMock: MiniSummaryData = {
 const categorySummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Category',
   bottomContentLine1: 'B',
-  bottomContentLine2: `Next review: ${formatDate('2023-02-19', 'short')}`,
+  bottomContentLine3: `Next review: ${formatDate('2023-02-19', 'short')}`,
   bottomClass: 'small',
   linkLabel: 'Manage category',
   linkHref: '#',
 }
 
 const incentiveSummaryDataMock: MiniSummaryData = {
-  bottomLabel: 'Incentive level',
-  bottomContentLine1: 'Standard',
-  bottomContentLine2: `Next review: ${formatDate('2024-01-30', 'short')}`,
+  bottomLabel: 'Incentives: since last review',
+  bottomContentLine1: 'Positive behaviours: 1',
+  bottomContentLine2: 'Negative behaviours: 1',
+  bottomContentLine3: `Next review by: ${formatDate('2024-01-01', 'short')}`,
   bottomClass: 'small',
   linkLabel: 'Incentive level details',
   linkHref: '#',
@@ -106,7 +107,7 @@ const incentiveSummaryDataMock: MiniSummaryData = {
 const csraSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'CSRA',
   bottomContentLine1: 'Standard',
-  bottomContentLine2: `Last review: ${formatDate('2021-02-19', 'short')}`,
+  bottomContentLine3: `Last review: ${formatDate('2021-02-19', 'short')}`,
   bottomClass: 'small',
   linkLabel: 'CSRA history',
   linkHref: '#',
