@@ -1,6 +1,28 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% extends "govuk/template.njk" %}
 {% block head %}
+  {% if tagManagerContainerId %}
+    <!-- Google Tag Manager -->
+    <script nonce="{{ cspNonce }}">window.dataLayer = window.dataLayer || [];</script>
+
+    <!-- Add user details to the dataLayer if present on this page load - for google analytics & tag manager -->
+    {% if user %}
+      <script nonce="{{ cspNonce }}">window.dataLayer.push({
+          'user': {
+            'prison': '{{ user.activeCaseLoadId }}',
+          },
+        })</script>
+    {% endif %}
+
+    <script nonce="{{ cspNonce }}">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;var n=d.querySelector('[nonce]');
+        n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','{{ tagManagerContainerId }}');</script>
+    <!-- End Google Tag Manager -->
+  {% endif %}
+
   <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet" />
 
   <script src="/assets/js/jquery.min.js"></script>
@@ -17,18 +39,29 @@
     crossorigin
   />
 {% endblock %}
+
 {% block pageTitle %}{{ pageTitle | default(applicationName) }}{% endblock %}
+
 {% block header %}
   {% include "./header.njk" %}
 {% endblock %}
+
 {% block beforeContent %}
   {{ govukBreadcrumbs({
       items: breadCrumbs | default([])
     }) }}
 {% endblock %}
-{% block bodyStart %}
 
+{% block bodyStart %}
+  {% if tagManagerContainerId %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id={{ tagManagerContainerId }}" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  {% endif %}
 {% endblock %}
+
 {% block bodyEnd %}
   {# Run JavaScript at end of the
   <body>, to avoid blocking the initial render. #}
@@ -36,7 +69,9 @@
   <script src="/assets/govukFrontendInit.js"></script>
   <script src="/assets/moj/all.js"></script>
   <script src="/assets/datepicker.js"></script>
+
   {# Javascript block for individual pages #}
   {% block pageScripts %}
-  {%  endblock %}
+  {% endblock %}
+
 {% endblock %}
