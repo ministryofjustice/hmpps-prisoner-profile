@@ -22,6 +22,7 @@ generic-service:
     CURIOUS_API_URL: "https://liveservices.sequation.com/sequation-virtual-campus2-api"
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     CASE_NOTES_API_URL: "https://offender-case-notes.service.justice.gov.uk"
+    INCENTIVES_API_URL: "https://incentives-api.hmpps.service.justice.gov.uk"
 
   allowlist:
     office: "217.33.148.210/32"

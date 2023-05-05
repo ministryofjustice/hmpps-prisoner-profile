@@ -14,6 +14,8 @@ Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber }) =
   cy.task('stubPrisonerData', prisonerNumber)
   cy.task('stubAccountBalances', bookingId)
   cy.task('stubAdjudications', bookingId)
+  cy.task('stubGetCaseNoteCount', bookingId)
+  cy.task('stubGetReviews', bookingId)
   cy.task('stubVisitSummary', bookingId)
   cy.task('stubVisitBalances', prisonerNumber)
   cy.task('stubAssessments', bookingId)

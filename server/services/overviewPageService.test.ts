@@ -41,6 +41,9 @@ import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { formatDate } from '../utils/dateHelpers'
 import { convertToTitleCase } from '../utils/utils'
+import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
+import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
+import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -53,8 +56,12 @@ describe('OverviewPageService', () => {
     getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
   }
 
+  const incentivesApiClient: IncentivesApiClient = {
+    getReviews: jest.fn(async () => incentiveReviewsMock),
+  }
+
   const overviewPageServiceConstruct = jest.fn(() => {
-    return new OverviewPageService(prisonApiClient, allocationManagerApiClient, keyWorkerApiClient)
+    return new OverviewPageService(prisonApiClient, allocationManagerApiClient, keyWorkerApiClient, incentivesApiClient)
   })
 
   beforeEach(() => {
@@ -70,6 +77,7 @@ describe('OverviewPageService', () => {
     prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
     prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
     prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
+    prisonApiClient.getCaseNoteCount = jest.fn(async () => caseNoteCountMock)
   })
 
   describe('Non-associations', () => {

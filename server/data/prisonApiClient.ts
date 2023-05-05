@@ -36,6 +36,7 @@ import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/refe
 import { ReasonableAdjustments } from '../interfaces/prisonApi/reasonableAdjustment'
 import { CaseNoteUsage } from '../interfaces/prisonApi/caseNoteUsage'
 import { formatDateISO } from '../utils/dateHelpers'
+import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -248,6 +249,19 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get({
       path: `/api/case-notes/usage`,
       query: `offenderNo=${prisonerNumber}&toDate=${today}&numMonths=1200`,
+    })
+  }
+
+  async getCaseNoteCount(
+    bookingId: number,
+    type: string,
+    subType: string,
+    fromDate: string,
+    toDate: string,
+  ): Promise<CaseNoteCount> {
+    return this.get({
+      path: `/api/bookings/${bookingId}/caseNotes/${type}/${subType}/count`,
+      query: `fromDate=${fromDate}&toDate=${toDate}`,
     })
   }
 }
