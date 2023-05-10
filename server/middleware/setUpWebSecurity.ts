@@ -23,12 +23,39 @@ export default function setUpWebSecurity(): Router {
           // <link href="http://example.com/" rel="stylesheet" nonce="{{ cspNonce }}">
           // This ensures only scripts we trust are loaded, and not anything injected into the
           // page by an attacker.
-          scriptSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
-          styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
+          scriptSrc: [
+            "'self'",
+            '*.google-analytics.com',
+            '*.analytics.google.com',
+            '*.googletagmanager.com',
+            (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
+          ],
+          styleSrc: [
+            "'self'",
+            '*.google-analytics.com',
+            '*.analytics.google.com',
+            '*.googletagmanager.com',
+            'fonts.googleapis.com',
+            (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
+          ],
+          connectSrc: [
+            "'self'",
+            '*.google-analytics.com',
+            '*.analytics.google.com',
+            '*.googletagmanager.com',
+            (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
+          ],
+          imgSrc: [
+            "'self'",
+            '*.google-analytics.com',
+            '*.analytics.google.com',
+            '*.googletagmanager.com',
+            (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
+          ],
           fontSrc: ["'self'"],
         },
       },
-      crossOriginEmbedderPolicy: true,
+      crossOriginEmbedderPolicy: { policy: 'credentialless' },
     }),
   )
   return router
