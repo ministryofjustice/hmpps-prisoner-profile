@@ -40,7 +40,7 @@
   />
 {% endblock %}
 
-{% block pageTitle %}{{ pageTitle | default(applicationName) }}{% endblock %}
+{% block pageTitle %}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
 
 {% block header %}
   {% include "./header.njk" %}
