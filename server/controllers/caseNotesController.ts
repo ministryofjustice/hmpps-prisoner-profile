@@ -47,6 +47,7 @@ export default class CaseNotesController {
 
     // Render page
     return res.render('pages/caseNotesPage', {
+      pageTitle: 'Case notes',
       ...mapHeaderData(prisonerData, 'case-notes'),
       ...caseNotesPageData,
       hasCaseNotes,

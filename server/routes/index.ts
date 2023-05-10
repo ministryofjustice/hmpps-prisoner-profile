@@ -59,6 +59,7 @@ export default function routes(service: Services): Router {
     const overviewPageData = await overviewPageService.get(prisonerData)
 
     res.render('pages/overviewPage', {
+      pageTitle: 'Overview',
       ...mapHeaderData(prisonerData, 'overview'),
       ...overviewPageData,
     })
@@ -82,6 +83,7 @@ export default function routes(service: Services): Router {
     const personalPageData = await personalPageService.get(prisonerData)
 
     res.render('pages/personalPage', {
+      pageTitle: 'Personal',
       ...mapHeaderData(prisonerData, 'personal'),
       ...personalPageData,
     })
@@ -100,6 +102,7 @@ export default function routes(service: Services): Router {
     res.render('pages/workAndSkills', {
       ...mapHeaderData(prisonerData, 'work-and-skills'),
       ...workAndSkillsPageData,
+      pageTitle: 'Work and skills',
     })
   })
 
@@ -125,6 +128,7 @@ export default function routes(service: Services): Router {
     const offencesPageData = await offencesPageService.get(prisonerData)
 
     res.render('pages/offences', {
+      pageTitle: 'Offences',
       ...mapHeaderData(prisonerData, 'offences'),
       ...offencesPageData,
       activeTab: true,
