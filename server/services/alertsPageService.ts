@@ -66,8 +66,13 @@ export default class AlertsPageService {
    *
    * @param prisonerData
    * @param queryParams
+   * @param canUpdateAlert
    */
-  public async get(prisonerData: Prisoner, queryParams: PagedListQueryParams): Promise<AlertsPageData> {
+  public async get(
+    prisonerData: Prisoner,
+    queryParams: PagedListQueryParams,
+    canUpdateAlert: boolean,
+  ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
 
     const { activeAlertCount, inactiveAlertCount, alerts } = await this.prisonApiClient.getInmateDetail(
@@ -114,6 +119,7 @@ export default class AlertsPageService {
         pagedAlerts = await this.prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
         pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
           ...alert,
+          updateLink: canUpdateAlert && alert.active && '#',
           addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
           expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
         }))

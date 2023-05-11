@@ -35,7 +35,7 @@ describe('Alerts Page', () => {
         .spyOn<any, string>(alertsPageService['prisonApiClient'], 'getAlerts')
         .mockResolvedValue(pagedActiveAlertsMock)
 
-      const alertsPageData = await alertsPageService.get(prisonerData, queryParams)
+      const alertsPageData = await alertsPageService.get(prisonerData, queryParams, true)
 
       expect(getInmateDetailsSpy).toHaveBeenCalledWith(prisonerData.bookingId)
       expect(getAlertsSpy).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'ACTIVE' })
@@ -59,7 +59,7 @@ describe('Alerts Page', () => {
         .spyOn<any, string>(alertsPageService['prisonApiClient'], 'getAlerts')
         .mockResolvedValue(pagedInactiveAlertsMock)
 
-      const alertsPageData = await alertsPageService.get(prisonerData, queryParams)
+      const alertsPageData = await alertsPageService.get(prisonerData, queryParams, true)
 
       expect(getInmateDetailsSpy).toHaveBeenCalledWith(prisonerData.bookingId)
       expect(getAlertsSpy).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'INACTIVE' })

@@ -10,8 +10,8 @@
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">
-        {% if alert.active %}
-        <a href="#{{ alert.alertId }}" class="govuk-link govuk-link--no-visited-state">Update or close</a>
+        {% if alert.updateLink %}
+        <a href="{{ alert.updateLink }}" class="govuk-link govuk-link--no-visited-state">Update or close</a>
         {% endif %}
     </div>
 </div>
