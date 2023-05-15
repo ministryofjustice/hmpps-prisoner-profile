@@ -90,7 +90,7 @@ export default class PersonalPage extends Page {
   }
 
   contacts = () => {
-    const cardData = () => cy.getDataQa('emergency-contacts')
+    const cardData = () => cy.getDataQa('next-of-kin')
     return {
       contact: contactNumber => {
         const contactData = () => cardData().find('[data-qa=emergency-contact]').eq(contactNumber)
