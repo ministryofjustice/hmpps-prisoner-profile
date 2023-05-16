@@ -35,7 +35,7 @@ describe('Case Notes Controller', () => {
       },
       render: jest.fn(),
     }
-    controller = new CaseNotesController(res.locals.clientToken)
+    controller = new CaseNotesController(res.locals.clientToken, res.locals.user.token)
   })
 
   it('should get case notes', async () => {
@@ -53,14 +53,18 @@ describe('Case Notes Controller', () => {
     await controller.displayCaseNotes(req, res)
     expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getgetCaseNotesUsageSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
-    expect(getCaseNotesSpy).toHaveBeenCalledWith(prisonerDetailMock, {
-      page: 0,
-      sort: 'dateCreated,ASC',
-      type: 'ACP',
-      subType: 'ASSESSMENT',
-      startDate: '01/01/2023',
-      endDate: '02/02/2023',
-    })
-    expect(mapSpy).toHaveBeenCalledWith(prisonerDetailMock, 'case-notes')
+    expect(getCaseNotesSpy).toHaveBeenCalledWith(
+      prisonerDetailMock,
+      {
+        page: 0,
+        sort: 'dateCreated,ASC',
+        type: 'ACP',
+        subType: 'ASSESSMENT',
+        startDate: '01/01/2023',
+        endDate: '02/02/2023',
+      },
+      false,
+    )
+    expect(mapSpy).toHaveBeenCalledWith(prisonerDetailMock, true, 'case-notes')
   })
 })

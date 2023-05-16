@@ -51,9 +51,9 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return alerts
 }
 
-export function mapHeaderData(prisonerData: Prisoner, pageId?: string) {
+export function mapHeaderData(prisonerData: Prisoner, canViewCaseNotes?: boolean, pageId?: string) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
-  const tabs = tabLinks(prisonerData.prisonerNumber)
+  const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes)
 
   if (pageId) {
     tabs.find(tab => tab.id === pageId).active = true

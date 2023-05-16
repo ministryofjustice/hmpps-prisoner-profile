@@ -1,4 +1,3 @@
-import * as jwt from 'jsonwebtoken'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
@@ -12,7 +11,6 @@ jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/alertsPageService.ts')
 
 describe('Alerts Controller', () => {
-  const token = jwt.sign({ authorities: ['ROLE_UPDATE_ALERT'] }, 'secret')
   beforeEach(() => {
     req = {
       params: { prisonerNumber: '' },
@@ -23,7 +21,7 @@ describe('Alerts Controller', () => {
       locals: {
         user: {
           activeCaseLoadId: 'MDI',
-          token,
+          userRoles: ['ROLE_UPDATE_ALERT'],
         },
         clientToken: 'CLIENT_TOKEN',
       },
@@ -56,7 +54,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, true, 'alerts')
   })
 
   it('should get inactive alerts', async () => {
@@ -86,7 +84,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, true, 'alerts')
   })
 
   it('should set canUpdateAlert to true if user has role and active caseload', async () => {
@@ -123,7 +121,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    res.locals.user.token = jwt.sign({ authorities: ['ROLE_OTHER'] }, 'secret')
+    res.locals.user.userRoles = ['ROLE_OTHER']
 
     await controller.displayAlerts(req, res)
 
