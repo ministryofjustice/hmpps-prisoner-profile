@@ -11,7 +11,7 @@ export default function authorisationMiddleware(authorisedRoles: string[] = []):
 
       if (authorisedRoles.length && !roles.some(role => authorisedRoles.includes(role))) {
         logger.error('User is not authorised to access this')
-        return res.redirect('/authError')
+        return res.redirect('/autherror')
       }
 
       return next()

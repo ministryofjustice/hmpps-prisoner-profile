@@ -23,7 +23,7 @@ export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
 
 export const initialiseName = (fullName?: string): string | null => {
-  // this check is for the authError page
+  // this check is for the autherror page
   if (!fullName) return null
 
   const array = fullName.split(' ')
