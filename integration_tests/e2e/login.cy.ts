@@ -3,6 +3,7 @@ import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
 import AuthManageDetailsPage from '../pages/authManageDetails'
 import DPSHomePage from '../pages/dpsHomePage'
+import AuthErrorPage from '../pages/autherror'
 
 context('SignIn', () => {
   beforeEach(() => {
@@ -28,6 +29,29 @@ context('SignIn', () => {
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)
     indexPage.headerUserName().should('contain.text', 'J. Smith')
+  })
+
+  it('User with prison role has access', () => {
+    cy.task('stubSignIn', ['ROLE_PRISON'])
+
+    cy.signIn()
+    cy.visit('/prisoner/G6123VU')
+    Page.verifyOnPage(IndexPage)
+  })
+
+  it('User with Global Search role has access', () => {
+    cy.task('stubSignIn', ['ROLE_GLOBAL_SEARCH'])
+
+    cy.signIn()
+    cy.visit('/prisoner/G6123VU')
+    Page.verifyOnPage(IndexPage)
+  })
+
+  it('User with neither prison or global search role denied access', () => {
+    cy.task('stubSignIn', ['ROLE_SOMETHING_ELSE'])
+
+    cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
+    Page.verifyOnPage(AuthErrorPage)
   })
 
   it('User can log out', () => {

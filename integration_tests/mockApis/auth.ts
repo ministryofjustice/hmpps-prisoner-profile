@@ -4,12 +4,12 @@ import { Response } from 'superagent'
 import { stubFor, getMatchingRequests } from './wiremock'
 import tokenVerification from './tokenVerification'
 
-const createToken = () => {
+const createToken = (userRoles: string[]) => {
   const payload = {
     user_name: 'USER1',
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: [],
+    authorities: userRoles,
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -95,7 +95,7 @@ const manageDetails = () =>
     },
   })
 
-const token = () =>
+const token = (userRoles: string[]) =>
   stubFor({
     request: {
       method: 'POST',
@@ -108,7 +108,7 @@ const token = () =>
         Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
       jsonBody: {
-        access_token: createToken(),
+        access_token: createToken(userRoles),
         token_type: 'bearer',
         user_name: 'USER1',
         expires_in: 599,
@@ -156,7 +156,16 @@ const stubUserRoles = () =>
 export default {
   getSignInUrl,
   stubAuthPing: ping,
-  stubSignIn: (): Promise<[Response, Response, Response, Response, Response, Response]> =>
-    Promise.all([favicon(), redirect(), signOut(), manageDetails(), token(), tokenVerification.stubVerifyToken()]),
+  stubSignIn: (
+    userRoles: string[] = ['ROLE_PRISON'],
+  ): Promise<[Response, Response, Response, Response, Response, Response]> =>
+    Promise.all([
+      favicon(),
+      redirect(),
+      signOut(),
+      manageDetails(),
+      token(userRoles),
+      tokenVerification.stubVerifyToken(),
+    ]),
   stubAuthUser: (name = 'john smith'): Promise<[Response, Response]> => Promise.all([stubUser(name), stubUserRoles()]),
 }
