@@ -2,7 +2,7 @@ import { CaseLoad } from '../../interfaces/caseLoad'
 
 export const CaseLoadsDummyDataA: CaseLoad[] = [
   {
-    caseLoadId: 'BAI',
+    caseLoadId: 'MDI',
     description: 'Moorland Closed (HMP & YOI)',
     type: 'INST',
     caseloadFunction: 'GENERAL',

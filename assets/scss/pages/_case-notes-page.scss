@@ -51,16 +51,15 @@
 }
 
 .hmpps-case-note-card-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-basis: min-content;
+  gap: 20px;
+
   padding-bottom: 30px;
   border-bottom: 1px solid govuk-colour('dark-grey');
   margin-bottom: 30px;
-
-  &__header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    flex-basis: min-content;
-  }
 
   &__content {
   }
@@ -76,7 +75,7 @@
     font-size: 19px;
     font-weight: bold;
     color: $govuk-text-colour;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
   }
 
   &__amendments-header {
@@ -86,20 +85,11 @@
     margin-top: 15px;
   }
 
-  &__amendment {
-    margin-top: 15px;
-
-    &:not(:last-of-type) {
-      padding-bottom: 15px;
-      border-bottom: 1px dashed govuk-colour('dark-grey');
-    }
-  }
-
   &__notes {
     font-size: 19px;
     font-weight: 300;
     color: $govuk-text-colour;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
     max-width: 670px;
     overflow-wrap: break-word;
 
@@ -111,6 +101,19 @@
     }
   }
 
+  &__amendment {
+    margin-top: 15px;
+
+    &:not(:last-of-type) {
+      padding-bottom: 15px;
+      border-bottom: 1px dashed govuk-colour('mid-grey');
+    }
+  }
+
+  &__amendment &__notes {
+    margin-bottom: 15px;
+  }
+
   &__metadata {
     font-size: 16px;
     font-weight: 300;
@@ -119,5 +122,13 @@
 
   &__link {
     white-space: nowrap;
+
+    a {
+      display: block;
+    }
+
+    a + a {
+      margin-top: 20px;
+    }
   }
 }

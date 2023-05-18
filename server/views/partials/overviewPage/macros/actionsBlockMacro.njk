@@ -1,11 +1,13 @@
-{% macro actionsBlock() %}
+{% macro actionsBlock(canAddCaseNotes) %}
   <div class="hmpps-actions-block govuk-!-margin-bottom-5">
     <h2 class="govuk-heading-m">Actions</h2>
     <ul class="hmpps-actions-block__list">
+      {% if canAddCaseNotes %}
       <li>
         <img src="/assets/images/add-case-note.svg" role="presentation" alt="" width="40px" height="40px" />
         <a href="#" class="govuk-link govuk-link--no-visited-state">Add case note</a>
       </li>
+      {% endif %}
       <li>
         <img src="/assets/images/add-appointment.svg" role="presentation" alt="" width="40px" height="40px" />
         <a href="#" class="govuk-link govuk-link--no-visited-state">Add appointment</a>

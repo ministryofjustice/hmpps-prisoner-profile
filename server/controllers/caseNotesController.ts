@@ -5,6 +5,8 @@ import { PrisonerSearchService } from '../services'
 import CaseNotesService from '../services/caseNotesService'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { Role } from '../data/enums/role'
+import { canViewOrAddCaseNotes } from '../utils/roleHelpers'
 
 /**
  * Parse request for case notes page and orchestrate response
@@ -16,10 +18,10 @@ export default class CaseNotesController {
 
   private prisonApiClient: PrisonApiClient
 
-  constructor(clientToken: string) {
+  constructor(clientToken: string, userToken: string) {
     this.prisonerSearchService = new PrisonerSearchService(clientToken)
-    this.caseNotesService = new CaseNotesService(clientToken)
     this.prisonApiClient = new PrisonApiRestClient(clientToken)
+    this.caseNotesService = new CaseNotesService(userToken) // Requires user token as API includes logic to return different results based on role
   }
 
   public async displayCaseNotes(req: Request, res: Response) {
@@ -35,12 +37,28 @@ export default class CaseNotesController {
     // Get prisoner data for banner and for use in alerts generation
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
+    // Set role based permissions
+    const canViewCaseNotes = canViewOrAddCaseNotes(
+      res.locals.user.userRoles,
+      res.locals.user.activeCaseLoadId,
+      prisonerData.prisonId,
+    )
+    const canDeleteSensitiveCaseNotes =
+      res.locals.user.userRoles?.some((role: string) => role === Role.DeleteSensitiveCaseNotes) || false
+
+    // If user cannot view this prisoner's case notes, redirect to 404 page
+    if (!canViewCaseNotes) {
+      return res.render('notFound.njk', {
+        url: req.headers.referer || `/prisoner/${prisonerData.prisonerNumber}`,
+      })
+    }
+
     // Get total count of case notes ignoring filters
     const caseNotesUsage = await this.prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber)
     const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
 
     // Get case notes based on given query params
-    const caseNotesPageData = await this.caseNotesService.get(prisonerData, queryParams)
+    const caseNotesPageData = await this.caseNotesService.get(prisonerData, queryParams, canDeleteSensitiveCaseNotes)
 
     // Get staffId to use in conditional logic for amend link
     const { staffId } = res.locals.user
@@ -48,7 +66,7 @@ export default class CaseNotesController {
     // Render page
     return res.render('pages/caseNotesPage', {
       pageTitle: 'Case notes',
-      ...mapHeaderData(prisonerData, 'case-notes'),
+      ...mapHeaderData(prisonerData, canViewCaseNotes, 'case-notes'),
       ...caseNotesPageData,
       hasCaseNotes,
       staffId,

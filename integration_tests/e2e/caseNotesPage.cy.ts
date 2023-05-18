@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import CaseNotesPage from '../pages/caseNotesPage'
+import NotFoundPage from '../pages/notFoundPage'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -15,8 +16,9 @@ context('Case Notes Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.task('stubAuthUser', { activeCaseLoadId: 'MDI' })
     cy.task('stubGetCaseNoteTypes')
+    cy.task('stubGetUserCaseLoad')
   })
 
   context('Case Notes List', () => {
@@ -144,6 +146,31 @@ context('Case Notes Page', () => {
       caseNotesPage.filterApplyButton().click()
 
       caseNotesPage.caseNotesList().children().should('have.length', 1)
+    })
+  })
+})
+
+context('Case Notes Page Not Found', () => {
+  beforeEach(() => {
+    cy.task('reset')
+    cy.task('stubSignIn')
+    cy.task('stubAuthUser', { activeCaseLoadId: 'ZZZ' })
+    cy.task('stubGetCaseNoteTypes')
+    cy.task('stubGetUserCaseLoad')
+  })
+
+  context('Page Not Found', () => {
+    beforeEach(() => {
+      cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubPrisonerDetail', 'G6123VU')
+      cy.task('stubGetCaseNotesUsage', 'G6123VU')
+      cy.task('stubGetCaseNotes', 'G6123VU')
+    })
+
+    it('Displays Page Not Found', () => {
+      cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
+      Page.verifyOnPage(NotFoundPage)
     })
   })
 })

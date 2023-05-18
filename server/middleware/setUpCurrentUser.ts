@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import auth from '../authentication/auth'
 import tokenVerifier from '../data/tokenVerification'
-import populateCurrentUser, { getUserActiveCaseLoad } from './populateCurrentUser'
+import populateCurrentUser, { getUserActiveCaseLoad, getUserRoles } from './populateCurrentUser'
 import type { Services } from '../services'
 
 export default function setUpCurrentUser({ userService }: Services): Router {
@@ -9,5 +9,6 @@ export default function setUpCurrentUser({ userService }: Services): Router {
   router.use(auth.authenticationMiddleware(tokenVerifier))
   router.use(populateCurrentUser(userService))
   router.use(getUserActiveCaseLoad(userService))
+  router.use(getUserRoles(userService))
   return router
 }
