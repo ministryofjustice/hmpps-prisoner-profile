@@ -5,6 +5,7 @@ import { SortOption } from '../interfaces/sortSelector'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
 import { ListMetadata } from '../interfaces/listMetadata'
+import { CaseLoad } from '../interfaces/caseLoad'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -319,4 +320,25 @@ export const findError = (errors: HmppsError[], formFieldId: string) => {
     }
   }
   return null
+}
+
+/**
+ * Whether or not the prisoner belongs to any of the users case loads
+ *
+ * @param prisonerAgencyId
+ * @param userCaseLoads
+ */
+export const prisonerBelongsToUsersCaseLoad = (prisonerAgencyId: string, userCaseLoads: CaseLoad[]): boolean => {
+  return userCaseLoads.some(caseLoad => caseLoad.caseLoadId === prisonerAgencyId)
+}
+
+/**
+ * Whether any of the roles exist for the given user allowing for conditional role based access on any number of roles
+ *
+ * @param rolesToCheck
+ * @param userRoles
+ */
+
+export const userHasRoles = (rolesToCheck: string[], userRoles: string[]): boolean => {
+  return rolesToCheck.some(role => userRoles.includes(role))
 }

@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express'
+import jwtDecode from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
+import { CaseLoad } from '../interfaces/caseLoad'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
   return async (req, res, next) => {
@@ -40,11 +42,11 @@ export function getUserLocations(userService: UserService): RequestHandler {
   }
 }
 
-export function getUserRoles(userService: UserService): RequestHandler {
+export function getUserRoles(): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const roles = res.locals.user && (await userService.getUserRoles(res.locals.user.token))
+        const { authorities: roles = [] } = jwtDecode(res.locals.user.token) as { authorities?: string[] }
         if (roles) {
           res.locals.user.userRoles = roles
         } else {
@@ -82,9 +84,16 @@ export function getUserActiveCaseLoad(userService: UserService): RequestHandler 
   return async (req, res, next) => {
     try {
       if (res.locals.user.activeCaseLoadId) {
-        const activeCaseLoad =
-          res.locals.user &&
-          (await userService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
+        let activeCaseLoad: CaseLoad[] | undefined
+
+        if (res.locals.user.caseLoads) {
+          activeCaseLoad = res.locals.user.caseLoads.filter((caseLoad: CaseLoad) => caseLoad.currentlyActive)
+        } else {
+          activeCaseLoad =
+            res.locals.user &&
+            (await userService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
+        }
+
         if (activeCaseLoad) {
           res.locals.user.activeCaseLoad = activeCaseLoad
         } else {

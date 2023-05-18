@@ -1,0 +1,11 @@
+{% macro conditionallyShow(params) %}
+  {% if(params.condition) %}
+    <div data-qa="visible-{{ params.id }}">
+      {{ caller() }}
+    </div>
+  {% else %}
+    <div data-qa="hidden-{{ params.id }}">
+      {{ params.hiddenState | default("") }}
+    </div>
+  {% endif %}
+{% endmacro %}

@@ -139,21 +139,6 @@ const stubUser = (name: string, activeCaseLoadId?: string) =>
     },
   })
 
-const stubUserRoles = () =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/auth/api/user/me/roles',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: [{ roleCode: 'SOME_USER_ROLE' }],
-    },
-  })
-
 export default {
   getSignInUrl,
   stubAuthPing: ping,
@@ -168,6 +153,6 @@ export default {
       token(userRoles),
       tokenVerification.stubVerifyToken(),
     ]),
-  stubAuthUser: ({ name = 'john smith', activeCaseLoadId = undefined } = {}): Promise<[Response, Response]> =>
-    Promise.all([stubUser(name, activeCaseLoadId), stubUserRoles()]),
+  stubAuthUser: ({ name = 'john smith', activeCaseLoadId = undefined } = {}): Promise<[Response]> =>
+    Promise.all([stubUser(name, activeCaseLoadId)]),
 }

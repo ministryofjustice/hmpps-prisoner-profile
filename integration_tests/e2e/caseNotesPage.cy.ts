@@ -18,7 +18,7 @@ context('Case Notes Page', () => {
     cy.task('stubSignIn')
     cy.task('stubAuthUser', { activeCaseLoadId: 'MDI' })
     cy.task('stubGetCaseNoteTypes')
-    cy.task('stubGetUserCaseLoad')
+    cy.task('stubUserCaseLoads')
   })
 
   context('Case Notes List', () => {
@@ -156,7 +156,7 @@ context('Case Notes Page Not Found', () => {
     cy.task('stubSignIn')
     cy.task('stubAuthUser', { activeCaseLoadId: 'ZZZ' })
     cy.task('stubGetCaseNoteTypes')
-    cy.task('stubGetUserCaseLoad')
+    cy.task('stubUserCaseLoads')
   })
 
   context('Page Not Found', () => {

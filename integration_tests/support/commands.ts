@@ -63,3 +63,9 @@ Cypress.Commands.add('setupOffencesPageStubs', ({ prisonerNumber, bookingId }) =
   cy.task('stubGetSentenceTerms', bookingId)
   cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
 })
+
+Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'MDI' }) => {
+  cy.task('stubSignIn', roles)
+  cy.task('stubUserCaseLoads', caseLoads)
+  cy.task('stubAuthUser', { activeCaseLoadId })
+})

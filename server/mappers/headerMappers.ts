@@ -69,6 +69,7 @@ export function mapHeaderData(prisonerData: Prisoner, canViewCaseNotes?: boolean
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks: tabs,
     photoType,
+    prisonId: prisonerData.prisonId,
   }
   return headerData
 }

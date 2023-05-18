@@ -35,6 +35,7 @@ import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/pri
 import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
+import { CaseLoad } from '../../server/interfaces/caseLoad'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -600,18 +601,18 @@ export default {
     })
   },
 
-  stubGetUserCaseLoad: () => {
+  stubUserCaseLoads: (caseLoads: CaseLoad[] = []) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/prison/api/users/me/caseLoads\\?allCaseloads=true',
+        urlPattern: `/prison/api/users/me/caseLoads\\?allCaseloads=true`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: CaseLoadsDummyDataA,
+        jsonBody: caseLoads.length > 0 ? caseLoads : CaseLoadsDummyDataA,
       },
     })
   },
