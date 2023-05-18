@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import jwtDecode from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
+import { CaseLoad } from '../interfaces/caseLoad'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
   return async (req, res, next) => {
@@ -83,9 +84,16 @@ export function getUserActiveCaseLoad(userService: UserService): RequestHandler 
   return async (req, res, next) => {
     try {
       if (res.locals.user.activeCaseLoadId) {
-        const activeCaseLoad =
-          res.locals.user &&
-          (await userService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
+        let activeCaseLoad: CaseLoad[] | undefined
+
+        if (res.locals.user.caseLoads) {
+          activeCaseLoad = res.locals.user.caseLoads.filter((caseLoad: CaseLoad) => caseLoad.currentlyActive)
+        } else {
+          activeCaseLoad =
+            res.locals.user &&
+            (await userService.getUserCaseLoads(res.locals.user.token)).filter(caseLoad => caseLoad.currentlyActive)
+        }
+
         if (activeCaseLoad) {
           res.locals.user.activeCaseLoad = activeCaseLoad
         } else {

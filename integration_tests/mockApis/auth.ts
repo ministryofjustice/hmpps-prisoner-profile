@@ -153,6 +153,6 @@ export default {
       token(userRoles),
       tokenVerification.stubVerifyToken(),
     ]),
-  stubAuthUser: ({ name = 'john smith', activeCaseLoadId = undefined } = {}): Promise<[Response, Response]> =>
-    Promise.all([stubUser(name, activeCaseLoadId), stubUserRoles()]),
+  stubAuthUser: ({ name = 'john smith', activeCaseLoadId = undefined } = {}): Promise<[Response]> =>
+    Promise.all([stubUser(name, activeCaseLoadId)]),
 }

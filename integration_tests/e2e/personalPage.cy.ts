@@ -13,7 +13,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: ['GLOBAL_SEARCH'],
+        roles: ['ROLE_GLOBAL_SEARCH'],
         caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
