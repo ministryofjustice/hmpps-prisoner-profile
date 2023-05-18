@@ -9,14 +9,17 @@ import {
   getNamesFromString,
   initialiseName,
   mapToQueryString,
+  prisonerBelongsToUsersCaseLoad,
   properCaseName,
   summaryListOneHalfWidth,
   SummaryListRow,
+  userHasRoles,
   yearsBetweenDateStrings,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
+import { CaseLoad } from '../interfaces/caseLoad'
 
 describe('convert to title case', () => {
   it.each([
@@ -274,5 +277,36 @@ describe('findError', () => {
     const errors: HmppsError[] = null
     const error = findError(errors, 'myError')
     expect(error).toBeNull()
+  })
+
+  describe('prisonerBelongsToUsersCaseLoad', () => {
+    it('Should return true when the user has a caseload matching the prisoner', () => {
+      const caseLoads: CaseLoad[] = [
+        { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
+        { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
+      ]
+
+      expect(prisonerBelongsToUsersCaseLoad('DEF', caseLoads)).toEqual(true)
+    })
+
+    it('Should return false when the user has a caseload that doesnt match the prisoner', () => {
+      const caseLoads: CaseLoad[] = [
+        { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
+        { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
+      ]
+
+      expect(prisonerBelongsToUsersCaseLoad('123', caseLoads)).toEqual(false)
+    })
+  })
+  describe('userHasRoles', () => {
+    it.each([
+      { roles: ['GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
+      { roles: ['GLOBAL_SEARCH'], userRoles: ['SOME_ROLE', 'GLOBAL_SEARCH'], result: true },
+      { roles: ['GLOBAL_SEARCH'], userRoles: [], result: false },
+      { roles: [], userRoles: ['GLOBAL_SEARCH'], result: false },
+      { roles: ['GLOBAL_SEARCH', 'SOME_ROLE'], userRoles: ['SOME_ROLE'], result: true },
+    ])('Should return the correct result when checking user roles', ({ roles, userRoles, result }) => {
+      expect(userHasRoles(roles, userRoles)).toEqual(result)
+    })
   })
 })

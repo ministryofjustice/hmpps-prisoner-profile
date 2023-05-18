@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+import jwtDecode from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
 
@@ -40,11 +41,11 @@ export function getUserLocations(userService: UserService): RequestHandler {
   }
 }
 
-export function getUserRoles(userService: UserService): RequestHandler {
+export function getUserRoles(): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const roles = res.locals.user && (await userService.getUserRoles(res.locals.user.token))
+        const { authorities: roles = [] } = jwtDecode(res.locals.user.token) as { authorities?: string[] }
         if (roles) {
           res.locals.user.userRoles = roles
         } else {

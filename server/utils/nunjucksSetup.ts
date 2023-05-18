@@ -2,7 +2,15 @@
 import nunjucks from 'nunjucks'
 import express from 'express'
 import * as pathModule from 'path'
-import { addressToLines, findError, formatScheduleItem, initialiseName, summaryListOneHalfWidth } from './utils'
+import {
+  addressToLines,
+  findError,
+  formatScheduleItem,
+  initialiseName,
+  prisonerBelongsToUsersCaseLoad,
+  summaryListOneHalfWidth,
+  userHasRoles,
+} from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
 import config from '../config'
@@ -46,6 +54,9 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
     analytics: { tagManagerContainerId },
   } = config
   njkEnv.addGlobal('tagManagerContainerId', tagManagerContainerId.trim())
+
+  njkEnv.addGlobal('prisonerBelongsToUsersCaseLoad', prisonerBelongsToUsersCaseLoad)
+  njkEnv.addGlobal('userHasRoles', userHasRoles)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatDate', formatDate)
