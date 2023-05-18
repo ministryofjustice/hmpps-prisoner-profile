@@ -1,4 +1,4 @@
-# 3. Use `async`/`await` pattern over `Promise.then`
+# 4. Use user token for Case Notes API calls
 
 Date: 2023-05-15
 
