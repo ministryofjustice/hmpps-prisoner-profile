@@ -3,21 +3,19 @@ import config from '../config'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { Services } from '../services'
-import OverviewPageService from '../services/overviewPageService'
 import CommonApiRoutes from './common/api'
 import { Prisoner } from '../interfaces/prisoner'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 
 import { mapHeaderData } from '../mappers/headerMappers'
-import AllocationManagerClient from '../data/allocationManagerApiClient'
-import KeyWorkersClient from '../data/keyWorkersApiClient'
 import CuriousApiClient from '../data/curiousApiClient'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import PersonalPageService from '../services/personalPageService'
 import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
-import IncentivesApiRestClient from '../data/incentivesApiClient'
+import OverviewController from '../controllers/overviewController'
+import { canViewOrAddCaseNotes } from '../utils/roleHelpers'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -42,26 +40,8 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-    const allocationManagerClient = new AllocationManagerClient(res.locals.clientToken)
-    const keyWorkersClient = new KeyWorkersClient(res.locals.clientToken)
-    const incentivesApiClient = new IncentivesApiRestClient(res.locals.clientToken)
-
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-
-    const overviewPageService = new OverviewPageService(
-      prisonApiClient,
-      allocationManagerClient,
-      keyWorkersClient,
-      incentivesApiClient,
-    )
-    const overviewPageData = await overviewPageService.get(prisonerData)
-
-    res.render('pages/overviewPage', {
-      ...mapHeaderData(prisonerData, 'overview'),
-      ...overviewPageData,
-    })
+    const overviewController = new OverviewController(res.locals.clientToken)
+    return overviewController.displayOverview(req, res)
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
@@ -69,7 +49,10 @@ export default function routes(service: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     res.render('pages/photoPage', {
-      ...mapHeaderData(prisonerData),
+      ...mapHeaderData(
+        prisonerData,
+        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
+      ),
     })
   })
 
@@ -82,7 +65,12 @@ export default function routes(service: Services): Router {
     const personalPageData = await personalPageService.get(prisonerData)
 
     res.render('pages/personalPage', {
-      ...mapHeaderData(prisonerData, 'personal'),
+      pageTitle: 'Personal',
+      ...mapHeaderData(
+        prisonerData,
+        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
+        'personal',
+      ),
       ...personalPageData,
     })
   })
@@ -98,8 +86,13 @@ export default function routes(service: Services): Router {
     const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
 
     res.render('pages/workAndSkills', {
-      ...mapHeaderData(prisonerData, 'work-and-skills'),
+      ...mapHeaderData(
+        prisonerData,
+        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
+        'work-and-skills',
+      ),
       ...workAndSkillsPageData,
+      pageTitle: 'Work and skills',
     })
   })
 
@@ -125,14 +118,19 @@ export default function routes(service: Services): Router {
     const offencesPageData = await offencesPageService.get(prisonerData)
 
     res.render('pages/offences', {
-      ...mapHeaderData(prisonerData, 'offences'),
+      pageTitle: 'Offences',
+      ...mapHeaderData(
+        prisonerData,
+        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
+        'offences',
+      ),
       ...offencesPageData,
       activeTab: true,
     })
   })
 
   get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
-    const caseNotesController = new CaseNotesController(res.locals.clientToken)
+    const caseNotesController = new CaseNotesController(res.locals.clientToken, res.locals.user.token)
     return caseNotesController.displayCaseNotes(req, res)
   })
 

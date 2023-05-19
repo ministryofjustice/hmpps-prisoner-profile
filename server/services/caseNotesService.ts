@@ -9,6 +9,7 @@ import CaseNotesApiRestClient from '../data/caseNotesApiClient'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
 import { CaseNote, CaseNoteAmendment } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNoteSource } from '../data/enums/caseNoteSource'
 
 export default class CaseNotesService {
   private caseNotesApiClient: CaseNotesApiClient
@@ -68,8 +69,13 @@ export default class CaseNotesService {
    *
    * @param prisonerData
    * @param queryParams
+   * @param canDeleteSensitiveCaseNotes
    */
-  public async get(prisonerData: Prisoner, queryParams: PagedListQueryParams): Promise<CaseNotesPageData> {
+  public async get(
+    prisonerData: Prisoner,
+    queryParams: PagedListQueryParams,
+    canDeleteSensitiveCaseNotes: boolean,
+  ): Promise<CaseNotesPageData> {
     const sortOptions: SortOption[] = [
       { value: 'creationDateTime,DESC', description: 'Created (most recent)' },
       { value: 'creationDateTime,ASC', description: 'Created (oldest)' },
@@ -111,6 +117,7 @@ export default class CaseNotesService {
           ...amendment,
           authorName: convertNameCommaToHuman(amendment.authorName),
         })),
+        deleteLink: caseNote.source === CaseNoteSource.SecureCaseNoteSource && canDeleteSensitiveCaseNotes && '#',
       }))
     }
 

@@ -53,9 +53,9 @@ interface TabLink {
   active: boolean
 }
 
-export function tabLinks(prisonerNumber: string): TabLink[] {
+export function tabLinks(prisonerNumber: string, canViewCaseNotes = false): TabLink[] {
   const baseUrl = `/prisoner/${prisonerNumber}`
-  return [
+  const links = [
     {
       label: 'Overview',
       classes: 'govuk-heading-s',
@@ -69,13 +69,6 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       id: 'personal',
       href: `${baseUrl}/personal`,
       active: false,
-    },
-    {
-      label: 'Case notes',
-      classes: 'govuk-heading-s',
-      id: 'case-notes',
-      active: false,
-      href: `${baseUrl}/case-notes`,
     },
     {
       label: 'Alerts',
@@ -99,4 +92,14 @@ export function tabLinks(prisonerNumber: string): TabLink[] {
       active: false,
     },
   ]
+  if (canViewCaseNotes) {
+    links.splice(2, 0, {
+      label: 'Case notes',
+      classes: 'govuk-heading-s',
+      id: 'case-notes',
+      active: false,
+      href: `${baseUrl}/case-notes`,
+    })
+  }
+  return links
 }

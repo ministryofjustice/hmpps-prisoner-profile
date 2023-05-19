@@ -29,7 +29,7 @@ describe('Case Notes Page', () => {
         .spyOn<any, string>(caseNotesService['caseNotesApiClient'], 'getCaseNotes')
         .mockResolvedValue(pagedCaseNotesMock)
 
-      const caseNotesPageData = await caseNotesService.get(prisonerData, {})
+      const caseNotesPageData = await caseNotesService.get(prisonerData, {}, true)
 
       expect(getCaseNoteTypesSpy).toHaveBeenCalled()
       expect(getCaseNotesSpy).toHaveBeenCalledWith(prisonerData.prisonerNumber, {})

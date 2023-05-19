@@ -31,8 +31,8 @@
     </details>
   </div>
 {% endmacro %}
-{%- call summaryCard({title: "Emergency contacts and next of kin", id: "emergency-contacts"}) -%}
-  <div class="govuk-grid-row" data-qa="emergency-contacts">
+{%- call summaryCard({title: "Next of kin", id: "next-of-kin"}) -%}
+  <div class="govuk-grid-row" data-qa="next-of-kin">
     <div class="govuk-grid-column-full">
       {% for contact in nextOfKin %}
         {{ prisonerContact({

@@ -1,3 +1,4 @@
+{% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% extends "./index.njk" %}
 {% block body %}
   <div class="govuk-grid-row">
@@ -12,9 +13,11 @@
         <li><a class="govuk-link govuk-link--no-visited-state" href="#identity-numbers">Identity numbers</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#care-needs">Care needs</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance'}) -%}
+          <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
+        {%- endcall -%}
         <li><a class="govuk-link govuk-link--no-visited-state" href="#addresses">Addresses</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#emergency-contacts">Emergency contacts and next of kin</a></li>
+        <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#security">Security</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#property">Property</a></li>
       </ul>
@@ -41,11 +44,13 @@
           {% include "../partials/personalPage/neurodiversity.njk" %}
         </div>
       </div> #}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/appearance.njk" %}
+      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance'}) -%}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            {% include "../partials/personalPage/appearance.njk" %}
+          </div>
         </div>
-      </div>
+      {%- endcall -%}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
           {% include "../partials/personalPage/addresses.njk" %}
@@ -53,7 +58,7 @@
       </div>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/emergencyContacts.njk" %}
+          {% include "../partials/personalPage/nextOfKin.njk" %}
         </div>
       </div>
       <div class="govuk-grid-row">
