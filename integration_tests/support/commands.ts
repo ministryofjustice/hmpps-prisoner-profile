@@ -57,9 +57,18 @@ Cypress.Commands.add('findDataQa', { prevSubject: true }, (subject, id) => {
   return subject.find(`[data-qa=${id}]`)
 })
 
-Cypress.Commands.add('setupOffencesPageStubs', ({ prisonerNumber, bookingId }) => {
-  cy.task('stubGetCourtCases', bookingId)
+Cypress.Commands.add('setupOffencesPageSentencedStubs', ({ prisonerNumber, bookingId }) => {
+  cy.task('stubGetCourtCasesSentenced', bookingId)
   cy.task('stubGetOffenceHistory', prisonerNumber)
-  cy.task('stubGetSentenceTerms', bookingId)
+  cy.task('stubGetSentenceTermsSentenced', bookingId)
   cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
+  cy.task('stubGetCourtDateResultsSentenced', prisonerNumber)
+})
+
+Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, bookingId }) => {
+  cy.task('stubGetCourtCasesUnsentenced', bookingId)
+  cy.task('stubGetOffenceHistory', prisonerNumber)
+  cy.task('stubGetSentenceTermsUnsentenced', bookingId)
+  cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
+  cy.task('stubGetCourtDateResultsUnsentenced', prisonerNumber)
 })

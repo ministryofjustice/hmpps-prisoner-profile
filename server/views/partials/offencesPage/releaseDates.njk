@@ -1,7 +1,11 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Release dates", id: "release-dates"}) -%}
+    {% if releaseDates.dates.length > 0 %}
     {{ govukSummaryList({
         rows: releaseDates.dates
     }) }}
+    {% else%}
+        <p>There are no recorded release dates for this prisoner.</p>
+    {% endif%}
 {%- endcall -%}

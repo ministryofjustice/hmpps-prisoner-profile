@@ -9,7 +9,8 @@ declare namespace Cypress {
     setupOverviewPageStubs(options: { prisonerNumber: string; bookingId: string }): Chainable<AUTWindow>
     setupAlertsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
     setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
-    setupOffencesPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+    setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+    setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
     getDataQa(id: string): Chainable<JQuery<HTMLElement>>
     findDataQa(id: string): Chainable<JQuery<HTMLElement>>
   }
