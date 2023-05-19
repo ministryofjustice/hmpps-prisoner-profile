@@ -12,7 +12,8 @@ import {
   userHasRoles,
 } from './utils'
 import { pluralise } from './pluralise'
-import { formatDate } from './dateHelpers'
+import { formatDate, formatDateTime } from './dateHelpers'
+import config from '../config'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -59,9 +60,32 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatDate', formatDate)
+  njkEnv.addFilter('formatDateTime', formatDateTime)
   njkEnv.addFilter('formatScheduleItem', formatScheduleItem)
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('findError', findError)
+  njkEnv.addFilter('addDefaultSelectedValue', (items, text) => {
+    if (!items) return null
+
+    return [
+      {
+        text,
+        value: '',
+        selected: true,
+      },
+      ...items,
+    ]
+  })
+
+  njkEnv.addFilter(
+    'setSelected',
+    (items: { value: string; text: string }[], selected) =>
+      items &&
+      items.map(entry => ({
+        ...entry,
+        selected: entry && entry.value === selected,
+      })),
+  )
 }
