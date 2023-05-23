@@ -31,10 +31,30 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds', 1102484)
     })
 
-    it('loads the page with the global search view', () => {
-      // TODO: Update this test once we know the correct criteria
+    it('Hides the next of kin card', () => {
+      visitPersonalDetailsPage()
+      cy.getDataQa('hidden-next-of-kin').should('exist')
+      cy.getDataQa('hidden-next-of-kin-nav').should('exist')
+    })
+
+    it('Hides the appearance card', () => {
       visitPersonalDetailsPage()
       cy.getDataQa('hidden-appearance').should('exist')
+      cy.getDataQa('hidden-appearance-nav').should('exist')
+    })
+
+    it('Hides the property card', () => {
+      visitPersonalDetailsPage()
+      cy.getDataQa('hidden-property').should('exist')
+      cy.getDataQa('hidden-property-nav').should('exist')
+    })
+
+    it('Hides the fields within personal details', () => {
+      visitPersonalDetailsPage()
+      cy.getDataQa('hidden-place-of-birth').should('exist')
+      cy.getDataQa('hidden-religion-or-belief').should('exist')
+      cy.getDataQa('hidden-sexual-orientation').should('exist')
+      cy.getDataQa('hidden-personal-details').should('exist')
     })
   })
 

@@ -12,14 +12,19 @@
         <li><a class="govuk-link govuk-link--no-visited-state" href="#personal-details">Personal details</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#identity-numbers">Identity numbers</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#care-needs">Care needs</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance'}) -%}
+        {# Hidden as the section is hidden below #}
+        {# <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li> #}
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
         {%- endcall -%}
         <li><a class="govuk-link govuk-link--no-visited-state" href="#addresses">Addresses</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'next-of-kin-nav'}) -%}
+          <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
+        {%- endcall -%}
         <li><a class="govuk-link govuk-link--no-visited-state" href="#security">Security</a></li>
-        <li><a class="govuk-link govuk-link--no-visited-state" href="#property">Property</a></li>
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'property-nav'}) -%}
+          <li><a class="govuk-link govuk-link--no-visited-state" href="#property">Property</a></li>
+        {%- endcall -%}
       </ul>
     </div>
     <div class="govuk-grid-column-three-quarters">
@@ -56,21 +61,25 @@
           {% include "../partials/personalPage/addresses.njk" %}
         </div>
       </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/nextOfKin.njk" %}
+      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'next-of-kin'}) -%}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            {% include "../partials/personalPage/nextOfKin.njk" %}
+          </div>
         </div>
-      </div>
+      {%- endcall -%}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
           {% include "../partials/personalPage/security.njk" %}
         </div>
       </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/property.njk" %}
+      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'property'}) -%}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            {% include "../partials/personalPage/property.njk" %}
+          </div>
         </div>
-      </div>
+      {%- endcall -%}
     </div>
   </div>
 {% endblock %}
