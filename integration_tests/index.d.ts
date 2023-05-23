@@ -13,7 +13,7 @@ declare global {
       setupAlertsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
-      setupUserAuth(options: {
+      setupUserAuth(options?: {
         roles?: string[]
         caseLoads?: CaseLoad[]
         activeCaseLoadId?: string

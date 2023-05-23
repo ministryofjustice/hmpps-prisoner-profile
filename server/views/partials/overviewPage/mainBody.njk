@@ -28,11 +28,15 @@
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% include "./schedule/schedule.njk" %}
+    {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'overview-schedule'}) -%}
+      {% include "./schedule/schedule.njk" %}
+    {%- endcall -%}
   </div>
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% include "./nonAssociations/nonAssociations.njk" %}
+    {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'overview-non-associations'}) -%}
+      {% include "./nonAssociations/nonAssociations.njk" %}
+    {%- endcall -%}
   </div>
 </div>
