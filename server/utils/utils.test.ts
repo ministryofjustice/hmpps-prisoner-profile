@@ -305,6 +305,8 @@ describe('findError', () => {
       { roles: ['GLOBAL_SEARCH'], userRoles: [], result: false },
       { roles: [], userRoles: ['GLOBAL_SEARCH'], result: false },
       { roles: ['GLOBAL_SEARCH', 'SOME_ROLE'], userRoles: ['SOME_ROLE'], result: true },
+      { roles: ['GLOBAL_SEARCH'], userRoles: ['ROLE_GLOBAL_SEARCH'], result: true },
+      { roles: ['ROLE_GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
     ])('Should return the correct result when checking user roles', ({ roles, userRoles, result }) => {
       expect(userHasRoles(roles, userRoles)).toEqual(result)
     })

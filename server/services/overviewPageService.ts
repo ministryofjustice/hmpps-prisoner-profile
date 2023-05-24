@@ -7,7 +7,14 @@ import {
   OverviewScheduleItem,
 } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { convertToTitleCase, formatMoney, formatPrivilegedVisitsSummary, getNamesFromString } from '../utils/utils'
+import {
+  convertToTitleCase,
+  formatMoney,
+  formatPrivilegedVisitsSummary,
+  getNamesFromString,
+  prisonerBelongsToUsersCaseLoad,
+  userHasRoles,
+} from '../utils/utils'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Prisoner } from '../interfaces/prisoner'
@@ -51,15 +58,15 @@ export default class OverviewPageService {
     this.incentivesApiClient = incentivesApiClient
   }
 
-  public async get(prisonerData: Prisoner): Promise<OverviewPage> {
+  public async get(prisonerData: Prisoner, userRoles: string[] = []): Promise<OverviewPage> {
     const { bookingId, prisonerNumber } = prisonerData
 
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
-    const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerNumber, bookingId)
-    const miniSummaryGroupB = await this.getMiniSummaryGroupB(bookingId)
+    const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerData, userRoles)
+    const miniSummaryGroupB = await this.getMiniSummaryGroupB(prisonerData)
     const personalDetails = await this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
-    const schedule = await this.getSchedule(prisonerData.bookingId)
+    const schedule = await this.getSchedule(bookingId)
     const statuses = await this.getStatuses(prisonerData)
 
     return {
@@ -202,12 +209,14 @@ export default class OverviewPageService {
     return { personalDetailsMain, personalDetailsSide }
   }
 
-  private async getMiniSummaryGroupA(prisonerNumber: string, bookingId: number): Promise<MiniSummary[]> {
-    const [accountBalances, adjudicationSummary, visitSummary, visitBalances] = await Promise.all([
+  private async getMiniSummaryGroupA(prisonerData: Prisoner, userRoles: string[]): Promise<MiniSummary[]> {
+    const { prisonerNumber, bookingId, prisonId } = prisonerData
+    const [accountBalances, adjudicationSummary, visitSummary, visitBalances, userCaseLoads] = await Promise.all([
       this.prisonApiClient.getAccountBalances(bookingId),
       this.prisonApiClient.getAdjudications(bookingId),
       this.prisonApiClient.getVisitSummary(bookingId),
       this.prisonApiClient.getVisitBalances(prisonerNumber),
+      this.prisonApiClient.getUserCaseLoads(),
     ])
 
     let privilegedVisitsDescription = ''
@@ -257,24 +266,28 @@ export default class OverviewPageService {
       linkHref: '#',
     }
 
-    return [
-      {
-        data: moneySummaryData,
-        classes: 'govuk-grid-row card-body',
-      },
-      {
-        data: adjudicationsSummaryData,
-        classes: 'govuk-grid-row card-body',
-      },
-      {
-        data: visitsSummaryData,
-        classes: 'govuk-grid-row card-body',
-      },
-    ]
+    const summaryData = []
+    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
+
+    if (belongsToCaseLoad) {
+      summaryData.push({ data: moneySummaryData, classes: 'govuk-grid-row card-body' })
+    }
+
+    if (belongsToCaseLoad || userHasRoles(['POM_USER', 'RECEPTION_USER'], userRoles)) {
+      summaryData.push({ data: adjudicationsSummaryData, classes: 'govuk-grid-row card-body' })
+    }
+
+    if (belongsToCaseLoad) {
+      summaryData.push({ data: visitsSummaryData, classes: 'govuk-grid-row card-body' })
+    }
+
+    return summaryData
   }
 
-  private async getMiniSummaryGroupB(bookingId: number): Promise<MiniSummary[]> {
+  private async getMiniSummaryGroupB(prisonerData: Prisoner): Promise<MiniSummary[]> {
+    const { bookingId, prisonId } = prisonerData
     const assessments = await this.prisonApiClient.getAssessments(bookingId)
+    const userCaseLoads = await this.prisonApiClient.getUserCaseLoads()
 
     const incentiveReviews: IncentiveReviews = await this.incentivesApiClient.getReviews(bookingId)
 
@@ -303,13 +316,20 @@ export default class OverviewPageService {
     const csra: Assessment =
       assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) || null
 
+    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
+
     const categorySummaryData: MiniSummaryData = {
       bottomLabel: 'Category',
       bottomContentLine1: category ? category.classificationCode : 'Not entered',
       bottomContentLine3: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
       bottomClass: 'small',
-      linkLabel: 'Manage category',
-      linkHref: '#',
+      linkLabel: undefined,
+      linkHref: undefined,
+    }
+
+    if (belongsToCaseLoad) {
+      categorySummaryData.linkLabel = 'Manage category'
+      categorySummaryData.linkHref = '#'
     }
 
     const incentiveSummaryData: MiniSummaryData = {
@@ -330,24 +350,26 @@ export default class OverviewPageService {
       bottomContentLine1: csra ? csra.classification : 'Not entered',
       bottomContentLine3: csra ? `Last review: ${formatDate(csra.assessmentDate, 'short')}` : '',
       bottomClass: 'small',
-      linkLabel: 'CSRA history',
-      linkHref: '#',
+      linkLabel: undefined,
+      linkHref: undefined,
     }
 
-    return [
-      {
-        data: categorySummaryData,
-        classes: 'govuk-grid-row card-body',
-      },
-      {
-        data: incentiveSummaryData,
-        classes: 'govuk-grid-row card-body',
-      },
-      {
-        data: csraSummaryData,
-        classes: 'govuk-grid-row card-body',
-      },
-    ]
+    if (belongsToCaseLoad) {
+      csraSummaryData.linkLabel = 'CSRA history'
+      csraSummaryData.linkHref = '#'
+    }
+
+    const summaryData = []
+
+    summaryData.push({ data: categorySummaryData, classes: 'govuk-grid-row card-body' })
+
+    if (belongsToCaseLoad) {
+      summaryData.push({ data: incentiveSummaryData, classes: 'govuk-grid-row card-body' })
+    }
+
+    summaryData.push({ data: csraSummaryData, classes: 'govuk-grid-row card-body' })
+
+    return summaryData
   }
 
   private async getSchedule(bookingId: number): Promise<OverviewSchedule> {

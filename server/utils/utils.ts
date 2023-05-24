@@ -340,5 +340,6 @@ export const prisonerBelongsToUsersCaseLoad = (prisonerAgencyId: string, userCas
  */
 
 export const userHasRoles = (rolesToCheck: string[], userRoles: string[]): boolean => {
-  return rolesToCheck.some(role => userRoles.includes(role))
+  const normaliseRoleText = (role: string): string => role.replace(/ROLE_/, '')
+  return rolesToCheck.map(normaliseRoleText).some(role => userRoles.map(normaliseRoleText).includes(role))
 }

@@ -73,7 +73,7 @@ Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, boo
   cy.task('stubGetCourtDateResultsUnsentenced', prisonerNumber)
 })
 
-Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'MDI' }) => {
+Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'MDI' } = {}) => {
   cy.task('stubSignIn', roles)
   cy.task('stubUserCaseLoads', caseLoads)
   cy.task('stubAuthUser', { activeCaseLoadId })

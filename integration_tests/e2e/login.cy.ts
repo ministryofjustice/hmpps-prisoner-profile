@@ -25,6 +25,7 @@ context('SignIn', () => {
   })
 
   it('User name visible in header', () => {
+    cy.setupUserAuth()
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)
@@ -32,7 +33,7 @@ context('SignIn', () => {
   })
 
   it('User with prison role has access', () => {
-    cy.task('stubSignIn', ['ROLE_PRISON'])
+    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
 
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
@@ -40,21 +41,21 @@ context('SignIn', () => {
   })
 
   it('User with Global Search role has access', () => {
-    cy.task('stubSignIn', ['ROLE_GLOBAL_SEARCH'])
-
+    cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     Page.verifyOnPage(IndexPage)
   })
 
   it('User with neither prison or global search role denied access', () => {
-    cy.task('stubSignIn', ['ROLE_SOMETHING_ELSE'])
+    cy.setupUserAuth({ roles: ['ROLE_SOMETHING_ELSE'] })
 
     cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
     Page.verifyOnPage(AuthErrorPage)
   })
 
   it('User can log out', () => {
+    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)
@@ -63,6 +64,7 @@ context('SignIn', () => {
   })
 
   it('User can manage their details', () => {
+    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)
@@ -73,6 +75,7 @@ context('SignIn', () => {
   })
 
   it('Token verification failure takes user to sign in page', () => {
+    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     Page.verifyOnPage(IndexPage)
@@ -83,6 +86,7 @@ context('SignIn', () => {
   })
 
   it('Token verification failure clears user session', () => {
+    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)

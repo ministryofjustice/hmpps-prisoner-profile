@@ -14,7 +14,7 @@ declare global {
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
-      setupUserAuth(options: {
+      setupUserAuth(options?: {
         roles?: string[]
         caseLoads?: CaseLoad[]
         activeCaseLoadId?: string

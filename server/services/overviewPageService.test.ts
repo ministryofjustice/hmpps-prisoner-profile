@@ -44,6 +44,7 @@ import { convertToTitleCase } from '../utils/utils'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -78,6 +79,7 @@ describe('OverviewPageService', () => {
     prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
     prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
     prisonApiClient.getCaseNoteCount = jest.fn(async () => caseNoteCountMock)
+    prisonApiClient.getUserCaseLoads = jest.fn(async () => CaseLoadsDummyDataA)
   })
 
   describe('Non-associations', () => {
@@ -130,7 +132,7 @@ describe('OverviewPageService', () => {
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get({ prisonerNumber, bookingId } as Prisoner)
+      await overviewPageService.get({ prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner)
       expect(prisonApiClient.getAccountBalances).toHaveBeenCalledWith(bookingId)
       expect(prisonApiClient.getAdjudications).toHaveBeenCalledWith(bookingId)
       expect(prisonApiClient.getVisitSummary).toHaveBeenCalledWith(bookingId)
@@ -142,9 +144,36 @@ describe('OverviewPageService', () => {
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({ prisonerNumber, bookingId } as Prisoner)
+      const res = await overviewPageService.get({ prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner)
 
       expect(res.miniSummaryGroupA).toEqual(miniSummaryGroupAMock)
+    })
+
+    describe('When the prisoner is not part of the users case loads', () => {
+      it('should return empty when the user has no specific roles', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({ prisonerNumber, bookingId, prisonId: '123' } as Prisoner)
+
+        expect(res.miniSummaryGroupA).toEqual([])
+      })
+
+      it.each(['POM_USER', 'RECEPTION_USER'])(
+        'should return the adjudications when the user has a specific role',
+        async userRole => {
+          const prisonerNumber = 'A1234BC'
+          const bookingId = 123456
+
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get({ prisonerNumber, bookingId, prisonId: '123' } as Prisoner, [
+            userRole,
+          ])
+
+          expect(res.miniSummaryGroupA).toEqual([miniSummaryGroupAMock[1]])
+        },
+      )
     })
   })
 
@@ -154,7 +183,7 @@ describe('OverviewPageService', () => {
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get({ ...PrisonerMockDataA, prisonerNumber, bookingId } as Prisoner)
+      await overviewPageService.get({ ...PrisonerMockDataA, prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner)
       expect(prisonApiClient.getAssessments).toHaveBeenCalledWith(bookingId)
     })
 
@@ -163,9 +192,71 @@ describe('OverviewPageService', () => {
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({ ...PrisonerMockDataA, prisonerNumber, bookingId } as Prisoner)
+      const res = await overviewPageService.get({
+        ...PrisonerMockDataA,
+        prisonerNumber,
+        bookingId,
+        prisonId: 'MDI',
+      } as Prisoner)
 
       expect(res.miniSummaryGroupB).toEqual(miniSummaryGroupBMock)
+    })
+    describe('When the prisoner is not part of the users case loads', () => {
+      it('should not return the incentives data', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: '123',
+        } as Prisoner)
+
+        expect(res.miniSummaryGroupB).toEqual([
+          {
+            classes: miniSummaryGroupBMock[0].classes,
+            data: { ...miniSummaryGroupBMock[0].data, linkHref: undefined, linkLabel: undefined },
+          },
+          {
+            classes: miniSummaryGroupBMock[2].classes,
+            data: { ...miniSummaryGroupBMock[2].data, linkHref: undefined, linkLabel: undefined },
+          },
+        ])
+      })
+
+      it('should not return have the links on the category card', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: '123',
+        } as Prisoner)
+
+        expect(res.miniSummaryGroupB[0].data.linkLabel).toBeUndefined()
+        expect(res.miniSummaryGroupB[0].data.linkHref).toBeUndefined()
+      })
+
+      it('should not return have the links on the CSRA card', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: '123',
+        } as Prisoner)
+
+        expect(res.miniSummaryGroupB[1].data.linkLabel).toBeUndefined()
+        expect(res.miniSummaryGroupB[1].data.linkHref).toBeUndefined()
+      })
     })
   })
 
