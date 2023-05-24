@@ -272,5 +272,3 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 }
-
-// /api/bookings/1090016/court-hearings

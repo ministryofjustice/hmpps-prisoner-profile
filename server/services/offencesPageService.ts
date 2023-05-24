@@ -136,18 +136,18 @@ export default class OffencesPageService {
   }
 
   getNextCourtAppearance(courtCase: CourtCase, todaysDate: string) {
-    const nextCourtAppearance: CourtHearing[] = []
+    let nextCourtAppearance: CourtHearing = {} as CourtHearing
     courtCase.courtHearings.forEach((courtHearing: CourtHearing) => {
       const courtCaseDate = format(new Date(courtHearing.dateTime), 'yyyy-MM-dd')
-      if (nextCourtAppearance.length === 0) {
+      if (nextCourtAppearance.dateTime === undefined) {
         if (courtCaseDate > todaysDate || courtCaseDate === todaysDate) {
-          nextCourtAppearance[0] = courtHearing
+          nextCourtAppearance = courtHearing
         }
-      } else if (nextCourtAppearance.length > 0) {
-        const nextCourtCaseDate = format(new Date(nextCourtAppearance[0].dateTime), 'yyyy-MM-dd')
+      } else {
+        const nextCourtCaseDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
         if (courtCaseDate > todaysDate || courtCaseDate === todaysDate) {
           if (courtCaseDate < nextCourtCaseDate) {
-            nextCourtAppearance[0] = courtHearing
+            nextCourtAppearance = courtHearing
           }
         }
       }

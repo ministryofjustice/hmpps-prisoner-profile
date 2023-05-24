@@ -120,17 +120,17 @@ describe('OffencesPageService', () => {
       it('Should not contain a next court appearance', async () => {
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getNextCourtAppearance(CourtCasesUnsentencedMockA[0], todaysDate)
-        expect(res).toEqual([])
+        expect(res).toEqual({})
       })
       it('Should contain a next court appearance', async () => {
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getNextCourtAppearance(CourtCaseWithNextCourtAppearance[0], todaysDate)
-        expect(res[0]).toEqual(CourtCaseWithNextCourtAppearance[0].courtHearings[0])
+        expect(res).toEqual(CourtCaseWithNextCourtAppearance[0].courtHearings[0])
       })
       it('Should contain a next court appearance', async () => {
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getNextCourtAppearance(CourtCaseWithNextCourtAppearance[1], todaysDate)
-        expect(res[0]).toEqual(CourtCaseWithNextCourtAppearance[1].courtHearings[2])
+        expect(res).toEqual(CourtCaseWithNextCourtAppearance[1].courtHearings[2])
       })
     })
 

@@ -1,4 +1,5 @@
 import { CourtCaseDataMapped, CourtCaseDataMappedUnsentenced } from '../../interfaces/courtCaseDataMapped'
+import { CourtHearing } from '../../interfaces/prisonApi/courtHearing'
 import { SentenceTerm } from '../../interfaces/prisonApi/sentenceTerms'
 
 export const sentenceTermsMock: SentenceTerm[] = [
@@ -135,7 +136,7 @@ export const GenericMapMock: object = {
     },
   ],
   courtName: 'Sheffield Crown Court',
-  nextCourtAppearance: [],
+  nextCourtAppearance: {} as CourtHearing,
 }
 
 export const SummaryDetailRowsMock: object[] = [
@@ -176,7 +177,7 @@ export const MappedSentencedCourtCasesMock: CourtCaseDataMapped[] = [
       },
     ],
     courtName: 'Sheffield Crown Court',
-    nextCourtAppearance: [],
+    nextCourtAppearance: {} as CourtHearing,
     sentenceTerms: [
       {
         offences: [
@@ -294,7 +295,7 @@ export const MappedSentencedCourtCasesMock: CourtCaseDataMapped[] = [
 export const MappedUnsentencedCourtCasesMock: CourtCaseDataMappedUnsentenced[] = [
   {
     sentenced: false,
-    nextCourtAppearance: [],
+    nextCourtAppearance: {} as CourtHearing,
     courtHearings: [
       {
         id: 502784852,
@@ -907,7 +908,7 @@ export const MappedUnsentencedCourtCasesMock: CourtCaseDataMappedUnsentenced[] =
   },
   {
     sentenced: false,
-    nextCourtAppearance: [],
+    nextCourtAppearance: {} as CourtHearing,
     courtHearings: [
       {
         id: 502784871,

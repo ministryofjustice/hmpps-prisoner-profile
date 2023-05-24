@@ -4,7 +4,7 @@ import { OffenceHistoryDetail } from './prisonApi/offenceHistoryDetail'
 
 export interface CourtCaseDataMapped {
   sentenced: boolean
-  nextCourtAppearance: CourtHearing[]
+  nextCourtAppearance: CourtHearing
   courtHearings: CourtHearing[]
   caseInfoNumber: string
   courtName: string
@@ -18,7 +18,7 @@ export interface CourtCaseDataMapped {
 
 export interface CourtCaseDataMappedUnsentenced {
   sentenced: boolean
-  nextCourtAppearance: CourtHearing[]
+  nextCourtAppearance: CourtHearing
   courtHearings: CourtHearing[]
   caseInfoNumber: string
   courtName: string

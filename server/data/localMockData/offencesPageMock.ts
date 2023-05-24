@@ -57,7 +57,7 @@ export const OffencesPageMockSentences = {
         },
       ],
       courtName: 'Sheffield Crown Court',
-      nextCourtAppearance: [] as CourtHearing[],
+      nextCourtAppearance: {} as CourtHearing,
       sentenceTerms: [
         {
           sentenceTypeDescription: 'EDS LASPO Discretionary Release',
@@ -449,7 +449,7 @@ export const GetCourtCaseData = [
       },
     ],
     courtName: 'Sheffield Crown Court',
-    nextCourtAppearance: [] as CourtHearing[],
+    nextCourtAppearance: {} as CourtHearing,
     sentenceTerms: [
       {
         sentenceHeader: 'Count 5',

@@ -18,16 +18,16 @@
                     {% elseif courtCase.charge.courtCaseRef %}
                         {{ courtCase.charge.courtCaseRef }}
                     {% else %}
-                     Not entered
+                        Not entered
                     {% endif %}
                 </p>
             </div>
 
-            {% if courtCase.sentenced == false and  courtCase.nextCourtAppearance[0].dateTime %}
+            {% if courtCase.sentenced == false and  courtCase.nextCourtAppearance.dateTime %}
                 <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Next court appearance</h4></div>
                 <div class="grid-item">
                     <p class="govuk-!-font-size-19">
-                        {{ courtCase.nextCourtAppearance[0].dateTime | formatDate }}
+                        {{ courtCase.nextCourtAppearance.dateTime | formatDate }}
                     </p>
                 </div>
             {% endif %}
@@ -50,11 +50,10 @@
 
     {% if courtCase.sentenced == true and courtCase.sentenceTerms.length > 0 %}
         {% for sentence in courtCase.sentenceTerms %}
-        {{ sentence.courtDateResultsPrimaryCode | dump }}
             {% for offence in sentence.offences %}
                 <div class="govuk-grid-row hmpps-grey-details-card govuk-!-static-margin-bottom-7">
                     <div class="govuk-grid-column-full govuk-!-static-padding-left-5">
-                        <div><p class="hmpps-dark-grey-font govuk-!-static-margin-bottom-2 govuk-!-static-margin-top-6 govuk-!-font-size-16">{{ sentence.sentenceHeader}}</p></div>
+                        <div><p class="hmpps-secondary-text govuk-!-static-margin-bottom-2 govuk-!-static-margin-top-6 govuk-!-font-size-16">{{ sentence.sentenceHeader}}</p></div>
 
                         <div class="govuk-!-static-margin-bottom-5">
                             <p class="govuk-!-font-weight-bold govuk-!-static-margin-bottom-0">{{offence.offenceDescription}}</p>
@@ -140,7 +139,7 @@
         {% for count in courtCase.courtDateResults%}
             <div class="govuk-grid-row hmpps-grey-details-card govuk-!-static-margin-bottom-7">
                 <div class="govuk-grid-column-full govuk-!-static-padding-left-5">
-                    <div><p class="hmpps-dark-grey-font govuk-!-static-margin-bottom-2 govuk-!-static-margin-top-6 govuk-!-font-size-16">{{ courtCase.sentenceHeader }}</p></div>
+                    <div><p class="hmpps-secondary-text govuk-!-static-margin-bottom-2 govuk-!-static-margin-top-6 govuk-!-font-size-16">{{ courtCase.sentenceHeader }}</p></div>
 
                     <div class="govuk-!-static-margin-bottom-5">
                         <p class="govuk-!-font-weight-bold govuk-!-static-margin-bottom-0">{{count.charge.offenceDescription}}</p>
