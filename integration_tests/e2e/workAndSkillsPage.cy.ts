@@ -10,8 +10,7 @@ const visitWorkAndSkillsPage = (): WorkAndSkillsPage => {
 context('Work and Skills Page', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth()
   })
 
   context('Default Prisoner State', () => {
