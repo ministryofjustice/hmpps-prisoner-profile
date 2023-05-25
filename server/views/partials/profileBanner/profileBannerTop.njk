@@ -2,12 +2,14 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
-    <div class="govuk-grid-row" class="govuk-!-padding-top-3 govuk-!-padding-bottom-3" style="background-color: #fbc9af;">
-      <div class="govuk-grid-column-full">
-        <p class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">This prisoner is not in your establishment</p>
-        <p class="govuk-body govuk-!-margin-bottom-2">Some information may be hidden</p>
+      <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
+        <div class="govuk-grid-column-full">
+          <p class="govuk-heading-m govuk-!-margin-bottom-2">
+            This prisoner is not in your establishment
+          </p>
+          <p class="govuk-body">Some information may be hidden</p>
+        </div>
       </div>
-    </div>
     {%- endcall -%}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full hmpps-profile-banner-top">
