@@ -23,6 +23,14 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
     CASE_NOTES_API_URL: "https://preprod.offender-case-notes.service.justice.gov.uk"
     INCENTIVES_API_URL: "https://incentives-api-preprod.hmpps.service.justice.gov.uk"
+    PATHFINDER_API_URL: "https://preprod-api.pathfinder.service.justice.gov.uk"
+    MANAGE_SOC_CASES_API_URL: "https://manage-soc-cases-api-preprod.hmpps.service.justice.gov.uk"
+
+    OFFENDER_CATEGORISATION_UI_URL: "https://preprod.offender-categorisation.service.justice.gov.uk"
+    USE_OF_FORCE_UI_URL: "https://preprod.use-of-force.service.justice.gov.uk"
+    MANAGE_A_WARRANT_FOLDER_UI_URL: "https://manage-a-warrant-folder-preprod.hmpps.service.justice.gov.uk"
+    PATHFINDER_UI_URL: "https://preprod.pathfinder.service.justice.gov.uk"
+    MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases-preprod.hmpps.service.justice.gov.uk"
 
   allowlist:
     office: "217.33.148.210/32"

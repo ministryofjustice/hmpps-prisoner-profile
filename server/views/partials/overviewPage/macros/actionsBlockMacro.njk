@@ -1,33 +1,13 @@
-{% macro actionsBlock(canAddCaseNotes) %}
+{% macro actionsBlock(actions) %}
   <div class="hmpps-actions-block govuk-!-margin-bottom-5">
     <h2 class="govuk-heading-m">Actions</h2>
     <ul class="hmpps-actions-block__list">
-      {% if canAddCaseNotes %}
+      {% for action in actions %}
       <li>
-        <img src="/assets/images/add-case-note.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state">Add case note</a>
+        <img src="/assets/images/{{ action.icon }}.svg" role="presentation" alt="" width="40px" height="40px" />
+        <a href="{{ action.url }}" class="govuk-link govuk-link--no-visited-state">{{ action.text }}</a>
       </li>
-      {% endif %}
-      <li>
-        <img src="/assets/images/add-appointment.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state">Add appointment</a>
-      </li>
-      <li>
-        <img src="/assets/images/report-use-of-force.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state">Report use of force</a>
-      </li>
-      <li>
-        <img src="/assets/images/refer-to-pathfinder.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state">Refer to Pathfinder</a>
-      </li>
-      <li>
-        <img src="/assets/images/add-to-soc.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state">Add to SOC</a>
-      </li>
-      <li>
-        <img src="/assets/images/manage-category.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="#" class="govuk-link govuk-link--no-visited-state">Manage category</a>
-      </li>
+      {% endfor %}
     </ul>
   </div>
 {% endmacro %}

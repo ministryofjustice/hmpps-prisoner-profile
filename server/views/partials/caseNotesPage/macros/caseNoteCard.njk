@@ -19,10 +19,10 @@
     </div>
     <div class="hmpps-case-note-card-list-item__link">
         {% if staffId == caseNote.authorUserId %}
-            <a href="#" class="govuk-link govuk-link--no-visited-state">Add more details</a>
+            <a href="{{ caseNote.addMoreLinkUrl }}" class="govuk-link govuk-link--no-visited-state">Add more details</a>
         {% endif %}
-        {% if caseNote.deleteLink %}
-            <a href="{{ caseNote.deleteLink }}" class="govuk-link govuk-link--no-visited-state">Delete case note</a>
+        {% if caseNote.deleteLinkUrl %}
+            <a href="{{ caseNote.deleteLinkUrl }}" class="govuk-link govuk-link--no-visited-state">Delete case note</a>
         {% endif %}
     </div>
 </div>

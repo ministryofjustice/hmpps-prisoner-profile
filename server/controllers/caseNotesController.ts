@@ -6,7 +6,9 @@ import CaseNotesService from '../services/caseNotesService'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Role } from '../data/enums/role'
-import { canViewOrAddCaseNotes } from '../utils/roleHelpers'
+import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
+import config from '../config'
+import { userHasRoles } from '../utils/utils'
 
 /**
  * Parse request for case notes page and orchestrate response
@@ -38,19 +40,18 @@ export default class CaseNotesController {
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
     // Set role based permissions
-    const canViewCaseNotes = canViewOrAddCaseNotes(
-      res.locals.user.userRoles,
-      res.locals.user.activeCaseLoadId,
-      prisonerData.prisonId,
-    )
-    const canDeleteSensitiveCaseNotes =
-      res.locals.user.userRoles?.some((role: string) => role === Role.DeleteSensitiveCaseNotes) || false
+    const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
 
     // If user cannot view this prisoner's case notes, redirect to 404 page
-    if (!canViewCaseNotes) {
+    if (!canViewCaseNotes(res.locals.user, prisonerData)) {
       return res.render('notFound.njk', {
         url: req.headers.referer || `/prisoner/${prisonerData.prisonerNumber}`,
       })
+    }
+
+    let addCaseNoteLinkUrl: string
+    if (canAddCaseNotes(res.locals.user, prisonerData)) {
+      addCaseNoteLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note`
     }
 
     // Get total count of case notes ignoring filters
@@ -66,9 +67,10 @@ export default class CaseNotesController {
     // Render page
     return res.render('pages/caseNotesPage', {
       pageTitle: 'Case notes',
-      ...mapHeaderData(prisonerData, canViewCaseNotes, 'case-notes'),
+      ...mapHeaderData(prisonerData, res.locals.user, 'case-notes'),
       ...caseNotesPageData,
       hasCaseNotes,
+      addCaseNoteLinkUrl,
       staffId,
     })
   }

@@ -118,7 +118,7 @@ export default class WorkAndSkillsPageService {
     const learnerEducation: LearnerEducation = await this.curiousApiClient.getLearnerEducation(prisonerNumber)
     const coursesAndQualifications: GovSummaryItem[] = []
     if (learnerEducation !== undefined) {
-      learnerEducation.content.forEach(content => {
+      learnerEducation.content?.forEach(content => {
         const item = {
           key: { text: content.courseName },
           value: { text: `Planned end date on ${formatDate(content.learningPlannedEndDate, 'long')}` },
@@ -138,7 +138,7 @@ export default class WorkAndSkillsPageService {
 
     if (learnerLatestAssessments !== undefined) {
       const list: GovSummaryGroup[] = []
-      learnerLatestAssessments[0].qualifications.forEach(content => {
+      learnerLatestAssessments[0]?.qualifications?.forEach(content => {
         const type = {
           key: { text: content.qualification.qualificationType },
           value: { text: content.qualification.qualificationGrade },

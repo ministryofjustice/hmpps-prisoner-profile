@@ -7,7 +7,20 @@ import AllocationManagerClient from '../data/allocationManagerApiClient'
 import KeyWorkersClient from '../data/keyWorkersApiClient'
 import IncentivesApiRestClient from '../data/incentivesApiClient'
 import OverviewPageService from '../services/overviewPageService'
-import { canViewOrAddCaseNotes } from '../utils/roleHelpers'
+import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
+import { Prisoner } from '../interfaces/prisoner'
+import { HmppsAction } from '../interfaces/hmppsAction'
+import { Icon } from '../data/enums/icon'
+import config from '../config'
+import { User } from '../data/hmppsAuthClient'
+import { prisonerBelongsToUsersCaseLoad, userCanEdit, userHasRoles } from '../utils/utils'
+import { Role } from '../data/enums/role'
+import PathfinderApiRestClient from '../data/pathfinderApiClient'
+import { Nominal } from '../interfaces/pathfinderApi/nominal'
+import ManageSocCasesApiRestClient from '../data/manageSocCasesApiClient'
+import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
+import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
+import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -21,7 +34,11 @@ export default class OverviewController {
 
   private keyWorkersClient: KeyWorkersClient
 
-  private incentivesApiClient: IncentivesApiRestClient
+  private incentivesApiClient: IncentivesApiClient
+
+  private pathfinderApiClient: PathfinderApiClient
+
+  private manageSocCasesApiClient: ManageSocCasesApiClient
 
   constructor(clientToken: string) {
     this.prisonerSearchService = new PrisonerSearchService(clientToken)
@@ -29,6 +46,8 @@ export default class OverviewController {
     this.allocationManagerClient = new AllocationManagerClient(clientToken)
     this.keyWorkersClient = new KeyWorkersClient(clientToken)
     this.incentivesApiClient = new IncentivesApiRestClient(clientToken)
+    this.pathfinderApiClient = new PathfinderApiRestClient(clientToken)
+    this.manageSocCasesApiClient = new ManageSocCasesApiRestClient(clientToken)
   }
 
   public async displayOverview(req: Request, res: Response) {
@@ -42,22 +61,149 @@ export default class OverviewController {
     // Get prisoner data for banner and for use in alerts generation
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
-    const overviewPageData = await overviewPageService.get(prisonerData)
+    const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
+      overviewPageService.get(prisonerData, res.locals.user.userRoles),
+      this.pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
+      this.manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
+    ])
+
+    const overviewActions = this.buildOverviewActions(prisonerData, pathfinderNominal, socNominal, res.locals.user)
+
+    const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
 
     // Set role based permissions
-    const canViewCaseNotes = canViewOrAddCaseNotes(
-      res.locals.user.userRoles,
-      res.locals.user.activeCaseLoadId,
-      prisonerData.prisonId,
-    )
-    const canAddCaseNotes = canViewCaseNotes
+    const canView = canViewCaseNotes(res.locals.user, prisonerData)
+    const canAdd = canAddCaseNotes(res.locals.user, prisonerData)
 
     res.render('pages/overviewPage', {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, canViewCaseNotes, 'overview'),
+      ...mapHeaderData(prisonerData, res.locals.user, 'overview'),
       ...overviewPageData,
-      canViewCaseNotes,
-      canAddCaseNotes,
+      overviewActions,
+      overviewInfoLinks,
+      canView,
+      canAdd,
     })
+  }
+
+  private buildOverviewActions(
+    prisonerData: Prisoner,
+    pathfinderNominal: Nominal,
+    socNominal: Nominal,
+    user: User,
+  ): HmppsAction[] {
+    const actions: HmppsAction[] = []
+    if (userCanEdit(user, prisonerData)) {
+      actions.push({
+        text: 'Add case note',
+        icon: Icon.AddCaseNote,
+        url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
+      })
+    }
+    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
+      actions.push({
+        text: 'Add appointment',
+        icon: Icon.AddAppointment,
+        url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`,
+      })
+    }
+    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
+      actions.push({
+        text: 'Report use of force',
+        icon: Icon.ReportUseOfForce,
+        url: `${config.serviceUrls.useOfForce}/report/${prisonerData.bookingId}/report-use-of-force`,
+      })
+    }
+    if (
+      userHasRoles(
+        [Role.PathfinderApproval, Role.PathfinderStdPrison, Role.PathfinderStdProbation, Role.PathfinderHQ],
+        user.userRoles,
+      ) &&
+      !pathfinderNominal
+    ) {
+      actions.push({
+        text: 'Refer to Pathfinder',
+        icon: Icon.ReferToPathfinder,
+        url: `${config.serviceUrls.pathfinder}/refer/offender/${prisonerData.prisonerNumber}`,
+      })
+    }
+    if (userHasRoles([Role.SocCustody, Role.SocCommunity], user.userRoles) && !socNominal) {
+      actions.push({
+        text: 'Add to SOC',
+        icon: Icon.AddToSOC,
+        url: `${config.serviceUrls.manageSocCases}/refer/offender/${prisonerData.prisonerNumber}`,
+      })
+    }
+    if (
+      userHasRoles(
+        [
+          Role.CreateCategorisation,
+          Role.ApproveCategorisation,
+          Role.CreateRecategorisation,
+          Role.CategorisationSecurity,
+        ],
+        user.userRoles,
+      )
+    ) {
+      actions.push({
+        text: 'Manage category',
+        icon: Icon.ManageCategory,
+        url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
+      })
+    }
+
+    return actions
+  }
+
+  private buildOverviewInfoLinks(
+    prisonerData: Prisoner,
+    pathfinderNominal: Nominal,
+    socNominal: Nominal,
+    user: User,
+  ): { text: string; url: string }[] {
+    const links: { text: string; url: string }[] = []
+
+    if (
+      userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
+      (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads) ||
+        ['OUT', 'TRN'].includes(prisonerData.prisonId))
+    ) {
+      links.push({
+        text: 'Probation documents',
+        url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/probation-documents`,
+      })
+    }
+
+    if (
+      userHasRoles(
+        [
+          Role.PathfinderApproval,
+          Role.PathfinderStdPrison,
+          Role.PathfinderStdProbation,
+          Role.PathfinderHQ,
+          Role.PathfinderUser,
+          Role.PathfinderLocalReader,
+          Role.PathfinderNationalReader,
+          Role.PathfinderPolice,
+          Role.PathfinderPsychologist,
+        ],
+        user.userRoles,
+      ) &&
+      pathfinderNominal
+    ) {
+      links.push({
+        text: 'Pathfinder profile',
+        url: `${config.serviceUrls.pathfinder}/nominal/${pathfinderNominal.id}`,
+      })
+    }
+
+    if (userHasRoles([Role.SocCommunity, Role.SocCustody], user.userRoles) && socNominal) {
+      links.push({
+        text: 'SOC profile',
+        url: `${config.serviceUrls.manageSocCases}/nominal/${socNominal.id}`,
+      })
+    }
+
+    return links
   }
 }

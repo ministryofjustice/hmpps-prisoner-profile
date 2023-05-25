@@ -36,6 +36,8 @@ import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { IncentiveReviews } from '../interfaces/IncentivesApi/incentiveReviews'
 import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
+import config from '../config'
+import { Role } from '../data/enums/role'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -59,14 +61,14 @@ export default class OverviewPageService {
   }
 
   public async get(prisonerData: Prisoner, userRoles: string[] = []): Promise<OverviewPage> {
-    const { bookingId, prisonerNumber } = prisonerData
+    const { prisonerNumber } = prisonerData
 
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerData, userRoles)
-    const miniSummaryGroupB = await this.getMiniSummaryGroupB(prisonerData)
+    const miniSummaryGroupB = await this.getMiniSummaryGroupB(prisonerData, userRoles)
     const personalDetails = await this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
-    const schedule = await this.getSchedule(bookingId)
+    const schedule = await this.getSchedule(prisonerData)
     const statuses = await this.getStatuses(prisonerData)
 
     return {
@@ -136,6 +138,7 @@ export default class OverviewPageService {
               communityOffenderManager[0].lastName,
             )}`
           : 'Not assigned',
+      linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
     }
 
     return staffContacts
@@ -235,7 +238,7 @@ export default class OverviewPageService {
       bottomContentLine1: formatMoney(accountBalances.cash),
       bottomClass: 'big',
       linkLabel: 'Transactions and savings',
-      linkHref: '#',
+      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/prisoner-finance-details/spends`,
     }
 
     const adjudicationsSummaryData: MiniSummaryData = {
@@ -250,7 +253,7 @@ export default class OverviewPageService {
       bottomContentLine1Href: adjudicationSummary.awards?.length ? '#' : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudications history',
-      linkHref: '#',
+      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
     }
 
     const visitsSummaryData: MiniSummaryData = {
@@ -263,7 +266,7 @@ export default class OverviewPageService {
       bottomContentLine3: privilegedVisitsDescription,
       bottomClass: visitBalances.remainingVo ? 'small' : 'big',
       linkLabel: 'Visits details',
-      linkHref: '#',
+      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/visits-details`,
     }
 
     const summaryData = []
@@ -284,8 +287,8 @@ export default class OverviewPageService {
     return summaryData
   }
 
-  private async getMiniSummaryGroupB(prisonerData: Prisoner): Promise<MiniSummary[]> {
-    const { bookingId, prisonId } = prisonerData
+  private async getMiniSummaryGroupB(prisonerData: Prisoner, userRoles: string[]): Promise<MiniSummary[]> {
+    const { prisonerNumber, bookingId, prisonId } = prisonerData
     const assessments = await this.prisonApiClient.getAssessments(bookingId)
     const userCaseLoads = await this.prisonApiClient.getUserCaseLoads()
 
@@ -328,8 +331,18 @@ export default class OverviewPageService {
     }
 
     if (belongsToCaseLoad) {
-      categorySummaryData.linkLabel = 'Manage category'
-      categorySummaryData.linkHref = '#'
+      categorySummaryData.linkLabel = userHasRoles(
+        [
+          Role.CreateRecategorisation,
+          Role.ApproveCategorisation,
+          Role.CreateRecategorisation,
+          Role.CategorisationSecurity,
+        ],
+        userRoles,
+      )
+        ? 'Manage category'
+        : 'View category'
+      categorySummaryData.linkHref = `${config.serviceUrls.offenderCategorisation}/${bookingId}`
     }
 
     const incentiveSummaryData: MiniSummaryData = {
@@ -342,7 +355,7 @@ export default class OverviewPageService {
         : undefined,
       bottomClass: 'small',
       linkLabel: 'Incentive level details',
-      linkHref: '#',
+      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
     }
 
     const csraSummaryData: MiniSummaryData = {
@@ -356,7 +369,7 @@ export default class OverviewPageService {
 
     if (belongsToCaseLoad) {
       csraSummaryData.linkLabel = 'CSRA history'
-      csraSummaryData.linkHref = '#'
+      csraSummaryData.linkHref = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/csra-history`
     }
 
     const summaryData = []
@@ -372,7 +385,7 @@ export default class OverviewPageService {
     return summaryData
   }
 
-  private async getSchedule(bookingId: number): Promise<OverviewSchedule> {
+  private async getSchedule(prisonerData: Prisoner): Promise<OverviewSchedule> {
     const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
       const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
       const startTime = new Date(event.startTime)
@@ -386,13 +399,14 @@ export default class OverviewPageService {
       }
     }
 
-    const scheduledEvents = await this.prisonApiClient.getEventsScheduledForToday(bookingId)
+    const scheduledEvents = await this.prisonApiClient.getEventsScheduledForToday(prisonerData.bookingId)
     const groupedEvents = groupEventsByPeriod(scheduledEvents)
 
     return {
       morning: groupedEvents.morningEvents.map(formatEventForOverview),
       afternoon: groupedEvents.afternoonEvents.map(formatEventForOverview),
       evening: groupedEvents.eveningEvents.map(formatEventForOverview),
+      linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`,
     }
   }
 

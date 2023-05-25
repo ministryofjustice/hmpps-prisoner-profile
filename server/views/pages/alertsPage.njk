@@ -43,9 +43,11 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
         <div class="govuk-grid-column-three-quarters">
+            {% if addAlertLinkUrl %}
             <div class="hmpps-action-header">
-                {{ hmppsActionButton({ text: 'Add alert', iconName: 'add-alert', id: 'add-alert-action-button', url: '#' }) }}
+                {{ hmppsActionButton({ text: 'Add alert', iconName: 'add-alert', id: 'add-alert-action-button', url: addAlertLinkUrl }) }}
             </div>
+            {% endif %}
         </div>
     </div>
 

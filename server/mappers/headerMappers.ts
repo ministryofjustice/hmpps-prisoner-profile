@@ -2,39 +2,56 @@ import { Alert, Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
-import { formatName } from '../utils/utils'
+import { formatName, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import config from '../config'
+import { Role } from '../data/enums/role'
+import { canViewCaseNotes } from '../utils/roleHelpers'
+import { User } from '../data/hmppsAuthClient'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
-export function mapProfileBannerTopLinks(prisonerData: Prisoner) {
-  const profileBannerTopLinks = [
+export function mapProfileBannerTopLinks(prisonerData: Prisoner, userRoles: string[]) {
+  return [
     {
       heading: 'Location',
       hiddenLabel: 'View location details',
       info: prisonerData.cellLocation,
       classes: '',
+      url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/cell-history`,
     },
     {
       heading: 'Category',
-      hiddenLabel: 'Manage category',
+      hiddenLabel: userHasRoles(
+        [
+          Role.CreateRecategorisation,
+          Role.ApproveCategorisation,
+          Role.CreateRecategorisation,
+          Role.CategorisationSecurity,
+        ],
+        userRoles,
+      )
+        ? 'Manage category'
+        : 'View category',
       info: prisonerData.category === 'U' ? 'Unsentenced' : prisonerData.category,
       classes: '',
+      url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
     },
     {
       heading: 'CSRA',
       hiddenLabel: 'View CSRA history',
       info: prisonerData.csra ? prisonerData.csra : 'Not entered',
       classes: '',
+      url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/csra-history`,
     },
     {
       heading: 'Incentive level',
       hiddenLabel: 'View incentive level details',
       info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : 'Not entered',
       classes: 'remove-column-gutter-right',
+      url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/incentive-level-details`,
     },
   ]
-  return profileBannerTopLinks
 }
 
 export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) {
@@ -51,25 +68,24 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return alerts
 }
 
-export function mapHeaderData(prisonerData: Prisoner, canViewCaseNotes?: boolean, pageId?: string) {
+export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
-  const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes)
+  const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 
   if (pageId) {
     tabs.find(tab => tab.id === pageId).active = true
   }
 
-  const headerData = {
+  return {
     backLinkLabel: 'Back to search results',
     prisonerName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
       style: NameFormatStyle.lastCommaFirst,
     }),
     prisonerNumber: prisonerData.prisonerNumber,
-    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData),
+    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, user.userRoles),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks: tabs,
     photoType,
     prisonId: prisonerData.prisonId,
   }
-  return headerData
 }

@@ -67,3 +67,8 @@ cloud-platform-environments/namespaces/live-1.cloud-platform.service.justice.gov
 Ensure the certificate is created and ready for use.
 
 The name of the kubernetes secret where the certificate is stored is used as a value to the helm chart - this is used to configure the ingress.
+
+### Secrets
+
+The following secrets should be configured in Cloud Platform:
+

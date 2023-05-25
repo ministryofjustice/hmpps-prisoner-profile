@@ -10,6 +10,7 @@ import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
 import { CaseNote, CaseNoteAmendment } from '../interfaces/caseNotesApi/caseNote'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
+import config from '../config'
 
 export default class CaseNotesService {
   private caseNotesApiClient: CaseNotesApiClient
@@ -117,7 +118,11 @@ export default class CaseNotesService {
           ...amendment,
           authorName: convertNameCommaToHuman(amendment.authorName),
         })),
-        deleteLink: caseNote.source === CaseNoteSource.SecureCaseNoteSource && canDeleteSensitiveCaseNotes && '#',
+        addMoreLinkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/case-notes/amend-case-note/${caseNote.caseNoteId}`,
+        deleteLinkUrl:
+          caseNote.source === CaseNoteSource.SecureCaseNoteSource &&
+          canDeleteSensitiveCaseNotes &&
+          `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/case-notes/delete-case-note/${caseNote.caseNoteId}`,
       }))
     }
 

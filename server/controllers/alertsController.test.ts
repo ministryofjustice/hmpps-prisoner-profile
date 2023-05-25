@@ -2,6 +2,8 @@ import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMoc
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { Role } from '../data/enums/role'
+import { CaseLoad } from '../interfaces/caseLoad'
 
 let req: any
 let res: any
@@ -21,7 +23,8 @@ describe('Alerts Controller', () => {
       locals: {
         user: {
           activeCaseLoadId: 'MDI',
-          userRoles: ['ROLE_UPDATE_ALERT'],
+          caseLoads: [{ caseLoadId: 'MDI' } as CaseLoad],
+          userRoles: [Role.UpdateAlert],
         },
         clientToken: 'CLIENT_TOKEN',
       },
@@ -54,7 +57,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, true, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'alerts')
   })
 
   it('should get inactive alerts', async () => {
@@ -84,10 +87,10 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, true, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'alerts')
   })
 
-  it('should set canUpdateAlert to true if user has role and active caseload', async () => {
+  it('should set canUpdateAlert to true if user has role and caseload', async () => {
     jest
       .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
       .mockResolvedValue(PrisonerMockDataA)
@@ -165,6 +168,7 @@ describe('Alerts Controller', () => {
   })
 
   it('should set canUpdateAlert to true if user does not have caseload but prisoner is OUT', async () => {
+    res.locals.user.userRoles.push(Role.InactiveBookings)
     jest
       .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
       .mockResolvedValue({ ...PrisonerMockDataA, prisonId: 'OUT' })
@@ -190,6 +194,7 @@ describe('Alerts Controller', () => {
   })
 
   it('should set canUpdateAlert to true if user does not have caseload but prisoner is TRN', async () => {
+    res.locals.user.userRoles.push(Role.InactiveBookings)
     jest
       .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
       .mockResolvedValue({ ...PrisonerMockDataA, prisonId: 'TRN' })

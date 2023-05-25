@@ -131,6 +131,30 @@ export default {
       },
       agent: new AgentConfig(Number(get('INCENTIVES_API_TIMEOUT_DEADLINE', 20000))),
     },
+    pathfinderApi: {
+      url: get('PATHFINDER_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PATHFINDER_API_TIMEOUT_RESPONSE', 20000)),
+        deadline: Number(get('PATHFINDER_API_TIMEOUT_DEADLINE', 20000)),
+      },
+      agent: new AgentConfig(Number(get('PATHFINDER_API_TIMEOUT_DEADLINE', 20000))),
+    },
+    manageSocCasesApi: {
+      url: get('MANAGE_SOC_CASES_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('MANAGE_SOC_CASES_API_TIMEOUT_RESPONSE', 20000)),
+        deadline: Number(get('MANAGE_SOC_CASES_API_TIMEOUT_DEADLINE', 20000)),
+      },
+      agent: new AgentConfig(Number(get('MANAGE_SOC_CASES_API_TIMEOUT_DEADLINE', 20000))),
+    },
+  },
+  serviceUrls: {
+    offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
+    useOfForce: get('USE_OF_FORCE_UI_URL', 'http://localhost:3001', requiredInProduction),
+    manageAWarrantFolder: get('MANAGE_A_WARRANT_FOLDER_UI_URL', 'http://localhost:3001', requiredInProduction),
+    digitalPrison: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
+    pathfinder: get('PATHFINDER_UI_URL', 'http://localhost:3001', requiredInProduction),
+    manageSocCases: get('MANAGE_SOC_CASES_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),

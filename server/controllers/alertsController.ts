@@ -4,7 +4,8 @@ import AlertsPageService from '../services/alertsPageService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
 import { Role } from '../data/enums/role'
-import { canViewOrAddCaseNotes } from '../utils/roleHelpers'
+import config from '../config'
+import { userCanEdit, userHasRoles } from '../utils/utils'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -38,8 +39,12 @@ export default class AlertsController {
 
     // Set role based permissions
     const canUpdateAlert =
-      res.locals.user.userRoles?.some((role: string) => role === Role.UpdateAlert) &&
-      (res.locals.user.activeCaseLoadId === prisonerData.prisonId || ['OUT', 'TRN'].includes(prisonerData.prisonId))
+      userHasRoles([Role.UpdateAlert], res.locals.user.userRoles) && userCanEdit(res.locals.user, prisonerData)
+
+    let addAlertLinkUrl: string
+    if (canUpdateAlert) {
+      addAlertLinkUrl = `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/create-alert`
+    }
 
     // Get alerts based on given query params
     const alertsPageData = await this.alertsPageService.get(prisonerData, queryParams, canUpdateAlert)
@@ -47,12 +52,9 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(
-        prisonerData,
-        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
-        'alerts',
-      ),
+      ...mapHeaderData(prisonerData, res.locals.user, 'alerts'),
       ...alertsPageData,
+      addAlertLinkUrl,
       activeTab: this.isActive,
     })
   }
