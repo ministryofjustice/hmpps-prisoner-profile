@@ -19,8 +19,7 @@ const visitEmptyAlertsPage = (): AlertsPage => {
 context('Alerts Page', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth()
   })
 
   context('Active Alerts', () => {

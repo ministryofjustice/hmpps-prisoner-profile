@@ -49,6 +49,7 @@ export default class AlertsController {
       pageTitle: 'Alerts',
       ...mapHeaderData(
         prisonerData,
+        res.locals.user.caseLoads,
         canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
         'alerts',
       ),

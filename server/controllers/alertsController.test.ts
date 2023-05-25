@@ -2,6 +2,7 @@ import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMoc
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 
 let req: any
 let res: any
@@ -22,6 +23,7 @@ describe('Alerts Controller', () => {
         user: {
           activeCaseLoadId: 'MDI',
           userRoles: ['ROLE_UPDATE_ALERT'],
+          caseLoads: CaseLoadsDummyDataA,
         },
         clientToken: 'CLIENT_TOKEN',
       },
@@ -54,7 +56,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, true, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, CaseLoadsDummyDataA, true, 'alerts')
   })
 
   it('should get inactive alerts', async () => {
@@ -84,7 +86,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, true, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, CaseLoadsDummyDataA, true, 'alerts')
   })
 
   it('should set canUpdateAlert to true if user has role and active caseload', async () => {

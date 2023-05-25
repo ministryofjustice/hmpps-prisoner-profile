@@ -12,8 +12,7 @@ context('Offences Page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOffencesPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })

@@ -1,20 +1,39 @@
+{% from "../../macros/conditionallyShow.njk" import conditionallyShow %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-full hmpps-profile-banner-top">
-    <a href="/prisoner/{{ prisonerNumber }}/image" class="hmpps-clickable-image" data-qa=prisoner-photo-link>
-      <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" />
-    </a>
-    <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
-    <div class="info">
-      <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
-        {{ prisonerNumber }}
-      </p>
-      <div class="info__links">
-        {% for link in  profileBannerTopLinks %}
-          <div class="{{ link.classes }}">
-            <h3 class="govuk-heading-s">{{ link.heading }}</h3>
-            <a href="#" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse">{{ link.info }}</a>
+  <div class="govuk-grid-column-full">
+    {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
+    <div class="govuk-grid-row" class="govuk-!-padding-top-3 govuk-!-padding-bottom-3" style="background-color: #fbc9af;">
+      <div class="govuk-grid-column-full">
+        <p class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">This prisoner is not in your establishment</p>
+        <p class="govuk-body govuk-!-margin-bottom-2">Some information may be hidden</p>
+      </div>
+    </div>
+    {%- endcall -%}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full hmpps-profile-banner-top">
+        <a href="/prisoner/{{ prisonerNumber }}/image" class="hmpps-clickable-image" data-qa="prisoner-photo-link">
+          <img
+            class="hmpps-profile-photo"
+            src="/api/prisoner/{{ prisonerNumber or photoType }}/image"
+            alt="{{ prisonerName }}"
+          />
+        </a>
+        <h2 class="govuk-heading-l hmpps-profile-prisoner-name">{{ prisonerName }}</h2>
+        <div class="info">
+          <p class="govuk-body govuk-!-font-size-24 hmpps-profile-prisoner-number" aria-label="Prisoner Number">
+            {{ prisonerNumber }}
+          </p>
+          <div class="info__links">
+            {% for link in  profileBannerTopLinks %}
+              <div class="{{ link.classes }}">
+                <h3 class="govuk-heading-s">{{ link.heading }}</h3>
+                <a href="#" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse"
+                  >{{ link.info }}</a
+                >
+              </div>
+            {% endfor %}
           </div>
-        {% endfor %}
+        </div>
       </div>
     </div>
   </div>
