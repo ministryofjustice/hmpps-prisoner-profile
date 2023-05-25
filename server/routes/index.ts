@@ -51,6 +51,7 @@ export default function routes(service: Services): Router {
     res.render('pages/photoPage', {
       ...mapHeaderData(
         prisonerData,
+        res.locals.user.caseLoads,
         canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
       ),
     })
@@ -68,6 +69,7 @@ export default function routes(service: Services): Router {
       pageTitle: 'Personal',
       ...mapHeaderData(
         prisonerData,
+        res.locals.user.caseLoads,
         canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
         'personal',
       ),
@@ -88,6 +90,7 @@ export default function routes(service: Services): Router {
     res.render('pages/workAndSkills', {
       ...mapHeaderData(
         prisonerData,
+        res.locals.user.caseLoads,
         canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
         'work-and-skills',
       ),
@@ -121,6 +124,7 @@ export default function routes(service: Services): Router {
       pageTitle: 'Offences',
       ...mapHeaderData(
         prisonerData,
+        res.locals.user.caseLoads,
         canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
         'offences',
       ),
