@@ -3,7 +3,7 @@ import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteUsageMock } from '../data/localMockData/caseNoteUsageMock'
 import { Role } from '../data/enums/role'
-import { CaseLoad } from '../interfaces/caseLoad'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
 let req: any
@@ -32,9 +32,9 @@ describe('Case Notes Controller', () => {
       locals: {
         clientToken: 'CLIENT_TOKEN',
         user: {
-          caseLoads: [{ caseLoadId: 'MDI' } as CaseLoad],
           userRoles: [Role.DeleteSensitiveCaseNotes],
           staffId: 487023,
+          caseLoads: CaseLoadsDummyDataA,
         },
       },
       render: jest.fn(),

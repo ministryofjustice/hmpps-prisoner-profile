@@ -2,7 +2,7 @@ import { Alert, Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
-import { formatName, userHasRoles } from '../utils/utils'
+import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { Role } from '../data/enums/role'
@@ -11,47 +11,52 @@ import { User } from '../data/hmppsAuthClient'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
-export function mapProfileBannerTopLinks(prisonerData: Prisoner, userRoles: string[]) {
-  return [
-    {
+export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
+  const { userRoles, caseLoads } = user
+  const profileBannerTopLinks = []
+
+  if (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads)) {
+    profileBannerTopLinks.push({
       heading: 'Location',
       hiddenLabel: 'View location details',
       info: prisonerData.cellLocation,
       classes: '',
       url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/cell-history`,
-    },
-    {
-      heading: 'Category',
-      hiddenLabel: userHasRoles(
-        [
-          Role.CreateRecategorisation,
-          Role.ApproveCategorisation,
-          Role.CreateRecategorisation,
-          Role.CategorisationSecurity,
-        ],
-        userRoles,
-      )
-        ? 'Manage category'
-        : 'View category',
-      info: prisonerData.category === 'U' ? 'Unsentenced' : prisonerData.category,
-      classes: '',
-      url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
-    },
-    {
-      heading: 'CSRA',
-      hiddenLabel: 'View CSRA history',
-      info: prisonerData.csra ? prisonerData.csra : 'Not entered',
-      classes: '',
-      url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/csra-history`,
-    },
-    {
-      heading: 'Incentive level',
-      hiddenLabel: 'View incentive level details',
-      info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : 'Not entered',
-      classes: 'remove-column-gutter-right',
-      url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/incentive-level-details`,
-    },
-  ]
+    })
+  }
+
+  profileBannerTopLinks.push({
+    heading: 'Category',
+    hiddenLabel: userHasRoles(
+      [
+        Role.CreateRecategorisation,
+        Role.ApproveCategorisation,
+        Role.CreateRecategorisation,
+        Role.CategorisationSecurity,
+      ],
+      userRoles,
+    )
+      ? 'Manage category'
+      : 'View category',
+    info: prisonerData.category === 'U' ? 'Unsentenced' : prisonerData.category,
+    classes: '',
+    url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
+  })
+  profileBannerTopLinks.push({
+    heading: 'CSRA',
+    hiddenLabel: 'View CSRA history',
+    info: prisonerData.csra ? prisonerData.csra : 'Not entered',
+    classes: '',
+    url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/csra-history`,
+  })
+  profileBannerTopLinks.push({
+    heading: 'Incentive level',
+    hiddenLabel: 'View incentive level details',
+    info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : 'Not entered',
+    classes: 'remove-column-gutter-right',
+    url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/incentive-level-details`,
+  })
+  return profileBannerTopLinks
 }
 
 export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) {
@@ -82,7 +87,7 @@ export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: stri
       style: NameFormatStyle.lastCommaFirst,
     }),
     prisonerNumber: prisonerData.prisonerNumber,
-    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, user.userRoles),
+    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, user),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks: tabs,
     photoType,

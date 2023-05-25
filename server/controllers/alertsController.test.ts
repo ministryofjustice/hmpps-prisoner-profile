@@ -2,8 +2,8 @@ import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMoc
 import AlertsController from './alertsController'
 import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
-import { CaseLoad } from '../interfaces/caseLoad'
 
 let req: any
 let res: any
@@ -23,8 +23,8 @@ describe('Alerts Controller', () => {
       locals: {
         user: {
           activeCaseLoadId: 'MDI',
-          caseLoads: [{ caseLoadId: 'MDI' } as CaseLoad],
           userRoles: [Role.UpdateAlert],
+          caseLoads: CaseLoadsDummyDataA,
         },
         clientToken: 'CLIENT_TOKEN',
       },

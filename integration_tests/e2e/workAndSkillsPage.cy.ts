@@ -10,10 +10,7 @@ const visitWorkAndSkillsPage = (): WorkAndSkillsPage => {
 context('Work and Skills Page', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({
-      roles: ['ROLE_GLOBAL_SEARCH'],
-      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-    })
+    cy.setupUserAuth()
   })
 
   context('Default Prisoner State', () => {

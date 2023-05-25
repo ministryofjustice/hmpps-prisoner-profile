@@ -12,10 +12,7 @@ context('Offences Page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({
-      roles: ['ROLE_GLOBAL_SEARCH'],
-      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-    })
+    cy.setupUserAuth()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOffencesPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })
