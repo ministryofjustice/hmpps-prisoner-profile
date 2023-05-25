@@ -6,8 +6,10 @@ context('Photo Page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth({
+      roles: ['ROLE_GLOBAL_SEARCH'],
+      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    })
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
   })

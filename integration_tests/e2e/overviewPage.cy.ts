@@ -111,7 +111,7 @@ context('Overview Page', () => {
         overviewPage.categoryCard().contains('p', 'Category')
         overviewPage.categoryCard().contains('p', 'B')
         overviewPage.categoryCard().contains('p', 'Next review: 19/02/2023')
-        overviewPage.categoryCard().contains('a', 'Manage category')
+        overviewPage.categoryCard().contains('a', 'View category')
       })
 
       it('Mini summary Group B should contain Incentives card with correct data', () => {

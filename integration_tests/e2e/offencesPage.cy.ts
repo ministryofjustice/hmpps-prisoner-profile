@@ -12,8 +12,10 @@ context('Offences Page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth({
+      roles: ['ROLE_GLOBAL_SEARCH'],
+      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    })
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOffencesPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })

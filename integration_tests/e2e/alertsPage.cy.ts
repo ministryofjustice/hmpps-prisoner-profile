@@ -19,8 +19,10 @@ const visitEmptyAlertsPage = (): AlertsPage => {
 context('Alerts Page', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth({
+      roles: ['ROLE_GLOBAL_SEARCH'],
+      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    })
   })
 
   context('Active Alerts', () => {

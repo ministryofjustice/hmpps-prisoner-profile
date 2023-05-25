@@ -15,10 +15,11 @@ const visitEmptyCaseNotesPage = (): CaseNotesPage => {
 context('Case Notes Page', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser', { activeCaseLoadId: 'MDI' })
+    cy.setupUserAuth({
+      roles: ['ROLE_GLOBAL_SEARCH'],
+      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    })
     cy.task('stubGetCaseNoteTypes')
-    cy.task('stubUserCaseLoads')
   })
 
   context('Case Notes List', () => {
@@ -153,10 +154,12 @@ context('Case Notes Page', () => {
 context('Case Notes Page Not Found', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser', { activeCaseLoadId: 'ZZZ' })
+    cy.setupUserAuth({
+      roles: ['ROLE_GLOBAL_SEARCH'],
+      caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+      activeCaseLoadId: 'ZZZ',
+    })
     cy.task('stubGetCaseNoteTypes')
-    cy.task('stubUserCaseLoads')
   })
 
   context('Page Not Found', () => {
