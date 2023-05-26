@@ -3,6 +3,7 @@ import * as headerMappers from '../mappers/headerMappers'
 import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteUsageMock } from '../data/localMockData/caseNoteUsageMock'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 
 let req: any
 let res: any
@@ -31,6 +32,7 @@ describe('Case Notes Controller', () => {
         clientToken: 'CLIENT_TOKEN',
         user: {
           staffId: 487023,
+          caseLoads: CaseLoadsDummyDataA,
         },
       },
       render: jest.fn(),
@@ -65,6 +67,6 @@ describe('Case Notes Controller', () => {
       },
       false,
     )
-    expect(mapSpy).toHaveBeenCalledWith(prisonerDetailMock, true, 'case-notes')
+    expect(mapSpy).toHaveBeenCalledWith(prisonerDetailMock, CaseLoadsDummyDataA, true, 'case-notes')
   })
 })

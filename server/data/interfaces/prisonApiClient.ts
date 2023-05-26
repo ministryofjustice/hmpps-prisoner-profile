@@ -28,6 +28,7 @@ import { ReferenceCode, ReferenceCodeDomain } from '../../interfaces/prisonApi/r
 import { ReasonableAdjustments } from '../../interfaces/prisonApi/reasonableAdjustment'
 import { CaseNoteUsage } from '../../interfaces/prisonApi/caseNoteUsage'
 import { CaseNoteCount } from '../../interfaces/prisonApi/caseNoteCount'
+import { CourtDateResults } from '../../interfaces/courtDateResults'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -73,4 +74,5 @@ export interface PrisonApiClient {
   ): Promise<CaseNoteCount>
   getMainOffence(bookingId: number): Promise<any>
   getFullStatus(prisonerNumber: string): Promise<any>
+  getCourtDateResults(offenderNumber: string): Promise<CourtDateResults[]>
 }

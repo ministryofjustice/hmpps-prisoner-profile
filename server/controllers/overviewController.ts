@@ -56,7 +56,7 @@ export default class OverviewController {
 
     res.render('pages/overviewPage', {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, canViewCaseNotes, 'overview'),
+      ...mapHeaderData(prisonerData, res.locals.user.caseLoads, canViewCaseNotes, 'overview'),
       ...overviewPageData,
       canViewCaseNotes,
       canAddCaseNotes,

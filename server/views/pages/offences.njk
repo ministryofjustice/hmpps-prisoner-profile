@@ -1,40 +1,26 @@
 {% extends "./index.njk" %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% block body %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <h1>Offences</h1>
-      {% if releaseDates.dates.length == 0 %}
-        {{ govukWarningText({
-          text: "This person is currently being held on remand.",
-          iconFallbackText: "Warning"
-        }) }}
-      {% endif %}
     </div>
   </div>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
-      {% if releaseDates.dates.length == 0 %}
-        <div class="hmpps-sidebar-single-link">
-          <h2 class="govuk-!-margin-top-0">Court cases and offences</h2>
-        </div>
-      {% else %}
-        <ul class="govuk-list hmpps-sidebar">
-          <li><a class="govuk-link" href="#courtCasesAccordion">Court cases and offences</a></li>
-          <li><a class="govuk-link" href="#release-dates">Release dates</a></li>
-        </ul>
-      {% endif %}
+      <ul class="govuk-list hmpps-sidebar">
+        <li><a class="govuk-link" href="#courtCasesAccordion">Court cases and offences</a></li>
+        <li><a class="govuk-link" href="#release-dates">Release dates</a></li>
+      </ul>
     </div>
     <div class="govuk-grid-column-three-quarters">
       <div class="govuk-grid-row" data-qa="court-cases-and-offences">
         <div class="govuk-grid-column-full" id="courtCasesAccordion">
           {% include "../partials/offencesPage/courtCasesAndOffences.njk" %}
         </div>
-        {% if releaseDates.dates.length > 0 %}
+        
           <div class="govuk-grid-column-full">
             {% include "../partials/offencesPage/releaseDates.njk" %}
           </div>
-        {% endif %}
       </div>
     </div>
   </div>

@@ -1,26 +1,70 @@
 import { CourtHearing } from '../../interfaces/prisonApi/courtHearing'
 import { SummaryListRow } from '../../utils/utils'
-import CourtHearingsMock from './courtHearingsMock'
+import { CourtHearingsMock } from './courtHearingsMock'
 
 export const OffencesPageMockSentences = {
   courtCaseData: [
     {
       caseInfoNumber: 'T20167348',
-      courtHearings: [] as CourtHearing[],
-      courtName: 'Sheffield Crown Court',
-      offences: [
-        'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
-        'Drive vehicle for more than 13 hours or more in a working day - domestic',
-        'Import nuclear material with intent to evade a prohibition / restriction',
+      courtHearings: [
+        {
+          dateTime: '2020-06-18T10:00:00',
+          id: 407072650,
+          location: {
+            active: true,
+            agencyId: 'SHEFCC',
+            agencyType: 'CRT',
+            courtType: 'CC',
+            description: 'Sheffield Crown Court',
+            longDescription: 'Sheffield Crown Court',
+          },
+        },
+        {
+          dateTime: '2016-05-30T10:00:00',
+          id: 304966745,
+          location: {
+            active: true,
+            agencyId: 'DONCMC',
+            agencyType: 'CRT',
+            courtType: 'MC',
+            description: 'Doncaster Magistrates Court',
+            longDescription: 'Doncaster Magistrates Court',
+          },
+        },
+        {
+          dateTime: '2016-06-27T10:00:00',
+          id: 304966783,
+          location: {
+            active: true,
+            agencyId: 'SHEFCC',
+            agencyType: 'CRT',
+            courtType: 'CC',
+            description: 'Sheffield Crown Court',
+            longDescription: 'Sheffield Crown Court',
+          },
+        },
+        {
+          dateTime: '2016-06-30T10:00:00',
+          id: 305411026,
+          location: {
+            active: true,
+            agencyId: 'SHEFCC',
+            agencyType: 'CRT',
+            courtType: 'CC',
+            description: 'Sheffield Crown Court',
+            longDescription: 'Sheffield Crown Court',
+          },
+        },
       ],
-      sentenceDate: '2 March 2020',
+      courtName: 'Sheffield Crown Court',
+      nextCourtAppearance: {} as CourtHearing,
       sentenceTerms: [
         {
-          sentenceHeader: 'Sentence 5',
           sentenceTypeDescription: 'EDS LASPO Discretionary Release',
+          sentenceHeader: 'Count 5',
           summaryDetailRows: [
             {
-              label: 'Start date',
+              label: 'Sentence date',
               value: '2 March 2020',
             },
             {
@@ -28,8 +72,8 @@ export const OffencesPageMockSentences = {
               value: '10 years',
             },
             {
-              label: 'Consecutive to',
-              value: undefined,
+              label: 'Concurrent or consecutive',
+              value: 'Concurrent',
             },
             undefined,
             {
@@ -37,13 +81,55 @@ export const OffencesPageMockSentences = {
               value: '5 years',
             },
           ],
+          offences: [
+            {
+              bookingId: 1102484,
+              caseId: 1563148,
+              courtDate: '2020-03-02',
+              mostSerious: true,
+              offenceCode: 'TR68132',
+              offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
+              primaryResultCode: '1002',
+              primaryResultConviction: true,
+              primaryResultDescription: 'Imprisonment',
+              secondaryResultConviction: false,
+              statuteCode: 'TR68',
+            },
+            {
+              bookingId: 1102484,
+              caseId: 1563148,
+              courtDate: '2020-03-02',
+              mostSerious: false,
+              offenceCode: 'WE13097',
+              offenceDescription:
+                'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
+              primaryResultCode: '1002',
+              primaryResultConviction: true,
+              primaryResultDescription: 'Imprisonment',
+              secondaryResultConviction: false,
+              statuteCode: 'WE13',
+            },
+            {
+              bookingId: 1102484,
+              caseId: 1563148,
+              courtDate: '2020-03-02',
+              mostSerious: false,
+              offenceCode: 'CE79245',
+              offenceDescription: 'Import nuclear material with intent to evade a prohibition / restriction',
+              primaryResultCode: '1002',
+              primaryResultConviction: true,
+              primaryResultDescription: 'Imprisonment',
+              secondaryResultConviction: false,
+              statuteCode: 'CE79',
+            },
+          ],
         },
         {
-          sentenceHeader: 'Sentence 4',
           sentenceTypeDescription: 'CJA03 Standard Determinate Sentence',
+          sentenceHeader: 'Count 4',
           summaryDetailRows: [
             {
-              label: 'Start date',
+              label: 'Sentence date',
               value: '2 March 2020',
             },
             {
@@ -51,8 +137,8 @@ export const OffencesPageMockSentences = {
               value: '100 years',
             },
             {
-              label: 'Consecutive to',
-              value: undefined,
+              label: 'Concurrent or consecutive',
+              value: 'Concurrent',
             },
             {
               label: 'Fine',
@@ -60,8 +146,51 @@ export const OffencesPageMockSentences = {
             },
             undefined,
           ],
+          offences: [
+            {
+              bookingId: 1102484,
+              caseId: 1563148,
+              courtDate: '2020-03-02',
+              mostSerious: true,
+              offenceCode: 'TR68132',
+              offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
+              primaryResultCode: '1002',
+              primaryResultConviction: true,
+              primaryResultDescription: 'Imprisonment',
+              secondaryResultConviction: false,
+              statuteCode: 'TR68',
+            },
+            {
+              bookingId: 1102484,
+              caseId: 1563148,
+              courtDate: '2020-03-02',
+              mostSerious: false,
+              offenceCode: 'WE13097',
+              offenceDescription:
+                'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
+              primaryResultCode: '1002',
+              primaryResultConviction: true,
+              primaryResultDescription: 'Imprisonment',
+              secondaryResultConviction: false,
+              statuteCode: 'WE13',
+            },
+            {
+              bookingId: 1102484,
+              caseId: 1563148,
+              courtDate: '2020-03-02',
+              mostSerious: false,
+              offenceCode: 'CE79245',
+              offenceDescription: 'Import nuclear material with intent to evade a prohibition / restriction',
+              primaryResultCode: '1002',
+              primaryResultConviction: true,
+              primaryResultDescription: 'Imprisonment',
+              secondaryResultConviction: false,
+              statuteCode: 'CE79',
+            },
+          ],
         },
       ],
+      sentenced: true,
     },
   ],
   courtCasesSentenceDetailsId: 'court-cases-sentence-details',
@@ -91,22 +220,6 @@ export const OffencesPageMockSentences = {
           text: '12 December 2021',
         },
       },
-      {
-        key: {
-          text: 'Licence expiry',
-        },
-        value: {
-          text: '12 March 2132',
-        },
-      },
-      {
-        key: {
-          text: 'Sentence expiry',
-        },
-        value: {
-          text: '12 March 2132',
-        },
-      },
     ],
   },
 }
@@ -122,7 +235,6 @@ export const OffencesPageMockHearings = {
         'Drive vehicle for more than 13 hours or more in a working day - domestic',
         'Import nuclear material with intent to evade a prohibition / restriction',
       ],
-      sentenceDate: '2 March 2020',
       sentenceTerms: [] as CourtHearing[],
     },
   ],
@@ -286,21 +398,65 @@ export const GroupedSentencesMock = [
 export const GetCourtCaseData = [
   {
     caseInfoNumber: 'T20167348',
-    courtHearings: [] as CourtHearing[],
-    courtName: 'Sheffield Crown Court',
-    offences: [
-      'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
-      'Drive vehicle for more than 13 hours or more in a working day - domestic',
-      'Import nuclear material with intent to evade a prohibition / restriction',
+    courtHearings: [
+      {
+        dateTime: '2020-06-18T10:00:00',
+        id: 407072650,
+        location: {
+          active: true,
+          agencyId: 'SHEFCC',
+          agencyType: 'CRT',
+          courtType: 'CC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+        },
+      },
+      {
+        dateTime: '2016-05-30T10:00:00',
+        id: 304966745,
+        location: {
+          active: true,
+          agencyId: 'DONCMC',
+          agencyType: 'CRT',
+          courtType: 'MC',
+          description: 'Doncaster Magistrates Court',
+          longDescription: 'Doncaster Magistrates Court',
+        },
+      },
+      {
+        dateTime: '2016-06-27T10:00:00',
+        id: 304966783,
+        location: {
+          active: true,
+          agencyId: 'SHEFCC',
+          agencyType: 'CRT',
+          courtType: 'CC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+        },
+      },
+      {
+        dateTime: '2016-06-30T10:00:00',
+        id: 305411026,
+        location: {
+          active: true,
+          agencyId: 'SHEFCC',
+          agencyType: 'CRT',
+          courtType: 'CC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+        },
+      },
     ],
-    sentenceDate: '2 March 2020',
+    courtName: 'Sheffield Crown Court',
+    nextCourtAppearance: {} as CourtHearing,
     sentenceTerms: [
       {
-        sentenceHeader: 'Sentence 5',
+        sentenceHeader: 'Count 5',
         sentenceTypeDescription: 'EDS LASPO Discretionary Release',
         summaryDetailRows: [
           {
-            label: 'Start date',
+            label: 'Sentence date',
             value: '2 March 2020',
           },
           {
@@ -308,8 +464,8 @@ export const GetCourtCaseData = [
             value: '10 years',
           },
           {
-            label: 'Consecutive to',
-            value: undefined,
+            label: 'Concurrent or consecutive',
+            value: 'Concurrent',
           },
           undefined,
           {
@@ -317,13 +473,55 @@ export const GetCourtCaseData = [
             value: '5 years',
           },
         ],
+        offences: [
+          {
+            bookingId: 1102484,
+            caseId: 1563148,
+            courtDate: '2020-03-02',
+            mostSerious: true,
+            offenceCode: 'TR68132',
+            offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
+            primaryResultCode: '1002',
+            primaryResultConviction: true,
+            primaryResultDescription: 'Imprisonment',
+            secondaryResultConviction: false,
+            statuteCode: 'TR68',
+          },
+          {
+            bookingId: 1102484,
+            caseId: 1563148,
+            courtDate: '2020-03-02',
+            mostSerious: false,
+            offenceCode: 'WE13097',
+            offenceDescription:
+              'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
+            primaryResultCode: '1002',
+            primaryResultConviction: true,
+            primaryResultDescription: 'Imprisonment',
+            secondaryResultConviction: false,
+            statuteCode: 'WE13',
+          },
+          {
+            bookingId: 1102484,
+            caseId: 1563148,
+            courtDate: '2020-03-02',
+            mostSerious: false,
+            offenceCode: 'CE79245',
+            offenceDescription: 'Import nuclear material with intent to evade a prohibition / restriction',
+            primaryResultCode: '1002',
+            primaryResultConviction: true,
+            primaryResultDescription: 'Imprisonment',
+            secondaryResultConviction: false,
+            statuteCode: 'CE79',
+          },
+        ],
       },
       {
-        sentenceHeader: 'Sentence 4',
+        sentenceHeader: 'Count 4',
         sentenceTypeDescription: 'CJA03 Standard Determinate Sentence',
         summaryDetailRows: [
           {
-            label: 'Start date',
+            label: 'Sentence date',
             value: '2 March 2020',
           },
           {
@@ -331,8 +529,8 @@ export const GetCourtCaseData = [
             value: '100 years',
           },
           {
-            label: 'Consecutive to',
-            value: undefined,
+            label: 'Concurrent or consecutive',
+            value: 'Concurrent',
           },
           {
             label: 'Fine',
@@ -340,8 +538,51 @@ export const GetCourtCaseData = [
           },
           undefined,
         ],
+        offences: [
+          {
+            bookingId: 1102484,
+            caseId: 1563148,
+            courtDate: '2020-03-02',
+            mostSerious: true,
+            offenceCode: 'TR68132',
+            offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
+            primaryResultCode: '1002',
+            primaryResultConviction: true,
+            primaryResultDescription: 'Imprisonment',
+            secondaryResultConviction: false,
+            statuteCode: 'TR68',
+          },
+          {
+            bookingId: 1102484,
+            caseId: 1563148,
+            courtDate: '2020-03-02',
+            mostSerious: false,
+            offenceCode: 'WE13097',
+            offenceDescription:
+              'AATF operator/approved exporter fail to include quarterly information in reg 66(1) report',
+            primaryResultCode: '1002',
+            primaryResultConviction: true,
+            primaryResultDescription: 'Imprisonment',
+            secondaryResultConviction: false,
+            statuteCode: 'WE13',
+          },
+          {
+            bookingId: 1102484,
+            caseId: 1563148,
+            courtDate: '2020-03-02',
+            mostSerious: false,
+            offenceCode: 'CE79245',
+            offenceDescription: 'Import nuclear material with intent to evade a prohibition / restriction',
+            primaryResultCode: '1002',
+            primaryResultConviction: true,
+            primaryResultDescription: 'Imprisonment',
+            secondaryResultConviction: false,
+            statuteCode: 'CE79',
+          },
+        ],
       },
     ],
+    sentenced: true,
   },
 ]
 
@@ -369,22 +610,6 @@ export const GetReleaseDates = {
       },
       value: {
         text: '12 December 2021',
-      },
-    },
-    {
-      key: {
-        text: 'Licence expiry',
-      },
-      value: {
-        text: '12 March 2132',
-      },
-    },
-    {
-      key: {
-        text: 'Sentence expiry',
-      },
-      value: {
-        text: '12 March 2132',
       },
     },
   ],

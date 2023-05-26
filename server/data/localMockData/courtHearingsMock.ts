@@ -1,6 +1,6 @@
 import { CourtHearing } from '../../interfaces/prisonApi/courtHearing'
 
-const CourtHearingsMock: CourtHearing[] = [
+export const CourtHearingsMock: CourtHearing[] = [
   {
     id: 407072650,
     dateTime: '2020-06-18T10:00:00',
@@ -51,4 +51,29 @@ const CourtHearingsMock: CourtHearing[] = [
   },
 ]
 
-export default CourtHearingsMock
+export const CourtHearingsMockA: CourtHearing[] = [
+  {
+    id: 329257623,
+    dateTime: '2017-01-17T10:00:00',
+    location: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+  },
+  {
+    id: 349392356,
+    dateTime: '2018-09-21T10:00:00',
+    location: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+  },
+]

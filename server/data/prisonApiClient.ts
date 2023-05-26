@@ -37,6 +37,7 @@ import { ReasonableAdjustments } from '../interfaces/prisonApi/reasonableAdjustm
 import { CaseNoteUsage } from '../interfaces/prisonApi/caseNoteUsage'
 import { formatDateISO } from '../utils/dateHelpers'
 import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
+import { CourtDateResults } from '../interfaces/courtDateResults'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -271,5 +272,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getFullStatus(prisonerNumber: string): Promise<any> {
     return this.get({ path: `/api/prisoners/${prisonerNumber}/full-status` })
+  }
+
+  async getCourtDateResults(prisonerNumber: string): Promise<CourtDateResults[]> {
+    return this.get<CourtDateResults[]>({
+      path: `/api/digital-warrant/court-date-results/${prisonerNumber}`,
+    })
   }
 }
