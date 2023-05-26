@@ -264,4 +264,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       query: `fromDate=${fromDate}&toDate=${toDate}`,
     })
   }
+
+  async getMainOffence(bookingId: number): Promise<any> {
+    return this.get({ path: `/api/bookings/${bookingId}/mainOffence` })
+  }
+
+  async getFullStatus(prisonerNumber: string): Promise<any> {
+    return this.get({ path: `/api/prisoners/${prisonerNumber}/full-status` })
+  }
 }

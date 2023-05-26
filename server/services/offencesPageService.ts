@@ -172,7 +172,7 @@ export default class OffencesPageService {
       })
   }
 
-  async getReleaseDates(prisonerNumber: string) {
+  public async getReleaseDates(prisonerNumber: string) {
     const releaseDates: PrisonerSentenceDetails = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
 
     const sentenceDetails = releaseDates.sentenceDetail

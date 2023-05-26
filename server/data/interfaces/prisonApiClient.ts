@@ -71,4 +71,6 @@ export interface PrisonApiClient {
     fromDate: string,
     toDate: string,
   ): Promise<CaseNoteCount>
+  getMainOffence(bookingId: number): Promise<any>
+  getFullStatus(prisonerNumber: string): Promise<any>
 }

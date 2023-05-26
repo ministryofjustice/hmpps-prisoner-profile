@@ -36,6 +36,7 @@ import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { IncentiveReviews } from '../interfaces/IncentivesApi/incentiveReviews'
 import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
+import OffencesPageService from './offencesPageService'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -59,7 +60,8 @@ export default class OverviewPageService {
   }
 
   public async get(prisonerData: Prisoner, userRoles: string[] = []): Promise<OverviewPage> {
-    const { bookingId, prisonerNumber } = prisonerData
+    const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
+      prisonerData
 
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerData, userRoles)
@@ -68,6 +70,13 @@ export default class OverviewPageService {
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(bookingId)
     const statuses = await this.getStatuses(prisonerData)
+    const offencesOverview = await this.getOffencesOverview(
+      bookingId,
+      prisonerNumber,
+      imprisonmentStatusDescription,
+      conditionalReleaseDate,
+      confirmedReleaseDate,
+    )
 
     return {
       miniSummaryGroupA,
@@ -77,6 +86,36 @@ export default class OverviewPageService {
       personalDetails,
       staffContacts,
       schedule,
+      offencesOverview,
+    }
+  }
+
+  public async getOffencesOverview(
+    bookingId: number,
+    prisonerNumber: string,
+    imprisonmentStatusDescription: string,
+    conditionalReleaseDate: string,
+    confirmedReleaseDate: string,
+  ): Promise<any> {
+    const offencesPageService = new OffencesPageService(this.prisonApiClient)
+
+    const [mainOffence, sentenceTerms, releaseDates, courtCaseData, fullStatus] = await Promise.all([
+      this.prisonApiClient.getMainOffence(bookingId),
+      this.prisonApiClient.getSentenceTerms(bookingId),
+      offencesPageService.getReleaseDates(prisonerNumber),
+      offencesPageService.getCourtCasesData(bookingId, prisonerNumber),
+      this.prisonApiClient.getFullStatus(prisonerNumber),
+    ])
+
+    return {
+      mainOffence,
+      sentenceTerms,
+      releaseDates,
+      courtCaseData,
+      fullStatus,
+      imprisonmentStatusDescription,
+      conditionalReleaseDate,
+      confirmedReleaseDate,
     }
   }
 

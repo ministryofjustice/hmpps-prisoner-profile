@@ -26,4 +26,5 @@ export interface OverviewPage {
   personalDetails: PersonalDetails
   staffContacts: object
   schedule: OverviewSchedule
+  offencesOverview: any
 }

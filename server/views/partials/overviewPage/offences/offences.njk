@@ -1,0 +1,28 @@
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{%- call summaryCard({title: "Offences"}) -%}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2">Main offence</p>
+        <p>{{offencesOverview.mainOffence[0].offenceDescription}}</p>
+        <hr class="govuk-section-break govuk-section-break--visible" />
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Imprisonment status</p>
+        <p> {{ offencesOverview.imprisonmentStatusDescription}}</p>
+        {% if offencesOverview.fullStatus.legalStatus !== "REMAND"%}
+            <hr class="govuk-section-break govuk-section-break--visible" />
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Conditional release date(CRD)</p>
+            <p> {{ offencesOverview.conditionalReleaseDate | formatDate}}</p>
+        {% endif %}
+        <hr class="govuk-section-break govuk-section-break--visible" />
+        <p class="govuk-body govuk-!-margin-top-4">
+            <a href="{{offencesOverview.fullStatus.nomsId}}/offences" class="govuk-link govuk-link--no-visited-state">
+            {% if offencesOverview.fullStatus.legalStatus !== "REMAND"%}
+             View all court cases and offences
+            {% else %}
+             View all offences, sentences and release dates
+            {% endif %}
+            </a>
+        </p>
+      </div>
+    </div>
+{%- endcall -%}

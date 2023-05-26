@@ -1,6 +1,5 @@
 {% from "./macros/statusListMacro.njk" import statusList %}
 {% from "./miniSummaryBoxes/miniSummaryBoxList.njk" import  miniSummaryListMacro %}
-
 <div class="govuk-grid-row">
   <section class="govuk-grid-column-full" aria-label="Status List">
     {{ statusList(statuses) }}
@@ -31,6 +30,11 @@
     {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'overview-schedule'}) -%}
       {% include "./schedule/schedule.njk" %}
     {%- endcall -%}
+  </div>
+</div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
+    {% include "./offences/offences.njk" %}
   </div>
 </div>
 <div class="govuk-grid-row">
