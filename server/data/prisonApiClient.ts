@@ -37,6 +37,7 @@ import { ReasonableAdjustments } from '../interfaces/prisonApi/reasonableAdjustm
 import { CaseNoteUsage } from '../interfaces/prisonApi/caseNoteUsage'
 import { formatDateISO } from '../utils/dateHelpers'
 import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
+import { CourtDateResults } from '../interfaces/courtDateResults'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -262,6 +263,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get({
       path: `/api/bookings/${bookingId}/caseNotes/${type}/${subType}/count`,
       query: `fromDate=${fromDate}&toDate=${toDate}`,
+    })
+  }
+
+  async getCourtDateResults(prisonerNumber: string): Promise<CourtDateResults[]> {
+    return this.get<CourtDateResults[]>({
+      path: `/api/digital-warrant/court-date-results/${prisonerNumber}`,
     })
   }
 }

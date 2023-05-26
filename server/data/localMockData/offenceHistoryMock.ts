@@ -1,6 +1,6 @@
 import { OffenceHistoryDetail } from '../../interfaces/prisonApi/offenceHistoryDetail'
 
-const OffenceHistoryMock: OffenceHistoryDetail[] = [
+export const OffenceHistoryMock: OffenceHistoryDetail[] = [
   {
     bookingId: 580596,
     offenceDate: '2011-02-16',
@@ -237,4 +237,46 @@ const OffenceHistoryMock: OffenceHistoryDetail[] = [
   },
 ]
 
-export default OffenceHistoryMock
+export const OffenceHistoryMockA: OffenceHistoryDetail[] = [
+  {
+    bookingId: 1167133,
+    offenceDate: '2016-07-23',
+    offenceDescription: '(CP TEST) Drive a motor vehicle dangerously',
+    offenceCode: 'RT88026',
+    statuteCode: 'RT88',
+    mostSerious: false,
+    primaryResultCode: '1002',
+    primaryResultDescription: 'Imprisonment',
+    primaryResultConviction: true,
+    secondaryResultConviction: false,
+    courtDate: '2018-09-21',
+    caseId: 1520515,
+  },
+  {
+    bookingId: 1167133,
+    offenceDate: '2016-08-04',
+    offenceDescription: 'Cause serious injury by dangerous driving',
+    offenceCode: 'RT88526',
+    statuteCode: 'RT88',
+    mostSerious: true,
+    primaryResultCode: '1002',
+    primaryResultDescription: 'Imprisonment',
+    primaryResultConviction: true,
+    secondaryResultConviction: false,
+    courtDate: '2018-09-21',
+    caseId: 1520515,
+  },
+  {
+    bookingId: 1167133,
+    offenceDescription: 'Drive motor vehicle when alcohol level above limit',
+    offenceCode: 'RT88007',
+    statuteCode: 'RT88',
+    mostSerious: false,
+    primaryResultCode: '1002',
+    primaryResultDescription: 'Imprisonment',
+    primaryResultConviction: true,
+    secondaryResultConviction: false,
+    courtDate: '2018-09-21',
+    caseId: 1520515,
+  },
+]

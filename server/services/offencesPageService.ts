@@ -9,6 +9,9 @@ import { FindConsecutiveSentence, Licence, OffenderSentenceTerms } from '../inte
 import { GroupedSentence } from '../interfaces/groupSentencesBySequence'
 import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
 import { Charge } from '../data/enums/chargeCodes'
+import { CourtCase } from '../interfaces/prisonApi/courtCase'
+import { CourtDateResults } from '../interfaces/courtDateResults'
+import { CourtCaseDataMapped, CourtCaseDataMappedUnsentenced } from '../interfaces/courtCaseDataMapped'
 
 export default class OffencesPageService {
   private prisonApiClient: PrisonApiClient
@@ -81,7 +84,7 @@ export default class OffencesPageService {
       // eslint-disable-next-line no-shadow
       (sentences: OffenderSentenceTerms) => sentences.sentenceSequence === consecutiveTo,
     )
-    return sentence && sentence.lineSeq
+    return sentence && sentence.lineSeq ? 'Consecutive' : 'Concurrent'
   }
 
   chargeCodesFilter(offenceHistory: OffenceHistoryDetail[]) {
@@ -103,80 +106,210 @@ export default class OffencesPageService {
   }
 
   async getCourtCasesData(bookingId: number, prisonerNumber: string) {
-    const [courtCaseData, offenceHistory, sentenceTermsData] = await Promise.all([
+    const [courtCaseData, offenceHistory, sentenceTermsData, courtDateResults] = await Promise.all([
       this.prisonApiClient.getCourtCases(bookingId),
       this.prisonApiClient.getOffenceHistory(prisonerNumber),
       this.prisonApiClient.getSentenceTerms(bookingId),
+      this.prisonApiClient.getCourtDateResults(prisonerNumber),
     ])
 
     const caseIds = [...new Set(this.chargeCodesFilter(offenceHistory))]
-
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
+    const courtCaseDataMapped: CourtCaseDataMapped[] = this.getMapForSentencedCourtCases(
+      courtCaseData,
+      caseIds,
+      todaysDate,
+      sentenceTermsData,
+      offenceHistory,
+      courtDateResults,
+    )
+
+    const courtCaseDataMappedUnsentenced: CourtCaseDataMappedUnsentenced[] = this.getMapForUnsentencedCourtCases(
+      courtCaseData,
+      todaysDate,
+      courtDateResults,
+      courtCaseDataMapped,
+    )
+
+    return [...courtCaseDataMapped, ...courtCaseDataMappedUnsentenced]
+  }
+
+  getNextCourtAppearance(courtCase: CourtCase, todaysDate: string) {
+    let nextCourtAppearance: CourtHearing = {} as CourtHearing
+    courtCase.courtHearings.forEach((courtHearing: CourtHearing) => {
+      const courtCaseDate = format(new Date(courtHearing.dateTime), 'yyyy-MM-dd')
+      if (nextCourtAppearance.dateTime === undefined) {
+        if (courtCaseDate > todaysDate || courtCaseDate === todaysDate) {
+          nextCourtAppearance = courtHearing
+        }
+      } else {
+        const nextCourtCaseDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
+        if (courtCaseDate > todaysDate || courtCaseDate === todaysDate) {
+          if (courtCaseDate < nextCourtCaseDate) {
+            nextCourtAppearance = courtHearing
+          }
+        }
+      }
+    })
+    return nextCourtAppearance
+  }
+
+  getCountDisplayText(count: number) {
+    return `Count ${count}`
+  }
+
+  getCourtHearings(courtCase: CourtCase) {
+    return courtCase.courtHearings
+  }
+
+  getCourtInfoNumber(courtCase: CourtCase) {
+    return courtCase.caseInfoNumber || 'Not entered'
+  }
+
+  getCourtName(courtCase: CourtCase) {
+    return courtCase.agency && courtCase.agency.description
+  }
+
+  getCountForUnsentencedCourtCase(courtCase: CourtCase) {
+    return this.getCountDisplayText(courtCase.caseSeq)
+  }
+
+  getCountForSentencedCourtCase(sentence: OffenderSentenceTerms) {
+    return this.getCountDisplayText(sentence.lineSeq)
+  }
+
+  getOffences(courtCase: CourtCase, offenceHistory: OffenceHistoryDetail[], courtDateResults: CourtDateResults[]) {
+    return [
+      ...new Set(
+        offenceHistory
+          .filter(offence => offence.caseId === courtCase.id)
+          .filter(offence => {
+            const courtDateResultsLocal = courtDateResults?.filter(
+              courtDateResult => courtDateResult.charge.courtCaseId === courtCase.id,
+            )
+            const finalOffences: OffenceHistoryDetail[] = []
+            if (courtDateResults) {
+              courtDateResultsLocal.forEach(courtDateResultLocal => {
+                if (courtDateResultLocal.charge.offenceCode === offence.offenceCode) {
+                  finalOffences.push(offence)
+                }
+              })
+            }
+            return finalOffences
+          }),
+      ),
+    ]
+  }
+
+  getSummaryDetailRow(sentence: OffenderSentenceTerms, sentenceTermsData: OffenderSentenceTerms[]) {
+    return [
+      {
+        label: 'Sentence date',
+        value: formatDate(sentence.sentenceStartDate && sentence.sentenceStartDate, 'long'),
+      },
+      {
+        label: 'Length',
+        value: this.getLengthTextLabels(sentence),
+      },
+      {
+        label: 'Concurrent or consecutive',
+        value: this.findConsecutiveSentence({
+          sentences: sentenceTermsData,
+          consecutiveTo: sentence.consecutiveTo,
+        }),
+      },
+      // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
+      sentence.fineAmount && { label: 'Fine', value: formatCurrency(sentence.fineAmount) },
+      sentence.licence && {
+        label: 'Licence',
+        value: this.getLengthTextLabels(sentence.licence),
+      },
+    ]
+  }
+
+  getSentenceTerms(
+    courtCase: CourtCase,
+    sentenceTermsData: OffenderSentenceTerms[],
+    offenceHistory: OffenceHistoryDetail[],
+    courtDateResults: CourtDateResults[],
+  ) {
+    return this.groupSentencesBySequence(sentenceTermsData)
+      .filter((group: GroupedSentence) => Number(group.caseId) === courtCase.id)
+      .map((groupedSentence: GroupedSentence) => this.mergeMostRecentLicenceTerm(groupedSentence.items))
+      .map((sentence: OffenderSentenceTerms) => ({
+        sentenceHeader: this.getCountForSentencedCourtCase(sentence),
+        sentenceTypeDescription: sentence.sentenceTypeDescription,
+        summaryDetailRows: this.getSummaryDetailRow(sentence, sentenceTermsData),
+        offences: this.getOffences(courtCase, offenceHistory, courtDateResults),
+      }))
+  }
+
+  getMapForUnsentencedCourtCases(
+    courtCaseData: CourtCase[],
+    todaysDate: string,
+    courtDateResults: CourtDateResults[],
+    courtCaseDataMapped: CourtCaseDataMapped[],
+  ) {
+    return (
+      courtCaseData
+        .map(courtCase => ({
+          ...this.getGenericMaps(courtCase, todaysDate),
+          sentenced: false,
+          sentenceHeader: this.getCountForUnsentencedCourtCase(courtCase),
+          courtDateResults: courtDateResults?.filter(
+            courtDateResult => courtDateResult.charge.courtCaseId === courtCase.id,
+          ),
+        }))
+        // eslint-disable-next-line array-callback-return,consistent-return
+        .filter(value => {
+          if (
+            !courtCaseDataMapped.filter(
+              courtCaseDataSentenced => courtCaseDataSentenced.caseInfoNumber === value.caseInfoNumber,
+            ) ||
+            courtCaseDataMapped.length === 0
+          ) {
+            return value
+          }
+        })
+    )
+  }
+
+  getGenericMaps(courtCase: CourtCase, todaysDate: string) {
+    return {
+      nextCourtAppearance: this.getNextCourtAppearance(courtCase, todaysDate),
+      courtHearings: this.getCourtHearings(courtCase),
+      courtName: this.getCourtName(courtCase),
+      caseInfoNumber: this.getCourtInfoNumber(courtCase),
+    }
+  }
+
+  getMapForSentencedCourtCases(
+    courtCaseData: CourtCase[],
+    caseIds: number[],
+    todaysDate: string,
+    sentenceTermsData: OffenderSentenceTerms[],
+    offenceHistory: OffenceHistoryDetail[],
+    courtDateResults: CourtDateResults[],
+  ) {
     return courtCaseData
       .filter(courtCase => caseIds.includes(courtCase.id))
       .map(courtCase => ({
-        courtHearings: courtCase.courtHearings.filter(
-          (courtHearing: CourtHearing, index: number) =>
-            index === courtCase.courtHearings.length - 1 && courtHearing.dateTime > todaysDate,
-        ),
-        caseInfoNumber: courtCase.caseInfoNumber || 'Not entered',
-        courtName: courtCase.agency && courtCase.agency.description,
-        sentenceTerms: this.groupSentencesBySequence(sentenceTermsData)
-          .filter((group: GroupedSentence) => Number(group.caseId) === courtCase.id)
-          .map((groupedSentence: GroupedSentence) => this.mergeMostRecentLicenceTerm(groupedSentence.items))
-          .map((sentence: OffenderSentenceTerms) => ({
-            sentenceHeader: `Sentence ${sentence.lineSeq}`,
-            sentenceTypeDescription: sentence.sentenceTypeDescription,
-            summaryDetailRows: [
-              {
-                label: 'Start date',
-                value: formatDate(sentence.sentenceStartDate && sentence.sentenceStartDate, 'long'),
-              },
-              {
-                label: 'Length',
-                value: this.getLengthTextLabels(sentence),
-              },
-              {
-                label: 'Consecutive to',
-                value: this.findConsecutiveSentence({
-                  sentences: sentenceTermsData,
-                  consecutiveTo: sentence.consecutiveTo,
-                }),
-              },
-              // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
-              sentence.fineAmount && { label: 'Fine', value: formatCurrency(sentence.fineAmount) },
-              sentence.licence && {
-                label: 'Licence',
-                value: this.getLengthTextLabels(sentence.licence),
-              },
-            ],
-          })),
-        offences: [
-          ...new Set(
-            offenceHistory
-              .filter(offence => offence.caseId === courtCase.id)
-              .map(offence => offence.offenceDescription)
-              .sort((left, right) => left.localeCompare(right)),
-          ),
-        ],
+        ...this.getGenericMaps(courtCase, todaysDate),
+        sentenced: true,
+        sentenceTerms: this.getSentenceTerms(courtCase, sentenceTermsData, offenceHistory, courtDateResults),
       }))
       .filter(courtCase => courtCase.sentenceTerms.length)
       .map(courtCase => {
-        const sentenceDateRow = courtCase.sentenceTerms[0].summaryDetailRows[0].value
-
         return {
           ...courtCase,
-          sentenceDate: typeof sentenceDateRow === 'string' ? formatDate(sentenceDateRow, 'long') : null,
         }
       })
   }
 
   async getReleaseDates(prisonerNumber: string) {
     const releaseDates: PrisonerSentenceDetails = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
-
     const sentenceDetails = releaseDates.sentenceDetail
-
     const conditionalRelease: string =
       sentenceDetails.conditionalReleaseOverrideDate || sentenceDetails.conditionalReleaseDate
     const postRecallDate = sentenceDetails.postRecallReleaseOverrideDate || sentenceDetails.postRecallReleaseDate
@@ -351,30 +484,6 @@ export default class OffencesPageService {
                 },
                 value: {
                   text: formatDate(sentenceDetails.earlyTermDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.licenceExpiryDate
-          ? [
-              {
-                key: {
-                  text: 'Licence expiry',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.licenceExpiryDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.sentenceExpiryDate
-          ? [
-              {
-                key: {
-                  text: 'Sentence expiry',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.sentenceExpiryDate, 'long'),
                 },
               },
             ]

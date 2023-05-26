@@ -1,97 +1,169 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% macro courtCaseContent(courtCase) %}
+{% macro courtCaseContent(courtCase,index) %}
 
 <div class="govuk-accordion__section ">
     <div class="govuk-accordion__section-header">
       <h3 class="govuk-accordion__section-heading">
-        <span class="govuk-accordion__section-button" id="accordion-with-summary-sections-heading-1">
-          {{courtCase.courtName}}
-        </span>
+        <div class="govuk-accordion__section-button govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-5" id="accordion-with-summary-sections-heading-1">
+          <span class="govuk-!-static-margin-bottom-2 hmpps-display-block govuk-!-static-padding-bottom-1">Court case {{index}}</span>
+        </div>
       </h3>
-      <div class="govuk-accordion__section-summary govuk-body" id="accordion-with-summary-sections-summary-1">
-        {{courtCase.sentenceDate}}
+      <div class="govuk-accordion__section-summary" id="accordion-with-summary-sections-summary-1">
+        <div class="hmpps-grid-container">
+            <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Court case number</h4></div>
+            <div class="grid-item">
+                <p class="govuk-!-font-size-19">
+                    {% if courtCase.caseInfoNumber %}
+                        {{ courtCase.caseInfoNumber }}
+                    {% elseif courtCase.charge.courtCaseRef %}
+                        {{ courtCase.charge.courtCaseRef }}
+                    {% else %}
+                        Not entered
+                    {% endif %}
+                </p>
+            </div>
+
+            {% if courtCase.sentenced == false and  courtCase.nextCourtAppearance.dateTime %}
+                <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Next court appearance</h4></div>
+                <div class="grid-item">
+                    <p class="govuk-!-font-size-19">
+                        {{ courtCase.nextCourtAppearance.dateTime | formatDate }}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="hmpps-grid-container">
+            <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Court name</h4></div>
+            <div class="grid-item">
+                <p class="govuk-!-font-size-19">
+                    {% if courtCase.courtName %}
+                        {{ courtCase.courtName }}
+                    {% elseif courtCase.charge.courtLocation %}
+                        {{ courtCase.charge.courtLocation }}
+                    {% endif %}                    
+                </p>
+            </div>
+        </div>
       </div>
     </div>
-    <div id="accordion-with-summary-sections-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-with-summary-sections-heading-1">
-    <h3>Offences</h3>
-    <ul class="govuk-list govuk-list--bullet govuk-list--spaced govuk-!-static-margin-bottom-9">
-        {% for offence in courtCase.offences %}
-            <li>
-                {{offence}}
-            </li>
-        {% endfor %}
-    </ul>
+    <div id="accordion-with-summary-sections-content-1" class="govuk-accordion__section-content govuk-!-static-padding-bottom-0" aria-labelledby="accordion-with-summary-sections-heading-1">  
 
-    {% if courtCase.sentenceTerms.length > 0 %}
-        <h3>Sentences</h3>
+    {% if courtCase.sentenced == true and courtCase.sentenceTerms.length > 0 %}
         {% for sentence in courtCase.sentenceTerms %}
-            <h4>{{ sentence.sentenceHeader}}</h4>
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-full govuk-!-static-padding-left-9">
-                    <dl class="govuk-summary-list">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Type
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                            {{ sentence.sentenceTypeDescription }}
-                            </dd>
+            {% for offence in sentence.offences %}
+                <div class="govuk-grid-row hmpps-grey-details-card govuk-!-static-margin-bottom-7">
+                    <div class="govuk-grid-column-full govuk-!-static-padding-left-5">
+                        <div><p class="hmpps-secondary-text govuk-!-static-margin-bottom-2 govuk-!-static-margin-top-6 govuk-!-font-size-16">{{ sentence.sentenceHeader}}</p></div>
+
+                        <div class="govuk-!-static-margin-bottom-5">
+                            <p class="govuk-!-font-weight-bold govuk-!-static-margin-bottom-0">{{offence.offenceDescription}}</p>
+                            {% if offence.offenceDate and offence.offenceRangeDate %}
+                                <p>Committed from {{offence.offenceRangeDate | formatDate}} to {{offence.offenceDate | formatDate}}</p>
+                            {% elseif offence.offenceDate %}
+                                <p>Committed on {{offence.offenceDate | formatDate}}</p>
+                            {% endif %}
                         </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                            {{ sentence.summaryDetailRows[0].label }}
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                            {{ sentence.summaryDetailRows[0].value }}
-                            </dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                            {{ sentence.summaryDetailRows[1].label }}
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                            {{ sentence.summaryDetailRows[1].value }}
-                            </dd>
-                        </div>
-                        
-                        {% if (sentence.summaryDetailRows[2].value) and (sentence.summaryDetailRows[2].value !== null) %}
+                        <dl class="govuk-summary-list govuk-summary-list--no-border">
                             <div class="govuk-summary-list__row">
                                 <dt class="govuk-summary-list__key">
-                                {{ sentence.summaryDetailRows[2].label }}
+                                    CJA Code
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                {{ sentence.summaryDetailRows[2].value }}
+                                {{ offence.statuteCode }}
+                                </dd>
+                            </div>                        
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Type
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                {{ sentence.sentenceTypeDescription }}
                                 </dd>
                             </div>
-                        {% endif %}
-                        {% if (sentence.summaryDetailRows[3].value) and (sentence.summaryDetailRows[3].value !== null) %}
                             <div class="govuk-summary-list__row">
                                 <dt class="govuk-summary-list__key">
-                                {{ sentence.summaryDetailRows[3].label }}
+                                {{ sentence.summaryDetailRows[0].label }}
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                {{ sentence.summaryDetailRows[3].value }}
+                                {{ sentence.summaryDetailRows[0].value }}
                                 </dd>
                             </div>
-                        {% endif %}
-                        {% if (sentence.summaryDetailRows[4].value) and (sentence.summaryDetailRows[4].value !== null)  %}
                             <div class="govuk-summary-list__row">
                                 <dt class="govuk-summary-list__key">
-                                {{ sentence.summaryDetailRows[4].label }}
+                                {{ sentence.summaryDetailRows[1].label }}
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                {{ sentence.summaryDetailRows[4].value }}
+                                {{ sentence.summaryDetailRows[1].value }}
                                 </dd>
-                            </div>   
-                        {% endif %}                
+                            </div>
+                            
+                            {% if (sentence.summaryDetailRows[2].value) and (sentence.summaryDetailRows[2].value !== null) %}
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                    {{ sentence.summaryDetailRows[2].label }}
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                    {{ sentence.summaryDetailRows[2].value }}
+                                    </dd>
+                                </div>
+                            {% endif %}
+                            {% if (sentence.summaryDetailRows[3].value) and (sentence.summaryDetailRows[3].value !== null) %}
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                    {{ sentence.summaryDetailRows[3].label }}
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                    {{ sentence.summaryDetailRows[3].value }}
+                                    </dd>
+                                </div>
+                            {% endif %}
+                            {% if (sentence.summaryDetailRows[4].value) and (sentence.summaryDetailRows[4].value !== null)  %}
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                    {{ sentence.summaryDetailRows[4].label }}
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                    {{ sentence.summaryDetailRows[4].value }}
+                                    </dd>
+                                </div>   
+                            {% endif %}                
+                        </dl>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+    {% endif %}
+
+    {% if courtCase.sentenced == false and courtCase.courtDateResults.length > 0 %}
+        {% for count in courtCase.courtDateResults%}
+            <div class="govuk-grid-row hmpps-grey-details-card govuk-!-static-margin-bottom-7">
+                <div class="govuk-grid-column-full govuk-!-static-padding-left-5">
+                    <div><p class="hmpps-secondary-text govuk-!-static-margin-bottom-2 govuk-!-static-margin-top-6 govuk-!-font-size-16">{{ courtCase.sentenceHeader }}</p></div>
+
+                    <div class="govuk-!-static-margin-bottom-5">
+                        <p class="govuk-!-font-weight-bold govuk-!-static-margin-bottom-0">{{count.charge.offenceDescription}}</p>
+                        {% if count.charge.offenceDate and count.charge.offenceEndDate %}
+                            <p>Committed from {{count.charge.offenceEndDate | formatDate}} to {{count.charge.offenceDate | formatDate}}</p>
+                        {% elseif count.charge.offenceDate %}
+                            <p>Committed on {{count.charge.offenceDate | formatDate}}</p>
+                        {% endif %}
+                    </div>
+                    <dl class="govuk-summary-list govuk-summary-list--no-border">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Status
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                            {{count.charge.resultDescription}}
+                            </dd>
+                        </div>                        
                     </dl>
                 </div>
-            </div>    
+            </div>
         {% endfor %}
-    {% else%}
-        <h3 class="govuk-!-margin-top-9">Next court appearance</h3>
-        <p>{% if courtCase.courtHearings.length > 0 %}{{courtCase.courtHearings[0].dateTime | formatDate}}{% else%} There are no upcoming court hearings{% endif %}</p>
     {% endif %}
+
     </div>
 </div>
 {% endmacro %}

@@ -30,3 +30,22 @@
 .hmpps-font-weight-normal dt {
   font-weight: normal;
 }
+
+.hmpps-grid-container {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+}
+
+.hmpps-display-block {
+  display: block;
+}
+
+.hmpps-grey-details-card {
+  border-left: 5px solid  govuk-colour("mid-grey");
+  margin: 0px;
+  background-color:  govuk-colour("light-grey");
+}
+
+.hmpps-dark-grey-font {
+  color: govuk-colour("dark-grey")
+}

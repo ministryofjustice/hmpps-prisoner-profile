@@ -1,8 +1,15 @@
+import { add, format, startOfToday } from 'date-fns'
 import { CourtCase } from '../../interfaces/prisonApi/courtCase'
 import AgencyMock from './agency'
-import CourtHearingsMock from './courtHearingsMock'
+import { CourtHearingsMock, CourtHearingsMockA } from './courtHearingsMock'
 
-const CourtCasesMock: CourtCase[] = [
+const sixMonthsInTheFuture = format(add(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
+const twelveMonthsInTheFuture = format(add(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
+
+const threeMonthsInTheFuture = format(add(startOfToday(), { months: 3 }), 'yyyy-MM-dd')
+const tenMonthsInTheFuture = format(add(startOfToday(), { months: 10 }), 'yyyy-MM-dd')
+
+export const CourtCasesMock: CourtCase[] = [
   {
     id: 1563148,
     caseSeq: 1,
@@ -15,4 +22,671 @@ const CourtCasesMock: CourtCase[] = [
   },
 ]
 
-export default CourtCasesMock
+export const CourtCasesSentencedMockA: CourtCase[] = [
+  {
+    id: 1520515,
+    caseSeq: 1,
+    beginDate: '2017-01-17',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'T20161014',
+    caseStatus: 'ACTIVE',
+    courtHearings: CourtHearingsMockA,
+  },
+]
+
+export const CourtCasesUnsentencedMockA: CourtCase[] = [
+  {
+    id: 1564679,
+    caseSeq: 1,
+    beginDate: '2013-02-13',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'S20130122',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 502784852,
+        dateTime: '2013-02-21T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784853,
+        dateTime: '2013-02-14T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 502784854,
+        dateTime: '2013-08-13T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784855,
+        dateTime: '2013-05-16T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784856,
+        dateTime: '2015-04-02T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784857,
+        dateTime: '2015-08-06T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784858,
+        dateTime: '2015-06-16T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784859,
+        dateTime: '2015-05-13T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+  {
+    id: 1564683,
+    caseSeq: 5,
+    beginDate: '2015-07-30',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'T20150853',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 502784871,
+        dateTime: '2015-07-30T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 502784872,
+        dateTime: '2015-08-13T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784873,
+        dateTime: '2015-09-10T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+]
+
+export const CourtCaseWithNextCourtAppearance: CourtCase[] = [
+  {
+    id: 1564679,
+    caseSeq: 1,
+    beginDate: '2017-01-17',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'S20130122',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 502784852,
+        dateTime: sixMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784853,
+        dateTime: '2013-02-14T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 502784854,
+        dateTime: twelveMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784855,
+        dateTime: '2013-05-16T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784856,
+        dateTime: '2015-04-02T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784857,
+        dateTime: '2015-08-06T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784858,
+        dateTime: '2015-06-16T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784859,
+        dateTime: '2015-05-13T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+  {
+    id: 1564683,
+    caseSeq: 5,
+    beginDate: '2015-07-30',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'T20150853',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 502784871,
+        dateTime: '2015-07-30T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 502784872,
+        dateTime: tenMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784873,
+        dateTime: threeMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+]
+
+export const CourtCaseNoInfoNumber: CourtCase[] = [
+  {
+    id: 1564679,
+    caseSeq: 1,
+    beginDate: '2017-01-17',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 502784852,
+        dateTime: sixMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784853,
+        dateTime: '2013-02-14T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 502784854,
+        dateTime: twelveMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784855,
+        dateTime: '2013-05-16T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784856,
+        dateTime: '2015-04-02T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784857,
+        dateTime: '2015-08-06T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784858,
+        dateTime: '2015-06-16T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784859,
+        dateTime: '2015-05-13T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+  {
+    id: 1564683,
+    caseSeq: 5,
+    beginDate: '2015-07-30',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'T20150853',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 502784871,
+        dateTime: '2015-07-30T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 502784872,
+        dateTime: tenMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 502784873,
+        dateTime: threeMonthsInTheFuture,
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+]
+
+export const SentenceTermsWithOffences: object[] = [
+  {
+    offences: [
+      {
+        bookingId: 1167133,
+        caseId: 1520515,
+        courtDate: '2018-09-21',
+        mostSerious: false,
+        offenceCode: 'RT88026',
+        offenceDate: '2016-07-23',
+        offenceDescription: '(CP TEST) Drive a motor vehicle dangerously',
+        primaryResultCode: '1002',
+        primaryResultConviction: true,
+        primaryResultDescription: 'Imprisonment',
+        secondaryResultConviction: false,
+        statuteCode: 'RT88',
+      },
+      {
+        bookingId: 1167133,
+        caseId: 1520515,
+        courtDate: '2018-09-21',
+        mostSerious: true,
+        offenceCode: 'RT88526',
+        offenceDate: '2016-08-04',
+        offenceDescription: 'Cause serious injury by dangerous driving',
+        primaryResultCode: '1002',
+        primaryResultConviction: true,
+        primaryResultDescription: 'Imprisonment',
+        secondaryResultConviction: false,
+        statuteCode: 'RT88',
+      },
+      {
+        bookingId: 1167133,
+        caseId: 1520515,
+        courtDate: '2018-09-21',
+        mostSerious: false,
+        offenceCode: 'RT88007',
+        offenceDescription: 'Drive motor vehicle when alcohol level above limit',
+        primaryResultCode: '1002',
+        primaryResultConviction: true,
+        primaryResultDescription: 'Imprisonment',
+        secondaryResultConviction: false,
+        statuteCode: 'RT88',
+      },
+    ],
+    sentenceHeader: 'Count 2',
+    sentenceTypeDescription: 'ORA CJA03 Standard Determinate Sentence',
+    summaryDetailRows: [
+      { label: 'Sentence date', value: '13 March 2017' },
+      { label: 'Length', value: '4 months' },
+      { label: 'Concurrent or consecutive', value: 'Concurrent' },
+      undefined,
+      undefined,
+    ],
+  },
+  {
+    offences: [
+      {
+        bookingId: 1167133,
+        caseId: 1520515,
+        courtDate: '2018-09-21',
+        mostSerious: false,
+        offenceCode: 'RT88026',
+        offenceDate: '2016-07-23',
+        offenceDescription: '(CP TEST) Drive a motor vehicle dangerously',
+        primaryResultCode: '1002',
+        primaryResultConviction: true,
+        primaryResultDescription: 'Imprisonment',
+        secondaryResultConviction: false,
+        statuteCode: 'RT88',
+      },
+      {
+        bookingId: 1167133,
+        caseId: 1520515,
+        courtDate: '2018-09-21',
+        mostSerious: true,
+        offenceCode: 'RT88526',
+        offenceDate: '2016-08-04',
+        offenceDescription: 'Cause serious injury by dangerous driving',
+        primaryResultCode: '1002',
+        primaryResultConviction: true,
+        primaryResultDescription: 'Imprisonment',
+        secondaryResultConviction: false,
+        statuteCode: 'RT88',
+      },
+      {
+        bookingId: 1167133,
+        caseId: 1520515,
+        courtDate: '2018-09-21',
+        mostSerious: false,
+        offenceCode: 'RT88007',
+        offenceDescription: 'Drive motor vehicle when alcohol level above limit',
+        primaryResultCode: '1002',
+        primaryResultConviction: true,
+        primaryResultDescription: 'Imprisonment',
+        secondaryResultConviction: false,
+        statuteCode: 'RT88',
+      },
+    ],
+    sentenceHeader: 'Count 1',
+    sentenceTypeDescription: 'ORA CJA03 Standard Determinate Sentence',
+    summaryDetailRows: [
+      { label: 'Sentence date', value: '2 March 2017' },
+      { label: 'Length', value: '20 months' },
+      { label: 'Concurrent or consecutive', value: 'Concurrent' },
+      undefined,
+      undefined,
+    ],
+  },
+]
+export const SentenceTermsWithoutOffences: object[] = [
+  {
+    offences: [],
+    sentenceHeader: 'Count 2',
+    sentenceTypeDescription: 'ORA CJA03 Standard Determinate Sentence',
+    summaryDetailRows: [
+      { label: 'Sentence date', value: '13 March 2017' },
+      { label: 'Length', value: '4 months' },
+      { label: 'Concurrent or consecutive', value: 'Concurrent' },
+      undefined,
+      undefined,
+    ],
+  },
+  {
+    offences: [],
+    sentenceHeader: 'Count 1',
+    sentenceTypeDescription: 'ORA CJA03 Standard Determinate Sentence',
+    summaryDetailRows: [
+      { label: 'Sentence date', value: '2 March 2017' },
+      { label: 'Length', value: '20 months' },
+      { label: 'Concurrent or consecutive', value: 'Concurrent' },
+      undefined,
+      undefined,
+    ],
+  },
+]

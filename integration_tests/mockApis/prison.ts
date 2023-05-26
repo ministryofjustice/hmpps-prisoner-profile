@@ -28,9 +28,13 @@ import {
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
-import CourtCasesMock from '../../server/data/localMockData/courtCaseMock'
-import OffenceHistoryMock from '../../server/data/localMockData/offenceHistoryMock'
-import sentenceTermsMock from '../../server/data/localMockData/sentenceTermsMock'
+import { CourtCasesMock, CourtCasesUnsentencedMockA } from '../../server/data/localMockData/courtCaseMock'
+import { OffenceHistoryMock } from '../../server/data/localMockData/offenceHistoryMock'
+import { MappedUnsentencedCourtCasesMock, sentenceTermsMock } from '../../server/data/localMockData/sentenceTermsMock'
+import {
+  CourtDateResultsMock,
+  CourtDateResultsUnsentencedMockA,
+} from '../../server/data/localMockData/courtDateResultsMock'
 import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/prisonerSentenceDetails'
 import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
@@ -500,7 +504,7 @@ export default {
     })
   },
 
-  stubGetCourtCases: (bookingId: number) => {
+  stubGetCourtCasesSentenced: (bookingId: number) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -512,6 +516,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: CourtCasesMock,
+      },
+    })
+  },
+
+  stubGetCourtCasesUnsentenced: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/court-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: CourtCasesUnsentencedMockA,
       },
     })
   },
@@ -532,7 +552,7 @@ export default {
     })
   },
 
-  stubGetSentenceTerms: (bookingId: number) => {
+  stubGetSentenceTermsSentenced: (bookingId: number) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -544,6 +564,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: sentenceTermsMock,
+      },
+    })
+  },
+
+  stubGetSentenceTermsUnsentenced: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offender-sentences/booking/${bookingId}/sentenceTerms\\?filterBySentenceTermCodes=IMP&filterBySentenceTermCodes=LIC`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: MappedUnsentencedCourtCasesMock,
       },
     })
   },
@@ -560,6 +596,38 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: prisonerSentenceDetailsMock,
+      },
+    })
+  },
+
+  stubGetCourtDateResultsSentenced: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/digital-warrant/court-date-results/${prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: CourtDateResultsMock,
+      },
+    })
+  },
+
+  stubGetCourtDateResultsUnsentenced: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/digital-warrant/court-date-results/${prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: CourtDateResultsUnsentencedMockA,
       },
     })
   },

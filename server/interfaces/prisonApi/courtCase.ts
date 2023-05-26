@@ -7,7 +7,7 @@ export interface CourtCase {
   beginDate: string
   agency: Agency
   caseType: string
-  caseInfoNumber: string
+  caseInfoNumber?: string
   caseStatus: string
   courtHearings: CourtHearing[]
 }
