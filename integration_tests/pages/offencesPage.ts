@@ -25,7 +25,7 @@ export default class OffencesPage extends Page {
   sectionSumaryOffences = (): PageElement => cy.get('#accordion-with-summary-sections-content-1 > :nth-child(1)')
 
   offencesChildOne = (): PageElement =>
-    cy.get('#accordion-with-summary-sections-content-1 > .govuk-list > :nth-child(1)')
+    cy.get(':nth-child(1) > .govuk-grid-column-full > .govuk-!-static-margin-bottom-5 > .govuk-!-font-weight-bold')
 
   offencesChildTwo = (): PageElement =>
     cy.get('#accordion-with-summary-sections-content-1 > .govuk-list > :nth-child(2)')
@@ -35,57 +35,8 @@ export default class OffencesPage extends Page {
 
   sectionSummarySentences = (): PageElement => cy.get('#accordion-with-summary-sections-content-1 > :nth-child(3)')
 
-  sentenceHeadingOne = (): PageElement => cy.get('#accordion-with-summary-sections-content-1 > :nth-child(4)')
-
-  sentenceOneTypeKey = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__key')
-
-  sentenceOneTypeValue = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value')
-
-  sentenceOneStartDateKey = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__key')
-
-  sentenceOneStartDateValue = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value')
-
-  sentenceOneLengthKey = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__key')
-
-  sentenceOneLengthValue = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value')
-
-  sentenceOneLicenceKey = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__key')
-
-  sentenceOneLicenceValue = (): PageElement =>
-    cy.get(':nth-child(5) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value')
-
-  sentenceHeadingTwo = (): PageElement => cy.get('#accordion-with-summary-sections-content-1 > :nth-child(6)')
-
-  sentenceTwoTypeKey = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__key')
-
-  sentenceTwoTypeValue = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value')
-
-  sentenceTwoStartDateKey = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__key')
-
-  sentenceTwoStartDateValue = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value')
-
-  sentenceTwoLengthKey = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__key')
-
-  sentenceTwoLengthValue = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value')
-
-  sentenceTwoFineKey = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__key')
-
-  sentenceTwoFineValue = (): PageElement =>
-    cy.get(':nth-child(7) > .govuk-grid-column-full > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value')
+  countOffenceCard = (): PageElement =>
+    cy.get('#accordion-with-summary-sections-content-1 > :nth-child(1) > .govuk-grid-column-full')
 
   releaseDatesCard = (): PageElement => cy.get('#release-dates')
 
@@ -108,14 +59,4 @@ export default class OffencesPage extends Page {
 
   paroleEligibilityValue = (): PageElement =>
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value')
-
-  licenseExpiryKey = (): PageElement =>
-    cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__key')
-
-  licenseExpiryValue = (): PageElement =>
-    cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value')
-
-  sentenceExpiryKey = (): PageElement => cy.get(':nth-child(5) > .govuk-summary-list__key')
-
-  sentenceExpiryValue = (): PageElement => cy.get(':nth-child(5) > .govuk-summary-list__value')
 }

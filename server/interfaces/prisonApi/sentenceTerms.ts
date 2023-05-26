@@ -5,11 +5,12 @@ export interface SentenceTerm {
   sentenceType: string
   sentenceTypeDescription: string
   startDate: string
-  years: number
+  years?: number
   lifeSentence: boolean
   caseId: string
   fineAmount?: number
   sentenceTermCode: string
   lineSeq: number
   sentenceStartDate: string
+  months?: number
 }

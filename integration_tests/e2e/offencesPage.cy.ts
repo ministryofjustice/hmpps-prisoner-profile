@@ -1,20 +1,19 @@
 import OffencesPage from '../pages/offencesPage'
-
 import Page from '../pages/page'
 
-const visitOffencesPage = (): OffencesPage => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/offences' })
-  return Page.verifyOnPage(OffencesPage)
-}
+context('Offences Page Sentenced', () => {
+  const visitOffencesPage = (): OffencesPage => {
+    cy.signIn({ redirectPath: '/prisoner/G6123VU/offences' })
+    return Page.verifyOnPage(OffencesPage)
+  }
 
-context('Offences Page', () => {
   const prisonerNumber = 'G6123VU'
 
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.setupBannerStubs({ prisonerNumber })
-    cy.setupOffencesPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    cy.setupOffencesPageSentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })
 
   it('Offences page is displayed', () => {
@@ -44,7 +43,7 @@ context('Offences Page', () => {
     it('Court cases and offences header should display', () => {
       const offencesPage = visitOffencesPage()
       offencesPage.courtCasesAndOffencesHeader().should('exist')
-      offencesPage.courtCasesAndOffencesHeader().contains('Court cases and offences')
+      offencesPage.courtCasesAndOffencesHeader().contains('Court cases, offences and sentences')
     })
     it('Show all text should display', () => {
       const offencesPage = visitOffencesPage()
@@ -53,163 +52,62 @@ context('Offences Page', () => {
     it('Section heading should display', () => {
       const offencesPage = visitOffencesPage()
       offencesPage.sectionHeading().should('exist')
-      offencesPage.sectionHeading().contains('Sheffield Crown Court')
+      offencesPage.sectionHeading().contains('Court case 1')
     })
     it('Section summary should display', () => {
       const offencesPage = visitOffencesPage()
       offencesPage.sectionSummary().should('exist')
-      offencesPage.sectionSummary().contains('2 March 2020')
+      offencesPage.sectionSummary().contains('Court case number')
+      offencesPage.sectionSummary().contains('Court name')
+      offencesPage.sectionSummary().contains('Sheffield Crown Court')
     })
     it('Section toggle text should display', () => {
       const offencesPage = visitOffencesPage()
       offencesPage.sectionToggleText().should('exist')
     })
-    context('Offences', () => {
+    context('Sentenced Counts', () => {
       it('Offences heading text should display', () => {
         const offencesPage = visitOffencesPage()
         offencesPage.showAllText().click({ force: true })
         offencesPage.sectionSumaryOffences().should('exist')
-        offencesPage.sectionSumaryOffences().contains('Offences')
+        offencesPage.sectionSumaryOffences().contains('Count 5')
       })
-      it('Offence child one should display', () => {
+      it('Should contain all count information', () => {
         const offencesPage = visitOffencesPage()
         offencesPage.showAllText().click({ force: true })
-        offencesPage.offencesChildOne().should('exist')
+        offencesPage.countOffenceCard().should('exist')
         offencesPage
-          .offencesChildOne()
-          .contains('AATF operator/approved exporter fail to include quarterly information in reg 66(1) report')
-      })
-      it('Offence child two should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.offencesChildTwo().should('exist')
-        offencesPage
-          .offencesChildTwo()
+          .sectionSumaryOffences()
           .contains('Drive vehicle for more than 13 hours or more in a working day - domestic')
-      })
-      it('Offence child three should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.offencesChildThree().should('exist')
-        offencesPage
-          .offencesChildThree()
-          .contains('Import nuclear material with intent to evade a prohibition / restriction')
+        offencesPage.sectionSumaryOffences().contains('TR68')
+        offencesPage.sectionSumaryOffences().contains('EDS LASPO Discretionary Release')
+        offencesPage.sectionSumaryOffences().contains('Sentence date')
+        offencesPage.sectionSumaryOffences().contains('2 March 2020')
+        offencesPage.sectionSumaryOffences().contains('Length')
+        offencesPage.sectionSumaryOffences().contains('10 years')
+        offencesPage.sectionSumaryOffences().contains('Concurrent or consecutive')
+        offencesPage.sectionSumaryOffences().contains('Concurrent')
+        offencesPage.sectionSumaryOffences().contains('Licence')
+        offencesPage.sectionSumaryOffences().contains('5 years')
       })
     })
-    context('Sentences', () => {
-      it('Sentences summary text should display', () => {
+    context('Unsentenced Counts', () => {
+      it('Offences heading text should display', () => {
+        cy.setupOffencesPageUnsentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         const offencesPage = visitOffencesPage()
         offencesPage.showAllText().click({ force: true })
-        offencesPage.sectionSummarySentences().should('exist')
-        offencesPage.sectionSummarySentences().contains('Sentences')
+        offencesPage.sectionSumaryOffences().should('exist')
+        offencesPage.sectionSumaryOffences().contains('Count 1')
       })
-      it('Sentence heading text should display', () => {
+      it('Should contain all count information', () => {
+        cy.setupOffencesPageUnsentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         const offencesPage = visitOffencesPage()
         offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceHeadingOne().should('exist')
-        offencesPage.sentenceHeadingOne().contains('Sentence 5')
-      })
-      it('Sentence type key text should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneTypeKey().should('exist')
-        offencesPage.sentenceOneTypeKey().contains('Type')
-      })
-      it('Sentence type value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneTypeValue().should('exist')
-        offencesPage.sentenceOneTypeValue().contains('EDS LASPO Discretionary Release')
-      })
-      it('Sentence start date key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneStartDateKey().should('exist')
-        offencesPage.sentenceOneStartDateKey().contains('Start date')
-      })
-      it('Sentence start date value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneStartDateValue().should('exist')
-        offencesPage.sentenceOneStartDateValue().contains('2 March 2020')
-      })
-      it('Sentence length key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneLengthKey().should('exist')
-        offencesPage.sentenceOneLengthKey().contains('Length')
-      })
-      it('Sentence length value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneLengthValue().should('exist')
-        offencesPage.sentenceOneLengthValue().contains('10 years')
-      })
-      it('Sentence licence key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneLicenceKey().should('exist')
-        offencesPage.sentenceOneLicenceKey().contains('Licence')
-      })
-      it('Sentence licence value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceOneLicenceValue().should('exist')
-        offencesPage.sentenceOneLicenceValue().contains('5 years')
-      })
-      it('Sentence heading text should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceHeadingTwo().should('exist')
-        offencesPage.sentenceHeadingTwo().contains('Sentence 4')
-      })
-      it('Sentence type key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoTypeKey().should('exist')
-        offencesPage.sentenceTwoTypeKey().contains('Type')
-      })
-      it('Sentence type value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoTypeValue().should('exist')
-        offencesPage.sentenceTwoTypeValue().contains('CJA03 Standard Determinate Sentence')
-      })
-      it('Sentence start date key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoStartDateKey().should('exist')
-        offencesPage.sentenceTwoStartDateKey().contains('Start date')
-      })
-      it('Sentence start date value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoStartDateValue().should('exist')
-        offencesPage.sentenceTwoStartDateValue().contains('2 March 2020')
-      })
-      it('Sentence length key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoLengthKey().should('exist')
-        offencesPage.sentenceTwoLengthKey().contains('Length')
-      })
-      it('Sentence length value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoLengthValue().should('exist')
-        offencesPage.sentenceTwoLengthValue().contains('100 years')
-      })
-      it('Sentence fine key should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoFineKey().should('exist')
-        offencesPage.sentenceTwoFineKey().contains('Fine')
-      })
-      it('Sentence fine value should display', () => {
-        const offencesPage = visitOffencesPage()
-        offencesPage.showAllText().click({ force: true })
-        offencesPage.sentenceTwoFineValue().should('exist')
-        offencesPage.sentenceTwoFineValue().contains('£10,000.00')
+        offencesPage.countOffenceCard().should('exist')
+        offencesPage.sectionSumaryOffences().contains('Theft - other - including theft by finding')
+        offencesPage.sectionSumaryOffences().contains('Committed on 13 March 2013')
+        offencesPage.sectionSumaryOffences().contains('Status')
+        offencesPage.sectionSumaryOffences().contains('Recall to Prison')
       })
     })
   })
@@ -253,26 +151,6 @@ context('Offences Page', () => {
       const offencesPage = visitOffencesPage()
       offencesPage.paroleEligibilityValue().should('exist')
       offencesPage.paroleEligibilityValue().contains('12 December 2021')
-    })
-    it('Licence expiry key should display', () => {
-      const offencesPage = visitOffencesPage()
-      offencesPage.licenseExpiryKey().should('exist')
-      offencesPage.licenseExpiryKey().contains('Licence expiry')
-    })
-    it('Licence expiry value should display', () => {
-      const offencesPage = visitOffencesPage()
-      offencesPage.licenseExpiryValue().should('exist')
-      offencesPage.licenseExpiryValue().contains('12 March 2132')
-    })
-    it('Sentence expiry key should display', () => {
-      const offencesPage = visitOffencesPage()
-      offencesPage.sentenceExpiryKey().should('exist')
-      offencesPage.sentenceExpiryKey().contains('Sentence expiry')
-    })
-    it('Sentence expiry value should display', () => {
-      const offencesPage = visitOffencesPage()
-      offencesPage.sentenceExpiryValue().should('exist')
-      offencesPage.sentenceExpiryValue().contains('12 March 2132')
     })
   })
 })
