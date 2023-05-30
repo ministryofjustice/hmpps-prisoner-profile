@@ -38,4 +38,6 @@ export default class CaseNotesPage extends Page {
   filterType = (): PageElement => cy.get('#type')
 
   filterApplyButton = (): PageElement => cy.get('[data-qa=apply-filter-button]')
+
+  addCaseNoteButton = (): PageElement => cy.get('#add-case-note-action-button a')
 }

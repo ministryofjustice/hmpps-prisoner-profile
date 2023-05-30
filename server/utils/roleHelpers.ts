@@ -1,9 +1,12 @@
 import { Role } from '../data/enums/role'
+import { userCanEdit, userHasAllRoles } from './utils'
+import { Prisoner } from '../interfaces/prisoner'
+import { User } from '../data/hmppsAuthClient'
 
-// eslint-disable-next-line import/prefer-default-export
-export const canViewOrAddCaseNotes = (roles: string[], activeCaseLoadId: string, prisonId: string) => {
-  return (
-    (roles?.some(role => role === Role.InactiveBookings) && ['OUT', 'TRN'].includes(prisonId)) ||
-    activeCaseLoadId === prisonId
-  )
+export const canViewCaseNotes = (user: User, prisoner: Prisoner) => {
+  return userHasAllRoles([Role.GlobalSearch, Role.PomUser], user.userRoles) || userCanEdit(user, prisoner)
+}
+
+export const canAddCaseNotes = (user: User, prisoner: Prisoner) => {
+  return userCanEdit(user, prisoner)
 }

@@ -66,8 +66,8 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
     try {
       if (res.locals.user) {
         const userCaseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
-        if (userCaseLoads) {
-          res.locals.user.caseLoads = userCaseLoads
+        if (userCaseLoads && Array.isArray(userCaseLoads)) {
+          res.locals.user.caseLoads = userCaseLoads.filter(caseload => caseload.type !== 'APP')
         } else {
           logger.info('No user case loads available')
         }

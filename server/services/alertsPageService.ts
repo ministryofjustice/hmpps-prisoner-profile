@@ -10,6 +10,7 @@ import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import { Alert } from '../interfaces/prisonApi/alert'
+import config from '../config'
 
 export default class AlertsPageService {
   private prisonApiClient: PrisonApiClient
@@ -119,7 +120,10 @@ export default class AlertsPageService {
         pagedAlerts = await this.prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
         pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
           ...alert,
-          updateLink: canUpdateAlert && alert.active && '#',
+          updateLinkUrl:
+            canUpdateAlert &&
+            alert.active &&
+            `${config.serviceUrls.digitalPrison}/edit-alert?offenderNo=${prisonerData.prisonerNumber}&alertId=${alert.alertId}`,
           addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
           expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
         }))

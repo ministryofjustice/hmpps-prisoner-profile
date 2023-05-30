@@ -40,6 +40,7 @@ import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsage
 import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import { CaseLoad } from '../../server/interfaces/caseLoad'
+import { CaseNoteUsage } from '../../server/interfaces/prisonApi/caseNoteUsage'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -632,7 +633,7 @@ export default {
   },
 
   stubGetCaseNotesUsage: (prisonerNumber: string) => {
-    let jsonResp
+    let jsonResp: CaseNoteUsage[]
     if (prisonerNumber === 'G6123VU') {
       jsonResp = caseNoteUsageMock
     } else if (prisonerNumber === 'A1234BC') {

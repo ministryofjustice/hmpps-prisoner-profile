@@ -48,7 +48,7 @@ export const assessmentsMock: Assessment[] = [
   } as Assessment,
 ]
 
-const moneySummaryDataMock: MiniSummaryData = {
+export const moneySummaryDataMock: MiniSummaryData = {
   heading: 'Money',
   topLabel: 'Spends',
   topContent: formatMoney(240.51),
@@ -57,10 +57,9 @@ const moneySummaryDataMock: MiniSummaryData = {
   bottomContentLine1: formatMoney(0),
   bottomClass: 'big',
   linkLabel: 'Transactions and savings',
-  linkHref: '#',
-}
+} as MiniSummaryData
 
-const adjudicationsSummaryDataMock: MiniSummaryData = {
+export const adjudicationsSummaryDataMock: MiniSummaryData = {
   heading: 'Adjudications',
   topLabel: 'Proven in last 3 months',
   topContent: 4,
@@ -69,10 +68,9 @@ const adjudicationsSummaryDataMock: MiniSummaryData = {
   bottomContentLine1: 'No active punishments',
   bottomClass: 'small',
   linkLabel: 'Adjudications history',
-  linkHref: '#',
-}
+} as MiniSummaryData
 
-const visitsSummaryDataMock: MiniSummaryData = {
+export const visitsSummaryDataMock: MiniSummaryData = {
   heading: 'Visits',
   topLabel: 'Next visit date',
   topContent: formatDate('2023-09-15', 'short'),
@@ -82,36 +80,32 @@ const visitsSummaryDataMock: MiniSummaryData = {
   bottomContentLine3: formatPrivilegedVisitsSummary(2),
   bottomClass: 'small',
   linkLabel: 'Visits details',
-  linkHref: '#',
-}
+} as MiniSummaryData
 
-const categorySummaryDataMock: MiniSummaryData = {
+export const categorySummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Category',
   bottomContentLine1: 'B',
   bottomContentLine3: `Next review: ${formatDate('2023-02-19', 'short')}`,
   bottomClass: 'small',
-  linkLabel: 'Manage category',
-  linkHref: '#',
-}
+  linkLabel: 'View category',
+} as MiniSummaryData
 
-const incentiveSummaryDataMock: MiniSummaryData = {
+export const incentiveSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Incentives: since last review',
   bottomContentLine1: 'Positive behaviours: 1',
   bottomContentLine2: 'Negative behaviours: 1',
   bottomContentLine3: `Next review by: ${formatDate('2024-01-01', 'short')}`,
   bottomClass: 'small',
   linkLabel: 'Incentive level details',
-  linkHref: '#',
-}
+} as MiniSummaryData
 
-const csraSummaryDataMock: MiniSummaryData = {
+export const csraSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'CSRA',
   bottomContentLine1: 'Standard',
   bottomContentLine3: `Last review: ${formatDate('2021-02-19', 'short')}`,
   bottomClass: 'small',
   linkLabel: 'CSRA history',
-  linkHref: '#',
-}
+} as MiniSummaryData
 
 export const miniSummaryGroupAMock: MiniSummary[] = [
   {
