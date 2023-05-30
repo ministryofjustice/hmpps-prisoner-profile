@@ -28,7 +28,11 @@ import {
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
-import { CourtCasesMock, CourtCasesUnsentencedMockA } from '../../server/data/localMockData/courtCaseMock'
+import {
+  CourtCasesMock,
+  CourtCasesUnsentencedMockA,
+  CourtCaseWithNextCourtAppearance,
+} from '../../server/data/localMockData/courtCaseMock'
 import { OffenceHistoryMock } from '../../server/data/localMockData/offenceHistoryMock'
 import { MappedUnsentencedCourtCasesMock, sentenceTermsMock } from '../../server/data/localMockData/sentenceTermsMock'
 import {
@@ -692,7 +696,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/bookings/${bookingId}/mainOffence`,
+        urlPattern: `/prison/api/bookings/${bookingId}/mainOffence`,
       },
       response: {
         status: 200,
@@ -708,7 +712,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/prisoners/${prisonerNumber}/full-status`,
+        urlPattern: `/prison/api/prisoners/${prisonerNumber}/full-status`,
       },
       response: {
         status: 200,
@@ -716,6 +720,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: fullStatusMock,
+      },
+    })
+  },
+
+  stubGetCourtCases: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/court-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: CourtCaseWithNextCourtAppearance,
       },
     })
   },

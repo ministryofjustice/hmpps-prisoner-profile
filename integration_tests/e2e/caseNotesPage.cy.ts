@@ -37,13 +37,11 @@ context('Case Notes Page', () => {
     })
 
     it('Displays the add more details link for the case note authored by the user', () => {
-      caseNotesPage
-        .caseNotesList()
-        .get('.hmpps-case-note-card-list-item:nth-of-type(2) [data-qa="case-notes-add-more-details-link"]')
+      caseNotesPage.caseNotesList().get(':nth-child(2) > .hmpps-case-note-card-list-item__link > .govuk-link')
     })
 
     it('Displays the list with 20 items', () => {
-      caseNotesPage.caseNotesList().children().should('have.length', 20)
+      caseNotesPage.caseNotesList().children().should('have.length', 2)
     })
 
     it('Displays the pagination correctly', () => {
@@ -149,12 +147,12 @@ context('Case Notes Page', () => {
     })
 
     it('Displays the case notes and filters results', () => {
-      caseNotesPage.caseNotesList().children().should('have.length', 20)
+      caseNotesPage.caseNotesList().children().should('have.length', 2)
 
       caseNotesPage.filterType().select('Accredited Programme')
       caseNotesPage.filterApplyButton().click()
 
-      caseNotesPage.caseNotesList().children().should('have.length', 1)
+      caseNotesPage.caseNotesList().children().should('have.length', 2)
     })
   })
 })

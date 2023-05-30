@@ -27,6 +27,7 @@ Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber, res
   cy.task('stubEventsForProfileImage', prisonerNumber)
   cy.task('stubGetMainOffence', bookingId)
   cy.task('stubGetFullStatus', prisonerNumber)
+  cy.task('stubGetCourtCases', bookingId)
   cy.task('stubGetPathfinderNominal')
   cy.task('stubGetPathfinderNominal404')
   cy.task('stubGetSocNominal')
