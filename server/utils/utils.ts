@@ -6,6 +6,9 @@ import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
 import { ListMetadata } from '../interfaces/listMetadata'
 import { CaseLoad } from '../interfaces/caseLoad'
+import { Prisoner } from '../interfaces/prisoner'
+import { User } from '../data/hmppsAuthClient'
+import { Role } from '../data/enums/role'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -338,8 +341,31 @@ export const prisonerBelongsToUsersCaseLoad = (prisonerAgencyId: string, userCas
  * @param rolesToCheck
  * @param userRoles
  */
-
 export const userHasRoles = (rolesToCheck: string[], userRoles: string[]): boolean => {
   const normaliseRoleText = (role: string): string => role.replace(/ROLE_/, '')
   return rolesToCheck.map(normaliseRoleText).some(role => userRoles.map(normaliseRoleText).includes(role))
+}
+
+/**
+ * Whether all of the roles exist for the given user allowing for conditional role based access on any number of roles
+ *
+ * @param rolesToCheck
+ * @param userRoles
+ */
+export const userHasAllRoles = (rolesToCheck: string[], userRoles: string[]): boolean => {
+  return rolesToCheck.every(role => userRoles.includes(role))
+}
+
+/**
+ * Enable the `userCanEdit` flag based on user roles/flags and prisoner location/flags
+ *
+ * @param user
+ * @param prisoner
+ */
+export const userCanEdit = (user: User, prisoner: Prisoner): boolean => {
+  return (
+    user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId) ||
+    (['OUT', 'TRN'].includes(prisoner.prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
+    (prisoner.restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
+  )
 }

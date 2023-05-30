@@ -11,6 +11,8 @@ import keyWorkerApi from './integration_tests/mockApis/keyWorker'
 import curiousApi from './integration_tests/mockApis/curiousApi'
 import caseNotesApi from './integration_tests/mockApis/caseNotesApi'
 import incentivesMockApi from './integration_tests/mockApis/incentivesMockApi'
+import pathfinderApi from './integration_tests/mockApis/pathfinderApi'
+import socApi from './integration_tests/mockApis/socApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -41,12 +43,13 @@ export default defineConfig({
         ...curiousApi,
         ...caseNotesApi,
         ...incentivesMockApi,
+        ...pathfinderApi,
+        ...socApi,
       })
     },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
-    experimentalSessionAndOrigin: true,
   },
 })

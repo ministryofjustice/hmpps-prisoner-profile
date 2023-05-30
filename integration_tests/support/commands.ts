@@ -5,13 +5,13 @@ Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath
 })
 
 Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber }) => {
-  cy.task('stubPrisonerData', prisonerNumber)
+  cy.task('stubPrisonerData', { prisonerNumber })
   cy.task('stubEventsForProfileImage', prisonerNumber)
 })
 
-Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber }) => {
+Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber, restrictedPatient = false }) => {
   cy.task('stubNonAssociations', prisonerNumber)
-  cy.task('stubPrisonerData', prisonerNumber)
+  cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient })
   cy.task('stubAccountBalances', bookingId)
   cy.task('stubAdjudications', bookingId)
   cy.task('stubGetCaseNoteCount', bookingId)
@@ -27,11 +27,15 @@ Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber }) =
   cy.task('stubEventsForProfileImage', prisonerNumber)
   cy.task('stubGetMainOffence', bookingId)
   cy.task('stubGetFullStatus', prisonerNumber)
+  cy.task('stubGetPathfinderNominal')
+  cy.task('stubGetPathfinderNominal404')
+  cy.task('stubGetSocNominal')
+  cy.task('stubGetSocNominal404')
 })
 
 Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber }) => {
   cy.task('stubEventsForProfileImage', prisonerNumber)
-  cy.task('stubPrisonerData', prisonerNumber)
+  cy.task('stubPrisonerData', { prisonerNumber })
   cy.task('stubActiveAlerts', bookingId)
   cy.task('stubActiveAlertsPage2', bookingId)
   cy.task('stubActiveAlertsSorted', bookingId)

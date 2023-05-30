@@ -16,19 +16,17 @@
     <nav aria-label="Account navigation">
       <ul class="hmpps-header__navigation">
         {% if user %}
+            {% if user.caseLoads.length > 1 %}
             <li class="hmpps-header__navigation__item">
-              <a  class="hmpps-header__link" href="/account-details"  target="_blank" rel="noopener noreferrer">
-                {% if user.activeCaseLoad[0].description %}
-                  <span class="govuk-heading-s  hmpps-header__link__main-text" data-qa=header-location-name>
+                <a class="hmpps-header__link" href="https://digital-dev.prison.service.justice.gov.uk/change-caseload">
+                    <span class="govuk-heading-s  hmpps-header__link__main-text" data-qa=header-location-name>
                     {{ user.activeCaseLoad[0].description }}
-                  </span>
-                {% endif %}
-                {% if user.caseLoads.length > 1 %}
-                  <span data-qa=header-change-location class="hmpps-header__link__sub-text">Change location</span>
-                {% endif %}
-              </a>
+                    </span>
+                    <span data-qa=header-change-location class="hmpps-header__link__sub-text">Change location</span>
+                </a>
             </li>
-          
+            {% endif %}
+
           <li class="hmpps-header__navigation__item">
             <a data-qa="manageDetails" class="hmpps-header__link" href="/account-details" data-test="manage-account-link" target="_blank" rel="noopener noreferrer">
               <span data-qa=header-user-name class="govuk-heading-s hmpps-header__link__main-text">{{ user.displayName | initialiseName }}</span>

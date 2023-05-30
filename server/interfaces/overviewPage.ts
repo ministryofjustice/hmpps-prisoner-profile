@@ -12,6 +12,7 @@ export interface OverviewSchedule {
   morning: OverviewScheduleItem[]
   afternoon: OverviewScheduleItem[]
   evening: OverviewScheduleItem[]
+  linkUrl: string
 }
 
 export type OverviewNonAssociation = {

@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import AlertsPage from '../pages/alertsPage'
+import { Role } from '../../server/data/enums/role'
 
 const visitActiveAlertsPage = (): AlertsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/active' })
@@ -16,7 +17,7 @@ const visitEmptyAlertsPage = (): AlertsPage => {
   return Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
 }
 
-context('Alerts Page', () => {
+context('Alerts Page - User does not have Update Alerts role', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
@@ -28,6 +29,14 @@ context('Alerts Page', () => {
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       alertsPage = visitActiveAlertsPage()
+    })
+
+    it('Does not display the add alert button', () => {
+      alertsPage.addAlertButton().should('not.exist')
+    })
+
+    it('Does not display the update alert link for each alert', () => {
+      alertsPage.updateAlertLink().should('not.exist')
     })
 
     it('Displays the active alerts tab selected with correct count', () => {
@@ -163,5 +172,27 @@ context('Alerts Page', () => {
 
       alertsPage.alertsList().children().should('have.length', 1)
     })
+  })
+})
+
+context('Alerts Page - User has Update Alert role', () => {
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth({
+      roles: [Role.PrisonUser, Role.UpdateAlert],
+      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    })
+    cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    alertsPage = visitActiveAlertsPage()
+  })
+
+  let alertsPage
+
+  it('Displays the add alert button', () => {
+    alertsPage.addAlertButton()
+  })
+
+  it('Displays the update alert link for each alert', () => {
+    alertsPage.updateAlertLink().should('have.length', 20)
   })
 })

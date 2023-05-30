@@ -3,6 +3,7 @@ export interface StaffContacts {
   prisonOffenderManager: string
   coworkingPrisonOffenderManager: string
   communityOffenderManager: string
+  linkUrl: string
 }
 
 export interface KeyWorkerUI {

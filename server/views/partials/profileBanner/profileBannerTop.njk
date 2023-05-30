@@ -29,7 +29,7 @@
             {% for link in  profileBannerTopLinks %}
               <div class="{{ link.classes }}">
                 <h3 class="govuk-heading-s">{{ link.heading }}</h3>
-                <a href="#" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse"
+                <a href="{{ link.url }}" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse"
                   >{{ link.info }}</a
                 >
               </div>

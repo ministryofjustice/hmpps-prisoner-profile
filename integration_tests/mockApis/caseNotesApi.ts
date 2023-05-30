@@ -5,6 +5,7 @@ import {
   pagedCaseNotesMockFiltered,
   pagedCaseNotesMockPage2,
   pagedCaseNotesMockSorted,
+  pomCaseNotesMock,
 } from '../../server/data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../../server/data/localMockData/caseNoteTypesMock'
 
@@ -109,6 +110,28 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: caseNoteTypesMock,
+      },
+    })
+  },
+
+  stubGetSensitiveCaseNotesPage: (prisonerNumber: string) => {
+    let jsonResp
+    if (prisonerNumber === 'G6123VU') {
+      jsonResp = pomCaseNotesMock
+    } else if (prisonerNumber === 'A1234BC') {
+      jsonResp = emptyCaseNotesMock
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=OMIC`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
       },
     })
   },

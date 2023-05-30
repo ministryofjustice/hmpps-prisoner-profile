@@ -1,8 +1,14 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
+import { Role } from '../../server/data/enums/role'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
+  return Page.verifyOnPage(OverviewPage)
+}
+
+const visitOverviewPageAlt = (): OverviewPage => {
+  cy.signIn({ redirectPath: '/prisoner/A1234BC' })
   return Page.verifyOnPage(OverviewPage)
 }
 
@@ -111,7 +117,7 @@ context('Overview Page', () => {
         overviewPage.categoryCard().contains('p', 'Category')
         overviewPage.categoryCard().contains('p', 'B')
         overviewPage.categoryCard().contains('p', 'Next review: 19/02/2023')
-        overviewPage.categoryCard().contains('a', 'Manage category')
+        overviewPage.categoryCard().contains('a', 'View category')
       })
 
       it('Mini summary Group B should contain Incentives card with correct data', () => {
@@ -203,6 +209,227 @@ context('Overview Page', () => {
         const overviewPage = visitOverviewPage()
         overviewPage.statusList().should('exist')
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
+      })
+    })
+
+    context('Actions', () => {
+      it('should display Add case note link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.addCaseNoteActionLink().should('exist')
+      })
+
+      it('should display Add appointment link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.addAppointmentActionLink().should('exist')
+      })
+
+      it('should display Report use of force link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.reportUseOfForceActionLink().should('exist')
+      })
+
+      it('should not display Refer to Pathfinder link or the Pathfinder profile link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.referToPathfinderActionLink().should('not.exist')
+        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+      })
+
+      it('should not display Add to SOC link or the SOC profile link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.addToSocActionLink().should('not.exist')
+        overviewPage.socProfileInfoLink().should('not.exist')
+      })
+
+      it('should not display Manage category link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.manageCategoryActionLink().should('not.exist')
+      })
+    })
+
+    context('More Info', () => {
+      it('should not display probation documents link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.probationDocumentsInfoLink().should('not.exist')
+      })
+
+      it('should not display pathfinder profile link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+      })
+      it('should not display soc profile link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.socProfileInfoLink().should('not.exist')
+      })
+    })
+  })
+
+  context('Given the user has PF_USER role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.PathfinderUser],
+      })
+    })
+
+    context('Prisoner is not currently in Pathfinder', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: '1234567' })
+      })
+
+      it('should not display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
+        const overviewPage = visitOverviewPageAlt()
+        overviewPage.referToPathfinderActionLink().should('not.exist')
+        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+      })
+    })
+
+    context('Prisoner is already in Pathfinder', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      })
+
+      it('should display Pathfinder profile link, and not the Refer to Pathfinder link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.pathfinderProfileInfoLink().should('exist')
+        overviewPage.referToPathfinderActionLink().should('not.exist')
+      })
+    })
+  })
+
+  context('Given the user has PF_STD_PRISON role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.PathfinderStdPrison],
+      })
+    })
+
+    context('Prisoner is not currently in Pathfinder', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: '1234567' })
+      })
+
+      it('should display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
+        const overviewPage = visitOverviewPageAlt()
+        overviewPage.referToPathfinderActionLink().should('exist')
+        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+      })
+    })
+
+    context('Prisoner is already in Pathfinder', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      })
+
+      it('should display Pathfinder profile link, and not the Refer to Pathfinder link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.pathfinderProfileInfoLink().should('exist')
+        overviewPage.referToPathfinderActionLink().should('not.exist')
+      })
+    })
+  })
+
+  context('Given the user has SOC_CUSTODY role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.SocCustody],
+      })
+    })
+
+    context('Prisoner is not currently in SOC', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: '1234567' })
+      })
+
+      it('should display Add to SOC link, and not the SOC profile link', () => {
+        const overviewPage = visitOverviewPageAlt()
+        overviewPage.addToSocActionLink().should('exist')
+        overviewPage.socProfileInfoLink().should('not.exist')
+      })
+    })
+
+    context('Prisoner is already in SOC', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      })
+
+      it('should display SOC profile link, and not the Add to SOC link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.socProfileInfoLink().should('exist')
+        overviewPage.addToSocActionLink().should('not.exist')
+      })
+    })
+  })
+
+  context('Given the user has CREATE_CATEGORISATION role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.CreateCategorisation],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+    })
+
+    it('should display Manage category link', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.manageCategoryActionLink().should('exist')
+    })
+  })
+
+  context('Given the user has POM role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.PomUser],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+    })
+
+    it('should display Probation documents  link', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.probationDocumentsInfoLink().should('exist')
+    })
+  })
+
+  context('Given the user has VIEW_PROBATION_DOCUMENTS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.ViewProbationDocuments],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+    })
+
+    it('should display Probation documents  link', () => {
+      const overviewPage = visitOverviewPage()
+      overviewPage.probationDocumentsInfoLink().should('exist')
+    })
+  })
+
+  context('Given the prisoner is a restricted patient', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484', restrictedPatient: true })
+    })
+
+    context('Actions', () => {
+      it('should display Add case note link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.addCaseNoteActionLink().should('exist')
+      })
+
+      it('should not display Add appointment link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.addAppointmentActionLink().should('not.exist')
+      })
+
+      it('should not display Report use of force link', () => {
+        const overviewPage = visitOverviewPage()
+        overviewPage.reportUseOfForceActionLink().should('not.exist')
       })
     })
   })

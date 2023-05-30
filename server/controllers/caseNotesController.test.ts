@@ -1,9 +1,10 @@
-import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import * as headerMappers from '../mappers/headerMappers'
 import CaseNotesController from './caseNotesController'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteUsageMock } from '../data/localMockData/caseNoteUsageMock'
+import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
+import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
 let req: any
 let res: any
@@ -31,6 +32,7 @@ describe('Case Notes Controller', () => {
       locals: {
         clientToken: 'CLIENT_TOKEN',
         user: {
+          userRoles: [Role.DeleteSensitiveCaseNotes],
           staffId: 487023,
           caseLoads: CaseLoadsDummyDataA,
         },
@@ -43,7 +45,7 @@ describe('Case Notes Controller', () => {
   it('should get case notes', async () => {
     const getPrisonerDetailsSpy = jest
       .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(prisonerDetailMock)
+      .mockResolvedValue(PrisonerMockDataA)
     const getgetCaseNotesUsageSpy = jest
       .spyOn<any, string>(controller['prisonApiClient'], 'getCaseNotesUsage')
       .mockResolvedValue(caseNoteUsageMock)
@@ -56,7 +58,7 @@ describe('Case Notes Controller', () => {
     expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getgetCaseNotesUsageSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getCaseNotesSpy).toHaveBeenCalledWith(
-      prisonerDetailMock,
+      PrisonerMockDataA,
       {
         page: 0,
         sort: 'dateCreated,ASC',
@@ -65,8 +67,8 @@ describe('Case Notes Controller', () => {
         startDate: '01/01/2023',
         endDate: '02/02/2023',
       },
-      false,
+      true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(prisonerDetailMock, CaseLoadsDummyDataA, true, 'case-notes')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'case-notes')
   })
 })

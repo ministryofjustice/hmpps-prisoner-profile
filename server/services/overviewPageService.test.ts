@@ -5,11 +5,16 @@ import OverviewPageService from './overviewPageService'
 import { Prisoner } from '../interfaces/prisoner'
 import {
   accountBalancesMock,
+  adjudicationsSummaryDataMock,
   adjudicationSummaryMock,
   assessmentsMock,
-  miniSummaryGroupAMock,
+  categorySummaryDataMock,
+  csraSummaryDataMock,
+  incentiveSummaryDataMock,
   miniSummaryGroupBMock,
+  moneySummaryDataMock,
   visitBalancesMock,
+  visitsSummaryDataMock,
   visitSummaryMock,
 } from '../data/localMockData/miniSummaryMock'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
@@ -151,7 +156,13 @@ describe('OverviewPageService', () => {
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get({ prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner)
 
-      expect(res.miniSummaryGroupA).toEqual(miniSummaryGroupAMock)
+      expect(res.miniSummaryGroupA).toEqual(
+        expect.arrayContaining([
+          { data: expect.objectContaining(moneySummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(visitsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
     })
 
     describe('When the prisoner is not part of the users case loads', () => {
@@ -176,7 +187,11 @@ describe('OverviewPageService', () => {
             userRole,
           ])
 
-          expect(res.miniSummaryGroupA).toEqual([miniSummaryGroupAMock[1]])
+          expect(res.miniSummaryGroupA).toEqual(
+            expect.arrayContaining([
+              { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+            ]),
+          )
         },
       )
     })
@@ -204,7 +219,13 @@ describe('OverviewPageService', () => {
         prisonId: 'MDI',
       } as Prisoner)
 
-      expect(res.miniSummaryGroupB).toEqual(miniSummaryGroupBMock)
+      expect(res.miniSummaryGroupB).toEqual(
+        expect.arrayContaining([
+          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(incentiveSummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
     })
     describe('When the prisoner is not part of the users case loads', () => {
       it('should not return the incentives data', async () => {
@@ -293,7 +314,7 @@ describe('OverviewPageService', () => {
 
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get({ ...PrisonerMockDataB, prisonerNumber, bookingId } as Prisoner)
-      expect(res.staffContacts).toEqual(StaffContactsMock)
+      expect(res.staffContacts).toEqual(expect.objectContaining(StaffContactsMock))
     })
   })
 

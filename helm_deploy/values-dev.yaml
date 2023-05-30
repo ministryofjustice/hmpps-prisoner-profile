@@ -23,6 +23,14 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     CASE_NOTES_API_URL: "https://dev.offender-case-notes.service.justice.gov.uk"
     INCENTIVES_API_URL: "https://incentives-api-dev.hmpps.service.justice.gov.uk"
+    PATHFINDER_API_URL: "https://dev-api.pathfinder.service.justice.gov.uk"
+    MANAGE_SOC_CASES_API_URL: "https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk"
+
+    OFFENDER_CATEGORISATION_UI_URL: "https://dev.offender-categorisation.service.justice.gov.uk"
+    USE_OF_FORCE_UI_URL: "https://dev.use-of-force.service.justice.gov.uk"
+    MANAGE_A_WARRANT_FOLDER_UI_URL: "https://manage-a-warrant-folder-dev.hmpps.service.justice.gov.uk"
+    PATHFINDER_UI_URL: "https://dev.pathfinder.service.justice.gov.uk"
+    MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases-dev.hmpps.service.justice.gov.uk"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

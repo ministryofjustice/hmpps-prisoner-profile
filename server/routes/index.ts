@@ -15,7 +15,6 @@ import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
-import { canViewOrAddCaseNotes } from '../utils/roleHelpers'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -49,11 +48,7 @@ export default function routes(service: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     res.render('pages/photoPage', {
-      ...mapHeaderData(
-        prisonerData,
-        res.locals.user.caseLoads,
-        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
-      ),
+      ...mapHeaderData(prisonerData, res.locals.user),
     })
   })
 
@@ -67,12 +62,7 @@ export default function routes(service: Services): Router {
 
     res.render('pages/personalPage', {
       pageTitle: 'Personal',
-      ...mapHeaderData(
-        prisonerData,
-        res.locals.user.caseLoads,
-        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
-        'personal',
-      ),
+      ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
       ...personalPageData,
     })
   })
@@ -87,15 +77,17 @@ export default function routes(service: Services): Router {
     const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
     const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
 
+    const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+    const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
+    const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
+
     res.render('pages/workAndSkills', {
-      ...mapHeaderData(
-        prisonerData,
-        res.locals.user.caseLoads,
-        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
-        'work-and-skills',
-      ),
+      ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
       ...workAndSkillsPageData,
       pageTitle: 'Work and skills',
+      fullCourseHistoryLinkUrl,
+      workAndActivities12MonthLinkUrl,
+      workAndActivities7DayLinkUrl,
     })
   })
 
@@ -122,12 +114,7 @@ export default function routes(service: Services): Router {
 
     res.render('pages/offences', {
       pageTitle: 'Offences',
-      ...mapHeaderData(
-        prisonerData,
-        res.locals.user.caseLoads,
-        canViewOrAddCaseNotes(res.locals.user.userRoles, res.locals.user.activeCaseLoadId, prisonerData.prisonId),
-        'offences',
-      ),
+      ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
       ...offencesPageData,
       activeTab: true,
     })

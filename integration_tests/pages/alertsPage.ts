@@ -40,4 +40,8 @@ export default class AlertsPage extends Page {
   filterCheckbox = (): PageElement => cy.get('.hmpps-side-filter .govuk-checkboxes__item').first().find('input')
 
   filterApplyButton = (): PageElement => cy.get('[data-qa=apply-filter-button]')
+
+  addAlertButton = (): PageElement => cy.get('#add-alert-action-button a')
+
+  updateAlertLink = (): PageElement => cy.get('.hmpps-alert-card-list-item__link a')
 }

@@ -92,4 +92,26 @@ export default class OverviewPage extends Page {
   // Statuses
 
   statusList = (): PageElement => cy.get('.hmpps-status-list')
+
+  // Actions
+
+  addCaseNoteActionLink = (): PageElement => cy.get('[data-qa=add-case-note-action-link]')
+
+  addAppointmentActionLink = (): PageElement => cy.get('[data-qa=add-appointment-action-link]')
+
+  reportUseOfForceActionLink = (): PageElement => cy.get('[data-qa=report-use-of-force-action-link]')
+
+  referToPathfinderActionLink = (): PageElement => cy.get('[data-qa=refer-to-pathfinder-action-link]')
+
+  addToSocActionLink = (): PageElement => cy.get('[data-qa=add-to-soc-action-link]')
+
+  manageCategoryActionLink = (): PageElement => cy.get('[data-qa=manage-category-action-link]')
+
+  // More Info
+
+  probationDocumentsInfoLink = (): PageElement => cy.get('[data-qa=probation-documents-info-link]')
+
+  pathfinderProfileInfoLink = (): PageElement => cy.get('[data-qa=pathfinder-profile-info-link]')
+
+  socProfileInfoLink = (): PageElement => cy.get('[data-qa=soc-profile-info-link]')
 }

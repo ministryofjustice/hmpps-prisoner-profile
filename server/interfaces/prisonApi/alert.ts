@@ -20,4 +20,5 @@ export interface Alert extends PagedListItem {
   expiredByFirstName?: string
   expiredByLastName?: string
   expiredByFullName?: string
+  updateLinkUrl?: string
 }

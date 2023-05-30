@@ -20,4 +20,21 @@ export const caseNoteTypesMock: CaseNoteType[] = [
     sensitive: false,
     restrictedUse: false,
   },
+  {
+    code: 'OMIC',
+    description: 'OMiC',
+    activeFlag: 'Y',
+    subCodes: [
+      {
+        code: 'OMiC',
+        description: 'OMiC',
+        activeFlag: 'Y',
+        subCodes: [],
+        sensitive: true,
+        restrictedUse: false,
+      },
+    ],
+    sensitive: true,
+    restrictedUse: false,
+  },
 ]
