@@ -13,7 +13,7 @@ const visitOverviewPageAlt = (): OverviewPage => {
 }
 
 context('Overview Page', () => {
-  context.skip('Given the prisoner is not within the users caseload', () => {
+  context('Given the prisoner is not within the users caseload', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
@@ -41,7 +41,7 @@ context('Overview Page', () => {
     })
   })
 
-  context.skip('Given prisoner is within the users case load', () => {
+  context('Given prisoner is within the users case load', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
@@ -263,7 +263,7 @@ context('Overview Page', () => {
     })
   })
 
-  context.skip('Given the user has PF_USER role', () => {
+  context('Given the user has PF_USER role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
@@ -296,7 +296,7 @@ context('Overview Page', () => {
     })
   })
 
-  context.skip('Given the user has PF_STD_PRISON role', () => {
+  context('Given the user has PF_STD_PRISON role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
@@ -329,7 +329,7 @@ context('Overview Page', () => {
     })
   })
 
-  context.skip('Given the user has SOC_CUSTODY role', () => {
+  context('Given the user has SOC_CUSTODY role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
