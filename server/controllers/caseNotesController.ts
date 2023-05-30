@@ -60,7 +60,6 @@ export default class CaseNotesController {
 
     // Get case notes based on given query params
     const caseNotesPageData = await this.caseNotesService.get(prisonerData, queryParams, canDeleteSensitiveCaseNotes)
-
     // Get staffId to use in conditional logic for amend link
     const { staffId } = res.locals.user
 

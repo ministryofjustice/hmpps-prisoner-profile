@@ -38,7 +38,12 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
     )
       ? 'Manage category'
       : 'View category',
-    info: prisonerData.category === 'U' ? 'Unsentenced' : prisonerData.category,
+    // eslint-disable-next-line no-nested-ternary
+    info: !prisonerData.category
+      ? 'Not entered'
+      : prisonerData.category === 'U'
+      ? 'Unsentenced'
+      : prisonerData.category,
     classes: '',
     url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
   })

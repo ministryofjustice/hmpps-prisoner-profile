@@ -6,7 +6,7 @@
       <h2>More Information</h2>
       <ul>
         {% for link in overviewInfoLinks %}
-        <li><a href="{{ link.url }}" class="govuk-link govuk-link--no-visited-state">{{ link.text }}</a></li>
+        <li><a href="{{ link.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="{{ link.dataQA }}">{{ link.text }}</a></li>
         {% endfor %}
       </ul>
     </div>

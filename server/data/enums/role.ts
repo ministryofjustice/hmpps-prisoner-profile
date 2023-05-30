@@ -21,4 +21,5 @@ export enum Role {
   GlobalSearch = 'ROLE_GLOBAL_SEARCH',
   PomUser = 'ROLE_POM',
   ViewProbationDocuments = 'ROLE_VIEW_PROBATION_DOCUMENTS',
+  PrisonUser = 'ROLE_PRISON',
 }

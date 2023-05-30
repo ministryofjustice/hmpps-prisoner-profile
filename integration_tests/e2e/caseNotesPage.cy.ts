@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import CaseNotesPage from '../pages/caseNotesPage'
 import NotFoundPage from '../pages/notFoundPage'
+import { Role } from '../../server/data/enums/role'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -15,10 +16,7 @@ const visitEmptyCaseNotesPage = (): CaseNotesPage => {
 context('Case Notes Page', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({
-      roles: ['ROLE_GLOBAL_SEARCH'],
-      caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-    })
+    cy.setupUserAuth()
     cy.task('stubGetCaseNoteTypes')
   })
 
@@ -32,6 +30,16 @@ context('Case Notes Page', () => {
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
+    })
+
+    it('Displays the add case note button', () => {
+      caseNotesPage.addCaseNoteButton()
+    })
+
+    it('Displays the add more details link for the case note authored by the user', () => {
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(2) [data-qa="case-notes-add-more-details-link"]')
     })
 
     it('Displays the list with 20 items', () => {
@@ -151,11 +159,70 @@ context('Case Notes Page', () => {
   })
 })
 
+context('Sensitive Case Notes', () => {
+  let caseNotesPage
+
+  context('POM User - No role to delete sensitive case notes', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.PomUser],
+        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+      })
+      cy.task('stubGetCaseNoteTypes')
+      cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubPrisonerDetail', 'G6123VU')
+      cy.task('stubGetCaseNotesUsage', 'G6123VU')
+      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
+      caseNotesPage = visitCaseNotesPage()
+    })
+
+    it('Displays the delete link for the sensitive case note', () => {
+      caseNotesPage.filterType().select('OMIC')
+      caseNotesPage.filterApplyButton().click()
+
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(1) [data-qa="delete-case-note-link"]')
+        .should('not.exist')
+    })
+  })
+
+  context('POM User - Has role to delete sensitive case notes', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.PomUser, Role.DeleteSensitiveCaseNotes],
+        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+      })
+      cy.task('stubGetCaseNoteTypes')
+      cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubPrisonerDetail', 'G6123VU')
+      cy.task('stubGetCaseNotesUsage', 'G6123VU')
+      cy.task('stubGetCaseNotes', 'G6123VU')
+      cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
+      caseNotesPage = visitCaseNotesPage()
+    })
+
+    it('Displays the delete link for the sensitive case note', () => {
+      caseNotesPage.filterType().select('OMIC')
+      caseNotesPage.filterApplyButton().click()
+
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(1) [data-qa="delete-case-note-link"]')
+    })
+  })
+})
+
 context('Case Notes Page Not Found', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth({
-      roles: ['ROLE_GLOBAL_SEARCH'],
+      roles: [Role.GlobalSearch],
       caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
       activeCaseLoadId: 'ZZZ',
     })

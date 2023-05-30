@@ -98,6 +98,7 @@ export default class OverviewController {
         text: 'Add case note',
         icon: Icon.AddCaseNote,
         url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
+        dataQA: 'add-case-note-action-link',
       })
     }
     if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
@@ -105,6 +106,7 @@ export default class OverviewController {
         text: 'Add appointment',
         icon: Icon.AddAppointment,
         url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`,
+        dataQA: 'add-appointment-action-link',
       })
     }
     if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
@@ -112,6 +114,7 @@ export default class OverviewController {
         text: 'Report use of force',
         icon: Icon.ReportUseOfForce,
         url: `${config.serviceUrls.useOfForce}/report/${prisonerData.bookingId}/report-use-of-force`,
+        dataQA: 'report-use-of-force-action-link',
       })
     }
     if (
@@ -125,6 +128,7 @@ export default class OverviewController {
         text: 'Refer to Pathfinder',
         icon: Icon.ReferToPathfinder,
         url: `${config.serviceUrls.pathfinder}/refer/offender/${prisonerData.prisonerNumber}`,
+        dataQA: 'refer-to-pathfinder-action-link',
       })
     }
     if (userHasRoles([Role.SocCustody, Role.SocCommunity], user.userRoles) && !socNominal) {
@@ -132,6 +136,7 @@ export default class OverviewController {
         text: 'Add to SOC',
         icon: Icon.AddToSOC,
         url: `${config.serviceUrls.manageSocCases}/refer/offender/${prisonerData.prisonerNumber}`,
+        dataQA: 'add-to-soc-action-link',
       })
     }
     if (
@@ -149,6 +154,7 @@ export default class OverviewController {
         text: 'Manage category',
         icon: Icon.ManageCategory,
         url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
+        dataQA: 'manage-category-action-link',
       })
     }
 
@@ -160,8 +166,8 @@ export default class OverviewController {
     pathfinderNominal: Nominal,
     socNominal: Nominal,
     user: User,
-  ): { text: string; url: string }[] {
-    const links: { text: string; url: string }[] = []
+  ): { text: string; url: string; dataQA: string }[] {
+    const links: { text: string; url: string; dataQA: string }[] = []
 
     if (
       userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
@@ -171,6 +177,7 @@ export default class OverviewController {
       links.push({
         text: 'Probation documents',
         url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/probation-documents`,
+        dataQA: 'probation-documents-info-link',
       })
     }
 
@@ -194,6 +201,7 @@ export default class OverviewController {
       links.push({
         text: 'Pathfinder profile',
         url: `${config.serviceUrls.pathfinder}/nominal/${pathfinderNominal.id}`,
+        dataQA: 'pathfinder-profile-info-link',
       })
     }
 
@@ -201,6 +209,7 @@ export default class OverviewController {
       links.push({
         text: 'SOC profile',
         url: `${config.serviceUrls.manageSocCases}/nominal/${socNominal.id}`,
+        dataQA: 'soc-profile-info-link',
       })
     }
 

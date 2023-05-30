@@ -9,7 +9,11 @@ declare global {
        */
       signIn(options?: { failOnStatusCode?: boolean; redirectPath?: string }): Chainable<AUTWindow>
       setupBannerStubs(options: { prisonerNumber: string }): Chainable<AUTWindow>
-      setupOverviewPageStubs(options: { prisonerNumber: string; bookingId: string }): Chainable<AUTWindow>
+      setupOverviewPageStubs(options: {
+        prisonerNumber: string
+        bookingId: string
+        restrictedPatient?: boolean
+      }): Chainable<AUTWindow>
       setupAlertsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
