@@ -213,6 +213,99 @@ export const CourtCasesUnsentencedMockA: CourtCase[] = [
   },
 ]
 
+export const CourtCasesUnsentencedMockB: CourtCase[] = [
+  {
+    id: 1445307,
+    caseSeq: 1,
+    beginDate: '2016-07-19',
+    agency: {
+      agencyId: 'NOTTCC',
+      description: 'Nottingham Crown Court',
+      longDescription: 'Nottingham Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'T20167429',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 325084884,
+        dateTime: '2016-12-12T10:00:00',
+        location: {
+          agencyId: 'NOTTCC',
+          description: 'Nottingham Crown Court',
+          longDescription: 'Nottingham Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 328261870,
+        dateTime: '2017-01-09T10:00:00',
+        location: {
+          agencyId: 'NOTTCC',
+          description: 'Nottingham Crown Court',
+          longDescription: 'Nottingham Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 328261909,
+        dateTime: '2017-01-10T10:00:00',
+        location: {
+          agencyId: 'NOTTCC',
+          description: 'Nottingham Crown Court',
+          longDescription: 'Nottingham Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 308122902,
+        dateTime: '2016-07-20T10:00:00',
+        location: {
+          agencyId: 'NOTTCC',
+          description: 'Nottingham Crown Court',
+          longDescription: 'Nottingham Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 308122848,
+        dateTime: '2016-07-19T10:00:00',
+        location: {
+          agencyId: 'MNSFMC',
+          description: 'Mansfield Magistrates Court',
+          longDescription: 'Mansfield Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 314591138,
+        dateTime: '2016-09-15T10:00:00',
+        location: {
+          agencyId: 'NOTTCC',
+          description: 'Nottingham Crown Court',
+          longDescription: 'Nottingham Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
+]
+
 export const CourtCaseWithNextCourtAppearance: CourtCase[] = [
   {
     id: 1564679,

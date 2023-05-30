@@ -38,6 +38,8 @@ import { CaseNoteUsage } from '../interfaces/prisonApi/caseNoteUsage'
 import { formatDateISO } from '../utils/dateHelpers'
 import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
 import { CourtDateResults } from '../interfaces/courtDateResults'
+import { MainOffence } from '../interfaces/prisonApi/mainOffence'
+import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -266,11 +268,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getMainOffence(bookingId: number): Promise<any> {
+  async getMainOffence(bookingId: number): Promise<MainOffence> {
     return this.get({ path: `/api/bookings/${bookingId}/mainOffence` })
   }
 
-  async getFullStatus(prisonerNumber: string): Promise<any> {
+  async getFullStatus(prisonerNumber: string): Promise<FullStatus> {
     return this.get({ path: `/api/prisoners/${prisonerNumber}/full-status` })
   }
 

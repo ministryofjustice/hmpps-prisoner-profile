@@ -41,6 +41,8 @@ import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCount
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import { CaseLoad } from '../../server/interfaces/caseLoad'
 
+import { mainOffenceMock, fullStatusMock } from '../../server/data/localMockData/offenceOverviewMock'
+
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
@@ -681,6 +683,38 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: caseLoads.length > 0 ? caseLoads : CaseLoadsDummyDataA,
+      },
+    })
+  },
+
+  stubGetMainOffence: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/api/bookings/${bookingId}/mainOffence`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mainOffenceMock,
+      },
+    })
+  },
+
+  stubGetFullStatus: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/api/prisoners/${prisonerNumber}/full-status`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: fullStatusMock,
       },
     })
   },

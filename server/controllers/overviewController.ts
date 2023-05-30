@@ -44,8 +44,6 @@ export default class OverviewController {
 
     const overviewPageData = await overviewPageService.get(prisonerData)
 
-    console.log(overviewPageData)
-
     // Set role based permissions
     const canViewCaseNotes = canViewOrAddCaseNotes(
       res.locals.user.userRoles,

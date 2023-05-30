@@ -245,6 +245,10 @@ export default class OffencesPageService {
       }))
   }
 
+  getUniqueChargesFromCourtDateResults(courtDateResults: CourtDateResults[]) {
+    return [...new Map(courtDateResults?.map(item => [item.charge.chargeId, item])).values()]
+  }
+
   getMapForUnsentencedCourtCases(
     courtCaseData: CourtCase[],
     todaysDate: string,
@@ -257,10 +261,11 @@ export default class OffencesPageService {
           ...this.getGenericMaps(courtCase, todaysDate),
           sentenced: false,
           sentenceHeader: this.getCountForUnsentencedCourtCase(courtCase),
-          courtDateResults: courtDateResults?.filter(
+          courtDateResults: this.getUniqueChargesFromCourtDateResults(courtDateResults)?.filter(
             courtDateResult => courtDateResult.charge.courtCaseId === courtCase.id,
           ),
         }))
+        // Hide unsentenced court cases if sentenced court case is available
         // eslint-disable-next-line array-callback-return,consistent-return
         .filter(value => {
           if (
@@ -307,7 +312,7 @@ export default class OffencesPageService {
       })
   }
 
-  public async getReleaseDates(prisonerNumber: string) {
+  async getReleaseDates(prisonerNumber: string) {
     const releaseDates: PrisonerSentenceDetails = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
     const sentenceDetails = releaseDates.sentenceDetail
     const conditionalRelease: string =

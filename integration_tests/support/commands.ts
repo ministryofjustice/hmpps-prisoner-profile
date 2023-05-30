@@ -25,6 +25,8 @@ Cypress.Commands.add('setupOverviewPageStubs', ({ bookingId, prisonerNumber }) =
   cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId })
   cy.task('stubGetOffenderContacts', bookingId)
   cy.task('stubEventsForProfileImage', prisonerNumber)
+  cy.task('stubGetMainOffence', bookingId)
+  cy.task('stubGetFullStatus', prisonerNumber)
 })
 
 Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber }) => {
