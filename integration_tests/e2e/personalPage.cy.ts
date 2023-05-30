@@ -1,19 +1,43 @@
+import { Role } from '../../server/data/enums/role'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { yearsBetweenDateStrings } from '../../server/utils/utils'
 import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
+import { permissionsTests } from './permissionsTests'
 
-const visitPersonalDetailsPage = (): PersonalPage => {
+const visitPersonalDetailsPage = () => {
   cy.signIn({ redirectPath: 'prisoner/G6123VU/personal' })
-  return Page.verifyOnPage(PersonalPage)
 }
 
 context('When signed in', () => {
+  const prisonerNumber = 'G6123VU'
+
+  context('Permissions', () => {
+    const visitPage = prisonerDataOverrides => {
+      cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
+      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubPrisonerDetail', prisonerNumber)
+      cy.task('stubSecondaryLanguages', 1102484)
+      cy.task('stubProperty', 1102484)
+      cy.task('stubAddresses', prisonerNumber)
+      cy.task('stubOffenderContacts', prisonerNumber)
+      cy.task('stubPersonAddresses')
+      cy.task('stubImages')
+      cy.task('stubHealthReferenceDomain')
+      cy.task('stubHealthTreatmentReferenceDomain')
+      cy.task('stubReasonableAdjustments', 1102484)
+      cy.task('stubPersonalCareNeeds', 1102484)
+      visitPersonalDetailsPage()
+    }
+
+    permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PersonalPage })
+  })
+
   context('As a global search user who does not have the prisoner in their case loads', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
+        roles: [Role.GlobalSearch],
         caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
@@ -29,28 +53,25 @@ context('When signed in', () => {
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
+      visitPersonalDetailsPage()
     })
 
     it('Hides the next of kin card', () => {
-      visitPersonalDetailsPage()
       cy.getDataQa('hidden-next-of-kin').should('exist')
       cy.getDataQa('hidden-next-of-kin-nav').should('exist')
     })
 
     it('Hides the appearance card', () => {
-      visitPersonalDetailsPage()
       cy.getDataQa('hidden-appearance').should('exist')
       cy.getDataQa('hidden-appearance-nav').should('exist')
     })
 
     it('Hides the property card', () => {
-      visitPersonalDetailsPage()
       cy.getDataQa('hidden-property').should('exist')
       cy.getDataQa('hidden-property-nav').should('exist')
     })
 
     it('Hides the fields within personal details', () => {
-      visitPersonalDetailsPage()
       cy.getDataQa('hidden-place-of-birth').should('exist')
       cy.getDataQa('hidden-religion-or-belief').should('exist')
       cy.getDataQa('hidden-sexual-orientation').should('exist')
@@ -77,16 +98,16 @@ context('When signed in', () => {
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
+      visitPersonalDetailsPage()
     })
 
     it('displays the personal details page', () => {
-      visitPersonalDetailsPage()
       cy.request('/prisoner/G6123VU/personal').its('body').should('contain', 'Personal')
     })
 
     context('Personal details card', () => {
       it('Displays all the information from the API', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.personalDetails().fullName().should('have.text', 'John Middle Names Saunders')
         page.personalDetails().aliases().row(1).name().should('have.text', 'Master Cordian')
         page.personalDetails().aliases().row(1).dateOfBirth().should('have.text', '1990-08-15')
@@ -112,7 +133,7 @@ context('When signed in', () => {
       })
 
       it('Displays all the information from the API: Languages', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.personalDetails().languages().spoken().should('include.text', 'Welsh')
         page.personalDetails().languages().written().should('include.text', 'English').and('include.text', '(written)')
         page.personalDetails().languages().otherLanguages('AZE').language().should('have.text', 'Azerbaijani')
@@ -143,7 +164,7 @@ context('When signed in', () => {
 
     context('Identity numbers card', () => {
       it('Displays the information from the API', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.identityNumbers().prisonNumber().should('include.text', 'G6123VU')
         page.identityNumbers().pncNumber().should('include.text', '08/359381C')
         page.identityNumbers().croNumber().should('include.text', '400862/08W')
@@ -155,7 +176,7 @@ context('When signed in', () => {
 
     context('Property card', () => {
       it('Displays the prisoners property', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.property().item(0).containerType().should('include.text', 'Valuables')
         page.property().item(0).sealMark().should('include.text', 'MDA646165646')
         page.property().item(0).location().should('include.text', 'Property Box 14')
@@ -170,7 +191,7 @@ context('When signed in', () => {
 
     context('Addresses', () => {
       it('Displays the prisoners address', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.addresess().address().should('include.text', 'Flat 7, premises address, street field')
         page.addresess().address().should('include.text', 'Leeds')
         page.addresess().address().should('include.text', 'LS1 AAA')
@@ -192,7 +213,7 @@ context('When signed in', () => {
 
     context('Emergency contacts and next of kin', () => {
       it('Displays the contacts', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
 
         const addressShouldIncludeCorrectText = contact => {
           contact.address().should('include.text', 'Flat 7, premises address, street field')
@@ -239,7 +260,7 @@ context('When signed in', () => {
 
     context('Appearance', () => {
       it('Displays the appearance information', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.appearance().height().should('include.text', '1.88m')
         page.appearance().weight().should('include.text', '86kg')
         page.appearance().hairColour().should('include.text', 'Brown')
@@ -271,7 +292,7 @@ context('When signed in', () => {
 
     context('Security', () => {
       it('Displays the security warnings', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.security().interestToImmigration().should('be.visible')
         page.security().travelRestrictions().should('be.visible')
         page.security().travelRestrictions().should('include.text', 'some travel restrictions')
@@ -280,7 +301,7 @@ context('When signed in', () => {
 
     context('Care needs', () => {
       it('Displays the care needs', () => {
-        const page = visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
         page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Maternity Status')
         page.careNeeds().personalCareNeeds(0).description().should('include.text', 'Preg, acc under 9mths')
         page.careNeeds().personalCareNeeds(0).comment().should('include.text', 'a comment')

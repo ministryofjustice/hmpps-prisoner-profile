@@ -19,11 +19,12 @@ describe('GET /', () => {
     return request(app).get('/').expect('Location', config.apis.dpsHomePageUrl).expect(302)
   })
 
-  it('should render index page', () => {
-    return request(app).get('/prisoner/A8469DY').expect('Content-Type', /html/)
-  })
+  // I'm not sure we need these given the e2e tests?
+  // it('should render index page', () => {
+  //   return request(app).get('/prisoner/A8469DY').expect('Content-Type', /html/)
+  // })
 
-  it('should render photo page', () => {
-    return request(app).get('/prisoner/A8469DY/image').expect('Content-Type', /html/)
-  })
+  // it('should render photo page', () => {
+  //   return request(app).get('/prisoner/A8469DY/image').expect('Content-Type', /html/)
+  // })
 })

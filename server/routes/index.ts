@@ -15,10 +15,37 @@ import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
+import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { Role } from '../data/enums/role'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
   const router = Router()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function checkPrisonerInCaseLoad(req: any, res: any, func: (prisonerData: Prisoner) => Promise<void>) {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const globalSearchUser = userHasRoles([Role.GlobalSearch], res.locals.user.userRoles)
+
+    if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) && !globalSearchUser) {
+      const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
+
+      if (inactiveBooking) {
+        if (!userHasRoles([Role.InactiveBookings], res.locals.user.userRoles)) {
+          return res.render('notFound.njk', {
+            url: req.headers.referer,
+          })
+        }
+      } else {
+        return res.render('notFound.njk', {
+          url: req.headers.referer,
+        })
+      }
+    }
+
+    return func(prisonerData)
+  }
 
   router.use(async (req, res, next) => {
     res.locals = {
@@ -44,26 +71,25 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-
-    res.render('pages/photoPage', {
-      ...mapHeaderData(prisonerData, res.locals.user),
+    checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+      res.render('pages/photoPage', {
+        ...mapHeaderData(prisonerData, res.locals.user),
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+    await checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
-    const personalPageService = new PersonalPageService(prisonApiClient)
-    const personalPageData = await personalPageService.get(prisonerData)
+      const personalPageService = new PersonalPageService(prisonApiClient)
+      const personalPageData = await personalPageService.get(prisonerData)
 
-    res.render('pages/personalPage', {
-      pageTitle: 'Personal',
-      ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
-      ...personalPageData,
+      res.render('pages/personalPage', {
+        pageTitle: 'Personal',
+        ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
+        ...personalPageData,
+      })
     })
   })
 
