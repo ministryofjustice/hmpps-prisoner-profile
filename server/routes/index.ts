@@ -66,8 +66,10 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const overviewController = new OverviewController(res.locals.clientToken)
-    return overviewController.displayOverview(req, res)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      const overviewController = new OverviewController(res.locals.clientToken)
+      return overviewController.displayOverview(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {

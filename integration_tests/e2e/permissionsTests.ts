@@ -78,6 +78,17 @@ export function permissionsTests<TPage extends Page>({
         Page.verifyOnPage(pageToDisplay)
       })
     })
+
+    context('The user has the GLOBAL_SEARCH role', () => {
+      beforeEach(() => {
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.GlobalSearch] })
+      })
+
+      it('Displays the page', () => {
+        visitPage(overrides)
+        Page.verifyOnPage(pageToDisplay)
+      })
+    })
   })
 
   context('The prisoner is transferring', () => {
@@ -100,6 +111,17 @@ export function permissionsTests<TPage extends Page>({
     context('The user has the INACTIVE_BOOKINGS role', () => {
       beforeEach(() => {
         cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.InactiveBookings] })
+      })
+
+      it('Displays the page', () => {
+        visitPage(overrides)
+        Page.verifyOnPage(pageToDisplay)
+      })
+    })
+
+    context('The user has the GLOBAL_SEARCH role', () => {
+      beforeEach(() => {
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.GlobalSearch] })
       })
 
       it('Displays the page', () => {
