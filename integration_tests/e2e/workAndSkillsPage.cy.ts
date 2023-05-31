@@ -1,13 +1,24 @@
 import WorkAndSkillsPage from '../pages/workAndSkillsPage'
 
 import Page from '../pages/page'
+import { permissionsTests } from './permissionsTests'
 
-const visitWorkAndSkillsPage = (): WorkAndSkillsPage => {
+const visitWorkAndSkillsPage = () => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/work-and-skills' })
-  return Page.verifyOnPage(WorkAndSkillsPage)
 }
 
 context('Work and Skills Page', () => {
+  context('Permissions', () => {
+    const prisonerNumber = 'G6123VU'
+    const visitPage = prisonerDataOverrides => {
+      cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
+      cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+      visitWorkAndSkillsPage()
+    }
+
+    permissionsTests({ prisonerNumber, pageToDisplay: WorkAndSkillsPage, visitPage })
+  })
+
   context('With a prisoner outside the users caseload', () => {
     beforeEach(() => {
       const prisonerNumber = 'G6123VU'
@@ -37,21 +48,21 @@ context('Work and Skills Page', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber })
         cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+        visitWorkAndSkillsPage()
       })
 
       it('Work and Skills page is displayed', () => {
-        visitWorkAndSkillsPage()
         cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and Skills')
       })
 
       it('Displays the Work and skills tab as active', () => {
-        const workAndSkillsPage = visitWorkAndSkillsPage()
+        const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
         workAndSkillsPage.activeTab().should('contain', 'Work and skills')
       })
 
       context('Sidebar', () => {
         it('Sidebar is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.sidebar().should('exist')
           workAndSkillsPage.sidebar().contains('a', 'Courses and qualifications')
           workAndSkillsPage.sidebar().contains('a', 'Work and activities')
@@ -63,98 +74,98 @@ context('Work and Skills Page', () => {
 
       context('Main', () => {
         it('Main block is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.main().should('exist')
         })
       })
 
       context('Courses and Qualifications card', () => {
         it('The card is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.CAQ_card().should('exist')
         })
         it('The card summary header contains Courses and qualifications', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.CAQ_header().contains('Courses and qualifications')
         })
 
         it('The card contains information about the card', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage
             .CAQ_info()
             .contains('This only includes educational courses. Contact the local education team to find out more.')
         })
 
         it('The card has a heading containing Current courses', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.CAQ_courses().contains('Current courses')
         })
 
         it('The card has a list key should contain "string"', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.CAQ_listKey().contains('string')
         })
 
         it('The card has a list value should contain end date 1 March 2023', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.CAQ_listValue().contains('Planned end date on 1 March 2023')
         })
 
         it('The card has a CTA link', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.CAQ_viewHistory().contains('View full course history')
         })
       })
 
       context('Work and activities card', () => {
         it('The card is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_card().should('exist')
         })
 
         it('The card summary header contains Work and activities', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_header().contains('Work and activities')
         })
 
         it('The card summary header contains Work and activities', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_header().contains('Work and activities')
         })
 
         it('The card has a list key that should contain Braille am', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_keyChild1().contains('Braille am')
         })
 
         it('The card contains the text Unacceptable absences', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_absences().contains('Unacceptable absences')
         })
 
         it('The card contains a key with the text Last 30 days', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_last30Days().contains('Last 30 days')
         })
 
         it('The card contains a value with the text Work "0"', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_valueChild1().contains('0')
         })
 
         it('The card contains the text John Saunders has no....', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.WAA_label().contains('John Saunders has no unacceptable absences in the last 6 months.')
         })
       })
 
       context('Employability skills card', () => {
         it('The card is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.ES_card().should('exist')
         })
         it('The card summary header should display', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.ES_header().should('exist')
           workAndSkillsPage.ES_header().contains('Employability skills')
           workAndSkillsPage.ES_heading().contains('Most recent levels')
@@ -165,11 +176,11 @@ context('Work and Skills Page', () => {
 
       context('Goals card', () => {
         it('The card is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.GoalsCard().should('exist')
         })
         it('The card details should display', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.GoalsHeader().should('exist')
           workAndSkillsPage.GoalsHeader().contains('Goals')
 
@@ -208,11 +219,11 @@ context('Work and Skills Page', () => {
 
       context('Functional skills level card', () => {
         it('The card is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.FSL_card().should('exist')
         })
         it('The card details should display', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.FSL_header().should('exist')
           workAndSkillsPage.FSL_header().contains('Functional skills level')
 
@@ -260,19 +271,19 @@ context('Work and Skills Page', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber })
         cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: true })
+        visitWorkAndSkillsPage()
       })
 
       context('Goals card', () => {
         it('Work and Skills page is displayed', () => {
-          visitWorkAndSkillsPage()
           cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and Skills')
         })
         it('The card is displayed', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.GoalsCard().should('exist')
         })
         it('The card details should display', () => {
-          const workAndSkillsPage = visitWorkAndSkillsPage()
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
           workAndSkillsPage.GoalsHeader().should('exist')
           workAndSkillsPage.GoalsHeader().contains('Goals')
 

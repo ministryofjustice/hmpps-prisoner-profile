@@ -96,26 +96,25 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
-    const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
+      const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
 
-    const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
-    const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
+      const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+      const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
+      const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
 
-    const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
-    const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
-    const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
-
-    res.render('pages/workAndSkills', {
-      ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
-      ...workAndSkillsPageData,
-      pageTitle: 'Work and skills',
-      fullCourseHistoryLinkUrl,
-      workAndActivities12MonthLinkUrl,
-      workAndActivities7DayLinkUrl,
+      res.render('pages/workAndSkills', {
+        ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
+        ...workAndSkillsPageData,
+        pageTitle: 'Work and skills',
+        fullCourseHistoryLinkUrl,
+        workAndActivities12MonthLinkUrl,
+        workAndActivities7DayLinkUrl,
+      })
     })
   })
 
