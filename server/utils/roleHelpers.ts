@@ -8,5 +8,5 @@ export const canViewCaseNotes = (user: User, prisoner: Prisoner) => {
 }
 
 export const canAddCaseNotes = (user: User, prisoner: Prisoner) => {
-  return userCanEdit(user, prisoner)
+  return userHasAllRoles([Role.GlobalSearch, Role.PomUser], user.userRoles) || userCanEdit(user, prisoner)
 }

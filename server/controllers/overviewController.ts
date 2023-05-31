@@ -93,7 +93,7 @@ export default class OverviewController {
     user: User,
   ): HmppsAction[] {
     const actions: HmppsAction[] = []
-    if (userCanEdit(user, prisonerData)) {
+    if (canAddCaseNotes(user, prisonerData)) {
       actions.push({
         text: 'Add case note',
         icon: Icon.AddCaseNote,
