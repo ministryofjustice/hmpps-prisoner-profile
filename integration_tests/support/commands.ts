@@ -34,9 +34,9 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber }) => {
+Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides = {} }) => {
   cy.task('stubEventsForProfileImage', prisonerNumber)
-  cy.task('stubPrisonerData', { prisonerNumber })
+  cy.task('stubPrisonerData', { prisonerNumber, overrides: prisonerDataOverrides })
   cy.task('stubActiveAlerts', bookingId)
   cy.task('stubActiveAlertsPage2', bookingId)
   cy.task('stubActiveAlertsSorted', bookingId)

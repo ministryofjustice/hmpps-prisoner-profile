@@ -119,17 +119,23 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/alerts', (req, res, next) => {
-    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
   })
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken, true)
-    return alertsController.displayAlerts(req, res)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      const alertsController = new AlertsController(res.locals.clientToken, true)
+      return alertsController.displayAlerts(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken, false)
-    return alertsController.displayAlerts(req, res)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      const alertsController = new AlertsController(res.locals.clientToken, false)
+      return alertsController.displayAlerts(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {

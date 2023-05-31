@@ -19,7 +19,11 @@ declare global {
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
-      setupAlertsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+      setupAlertsPageStubs(options: {
+        prisonerNumber: string
+        bookingId: number
+        prisonerDataOverrides?: Partial<Prisoner>
+      }): Chainable<AUTWindow>
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>

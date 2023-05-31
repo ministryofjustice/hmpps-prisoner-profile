@@ -8,11 +8,22 @@ export function permissionsTests<TPage extends Page>({
   prisonerNumber,
   visitPage,
   pageToDisplay,
+  pageWithTitleToDisplay,
 }: {
   prisonerNumber: string
   visitPage: (prisonerDataOverrides: Partial<Prisoner>) => void
-  pageToDisplay: new () => TPage
+  pageToDisplay?: new () => TPage
+  pageWithTitleToDisplay?: { page: new (title: string) => TPage; title: string }
 }) {
+  const verifyPageDisplayed = () => {
+    if (pageToDisplay) {
+      Page.verifyOnPage(pageToDisplay)
+    }
+    if (pageWithTitleToDisplay) {
+      Page.verifyOnPageWithTitle(pageWithTitleToDisplay.page, pageWithTitleToDisplay.title)
+    }
+  }
+
   beforeEach(() => {
     cy.task('reset')
   })
@@ -46,7 +57,7 @@ export function permissionsTests<TPage extends Page>({
 
       it('Displays the page', () => {
         visitPage(overrides)
-        Page.verifyOnPage(pageToDisplay)
+        verifyPageDisplayed()
       })
     })
   })
@@ -75,7 +86,7 @@ export function permissionsTests<TPage extends Page>({
 
       it('Displays the page', () => {
         visitPage(overrides)
-        Page.verifyOnPage(pageToDisplay)
+        verifyPageDisplayed()
       })
     })
 
@@ -86,7 +97,7 @@ export function permissionsTests<TPage extends Page>({
 
       it('Displays the page', () => {
         visitPage(overrides)
-        Page.verifyOnPage(pageToDisplay)
+        verifyPageDisplayed()
       })
     })
   })
@@ -115,7 +126,7 @@ export function permissionsTests<TPage extends Page>({
 
       it('Displays the page', () => {
         visitPage(overrides)
-        Page.verifyOnPage(pageToDisplay)
+        verifyPageDisplayed()
       })
     })
 
@@ -126,7 +137,7 @@ export function permissionsTests<TPage extends Page>({
 
       it('Displays the page', () => {
         visitPage(overrides)
-        Page.verifyOnPage(pageToDisplay)
+        verifyPageDisplayed()
       })
     })
   })
