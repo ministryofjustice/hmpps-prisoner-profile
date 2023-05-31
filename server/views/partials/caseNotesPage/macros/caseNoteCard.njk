@@ -1,30 +1,21 @@
 {% macro caseNoteCard(caseNote, staffId) %}
-    <div class="hmpps-case-note-card-list-item" role="listitem">
-        <div class="hmpps-case-note-card-list-item__content">
-            <div class="hmpps-case-note-card-list-item__header">
-                <div class="hmpps-case-note-card-list-item__title">{{ caseNote.typeDescription }}: {{ caseNote.subTypeDescription }}</div>
-            </div>
-            <pre class="hmpps-case-note-card-list-item__notes govuk-body">{{ caseNote.text }}</pre>
-            <div class="hmpps-case-note-card-list-item__metadata">Happened: {{ caseNote.occurrenceDateTime | formatDateTime('full') }}</div>
-            <div class="hmpps-case-note-card-list-item__metadata">Created: {{ caseNote.creationDateTime | formatDateTime('full') }} by {{ caseNote.authorName }}</div>
-            {% if caseNote.amendments.length %}
-                <div class="hmpps-case-note-card-list-item__amendments-header">More details added:</div>
-                {% for amendment in caseNote.amendments %}
-                    <div class="hmpps-case-note-card-list-item__amendment">
-                        <pre class="hmpps-case-note-card-list-item__notes govuk-body">{{ amendment.additionalNoteText }}</pre>
-                        <div class="hmpps-case-note-card-list-item__metadata">Added: {{ amendment.creationDateTime | formatDateTime('full') }} by {{ amendment.authorName }}</div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+<div class="hmpps-case-note-card-list-item" role="listitem">
+    <div class="hmpps-case-note-card-list-item__content">
+        <div class="hmpps-case-note-card-list-item__header">
+            <div class="hmpps-case-note-card-list-item__title">{{ caseNote.typeDescription }}: {{ caseNote.subTypeDescription }}</div>
         </div>
-        <div class="hmpps-case-note-card-list-item__link">
-            {% if staffId == caseNote.authorUserId %}
-                <a href="#" class="govuk-link govuk-link--no-visited-state">Add more details</a>
-            {% endif %}
-            {% if caseNote.deleteLink %}
-                <a href="{{ caseNote.deleteLink }}" class="govuk-link govuk-link--no-visited-state">Delete case note</a>
-            {% endif %}
-        </div>
+        <pre class="hmpps-case-note-card-list-item__notes govuk-body">{{ caseNote.text }}</pre>
+        <div class="hmpps-case-note-card-list-item__metadata">Happened: {{ caseNote.occurrenceDateTime | formatDateTime('full') }}</div>
+        <div class="hmpps-case-note-card-list-item__metadata">Created: {{ caseNote.creationDateTime | formatDateTime('full') }} by {{ caseNote.authorName }}</div>
+        {% if caseNote.amendments.length %}
+            <div class="hmpps-case-note-card-list-item__amendments-header">More details added:</div>
+            {% for amendment in caseNote.amendments %}
+                <div class="hmpps-case-note-card-list-item__amendment">
+                    <pre class="hmpps-case-note-card-list-item__notes govuk-body">{{ amendment.additionalNoteText }}</pre>
+                    <div class="hmpps-case-note-card-list-item__metadata">Added: {{ amendment.creationDateTime | formatDateTime('full') }} by {{ amendment.authorName }}</div>
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="hmpps-case-note-card-list-item__link">
         {% if staffId == caseNote.authorUserId %}
