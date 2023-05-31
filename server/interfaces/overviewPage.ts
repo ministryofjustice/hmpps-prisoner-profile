@@ -1,5 +1,9 @@
 import { MiniSummary } from './miniSummary'
 import { PersonalDetails } from './personalDetails'
+import { CourtCase } from './prisonApi/courtCase'
+import { CourtHearing } from './prisonApi/courtHearing'
+import { FullStatus } from './prisonApi/fullStatus'
+import { MainOffence } from './prisonApi/mainOffence'
 import { Status } from './status'
 
 export interface OverviewScheduleItem {
@@ -27,5 +31,13 @@ export interface OverviewPage {
   personalDetails: PersonalDetails
   staffContacts: object
   schedule: OverviewSchedule
-  offencesOverview: any
+  offencesOverview: {
+    mainOffence: MainOffence
+    courtCaseData: CourtCase[]
+    fullStatus: FullStatus
+    imprisonmentStatusDescription: string
+    conditionalReleaseDate: string
+    confirmedReleaseDate: string
+    nextCourtAppearance: CourtHearing
+  }
 }
