@@ -716,10 +716,10 @@ export default {
 
   stubGetFullStatus: (prisonerNumber: string) => {
     let jsonResp: FullStatus
-    if (prisonerNumber === 'G6123VU') {
-      jsonResp = fullStatusMock
-    } else if (prisonerNumber === 'ONREMAND') {
+    if (prisonerNumber === 'ONREMAND') {
       jsonResp = fullStatusRemandMock
+    } else {
+      jsonResp = fullStatusMock
     }
     return stubFor({
       request: {
@@ -738,10 +738,10 @@ export default {
 
   stubGetCourtCases: (bookingId: number) => {
     let jsonResp
-    if (bookingId === 1102484) {
-      jsonResp = CourtCasesSentencedMockA
-    } else if (bookingId === 1234568) {
+    if (bookingId === 1234568) {
       jsonResp = CourtCaseWithNextCourtAppearance
+    } else {
+      jsonResp = CourtCasesSentencedMockA
     }
     return stubFor({
       request: {
