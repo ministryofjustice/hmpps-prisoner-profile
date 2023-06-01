@@ -616,4 +616,12 @@ describe('PersonalPageService', () => {
       expect(reasonableAdjustments[0].agency).toEqual('Moorland (HMP & YOI)')
     })
   })
+
+  describe('Addresses returns undefined', () => {
+    it('Sets the address to empty', async () => {
+      prisonApiClient.getAddresses = jest.fn(async () => undefined)
+      const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(addresses.address.street).toEqual('')
+    })
+  })
 })
