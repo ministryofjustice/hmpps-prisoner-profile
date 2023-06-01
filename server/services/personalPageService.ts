@@ -160,7 +160,7 @@ export default class PersonalPageService {
     }))
   }
 
-  private addresses(addresses: Address[]): Addresses {
+  private addresses(addresses: Address[] = []): Addresses | undefined {
     const primaryAddress = addresses.find(address => address.primary)
     return {
       comment: primaryAddress?.comment || '',
