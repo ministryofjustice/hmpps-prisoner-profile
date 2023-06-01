@@ -11,7 +11,7 @@ declare global {
       setupBannerStubs(options: { prisonerNumber: string }): Chainable<AUTWindow>
       setupOverviewPageStubs(options: {
         prisonerNumber: string
-        bookingId: string
+        bookingId: number
         restrictedPatient?: boolean
       }): Chainable<AUTWindow>
       setupAlertsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>

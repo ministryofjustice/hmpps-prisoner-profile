@@ -3,7 +3,7 @@ import { CourtCase } from '../../interfaces/prisonApi/courtCase'
 import AgencyMock from './agency'
 import { CourtHearingsMock, CourtHearingsMockA } from './courtHearingsMock'
 
-const sixMonthsInTheFuture = format(add(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
+export const sixMonthsInTheFuture = format(add(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
 const twelveMonthsInTheFuture = format(add(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
 
 const threeMonthsInTheFuture = format(add(startOfToday(), { months: 3 }), 'yyyy-MM-dd')

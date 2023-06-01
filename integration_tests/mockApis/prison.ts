@@ -30,6 +30,7 @@ import {
 } from '../../server/data/localMockData/pagedAlertsMock'
 import {
   CourtCasesMock,
+  CourtCasesSentencedMockA,
   CourtCasesUnsentencedMockA,
   CourtCaseWithNextCourtAppearance,
 } from '../../server/data/localMockData/courtCaseMock'
@@ -46,7 +47,12 @@ import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import { CaseLoad } from '../../server/interfaces/caseLoad'
 import { CaseNoteUsage } from '../../server/interfaces/prisonApi/caseNoteUsage'
 
-import { mainOffenceMock, fullStatusMock } from '../../server/data/localMockData/offenceOverviewMock'
+import {
+  mainOffenceMock,
+  fullStatusMock,
+  fullStatusRemandMock,
+} from '../../server/data/localMockData/offenceOverviewMock'
+import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -709,6 +715,12 @@ export default {
   },
 
   stubGetFullStatus: (prisonerNumber: string) => {
+    let jsonResp: FullStatus
+    if (prisonerNumber === 'G6123VU') {
+      jsonResp = fullStatusMock
+    } else if (prisonerNumber === 'ONREMAND') {
+      jsonResp = fullStatusRemandMock
+    }
     return stubFor({
       request: {
         method: 'GET',
@@ -719,12 +731,18 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: fullStatusMock,
+        jsonBody: jsonResp,
       },
     })
   },
 
   stubGetCourtCases: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1102484) {
+      jsonResp = CourtCasesSentencedMockA
+    } else if (bookingId === 1234568) {
+      jsonResp = CourtCaseWithNextCourtAppearance
+    }
     return stubFor({
       request: {
         method: 'GET',
@@ -735,7 +753,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: CourtCaseWithNextCourtAppearance,
+        jsonBody: jsonResp,
       },
     })
   },

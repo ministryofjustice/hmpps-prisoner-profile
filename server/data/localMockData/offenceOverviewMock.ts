@@ -25,6 +25,23 @@ export const fullStatusMock: FullStatus = {
   establishmentName: 'Transfer',
 }
 
+export const fullStatusRemandMock: FullStatus = {
+  nomsId: 'G6123VU',
+  establishmentCode: 'TRN',
+  bookingId: 1102484,
+  givenName1: 'JOHN',
+  lastName: 'SAUNDERS',
+  dateOfBirth: '1990-10-12',
+  gender: 'Male',
+  englishSpeaking: true,
+  bookingBeginDate: '2016-05-30',
+  releaseDate: '2076-01-29',
+  categoryCode: 'C',
+  communityStatus: 'INACTIVE TRN',
+  legalStatus: 'REMAND',
+  establishmentName: 'Transfer',
+}
+
 export const offenceOverviewMock: object = {
   conditionalReleaseDate: undefined,
   confirmedReleaseDate: undefined,

@@ -114,4 +114,36 @@ export default class OverviewPage extends Page {
   pathfinderProfileInfoLink = (): PageElement => cy.get('[data-qa=pathfinder-profile-info-link]')
 
   socProfileInfoLink = (): PageElement => cy.get('[data-qa=soc-profile-info-link]')
+
+  // Offences
+
+  offencesHeader = (): PageElement =>
+    cy.get('[data-qa="overview-offences"] > .hmpps-summary-card > [data-qa="summary-header"]')
+
+  offenceCardContent = (): PageElement =>
+    cy.get(
+      '[data-qa="overview-offences"] > .hmpps-summary-card > .hmpps-summary-card__body > .govuk-grid-row > .govuk-grid-column-full',
+    )
+
+  mainOffence = (): PageElement => cy.get('[data-qa="overview-main-offence"]')
+
+  imprisonmentStatusLabel = (): PageElement =>
+    cy.get(
+      '[data-qa="overview-offences"] > .hmpps-summary-card > .hmpps-summary-card__body > .govuk-grid-row > .govuk-grid-column-full > :nth-child(4)',
+    )
+
+  imprisonmentStatus = (): PageElement =>
+    cy.get(
+      '[data-qa="overview-offences"] > .hmpps-summary-card > .hmpps-summary-card__body > .govuk-grid-row > .govuk-grid-column-full > :nth-child(5)',
+    )
+
+  viewAllOffencesLink = (): PageElement => cy.get('[data-qa="overview-offences-view-all"]')
+
+  // Not on remand
+  overviewConditionalReleaseLabel = (): PageElement => cy.get('[data-qa="overview-conditional-release-label"]')
+
+  overviewConditionalRelease = (): PageElement => cy.get('[data-qa="overview-conditional-release"]')
+
+  // On remand
+  nextAppearanceDate = (): PageElement => cy.get('[data-qa="overview-next-court-appearance"]')
 }

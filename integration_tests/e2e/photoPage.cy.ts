@@ -2,7 +2,7 @@ import PrisonerPhotoPage from '../pages/photoPage'
 
 context('Photo Page', () => {
   const prisonerNumber = 'G6123VU'
-  const bookingId = '1102484'
+  const bookingId = 1102484
 
   beforeEach(() => {
     cy.task('reset')
