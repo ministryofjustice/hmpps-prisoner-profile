@@ -139,17 +139,17 @@ export default function routes(service: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-    const offencesPageService = new OffencesPageService(prisonApiClient)
-    const offencesPageData = await offencesPageService.get(prisonerData)
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const offencesPageService = new OffencesPageService(prisonApiClient)
+      const offencesPageData = await offencesPageService.get(prisonerData)
 
-    res.render('pages/offences', {
-      pageTitle: 'Offences',
-      ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
-      ...offencesPageData,
-      activeTab: true,
+      res.render('pages/offences', {
+        pageTitle: 'Offences',
+        ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
+        ...offencesPageData,
+        activeTab: true,
+      })
     })
   })
 
