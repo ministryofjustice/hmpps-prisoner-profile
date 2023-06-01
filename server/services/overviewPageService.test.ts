@@ -52,6 +52,7 @@ import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
 import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
+import { Role } from '../data/enums/role'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -176,7 +177,7 @@ describe('OverviewPageService', () => {
         expect(res.miniSummaryGroupA).toEqual([])
       })
 
-      it.each(['POM_USER', 'RECEPTION_USER'])(
+      it.each([Role.PomUser, Role.ReceptionUser])(
         'should return the adjudications when the user has a specific role',
         async userRole => {
           const prisonerNumber = 'A1234BC'

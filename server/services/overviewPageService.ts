@@ -334,7 +334,7 @@ export default class OverviewPageService {
       summaryData.push({ data: moneySummaryData, classes: 'govuk-grid-row card-body' })
     }
 
-    if (belongsToCaseLoad || userHasRoles(['POM_USER', 'RECEPTION_USER'], userRoles)) {
+    if (belongsToCaseLoad || userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)) {
       summaryData.push({ data: adjudicationsSummaryData, classes: 'govuk-grid-row card-body' })
     }
 

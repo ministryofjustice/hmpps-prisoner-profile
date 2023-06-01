@@ -22,4 +22,5 @@ export enum Role {
   PomUser = 'ROLE_POM',
   ViewProbationDocuments = 'ROLE_VIEW_PROBATION_DOCUMENTS',
   PrisonUser = 'ROLE_PRISON',
+  ReceptionUser = 'ROLE_PRISON_RECEPTION',
 }
