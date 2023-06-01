@@ -4,4 +4,8 @@ export default class NotFoundPage extends Page {
   constructor() {
     super('Page not found')
   }
+
+  shouldBeDisplayed() {
+    cy.getDataQa('page-not-found').should('be.visible')
+  }
 }
