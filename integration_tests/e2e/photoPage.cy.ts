@@ -1,8 +1,14 @@
 import PrisonerPhotoPage from '../pages/photoPage'
+import { permissionsTests } from './permissionsTests'
 
 context('Photo Page', () => {
   const prisonerNumber = 'G6123VU'
   const bookingId = 1102484
+
+  context('Permissions', () => {
+    const visitPage = () => cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
+    permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoPage })
+  })
 
   beforeEach(() => {
     cy.task('reset')

@@ -1,10 +1,10 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
+import { permissionsTests } from './permissionsTests'
 
-const visitOverviewPage = (): OverviewPage => {
+const visitOverviewPage = () => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
-  return Page.verifyOnPage(OverviewPage)
 }
 
 const visitOverviewPageAlt = (): OverviewPage => {
@@ -18,6 +18,15 @@ const visitOverviewPageOnRemand = (): OverviewPage => {
 }
 
 context('Overview Page', () => {
+  context('Permissions', () => {
+    const prisonerNumber = 'G6123VU'
+    const visitPage = prisonerDataOverrides => {
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId: 1102484, prisonerDataOverrides })
+      visitOverviewPage()
+    }
+
+    permissionsTests({ prisonerNumber, pageToDisplay: OverviewPage, visitPage })
+  })
   context('Given the prisoner is not within the users caseload', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
@@ -51,31 +60,31 @@ context('Overview Page', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
     })
 
     it('Overview page is displayed', () => {
-      visitOverviewPage()
       cy.request('/prisoner/G6123VU').its('body').should('contain', 'Overview')
     })
 
     it('Displays the overview tab as active', () => {
-      const overviewPage = visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.activeTab().should('contain', 'Overview')
     })
 
     context('Mini Summary A', () => {
       it('Mini summary list is displayed', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.miniSummaryGroupA().should('exist')
       })
 
       it('Mini summary Group A should display the macro header', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.miniSummaryGroupA_MacroHeader().should('exist')
       })
 
       it('Mini summary Group A should contain Money card with correct data', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.moneyCard().contains('h2', 'Money')
         overviewPage.moneyCard().contains('p', 'Spends')
         overviewPage.moneyCard().contains('p', '£240.51')
@@ -85,7 +94,7 @@ context('Overview Page', () => {
       })
 
       it('Mini summary Group A should contain Adjudications card with correct data', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.adjudicationsCard().contains('h2', 'Adjudications')
         overviewPage.adjudicationsCard().contains('p', 'Proven in last 3 months')
         overviewPage.adjudicationsCard().contains('p', '4')
@@ -95,7 +104,7 @@ context('Overview Page', () => {
       })
 
       it('Mini summary Group A should contain Visits card with correct data', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.visitsCard().contains('h2', 'Visits')
         overviewPage.visitsCard().contains('p', 'Next visit date')
         overviewPage.visitsCard().contains('p', '15/09/2023')
@@ -108,17 +117,17 @@ context('Overview Page', () => {
 
     context('Mini Summary B', () => {
       it('Mini summary list is displayed', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.miniSummaryGroupB().should('exist')
       })
 
       it('Mini summary Group B should hide the macro header', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.miniSummaryGroupB_MacroHeader().should('not.exist')
       })
 
       it('Mini summary Group B should contain Category card with correct data', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.categoryCard().contains('p', 'Category')
         overviewPage.categoryCard().contains('p', 'B')
         overviewPage.categoryCard().contains('p', 'Next review: 19/02/2023')
@@ -126,7 +135,7 @@ context('Overview Page', () => {
       })
 
       it('Mini summary Group B should contain Incentives card with correct data', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.incentivesCard().contains('p', 'Incentives: since last review')
         overviewPage.incentivesCard().contains('p', 'Positive behaviours: 1')
         overviewPage.incentivesCard().contains('p', 'Negative behaviours: 1')
@@ -135,7 +144,7 @@ context('Overview Page', () => {
       })
 
       it('Mini summary Group B should contain CSRA card with correct data', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.csraCard().contains('p', 'CSRA')
         overviewPage.csraCard().contains('p', 'Standard')
         overviewPage.csraCard().contains('p', 'Last review: 19/02/2021')
@@ -144,14 +153,14 @@ context('Overview Page', () => {
     })
 
     it('Should hide the change location link', () => {
-      const overviewPage = visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
       // The link text label is change location but the functionality is change caseload
       overviewPage.headerChangeLocation().should('not.exist')
     })
 
     context('Non-associations', () => {
       it('Displays the non associations on the page', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.nonAssociations().table().should('exist')
         overviewPage.nonAssociations().rows().should('have.length', 3)
         overviewPage.nonAssociations().row(1).prisonerName().should('have.text', 'John Doe')
@@ -167,14 +176,14 @@ context('Overview Page', () => {
 
     context('Personal details', () => {
       it('Displays the prisoner presonal details', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.personalDetails().should('exist')
       })
     })
 
     context('Schedule', () => {
       it('Displays the schedule on the page', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.schedule().morning().column().should('exist')
         overviewPage.schedule().afternoon().column().should('exist')
         overviewPage.schedule().evening().column().should('exist')
@@ -188,13 +197,13 @@ context('Overview Page', () => {
 
     context('Staff contacts', () => {
       it('Displays the offender staff contact details', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.staffContacts().should('exist')
       })
     })
 
     it('Click the prisoner profile and go to the stand alone photo page', () => {
-      const overviewPage = visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
       cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
       overviewPage.prisonerPhotoLink().should('exist')
       overviewPage.prisonerPhotoLink().click({ force: true })
@@ -203,7 +212,7 @@ context('Overview Page', () => {
 
     context('Statuses', () => {
       it('Displays the status list', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().should('exist')
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
       })
@@ -211,7 +220,7 @@ context('Overview Page', () => {
 
     context('Click work and skills button', () => {
       it('Displays the status list', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().should('exist')
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
       })
@@ -219,50 +228,50 @@ context('Overview Page', () => {
 
     context('Actions', () => {
       it('should display Add case note link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.addCaseNoteActionLink().should('exist')
       })
 
       it('should display Add appointment link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.addAppointmentActionLink().should('exist')
       })
 
       it('should display Report use of force link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.reportUseOfForceActionLink().should('exist')
       })
 
       it('should not display Refer to Pathfinder link or the Pathfinder profile link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.referToPathfinderActionLink().should('not.exist')
         overviewPage.pathfinderProfileInfoLink().should('not.exist')
       })
 
       it('should not display Add to SOC link or the SOC profile link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.addToSocActionLink().should('not.exist')
         overviewPage.socProfileInfoLink().should('not.exist')
       })
 
       it('should not display Manage category link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.manageCategoryActionLink().should('not.exist')
       })
     })
 
     context('More Info', () => {
       it('should not display probation documents link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.probationDocumentsInfoLink().should('not.exist')
       })
 
       it('should not display pathfinder profile link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.pathfinderProfileInfoLink().should('not.exist')
       })
       it('should not display soc profile link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.socProfileInfoLink().should('not.exist')
       })
     })
@@ -291,10 +300,11 @@ context('Overview Page', () => {
     context('Prisoner is already in Pathfinder', () => {
       beforeEach(() => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        visitOverviewPage()
       })
 
       it('should display Pathfinder profile link, and not the Refer to Pathfinder link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.pathfinderProfileInfoLink().should('exist')
         overviewPage.referToPathfinderActionLink().should('not.exist')
       })
@@ -324,10 +334,11 @@ context('Overview Page', () => {
     context('Prisoner is already in Pathfinder', () => {
       beforeEach(() => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        visitOverviewPage()
       })
 
       it('should display Pathfinder profile link, and not the Refer to Pathfinder link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.pathfinderProfileInfoLink().should('exist')
         overviewPage.referToPathfinderActionLink().should('not.exist')
       })
@@ -357,10 +368,11 @@ context('Overview Page', () => {
     context('Prisoner is already in SOC', () => {
       beforeEach(() => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        visitOverviewPage()
       })
 
       it('should display SOC profile link, and not the Add to SOC link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.socProfileInfoLink().should('exist')
         overviewPage.addToSocActionLink().should('not.exist')
       })
@@ -374,10 +386,11 @@ context('Overview Page', () => {
         roles: [Role.PrisonUser, Role.CreateCategorisation],
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
     })
 
     it('should display Manage category link', () => {
-      const overviewPage = visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.manageCategoryActionLink().should('exist')
     })
   })
@@ -389,10 +402,11 @@ context('Overview Page', () => {
         roles: [Role.PrisonUser, Role.PomUser],
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
     })
 
     it('should display Probation documents  link', () => {
-      const overviewPage = visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.probationDocumentsInfoLink().should('exist')
     })
   })
@@ -404,10 +418,11 @@ context('Overview Page', () => {
         roles: [Role.PrisonUser, Role.ViewProbationDocuments],
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
     })
 
     it('should display Probation documents  link', () => {
-      const overviewPage = visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.probationDocumentsInfoLink().should('exist')
     })
   })
@@ -419,21 +434,22 @@ context('Overview Page', () => {
         roles: [Role.PrisonUser],
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, restrictedPatient: true })
+      visitOverviewPage()
     })
 
     context('Actions', () => {
       it('should display Add case note link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.addCaseNoteActionLink().should('exist')
       })
 
       it('should not display Add appointment link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.addAppointmentActionLink().should('not.exist')
       })
 
       it('should not display Report use of force link', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.reportUseOfForceActionLink().should('not.exist')
       })
     })
@@ -446,11 +462,12 @@ context('Overview Page', () => {
         roles: ['ROLE_GLOBAL_SEARCH'],
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
     })
 
     context('Main offence overview', () => {
       it('should display main offence and conditional release date and hide the next court appearance', () => {
-        const overviewPage = visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.offencesHeader().should('exist')
         overviewPage.offenceCardContent().should('exist')
         overviewPage.mainOffence().should('exist')

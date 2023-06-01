@@ -15,10 +15,37 @@ import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
+import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { Role } from '../data/enums/role'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
   const router = Router()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function checkPrisonerInCaseLoad(req: any, res: any, func: (prisonerData: Prisoner) => Promise<void>) {
+    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const globalSearchUser = userHasRoles([Role.GlobalSearch], res.locals.user.userRoles)
+
+    if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) && !globalSearchUser) {
+      const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
+
+      if (inactiveBooking) {
+        if (!userHasRoles([Role.InactiveBookings], res.locals.user.userRoles)) {
+          return res.render('notFound.njk', {
+            url: req.headers.referer,
+          })
+        }
+      } else {
+        return res.render('notFound.njk', {
+          url: req.headers.referer,
+        })
+      }
+    }
+
+    return func(prisonerData)
+  }
 
   router.use(async (req, res, next) => {
     res.locals = {
@@ -39,84 +66,90 @@ export default function routes(service: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const overviewController = new OverviewController(res.locals.clientToken)
-    return overviewController.displayOverview(req, res)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      const overviewController = new OverviewController(res.locals.clientToken)
+      return overviewController.displayOverview(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-
-    res.render('pages/photoPage', {
-      ...mapHeaderData(prisonerData, res.locals.user),
+    checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+      res.render('pages/photoPage', {
+        ...mapHeaderData(prisonerData, res.locals.user),
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+    await checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
-    const personalPageService = new PersonalPageService(prisonApiClient)
-    const personalPageData = await personalPageService.get(prisonerData)
+      const personalPageService = new PersonalPageService(prisonApiClient)
+      const personalPageData = await personalPageService.get(prisonerData)
 
-    res.render('pages/personalPage', {
-      pageTitle: 'Personal',
-      ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
-      ...personalPageData,
+      res.render('pages/personalPage', {
+        pageTitle: 'Personal',
+        ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
+        ...personalPageData,
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
 
-    const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
+      const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
 
-    const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
-    const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
+      const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+      const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
+      const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
 
-    const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
-    const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
-    const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
-
-    res.render('pages/workAndSkills', {
-      ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
-      ...workAndSkillsPageData,
-      pageTitle: 'Work and skills',
-      fullCourseHistoryLinkUrl,
-      workAndActivities12MonthLinkUrl,
-      workAndActivities7DayLinkUrl,
+      res.render('pages/workAndSkills', {
+        ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
+        ...workAndSkillsPageData,
+        pageTitle: 'Work and skills',
+        fullCourseHistoryLinkUrl,
+        workAndActivities12MonthLinkUrl,
+        workAndActivities7DayLinkUrl,
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/alerts', (req, res, next) => {
-    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
   })
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken, true)
-    return alertsController.displayAlerts(req, res)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      const alertsController = new AlertsController(res.locals.clientToken, true)
+      return alertsController.displayAlerts(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    const alertsController = new AlertsController(res.locals.clientToken, false)
-    return alertsController.displayAlerts(req, res)
+    checkPrisonerInCaseLoad(req, res, async () => {
+      const alertsController = new AlertsController(res.locals.clientToken, false)
+      return alertsController.displayAlerts(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
-    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-    const offencesPageService = new OffencesPageService(prisonApiClient)
-    const offencesPageData = await offencesPageService.get(prisonerData)
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const offencesPageService = new OffencesPageService(prisonApiClient)
+      const offencesPageData = await offencesPageService.get(prisonerData)
 
-    res.render('pages/offences', {
-      pageTitle: 'Offences',
-      ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
-      ...offencesPageData,
-      activeTab: true,
+      res.render('pages/offences', {
+        pageTitle: 'Offences',
+        ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
+        ...offencesPageData,
+        activeTab: true,
+      })
     })
   })
 

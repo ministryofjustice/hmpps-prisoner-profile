@@ -1,4 +1,5 @@
 import { CaseLoad } from '../server/interfaces/caseLoad'
+import { Prisoner } from '../server/interfaces/prisoner'
 
 declare global {
   namespace Cypress {
@@ -8,13 +9,21 @@ declare global {
        * @example cy.signIn({ failOnStatusCode: boolean })
        */
       signIn(options?: { failOnStatusCode?: boolean; redirectPath?: string }): Chainable<AUTWindow>
-      setupBannerStubs(options: { prisonerNumber: string }): Chainable<AUTWindow>
+      setupBannerStubs(options: {
+        prisonerNumber: string
+        prisonerDataOverrides?: Partial<Prisoner>
+      }): Chainable<AUTWindow>
       setupOverviewPageStubs(options: {
         prisonerNumber: string
         bookingId: number
         restrictedPatient?: boolean
+        prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
-      setupAlertsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+      setupAlertsPageStubs(options: {
+        prisonerNumber: string
+        bookingId: number
+        prisonerDataOverrides?: Partial<Prisoner>
+      }): Chainable<AUTWindow>
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>

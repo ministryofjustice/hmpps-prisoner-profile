@@ -1,21 +1,34 @@
 import Page from '../pages/page'
 import AlertsPage from '../pages/alertsPage'
 import { Role } from '../../server/data/enums/role'
+import { permissionsTests } from './permissionsTests'
 
-const visitActiveAlertsPage = (): AlertsPage => {
+const visitActiveAlertsPage = () => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/active' })
-  return Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
 }
 
-const visitInactiveAlertsPage = (): AlertsPage => {
+const visitInactiveAlertsPage = () => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/inactive?page=2' })
-  return Page.verifyOnPageWithTitle(AlertsPage, 'Inactive alerts')
 }
 
-const visitEmptyAlertsPage = (): AlertsPage => {
+const visitEmptyAlertsPage = () => {
   cy.signIn({ redirectPath: '/prisoner/A1234BC/alerts/active' })
-  return Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
 }
+
+context('Alerts Page - Permissions', () => {
+  context('Active alerts', () => {
+    const visitPage = prisonerDataOverrides => {
+      cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonerDataOverrides })
+      visitActiveAlertsPage()
+    }
+
+    permissionsTests({
+      prisonerNumber: 'G6123VU',
+      visitPage,
+      pageWithTitleToDisplay: { page: AlertsPage, title: 'Active alerts' },
+    })
+  })
+})
 
 context('Alerts Page - User does not have Update Alerts role', () => {
   beforeEach(() => {
@@ -28,7 +41,8 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      alertsPage = visitActiveAlertsPage()
+      visitActiveAlertsPage()
+      alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
     it('Does not display the add alert button', () => {
@@ -66,7 +80,8 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      alertsPage = visitInactiveAlertsPage()
+      visitInactiveAlertsPage()
+      alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Inactive alerts')
     })
 
     it('Displays the inactive alerts tab selected with correct count', () => {
@@ -96,7 +111,8 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
-      alertsPage = visitEmptyAlertsPage()
+      visitEmptyAlertsPage()
+      alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
     it('Displays the active alerts tab selected with correct count', () => {
@@ -122,7 +138,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      alertsPage = visitActiveAlertsPage()
+      alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
     it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
@@ -142,7 +158,8 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      alertsPage = visitActiveAlertsPage()
+      visitActiveAlertsPage()
+      alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
     it('Displays the active alerts tab and sorts results by Created (oldest)', () => {
@@ -161,7 +178,8 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      alertsPage = visitActiveAlertsPage()
+      visitActiveAlertsPage()
+      alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
     it('Displays the active alerts tab and filters results', () => {
@@ -183,7 +201,8 @@ context('Alerts Page - User has Update Alert role', () => {
       caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
     })
     cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-    alertsPage = visitActiveAlertsPage()
+    visitActiveAlertsPage()
+    alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
   })
 
   let alertsPage
