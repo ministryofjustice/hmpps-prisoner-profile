@@ -376,7 +376,7 @@ export const apostrophe = (word: string): string => {
   if (lastCh === 's') {
     return `${word}’`
   }
-  return `${word}s’`
+  return `${word}’s`
 }
 
 export const prependBaseUrl = (url: string): string => {
