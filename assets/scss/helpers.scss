@@ -18,7 +18,12 @@
 }
 
 .hmpps-clickable-image {
-  width: 0px;
+  width: 0;
+
+  &:focus img {
+    outline: 4px solid $govuk-focus-colour;
+    outline-offset: -1px;
+  }
 }
 
 .hmpps-icon {
@@ -42,7 +47,7 @@
 
 .hmpps-grey-details-card {
   border-left: 5px solid  govuk-colour("mid-grey");
-  margin: 0px;
+  margin: 0;
   background-color:  govuk-colour("light-grey");
 }
 

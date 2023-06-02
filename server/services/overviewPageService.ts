@@ -9,6 +9,7 @@ import {
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
   convertToTitleCase,
+  formatCategoryCodeDescription,
   formatMoney,
   formatPrivilegedVisitsSummary,
   getNamesFromString,
@@ -381,7 +382,7 @@ export default class OverviewPageService {
 
     const categorySummaryData: MiniSummaryData = {
       bottomLabel: 'Category',
-      bottomContentLine1: category ? category.classificationCode : 'Not entered',
+      bottomContentLine1: formatCategoryCodeDescription(category?.classificationCode),
       bottomContentLine3: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
       bottomClass: 'small',
       linkLabel: undefined,
@@ -497,24 +498,19 @@ export default class OverviewPageService {
     ])
 
     // Current Location
-    const inOutStatusDescription = (status: string) =>
-      ({
-        IN: 'In',
-        OUT: 'Out from',
-        TRN: 'Transfer',
-      }[status])
-
-    const inOutLocationDescription = (status: string) =>
-      ({
-        IN: prisonerData.locationDescription,
-        OUT: prisonerData.locationDescription,
-        TRN: prisonerData.locationDescription,
-      }[status])
+    let currentLocation = ''
+    if (prisonerData.inOutStatus === 'IN') {
+      currentLocation = `In ${prisonerData.prisonName}`
+    } else if (prisonerData.status === 'ACTIVE OUT') {
+      currentLocation = `Out from ${prisonerData.prisonName}`
+    } else if (prisonerData.status === 'INACTIVE OUT') {
+      currentLocation = prisonerData.locationDescription
+    } else if (prisonerData.inOutStatus === 'TRN') {
+      currentLocation = 'Being transferred'
+    }
 
     statusList.push({
-      label: `${inOutStatusDescription(prisonerData.inOutStatus)} ${inOutLocationDescription(
-        prisonerData.inOutStatus,
-      )}`,
+      label: currentLocation,
     })
 
     // Pregnant
