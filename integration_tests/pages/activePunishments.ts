@@ -13,11 +13,11 @@ export default class ActivePunishmentsPage extends Page {
 
   startDateLabel = (): PageElement => cy.get('[data-qa="active-punishment-start-date-label"]')
 
-  firstRowPunishmentType = (): PageElement => cy.get('.govuk-summary-list > :nth-child(2) > :nth-child(1)')
+  firstRowPunishmentType = (): PageElement => cy.get('.govuk-table__body > .govuk-table__row > :nth-child(1)')
 
-  firstRowDetailsComment = (): PageElement => cy.get('.govuk-summary-list > :nth-child(2) > :nth-child(2)')
+  firstRowDetailsComment = (): PageElement => cy.get('.govuk-table__body > .govuk-table__row > :nth-child(2)')
 
-  firstRowStartDate = (): PageElement => cy.get('.govuk-summary-list > :nth-child(2) > :nth-child(3)')
+  firstRowStartDate = (): PageElement => cy.get('.govuk-table__body > .govuk-table__row > :nth-child(3)')
 
   viewHistoryLink = (): PageElement => cy.get('[data-qa="active-punishment-view-history"]')
 }

@@ -176,12 +176,12 @@ export default function routes(service: Services): Router {
 
   get('/prisoner/:prisonerNumber/adjudications', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      res.redirect(`${config.apis.dpsHomePageUrl}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
+      res.redirect(`${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
     })
   })
 
   get('/', (req, res, next) => {
-    res.redirect(config.apis.dpsHomePageUrl)
+    res.redirect(`${config.serviceUrls.digitalPrison}`)
   })
 
   return router

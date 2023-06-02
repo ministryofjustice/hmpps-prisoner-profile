@@ -1,38 +1,41 @@
 {% extends "./index.njk" %}
+{% set breadCrumbs = [
+  {
+    text: 'Home',
+    href:  "/" | prependBaseUrl
+  },
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% block body %}
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1>{{name}}’ active punishments</h1>
+            <h1>{{name |  apostrophe}} active punishments</h1>
         </div>
     </div>
 
-    <dl class="govuk-summary-list">
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key" data-qa="active-punishment-type-label">
-            Punishment type
-        </dt>
-        <dt class="govuk-summary-list__key" data-qa="active-punishment-details-label">
-            Details
-        </dt>
-        <dd class="govuk-summary-list__actions govuk-!-font-weight-bold govuk-!-text-align-left hmpps-active-punishments-start-date" data-qa="active-punishment-start-date-label">
-            Start date
-        </dd>
-    </div>
-    {% for award in adjudications.awards %}
-        <div class="govuk-summary-list__row">
-            <dd class="govuk-summary-list__value">
-                {{award.days}} days {{award.sanctionCodeDescription}}
-            </dd>
-            <dd class="govuk-summary-list__value">
-                {% if award.comment %}{{award.comment}}{%else%}None entered{% endif %}
-            </dd>
-            <dd class="govuk-summary-list__actions govuk-!-text-align-left hmpps-active-punishments-start-date">
-                {{award.effectiveDate | formatDate('short') }}
-            </dd>
-        </div>
-    {% endfor %}
-    </dl>
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third" data-qa="active-punishment-type-label">Punishment type</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third" data-qa="active-punishment-details-label">Details</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third hmpps-active-punishments-start-date" data-qa="active-punishment-start-date-label">Start date</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            {% for award in adjudications.awards %}
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">{{ award.days | pluralise('day') }} {{award.sanctionCodeDescription}}</th>
+                    <td class="govuk-table__cell">{% if award.comment %}{{award.comment}}{%else%}None entered{% endif %}</td>
+                    <td class="govuk-table__cell">{{award.effectiveDate | formatDate('short') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-    <a href="/prisoner/{{ prisonerNumber }}/adjudications" data-qa="active-punishment-view-history">View adjudication history</a>
+    <a href="{{ '/prisoner' | prependBaseUrl }}/{{ prisonerNumber }}/adjudications" data-qa="active-punishment-view-history">View adjudication history</a>
 {% endblock %}

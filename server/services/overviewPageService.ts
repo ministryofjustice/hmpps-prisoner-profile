@@ -250,7 +250,9 @@ export default class OverviewPageService {
       bottomContentLine1: pluralise(adjudicationSummary.awards.length, 'active punishment', {
         emptyMessage: 'No active punishments',
       }),
-      bottomContentLine1Href: adjudicationSummary.awards?.length ? '#' : undefined,
+      bottomContentLine1Href: adjudicationSummary.awards?.length
+        ? `/prisoner/${prisonerNumber}/active-punishments`
+        : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudications history',
       linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,

@@ -10,6 +10,8 @@ import {
   prisonerBelongsToUsersCaseLoad,
   summaryListOneHalfWidth,
   userHasRoles,
+  apostrophe,
+  prependBaseUrl,
 } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
@@ -88,4 +90,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
         selected: entry && entry.value === selected,
       })),
   )
+
+  njkEnv.addFilter('apostrophe', apostrophe)
+  njkEnv.addFilter('prependBaseUrl', prependBaseUrl)
 }
