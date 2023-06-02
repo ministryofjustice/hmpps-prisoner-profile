@@ -17,6 +17,7 @@ import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
+import ActivePunishmentsService from '../services/activePunishmentsService'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -156,6 +157,27 @@ export default function routes(service: Services): Router {
   get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
     const caseNotesController = new CaseNotesController(res.locals.clientToken, res.locals.user.token)
     return caseNotesController.displayCaseNotes(req, res)
+  })
+
+  get('/prisoner/:prisonerNumber/active-punishments', async (req, res, next) => {
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const activePunishmentsService = new ActivePunishmentsService(prisonApiClient)
+      const activePunishmentsPageData = await activePunishmentsService.get(prisonerData)
+
+      res.render('pages/activePunishments', {
+        pageTitle: 'Active punishments',
+        ...mapHeaderData(prisonerData, res.locals.user, 'active-punishments', true),
+        ...activePunishmentsPageData,
+        activeTab: false,
+      })
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/adjudications', async (req, res, next) => {
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      res.redirect(`${config.apis.dpsHomePageUrl}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
+    })
   })
 
   get('/', (req, res, next) => {

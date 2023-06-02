@@ -1,0 +1,38 @@
+{% extends "./index.njk" %}
+{% from "../macros/conditionallyShow.njk" import conditionallyShow %}
+{% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1>{{name}}’ active punishments</h1>
+        </div>
+    </div>
+
+    <dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key" data-qa="active-punishment-type-label">
+            Punishment type
+        </dt>
+        <dt class="govuk-summary-list__key" data-qa="active-punishment-details-label">
+            Details
+        </dt>
+        <dd class="govuk-summary-list__actions govuk-!-font-weight-bold govuk-!-text-align-left hmpps-active-punishments-start-date" data-qa="active-punishment-start-date-label">
+            Start date
+        </dd>
+    </div>
+    {% for award in adjudications.awards %}
+        <div class="govuk-summary-list__row">
+            <dd class="govuk-summary-list__value">
+                {{award.days}} days {{award.sanctionCodeDescription}}
+            </dd>
+            <dd class="govuk-summary-list__value">
+                {% if award.comment %}{{award.comment}}{%else%}None entered{% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions govuk-!-text-align-left hmpps-active-punishments-start-date">
+                {{award.effectiveDate | formatDate('short') }}
+            </dd>
+        </div>
+    {% endfor %}
+    </dl>
+
+    <a href="/prisoner/{{ prisonerNumber }}/adjudications" data-qa="active-punishment-view-history">View adjudication history</a>
+{% endblock %}

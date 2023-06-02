@@ -85,3 +85,8 @@ Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'M
   cy.task('stubUserCaseLoads', caseLoads)
   cy.task('stubAuthUser', { activeCaseLoadId })
 })
+
+Cypress.Commands.add('setupActivePunishmentsPageStubs', ({ prisonerNumber, bookingId }) => {
+  cy.task('stubAdjudicationsWithActive', bookingId)
+  cy.task('stubDpsAdjudicationsHistoryPage', prisonerNumber)
+})

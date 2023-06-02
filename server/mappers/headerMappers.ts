@@ -78,11 +78,11 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return alerts
 }
 
-export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string) {
+export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string, hideBanner?: boolean) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 
-  if (pageId) {
+  if (pageId && tabs.find(tab => tab.id === pageId)) {
     tabs.find(tab => tab.id === pageId).active = true
   }
 
@@ -97,5 +97,6 @@ export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: stri
     tabLinks: tabs,
     photoType,
     prisonId: prisonerData.prisonId,
+    hideBanner: hideBanner || false,
   }
 }
