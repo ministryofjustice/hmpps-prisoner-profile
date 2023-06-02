@@ -3,6 +3,7 @@ import {
   arrayToQueryString,
   convertToTitleCase,
   findError,
+  formatCategoryCodeDescription,
   formatMoney,
   formatName,
   formatScheduleItem,
@@ -298,6 +299,7 @@ describe('findError', () => {
       expect(prisonerBelongsToUsersCaseLoad('123', caseLoads)).toEqual(false)
     })
   })
+
   describe('userHasRoles', () => {
     it.each([
       { roles: ['GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
@@ -309,6 +311,19 @@ describe('findError', () => {
       { roles: ['ROLE_GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
     ])('Should return the correct result when checking user roles', ({ roles, userRoles, result }) => {
       expect(userHasRoles(roles, userRoles)).toEqual(result)
+    })
+  })
+
+  describe('formatCategoryCodeDescription', () => {
+    it.each([
+      { code: undefined, result: 'Not entered' },
+      { code: null, result: 'Not entered' },
+      { code: 'C', result: 'C' },
+      { code: 'I', result: 'I' },
+      { code: 'U', result: 'Unsentenced' },
+      { code: 'P', result: 'A (provisional)' },
+    ])('Should return the correct description', ({ code, result }) => {
+      expect(formatCategoryCodeDescription(code)).toEqual(result)
     })
   })
 })

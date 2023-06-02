@@ -19,7 +19,7 @@ export interface Prisoner {
   status: string
   lastMovementTypeCode?: string
   lastMovementReasonCode?: string
-  inOutStatus?: 'IN' | 'OUT'
+  inOutStatus?: 'IN' | 'OUT' | 'TRN'
   prisonId?: string
   prisonName?: string
   cellLocation?: string

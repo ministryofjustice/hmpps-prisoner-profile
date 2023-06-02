@@ -389,14 +389,13 @@ describe('OverviewPageService', () => {
           prisonerNumber,
           bookingId,
           inOutStatus: 'IN',
-          locationDescription: 'Moorland (HMP & YOI)',
+          prisonName: 'Moorland (HMP & YOI)',
         } as Prisoner)
 
         expect(res.statuses.some(status => status.label === 'In Moorland (HMP & YOI)')).toBeTruthy()
-        expect(res.statuses.some(status => status.label === 'Out from Moorland (HMP & YOI)')).toBeFalsy()
       })
 
-      it('should have "out" location if out of prison', async () => {
+      it('should have "out" location if temp out of prison', async () => {
         const prisonerNumber = 'A1234BC'
         const bookingId = 123456
 
@@ -405,11 +404,43 @@ describe('OverviewPageService', () => {
           prisonerNumber,
           bookingId,
           inOutStatus: 'OUT',
-          locationDescription: 'Moorland (HMP & YOI)',
+          status: 'ACTIVE OUT',
+          prisonName: 'Moorland (HMP & YOI)',
         } as Prisoner)
 
         expect(res.statuses.some(status => status.label === 'Out from Moorland (HMP & YOI)')).toBeTruthy()
-        expect(res.statuses.some(status => status.label === 'In Moorland (HMP & YOI)')).toBeFalsy()
+      })
+
+      it('should have "out" location if released from prison', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          prisonerNumber,
+          bookingId,
+          inOutStatus: 'OUT',
+          status: 'INACTIVE OUT',
+          locationDescription: 'Outside - released from Moorland (HMP & YOI)',
+        } as Prisoner)
+
+        expect(
+          res.statuses.some(status => status.label === 'Outside - released from Moorland (HMP & YOI)'),
+        ).toBeTruthy()
+      })
+
+      it('should have "Being transferred" location if TRN', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          prisonerNumber,
+          bookingId,
+          inOutStatus: 'TRN',
+        } as Prisoner)
+
+        expect(res.statuses.some(status => status.label === 'Being transferred')).toBeTruthy()
       })
 
       it('should have pregnant status if care need is one of the pregnant types', async () => {
