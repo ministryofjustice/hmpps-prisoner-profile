@@ -1,5 +1,5 @@
 import { stubFor } from './wiremock'
-import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
+import { PrisonerMockDataA, PrisonerOnRemandMockData } from '../../server/data/localMockData/prisoner'
 import { Prisoner } from '../../server/interfaces/prisoner'
 
 export default {
@@ -18,6 +18,8 @@ export default {
       jsonResp = { ...PrisonerMockDataA, restrictedPatient }
     } else if (prisonerNumber === 'A1234BC') {
       jsonResp = { ...PrisonerMockDataA, prisonerNumber: 'A1234BC', bookingId: 1234567, restrictedPatient }
+    } else if (prisonerNumber === 'ONREMAND') {
+      jsonResp = { ...PrisonerOnRemandMockData, prisonerNumber: 'ONREMAND', bookingId: 1234568, restrictedPatient }
     }
     jsonResp = { ...jsonResp, ...overrides }
     return stubFor({

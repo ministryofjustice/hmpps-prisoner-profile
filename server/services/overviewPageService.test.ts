@@ -50,6 +50,8 @@ import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
+import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
+import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
 
 describe('OverviewPageService', () => {
@@ -86,6 +88,9 @@ describe('OverviewPageService', () => {
     prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
     prisonApiClient.getCaseNoteCount = jest.fn(async () => caseNoteCountMock)
     prisonApiClient.getUserCaseLoads = jest.fn(async () => CaseLoadsDummyDataA)
+    prisonApiClient.getMainOffence = jest.fn(async () => mainOffenceMock)
+    prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
+    prisonApiClient.getFullStatus = jest.fn(async () => fullStatusMock)
   })
 
   describe('Non-associations', () => {
@@ -384,14 +389,13 @@ describe('OverviewPageService', () => {
           prisonerNumber,
           bookingId,
           inOutStatus: 'IN',
-          locationDescription: 'Moorland (HMP & YOI)',
+          prisonName: 'Moorland (HMP & YOI)',
         } as Prisoner)
 
         expect(res.statuses.some(status => status.label === 'In Moorland (HMP & YOI)')).toBeTruthy()
-        expect(res.statuses.some(status => status.label === 'Out from Moorland (HMP & YOI)')).toBeFalsy()
       })
 
-      it('should have "out" location if out of prison', async () => {
+      it('should have "out" location if temp out of prison', async () => {
         const prisonerNumber = 'A1234BC'
         const bookingId = 123456
 
@@ -400,11 +404,43 @@ describe('OverviewPageService', () => {
           prisonerNumber,
           bookingId,
           inOutStatus: 'OUT',
-          locationDescription: 'Moorland (HMP & YOI)',
+          status: 'ACTIVE OUT',
+          prisonName: 'Moorland (HMP & YOI)',
         } as Prisoner)
 
         expect(res.statuses.some(status => status.label === 'Out from Moorland (HMP & YOI)')).toBeTruthy()
-        expect(res.statuses.some(status => status.label === 'In Moorland (HMP & YOI)')).toBeFalsy()
+      })
+
+      it('should have "out" location if released from prison', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          prisonerNumber,
+          bookingId,
+          inOutStatus: 'OUT',
+          status: 'INACTIVE OUT',
+          locationDescription: 'Outside - released from Moorland (HMP & YOI)',
+        } as Prisoner)
+
+        expect(
+          res.statuses.some(status => status.label === 'Outside - released from Moorland (HMP & YOI)'),
+        ).toBeTruthy()
+      })
+
+      it('should have "Being transferred" location if TRN', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          prisonerNumber,
+          bookingId,
+          inOutStatus: 'TRN',
+        } as Prisoner)
+
+        expect(res.statuses.some(status => status.label === 'Being transferred')).toBeTruthy()
       })
 
       it('should have pregnant status if care need is one of the pregnant types', async () => {
@@ -469,6 +505,37 @@ describe('OverviewPageService', () => {
           expect(res.statuses.some(status => status.label === 'Recognised Listener')).toEqual(displayRecognised)
         },
       )
+    })
+  })
+  describe('getOffenceOverview', () => {
+    it('should get the offence overview data', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        prisonerNumber,
+        bookingId,
+        inOutStatus: 'OUT',
+        locationDescription: 'Moorland (HMP & YOI)',
+      } as Prisoner)
+      expect(res.offencesOverview).toEqual(offenceOverviewMock)
+    })
+
+    it('should get the next court appearance from all court cases for the overview page', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+      const overviewPageService = overviewPageServiceConstruct()
+      await overviewPageService.get({
+        prisonerNumber,
+        bookingId,
+        inOutStatus: 'OUT',
+        locationDescription: 'Moorland (HMP & YOI)',
+      } as Prisoner)
+
+      const nextCourtAppearance = await overviewPageService.getNextCourtAppearanceForOverview(
+        CourtCaseWithNextCourtAppearance,
+      )
+      expect(nextCourtAppearance).toEqual(CourtCaseWithNextCourtAppearance[1].courtHearings[2])
     })
   })
 })

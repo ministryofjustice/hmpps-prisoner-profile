@@ -383,3 +383,24 @@ export const prependBaseUrl = (url: string): string => {
   const urlWithBaseUrl = `${config.serviceUrls.digitalPrison}${url}`
   return urlWithBaseUrl
 }
+
+/**
+ * Returns a description for specific category codes, otherwise just the code.
+ *
+ * Returns 'Not entered' of the code is undefined
+ *
+ * @param code
+ */
+export const formatCategoryCodeDescription = (code: string): string => {
+  switch (code) {
+    case null:
+    case undefined:
+      return 'Not entered'
+    case 'U':
+      return 'Unsentenced'
+    case 'P':
+      return 'A (provisional)'
+    default:
+      return code
+  }
+}

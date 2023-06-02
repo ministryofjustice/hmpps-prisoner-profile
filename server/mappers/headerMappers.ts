@@ -2,7 +2,7 @@ import { Alert, Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
-import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { formatCategoryCodeDescription, formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { Role } from '../data/enums/role'
@@ -39,11 +39,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
       ? 'Manage category'
       : 'View category',
     // eslint-disable-next-line no-nested-ternary
-    info: !prisonerData.category
-      ? 'Not entered'
-      : prisonerData.category === 'U'
-      ? 'Unsentenced'
-      : prisonerData.category,
+    info: formatCategoryCodeDescription(prisonerData.category),
     classes: '',
     url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
   })

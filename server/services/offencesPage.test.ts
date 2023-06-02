@@ -6,6 +6,7 @@ import {
   CourtCasesMock,
   CourtCasesSentencedMockA,
   CourtCasesUnsentencedMockA,
+  CourtCasesUnsentencedMockB,
   CourtCaseWithNextCourtAppearance,
   SentenceTermsWithOffences,
   SentenceTermsWithoutOffences,
@@ -28,7 +29,12 @@ import {
   OffencesPageMockSentences,
 } from '../data/localMockData/offencesPageMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { CourtDateResultsMockA, CourtDateResultsUnsentencedMockA } from '../data/localMockData/courtDateResultsMock'
+import {
+  CourtDateResultsMockA,
+  CourtDateResultsUnsentencedMockB,
+  UniqueCourtDateResultsUnsentencedMockA,
+} from '../data/localMockData/courtDateResultsMock'
+import { CourtCaseDataMapped } from '../interfaces/courtCaseDataMapped'
 
 describe('OffencesPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -108,10 +114,10 @@ describe('OffencesPageService', () => {
     it('Get map for unsentenced court cases', async () => {
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getMapForUnsentencedCourtCases(
-        CourtCasesUnsentencedMockA,
+        CourtCasesUnsentencedMockB,
         todaysDate,
-        CourtDateResultsUnsentencedMockA,
-        [],
+        CourtDateResultsUnsentencedMockB,
+        [] as CourtCaseDataMapped[],
       )
       expect(res).toEqual(MappedUnsentencedCourtCasesMock)
     })
@@ -212,6 +218,12 @@ describe('OffencesPageService', () => {
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getGenericMaps(CourtCasesSentencedMockA[0], todaysDate)
       expect(res).toEqual(GenericMapMock)
+    })
+
+    it('Get unique charges from court date results', async () => {
+      const offencesPageService = offencesPageServiceConstruct()
+      const res = await offencesPageService.getUniqueChargesFromCourtDateResults(CourtDateResultsUnsentencedMockB)
+      expect(res).toEqual(UniqueCourtDateResultsUnsentencedMockA)
     })
   })
 })

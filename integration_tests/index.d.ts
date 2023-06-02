@@ -15,7 +15,7 @@ declare global {
       }): Chainable<AUTWindow>
       setupOverviewPageStubs(options: {
         prisonerNumber: string
-        bookingId: string
+        bookingId: number
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
