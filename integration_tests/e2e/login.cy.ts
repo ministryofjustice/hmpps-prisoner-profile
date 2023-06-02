@@ -11,7 +11,7 @@ context('SignIn', () => {
     cy.task('stubSignIn')
     cy.task('stubDpsHomePage')
     cy.task('stubAuthUser')
-    cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+    cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })
 
   it('Unauthenticated user directed to auth', () => {

@@ -15,7 +15,7 @@ context('Profile banner', () => {
           roles: ['ROLE_GLOBAL_SEARCH'],
           caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       })
 
       it('Displays the banner', () => {
@@ -32,7 +32,7 @@ context('Profile banner', () => {
         roles: ['ROLE_PRISON'],
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
 
     it('Hides the banner', () => {

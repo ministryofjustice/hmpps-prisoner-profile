@@ -28,7 +28,12 @@ import {
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
-import { CourtCasesMock, CourtCasesUnsentencedMockA } from '../../server/data/localMockData/courtCaseMock'
+import {
+  CourtCasesMock,
+  CourtCasesSentencedMockA,
+  CourtCasesUnsentencedMockA,
+  CourtCaseWithNextCourtAppearance,
+} from '../../server/data/localMockData/courtCaseMock'
 import { OffenceHistoryMock } from '../../server/data/localMockData/offenceHistoryMock'
 import { MappedUnsentencedCourtCasesMock, sentenceTermsMock } from '../../server/data/localMockData/sentenceTermsMock'
 import {
@@ -41,6 +46,13 @@ import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCount
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import { CaseLoad } from '../../server/interfaces/caseLoad'
 import { CaseNoteUsage } from '../../server/interfaces/prisonApi/caseNoteUsage'
+
+import {
+  mainOffenceMock,
+  fullStatusMock,
+  fullStatusRemandMock,
+} from '../../server/data/localMockData/offenceOverviewMock'
+import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -682,6 +694,66 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: caseLoads.length > 0 ? caseLoads : CaseLoadsDummyDataA,
+      },
+    })
+  },
+
+  stubGetMainOffence: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/mainOffence`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mainOffenceMock,
+      },
+    })
+  },
+
+  stubGetFullStatus: (prisonerNumber: string) => {
+    let jsonResp: FullStatus
+    if (prisonerNumber === 'ONREMAND') {
+      jsonResp = fullStatusRemandMock
+    } else {
+      jsonResp = fullStatusMock
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/prisoners/${prisonerNumber}/full-status`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubGetCourtCases: (bookingId: number) => {
+    let jsonResp
+    if (bookingId === 1234568) {
+      jsonResp = CourtCaseWithNextCourtAppearance
+    } else {
+      jsonResp = CourtCasesSentencedMockA
+    }
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/court-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
       },
     })
   },

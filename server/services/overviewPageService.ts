@@ -1,4 +1,4 @@
-import { differenceInDays, isAfter } from 'date-fns'
+import { differenceInDays, format, isAfter, startOfToday } from 'date-fns'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import {
   OverviewNonAssociation,
@@ -36,6 +36,9 @@ import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { IncentiveReviews } from '../interfaces/IncentivesApi/incentiveReviews'
 import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
+import OffencesPageService from './offencesPageService'
+import { CourtHearing } from '../interfaces/prisonApi/courtHearing'
+import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import config from '../config'
 import { Role } from '../data/enums/role'
 
@@ -61,7 +64,8 @@ export default class OverviewPageService {
   }
 
   public async get(prisonerData: Prisoner, userRoles: string[] = []): Promise<OverviewPage> {
-    const { prisonerNumber } = prisonerData
+    const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
+      prisonerData
 
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
     const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerData, userRoles)
@@ -70,6 +74,13 @@ export default class OverviewPageService {
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData)
     const statuses = await this.getStatuses(prisonerData)
+    const offencesOverview = await this.getOffencesOverview(
+      bookingId,
+      prisonerNumber,
+      imprisonmentStatusDescription,
+      conditionalReleaseDate,
+      confirmedReleaseDate,
+    )
 
     return {
       miniSummaryGroupA,
@@ -79,7 +90,54 @@ export default class OverviewPageService {
       personalDetails,
       staffContacts,
       schedule,
+      offencesOverview,
     }
+  }
+
+  public async getOffencesOverview(
+    bookingId: number,
+    prisonerNumber: string,
+    imprisonmentStatusDescription: string,
+    conditionalReleaseDate: string,
+    confirmedReleaseDate: string,
+  ) {
+    const [mainOffence, courtCaseData, fullStatus] = await Promise.all([
+      this.prisonApiClient.getMainOffence(bookingId),
+      this.prisonApiClient.getCourtCases(bookingId),
+      this.prisonApiClient.getFullStatus(prisonerNumber),
+    ])
+
+    const nextCourtAppearance = await this.getNextCourtAppearanceForOverview(courtCaseData)
+
+    return {
+      mainOffence,
+      courtCaseData,
+      fullStatus,
+      imprisonmentStatusDescription,
+      conditionalReleaseDate,
+      confirmedReleaseDate,
+      nextCourtAppearance,
+    }
+  }
+
+  async getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {
+    const offencesPageService = new OffencesPageService(this.prisonApiClient)
+    const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
+    let nextCourtAppearance: CourtHearing = {} as CourtHearing
+    await courtCaseData.forEach(async (courtCase: CourtCase) => {
+      const courtAppearance = await offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
+
+      if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
+        nextCourtAppearance = courtAppearance
+      } else if (courtAppearance.dateTime && nextCourtAppearance.dateTime) {
+        const courtDate = format(new Date(courtAppearance.dateTime), 'yyyy-MM-dd')
+        const currentNextDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
+        if (courtDate < currentNextDate) {
+          nextCourtAppearance = courtAppearance
+        }
+      }
+    })
+    return nextCourtAppearance
   }
 
   public async getStaffContacts(prisonerData: Prisoner): Promise<StaffContacts> {

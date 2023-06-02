@@ -12,11 +12,16 @@ const visitOverviewPageAlt = (): OverviewPage => {
   return Page.verifyOnPage(OverviewPage)
 }
 
+const visitOverviewPageOnRemand = (): OverviewPage => {
+  cy.signIn({ redirectPath: '/prisoner/ONREMAND' })
+  return Page.verifyOnPage(OverviewPage)
+}
+
 context('Overview Page', () => {
   context('Permissions', () => {
     const prisonerNumber = 'G6123VU'
     const visitPage = prisonerDataOverrides => {
-      cy.setupOverviewPageStubs({ prisonerNumber, bookingId: '1102484', prisonerDataOverrides })
+      cy.setupOverviewPageStubs({ prisonerNumber, bookingId: 1102484, prisonerDataOverrides })
       visitOverviewPage()
     }
 
@@ -30,7 +35,7 @@ context('Overview Page', () => {
           roles: ['ROLE_GLOBAL_SEARCH'],
           caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       })
 
       it('Does not display the sidebar', () => {
@@ -54,7 +59,7 @@ context('Overview Page', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
 
@@ -282,7 +287,7 @@ context('Overview Page', () => {
 
     context('Prisoner is not currently in Pathfinder', () => {
       beforeEach(() => {
-        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: '1234567' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
       })
 
       it('should not display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
@@ -294,7 +299,7 @@ context('Overview Page', () => {
 
     context('Prisoner is already in Pathfinder', () => {
       beforeEach(() => {
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         visitOverviewPage()
       })
 
@@ -316,7 +321,7 @@ context('Overview Page', () => {
 
     context('Prisoner is not currently in Pathfinder', () => {
       beforeEach(() => {
-        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: '1234567' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
       })
 
       it('should display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
@@ -328,7 +333,7 @@ context('Overview Page', () => {
 
     context('Prisoner is already in Pathfinder', () => {
       beforeEach(() => {
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         visitOverviewPage()
       })
 
@@ -350,7 +355,7 @@ context('Overview Page', () => {
 
     context('Prisoner is not currently in SOC', () => {
       beforeEach(() => {
-        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: '1234567' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
       })
 
       it('should display Add to SOC link, and not the SOC profile link', () => {
@@ -362,7 +367,7 @@ context('Overview Page', () => {
 
     context('Prisoner is already in SOC', () => {
       beforeEach(() => {
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         visitOverviewPage()
       })
 
@@ -380,7 +385,7 @@ context('Overview Page', () => {
       cy.setupUserAuth({
         roles: [Role.PrisonUser, Role.CreateCategorisation],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
 
@@ -396,7 +401,7 @@ context('Overview Page', () => {
       cy.setupUserAuth({
         roles: [Role.PrisonUser, Role.PomUser],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
 
@@ -412,7 +417,7 @@ context('Overview Page', () => {
       cy.setupUserAuth({
         roles: [Role.PrisonUser, Role.ViewProbationDocuments],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484' })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
 
@@ -428,7 +433,7 @@ context('Overview Page', () => {
       cy.setupUserAuth({
         roles: [Role.PrisonUser],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: '1102484', restrictedPatient: true })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, restrictedPatient: true })
       visitOverviewPage()
     })
 
@@ -446,6 +451,57 @@ context('Overview Page', () => {
       it('should not display Report use of force link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.reportUseOfForceActionLink().should('not.exist')
+      })
+    })
+  })
+
+  context('Given the prisoner is not on remand', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: ['ROLE_GLOBAL_SEARCH'],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
+    })
+
+    context('Main offence overview', () => {
+      it('should display main offence and conditional release date and hide the next court appearance', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.offencesHeader().should('exist')
+        overviewPage.offenceCardContent().should('exist')
+        overviewPage.mainOffence().should('exist')
+        overviewPage.imprisonmentStatusLabel().should('exist')
+        overviewPage.imprisonmentStatus().should('exist')
+        overviewPage.viewAllOffencesLink().should('exist')
+        overviewPage.overviewConditionalReleaseLabel().should('exist')
+        overviewPage.overviewConditionalRelease().should('exist')
+        overviewPage.nextAppearanceDate().should('not.exist')
+      })
+    })
+  })
+
+  context('Given the prisoner is on remand', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: ['ROLE_GLOBAL_SEARCH'],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'ONREMAND', bookingId: 1234568 })
+    })
+
+    context('Main offence overview', () => {
+      it('should display main offence and the next court appearance and hide the conditional release date', () => {
+        const overviewPage = visitOverviewPageOnRemand()
+        overviewPage.offencesHeader().should('exist')
+        overviewPage.offenceCardContent().should('exist')
+        overviewPage.mainOffence().should('exist')
+        overviewPage.imprisonmentStatusLabel().should('exist')
+        overviewPage.imprisonmentStatus().should('exist')
+        overviewPage.viewAllOffencesLink().should('exist')
+        overviewPage.overviewConditionalReleaseLabel().should('not.exist')
+        overviewPage.overviewConditionalRelease().should('not.exist')
+        overviewPage.nextAppearanceDate().should('exist')
       })
     })
   })
