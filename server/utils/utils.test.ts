@@ -1,5 +1,6 @@
 import {
   addressToLines,
+  apostrophe,
   arrayToQueryString,
   convertToTitleCase,
   findError,
@@ -10,6 +11,7 @@ import {
   getNamesFromString,
   initialiseName,
   mapToQueryString,
+  prependBaseUrl,
   prisonerBelongsToUsersCaseLoad,
   properCaseName,
   summaryListOneHalfWidth,
@@ -21,6 +23,8 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
 import { CaseLoad } from '../interfaces/caseLoad'
+
+import config from '../config'
 
 describe('convert to title case', () => {
   it.each([
@@ -325,5 +329,17 @@ describe('findError', () => {
     ])('Should return the correct description', ({ code, result }) => {
       expect(formatCategoryCodeDescription(code)).toEqual(result)
     })
+  })
+
+  describe('apostrophe', () => {
+    const firstName = 'James'
+    const lastName = 'Grant'
+    expect(apostrophe(firstName)).toEqual('James’')
+    expect(apostrophe(lastName)).toEqual('Grant’s')
+  })
+
+  describe('prependBaseUrl', () => {
+    const route = '/prisoner'
+    expect(prependBaseUrl(route)).toEqual(`${config.serviceUrls.digitalPrison}${route}`)
   })
 })

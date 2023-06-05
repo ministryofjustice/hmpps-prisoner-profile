@@ -21,6 +21,25 @@ export const adjudicationSummaryMock: AdjudicationSummary = {
   awards: [],
 }
 
+export const adjudicationSummaryWithActiveMock: AdjudicationSummary = {
+  adjudicationCount: 4,
+  bookingId: 123456,
+  awards: [
+    {
+      bookingId: 1102484,
+      sanctionCode: 'FORFEIT',
+      sanctionCodeDescription: 'Forfeiture of Privileges',
+      days: 10,
+      comment: 'Loss of CANTEEN',
+      effectiveDate: '2023-05-31',
+      status: 'SUSPENDED',
+      statusDescription: 'Suspended',
+      hearingId: 2012387,
+      hearingSequence: 1,
+    },
+  ],
+}
+
 export const visitSummaryMock: VisitSummary = {
   hasVisits: true,
   startDateTime: '2023-09-15',

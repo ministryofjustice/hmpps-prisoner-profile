@@ -1,6 +1,12 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "../macros/hmppsActionButton.njk" import hmppsActionButton %}
 {% extends "./index.njk" %}
+{% set breadCrumbs = [
+  {
+    text: 'Back to search results',
+    href:  "/" | prependBaseUrl
+  }
+]%}
 {% block body %}
 
     {% if errors.length > 0 %}
@@ -8,8 +14,7 @@
             titleText: "There is a problem",
             errorList: errors,
             attributes: { 'data-qa-errors': true }
-        })
-        }}
+        })}}
     {% endif %}
 
     <div class="govuk-grid-row">
