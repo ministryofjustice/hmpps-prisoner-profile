@@ -20,7 +20,8 @@ export interface OverviewSchedule {
 }
 
 export type OverviewNonAssociation = {
-  text: string
+  html?: string
+  text?: string
 }[]
 
 export interface OverviewPage {
