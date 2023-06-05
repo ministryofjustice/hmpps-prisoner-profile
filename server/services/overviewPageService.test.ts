@@ -93,6 +93,14 @@ describe('OverviewPageService', () => {
     prisonApiClient.getFullStatus = jest.fn(async () => fullStatusMock)
   })
 
+  describe('Prison name', () => {
+    it('Returns the prison name', async () => {
+      const overviewPageService = overviewPageServiceConstruct()
+      const { prisonName } = await overviewPageService.get(PrisonerMockDataA)
+      expect(prisonName).toEqual(PrisonerMockDataA.prisonName)
+    })
+  })
+
   describe('Non-associations', () => {
     it.each(['ABC123', 'DEF321'])('Gets the non-associations for the prisoner', async (prisonerNumber: string) => {
       const overviewPageService = overviewPageServiceConstruct()

@@ -92,6 +92,7 @@ export default class OverviewPageService {
       staffContacts,
       schedule,
       offencesOverview,
+      prisonName: prisonerData.prisonName,
     }
   }
 
