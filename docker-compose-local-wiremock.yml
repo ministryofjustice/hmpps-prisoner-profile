@@ -1,0 +1,71 @@
+version: '3.1'
+services:
+
+  redis:
+    image: 'redis:6.2'
+    networks:
+      - hmpps
+    ports:
+      - '6379:6379'
+
+  wiremock:
+    image: wiremock/wiremock
+    networks:
+    - hmpps
+    container_name: wiremock
+    restart: always
+    ports:
+      - "9091:8080"
+    volumes:
+      - ./local-wiremock/mappings/:/./home/wiremock/mappings/
+    command:
+      - -verbose
+      - -global-response-templating
+
+  hmpps-auth:
+    image: quay.io/hmpps/hmpps-auth:latest
+    depends_on:
+      - nomis-user-roles-api
+    networks:
+      - hmpps
+    container_name: hmpps-auth
+    ports:
+      - "9090:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev,nomis
+      - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8081
+
+  nomis-user-roles-api:
+    image: quay.io/hmpps/nomis-user-roles-api:latest
+    container_name: nomis-user-roles-api
+    networks:
+      - hmpps
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health/ping"]
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_PROFILES_ACTIVE=dev
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
+
+  prison-api:
+    image: quay.io/hmpps/prison-api:latest
+    container_name: prison-api
+    networks:
+      - hmpps
+    depends_on:
+      - hmpps-auth
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=nomis-hsqldb
+
+networks:
+  hmpps:
