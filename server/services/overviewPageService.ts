@@ -484,7 +484,9 @@ export default class OverviewPageService {
         const { offenderNonAssociation } = nonAssocation
         const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
         return [
-          { text: nonAssociationName },
+          {
+            html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${offenderNonAssociation.offenderNo}">${nonAssociationName}</a>`,
+          },
           { text: offenderNonAssociation.offenderNo },
           { text: offenderNonAssociation.assignedLivingUnitDescription },
           { text: offenderNonAssociation.reasonDescription },

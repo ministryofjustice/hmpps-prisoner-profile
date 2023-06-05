@@ -57,7 +57,7 @@ export default class OverviewPage extends Page {
     row: (rowNumber: number) => {
       const row = this.nonAssociations().table().find('tr').eq(rowNumber).find('th, td')
       return {
-        prisonerName: (): PageElement => row.eq(0),
+        prisonerName: (): PageElement => row.eq(0).find('a'),
         prisonNumber: (): PageElement => row.eq(1),
         location: (): PageElement => row.eq(2),
         reciprocalReason: (): PageElement => row.eq(3),
