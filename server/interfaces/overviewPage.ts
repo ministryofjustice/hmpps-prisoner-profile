@@ -40,4 +40,5 @@ export interface OverviewPage {
     confirmedReleaseDate: string
     nextCourtAppearance: CourtHearing
   }
+  prisonName: string
 }
