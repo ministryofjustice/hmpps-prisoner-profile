@@ -31,6 +31,8 @@ import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments
 import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
+import { Alias } from '../interfaces/prisonApi/alias'
+import { aliasesMock } from './localMockData/aliases'
 
 jest.mock('./tokenStore')
 
@@ -319,6 +321,15 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getCaseNotesUsage(prisonerNumber)
       expect(output).toEqual(caseNoteUsageMock)
+    })
+  })
+
+  describe('getAliases', () => {
+    it('should return data from the API', async () => {
+      const bookingId = 12345
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/aliases`, aliasesMock)
+      const output = await prisonApiClient.getAliases(bookingId)
+      expect(output).toEqual(aliasesMock)
     })
   })
 })

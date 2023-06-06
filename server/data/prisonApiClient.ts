@@ -41,6 +41,7 @@ import { CourtDateResults } from '../interfaces/courtDateResults'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
+import { Alias } from '../interfaces/prisonApi/alias'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -287,5 +288,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<OffenderIdentifier[]>({
       path: `/api/bookings/${bookingId}/identifiers`,
     })
+  }
+
+  async getAliases(bookingId: number): Promise<Alias[]> {
+    return this.get<Alias[]>({ path: `/api/bookings/${bookingId}/aliases` })
   }
 }

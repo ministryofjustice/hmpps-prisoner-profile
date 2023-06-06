@@ -55,6 +55,7 @@ import {
 } from '../../server/data/localMockData/offenceOverviewMock'
 import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
+import { aliasesMock } from '../../server/data/localMockData/aliases'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -787,6 +788,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: identifiersMock,
+      },
+    })
+  },
+
+  stubAliases: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/aliases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: aliasesMock,
       },
     })
   },

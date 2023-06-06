@@ -3,7 +3,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
-import { Alias } from '../interfaces/prisoner'
+import { Alias } from '../interfaces/prisonApi/alias'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
@@ -17,6 +17,7 @@ import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjus
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { formatDate } from '../utils/dateHelpers'
 import { identifiersMock } from '../data/localMockData/identifiersMock'
+import { aliasesMock } from '../data/localMockData/aliases'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -34,6 +35,7 @@ describe('PersonalPageService', () => {
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
+    prisonApiClient.getAliases = jest.fn(async () => aliasesMock)
   })
 
   describe('Getting information from the Prison API', () => {
@@ -76,10 +78,9 @@ describe('PersonalPageService', () => {
 
     describe('Aliases', () => {
       const getResponseWithAliases = async (aliases: Alias[]) => {
-        const prisonerData = { ...PrisonerMockDataA }
-        prisonerData.aliases = aliases
+        prisonApiClient.getAliases = jest.fn(async () => aliases)
         const service = new PersonalPageService(prisonApiClient)
-        return service.get(prisonerData)
+        return service.get(PrisonerMockDataA)
       }
 
       it('Handles no aliases', async () => {
@@ -89,8 +90,23 @@ describe('PersonalPageService', () => {
 
       it('Maps multiple aliases', async () => {
         const response = await getResponseWithAliases([
-          { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: '' },
-          { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
+          {
+            dob: '2022-01-01',
+            firstName: 'First name',
+            lastName: 'Last name',
+            gender: '',
+            age: 123,
+            createDate: '2022-01-01',
+          },
+          {
+            dob: '2023-01-01',
+            firstName: 'First',
+            middleName: 'Middle',
+            lastName: 'Last',
+            gender: '',
+            age: 123,
+            createDate: '2022-01-01',
+          },
         ])
         expect(response.personalDetails.aliases[0]).toEqual({
           alias: 'First Name Last Name',

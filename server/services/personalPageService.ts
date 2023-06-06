@@ -25,6 +25,7 @@ import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { formatDate } from '../utils/dateHelpers'
+import { Alias } from '../interfaces/prisonApi/alias'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -46,6 +47,7 @@ export default class PersonalPageService {
       healthReferenceCodes,
       healthTreatmentReferenceCodes,
       identifiers,
+      aliases,
     ] = await Promise.all([
       this.prisonApiClient.getInmateDetail(bookingId),
       this.prisonApiClient.getPrisoner(prisonerNumber),
@@ -56,10 +58,11 @@ export default class PersonalPageService {
       this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
       this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
       this.prisonApiClient.getIdentifiers(bookingId),
+      this.prisonApiClient.getAliases(bookingId),
     ])
 
     return {
-      personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages),
+      personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages, aliases),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses: this.addresses(addresses),
@@ -84,12 +87,13 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
+    aliases: Alias[],
   ): PersonalDetails {
     const { profileInformation } = inmateDetail
 
-    const aliases = prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
-      alias: formatName(firstName, middleNames, lastName),
-      dateOfBirth: formatDate(dateOfBirth, 'short'),
+    const prisonerAliases = aliases.map(({ firstName, middleName, lastName, dob }) => ({
+      alias: formatName(firstName, middleName, lastName),
+      dateOfBirth: formatDate(dob, 'short'),
     }))
 
     const todaysDateString = new Date().toISOString()
@@ -104,7 +108,7 @@ export default class PersonalPageService {
 
     return {
       age: (inmateDetail.age || yearsBetweenDateStrings(prisonerData.dateOfBirth, todaysDateString)).toString(),
-      aliases,
+      aliases: prisonerAliases,
       dateOfBirth: formatDate(prisonerData.dateOfBirth, 'short'),
       domesticAbusePerpetrator: getProfileInformationValue(
         ProfileInformationType.DomesticAbusePerpetrator,

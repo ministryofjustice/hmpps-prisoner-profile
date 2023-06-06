@@ -37,4 +37,5 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getFullStatus: jest.fn(),
   getCourtDateResults: jest.fn(),
   getIdentifiers: jest.fn(),
+  getAliases: jest.fn(),
 })

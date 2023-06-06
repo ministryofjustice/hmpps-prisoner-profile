@@ -27,6 +27,7 @@ context('When signed in', () => {
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
+      cy.task('stubAliases', 1102484)
       visitPersonalDetailsPage()
     }
 
@@ -53,6 +54,7 @@ context('When signed in', () => {
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
+      cy.task('stubAliases', 1102484)
       visitPersonalDetailsPage()
     })
 
@@ -99,6 +101,7 @@ context('When signed in', () => {
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
       cy.task('stubGetIdentifiers', 1102484)
+      cy.task('stubAliases', 1102484)
       visitPersonalDetailsPage()
     })
 

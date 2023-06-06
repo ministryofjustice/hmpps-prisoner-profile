@@ -32,6 +32,7 @@ import { CourtDateResults } from '../../interfaces/courtDateResults'
 import { MainOffence } from '../../interfaces/prisonApi/mainOffence'
 import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
+import { Alias } from '../../interfaces/prisonApi/alias'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -79,4 +80,5 @@ export interface PrisonApiClient {
   getFullStatus(prisonerNumber: string): Promise<FullStatus>
   getCourtDateResults(offenderNumber: string): Promise<CourtDateResults[]>
   getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]>
+  getAliases(bookingId: number): Promise<Alias[]>
 }
