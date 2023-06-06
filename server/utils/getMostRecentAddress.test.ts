@@ -92,9 +92,7 @@ describe('getMostRecentAddress', () => {
       describe('and no addresses are a home address', () => {
         describe('and there is one address', () => {
           it('returns the address', () => {
-            const addresses: Address[] = [
-              { primary: false, noFixedAddress: false, premise: 'Some other address', addressType: 'away' },
-            ]
+            const addresses: Address[] = [{ primary: false, noFixedAddress: false, premise: 'Some other address' }]
 
             expect(getMostRecentAddress(addresses)).toEqual(addresses[0])
           })
@@ -107,14 +105,12 @@ describe('getMostRecentAddress', () => {
                 primary: false,
                 noFixedAddress: false,
                 premise: 'Some other address',
-                addressType: 'away',
                 startDate: dateInThePast(3),
               },
               {
                 primary: false,
                 noFixedAddress: false,
                 premise: 'Some address',
-                addressType: 'home',
                 startDate: dateInThePast(30),
               },
             ]

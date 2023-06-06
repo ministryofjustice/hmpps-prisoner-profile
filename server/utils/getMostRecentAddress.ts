@@ -23,7 +23,7 @@ export const getMostRecentAddress = (addresses: Address[] = []): Address | undef
   }
 
   const homeAddress = activeAddresses
-    .filter(address => address.addressType.toLowerCase().includes('home'))
+    .filter(address => address.addressType && address.addressType.toLowerCase().includes('home'))
     .sort(sortAddressesByStartDate)[0]
 
   if (homeAddress) {
