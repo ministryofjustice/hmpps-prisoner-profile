@@ -42,7 +42,7 @@ export const identifiersMock: OffenderIdentifier[] = [
   },
   {
     type: 'NINO',
-    value: 'AB123456A',
+    value: 'QQ123456C',
     offenderNo: 'G6123VU',
     issuedDate: '2014-06-25',
     caseloadType: 'INST',

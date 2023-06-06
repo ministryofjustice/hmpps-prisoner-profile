@@ -211,7 +211,7 @@ describe('PersonalPageService', () => {
       expect(identityNumbers.croNumber).toEqual(PrisonerMockDataA.croNumber)
       expect(identityNumbers.drivingLicenceNumber).toEqual('ABCD/123456/AB9DE')
       expect(identityNumbers.homeOfficeReferenceNumber).toEqual('A1234567')
-      expect(identityNumbers.nationalInsuranceNumber).toEqual('AB123456A')
+      expect(identityNumbers.nationalInsuranceNumber).toEqual('QQ123456C')
       expect(identityNumbers.pncNumber).toEqual(PrisonerMockDataA.pncNumber)
       expect(identityNumbers.prisonNumber).toEqual(PrisonerMockDataA.prisonerNumber)
     })

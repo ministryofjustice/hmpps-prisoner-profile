@@ -170,7 +170,7 @@ context('When signed in', () => {
         page.identityNumbers().pncNumber().should('include.text', '08/359381C')
         page.identityNumbers().croNumber().should('include.text', '400862/08W')
         page.identityNumbers().homeOfficeReferenceNumber().should('include.text', 'A1234567')
-        page.identityNumbers().nationalInsuranceNumber().should('include.text', 'AB123456A')
+        page.identityNumbers().nationalInsuranceNumber().should('include.text', 'QQ123456C')
         page.identityNumbers().drivingLicenceNumber().should('include.text', 'ABCD/123456/AB9DE')
       })
     })
