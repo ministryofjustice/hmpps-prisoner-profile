@@ -7,6 +7,12 @@
       <span class="govuk-details__summary-text">View details</span>
     </summary>
     <div class="govuk-details__text">
+      {% if info.bodyPart %}
+        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-body-part">
+          <span class="govuk-!-font-weight-bold">Body part</span><br />
+          {{ info.bodyPart }}
+        </p>
+      {% endif %}
       {% if info.side %}
         <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
           <span class="govuk-!-font-weight-bold">Side</span><br />
@@ -40,11 +46,12 @@
       {{
         govukSummaryList({
         rows: [
-        {key: { text: "Height"}, value: { text: [physicalCharacteristics.height, "m"] | join } },
-        {key: { text: "Weight"}, value: { text: [physicalCharacteristics.weight, "kg"] | join } },
+        {key: { text: "Height"}, value: { text: physicalCharacteristics.height } },
+        {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
         {key: { text: "Hair colour"}, value: { text: physicalCharacteristics.hairColour } },
         {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
         {key: { text: "Right eye colour"}, value: { text: physicalCharacteristics.rightEyeColour } },
+        {key: { text: "Facial hair"}, value: { text: physicalCharacteristics.facialHair } },
         {key: { text: "Shape of face"}, value: { text: physicalCharacteristics.shapeOfFace } },
         {key: { text: "Build"}, value: { text: physicalCharacteristics.build } },
         {key: { text: "Shoe size"}, value: { text: physicalCharacteristics.shoeSize } },

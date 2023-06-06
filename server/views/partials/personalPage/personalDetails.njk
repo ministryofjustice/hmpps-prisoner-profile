@@ -18,7 +18,8 @@
         {{ summaryListRow("Full name", personalDetails.fullName | title, "full-name") }}
       </dl>
 
-      <details class="govuk-details" data-module="govuk-details">
+      {% if aliases.length %}
+      <details class="govuk-details hmpps-alias-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
           <span class="govuk-details__summary-text">View aliases</span>
         </summary>
@@ -26,30 +27,31 @@
           {{ govukTable({ head: [ { text: "Alias" }, { text: "Alias date of birth" } ], rows: aliases }) }}
         </div>
       </details>
+      {% endif %}
 
       <hr class="govuk-section-break govuk-section-break--visible" />
       <dl class="govuk-summary-list">
         {{ summaryListRow("Preferred name", personalDetails.preferredName, "preferred-name", { hideIfEmpty: true }) }}
         {{ summaryListRow("Date of birth", dateOfBirthText, "date-of-birth") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'place-of-birth'}) -%}
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'place-of-birth', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Place of birth", personalDetails.placeOfBirth | title, "place-of-birth") }}
         {%- endcall -%}
         {{ summaryListRow("Nationality", personalDetails.nationality, "nationality") }}
         {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
         {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'religion-or-belief'}) -%}
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'religion-or-belief', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Religion or belief", personalDetails.religionOrBelief, "religion-or-belief") }}
         {%- endcall -%}
         {{ summaryListRow("Sex", personalDetails.sex, "sex") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'sexual-orientation'}) -%}
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Sexual orientation", personalDetails.sexualOrientation, "sexual-orientation") }}
         {%- endcall -%}
         {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
         {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'personal-details'}) -%}
+        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'personal-details', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Languages", languagesHtml(personalDetails), "languages", { html: true }) }}
-          {{ summaryListRow("Types of diet", personalDetails.typeOfDiet, "type-of-diet") }}
-          {{ summaryListRow("Smoker of vaper", personalDetails.smokerOrVaper, "smoker-or-vaper") }}
+          {{ summaryListRow("Type of diet", personalDetails.typeOfDiet, "type-of-diet") }}
+          {{ summaryListRow("Smoker or vaper", personalDetails.smokerOrVaper, "smoker-or-vaper") }}
           {{ summaryListRow("Domestic abuse perpetrator", personalDetails.domesticAbusePerpetrator, "domestic-abuse-perpetrator", { hideIfEmpty: true }) }}
           {{ summaryListRow("Domestic abuse victim", personalDetails.domesticAbuseVictim, "domestic-abuse-victim", { hideIfEmpty: true }) }}
           {{ summaryListRow("Social care needed", personalDetails.socialCareNeeded, "social-care-needed", { hideIfEmpty: true }) }}

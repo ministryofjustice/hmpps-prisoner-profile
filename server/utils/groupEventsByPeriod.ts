@@ -19,6 +19,10 @@ const sortByStartAndEndTime = (a: ScheduledEvent, b: ScheduledEvent) => {
 }
 
 export default (scheduledEvents: ScheduledEvent[]): filteredEvents => {
+  if (!Array.isArray(scheduledEvents)) {
+    return { morningEvents: [], afternoonEvents: [], eveningEvents: [] }
+  }
+
   const morningEvents = scheduledEvents
     .filter(event => new Date(event.startTime).getHours() < 12)
     .sort(sortByStartAndEndTime)

@@ -1,7 +1,9 @@
 {% macro summaryListRow(key, value, id, options) %}
   {% set hideIfEmpty = options.hideIfEmpty | default(false) %}
   {% if hideIfEmpty and not value %}
-    <div data-qa="{{ id }}-empty"></div>
+    <div class="govuk-summary-list__row govuk-summary-list__row--hidden" data-qa="{{ id }}-empty">
+      <dt class="govuk-summary-list__key"></dt>
+    </div>
   {% else %}
     <div class="govuk-summary-list__row" data-qa="{{ id }}-row">
       <dt class="govuk-summary-list__key" data-qa="{{ id }}-key">{{ key }}</dt>

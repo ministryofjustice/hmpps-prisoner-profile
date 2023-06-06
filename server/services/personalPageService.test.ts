@@ -15,6 +15,8 @@ import { PersonalCareNeed } from '../interfaces/personalCareNeeds'
 import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
+import { formatDate } from '../utils/dateHelpers'
+import { identifiersMock } from '../data/localMockData/identifiersMock'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -31,6 +33,7 @@ describe('PersonalPageService', () => {
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => [])
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
+    prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
   })
 
   describe('Getting information from the Prison API', () => {
@@ -91,11 +94,11 @@ describe('PersonalPageService', () => {
         ])
         expect(response.personalDetails.aliases[0]).toEqual({
           alias: 'First Name Last Name',
-          dateOfBirth: '2022-01-01',
+          dateOfBirth: '01/01/2022',
         })
         expect(response.personalDetails.aliases[1]).toEqual({
           alias: 'First Middle Last',
-          dateOfBirth: '2023-01-01',
+          dateOfBirth: '01/01/2023',
         })
       })
     })
@@ -183,8 +186,10 @@ describe('PersonalPageService', () => {
     describe('One-to-one mapped data', () => {
       it('Maps the data from the API', async () => {
         const { personalDetails } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
-        expect(personalDetails.dateOfBirth).toEqual(PrisonerMockDataA.dateOfBirth)
-        expect(personalDetails.ethnicGroup).toEqual(PrisonerMockDataA.ethnicity)
+        expect(personalDetails.dateOfBirth).toEqual(formatDate(PrisonerMockDataA.dateOfBirth, 'short'))
+        expect(personalDetails.ethnicGroup).toEqual(
+          `${PrisonerMockDataA.ethnicity} (${prisonerDetailMock.ethnicityCode})`,
+        )
         expect(personalDetails.fullName).toEqual(
           formatName(PrisonerMockDataA.firstName, PrisonerMockDataA.middleNames, PrisonerMockDataA.lastName),
         )
@@ -206,7 +211,7 @@ describe('PersonalPageService', () => {
       expect(identityNumbers.croNumber).toEqual(PrisonerMockDataA.croNumber)
       expect(identityNumbers.drivingLicenceNumber).toEqual('ABCD/123456/AB9DE')
       expect(identityNumbers.homeOfficeReferenceNumber).toEqual('A1234567')
-      expect(identityNumbers.nationalInsuranceNumber).toEqual('AB123456A')
+      expect(identityNumbers.nationalInsuranceNumber).toEqual('QQ123456C')
       expect(identityNumbers.pncNumber).toEqual(PrisonerMockDataA.pncNumber)
       expect(identityNumbers.prisonNumber).toEqual(PrisonerMockDataA.prisonerNumber)
     })
@@ -381,8 +386,8 @@ describe('PersonalPageService', () => {
   describe('Appearance', () => {
     it('Maps the data from the API', async () => {
       const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
-      expect(physicalCharacteristics.height).toEqual('1.88')
-      expect(physicalCharacteristics.weight).toEqual('86')
+      expect(physicalCharacteristics.height).toEqual('1.88m')
+      expect(physicalCharacteristics.weight).toEqual('86kg')
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
       expect(physicalCharacteristics.leftEyeColour).toEqual('Blue')
       expect(physicalCharacteristics.rightEyeColour).toEqual('Blue')
@@ -621,7 +626,7 @@ describe('PersonalPageService', () => {
     it('Sets the address to empty', async () => {
       prisonApiClient.getAddresses = jest.fn(async () => undefined)
       const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
-      expect(addresses.address.street).toEqual('')
+      expect(addresses).toBeUndefined()
     })
   })
 })

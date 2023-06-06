@@ -31,4 +31,8 @@
     @include govuk-font($size: 19);
     @include govuk-responsive-margin(0, 'bottom');
   }
+
+  &:last-of-type {
+    margin-bottom: 30px;
+  }
 }

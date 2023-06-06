@@ -14,6 +14,9 @@
 {%- call summaryCard({title: "Property", id: "property"}) -%}
   <div class="govuk-grid-row" data-qa="property">
     <div class="govuk-grid-column-full">
+      {% if not property.length %}
+        <p>No property entered.</p>
+      {% endif %}
       {% for item in property %}
         {{ propertyItem({containerType: item.containerType, sealMark: item.sealMark, location: item.location}) }}
       {% endfor %}
