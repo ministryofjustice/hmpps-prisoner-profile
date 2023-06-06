@@ -1,18 +1,22 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
   Addresses,
+  CareNeeds,
   IdentityNumbers,
   NextOfKin,
   PersonalDetails,
   PersonalPage,
   PhysicalCharacteristics,
   PropertyItem,
-  CareNeeds,
 } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName, yearsBetweenDateStrings } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
-import { getOffenderIdentifierValue, OffenderIdentifierType } from '../interfaces/prisonApi/offenderIdentifier'
+import {
+  getOffenderIdentifierValue,
+  OffenderIdentifier,
+  OffenderIdentifierType,
+} from '../interfaces/prisonApi/offenderIdentifier'
 import { Address } from '../interfaces/prisonApi/address'
 import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
@@ -20,6 +24,7 @@ import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
+import { formatDate } from '../utils/dateHelpers'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -40,6 +45,7 @@ export default class PersonalPageService {
       contacts,
       healthReferenceCodes,
       healthTreatmentReferenceCodes,
+      identifiers,
     ] = await Promise.all([
       this.prisonApiClient.getInmateDetail(bookingId),
       this.prisonApiClient.getPrisoner(prisonerNumber),
@@ -49,11 +55,12 @@ export default class PersonalPageService {
       this.prisonApiClient.getOffenderContacts(prisonerNumber),
       this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
       this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
+      this.prisonApiClient.getIdentifiers(bookingId),
     ])
 
     return {
       personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages),
-      identityNumbers: this.identityNumbers(prisonerData, inmateDetail),
+      identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses: this.addresses(addresses),
       nextOfKin: await this.nextOfKin(contacts),
@@ -80,23 +87,31 @@ export default class PersonalPageService {
   ): PersonalDetails {
     const { profileInformation } = inmateDetail
 
-    const aliases = prisonerData.aliases.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
+    const aliases = prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
       alias: formatName(firstName, middleNames, lastName),
-      dateOfBirth,
+      dateOfBirth: formatDate(dateOfBirth, 'short'),
     }))
 
     const todaysDateString = new Date().toISOString()
 
+    let ethnicGroup = 'Not entered'
+    if (prisonerDetail?.ethnicity) {
+      ethnicGroup = `${prisonerDetail.ethnicity}`
+      if (prisonerDetail?.ethnicityCode) {
+        ethnicGroup += ` (${prisonerDetail.ethnicityCode})`
+      }
+    }
+
     return {
       age: (inmateDetail.age || yearsBetweenDateStrings(prisonerData.dateOfBirth, todaysDateString)).toString(),
       aliases,
-      dateOfBirth: prisonerData.dateOfBirth,
+      dateOfBirth: formatDate(prisonerData.dateOfBirth, 'short'),
       domesticAbusePerpetrator: getProfileInformationValue(
         ProfileInformationType.DomesticAbusePerpetrator,
         profileInformation,
       ),
       domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
-      ethnicGroup: prisonerData.ethnicity || 'Not entered',
+      ethnicGroup,
       fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
       languages: {
         interpreterRequired: inmateDetail.interpreterRequired,
@@ -117,9 +132,9 @@ export default class PersonalPageService {
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
       placeOfBirth: inmateDetail.birthPlace || 'Not entered',
       preferredName: formatName(
-        prisonerDetail.currentWorkingFirstName,
+        prisonerDetail?.currentWorkingFirstName,
         undefined,
-        prisonerDetail.currentWorkingLastName,
+        prisonerDetail?.currentWorkingLastName,
       ),
       religionOrBelief: prisonerData.religion || 'Not entered',
       sex: prisonerData.gender,
@@ -132,27 +147,24 @@ export default class PersonalPageService {
     }
   }
 
-  private identityNumbers(prisonerData: Prisoner, inmateDetail: InmateDetail): IdentityNumbers {
+  private identityNumbers(prisonerData: Prisoner, identifiers: OffenderIdentifier[]): IdentityNumbers {
     return {
       croNumber: prisonerData.croNumber || 'Not entered',
-      drivingLicenceNumber: getOffenderIdentifierValue(
-        OffenderIdentifierType.DrivingLicenseNumber,
-        inmateDetail.identifiers,
-      ),
+      drivingLicenceNumber: getOffenderIdentifierValue(OffenderIdentifierType.DrivingLicenseNumber, identifiers),
       homeOfficeReferenceNumber: getOffenderIdentifierValue(
         OffenderIdentifierType.HomeOfficeReferenceNumber,
-        inmateDetail.identifiers,
+        identifiers,
       ),
-      nationalInsuranceNumber: getOffenderIdentifierValue(
-        OffenderIdentifierType.NationalInsuranceNumber,
-        inmateDetail.identifiers,
-      ),
+      nationalInsuranceNumber: getOffenderIdentifierValue(OffenderIdentifierType.NationalInsuranceNumber, identifiers),
       pncNumber: prisonerData.pncNumber || 'Not entered',
       prisonNumber: prisonerData.prisonerNumber,
     }
   }
 
   private property(property: PropertyContainer[]): PropertyItem[] {
+    if (!Array.isArray(property)) {
+      return []
+    }
     return property.map(({ location, containerType, sealMark }) => ({
       containerType,
       sealMark: sealMark || 'Not entered',
@@ -160,9 +172,14 @@ export default class PersonalPageService {
     }))
   }
 
-  private addresses(addresses: Address[] = []): Addresses | undefined {
+  private addresses(addresses: Address[]): Addresses | undefined {
+    if (!Array.isArray(addresses)) {
+      return undefined
+    }
     const primaryAddress = addresses.find(address => address.primary)
+
     return {
+      isPrimaryAddress: !!primaryAddress,
       comment: primaryAddress?.comment || '',
       phones: primaryAddress?.phones.map(phone => phone.number) || [],
       addressTypes:
@@ -184,16 +201,18 @@ export default class PersonalPageService {
   }
 
   private async nextOfKin(contacts: OffenderContacts): Promise<NextOfKin[]> {
-    const activeNextOfKinContacts = contacts.offenderContacts.filter(contact => contact.active && contact.nextOfKin)
-    const contactAddresses = await Promise.all(
-      activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId)),
-    )
+    const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
+    let contactAddresses: { personId: number; addresses: Address[] }[] = []
+    if (activeNextOfKinContacts) {
+      contactAddresses = await Promise.all(
+        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId)),
+      )
+    }
 
     return contacts.offenderContacts
-      .filter(contact => contact.nextOfKin && contact.active)
+      ?.filter(contact => contact.nextOfKin && contact.active)
       .map(contact => {
         const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
-
         return {
           address: this.addresses(personAddresses.addresses),
           emails: contact.emails?.map(({ email }) => email) || [],
@@ -225,7 +244,7 @@ export default class PersonalPageService {
         })) || [],
       facialHair: prisonerData.facialHair || 'Not entered',
       hairColour: prisonerData.hairColour || 'Not entered',
-      height: prisonerData.heightCentimetres ? (prisonerData.heightCentimetres / 100).toString() : 'Not entered',
+      height: prisonerData.heightCentimetres ? `${(prisonerData.heightCentimetres / 100).toString()}m` : 'Not entered',
       leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
       rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
       shapeOfFace: prisonerData.shapeOfFace || 'Not entered',
@@ -238,7 +257,7 @@ export default class PersonalPageService {
           ProfileInformationType.WarnedNotToChangeAppearance,
           inmateDetail.profileInformation,
         ) || 'Needs to be warned',
-      weight: prisonerData.weightKilograms ? prisonerData.weightKilograms.toString() : 'Not entered',
+      weight: prisonerData.weightKilograms ? `${prisonerData.weightKilograms}kg` : 'Not entered',
     }
   }
 

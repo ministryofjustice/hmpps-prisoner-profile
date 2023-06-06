@@ -54,3 +54,12 @@
 .hmpps-dark-grey-font {
   color: govuk-colour("dark-grey")
 }
+
+@media (min-width: 40.0625em) {
+  .hmpps-conditional-summary-row {
+    display: table-row-group;
+  }
+}
+.govuk-summary-list__row--hidden {
+  display: none;
+}

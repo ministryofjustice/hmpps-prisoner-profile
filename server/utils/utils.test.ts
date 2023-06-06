@@ -234,8 +234,9 @@ describe('Address to lines', () => {
     const lines = addressToLines(address)
     expect(lines[0]).toEqual('Flat 7, premises address, street field')
     expect(lines[1]).toEqual('Leeds')
-    expect(lines[2]).toEqual('LS1 AAA')
-    expect(lines[3]).toEqual('England')
+    expect(lines[2]).toEqual('West Yorkshire')
+    expect(lines[3]).toEqual('LS1 AAA')
+    expect(lines[4]).toEqual('England')
   })
 
   it('Maps a partial address', () => {
@@ -250,8 +251,9 @@ describe('Address to lines', () => {
 
     const lines = addressToLines(address)
     expect(lines[0]).toEqual('premises address, street field')
-    expect(lines[1]).toEqual('LS1 AAA')
-    expect(lines[2]).toEqual('England')
+    expect(lines[1]).toEqual('West Yorkshire')
+    expect(lines[2]).toEqual('LS1 AAA')
+    expect(lines[3]).toEqual('England')
   })
 })
 

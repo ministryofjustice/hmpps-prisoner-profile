@@ -296,12 +296,12 @@ export const generateListMetadata = (
 export const formatCurrency = (number: number, currency: string): string =>
   typeof number === 'number' ? number.toLocaleString('en-GB', { style: 'currency', currency: currency || 'GBP' }) : ''
 
-export const addressToLines = ({ flat, premise, street, town, postalCode, country }: Address): string[] => {
+export const addressToLines = ({ flat, premise, street, town, county, postalCode, country }: Address): string[] => {
   let lineOne = [premise, street].filter(s => s).join(', ')
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
   }
-  return [lineOne, town, postalCode, country].filter(s => s)
+  return [lineOne, town, county, postalCode, country].filter(s => s)
 }
 
 /**

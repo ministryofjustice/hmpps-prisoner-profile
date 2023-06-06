@@ -34,6 +34,9 @@
 {%- call summaryCard({title: "Next of kin", id: "next-of-kin"}) -%}
   <div class="govuk-grid-row" data-qa="next-of-kin">
     <div class="govuk-grid-column-full">
+      {% if not nextOfKin.length %}
+        <p>No next of kin entered.</p>
+      {% endif %}
       {% for contact in nextOfKin %}
         {{ prisonerContact({
           emergencyContact: contact.emergencyContact,
@@ -43,7 +46,9 @@
           emails: contact.emails,
           address: contact.address
         }) }}
+        {% if not loop.last %}
         <hr class="govuk-section-break govuk-section-break--visible" />
+        {% endif %}
       {% endfor %}
     </div>
   </div>

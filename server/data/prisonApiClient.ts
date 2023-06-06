@@ -40,6 +40,7 @@ import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
 import { CourtDateResults } from '../interfaces/courtDateResults'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
+import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   restClient: RestClient
@@ -279,6 +280,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getCourtDateResults(prisonerNumber: string): Promise<CourtDateResults[]> {
     return this.get<CourtDateResults[]>({
       path: `/api/digital-warrant/court-date-results/${prisonerNumber}`,
+    })
+  }
+
+  async getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]> {
+    return this.get<OffenderIdentifier[]>({
+      path: `/api/bookings/${bookingId}/identifiers`,
     })
   }
 }
