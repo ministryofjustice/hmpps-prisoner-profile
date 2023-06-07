@@ -42,6 +42,7 @@ import { CourtHearing } from '../interfaces/prisonApi/courtHearing'
 import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import config from '../config'
 import { Role } from '../data/enums/role'
+import { CaseLoad } from '../interfaces/caseLoad'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -64,13 +65,17 @@ export default class OverviewPageService {
     this.incentivesApiClient = incentivesApiClient
   }
 
-  public async get(prisonerData: Prisoner, userRoles: string[] = []): Promise<OverviewPage> {
+  public async get(
+    prisonerData: Prisoner,
+    userCaseLoads: CaseLoad[] = [],
+    userRoles: string[] = [],
+  ): Promise<OverviewPage> {
     const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
       prisonerData
 
     const nonAssociations = await this.getNonAssociations(prisonerNumber)
-    const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerData, userRoles)
-    const miniSummaryGroupB = await this.getMiniSummaryGroupB(prisonerData, userRoles)
+    const miniSummaryGroupA = await this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles)
+    const miniSummaryGroupB = await this.getMiniSummaryGroupB(prisonerData, userCaseLoads, userRoles)
     const personalDetails = await this.getPersonalDetails(prisonerData)
     const staffContacts = await this.getStaffContacts(prisonerData)
     const schedule = await this.getSchedule(prisonerData)
@@ -274,14 +279,17 @@ export default class OverviewPageService {
     return { personalDetailsMain, personalDetailsSide }
   }
 
-  private async getMiniSummaryGroupA(prisonerData: Prisoner, userRoles: string[]): Promise<MiniSummary[]> {
+  private async getMiniSummaryGroupA(
+    prisonerData: Prisoner,
+    userCaseLoads: CaseLoad[],
+    userRoles: string[],
+  ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
-    const [accountBalances, adjudicationSummary, visitSummary, visitBalances, userCaseLoads] = await Promise.all([
+    const [accountBalances, adjudicationSummary, visitSummary, visitBalances] = await Promise.all([
       this.prisonApiClient.getAccountBalances(bookingId),
       this.prisonApiClient.getAdjudications(bookingId),
       this.prisonApiClient.getVisitSummary(bookingId),
       this.prisonApiClient.getVisitBalances(prisonerNumber),
-      this.prisonApiClient.getUserCaseLoads(),
     ])
 
     let privilegedVisitsDescription = ''
@@ -351,10 +359,14 @@ export default class OverviewPageService {
     return summaryData
   }
 
-  private async getMiniSummaryGroupB(prisonerData: Prisoner, userRoles: string[]): Promise<MiniSummary[]> {
+  private async getMiniSummaryGroupB(
+    prisonerData: Prisoner,
+    userCaseLoads: CaseLoad[],
+    userRoles: string[],
+  ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
+
     const assessments = await this.prisonApiClient.getAssessments(bookingId)
-    const userCaseLoads = await this.prisonApiClient.getUserCaseLoads()
 
     const incentiveReviews: IncentiveReviews = await this.incentivesApiClient.getReviews(bookingId)
 

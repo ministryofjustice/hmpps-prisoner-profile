@@ -165,7 +165,10 @@ describe('OverviewPageService', () => {
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({ prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner)
+      const res = await overviewPageService.get(
+        { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        CaseLoadsDummyDataA,
+      )
 
       expect(res.miniSummaryGroupA).toEqual(
         expect.arrayContaining([
@@ -194,9 +197,11 @@ describe('OverviewPageService', () => {
           const bookingId = 123456
 
           const overviewPageService = overviewPageServiceConstruct()
-          const res = await overviewPageService.get({ prisonerNumber, bookingId, prisonId: '123' } as Prisoner, [
-            userRole,
-          ])
+          const res = await overviewPageService.get(
+            { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+            CaseLoadsDummyDataA,
+            [userRole],
+          )
 
           expect(res.miniSummaryGroupA).toEqual(
             expect.arrayContaining([
@@ -223,12 +228,15 @@ describe('OverviewPageService', () => {
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        ...PrisonerMockDataA,
-        prisonerNumber,
-        bookingId,
-        prisonId: 'MDI',
-      } as Prisoner)
+      const res = await overviewPageService.get(
+        {
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: 'MDI',
+        } as Prisoner,
+        CaseLoadsDummyDataA,
+      )
 
       expect(res.miniSummaryGroupB).toEqual(
         expect.arrayContaining([

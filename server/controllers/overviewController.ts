@@ -62,7 +62,7 @@ export default class OverviewController {
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
-      overviewPageService.get(prisonerData, res.locals.user.userRoles),
+      overviewPageService.get(prisonerData, res.locals.user.caseLoads, res.locals.user.userRoles),
       this.pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
       this.manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
     ])

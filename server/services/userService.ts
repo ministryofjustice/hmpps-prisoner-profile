@@ -4,9 +4,11 @@ import { CaseLoad } from '../interfaces/caseLoad'
 import { Location } from '../interfaces/location'
 import PrisonApiClient from '../data/prisonApiClient'
 
-interface UserDetails {
+export interface UserDetails {
   name: string
   displayName: string
+  locations: Location[]
+  caseLoads: CaseLoad[]
   activeCaseLoadId?: string
   activeCaseLoad?: CaseLoad
 }
@@ -15,19 +17,12 @@ export default class UserService {
   constructor(private readonly hmppsAuthClient: HmppsAuthClient) {}
 
   async getUser(token: string): Promise<UserDetails> {
-    const user = await this.hmppsAuthClient.getUser(token)
-    return { ...user, displayName: convertToTitleCase(user.name) }
-  }
-
-  getUserRoles(token: string): Promise<string[]> {
-    return this.hmppsAuthClient.getUserRoles(token)
-  }
-
-  getUserLocations(token: string): Promise<Location[]> {
-    return new PrisonApiClient(token).getUserLocations()
-  }
-
-  getUserCaseLoads(token: string): Promise<CaseLoad[]> {
-    return new PrisonApiClient(token).getUserCaseLoads()
+    const [user, locations, caseLoads] = await Promise.all([
+      this.hmppsAuthClient.getUser(token),
+      new PrisonApiClient(token).getUserLocations(),
+      new PrisonApiClient(token).getUserCaseLoads(),
+    ])
+    const activeCaseLoad = caseLoads.filter((caseLoad: CaseLoad) => caseLoad.currentlyActive)[0]
+    return { ...user, locations, caseLoads, activeCaseLoad, displayName: convertToTitleCase(user.name) }
   }
 }
