@@ -26,6 +26,7 @@ import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { formatDate } from '../utils/dateHelpers'
 import { Alias } from '../interfaces/prisonApi/alias'
+import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -180,27 +181,28 @@ export default class PersonalPageService {
     if (!Array.isArray(addresses)) {
       return undefined
     }
-    const primaryAddress = addresses.find(address => address.primary)
+
+    const mostRecentAddress = getMostRecentAddress(addresses)
 
     return {
-      isPrimaryAddress: !!primaryAddress,
-      comment: primaryAddress?.comment || '',
-      phones: primaryAddress?.phones.map(phone => phone.number) || [],
+      isPrimaryAddress: !!mostRecentAddress,
+      comment: mostRecentAddress?.comment || '',
+      phones: mostRecentAddress?.phones.map(phone => phone.number) || [],
       addressTypes:
-        primaryAddress?.addressUsages
+        mostRecentAddress?.addressUsages
           .filter(usage => usage.activeFlag && usage.activeFlag)
           .map(usage => usage.addressUsageDescription) || [],
       address: {
-        country: primaryAddress?.country || '',
-        county: primaryAddress?.county || '',
-        flat: primaryAddress?.flat || '',
-        locality: primaryAddress?.locality || '',
-        postalCode: primaryAddress?.postalCode || '',
-        premise: primaryAddress?.premise || '',
-        street: primaryAddress?.street || '',
-        town: primaryAddress?.town || '',
+        country: mostRecentAddress?.country || '',
+        county: mostRecentAddress?.county || '',
+        flat: mostRecentAddress?.flat || '',
+        locality: mostRecentAddress?.locality || '',
+        postalCode: mostRecentAddress?.postalCode || '',
+        premise: mostRecentAddress?.premise || '',
+        street: mostRecentAddress?.street || '',
+        town: mostRecentAddress?.town || '',
       },
-      addedOn: primaryAddress?.startDate || '',
+      addedOn: mostRecentAddress?.startDate || '',
     }
   }
 
