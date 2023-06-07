@@ -31,6 +31,7 @@ import { CaseNoteCount } from '../../interfaces/prisonApi/caseNoteCount'
 import { CourtDateResults } from '../../interfaces/courtDateResults'
 import { MainOffence } from '../../interfaces/prisonApi/mainOffence'
 import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
+import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 
 export interface PrisonApiClient {
   getUserLocations(): Promise<Location[]>
@@ -77,4 +78,5 @@ export interface PrisonApiClient {
   getMainOffence(bookingId: number): Promise<MainOffence>
   getFullStatus(prisonerNumber: string): Promise<FullStatus>
   getCourtDateResults(offenderNumber: string): Promise<CourtDateResults[]>
+  getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
 }

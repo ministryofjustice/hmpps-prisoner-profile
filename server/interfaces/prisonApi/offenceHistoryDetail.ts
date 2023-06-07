@@ -1,11 +1,11 @@
 export interface OffenceHistoryDetail {
-  bookingId: number
+  bookingId?: number
   offenceDate?: string
   offenceRangeDate?: string
   offenceDescription: string
   offenceCode: string
-  statuteCode: string
-  mostSerious: boolean
+  statuteCode?: string
+  mostSerious?: boolean
   primaryResultCode?: string
   secondaryResultCode?: string
   primaryResultDescription?: string
@@ -14,4 +14,13 @@ export interface OffenceHistoryDetail {
   secondaryResultConviction?: boolean
   courtDate?: string
   caseId?: number
+}
+
+export interface SentenceSummaryOffence extends OffenceHistoryDetail {
+  offenderChargeId?: number
+  offenceStartDate?: string
+  offenceEndDate?: string
+  indicators?: string[]
+  offenceDescription: string
+  offenceCode: string
 }

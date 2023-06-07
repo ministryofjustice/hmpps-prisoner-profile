@@ -8,12 +8,7 @@ export interface CourtCaseDataMapped {
   courtHearings: CourtHearing[]
   caseInfoNumber: string
   courtName: string
-  sentenceTerms: {
-    sentenceHeader: string
-    sentenceTypeDescription: string
-    summaryDetailRows: object[]
-    offences: OffenceHistoryDetail[]
-  }[]
+  sentenceTerms: CourtCaseSentenceTerm[]
 }
 
 export interface CourtCaseDataMappedUnsentenced {
@@ -24,4 +19,11 @@ export interface CourtCaseDataMappedUnsentenced {
   courtName: string
   sentenceHeader: string
   courtDateResults: CourtDateResults[]
+}
+
+export interface CourtCaseSentenceTerm {
+  sentenceHeader: string
+  sentenceTypeDescription: string
+  summaryDetailRows: object[]
+  offences: OffenceHistoryDetail[]
 }

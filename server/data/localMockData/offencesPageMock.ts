@@ -5,7 +5,7 @@ import { CourtHearingsMock } from './courtHearingsMock'
 export const OffencesPageMockSentences = {
   courtCaseData: [
     {
-      caseInfoNumber: 'T20167348',
+      caseInfoNumber: 'T20161587',
       courtHearings: [
         {
           dateTime: '2020-06-18T10:00:00',
@@ -397,7 +397,7 @@ export const GroupedSentencesMock = [
 
 export const GetCourtCaseData = [
   {
-    caseInfoNumber: 'T20167348',
+    caseInfoNumber: 'T20161587',
     courtHearings: [
       {
         dateTime: '2020-06-18T10:00:00',
