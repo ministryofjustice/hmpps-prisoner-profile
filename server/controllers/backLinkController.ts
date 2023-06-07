@@ -23,6 +23,7 @@ export const registeredBackLinkServices: RegisteredService[] = [
 
 export const saveBackLink =
   (registeredServices: Array<RegisteredService> = registeredBackLinkServices) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (req: any, res: any) => {
     const { service, returnPath, redirectPath, backLinkText } = req.query
 

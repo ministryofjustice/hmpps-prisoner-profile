@@ -5,6 +5,7 @@ import UserService from '../services/userService'
 import { CaseLoad } from '../interfaces/caseLoad'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (req: any, res, next) => {
     try {
       if (res.locals.user) {
