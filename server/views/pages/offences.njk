@@ -1,4 +1,10 @@
 {% extends "./index.njk" %}
+{% set breadCrumbs = [
+  {
+    text: 'Back to search results',
+    href:  "/" | prependBaseUrl
+  }
+] %}
 {% block body %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">

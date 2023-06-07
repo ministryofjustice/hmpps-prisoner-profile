@@ -9,6 +9,7 @@ import { CaseLoad } from '../interfaces/caseLoad'
 import { Prisoner } from '../interfaces/prisoner'
 import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
+import config from '../config'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -296,12 +297,12 @@ export const generateListMetadata = (
 export const formatCurrency = (number: number, currency: string): string =>
   typeof number === 'number' ? number.toLocaleString('en-GB', { style: 'currency', currency: currency || 'GBP' }) : ''
 
-export const addressToLines = ({ flat, premise, street, town, postalCode, country }: Address): string[] => {
+export const addressToLines = ({ flat, premise, street, town, county, postalCode, country }: Address): string[] => {
   let lineOne = [premise, street].filter(s => s).join(', ')
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
   }
-  return [lineOne, town, postalCode, country].filter(s => s)
+  return [lineOne, town, county, postalCode, country].filter(s => s)
 }
 
 /**
@@ -368,6 +369,19 @@ export const userCanEdit = (user: User, prisoner: Prisoner): boolean => {
     (['OUT', 'TRN'].includes(prisoner.prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
     (prisoner.restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
   )
+}
+
+export const apostrophe = (word: string): string => {
+  const lastCh = word.charAt(word.length - 1)
+  if (lastCh === 's') {
+    return `${word}’`
+  }
+  return `${word}’s`
+}
+
+export const prependBaseUrl = (url: string): string => {
+  const urlWithBaseUrl = `${config.serviceUrls.digitalPrison}${url}`
+  return urlWithBaseUrl
 }
 
 /**

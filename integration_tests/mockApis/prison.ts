@@ -2,6 +2,7 @@ import { stubFor } from './wiremock'
 import {
   accountBalancesMock,
   adjudicationSummaryMock,
+  adjudicationSummaryWithActiveMock,
   assessmentsMock,
   visitBalancesMock,
   visitSummaryMock,
@@ -53,6 +54,7 @@ import {
   fullStatusRemandMock,
 } from '../../server/data/localMockData/offenceOverviewMock'
 import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
+import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
 
 import {
   SentenceSummaryWithSentenceMock,
@@ -104,6 +106,21 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: adjudicationSummaryMock,
+      },
+    })
+  },
+  stubAdjudicationsWithActive: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/adjudications`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: adjudicationSummaryWithActiveMock,
       },
     })
   },
@@ -759,6 +776,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubGetIdentifiers: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: identifiersMock,
       },
     })
   },

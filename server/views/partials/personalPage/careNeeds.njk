@@ -13,6 +13,7 @@
 {%- call summaryCard({title: "Care needs", id: "care-needs"}) -%}
   <div class="govuk-grid-row" data-qa="care-needs">
     <div class="govuk-grid-column-full">
+      {% if careNeeds.personalCareNeeds.length or careNeeds.reasonableAdjustments.length %}
       <dl class="govuk-summary-list" data-qa="care-needs-list">
         {% for need in careNeeds.personalCareNeeds %}
           {{ summaryListRow(need.type, careNeed(need), "care-need") }}
@@ -21,6 +22,9 @@
           {{ summaryListRow(need.type, careNeed(need), "reasonable-adjustment") }}
         {% endfor %}
       </dl>
+      {% else %}
+        <p>No care needs have been entered.</p>
+      {% endif %}
     </div>
   </div>
 {%- endcall -%}

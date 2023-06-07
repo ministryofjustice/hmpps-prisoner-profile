@@ -93,6 +93,14 @@ describe('OverviewPageService', () => {
     prisonApiClient.getFullStatus = jest.fn(async () => fullStatusMock)
   })
 
+  describe('Prison name', () => {
+    it('Returns the prison name', async () => {
+      const overviewPageService = overviewPageServiceConstruct()
+      const { prisonName } = await overviewPageService.get(PrisonerMockDataA)
+      expect(prisonName).toEqual(PrisonerMockDataA.prisonName)
+    })
+  })
+
   describe('Non-associations', () => {
     it.each(['ABC123', 'DEF321'])('Gets the non-associations for the prisoner', async (prisonerNumber: string) => {
       const overviewPageService = overviewPageServiceConstruct()
@@ -106,11 +114,13 @@ describe('OverviewPageService', () => {
       expect(res.nonAssociations.length).toEqual(2)
       const associationRowOne = res.nonAssociations[0]
       const associationRowTwo = res.nonAssociations[1]
-      expect(associationRowOne[0].text).toEqual('John Doe')
+      expect(associationRowOne[0].html).toContain('John Doe')
+      expect(associationRowOne[0].html).toContain('/prisoner/ABC123')
       expect(associationRowOne[1].text).toEqual('ABC123')
       expect(associationRowOne[2].text).toEqual('NMI-RECP')
       expect(associationRowOne[3].text).toEqual('Victim')
-      expect(associationRowTwo[0].text).toEqual('Guy Incognito')
+      expect(associationRowTwo[0].html).toContain('Guy Incognito')
+      expect(associationRowTwo[0].html).toContain('/prisoner/DEF321')
       expect(associationRowTwo[1].text).toEqual('DEF321')
       expect(associationRowTwo[2].text).toEqual('NMI-RECP')
       expect(associationRowTwo[3].text).toEqual('Rival Gang')

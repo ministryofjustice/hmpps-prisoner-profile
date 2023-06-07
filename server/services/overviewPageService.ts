@@ -92,6 +92,7 @@ export default class OverviewPageService {
       staffContacts,
       schedule,
       offencesOverview,
+      prisonName: prisonerData.prisonName,
     }
   }
 
@@ -125,19 +126,21 @@ export default class OverviewPageService {
     const offencesPageService = new OffencesPageService(this.prisonApiClient)
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     let nextCourtAppearance: CourtHearing = {} as CourtHearing
-    await courtCaseData.forEach(async (courtCase: CourtCase) => {
-      const courtAppearance = await offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
+    if (Array.isArray(courtCaseData)) {
+      await courtCaseData.forEach(async (courtCase: CourtCase) => {
+        const courtAppearance = await offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
 
-      if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
-        nextCourtAppearance = courtAppearance
-      } else if (courtAppearance.dateTime && nextCourtAppearance.dateTime) {
-        const courtDate = format(new Date(courtAppearance.dateTime), 'yyyy-MM-dd')
-        const currentNextDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
-        if (courtDate < currentNextDate) {
+        if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
           nextCourtAppearance = courtAppearance
+        } else if (courtAppearance.dateTime && nextCourtAppearance.dateTime) {
+          const courtDate = format(new Date(courtAppearance.dateTime), 'yyyy-MM-dd')
+          const currentNextDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
+          if (courtDate < currentNextDate) {
+            nextCourtAppearance = courtAppearance
+          }
         }
-      }
-    })
+      })
+    }
     return nextCourtAppearance
   }
 
@@ -306,10 +309,12 @@ export default class OverviewPageService {
       topContent: adjudicationSummary.adjudicationCount,
       topClass: 'big',
       bottomLabel: 'Active',
-      bottomContentLine1: pluralise(adjudicationSummary.awards.length, 'active punishment', {
+      bottomContentLine1: pluralise(adjudicationSummary.awards?.length, 'active punishment', {
         emptyMessage: 'No active punishments',
       }),
-      bottomContentLine1Href: adjudicationSummary.awards?.length ? '#' : undefined,
+      bottomContentLine1Href: adjudicationSummary.awards?.length
+        ? `/prisoner/${prisonerNumber}/active-punishments`
+        : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudications history',
       linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
@@ -481,7 +486,9 @@ export default class OverviewPageService {
         const { offenderNonAssociation } = nonAssocation
         const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
         return [
-          { text: nonAssociationName },
+          {
+            html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${offenderNonAssociation.offenderNo}">${nonAssociationName}</a>`,
+          },
           { text: offenderNonAssociation.offenderNo },
           { text: offenderNonAssociation.assignedLivingUnitDescription },
           { text: offenderNonAssociation.reasonDescription },

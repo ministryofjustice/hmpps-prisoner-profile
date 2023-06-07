@@ -52,6 +52,7 @@ export interface PropertyItem {
 }
 
 export interface Addresses {
+  isPrimaryAddress: boolean
   address: Address
   comment: string
   addressTypes: string[]

@@ -1,4 +1,6 @@
-<div data-test="hmpps-profile-banner-partial" class="hmpps-profile-banner">
-  {% include "./profileBannerTop.njk" %}
-  {% include "./profileBannerBottom.njk" %}
-</div>
+{% if hideBanner === false %}
+  <div data-test="hmpps-profile-banner-partial" class="hmpps-profile-banner">
+    {% include "./profileBannerTop.njk" %}
+    {% include "./profileBannerBottom.njk" %}
+  </div>
+{% endif %}

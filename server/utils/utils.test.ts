@@ -1,5 +1,6 @@
 import {
   addressToLines,
+  apostrophe,
   arrayToQueryString,
   convertToTitleCase,
   findError,
@@ -10,6 +11,7 @@ import {
   getNamesFromString,
   initialiseName,
   mapToQueryString,
+  prependBaseUrl,
   prisonerBelongsToUsersCaseLoad,
   properCaseName,
   summaryListOneHalfWidth,
@@ -21,6 +23,8 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
 import { CaseLoad } from '../interfaces/caseLoad'
+
+import config from '../config'
 
 describe('convert to title case', () => {
   it.each([
@@ -234,8 +238,9 @@ describe('Address to lines', () => {
     const lines = addressToLines(address)
     expect(lines[0]).toEqual('Flat 7, premises address, street field')
     expect(lines[1]).toEqual('Leeds')
-    expect(lines[2]).toEqual('LS1 AAA')
-    expect(lines[3]).toEqual('England')
+    expect(lines[2]).toEqual('West Yorkshire')
+    expect(lines[3]).toEqual('LS1 AAA')
+    expect(lines[4]).toEqual('England')
   })
 
   it('Maps a partial address', () => {
@@ -250,8 +255,9 @@ describe('Address to lines', () => {
 
     const lines = addressToLines(address)
     expect(lines[0]).toEqual('premises address, street field')
-    expect(lines[1]).toEqual('LS1 AAA')
-    expect(lines[2]).toEqual('England')
+    expect(lines[1]).toEqual('West Yorkshire')
+    expect(lines[2]).toEqual('LS1 AAA')
+    expect(lines[3]).toEqual('England')
   })
 })
 
@@ -325,5 +331,17 @@ describe('findError', () => {
     ])('Should return the correct description', ({ code, result }) => {
       expect(formatCategoryCodeDescription(code)).toEqual(result)
     })
+  })
+
+  describe('apostrophe', () => {
+    const firstName = 'James'
+    const lastName = 'Grant'
+    expect(apostrophe(firstName)).toEqual('James’')
+    expect(apostrophe(lastName)).toEqual('Grant’s')
+  })
+
+  describe('prependBaseUrl', () => {
+    const route = '/prisoner'
+    expect(prependBaseUrl(route)).toEqual(`${config.serviceUrls.digitalPrison}${route}`)
   })
 })
