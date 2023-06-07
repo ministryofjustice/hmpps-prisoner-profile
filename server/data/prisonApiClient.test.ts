@@ -31,7 +31,6 @@ import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments
 import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
-import { Alias } from '../interfaces/prisonApi/alias'
 import { aliasesMock } from './localMockData/aliases'
 
 jest.mock('./tokenStore')
