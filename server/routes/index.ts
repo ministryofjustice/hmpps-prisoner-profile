@@ -18,6 +18,7 @@ import OverviewController from '../controllers/overviewController'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import ActivePunishmentsService from '../services/activePunishmentsService'
+import { saveBackLink } from '../controllers/backLinkController'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function routes(service: Services): Router {
@@ -183,6 +184,8 @@ export default function routes(service: Services): Router {
   get('/', (req, res, next) => {
     res.redirect(`${config.serviceUrls.digitalPrison}`)
   })
+
+  get('/save-backlink', saveBackLink())
 
   return router
 }

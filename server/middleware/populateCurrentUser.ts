@@ -5,12 +5,12 @@ import UserService from '../services/userService'
 import { CaseLoad } from '../interfaces/caseLoad'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
-  return async (req, res, next) => {
+  return async (req: any, res, next) => {
     try {
       if (res.locals.user) {
         const user = res.locals.user && (await userService.getUser(res.locals.user.token))
         if (user) {
-          res.locals.user = { ...user, ...res.locals.user }
+          res.locals.user = { ...user, ...res.locals.user, backLink: req.session.userBackLink }
         } else {
           logger.info('No user available')
         }
