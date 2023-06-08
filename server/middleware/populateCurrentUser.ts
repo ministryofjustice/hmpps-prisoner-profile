@@ -18,7 +18,12 @@ export default function populateCurrentUser(userService: UserService): RequestHa
       const showFeedbackBanner =
         req.session.userDetails && config.feedbackEnabledPrisons.includes(req.session.userDetails.activeCaseLoadId)
 
-      res.locals.user = { ...req.session.userDetails, ...res.locals.user, showFeedbackBanner }
+      res.locals.user = {
+        ...req.session.userDetails,
+        ...res.locals.user,
+        showFeedbackBanner,
+        backLink: req.session.userBackLink,
+      }
       next()
     } catch (error) {
       logger.error(error, `Failed to retrieve user for: ${res.locals.user && res.locals.user.username}`)

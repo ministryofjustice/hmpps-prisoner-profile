@@ -1,0 +1,40 @@
+import config from '../config'
+
+const sanitizeUrl = (url: string) => (url?.endsWith('/') ? url.substring(0, url.length - 1) : url)
+
+export interface RegisteredService {
+  name: string
+  hostname: string
+  defaultBackLinkText: string
+}
+
+export const registeredBackLinkServices: RegisteredService[] = [
+  {
+    name: 'digital-prison-services',
+    hostname: sanitizeUrl(config.serviceUrls.digitalPrison),
+    defaultBackLinkText: 'View most recent search',
+  },
+  {
+    name: 'welcome-people-into-prison',
+    hostname: sanitizeUrl(config.serviceUrls.welcomePeopleIntoPrison),
+    defaultBackLinkText: 'Back to Welcome people into prison',
+  },
+]
+
+export const saveBackLink =
+  (registeredServices: Array<RegisteredService> = registeredBackLinkServices) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async (req: any, res: any) => {
+    const { service, returnPath, redirectPath, backLinkText } = req.query
+
+    if (!service || !returnPath || !redirectPath) throw new Error('Required query parameters missing')
+
+    const registeredService = registeredServices.find(e => e.name === service)
+    if (!registeredService) throw new Error(`Could not find service: [${service}]`)
+
+    req.session.userBackLink = {
+      url: registeredService.hostname + returnPath,
+      text: backLinkText || registeredService.defaultBackLinkText,
+    }
+    res.redirect(sanitizeUrl(config.domain) + redirectPath)
+  }

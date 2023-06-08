@@ -17,6 +17,7 @@ import OverviewController from '../controllers/overviewController'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import ActivePunishmentsService from '../services/activePunishmentsService'
+import { saveBackLink } from '../controllers/backLinkController'
 
 export default function routes(): Router {
   const router = Router()
@@ -181,6 +182,8 @@ export default function routes(): Router {
   get('/', (req, res, next) => {
     res.redirect(`${config.serviceUrls.digitalPrison}`)
   })
+
+  get('/save-backlink', saveBackLink())
 
   return router
 }
