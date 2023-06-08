@@ -65,13 +65,13 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   if (prisonerData.alerts) {
     prisonerData.alerts.forEach((alert: Alert) => {
       alertFlags.forEach((alertFlag: AlertFlagLabel) => {
-        if (alert.alertCode === alertFlag.alertCodes[0]) {
+        if (alertFlag.alertCodes.includes(alert.alertCode)) {
           alerts.push(alertFlag)
         }
       })
     })
   }
-  return alerts
+  return [...new Set(alerts)]
 }
 
 export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string, hideBanner?: boolean) {
