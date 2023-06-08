@@ -47,6 +47,9 @@
 {% endblock %}
 
 {% block beforeContent %}
+  {% if user.showFeedbackBanner %}
+    {% include "./feedbackBanner.njk" %}
+  {% endif %}
   {{ govukBreadcrumbs({
       items: breadCrumbs | default([])
     }) }}
