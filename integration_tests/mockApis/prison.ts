@@ -55,6 +55,7 @@ import {
 } from '../../server/data/localMockData/offenceOverviewMock'
 import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
+import { StaffRole } from '../../server/interfaces/prisonApi/staffRole'
 
 import {
   SentenceSummaryWithSentenceMock,
@@ -824,6 +825,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: SentenceSummaryWithoutSentenceMock,
+      },
+    })
+  },
+
+  stubGetStaffRoles: (roles: StaffRole[]) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/staff/(.*)/(.*)/roles`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: roles,
       },
     })
   },

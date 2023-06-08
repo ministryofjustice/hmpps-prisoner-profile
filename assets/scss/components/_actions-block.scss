@@ -23,6 +23,7 @@
     margin: 0 15px;
 
     img {
+      align-self: flex-start;
       margin-right: 15px;
 
       @media (max-width: 1000px) {

@@ -62,12 +62,23 @@ export default class OverviewController {
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
-      overviewPageService.get(prisonerData, res.locals.user.caseLoads, res.locals.user.userRoles),
+      overviewPageService.get(
+        prisonerData,
+        res.locals.user.staffId,
+        res.locals.user.caseLoads,
+        res.locals.user.userRoles,
+      ),
       this.pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
       this.manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
     ])
 
-    const overviewActions = this.buildOverviewActions(prisonerData, pathfinderNominal, socNominal, res.locals.user)
+    const overviewActions = this.buildOverviewActions(
+      prisonerData,
+      pathfinderNominal,
+      socNominal,
+      res.locals.user,
+      overviewPageData.staffRoles,
+    )
 
     const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
 
@@ -91,6 +102,7 @@ export default class OverviewController {
     pathfinderNominal: Nominal,
     socNominal: Nominal,
     user: User,
+    staffRoles: string[] = [],
   ): HmppsAction[] {
     const actions: HmppsAction[] = []
     if (canAddCaseNotes(user, prisonerData)) {
@@ -99,6 +111,14 @@ export default class OverviewController {
         icon: Icon.AddCaseNote,
         url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
         dataQA: 'add-case-note-action-link',
+      })
+    }
+    if (staffRoles.includes('KW')) {
+      actions.push({
+        text: 'Add key worker session',
+        icon: Icon.AddKeyWorkerSession,
+        url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA&subType=KS`,
+        dataQA: 'add-key-worker-session-action-link',
       })
     }
     if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {

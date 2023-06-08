@@ -429,6 +429,22 @@ context('Overview Page', () => {
     })
   })
 
+  context('Given the user has the KW staff role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.ViewProbationDocuments],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, staffRoles: [{ role: 'KW' }] })
+      visitOverviewPage()
+    })
+
+    it('Should display the add key worker session buton', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.addKeyWorkerSessionActionLink().should('exist')
+    })
+  })
+
   context('Given the prisoner is a restricted patient', () => {
     beforeEach(() => {
       cy.task('reset')
