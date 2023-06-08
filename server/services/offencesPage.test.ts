@@ -61,6 +61,7 @@ describe('OffencesPageService', () => {
     it('Get all data for the offences page for the sentences', async () => {
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.get({ prisonerNumber: 'G6123VU', bookingId: 1102484 } as Prisoner)
+
       expect(res).toEqual(OffencesPageMockSentences)
     })
     it('Get length text labels', async () => {
