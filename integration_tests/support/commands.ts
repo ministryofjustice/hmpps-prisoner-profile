@@ -73,6 +73,7 @@ Cypress.Commands.add('setupOffencesPageSentencedStubs', ({ prisonerNumber, booki
   cy.task('stubGetSentenceTermsSentenced', bookingId)
   cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
   cy.task('stubGetCourtDateResultsSentenced', prisonerNumber)
+  cy.task('stubGetSentenceSummaryWithSentence', prisonerNumber)
 })
 
 Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, bookingId }) => {
@@ -81,6 +82,7 @@ Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, boo
   cy.task('stubGetSentenceTermsUnsentenced', bookingId)
   cy.task('stubGetPrisonerSentenceDetails', prisonerNumber)
   cy.task('stubGetCourtDateResultsUnsentenced', prisonerNumber)
+  cy.task('stubGetSentenceSummaryWithoutSentence', prisonerNumber)
 })
 
 Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'MDI' } = {}) => {

@@ -2,7 +2,6 @@ import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { Services } from '../services'
 import CommonApiRoutes from './common/api'
 import { Prisoner } from '../interfaces/prisoner'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
@@ -20,8 +19,7 @@ import { Role } from '../data/enums/role'
 import ActivePunishmentsService from '../services/activePunishmentsService'
 import { saveBackLink } from '../controllers/backLinkController'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function routes(service: Services): Router {
+export default function routes(): Router {
   const router = Router()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -56,6 +56,11 @@ import {
 import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
 
+import {
+  SentenceSummaryWithSentenceMock,
+  SentenceSummaryWithoutSentenceMock,
+} from '../../server/data/localMockData/sentenceSummaryMock'
+
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
@@ -787,6 +792,38 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: identifiersMock,
+      },
+    })
+  },
+
+  stubGetSentenceSummaryWithSentence: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/booking/latest/sentence-summary`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: SentenceSummaryWithSentenceMock,
+      },
+    })
+  },
+
+  stubGetSentenceSummaryWithoutSentence: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/booking/latest/sentence-summary`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: SentenceSummaryWithoutSentenceMock,
       },
     })
   },
