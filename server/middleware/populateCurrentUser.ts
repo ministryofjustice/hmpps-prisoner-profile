@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import jwtDecode from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
+import config from '../config'
 
 export default function populateCurrentUser(userService: UserService): RequestHandler {
   return async (req, res, next) => {
@@ -14,8 +15,15 @@ export default function populateCurrentUser(userService: UserService): RequestHa
           logger.info('No user details retrieved')
         }
       }
+      const showFeedbackBanner =
+        req.session.userDetails && config.feedbackEnabledPrisons.includes(req.session.userDetails.activeCaseLoadId)
 
-      res.locals.user = { ...req.session.userDetails, ...res.locals.user, backLink: req.session.userBackLink }
+      res.locals.user = {
+        ...req.session.userDetails,
+        ...res.locals.user,
+        showFeedbackBanner,
+        backLink: req.session.userBackLink,
+      }
       next()
     } catch (error) {
       logger.error(error, `Failed to retrieve user for: ${res.locals.user && res.locals.user.username}`)

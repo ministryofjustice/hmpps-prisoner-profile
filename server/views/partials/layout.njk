@@ -47,22 +47,26 @@
 {% endblock %}
 
 {% block beforeContent %}
-<div class="prisoner-profile-breadcrumbs">
-
-{% if user.backLink %}
-    <div class="prisoner-profile-breadcrumbs__search">
-      <a href="{{ user.backLink.url }}" class="govuk-link govuk-link--no-visited-state" data-test="back-link">
-        {{ user.backLink.text }}
-      </a>
-    </div>
+  {% if user.showFeedbackBanner %}
+    {% include "./feedbackBanner.njk" %}
   {% endif %}
 
-  <div class="prisoner-profile-breadcrumbs__breadcrumbs">
-  {{ govukBreadcrumbs({
-      items: breadCrumbs | default([])
-    }) }}
+  <div class="prisoner-profile-breadcrumbs">
+
+  {% if user.backLink %}
+      <div class="prisoner-profile-breadcrumbs__search">
+        <a href="{{ user.backLink.url }}" class="govuk-link govuk-link--no-visited-state" data-test="back-link">
+          {{ user.backLink.text }}
+        </a>
+      </div>
+    {% endif %}
+
+    <div class="prisoner-profile-breadcrumbs__breadcrumbs">
+    {{ govukBreadcrumbs({
+        items: breadCrumbs | default([])
+      }) }}
+    </div>
   </div>
-</div>
 {% endblock %}
 
 {% block bodyStart %}
