@@ -35,6 +35,10 @@ import {
   UniqueCourtDateResultsUnsentencedMockA,
 } from '../data/localMockData/courtDateResultsMock'
 import { CourtCaseDataMapped } from '../interfaces/courtCaseDataMapped'
+import {
+  SentenceSummaryWithSentenceMock,
+  SentenceSummaryWithoutSentenceMock,
+} from '../data/localMockData/sentenceSummaryMock'
 
 describe('OffencesPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -50,6 +54,7 @@ describe('OffencesPageService', () => {
     prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
     prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
     prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
+    prisonApiClient.getSentenceSummary = jest.fn(async () => SentenceSummaryWithSentenceMock)
   })
 
   describe('Offences Page', () => {
@@ -107,6 +112,7 @@ describe('OffencesPageService', () => {
         SentencedTermsMockA,
         OffenceHistoryMockA,
         CourtDateResultsMockA,
+        SentenceSummaryWithSentenceMock,
       )
       expect(res).toEqual(MappedSentencedCourtCasesMock)
     })
@@ -182,6 +188,7 @@ describe('OffencesPageService', () => {
         CourtCasesSentencedMockA[0],
         OffenceHistoryMockA,
         CourtDateResultsMockA,
+        SentenceSummaryWithSentenceMock,
       )
       expect(res).toEqual(OffenceHistoryMockA)
     })
@@ -199,6 +206,7 @@ describe('OffencesPageService', () => {
         SentencedTermsMockA,
         OffenceHistoryMockA,
         CourtDateResultsMockA,
+        SentenceSummaryWithSentenceMock,
       )
       expect(res).toEqual(SentenceTermsWithOffences)
     })
@@ -210,6 +218,7 @@ describe('OffencesPageService', () => {
         SentencedTermsMockA,
         OffenceHistoryMock,
         CourtDateResultsMockA,
+        SentenceSummaryWithoutSentenceMock,
       )
       expect(res).toEqual(SentenceTermsWithoutOffences)
     })
