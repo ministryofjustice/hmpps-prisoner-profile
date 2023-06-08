@@ -8,9 +8,8 @@ import AuthErrorPage from '../pages/autherror'
 context('SignIn', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
     cy.task('stubDpsHomePage')
-    cy.task('stubAuthUser')
+    cy.setupUserAuth()
     cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
   })
 

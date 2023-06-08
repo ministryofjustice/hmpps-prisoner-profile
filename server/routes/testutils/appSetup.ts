@@ -39,7 +39,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   })
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use(routes(services))
+  app.use(routes())
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 
