@@ -15,7 +15,7 @@ export default function populateCurrentUser(userService: UserService): RequestHa
         }
       }
 
-      res.locals.user = { ...req.session.userDetails, ...res.locals.user }
+      res.locals.user = { ...req.session.userDetails, ...res.locals.user, backLink: req.session.userBackLink }
       next()
     } catch (error) {
       logger.error(error, `Failed to retrieve user for: ${res.locals.user && res.locals.user.username}`)
