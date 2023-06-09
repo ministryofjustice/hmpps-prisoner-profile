@@ -371,20 +371,12 @@ export const userCanEdit = (user: User, prisoner: Prisoner): boolean => {
   )
 }
 
-export const prisonerIsOut = (user: User, prisonId: string, restrictedPatient: boolean): boolean => {
-  return (
-    user.caseLoads?.some(caseload => caseload.caseLoadId === prisonId) ||
-    (['OUT'].includes(prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
-    (restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
-  )
+export const prisonerIsOut = (prisonId: string): boolean => {
+  return ['OUT'].includes(prisonId)
 }
 
-export const prisonerIsTRN = (user: User, prisonId: string, restrictedPatient: boolean): boolean => {
-  return (
-    user.caseLoads?.some(caseload => caseload.caseLoadId === prisonId) ||
-    (['TRN'].includes(prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
-    (restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
-  )
+export const prisonerIsTRN = (prisonId: string): boolean => {
+  return ['TRN'].includes(prisonId)
 }
 
 export const apostrophe = (word: string): string => {

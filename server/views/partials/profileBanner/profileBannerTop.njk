@@ -1,7 +1,7 @@
 {% from "../../macros/conditionallyShow.njk" import conditionallyShow %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {%- call conditionallyShow({condition: prisonerIsTRN(user, prisonId, restrictedPatient) == true, id: 'TRN-establishment-banner'}) -%}
+    {%- call conditionallyShow({condition: prisonerIsTRN(prisonId) == true, id: 'TRN-establishment-banner'}) -%}
       <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
         <div class="govuk-grid-column-full">
           <p class="govuk-heading-m govuk-!-margin-bottom-2">
@@ -11,7 +11,7 @@
         </div>
       </div>
     {%- endcall -%}
-    {%- call conditionallyShow({condition: prisonerIsTRN(user, prisonId, restrictedPatient) != true and prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
+    {%- call conditionallyShow({condition: prisonerIsTRN(prisonId) != true and prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
       <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
         <div class="govuk-grid-column-full">
           <p class="govuk-heading-m govuk-!-margin-bottom-2">
@@ -21,7 +21,7 @@
         </div>
       </div>
     {%- endcall -%}
-    {%- call conditionallyShow({condition: prisonerIsTRN(user, prisonId, restrictedPatient) != true and prisonerIsOut(user, prisonId, restrictedPatient) == true, id: 'OUT-establishment-banner'}) -%}
+    {%- call conditionallyShow({condition: prisonerIsTRN(prisonId) != true and prisonerIsOut(prisonId) == true, id: 'OUT-establishment-banner'}) -%}
       <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
         <div class="govuk-grid-column-full">
           <p class="govuk-heading-m govuk-!-margin-bottom-2">
