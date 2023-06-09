@@ -182,6 +182,7 @@ export default class PersonalPageService {
 
     return {
       isPrimaryAddress: !!mostRecentAddress,
+      noFixedAddress: mostRecentAddress?.noFixedAddress,
       comment: mostRecentAddress?.comment || '',
       phones: mostRecentAddress?.phones.map(phone => phone.number) || [],
       addressTypes:

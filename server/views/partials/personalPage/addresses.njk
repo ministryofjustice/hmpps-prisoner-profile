@@ -20,7 +20,9 @@
 {%- call summaryCard({title: "Addresses", id: "addresses"}) -%}
   <div class="govuk-grid-row" data-qa="addresses">
     <div class="govuk-grid-column-full">
-      {% if addresses and addresses.isPrimaryAddress %}
+      {% if addresses and addresses.noFixedAddress %}
+        <p>No fixed abode.</p>
+      {% elseif addresses and addresses.isPrimaryAddress %}
       <p class="govuk-body">Primary</p>
       {{ govukSummaryList({
           rows: [
@@ -31,7 +33,7 @@
           ]
       }) }}
       <p class="govuk-body">Added on <span data-qa="address-added-on">{{ addresses.addedOn | formatDate }}</span></p>
-      {% elseif addresses and not addresses.isPrimaryAddress%}
+      {% elseif addresses and not addresses.isPrimaryAddress %}
         <p>No active, primary address entered.</p>
       {% else %}
         <p>You cannot view this prisoner’s addresses.</p>
