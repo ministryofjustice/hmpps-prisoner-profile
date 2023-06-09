@@ -1,4 +1,5 @@
 import { CaseLoad } from '../server/interfaces/caseLoad'
+import { StaffRole } from '../server/interfaces/prisonApi/staffRole'
 import { Prisoner } from '../server/interfaces/prisoner'
 
 declare global {
@@ -18,6 +19,8 @@ declare global {
         bookingId: number
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
+        prisonId?: string
+        staffRoles?: StaffRole[]
       }): Chainable<AUTWindow>
       setupAlertsPageStubs(options: {
         prisonerNumber: string

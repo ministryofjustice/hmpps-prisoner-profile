@@ -6,4 +6,5 @@ export enum Icon {
   ReferToPathfinder = 'refer-to-pathfinder',
   AddToSOC = 'add-to-soc',
   ManageCategory = 'manage-category',
+  AddKeyWorkerSession = 'add-key-worker-session',
 }

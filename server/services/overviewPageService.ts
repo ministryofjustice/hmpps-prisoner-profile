@@ -66,6 +66,7 @@ export default class OverviewPageService {
 
   public async get(
     prisonerData: Prisoner,
+    staffId: number,
     userCaseLoads: CaseLoad[] = [],
     userRoles: string[] = [],
   ): Promise<OverviewPage> {
@@ -81,6 +82,7 @@ export default class OverviewPageService {
       schedule,
       statuses,
       offencesOverview,
+      staffRoles,
     ] = await Promise.all([
       this.getNonAssociations(prisonerNumber),
       this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles),
@@ -96,6 +98,7 @@ export default class OverviewPageService {
         conditionalReleaseDate,
         confirmedReleaseDate,
       ),
+      this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
     ])
 
     return {
@@ -108,6 +111,7 @@ export default class OverviewPageService {
       schedule,
       offencesOverview,
       prisonName: prisonerData.prisonName,
+      staffRoles: staffRoles.map(role => role.role),
     }
   }
 

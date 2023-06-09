@@ -31,6 +31,7 @@ import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments
 import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
+import { mockStaffRoles } from './localMockData/staffRoles'
 
 jest.mock('./tokenStore')
 
@@ -319,6 +320,16 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getCaseNotesUsage(prisonerNumber)
       expect(output).toEqual(caseNoteUsageMock)
+    })
+  })
+
+  describe('getStaffRoles', () => {
+    it('Should return data from the API', async () => {
+      const staffNumber = 12345
+      const agencyId = 'Agency'
+      mockSuccessfulPrisonApiCall(`/api/staff/${staffNumber}/${agencyId}/roles`, mockStaffRoles)
+      const output = await prisonApiClient.getStaffRoles(staffNumber, agencyId)
+      expect(output).toEqual(mockStaffRoles)
     })
   })
 })

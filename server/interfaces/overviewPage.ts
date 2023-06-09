@@ -42,4 +42,5 @@ export interface OverviewPage {
     nextCourtAppearance: CourtHearing
   }
   prisonName: string
+  staffRoles: string[]
 }

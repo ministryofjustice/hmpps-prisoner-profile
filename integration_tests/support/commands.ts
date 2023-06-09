@@ -11,7 +11,7 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
 
 Cypress.Commands.add(
   'setupOverviewPageStubs',
-  ({ bookingId, prisonerNumber, restrictedPatient = false, prisonerDataOverrides = {} }) => {
+  ({ bookingId, prisonerNumber, restrictedPatient = false, prisonerDataOverrides = {}, staffRoles = [] }) => {
     cy.task('stubNonAssociations', prisonerNumber)
     cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, overrides: prisonerDataOverrides })
     cy.task('stubAccountBalances', bookingId)
@@ -34,6 +34,7 @@ Cypress.Commands.add(
     cy.task('stubGetPathfinderNominal404')
     cy.task('stubGetSocNominal')
     cy.task('stubGetSocNominal404')
+    cy.task('stubGetStaffRoles', staffRoles)
   },
 )
 
