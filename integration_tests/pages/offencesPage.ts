@@ -59,4 +59,7 @@ export default class OffencesPage extends Page {
 
   paroleEligibilityValue = (): PageElement =>
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value')
+
+  countFiveCard = (): PageElement =>
+    cy.get('#accordion-with-summary-sections-content-1 > :nth-child(3) > .govuk-grid-column-full')
 }

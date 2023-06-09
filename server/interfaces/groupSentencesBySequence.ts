@@ -5,7 +5,7 @@ export interface GroupedSentence {
   key: number
   lineSeq: number
   sentenceHeader: string
-  caseId: string
+  caseId: number
   items: OffenderSentenceTerms[]
   summaryListRows: SummaryListRow[]
 }

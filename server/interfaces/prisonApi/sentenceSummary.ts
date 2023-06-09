@@ -2,6 +2,7 @@ import { Agency } from './agency'
 import { Court, IssuingCourt } from './courtCase'
 import { CourtHearing } from './courtHearing'
 import { SentenceSummaryOffence } from './offenceHistoryDetail'
+import { Licence } from './offenderSentenceTerms'
 
 export interface SentenceSumaryTerm {
   bookNumber: string
@@ -95,10 +96,17 @@ export interface SentenceSummaryCourtSentence {
   sentenceStartDate: string
   sentenceEndDate: string
   consecutiveToSequence?: number
+  consecutiveTo?: number
   lineSeq?: number
   offences: SentenceSummaryOffence[]
   terms: SentenceSummaryTermDetail[]
   fineAmount?: number
+  sentenceHeader?: string
+  sentenced?: boolean
+  sentenceLength?: string
+  concurrentConsecutive?: string
+  fineAmountFormat?: string
+  sentenceLicence?: string
 }
 
 export interface SentenceSummaryTermDetail {
@@ -110,4 +118,7 @@ export interface SentenceSummaryTermDetail {
   months?: number
   years?: number
   lifeSentence: boolean
+  licence?: Licence
+  caseId?: string
+  sentenceTypeDescription?: string
 }
