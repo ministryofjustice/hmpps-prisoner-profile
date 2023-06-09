@@ -36,10 +36,10 @@
   <div class="hmpps-location-bar location-bar">
     <p class="location-bar__location govuk-!-font-size-19 govuk-!-font-weight-bold" data-test="active-location">{{ user.activeCaseLoad.description }}</p>
     {% if user.caseLoads.length > 1 %}
-      <a className="location-bar__link " href="{{ "/change-caseload" | prependBaseUrl}}" data-test="change-location-link">
+      <a className="location-bar__link " href="{{ "/change-caseload" | prependBaseUrl}}" referrerpolicy="no-referrer-when-downgrade" data-test="change-location-link">
         Change your location
       </a>
-    {% endif %} 
+    {% endif %}
   </div>
 </div>
 
