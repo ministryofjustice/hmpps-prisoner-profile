@@ -16,20 +16,9 @@
     <nav aria-label="Account navigation">
       <ul class="hmpps-header__navigation">
         {% if user %}
-            {# {% if user.caseLoads.length > 1 %}
-            <li class="hmpps-header__navigation__item">
-                <a class="hmpps-header__link" href="https://digital-dev.prison.service.justice.gov.uk/change-caseload">
-                    <span class="govuk-heading-s  hmpps-header__link__main-text" data-qa=header-location-name>
-                    {{ user.activeCaseLoad[0].description }}
-                    </span>
-                    <span data-qa=header-change-location class="hmpps-header__link__sub-text">Change location</span>
-                </a>
-            </li>
-            {% endif %} #}
-
           <li class="hmpps-header__navigation__item">
             <a data-qa="manageDetails" class="hmpps-header__link" href="/account-details" data-test="manage-account-link" target="_blank" rel="noopener noreferrer">
-              <span data-qa=header-user-name class="govuk-heading-s hmpps-header__link__main-text">{{ user.displayName | initialiseName }}</span>
+              <span data-qa=header-user-name>{{ user.displayName | initialiseName }}</span>
               <span class="hmpps-header__link__sub-text">Manage your details</span>
             </a>
           </li>
@@ -42,15 +31,15 @@
     </nav>
   </div>
 </header>
+
 <div class="hmpps-header__container">
-  <div className="location-bar">
-    <p className="location-bar__location govuk-body govuk-!-font-size-24 govuk-body govuk-!-font-weight-bold" data-test="active-location">
-      {{ user.activeCaseLoad[0].description }}
-    </p>
+  <div class="hmpps-location-bar location-bar">
+    <p class="location-bar__location govuk-!-font-size-19 govuk-!-font-weight-bold" data-test="active-location">{{ user.activeCaseLoad[0].description }}</p>
     {% if user.caseLoads.length > 1 %}
-      <a className="location-bar__link" href="/change-caseload" data-test="change-location-link">
+      <a className="location-bar__link " href="{{ "/change-caseload" | prependBaseUrl}}" data-test="change-location-link">
         Change your location
       </a>
     {% endif %} 
   </div>
 </div>
+
