@@ -12,7 +12,10 @@
       rows: offenderActivitiesHistory.activitiesHistory
       })
     }}
+  {% else %}
+    <p>{{ prisonerName }} has no work or activities.</p>
   {% endif %}
+
   {% if not prisonerData.restrictedPatient %}
     <p class="govuk-body">
         <a class="govuk-link--no-visited-state" href="{{ workAndActivities12MonthLinkUrl }}">View work and activities for the last 12 months</a>

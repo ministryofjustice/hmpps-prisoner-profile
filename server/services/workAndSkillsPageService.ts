@@ -87,11 +87,12 @@ export default class WorkAndSkillsPageService {
   }
 
   private async getOffenderActivitiesHistory(prisonerNumber: string) {
-    const oneYearAgo = format(sub(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
+    const today = format(startOfToday(), 'yyyy-MM-dd')
+    // API returns results that have not ended or have an end date after the given date
     const offenderActivitiesHistory: OffenderActivitiesHistory =
-      await this.prisonApiClient.getOffenderActivitiesHistory(prisonerNumber, oneYearAgo)
+      await this.prisonApiClient.getOffenderActivitiesHistory(prisonerNumber, today)
     const activitiesHistory: GovSummaryItem[] = []
-    if (offenderActivitiesHistory !== undefined && offenderActivitiesHistory.content.length) {
+    if (offenderActivitiesHistory !== undefined && offenderActivitiesHistory.content?.length) {
       offenderActivitiesHistory.content.forEach(content => {
         const item = {
           key: { text: content.description },

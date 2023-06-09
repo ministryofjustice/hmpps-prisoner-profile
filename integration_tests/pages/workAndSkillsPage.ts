@@ -79,6 +79,9 @@ export default class WorkAndSkillsPage extends Page {
 
   WAA_label = (): PageElement => cy.get('.hmpps-summary-card__body > :nth-child(11)')
 
+  WAA_emptyStateMessage = (): PageElement =>
+    cy.get('#work-and-activities > .hmpps-summary-card__body > p:nth-of-type(2)')
+
   // ES = Employability skills card
   ES_card = (): PageElement => cy.get('#employability-skills')
 
