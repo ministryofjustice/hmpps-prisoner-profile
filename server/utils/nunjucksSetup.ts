@@ -12,6 +12,7 @@ import {
   userHasRoles,
   apostrophe,
   prependBaseUrl,
+  prependHmppsAuthBaseUrl,
 } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
@@ -93,4 +94,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
 
   njkEnv.addFilter('apostrophe', apostrophe)
   njkEnv.addFilter('prependBaseUrl', prependBaseUrl)
+  njkEnv.addFilter('prependHmppsAuthBaseUrl', prependHmppsAuthBaseUrl)
 }

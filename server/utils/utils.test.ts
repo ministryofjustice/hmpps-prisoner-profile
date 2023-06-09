@@ -12,6 +12,7 @@ import {
   initialiseName,
   mapToQueryString,
   prependBaseUrl,
+  prependHmppsAuthBaseUrl,
   prisonerBelongsToUsersCaseLoad,
   properCaseName,
   summaryListOneHalfWidth,
@@ -343,5 +344,10 @@ describe('findError', () => {
   describe('prependBaseUrl', () => {
     const route = '/prisoner'
     expect(prependBaseUrl(route)).toEqual(`${config.serviceUrls.digitalPrison}${route}`)
+  })
+
+  describe('prependHmppsAuthBaseUrl', () => {
+    const route = '/account-details'
+    expect(prependHmppsAuthBaseUrl(route)).toEqual(`${config.apis.hmppsAuth.url}${route}`)
   })
 })
