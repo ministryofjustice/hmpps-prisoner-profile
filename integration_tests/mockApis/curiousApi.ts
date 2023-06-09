@@ -7,7 +7,10 @@ import { LearnerLatestAssessmentsMock } from '../../server/data/localMockData/le
 import { LearnerGoalsMock, LearnerGoalsMockB } from '../../server/data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../../server/data/localMockData/learnerNeurodivergenceMock'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
-import { OffenderActivitiesMock } from '../../server/data/localMockData/offenderActivitiesMock'
+import {
+  OffenderActivitiesEmptyMock,
+  OffenderActivitiesMock,
+} from '../../server/data/localMockData/offenderActivitiesMock'
 import { LearnerGoalsTestParams } from '../../server/interfaces/learnerGoals'
 
 export default {
@@ -124,19 +127,25 @@ export default {
       },
     })
   },
-  stubGetOffenderActivities: (prisonerNumber: string) => {
-    const oneYearAgo = format(sub(startOfToday(), { months: 12 }), 'yyyy-MM-dd')
+  stubGetOffenderActivities: (params: { prisonerNumber; emptyStates }) => {
+    let jsonResp
+    if (params.emptyStates === false) {
+      jsonResp = OffenderActivitiesMock
+    } else if (params.emptyStates === true) {
+      jsonResp = OffenderActivitiesEmptyMock
+    }
+    const today = format(startOfToday(), 'yyyy-MM-dd')
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/activities-history\\?earliestEndDate=${oneYearAgo}`,
+        urlPattern: `/prison/api/offender-activities/${params.prisonerNumber}/activities-history\\?earliestEndDate=${today}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: OffenderActivitiesMock,
+        jsonBody: jsonResp,
       },
     })
   },

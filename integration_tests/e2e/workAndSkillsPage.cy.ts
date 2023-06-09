@@ -266,6 +266,22 @@ context('Work and Skills Page', () => {
       })
     })
 
+    context('Activity empty state', () => {
+      const prisonerNumber = 'G6123VU'
+      beforeEach(() => {
+        cy.setupBannerStubs({ prisonerNumber })
+        cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: true })
+        visitWorkAndSkillsPage()
+      })
+
+      context('Empty Work and activities card', () => {
+        it('The card shows an empty state message', () => {
+          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+          workAndSkillsPage.WAA_emptyStateMessage().contains('John Saunders has no work or activities.')
+        })
+      })
+    })
+
     context('Learner goals empty states', () => {
       const prisonerNumber = 'G6123VU'
       beforeEach(() => {
