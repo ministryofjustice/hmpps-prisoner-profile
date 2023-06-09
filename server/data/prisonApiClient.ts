@@ -40,6 +40,7 @@ import { CaseNoteCount } from '../interfaces/prisonApi/caseNoteCount'
 import { CourtDateResults } from '../interfaces/courtDateResults'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
+import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
@@ -286,6 +287,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]> {
     return this.get<OffenderIdentifier[]>({
       path: `/api/bookings/${bookingId}/identifiers`,
+    })
+  }
+
+  async getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary> {
+    return this.get<SentenceSummary>({
+      path: `/api/offenders/${prisonerNumber}/booking/latest/sentence-summary`,
     })
   }
 }

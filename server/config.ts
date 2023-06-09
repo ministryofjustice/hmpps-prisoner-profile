@@ -155,10 +155,12 @@ export default {
     digitalPrison: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
     pathfinder: get('PATHFINDER_UI_URL', 'http://localhost:3001', requiredInProduction),
     manageSocCases: get('MANAGE_SOC_CASES_UI_URL', 'http://localhost:3001', requiredInProduction),
+    welcomePeopleIntoPrison: get('WELCOME_PEOPLE_INTO_PRISON_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),
+  feedbackEnabledPrisons: get('FEEDBACK_ENABLED_PRISONS', [], requiredInProduction),
 }
