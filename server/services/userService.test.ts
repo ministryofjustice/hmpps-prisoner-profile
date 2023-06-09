@@ -3,7 +3,6 @@ import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
 
 import PrisonApiClient from '../data/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { LocationDummyDataB } from '../data/localMockData/locations'
 
 const token = 'some token'
 const prisonApiClient = prisonApiClientMock()
@@ -23,7 +22,6 @@ describe('User service', () => {
 
       MockedPrisonApiClient.mockImplementation(_ => prisonApiClient as PrisonApiClient)
       prisonApiClient.getUserCaseLoads = jest.fn(async () => [])
-      prisonApiClient.getUserLocations = jest.fn(async () => [])
 
       userService = new UserService(hmppsAuthClient)
     })
@@ -31,13 +29,6 @@ describe('User service', () => {
     it('Retrieves and formats user name', async () => {
       const result = await userService.getUser(token)
       expect(result.displayName).toEqual('John Smith')
-    })
-
-    it('Retrieves user locations', async () => {
-      prisonApiClient.getUserLocations = jest.fn(async () => LocationDummyDataB)
-
-      const result = await userService.getUser(token)
-      expect(result.locations).toEqual(LocationDummyDataB)
     })
 
     it('Propagates error', async () => {

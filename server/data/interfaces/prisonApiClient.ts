@@ -1,6 +1,5 @@
 import { Readable } from 'stream'
 import { CaseLoad } from '../../interfaces/caseLoad'
-import { Location } from '../../interfaces/location'
 import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
 import { AccountBalances } from '../../interfaces/accountBalances'
 import { AdjudicationSummary } from '../../interfaces/adjudicationSummary'
@@ -36,7 +35,6 @@ import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifie
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
 
 export interface PrisonApiClient {
-  getUserLocations(): Promise<Location[]>
   getUserCaseLoads(): Promise<CaseLoad[]>
   getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails>
   getAccountBalances(bookingId: number): Promise<AccountBalances>

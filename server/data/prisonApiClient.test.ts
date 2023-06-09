@@ -2,7 +2,6 @@ import nock from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import dummyScheduledEvents from './localMockData/eventsForToday'
-import { LocationDummyDataC } from './localMockData/locations'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
 import {
@@ -54,15 +53,6 @@ describe('prisonApiClient', () => {
   const mockSuccessfulPrisonApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakePrisonApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
-
-  describe('getUserLocations', () => {
-    it('should return data from api', async () => {
-      mockSuccessfulPrisonApiCall('/api/users/me/locations', LocationDummyDataC)
-
-      const output = await prisonApiClient.getUserLocations()
-      expect(output).toEqual(LocationDummyDataC)
-    })
-  })
 
   describe('getCaseLoads', () => {
     it('should return data from api', async () => {
