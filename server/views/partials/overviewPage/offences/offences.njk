@@ -14,9 +14,9 @@
             <p> {{ offencesOverview.nextCourtAppearance.dateTime | formatDate }}</p>
         {% endif %}
 
-        {% if offencesOverview.fullStatus.legalStatus !== "REMAND"%}
+        {% if offencesOverview.fullStatus.legalStatus !== "REMAND" and offencesOverview.conditionalReleaseDate %}
             <hr class="govuk-section-break govuk-section-break--visible" />
-            <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Conditional release date(CRD)</p>
+            <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Conditional release date (CRD)</p>
             <p data-qa="overview-conditional-release"> {{ offencesOverview.conditionalReleaseDate | formatDate}}</p>
         {% endif %}
         <hr class="govuk-section-break govuk-section-break--visible" />
