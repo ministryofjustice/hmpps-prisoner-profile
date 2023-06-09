@@ -42,6 +42,7 @@ import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import config from '../config'
 import { Role } from '../data/enums/role'
 import { CaseLoad } from '../interfaces/caseLoad'
+import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -481,14 +482,12 @@ export default class OverviewPageService {
   private async getSchedule(prisonerData: Prisoner): Promise<OverviewSchedule> {
     const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
       const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
-      const startTime = new Date(event.startTime)
-      const endTime = new Date(event.endTime)
-      const padWithZero = (num: number) => (num.toString().length === 1 ? `0${num}` : `${num}`)
+      const { startTime, endTime } = formatScheduledEventTime(event)
 
       return {
         name,
-        startTime: `${padWithZero(startTime.getHours())}:${padWithZero(startTime.getMinutes())}`,
-        endTime: `${padWithZero(endTime.getHours())}:${padWithZero(endTime.getMinutes())}`,
+        startTime,
+        endTime,
       }
     }
 

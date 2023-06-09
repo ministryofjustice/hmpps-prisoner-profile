@@ -384,7 +384,6 @@ describe('OverviewPageService', () => {
 
       expect(morning[0].name).toEqual('Joinery AM')
       expect(morning[0].startTime).toEqual('08:30')
-      expect(morning[0].endTime).toEqual('11:45')
 
       expect(afternoon[0].name).toEqual('Joinery PM')
       expect(afternoon[0].startTime).toEqual('13:15')

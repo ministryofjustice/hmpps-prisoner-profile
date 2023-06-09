@@ -40,8 +40,10 @@ export const initialiseName = (fullName?: string): string | null => {
  * StartTime to EndTime
  */
 export const formatScheduleItem = (scheduleItem: ScheduleItem): string => {
-  if (scheduleItem.startTime && scheduleItem.endTime) {
-    return `${scheduleItem.startTime} to ${scheduleItem.endTime}`
+  if (scheduleItem.startTime) {
+    const times = [scheduleItem.startTime]
+    if (scheduleItem.endTime) times.push(scheduleItem.endTime)
+    return times.join(' to ')
   }
   return ''
 }
