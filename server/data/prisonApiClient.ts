@@ -1,10 +1,8 @@
 import { Readable } from 'stream'
 import config from '../config'
 import RestClient from './restClient'
-import { LocationDummyDataB } from './localMockData/locations'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
-import { Location } from '../interfaces/location'
 import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import { PrisonApiClient } from './interfaces/prisonApiClient'
@@ -70,10 +68,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<OffenderAttendanceHistory>({
       path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=20`,
     })
-  }
-
-  async getUserLocations(): Promise<Location[]> {
-    return this.get<Location[]>({ path: '/api/users/me/locations' }, LocationDummyDataB)
   }
 
   async getUserCaseLoads(): Promise<CaseLoad[]> {
