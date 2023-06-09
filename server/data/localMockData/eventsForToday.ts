@@ -12,7 +12,6 @@ const dummyScheduledEvents: ScheduledEvent[] = [
     eventSubTypeDesc: 'Prison Activities',
     eventDate: '2023-02-14',
     startTime: '2023-02-14T08:30:00',
-    endTime: '2023-02-14T11:45:00',
     eventLocation: 'WORKSHOP 16 - JOINERY',
     eventLocationId: 27026,
     eventSource: 'PA',
