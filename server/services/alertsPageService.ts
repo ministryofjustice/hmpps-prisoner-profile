@@ -137,7 +137,7 @@ export default class AlertsPageService {
 
     return {
       pagedAlerts,
-      listMetadata: generateListMetadata(pagedAlerts, { ...params }, 'alerts', sortOptions, 'Sort by'),
+      listMetadata: generateListMetadata(pagedAlerts, { ...params }, 'alert', sortOptions, 'Sort by'),
       alertTypes,
       activeAlertCount,
       inactiveAlertCount,

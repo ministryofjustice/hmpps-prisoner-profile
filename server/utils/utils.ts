@@ -265,6 +265,8 @@ export const generateListMetadata = (
         text: 'Previous',
       }
 
+  const viewAllUrl = [`?${mapToQueryString(queryParams)}`, 'showAll=true'].filter(Boolean).join('&')
+
   return <ListMetadata>{
     filtering: {
       ...queryParams,
@@ -290,6 +292,7 @@ export const generateListMetadata = (
       totalElements: pagedList?.totalElements,
       elementsOnPage: pagedList?.numberOfElements,
       pages,
+      viewAllUrl,
     },
   }
 }

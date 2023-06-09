@@ -8,7 +8,7 @@ export interface ListMetadata {
     endDate: string
     type: string
     subType: string
-    queryParams?: { [key: string]: string | number }
+    queryParams?: { [key: string]: string | number | boolean }
   }
   sorting: SortParams
   pagination: {
@@ -22,5 +22,6 @@ export interface ListMetadata {
     totalElements: number
     elementsOnPage: number
     pages: { href: string; text: string; selected: boolean; type?: string }[]
+    viewAllUrl?: string
   }
 }

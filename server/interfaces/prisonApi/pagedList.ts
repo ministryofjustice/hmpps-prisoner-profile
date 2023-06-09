@@ -38,6 +38,7 @@ export interface PagedListQueryParams {
   page?: number
   size?: number
   sort?: string
+  showAll?: boolean
 
   from?: string
   to?: string

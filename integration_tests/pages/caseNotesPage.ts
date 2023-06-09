@@ -40,4 +40,6 @@ export default class CaseNotesPage extends Page {
   filterApplyButton = (): PageElement => cy.get('[data-qa=apply-filter-button]')
 
   addCaseNoteButton = (): PageElement => cy.get('#add-case-note-action-button a')
+
+  viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
 }

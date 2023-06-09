@@ -131,7 +131,7 @@ export default class CaseNotesService {
       listMetadata: generateListMetadata(
         pagedCaseNotes,
         { ...queryParams, page: undefined }, // Remove page param before generating metadata as this value come from API
-        'case notes',
+        'case note',
         sortOptions,
         'Sort by',
       ),
