@@ -1,8 +1,8 @@
 import { SummaryListRow } from '../../utils/utils'
 
 export interface OffenderSentenceTerms {
-  bookingId: number
-  sentenceSequence: number
+  bookingId?: number
+  sentenceSequence?: number
   termSequence: number
   consecutiveTo?: number
   sentenceType?: string
@@ -13,11 +13,11 @@ export interface OffenderSentenceTerms {
   weeks?: number
   days?: number
   lifeSentence: boolean
-  caseId: string
+  caseId?: string
   fineAmount?: number
   sentenceTermCode: string
-  lineSeq: number
-  sentenceStartDate: string
+  lineSeq?: number
+  sentenceStartDate?: string
   licence?: Licence
   summaryListRow?: SummaryListRow[]
 }

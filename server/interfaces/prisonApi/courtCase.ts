@@ -1,6 +1,7 @@
 import { Agency } from './agency'
 import { CourtHearing } from './courtHearing'
 import { SentenceSummaryOffence } from './offenceHistoryDetail'
+import { Licence } from './offenderSentenceTerms'
 
 export interface CourtCase {
   id: number
@@ -29,10 +30,12 @@ export interface CourtCaseSentenceSummaryCourtSentence {
   sentenceStartDate: string
   sentenceEndDate: string
   consecutiveToSequence?: number
+  consecutiveTo?: number
   lineSeq?: number
   offences: SentenceSummaryOffence[]
   terms: CourtCaseSentenceSummaryTermDetail[]
   fineAmount?: number
+  licence?: Licence
 }
 
 export interface CourtCaseSentenceSummaryTermDetail {

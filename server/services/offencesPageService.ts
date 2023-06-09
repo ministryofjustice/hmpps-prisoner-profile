@@ -9,10 +9,15 @@ import { FindConsecutiveSentence, Licence, OffenderSentenceTerms } from '../inte
 import { GroupedSentence } from '../interfaces/groupSentencesBySequence'
 import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
 import { Charge } from '../data/enums/chargeCodes'
-import { CourtCase, CourtCaseExtended } from '../interfaces/prisonApi/courtCase'
+import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import { CourtDateResults } from '../interfaces/courtDateResults'
 import { CourtCaseDataMapped, CourtCaseDataMappedUnsentenced } from '../interfaces/courtCaseDataMapped'
-import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
+import {
+  SentenceSummary,
+  SentenceSummaryCourtCaseExtended,
+  SentenceSummaryCourtSentence,
+  SentenceSummaryTermDetail,
+} from '../interfaces/prisonApi/sentenceSummary'
 
 export default class OffencesPageService {
   private prisonApiClient: PrisonApiClient
@@ -38,7 +43,7 @@ export default class OffencesPageService {
     }
   }
 
-  getLengthTextLabels(data: Licence | OffenderSentenceTerms) {
+  getLengthTextLabels(data: Licence | OffenderSentenceTerms | SentenceSummaryTermDetail) {
     const { years, months, weeks, days } = data
     const yearsLabel = years > 0 && `${years} ${years === 1 ? 'year' : 'years'}`
     const monthsLabel = months > 0 && `${months} ${months === 1 ? 'month' : 'months'}`
@@ -47,22 +52,25 @@ export default class OffencesPageService {
     return [yearsLabel, monthsLabel, weeksLabel, daysLabel].filter(label => label).join(', ')
   }
 
-  mergeMostRecentLicenceTerm(sentences: OffenderSentenceTerms[]) {
-    return sentences.reduce((result: OffenderSentenceTerms, current: OffenderSentenceTerms) => {
-      if (current.sentenceTermCode === 'IMP' && !result) return current
-      if (current.sentenceTermCode === 'LIC' && !result?.licence) {
-        return {
-          licence: {
-            years: current.years,
-            months: current.months,
-            weeks: current.weeks,
-            days: current.days,
-          },
-          ...result,
+  mergeMostRecentLicenceTerm(sentences: OffenderSentenceTerms[] | SentenceSummaryTermDetail[]) {
+    return sentences.reduce(
+      (result: OffenderSentenceTerms, current: OffenderSentenceTerms | SentenceSummaryTermDetail) => {
+        if (current.sentenceTermCode === 'IMP' && !result) return current
+        if (current.sentenceTermCode === 'LIC' && !result?.licence) {
+          return {
+            licence: {
+              years: current.years,
+              months: current.months,
+              weeks: current.weeks,
+              days: current.days,
+            },
+            ...result,
+          }
         }
-      }
-      return result
-    }, null)
+        return result
+      },
+      null,
+    )
   }
 
   groupSentencesBySequence(sentences: OffenderSentenceTerms[]) {
@@ -81,9 +89,9 @@ export default class OffencesPageService {
   }
 
   findConsecutiveSentence({ sentences, consecutiveTo }: FindConsecutiveSentence) {
-    const sentence: OffenderSentenceTerms = sentences.find(
+    const sentence: OffenderSentenceTerms | SentenceSummaryCourtSentence = sentences.find(
       // eslint-disable-next-line no-shadow
-      (sentences: OffenderSentenceTerms) => sentences.sentenceSequence === consecutiveTo,
+      (sentences: OffenderSentenceTerms | SentenceSummaryCourtSentence) => sentences.sentenceSequence === consecutiveTo,
     )
     return sentence && sentence.lineSeq ? 'Consecutive' : 'Concurrent'
   }
@@ -131,10 +139,8 @@ export default class OffencesPageService {
     const summarySentencedCourtCasesMapped = this.getMapForSentenceSummaryCourtCases(
       courtCaseData,
       caseIds,
-      todaysDate,
       offenceHistory,
       sentenceSummary,
-      courtDateResults,
       sentenceTermsData,
     )
 
@@ -186,11 +192,13 @@ export default class OffencesPageService {
     let courtName: string
     if (courtCase.agency && courtCase.agency.description) {
       courtName = courtCase.agency.description
-    } else if (courtCase.court && courtCase.court.description) {
-      courtName = courtCase.court.description
-    } else {
-      courtName = undefined
+      return courtName
     }
+    if (courtCase.court && courtCase.court.description) {
+      courtName = courtCase.court.description
+      return courtName
+    }
+    courtName = undefined
     return courtName
   }
 
@@ -359,34 +367,23 @@ export default class OffencesPageService {
   getMapForSentenceSummaryCourtCases(
     courtCaseData: CourtCase[],
     caseIds: number[],
-    todaysDate: string,
     offenceHistory: OffenceHistoryDetail[],
     sentenceSummary: SentenceSummary,
-    courtDateResults: CourtDateResults[],
     sentenceTermsData: OffenderSentenceTerms[],
   ) {
-    return this.getSentenceSummaryMapped(sentenceSummary, offenceHistory, courtCaseData)
-      .filter(courtCase => caseIds.includes(courtCase.id))
-      .map(courtCase => ({
-        ...this.getGenericMaps(courtCase, todaysDate),
-        sentenced: true,
-        sentenceTerms: this.getSentenceTerms(
-          courtCase,
-          sentenceTermsData,
-          offenceHistory,
-          courtDateResults,
-          sentenceSummary,
-        ),
-      }))
-      .filter(courtCase => courtCase.sentenceTerms.length)
+    return this.getSentenceSummaryMapped(sentenceSummary, offenceHistory, courtCaseData, sentenceTermsData).filter(
+      courtCase => caseIds.includes(courtCase.id),
+    )
   }
+  /* eslint-disable no-param-reassign */
 
   getSentenceSummaryMapped(
     sentenceSummary: SentenceSummary,
     offenceHistory: OffenceHistoryDetail[],
     courtCaseData: CourtCase[],
+    sentenceTermsData: OffenderSentenceTerms[],
   ) {
-    const sentencedCourtCases: CourtCaseExtended[] = sentenceSummary.latestPrisonTerm.courtSentences
+    const sentencedCourtCases: SentenceSummaryCourtCaseExtended[] = sentenceSummary.latestPrisonTerm.courtSentences
 
     return sentencedCourtCases.map(courtSentence => {
       courtSentence.sentences.forEach((sentence, i) => {
@@ -396,11 +393,8 @@ export default class OffencesPageService {
               offence.offenceDate === sentenceOffence.offenceStartDate &&
               offence.offenceCode === sentenceOffence.offenceCode
             ) {
-              // eslint-disable-next-line no-param-reassign
               courtSentence.sentences[i].offences[j].offenceRangeDate = offence.offenceRangeDate
-              // eslint-disable-next-line no-param-reassign
               courtSentence.sentences[i].offences[j].offenceDate = offence.offenceDate
-              // eslint-disable-next-line no-param-reassign
               courtSentence.sentences[i].offences[j].statuteCode = offence.statuteCode
             }
             return courtSentence
@@ -408,11 +402,44 @@ export default class OffencesPageService {
         })
       })
 
+      const mostRecentLicenceTerms = this.groupSentencesBySequence(sentenceTermsData)
+        .filter((group: GroupedSentence) => Number(group.caseId) === courtSentence.id)
+        .map((groupedSentence: GroupedSentence) => this.mergeMostRecentLicenceTerm(groupedSentence.items))
+
       courtCaseData.forEach(courtCase => {
-        if (courtCase.id === courtSentence.id && courtCase.courtHearings) {
-          // eslint-disable-next-line no-param-reassign
+        if (courtCase.caseInfoNumber === courtSentence.caseInfoNumber && courtCase.courtHearings) {
           courtSentence.courtHearings = courtCase.courtHearings
         }
+      })
+      courtSentence.sentences.map(sentenceValue => {
+        sentenceValue.sentenceHeader = this.getCountDisplayText(sentenceValue.lineSeq)
+        // eslint-disable-next-line  no-self-assign
+        sentenceValue.sentenceTypeDescription = sentenceValue.sentenceTypeDescription
+        sentenceValue.sentenced = true
+        sentenceValue.sentenceStartDate = formatDate(
+          sentenceValue.sentenceStartDate && sentenceValue.sentenceStartDate,
+          'long',
+        )
+        sentenceValue.sentenceLength = this.getLengthTextLabels(sentenceValue.terms[0])
+        sentenceValue.concurrentConsecutive = this.findConsecutiveSentence({
+          sentences: sentenceTermsData,
+          consecutiveTo: sentenceValue.consecutiveToSequence,
+        })
+        // eslint-disable-next-line no-unused-expressions
+        sentenceValue.fineAmount
+          ? (sentenceValue.fineAmountFormat = formatCurrency(sentenceValue.fineAmount, 'GBP').toString())
+          : undefined
+        mostRecentLicenceTerms.forEach(term => {
+          if (
+            Number(term.caseId) === courtSentence.id &&
+            sentenceValue.sentenceTypeDescription === term.sentenceTypeDescription
+          ) {
+            if (term.licence) {
+              sentenceValue.sentenceLicence = this.getLengthTextLabels(term.licence)
+            }
+          }
+        })
+        return sentenceValue
       })
       return courtSentence
     })
