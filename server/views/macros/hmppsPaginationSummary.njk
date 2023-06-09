@@ -1,7 +1,10 @@
 {% macro hmppsPaginationSummary(params) %}
     {% if params.totalElements %}
-        <p class="moj-pagination__results">Showing <b>{{ params.offset+1 }}</b> to <b>{{ params.offset+params.elementsOnPage }}</b> of <b>{{ params.totalElements }}</b> {{ params.itemDescription }}</p>
+        <p class="moj-pagination__results">Showing <b>{{ params.offset+1 }}</b> to <b>{{ params.offset+params.elementsOnPage }}</b> of <b>{{ params.totalElements }}</b> {{ params.totalElements | pluralise(params.itemDescription, { includeCount: false }) }}</p>
     {% else %}
-        <p class="moj-pagination__results"><b>0</b> {{ params.itemDescription }}</p>
+        <p class="moj-pagination__results"><b>0</b> {{ params.totalElements | pluralise(params.itemDescription, { includeCount: false }) }}</p>
+    {% endif %}
+    {% if params.totalPages > 1 and not params.showingAll %}
+        <div class="hmpps-pagination-view-all"><a href="{{ params.viewAllUrl }}" class="govuk-link govuk-link--no-visited-state">View all {{ params.totalElements | pluralise(params.itemDescription, { includeCount: false }) }}</a></div>
     {% endif %}
 {% endmacro %}

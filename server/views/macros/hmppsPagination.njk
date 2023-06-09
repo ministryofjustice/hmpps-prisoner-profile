@@ -1,5 +1,5 @@
 {% macro hmppsPagination(params) %}
-{% if params.totalPages > 1 %}
+{% if params.totalPages > 1 and not params.showingAll %}
 <nav class="moj-pagination {{- ' ' + params.classes if params.classes}}" aria-label="Pagination navigation">
     <ul class="moj-pagination__list">
         {%- if params.previous %}

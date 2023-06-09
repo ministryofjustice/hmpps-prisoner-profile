@@ -187,7 +187,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getAlerts(bookingId: number, queryParams?: PagedListQueryParams): Promise<PagedList> {
     // Set defaults then apply queryParams
     const params: PagedListQueryParams = {
-      size: 20,
+      size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }
     return this.get<PagedList>({ path: `/api/bookings/${bookingId}/alerts/v2`, query: mapToQueryString(params) })

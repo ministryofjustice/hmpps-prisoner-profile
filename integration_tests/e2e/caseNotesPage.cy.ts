@@ -57,6 +57,7 @@ context('Case Notes Page', () => {
     it('Displays the pagination summary correctly', () => {
       caseNotesPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 case notes')
       caseNotesPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 case notes')
+      caseNotesPage.viewAllLink().should('exist')
     })
   })
 
@@ -82,6 +83,7 @@ context('Case Notes Page', () => {
       caseNotesPage.paginationFooter().should('not.exist')
       caseNotesPage.paginationSummaryHeader().should('not.exist')
       caseNotesPage.paginationSummaryFooter().should('not.exist')
+      caseNotesPage.viewAllLink().should('not.exist')
     })
   })
 

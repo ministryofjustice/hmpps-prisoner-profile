@@ -33,6 +33,7 @@ export default class AlertsController {
     if (req.query.to) queryParams.to = req.query.to as string
     if (this.isActive) queryParams.alertStatus = 'ACTIVE'
     if (!this.isActive) queryParams.alertStatus = 'INACTIVE'
+    if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
     // Get prisoner data for banner and for use in alerts generation
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
@@ -48,12 +49,14 @@ export default class AlertsController {
 
     // Get alerts based on given query params
     const alertsPageData = await this.alertsPageService.get(prisonerData, queryParams, canUpdateAlert)
+    const showingAll = queryParams.showAll
 
     // Render page
     return res.render('pages/alertsPage', {
       pageTitle: 'Alerts',
       ...mapHeaderData(prisonerData, res.locals.user, 'alerts'),
       ...alertsPageData,
+      showingAll,
       addAlertLinkUrl,
       activeTab: this.isActive,
     })

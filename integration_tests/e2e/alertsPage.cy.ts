@@ -72,6 +72,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     it('Displays the pagination summary correctly', () => {
       alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
       alertsPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 alerts')
+      alertsPage.viewAllLink().should('exist')
     })
   })
 
@@ -103,6 +104,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     it('Displays the pagination summary correctly', () => {
       alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
       alertsPage.paginationSummaryFooter().contains('Showing 21 to 40 of 80 alerts')
+      alertsPage.viewAllLink().should('exist')
     })
   })
 
@@ -129,6 +131,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
       alertsPage.paginationFooter().should('not.exist')
       alertsPage.paginationSummaryHeader().should('not.exist')
       alertsPage.paginationSummaryFooter().should('not.exist')
+      alertsPage.viewAllLink().should('not.exist')
     })
   })
 

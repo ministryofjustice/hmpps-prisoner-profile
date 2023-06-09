@@ -35,6 +35,7 @@ export default class CaseNotesController {
     if (req.query.subType) queryParams.subType = req.query.subType as string
     if (req.query.startDate) queryParams.startDate = req.query.startDate as string
     if (req.query.endDate) queryParams.endDate = req.query.endDate as string
+    if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
     // Get prisoner data for banner and for use in alerts generation
     const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
@@ -60,6 +61,8 @@ export default class CaseNotesController {
 
     // Get case notes based on given query params
     const caseNotesPageData = await this.caseNotesService.get(prisonerData, queryParams, canDeleteSensitiveCaseNotes)
+    const showingAll = queryParams.showAll
+
     // Get staffId to use in conditional logic for amend link
     const { staffId } = res.locals.user
 
@@ -68,6 +71,7 @@ export default class CaseNotesController {
       pageTitle: 'Case notes',
       ...mapHeaderData(prisonerData, res.locals.user, 'case-notes'),
       ...caseNotesPageData,
+      showingAll,
       hasCaseNotes,
       addCaseNoteLinkUrl,
       staffId,
