@@ -3,10 +3,6 @@
   @include govuk-responsive-padding(3, 'bottom');
   background-color: govuk-colour('black');
 
-  .hmpps-header__link__main-text {
-    color: govuk-colour('white');
-    margin-bottom: 0;
-  }
   &__container {
     @include govuk-width-container;
     display: flex;
@@ -112,6 +108,7 @@
         border-right: 0;
         padding-right: 0;
       }
+
     }
   }
 
@@ -120,27 +117,32 @@
   }
 }
 
-.location-bar {
+.hmpps-location-bar {
   @include govuk-width-container;
   @include govuk-responsive-margin(3, 'bottom');
   @include govuk-responsive-padding(3, 'top');
   @include govuk-responsive-padding(3, 'bottom');
+
+  width: 100%;
+  display: flex!important;
+  flex-wrap: wrap;
+  .location-bar__location {
+    @include govuk-font($size: 19, $weight: 'bold');
+    @include govuk-responsive-margin(3, 'right');
+    @include govuk-responsive-margin(0, 'bottom');
+  }
+  a{
+    @include govuk-link-common;
+    @include govuk-link-style-default;
+    @include govuk-font($size: 19, $weight: 'normal');
+    height: fit-content;
+  }
+
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   border-bottom: 1px solid $govuk-border-colour;
-
-  &__location {
-    @include govuk-font($size: 19, $weight: 'bold');
-    @include govuk-responsive-margin(3, 'right');
-  }
-
-  &__link {
-    @include govuk-link-common;
-    @include govuk-link-style-default;
-    @include govuk-font($size: 19, $weight: 'normal');
-  }
-
+  
   @media print {
     display: none;
   }

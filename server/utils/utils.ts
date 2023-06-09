@@ -384,6 +384,11 @@ export const prependBaseUrl = (url: string): string => {
   return urlWithBaseUrl
 }
 
+export const prependHmppsAuthBaseUrl = (url: string): string => {
+  const urlWithHmppsAuthBaseUrl = `${config.apis.hmppsAuth.url}${url}`
+  return urlWithHmppsAuthBaseUrl
+}
+
 /**
  * Returns a description for specific category codes, otherwise just the code.
  *
