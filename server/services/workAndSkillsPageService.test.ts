@@ -63,7 +63,7 @@ describe('WorkAndSkillsService', () => {
       prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
     })
 
-    describe('Work and Skills', () => {
+    describe('Work and skills', () => {
       it.each(['ABC123', 'DEF321'])('Gets the activities history for the prisoner', async (prisonerNumber: string) => {
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
         await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
@@ -201,7 +201,7 @@ describe('WorkAndSkillsService', () => {
       prisonApiClient = prisonApiClientMock()
     })
 
-    describe('Work and Skills', () => {
+    describe('Work and skills', () => {
       it('Prisoner without learner goals', async () => {
         const prisonerNumber = '123123'
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
