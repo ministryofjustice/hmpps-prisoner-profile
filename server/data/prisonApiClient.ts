@@ -265,7 +265,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getMainOffence(bookingId: number): Promise<MainOffence> {
+  async getMainOffence(bookingId: number): Promise<MainOffence[]> {
     return this.get({ path: `/api/bookings/${bookingId}/mainOffence` })
   }
 

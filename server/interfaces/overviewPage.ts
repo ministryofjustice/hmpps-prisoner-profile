@@ -33,7 +33,7 @@ export interface OverviewPage {
   staffContacts: object
   schedule: OverviewSchedule
   offencesOverview: {
-    mainOffence: MainOffence
+    mainOffenceDescription: string
     courtCaseData: CourtCase[]
     fullStatus: FullStatus
     imprisonmentStatusDescription: string
