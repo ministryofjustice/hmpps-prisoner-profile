@@ -7,7 +7,7 @@ const visitWorkAndSkillsPage = () => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/work-and-skills' })
 }
 
-context('Work and Skills Page', () => {
+context('Work and skills page', () => {
   context('Permissions', () => {
     const prisonerNumber = 'G6123VU'
     const visitPage = prisonerDataOverrides => {
@@ -51,8 +51,8 @@ context('Work and Skills Page', () => {
         visitWorkAndSkillsPage()
       })
 
-      it('Work and Skills page is displayed', () => {
-        cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and Skills')
+      it('Work and skills page is displayed', () => {
+        cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and skills')
       })
 
       it('Displays the Work and skills tab as active', () => {
@@ -291,8 +291,8 @@ context('Work and Skills Page', () => {
       })
 
       context('Goals card', () => {
-        it('Work and Skills page is displayed', () => {
-          cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and Skills')
+        it('Work and skills page is displayed', () => {
+          cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and skills')
         })
         it('The card is displayed', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
