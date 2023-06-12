@@ -14,6 +14,8 @@ import {
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
   prisonerBelongsToUsersCaseLoad,
+  prisonerIsOut,
+  prisonerIsTRN,
   properCaseName,
   summaryListOneHalfWidth,
   SummaryListRow,
@@ -350,5 +352,15 @@ describe('findError', () => {
   describe('prependHmppsAuthBaseUrl', () => {
     const route = '/account-details'
     expect(prependHmppsAuthBaseUrl(route)).toEqual(`${config.apis.hmppsAuth.url}${route}`)
+  })
+
+  describe('prisonerIsOut', () => {
+    expect(prisonerIsTRN('TRN')).toEqual(true)
+    expect(prisonerIsTRN('OUT')).toEqual(false)
+  })
+
+  describe('prisonerIsTRN', () => {
+    expect(prisonerIsOut('TRN')).toEqual(false)
+    expect(prisonerIsOut('OUT')).toEqual(true)
   })
 })

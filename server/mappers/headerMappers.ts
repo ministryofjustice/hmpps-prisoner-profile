@@ -93,6 +93,7 @@ export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: stri
     tabLinks: tabs,
     photoType,
     prisonId: prisonerData.prisonId,
+    restrictedPatient: prisonerData.restrictedPatient,
     hideBanner: hideBanner || false,
   }
 }
