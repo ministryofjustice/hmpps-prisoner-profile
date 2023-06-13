@@ -1,36 +1,36 @@
 {% from "../../macros/conditionallyShow.njk" import conditionallyShow %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {%- call conditionallyShow({condition: prisonerIsTRN(prisonId) == true, id: 'TRN-establishment-banner'}) -%}
-      <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
-        <div class="govuk-grid-column-full">
-          <p class="govuk-heading-m govuk-!-margin-bottom-2">
-            This prisoner is being transferred
-          </p>
-          <p class="govuk-body">Some information may be hidden</p>
+    {% if  prisonerIsTRN(prisonId) %}
+        <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert" data-qa="TRN-establishment-banner">
+          <div class="govuk-grid-column-full">
+            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+              This prisoner is being transferred
+            </p>
+            <p class="govuk-body">Some information may be hidden</p>
+          </div>
         </div>
-      </div>
-    {%- endcall -%}
-    {%- call conditionallyShow({condition: prisonerIsTRN(prisonId) != true and prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
-      <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
-        <div class="govuk-grid-column-full">
-          <p class="govuk-heading-m govuk-!-margin-bottom-2">
-            This prisoner is not in your establishment
-          </p>
-          <p class="govuk-body">Some information may be hidden</p>
+    {% elseif prisonerIsOut(prisonId) %}
+        <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert" data-qa="OUT-establishment-banner">
+          <div class="govuk-grid-column-full">
+            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+              This person has been released
+            </p>
+            <p class="govuk-body">Some information may be hidden</p>
+          </div>
         </div>
-      </div>
-    {%- endcall -%}
-    {%- call conditionallyShow({condition: prisonerIsTRN(prisonId) != true and prisonerIsOut(prisonId) == true, id: 'OUT-establishment-banner'}) -%}
-      <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
-        <div class="govuk-grid-column-full">
-          <p class="govuk-heading-m govuk-!-margin-bottom-2">
-            This person has been released
-          </p>
-          <p class="govuk-body">Some information may be hidden</p>
+    {% else %}
+      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
+        <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
+          <div class="govuk-grid-column-full">
+            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+              This prisoner is not in your establishment
+            </p>
+            <p class="govuk-body">Some information may be hidden</p>
+          </div>
         </div>
-      </div>
-    {%- endcall -%}
+      {%- endcall -%}
+    {% endif %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full hmpps-profile-banner-top">
         <a href="/prisoner/{{ prisonerNumber }}/image" class="hmpps-clickable-image" data-qa="prisoner-photo-link">
