@@ -62,7 +62,7 @@
                             <div class="govuk-!-static-margin-bottom-5">
                                 <p class="govuk-!-font-weight-bold govuk-!-static-margin-bottom-0">{{offence.offenceDescription}}</p>
                                 {% if offence.offenceDate and offence.offenceRangeDate %}
-                                    <p>Committed from {{offence.offenceRangeDate | formatDate}} to {{offence.offenceDate | formatDate}}</p>
+                                    <p>Committed from {{offence.offenceDate | formatDate}} to {{offence.offenceRangeDate | formatDate}}</p>
                                 {% elseif offence.offenceDate %}
                                     <p>Committed on {{offence.offenceDate | formatDate}}</p>
                                 {% endif %}
