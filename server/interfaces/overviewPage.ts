@@ -3,7 +3,6 @@ import { PersonalDetails } from './personalDetails'
 import { CourtCase } from './prisonApi/courtCase'
 import { CourtHearing } from './prisonApi/courtHearing'
 import { FullStatus } from './prisonApi/fullStatus'
-import { MainOffence } from './prisonApi/mainOffence'
 import { Status } from './status'
 
 export interface OverviewScheduleItem {
@@ -33,7 +32,7 @@ export interface OverviewPage {
   staffContacts: object
   schedule: OverviewSchedule
   offencesOverview: {
-    mainOffence: MainOffence
+    mainOffenceDescription: string
     courtCaseData: CourtCase[]
     fullStatus: FullStatus
     imprisonmentStatusDescription: string

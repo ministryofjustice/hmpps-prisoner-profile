@@ -1,12 +1,14 @@
 import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { MainOffence } from '../../interfaces/prisonApi/mainOffence'
 
-export const mainOffenceMock: MainOffence = {
-  bookingId: 1102484,
-  offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
-  offenceCode: 'TR68132',
-  statuteCode: 'TR68',
-}
+export const mainOffenceMock: MainOffence[] = [
+  {
+    bookingId: 1102484,
+    offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
+    offenceCode: 'TR68132',
+    statuteCode: 'TR68',
+  },
+]
 
 export const fullStatusMock: FullStatus = {
   nomsId: 'G6123VU',
@@ -130,11 +132,6 @@ export const offenceOverviewMock: object = {
     releaseDate: '2076-01-29',
   },
   imprisonmentStatusDescription: undefined,
-  mainOffence: {
-    bookingId: 1102484,
-    offenceCode: 'TR68132',
-    offenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
-    statuteCode: 'TR68',
-  },
+  mainOffenceDescription: 'Drive vehicle for more than 13 hours or more in a working day - domestic',
   nextCourtAppearance: {},
 }

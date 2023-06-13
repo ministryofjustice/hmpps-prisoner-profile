@@ -594,4 +594,12 @@ describe('OverviewPageService', () => {
       expect(staffRoles).toEqual(['A', 'B'])
     })
   })
+
+  describe('Main offence', () => {
+    it('should return the main offence description', async () => {
+      const overviewPageService = await overviewPageServiceConstruct()
+      const desc = await overviewPageService.getMainOffenceDescription(mainOffenceMock)
+      expect(desc).toEqual(mainOffenceMock[0].offenceDescription)
+    })
+  })
 })
