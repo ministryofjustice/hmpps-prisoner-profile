@@ -327,5 +327,18 @@ context('When signed in', () => {
         page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', 'Moorland (HMP & YOI)')
       })
     })
+
+    context('Back to top', () => {
+      it('Does not display the back to top link initially', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.backToTopLinkHidden().should('exist')
+      })
+
+      it('Displays the back to top link after scrolling down', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        cy.get('.govuk-footer').scrollTo('bottom', { ensureScrollable: false })
+        page.backToTopLink().should('be.visible')
+      })
+    })
   })
 })
