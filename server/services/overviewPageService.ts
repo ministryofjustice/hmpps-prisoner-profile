@@ -43,6 +43,7 @@ import config from '../config'
 import { Role } from '../data/enums/role'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
+import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -131,8 +132,9 @@ export default class OverviewPageService {
 
     const nextCourtAppearance = await this.getNextCourtAppearanceForOverview(courtCaseData)
 
+    const mainOffenceDescription = await this.getMainOffenceDescription(mainOffence)
     return {
-      mainOffence,
+      mainOffenceDescription,
       courtCaseData,
       fullStatus,
       imprisonmentStatusDescription,
@@ -140,6 +142,11 @@ export default class OverviewPageService {
       confirmedReleaseDate,
       nextCourtAppearance,
     }
+  }
+
+  async getMainOffenceDescription(mainOffence: MainOffence[]): Promise<string> {
+    const desc = mainOffence[0] && mainOffence[0].offenceDescription ? mainOffence[0].offenceDescription : 'Not entered'
+    return desc
   }
 
   async getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {

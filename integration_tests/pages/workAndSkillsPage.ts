@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class WorkAndSkillsPage extends Page {
   constructor() {
-    super('Work and Skills')
+    super('Work and skills')
   }
 
   activeTab = (): PageElement => cy.get('[data-qa=active-tab]')

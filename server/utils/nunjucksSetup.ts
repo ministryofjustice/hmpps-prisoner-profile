@@ -13,6 +13,8 @@ import {
   apostrophe,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
+  prisonerIsOut,
+  prisonerIsTRN,
 } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
@@ -60,6 +62,9 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
 
   njkEnv.addGlobal('prisonerBelongsToUsersCaseLoad', prisonerBelongsToUsersCaseLoad)
   njkEnv.addGlobal('userHasRoles', userHasRoles)
+
+  njkEnv.addGlobal('prisonerIsTRN', prisonerIsTRN)
+  njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatDate', formatDate)

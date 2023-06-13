@@ -376,6 +376,14 @@ export const userCanEdit = (user: User, prisoner: Prisoner): boolean => {
   )
 }
 
+export const prisonerIsOut = (prisonId: string): boolean => {
+  return ['OUT'].includes(prisonId)
+}
+
+export const prisonerIsTRN = (prisonId: string): boolean => {
+  return ['TRN'].includes(prisonId)
+}
+
 export const apostrophe = (word: string): string => {
   const lastCh = word.charAt(word.length - 1)
   if (lastCh === 's') {
