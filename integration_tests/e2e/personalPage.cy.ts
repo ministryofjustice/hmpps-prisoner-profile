@@ -331,9 +331,6 @@ context('When signed in', () => {
     context('Back to top', () => {
       it('Does not display the back to top link initially', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        // Wait for JS
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
         page.backToTopLinkHidden().should('exist')
       })
 

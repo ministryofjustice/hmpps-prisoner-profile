@@ -16,6 +16,7 @@ import socApi from './integration_tests/mockApis/socApi'
 
 export default defineConfig({
   viewportWidth: 1152,
+  viewportHeight: 768,
   chromeWebSecurity: false,
   fixturesFolder: 'integration_tests/fixtures',
   screenshotsFolder: 'integration_tests/screenshots',
