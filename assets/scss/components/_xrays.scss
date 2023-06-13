@@ -1,0 +1,14 @@
+.hmpps-xray {
+  &__total {
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+
+  &__since {
+    font-size: 8px;
+  }
+
+  &__label {
+    font-weight: bold;
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+}

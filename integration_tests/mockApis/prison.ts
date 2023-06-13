@@ -19,7 +19,7 @@ import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
 import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
-import { personalCareNeedsMock } from '../../server/data/localMockData/personalCareNeedsMock'
+import { personalCareNeedsMock, xrayCareNeeds } from '../../server/data/localMockData/personalCareNeedsMock'
 import { mockReasonableAdjustments } from '../../server/data/localMockData/reasonableAdjustments'
 import {
   emptyAlertsMock,
@@ -535,6 +535,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: personalCareNeedsMock,
+      },
+    })
+  },
+
+  stubXrayCareNeeds: ({ bookingId, numberOfXrays }: { bookingId: number; numberOfXrays: number }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/personal-care-needs\\?type=(.*)`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: xrayCareNeeds(numberOfXrays),
       },
     })
   },

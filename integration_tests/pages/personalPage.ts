@@ -144,6 +144,10 @@ export default class PersonalPage extends Page {
     return {
       interestToImmigration: () => cardData().findDataQa('interest-to-immigration'),
       travelRestrictions: () => cardData().findDataQa('travel-restrictions'),
+      xrays: () => ({
+        total: () => cardData().findDataQa('security-xrays').findDataQa('total-xrays'),
+        since: () => cardData().findDataQa('security-xrays').findDataQa('xrays-since'),
+      }),
     }
   }
 
