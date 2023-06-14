@@ -36,7 +36,7 @@
 
     {% if (hasCaseNotes) %}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-grid-column-one-quarter app-sidebar">
             {% include '../partials/caseNotesPage/caseNotesFilter.njk' %}
         </div>
         <div class="govuk-grid-column-three-quarters ">
@@ -50,4 +50,7 @@
         </div>
     </div>
     {% endif %}
+
+    {% include "../partials/backToTop.njk" %}
+
 {% endblock %}

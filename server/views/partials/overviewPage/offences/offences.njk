@@ -3,22 +3,22 @@
 {%- call summaryCard({title: "Offences"}) -%}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <p data-qa="overview-main-offence" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2">Main offence</p>
+        <p data-qa="overview-main-offence" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1">Main offence</p>
         <p>         
             {{offencesOverview.mainOffenceDescription}}
         </p>
         <hr class="govuk-section-break govuk-section-break--visible" />
-        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Imprisonment status</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Imprisonment status</p>
         <p> {{ offencesOverview.imprisonmentStatusDescription}}</p>
         {% if offencesOverview.fullStatus.legalStatus == "REMAND" and offencesOverview.nextCourtAppearance.dateTime %}
             <hr class="govuk-section-break govuk-section-break--visible" />
-            <p data-qa="overview-next-court-appearance" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Next court appearance</p>
+            <p data-qa="overview-next-court-appearance" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Next court appearance</p>
             <p> {{ offencesOverview.nextCourtAppearance.dateTime | formatDate }}</p>
         {% endif %}
 
         {% if offencesOverview.fullStatus.legalStatus !== "REMAND" and offencesOverview.conditionalReleaseDate %}
             <hr class="govuk-section-break govuk-section-break--visible" />
-            <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4">Conditional release date (CRD)</p>
+            <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Conditional release date (CRD)</p>
             <p data-qa="overview-conditional-release"> {{ offencesOverview.conditionalReleaseDate | formatDate}}</p>
         {% endif %}
         <hr class="govuk-section-break govuk-section-break--visible" />
