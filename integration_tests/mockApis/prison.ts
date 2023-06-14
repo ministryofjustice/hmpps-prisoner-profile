@@ -639,7 +639,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/digital-warrant/court-date-results/${prisonerNumber}`,
+        urlPattern: `/prison/api/court-date-results/${prisonerNumber}`,
       },
       response: {
         status: 200,
@@ -655,7 +655,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/digital-warrant/court-date-results/${prisonerNumber}`,
+        urlPattern: `/prison/api/court-date-results/${prisonerNumber}`,
       },
       response: {
         status: 200,
