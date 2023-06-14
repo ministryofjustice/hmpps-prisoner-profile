@@ -163,13 +163,15 @@ export const formatName = (
     names.unshift(`${names.pop()},`)
     names.pop() // Remove middleNames
   } else if (options?.style === NameFormatStyle.firstLast) {
-    names.forEach((name, i) => {
-      if (name) {
-        if (i !== 0 && i !== 2) {
-          names.splice(i, 1)
+    if (names.length > 2) {
+      names.forEach((name, i) => {
+        if (name) {
+          if (i !== 0 && i !== 2) {
+            names.splice(i, 1)
+          }
         }
-      }
-    })
+      })
+    }
   }
   return names
     .filter(s => s)

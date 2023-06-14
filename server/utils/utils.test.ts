@@ -211,6 +211,14 @@ describe('format name', () => {
       'Smith, John',
     ],
     ['All names (LastCommaFirst)', 'John', 'James', 'Smith', { style: NameFormatStyle.lastCommaFirst }, 'Smith, John'],
+    [
+      'First name and last name (LastCommaFirst)',
+      'John',
+      'James',
+      'Smith',
+      { style: NameFormatStyle.firstLast },
+      'John Smith',
+    ],
   ])(
     '%s: formatName(%s, %s, %s, %s)',
     (
