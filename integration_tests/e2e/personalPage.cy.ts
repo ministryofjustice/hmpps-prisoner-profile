@@ -106,6 +106,12 @@ context('When signed in', () => {
       cy.request('/prisoner/G6123VU/personal').its('body').should('contain', 'Personal')
     })
 
+    it('should contain elements with CSS classes linked to Google Analytics', () => {
+      cy.get('.info__links').should('exist')
+      cy.get('.hmpps-profile-tab-links').should('exist')
+      cy.get('.hmpps-sidebar').should('exist')
+    })
+
     context('Personal details card', () => {
       it('Displays all the information from the API', () => {
         const page = Page.verifyOnPage(PersonalPage)
