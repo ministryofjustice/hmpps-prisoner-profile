@@ -129,6 +129,7 @@ export default class PersonalPage extends Page {
       distinguishingMarks: (row: number) => {
         const mark = () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-row').eq(row)
         return {
+          bodyPart: () => mark().findDataQa('mark-body-part'),
           type: () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-key').eq(row),
           side: () => mark().findDataQa('mark-side'),
           orientation: () => mark().findDataQa('mark-orientation'),
@@ -144,6 +145,11 @@ export default class PersonalPage extends Page {
     return {
       interestToImmigration: () => cardData().findDataQa('interest-to-immigration'),
       travelRestrictions: () => cardData().findDataQa('travel-restrictions'),
+      xrays: () => ({
+        total: () => cardData().findDataQa('security-xrays').findDataQa('total-xrays'),
+        since: () => cardData().findDataQa('security-xrays').findDataQa('xrays-since'),
+        warningMessage: () => cardData().findDataQa('security-xrays').findDataQa('xray-limit-reached-message'),
+      }),
     }
   }
 
