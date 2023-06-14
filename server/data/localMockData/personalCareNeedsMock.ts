@@ -1,3 +1,5 @@
+import { addDays, startOfYear } from 'date-fns'
+
 import { PersonalCareNeed, PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 
 export const pregnantCareNeedMock: PersonalCareNeed = {
@@ -23,3 +25,17 @@ export const personalCareNeedsMock: PersonalCareNeeds = {
   offenderNo: 'A1234BC',
   personalCareNeeds: [pregnantCareNeedMock],
 }
+
+const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
+  commentText: '',
+  problemCode: 'BSC5.5',
+  problemDescription: 'Body scan',
+  problemStatus: 'ON',
+  problemType: 'BSCAN',
+  startDate: addDays(startOfYear(new Date()), daysAfterStartOfYear).toISOString(),
+})
+
+export const xrayCareNeeds = (numberOfXrays: number): PersonalCareNeeds => ({
+  offenderNo: 'A1234BC',
+  personalCareNeeds: Array.from(Array(numberOfXrays)).map(() => xrayNeed(10)),
+})

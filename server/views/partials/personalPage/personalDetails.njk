@@ -46,9 +46,9 @@
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Sexual orientation", personalDetails.sexualOrientation, "sexual-orientation") }}
         {%- endcall -%}
-        {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
-        {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'personal-details', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
+          {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
+          {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
           {{ summaryListRow("Languages", languagesHtml(personalDetails), "languages", { html: true }) }}
           {{ summaryListRow("Type of diet", personalDetails.typeOfDiet, "type-of-diet") }}
           {{ summaryListRow("Smoker or vaper", personalDetails.smokerOrVaper, "smoker-or-vaper") }}
