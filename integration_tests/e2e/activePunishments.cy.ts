@@ -23,7 +23,7 @@ context('Active punishments', () => {
   it('Active punishments should contain the correct adjudication data', () => {
     activePunishmentsPageUrl()
     const activePunishmentsPage = Page.verifyOnPageWithTitle(ActivePunishmentsPage, 'active Punishments')
-    activePunishmentsPage.h1().contains('John Middle Names Saunders’ active punishments')
+    activePunishmentsPage.h1().contains('John Saunders’ active punishments')
     activePunishmentsPage.punishmentTypeLabel().contains('Punishment type')
     activePunishmentsPage.detailsCommentLabel().contains('Details')
     activePunishmentsPage.startDateLabel().contains('Start date')
