@@ -1,4 +1,5 @@
 import { Address } from '../address'
+import { GovSummaryItem } from '../govSummaryItem'
 
 export interface PersonalDetails {
   age: string
@@ -124,6 +125,7 @@ export interface PersonalPage {
   identityNumbers: IdentityNumbers
   property: PropertyItem[]
   addresses: Addresses
+  addressSummary: GovSummaryItem[]
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
