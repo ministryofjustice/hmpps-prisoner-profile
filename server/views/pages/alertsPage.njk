@@ -59,7 +59,7 @@
 
     {% if (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-grid-column-one-quarter app-sidebar">
             {% include '../partials/alertsPage/alertsFilter.njk' %}
         </div>
         <div class="govuk-grid-column-three-quarters ">
@@ -73,4 +73,7 @@
         </div>
     </div>
     {% endif %}
+
+    {% include "../partials/backToTop.njk" %}
+
 {% endblock %}
