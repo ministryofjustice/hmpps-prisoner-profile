@@ -76,7 +76,7 @@
           </div>
         </div>
       {%- endcall -%}
-      {%- call conditionallyShow({condition: security.interestToImmigration == "Yes" or security.travelRestrictions, id: 'security'}) -%}
+      {%- call conditionallyShow({condition: security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0, id: 'security'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% include "../partials/personalPage/security.njk" %}
