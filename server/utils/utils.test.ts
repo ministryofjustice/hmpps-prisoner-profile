@@ -214,7 +214,7 @@ describe('format name', () => {
     [
       'First name and last name (LastCommaFirst)',
       'John',
-      'James',
+      undefined,
       'Smith',
       { style: NameFormatStyle.firstLast },
       'John Smith',
