@@ -129,6 +129,7 @@ export default class PersonalPage extends Page {
       distinguishingMarks: (row: number) => {
         const mark = () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-row').eq(row)
         return {
+          bodyPart: () => mark().findDataQa('mark-body-part'),
           type: () => cardData().findDataQa('distinguishing-marks').findDataQa('distinguishing-mark-key').eq(row),
           side: () => mark().findDataQa('mark-side'),
           orientation: () => mark().findDataQa('mark-orientation'),

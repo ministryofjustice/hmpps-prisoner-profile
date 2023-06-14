@@ -252,16 +252,19 @@ context('When signed in', () => {
         page.appearance().warnedAboutTattooing().should('include.text', 'Yes')
         page.appearance().warnedNotTochangeAppearance().should('include.text', 'Yes')
 
+        page.appearance().distinguishingMarks(0).bodyPart().should('include.text', 'Arm')
         page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
         page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
         page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
         page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
 
+        page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Torso')
         page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
         page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
         page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
         page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
 
+        page.appearance().distinguishingMarks(2).bodyPart().should('include.text', 'Leg')
         page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
         page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
         page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
