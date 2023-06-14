@@ -1,3 +1,4 @@
+import { addDays, startOfYear } from 'date-fns'
 import PersonalPageService from './personalPageService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
@@ -17,6 +18,7 @@ import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjus
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { formatDate } from '../utils/dateHelpers'
 import { identifiersMock } from '../data/localMockData/identifiersMock'
+import { addressSummaryMock } from '../data/localMockData/addressSummary'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -35,6 +37,17 @@ describe('PersonalPageService', () => {
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
   })
+
+  const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
+    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
+      offenderNo: 'AB1234',
+      personalCareNeeds: careNeeds,
+    }))
+  }
+
+  const setCodeReferences = (referenceCodes: ReferenceCode[]) => {
+    prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
+  }
 
   describe('Getting information from the Prison API', () => {
     it('Gets inmate details from the api', async () => {
@@ -231,7 +244,7 @@ describe('PersonalPageService', () => {
 
   describe('Addresses', () => {
     it('Maps the data from the API for the primary address', async () => {
-      const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { addresses, addressSummary } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
       const expectedAddress = mockAddresses[0]
       const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
       const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
@@ -251,6 +264,8 @@ describe('PersonalPageService', () => {
       expect(premise).toEqual(expectedAddress.premise)
       expect(street).toEqual(expectedAddress.street)
       expect(town).toEqual(expectedAddress.town)
+
+      expect(addressSummary).toEqual(addressSummaryMock)
     })
   })
 
@@ -432,20 +447,72 @@ describe('PersonalPageService', () => {
       expect(security.interestToImmigration).toEqual('Yes')
       expect(security.travelRestrictions).toEqual('some travel restrictions')
     })
+
+    describe('X-ray information', () => {
+      const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
+        commentText: '',
+        problemCode: 'BSC5.5',
+        problemDescription: 'Body scan',
+        problemStatus: 'ON',
+        problemType: 'BSCAN',
+        startDate: addDays(startOfYear(new Date()), daysAfterStartOfYear).toISOString(),
+      })
+
+      beforeEach(() => {
+        setCodeReferences([
+          {
+            description: 'X-ray body scan',
+            code: 'BSCAN',
+            activeFlag: 'Y',
+            domain: 'HEALTH',
+          },
+        ])
+      })
+
+      describe('Given no x-ray care needs', () => {
+        it('Returns no xray security information', async () => {
+          setPersonalCareNeeds([])
+          const {
+            security: { xrays },
+          } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          expect(xrays.total).toEqual(0)
+          expect(xrays.since).toBeUndefined()
+        })
+      })
+
+      describe('Given x-rays for this year', () => {
+        it('Returns the correct number of x-rays and the start date', async () => {
+          setPersonalCareNeeds([xrayNeed(0), xrayNeed(10), xrayNeed(20), xrayNeed(40)])
+          const {
+            security: { xrays },
+          } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          expect(xrays.total).toEqual(4)
+          expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
+        })
+      })
+
+      describe('Given x-rays over multiple years', () => {
+        it('Returns the correct number of x-rays for this year and the start date', async () => {
+          setPersonalCareNeeds([
+            xrayNeed(-10),
+            xrayNeed(-20),
+            xrayNeed(-40),
+            xrayNeed(0),
+            xrayNeed(10),
+            xrayNeed(20),
+            xrayNeed(40),
+          ])
+          const {
+            security: { xrays },
+          } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          expect(xrays.total).toEqual(4)
+          expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
+        })
+      })
+    })
   })
 
   describe('Care needs', () => {
-    const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
-      prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
-        offenderNo: 'AB1234',
-        personalCareNeeds: careNeeds,
-      }))
-    }
-
-    const setCodeReferences = (referenceCodes: ReferenceCode[]) => {
-      prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
-    }
-
     it('Handles empty personal care needs', async () => {
       setPersonalCareNeeds([])
 
@@ -527,6 +594,31 @@ describe('PersonalPageService', () => {
         {
           description: 'Code reference description',
           code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
+      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      expect(careNeeds.personalCareNeeds.length).toEqual(0)
+    })
+
+    it('Doesnt map care needs with problem type BSCAN', async () => {
+      setPersonalCareNeeds([
+        {
+          problemCode: 'BSC5.5',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'BSCAN',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'BSCAN',
           activeFlag: 'Y',
           domain: 'HEALTH',
         },

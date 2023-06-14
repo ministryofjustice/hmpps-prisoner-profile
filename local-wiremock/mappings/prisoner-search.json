@@ -1,0 +1,77 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/prisonersearch/prisoner/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "prisonerNumber": "A1234AA",
+      "pncNumber": "08/359381C",
+      "pncNumberCanonicalShort": "08/359381C",
+      "pncNumberCanonicalLong": "2008/359381C",
+      "croNumber": "400862/08W",
+      "bookingId": -1,
+      "bookNumber": "W21339",
+      "firstName": "JOHN",
+      "middleNames": "MIDDLE NAMES",
+      "lastName": "SAUNDERS",
+      "dateOfBirth": "1990-10-12",
+      "gender": "Male",
+      "ethnicity": "White: Eng./Welsh/Scot./N.Irish/British",
+      "youthOffender": true,
+      "maritalStatus": "No",
+      "religion": "Celestial Church of God",
+      "nationality": "Stateless",
+      "status": "ACTIVE IN",
+      "lastMovementTypeCode": "ADM",
+      "lastMovementReasonCode": "24",
+      "inOutStatus": "IN",
+      "prisonId": "MDI",
+      "prisonName": "Moorland (HMP & YOI)",
+      "cellLocation": "1-1-035",
+      "aliases": [],
+      "alerts": [],
+      "csra": "High",
+      "category": "A",
+      "legalStatus": "RECALL",
+      "imprisonmentStatus": "CUR_ORA",
+      "imprisonmentStatusDescription": "ORA Recalled from Curfew Conditions",
+      "mostSeriousOffence": "Drive vehicle for more than 13 hours or more in a working day - domestic",
+      "recall": true,
+      "indeterminateSentence": false,
+      "sentenceStartDate": "2020-03-02",
+      "releaseDate": "2076-01-29",
+      "sentenceExpiryDate": "2132-03-12",
+      "licenceExpiryDate": "2132-03-12",
+      "nonDtoReleaseDate": "2076-01-29",
+      "nonDtoReleaseDateType": "CRD",
+      "receptionDate": "2016-05-30",
+      "paroleEligibilityDate": "2021-12-12",
+      "postRecallReleaseDate": "2021-12-12",
+      "conditionalReleaseDate": "2076-01-29",
+      "locationDescription": "Moorland (HMP & YOI)",
+      "restrictedPatient": false,
+      "currentIncentive": {
+        "level": {
+          "code": "STD",
+          "description": "Standard"
+        },
+        "dateTime": "2023-01-30T14:46:01",
+        "nextReviewDate": "2024-01-30"
+      },
+      "build": "Proportional",
+      "facialHair": "Clean Shaven",
+      "hairColour": "Brown",
+      "heightCentimetres": 188,
+      "weightKilograms": 86,
+      "leftEyeColour": "Blue",
+      "rightEyeColour": "Blue",
+      "shapeOfFace": "Angular",
+      "shoeSize": 10
+    }
+  }
+}

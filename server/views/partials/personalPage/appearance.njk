@@ -2,42 +2,44 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro mark(info) %}
-  <details class="govuk-details" data-module="govuk-details" data-qa="distinguishing-mark">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">View details</span>
-    </summary>
-    <div class="govuk-details__text">
-      {% if info.bodyPart %}
+    {% if info.bodyPart %}
         <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-body-part">
-          <span class="govuk-!-font-weight-bold">Body part</span><br />
-          {{ info.bodyPart }}
+            {{ info.bodyPart }}
         </p>
-      {% endif %}
-      {% if info.side %}
-        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
-          <span class="govuk-!-font-weight-bold">Side</span><br />
-          {{ info.side }}
-        </p>
-      {% endif %}
-      {% if info.orientation %}
-        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
-          <span class="govuk-!-font-weight-bold">Orientation</span><br />
-          {{ info.orientation }}
-        </p>
-      {% endif %}
-      {% if info.comment %}
-        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
-          <span class="govuk-!-font-weight-bold">Comment</span><br />
-          {{ info.comment }}
-        </p>
-      {% endif %}
-      {% if info.imageId %}
-        <p class="govuk-body">
-          <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
-        </p>
-      {% endif %}
-    </div>
-  </details>
+    {% endif %}
+
+    {% if info.side or info.orientation or info.comment or info.imageId %}
+        <details class="govuk-details" data-module="govuk-details" data-qa="distinguishing-mark">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">View details</span>
+            </summary>
+            <div class="govuk-details__text">
+              {% if info.side %}
+                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
+                  <span class="govuk-!-font-weight-bold">Side</span><br />
+                  {{ info.side }}
+                </p>
+              {% endif %}
+              {% if info.orientation %}
+                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
+                  <span class="govuk-!-font-weight-bold">Orientation</span><br />
+                  {{ info.orientation }}
+                </p>
+              {% endif %}
+              {% if info.comment %}
+                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
+                  <span class="govuk-!-font-weight-bold">Comment</span><br />
+                  {{ info.comment }}
+                </p>
+              {% endif %}
+              {% if info.imageId %}
+                <p class="govuk-body">
+                  <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
+                </p>
+              {% endif %}
+            </div>
+        </details>
+    {% endif %}
 {% endmacro %}
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
   <div class="govuk-grid-row" data-qa="appearance">
@@ -62,7 +64,7 @@
       }}
       {% if physicalCharacteristics.distinguishingMarks.length > 0 %}
         <h3 class="govuk-heading-m">Distinguishing marks</h3>
-        <dl class="govuk-summary-list" data-qa="distinguishing-marks">
+        <dl class="govuk-summary-list hmpps-distinguishing-marks" data-qa="distinguishing-marks">
           {% for m in physicalCharacteristics.distinguishingMarks %}
             {{ summaryListRow(m.type, mark(m), "distinguishing-mark") }}
           {% endfor %}
