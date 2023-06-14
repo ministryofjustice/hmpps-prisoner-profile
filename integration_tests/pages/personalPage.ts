@@ -170,4 +170,8 @@ export default class PersonalPage extends Page {
       }),
     }
   }
+
+  backToTopLink = (): PageElement => cy.get('[data-module=hmpps-back-to-top] a')
+
+  backToTopLinkHidden = (): PageElement => cy.get('.hmpps-back-to-top--hidden')
 }
