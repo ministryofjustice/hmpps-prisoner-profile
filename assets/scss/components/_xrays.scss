@@ -1,0 +1,32 @@
+.hmpps-xray {
+  &__total {
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+
+  &__since {
+    font-size: 8px;
+  }
+
+  &__label {
+    font-weight: bold;
+    @include govuk-responsive-margin(1, 'bottom');
+  }
+
+  &__warning {
+    background-color: govuk-colour('red');
+    color: govuk-colour('white');
+    margin-top: -15px;
+  }
+
+  .govuk-warning-text {
+    &__icon {
+      color: govuk-colour('black');
+      background-color: govuk-colour('white');
+      border: 3px solid govuk-colour('white');
+    }
+
+    &__text {
+      color: govuk-colour('white');
+    }
+  }
+}
