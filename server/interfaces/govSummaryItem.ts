@@ -1,6 +1,6 @@
 export interface GovSummaryItem {
   key: { text: string }
-  value: { text: string }
+  value: { text?: string; html?: string }
 }
 
 export interface GovSummaryGroup {

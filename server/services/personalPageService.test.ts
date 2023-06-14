@@ -17,6 +17,7 @@ import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjus
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { formatDate } from '../utils/dateHelpers'
 import { identifiersMock } from '../data/localMockData/identifiersMock'
+import { addressSummaryMock } from '../data/localMockData/addressSummary'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -231,7 +232,7 @@ describe('PersonalPageService', () => {
 
   describe('Addresses', () => {
     it('Maps the data from the API for the primary address', async () => {
-      const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { addresses, addressSummary } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
       const expectedAddress = mockAddresses[0]
       const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
       const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
@@ -251,6 +252,8 @@ describe('PersonalPageService', () => {
       expect(premise).toEqual(expectedAddress.premise)
       expect(street).toEqual(expectedAddress.street)
       expect(town).toEqual(expectedAddress.town)
+
+      expect(addressSummary).toEqual(addressSummaryMock)
     })
   })
 
