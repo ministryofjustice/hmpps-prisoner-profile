@@ -1,22 +1,5 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% if addresses %}
-{% set addressHtml %}
-  {% for line in addresses.address | addressToLines %}
-    {{ line }}<br />
-  {% endfor %}
-{% endset %}
-{% set phoneHtml %}
-  {% for number in addresses.phones %}
-    {{ number }}<br />
-  {% endfor %}
-{% endset %}
-{% set addressTypesHtml %}
-  {% for type in addresses.addressTypes %}
-    {{ type }}<br />
-  {% endfor %}
-{% endset %}
-{% endif %}
 {%- call summaryCard({title: "Addresses", id: "addresses"}) -%}
   <div class="govuk-grid-row" data-qa="addresses">
     <div class="govuk-grid-column-full">
@@ -25,12 +8,7 @@
       {% elseif addresses and addresses.isPrimaryAddress %}
       <p class="govuk-body">Primary</p>
       {{ govukSummaryList({
-          rows: [
-            { key: { text: "Address"}, value: { html: addressHtml } },
-            { key: { text: "Type of address"}, value: { html: addressTypesHtml } },
-            { key: { text: "Phone"}, value: { html: phoneHtml } },
-            { key: { text: "Comments"}, value: { text: addresses.comment } }
-          ]
+          rows: addressSummary
       }) }}
       <p class="govuk-body">Added on <span data-qa="address-added-on">{{ addresses.addedOn | formatDate }}</span></p>
       {% elseif addresses and not addresses.isPrimaryAddress %}
