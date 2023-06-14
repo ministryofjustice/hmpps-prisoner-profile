@@ -1,9 +1,11 @@
+import { startOfYear } from 'date-fns'
 import { Role } from '../../server/data/enums/role'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { yearsBetweenDateStrings } from '../../server/utils/utils'
 import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
 import { permissionsTests } from './permissionsTests'
+import { formatDate } from '../../server/utils/dateHelpers'
 
 const visitPersonalDetailsPage = () => {
   cy.signIn({ redirectPath: 'prisoner/G6123VU/personal' })
@@ -11,22 +13,11 @@ const visitPersonalDetailsPage = () => {
 
 context('When signed in', () => {
   const prisonerNumber = 'G6123VU'
+  const bookingId = 1102484
 
   context('Permissions', () => {
     const visitPage = prisonerDataOverrides => {
-      cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
-      cy.task('stubInmateDetail', 1102484)
-      cy.task('stubPrisonerDetail', prisonerNumber)
-      cy.task('stubSecondaryLanguages', 1102484)
-      cy.task('stubProperty', 1102484)
-      cy.task('stubAddresses', prisonerNumber)
-      cy.task('stubOffenderContacts', prisonerNumber)
-      cy.task('stubPersonAddresses')
-      cy.task('stubImages')
-      cy.task('stubHealthReferenceDomain')
-      cy.task('stubHealthTreatmentReferenceDomain')
-      cy.task('stubReasonableAdjustments', 1102484)
-      cy.task('stubPersonalCareNeeds', 1102484)
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId, prisonerDataOverrides })
       visitPersonalDetailsPage()
     }
 
@@ -85,20 +76,7 @@ context('When signed in', () => {
       cy.task('stubSignIn')
       cy.task('stubAuthUser')
       cy.task('stubUserCaseLoads')
-      cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
-      cy.task('stubPrisonerDetail', 'G6123VU')
-      cy.task('stubSecondaryLanguages', 1102484)
-      cy.task('stubProperty', 1102484)
-      cy.task('stubAddresses', 'G6123VU')
-      cy.task('stubOffenderContacts', 'G6123VU')
-      cy.task('stubPersonAddresses')
-      cy.task('stubImages')
-      cy.task('stubHealthReferenceDomain')
-      cy.task('stubHealthTreatmentReferenceDomain')
-      cy.task('stubReasonableAdjustments', 1102484)
-      cy.task('stubPersonalCareNeeds', 1102484)
-      cy.task('stubGetIdentifiers', 1102484)
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       visitPersonalDetailsPage()
     })
 
@@ -341,6 +319,45 @@ context('When signed in', () => {
         const page = Page.verifyOnPage(PersonalPage)
         cy.get('.govuk-footer').scrollTo('bottom', { ensureScrollable: false })
         page.backToTopLink().should('be.visible')
+      })
+    })
+  })
+
+  context('X-ray details', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn')
+      cy.task('stubAuthUser')
+      cy.task('stubUserCaseLoads')
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+    })
+
+    context('With less than the limit', () => {
+      it('Displays the xray count and date', () => {
+        cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 10 })
+        visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
+        page.security().xrays().total().should('include.text', '10')
+        page
+          .security()
+          .xrays()
+          .since()
+          .should('include.text', formatDate(startOfYear(new Date()).toISOString()))
+      })
+    })
+
+    context('With the limit', () => {
+      it('Displays the xray count and date', () => {
+        cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 116 })
+        visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
+        page.security().xrays().total().should('include.text', '116')
+        page
+          .security()
+          .xrays()
+          .since()
+          .should('include.text', formatDate(startOfYear(new Date()).toISOString()))
+        page.security().xrays().warningMessage().should('exist')
       })
     })
   })
