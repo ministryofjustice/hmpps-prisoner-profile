@@ -33,6 +33,7 @@ generic-service:
     MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases-preprod.hmpps.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-preprod.prison.service.justice.gov.uk"
     FEEDBACK_ENABLED_PRISONS: "LEI"
+    SYSTEM_PHASE: "PRE-PRODUCTION"
 
   allowlist:
     office: "217.33.148.210/32"
