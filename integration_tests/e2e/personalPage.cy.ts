@@ -342,5 +342,20 @@ context('When signed in', () => {
           .should('include.text', formatDate(startOfYear(new Date()).toISOString()))
       })
     })
+
+    context('With the limit', () => {
+      it('Displays the xray count and date', () => {
+        cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 116 })
+        visitPersonalDetailsPage()
+        const page = Page.verifyOnPage(PersonalPage)
+        page.security().xrays().total().should('include.text', '116')
+        page
+          .security()
+          .xrays()
+          .since()
+          .should('include.text', formatDate(startOfYear(new Date()).toISOString()))
+        page.security().xrays().warningMessage().should('exist')
+      })
+    })
   })
 })

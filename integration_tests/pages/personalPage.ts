@@ -147,6 +147,7 @@ export default class PersonalPage extends Page {
       xrays: () => ({
         total: () => cardData().findDataQa('security-xrays').findDataQa('total-xrays'),
         since: () => cardData().findDataQa('security-xrays').findDataQa('xrays-since'),
+        warningMessage: () => cardData().findDataQa('security-xrays').findDataQa('xray-limit-reached-message'),
       }),
     }
   }

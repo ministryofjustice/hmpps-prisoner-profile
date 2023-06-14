@@ -6,11 +6,31 @@
     <div class="govuk-grid-column-full">
       {% if security.xrays.total > 0 %}
         <div class="hmpps-xray govuk-!-margin-bottom-3" data-qa="security-xrays">
+          {% if security.xrays.total >= 116 %}
+            <div
+              class="govuk-grid-row hmpps-xray__warning govuk-!-margin-bottom-3"
+              data-qa="xray-limit-reached-message"
+            >
+              <div class="govuk-grid-column-full">
+                <div class="govuk-warning-text govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                  <span class="govuk-warning-text__icon hmpps-xray__warning-icon" aria-hidden="true">!</span>
+                  <div class="govuk-warning-text__text">
+                    <strong>
+                      <span class="govuk-warning-text__assistive">Warning</span>
+                      Do not scan - annual body scan limit reached
+                    </strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
           <div class="hmpps-xray__total">
-            <div class="govuk-grid-row">
+            <div class="govuk-grid-row govuk-!-margin-top-3">
               <div class="govuk-grid-column-one-third">
                 <p class="govuk-body hmpps-xray__label">X-ray body scans</p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" data-qa="xrays-since">Since {{ security.xrays.since | formatDate }}</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0" data-qa="xrays-since">
+                  Since {{ security.xrays.since | formatDate }}
+                </p>
               </div>
               <div class="govuk-grid-column-two-thirds">
                 <p class="govuk-body hmpps-xray__total" data-qa="total-xrays">{{ security.xrays.total }}</p>
