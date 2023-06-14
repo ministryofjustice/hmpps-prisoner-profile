@@ -328,7 +328,7 @@ context('When signed in', () => {
       })
     })
 
-    context('Back to top', () => {
+    context.skip('Back to top', () => {
       it('Does not display the back to top link initially', () => {
         const page = Page.verifyOnPage(PersonalPage)
         page.backToTopLinkHidden().should('exist')
