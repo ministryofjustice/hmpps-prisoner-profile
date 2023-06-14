@@ -99,7 +99,7 @@ docker-compose -f docker-compose-local-wiremock.yml up
 export $(cat .env-local-wiremock) && npm run start:dev
 ```
 
-4/ To access the service, navigate in a web browser to http://localhost:3000/prisoner/A1234AA
+3/ To access the service, navigate in a web browser to http://localhost:3000/prisoner/A1234AA
 and sign in with the following test credentials:
 
 username: `ITAG_USER`
