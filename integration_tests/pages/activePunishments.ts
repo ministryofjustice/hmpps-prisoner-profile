@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class ActivePunishmentsPage extends Page {
   constructor() {
-    super('John Middle Names Saunders’ active punishments')
+    super('John Saunders’ active punishments')
   }
 
   h1 = (): PageElement => cy.get('h1')

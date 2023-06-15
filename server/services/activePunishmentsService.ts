@@ -1,6 +1,7 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName } from '../utils/utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 export default class ActivePunishmentsService {
   private prisonApiClient: PrisonApiClient
@@ -13,7 +14,7 @@ export default class ActivePunishmentsService {
     const { bookingId, firstName, middleNames, lastName } = prisonerData
 
     const adjudications = await this.getAdjudications(bookingId)
-    const name = formatName(firstName, middleNames, lastName)
+    const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
     return {
       adjudications,
