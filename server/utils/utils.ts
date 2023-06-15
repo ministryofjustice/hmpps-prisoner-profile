@@ -162,6 +162,8 @@ export const formatName = (
   } else if (options?.style === NameFormatStyle.lastCommaFirst) {
     names.unshift(`${names.pop()},`)
     names.pop() // Remove middleNames
+  } else if (options?.style === NameFormatStyle.firstLast) {
+    names.splice(1, 1)
   }
   return names
     .filter(s => s)
