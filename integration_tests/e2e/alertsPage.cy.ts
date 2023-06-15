@@ -45,6 +45,11 @@ context('Alerts Page - User does not have Update Alerts role', () => {
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
+    it('should contain elements with CSS classes linked to Google Analytics', () => {
+      cy.get('.info__links').should('exist')
+      cy.get('.hmpps-profile-tab-links').should('exist')
+    })
+
     it('Does not display the add alert button', () => {
       alertsPage.addAlertButton().should('not.exist')
     })

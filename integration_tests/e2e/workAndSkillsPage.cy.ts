@@ -55,6 +55,12 @@ context('Work and skills page', () => {
         cy.request('/prisoner/G6123VU/work-and-skills').its('body').should('contain', 'Work and skills')
       })
 
+      it('should contain elements with CSS classes linked to Google Analytics', () => {
+        cy.get('.info__links').should('exist')
+        cy.get('.hmpps-profile-tab-links').should('exist')
+        cy.get('.hmpps-sidebar').should('exist')
+      })
+
       it('Displays the Work and skills tab as active', () => {
         const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
         workAndSkillsPage.activeTab().should('contain', 'Work and skills')
