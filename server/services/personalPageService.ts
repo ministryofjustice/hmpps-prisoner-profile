@@ -1,3 +1,4 @@
+import { isSameYear, startOfYear } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
   Addresses,
@@ -27,6 +28,8 @@ import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/refe
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import { GovSummaryItem } from '../interfaces/govSummaryItem'
+import { HealthDomainReferenceCode, PersonalCareNeed } from '../interfaces/personalCareNeeds'
+import { ReasonableAdjustment } from '../interfaces/prisonApi/reasonableAdjustment'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
@@ -37,7 +40,6 @@ export default class PersonalPageService {
 
   public async get(prisonerData: Prisoner): Promise<PersonalPage> {
     const { bookingId, prisonerNumber } = prisonerData
-
     const [
       inmateDetail,
       prisonerDetail,
@@ -61,6 +63,12 @@ export default class PersonalPageService {
     ])
 
     const addresses: Addresses = this.addresses(addressList)
+    const healthCodes = healthReferenceCodes.map(code => code.code)
+    const treatmentCodes = healthTreatmentReferenceCodes.map(code => code.code)
+    const [{ personalCareNeeds }, { reasonableAdjustments }] = await Promise.all([
+      this.prisonApiClient.getPersonalCareNeeds(inmateDetail.bookingId, healthCodes),
+      this.prisonApiClient.getReasonableAdjustments(inmateDetail.bookingId, treatmentCodes),
+    ])
 
     return {
       personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages),
@@ -79,8 +87,9 @@ export default class PersonalPageService {
           ProfileInformationType.TravelRestrictions,
           inmateDetail.profileInformation,
         ),
+        xrays: this.xrays(personalCareNeeds),
       },
-      careNeeds: await this.careNeeds(inmateDetail, healthReferenceCodes, healthTreatmentReferenceCodes),
+      careNeeds: await this.careNeeds(healthReferenceCodes, personalCareNeeds, reasonableAdjustments),
     }
   }
 
@@ -296,21 +305,17 @@ export default class PersonalPageService {
   }
 
   private async careNeeds(
-    inmateDetail: InmateDetail,
     healthReferenceCodes: ReferenceCode[],
-    healthTreatmentReferenceCodes: ReferenceCode[],
+    personalCareNeeds: PersonalCareNeed[],
+    reasonableAdjustments: ReasonableAdjustment[],
   ): Promise<CareNeeds> {
     const careNeedType = (problemType: string) => {
       return healthReferenceCodes.find(code => code.code === problemType)?.description || problemType
     }
 
     const healthCodes = healthReferenceCodes.map(code => code.code)
-    const treatmentCodes = healthTreatmentReferenceCodes.map(code => code.code)
-
-    const [{ personalCareNeeds }, { reasonableAdjustments }] = await Promise.all([
-      this.prisonApiClient.getPersonalCareNeeds(inmateDetail.bookingId, healthCodes),
-      this.prisonApiClient.getReasonableAdjustments(inmateDetail.bookingId, treatmentCodes),
-    ])
+    const excludedProblemCodes = ['NR']
+    const excludedProblemTypes = [HealthDomainReferenceCode.XRayBodyScan.toString()]
 
     return {
       personalCareNeeds:
@@ -319,7 +324,8 @@ export default class PersonalPageService {
             careNeed =>
               careNeed.problemStatus === 'ON' &&
               healthCodes.includes(careNeed.problemType) &&
-              careNeed.problemCode !== 'NR',
+              !excludedProblemCodes.includes(careNeed.problemCode) &&
+              !excludedProblemTypes.includes(careNeed.problemType),
           )
           .map(careNeed => ({
             comment: careNeed.commentText,
@@ -334,6 +340,17 @@ export default class PersonalPageService {
         comment: adjustment.commentText,
         agency: adjustment.agencyDescription,
       })),
+    }
+  }
+
+  private xrays(personalCareNeeds: PersonalCareNeed[]): { total: number; since?: string } {
+    const yearStart = startOfYear(new Date())
+    const xrayNeeds = personalCareNeeds
+      .filter(need => need.problemType === HealthDomainReferenceCode.XRayBodyScan)
+      .filter(need => isSameYear(new Date(need.startDate), yearStart))
+    return {
+      total: xrayNeeds.length,
+      since: xrayNeeds.length > 0 ? yearStart.toISOString() : undefined,
     }
   }
 }

@@ -98,6 +98,7 @@ export interface PhysicalCharacteristics {
 export interface Security {
   interestToImmigration: string
   travelRestrictions: string
+  xrays: { total: number; since?: string }
 }
 
 export interface CareNeed {

@@ -1,11 +1,15 @@
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% extends "./index.njk" %}
-{% set breadCrumbs = [
+{%
+  set breadCrumbs = [
   {
-    text: 'Home',
-    href:  "/" | prependBaseUrl
+  text: 'Home',
+  href:  "/" | prependBaseUrl
   }
-] %}
+  ]
+%}
+{% set showSecurity  = security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0 %}
+
 {% block body %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
@@ -27,7 +31,7 @@
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'next-of-kin-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
         {%- endcall -%}
-        {%- call conditionallyShow({condition: security.interestToImmigration == "Yes" or security.travelRestrictions, id: 'security-nav'}) -%}
+        {%- call conditionallyShow({condition: showSecurity, id: 'security-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#security">Security</a></li>
         {%- endcall -%}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'property-nav'}) -%}
@@ -76,7 +80,7 @@
           </div>
         </div>
       {%- endcall -%}
-      {%- call conditionallyShow({condition: security.interestToImmigration == "Yes" or security.travelRestrictions, id: 'security'}) -%}
+      {%- call conditionallyShow({condition: showSecurity, id: 'security'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% include "../partials/personalPage/security.njk" %}
