@@ -2,32 +2,26 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if  prisonerIsTRN(prisonId) %}
-        <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert" data-qa="TRN-establishment-banner">
-          <div class="govuk-grid-column-full">
-            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+        <div class="hmpps-profile-banner-alert" data-qa="TRN-establishment-banner">
+            <p class="govuk-heading-m">
               This prisoner is being transferred
             </p>
-            <p class="govuk-body">Some information may be hidden</p>
-          </div>
+            <p>Some information may be hidden</p>
         </div>
     {% elseif prisonerIsOut(prisonId) %}
-        <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert" data-qa="OUT-establishment-banner">
-          <div class="govuk-grid-column-full">
-            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+        <div class="hmpps-profile-banner-alert" data-qa="OUT-establishment-banner">
+            <p class="govuk-heading-m">
               This person has been released
             </p>
-            <p class="govuk-body">Some information may be hidden</p>
-          </div>
+            <p>Some information may be hidden</p>
         </div>
     {% else %}
       {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
-        <div class="govuk-grid-row govuk-!-padding-top-2 govuk-!-padding-bottom-2 hmpps-profile-banner-alert">
-          <div class="govuk-grid-column-full">
-            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+        <div class="hmpps-profile-banner-alert">
+            <p class="govuk-heading-m">
               This prisoner is not in your establishment
             </p>
-            <p class="govuk-body">Some information may be hidden</p>
-          </div>
+            <p>Some information may be hidden</p>
         </div>
       {%- endcall -%}
     {% endif %}
