@@ -67,6 +67,12 @@ context('Overview Page', () => {
       cy.request('/prisoner/G6123VU').its('body').should('contain', 'Overview')
     })
 
+    it('should contain elements with CSS classes linked to Google Analytics', () => {
+      cy.get('.info__links').should('exist')
+      cy.get('.hmpps-profile-tab-links').should('exist')
+      cy.get('.hmpps-actions-block__list').should('exist')
+    })
+
     it('Displays the overview tab as active', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
       overviewPage.activeTab().should('contain', 'Overview')
