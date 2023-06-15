@@ -2,12 +2,12 @@
 {% set mainClasses = "govuk-main-wrapper--l" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set title =  "Page not found" %}
+{% set pageTitle =  "Page not found" %}
 
 {% block content %}
     <div class="govuk-grid-row" data-qa="page-not-found">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">{{ title }}</h1>
+            <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
             <p class="govuk-body">
                 If you typed or pasted the web address, check it is correct.
             </p>

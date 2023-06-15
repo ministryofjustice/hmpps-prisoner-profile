@@ -75,6 +75,7 @@ export default function routes(): Router {
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
       res.render('pages/photoPage', {
+        pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
         ...mapHeaderData(prisonerData, res.locals.user),
       })
     })
