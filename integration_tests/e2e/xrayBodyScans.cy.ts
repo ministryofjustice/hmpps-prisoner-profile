@@ -30,6 +30,13 @@ context('X-Ray body scans', () => {
 
   it('Displays the page', () => {
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
-    const xrayPage = Page.verifyOnPageWithTitle(XrayBodyScans, prisonerName)
+    Page.verifyOnPageWithTitle(XrayBodyScans, prisonerName)
+  })
+
+  it('Displays the body scans', () => {
+    cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
+    const page = Page.verifyOnPageWithTitle(XrayBodyScans, prisonerName)
+    page.bodyScan(1).date().should('include.text', new Date().getFullYear())
+    page.bodyScan(1).comment().should('include.text', 'There was a body scan')
   })
 })
