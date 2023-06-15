@@ -1,3 +1,4 @@
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
 <header class="hmpps-header" role="banner">
   <div class="hmpps-header__container">
     <div class="hmpps-header__title">
@@ -34,6 +35,13 @@
 
 <div class="hmpps-header__container">
   <div class="hmpps-location-bar location-bar">
+    {% if phaseName %}
+      {{ govukTag({
+        text: phaseName,
+        classes: 'govuk-!-margin-right-1 ' + phaseNameColour
+      }) }}
+    {% endif %}
+
     <p class="location-bar__location govuk-!-font-size-19 govuk-!-font-weight-bold" data-test="active-location">{{ user.activeCaseLoad.description }}</p>
     {% if user.caseLoads.length > 1 %}
       <a className="location-bar__link " href="{{ "/change-caseload" | prependBaseUrl}}" referrerpolicy="no-referrer-when-downgrade" data-test="change-location-link">

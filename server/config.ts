@@ -163,4 +163,5 @@ export default {
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),
   feedbackEnabledPrisons: get('FEEDBACK_ENABLED_PRISONS', [], requiredInProduction),
+  phaseName: get('SYSTEM_PHASE', ''),
 }

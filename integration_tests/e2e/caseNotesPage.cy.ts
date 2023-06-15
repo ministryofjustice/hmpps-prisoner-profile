@@ -32,6 +32,11 @@ context('Case Notes Page', () => {
       caseNotesPage = visitCaseNotesPage()
     })
 
+    it('should contain elements with CSS classes linked to Google Analytics', () => {
+      cy.get('.info__links').should('exist')
+      cy.get('.hmpps-profile-tab-links').should('exist')
+    })
+
     it('Displays the add case note button', () => {
       caseNotesPage.addCaseNoteButton()
     })

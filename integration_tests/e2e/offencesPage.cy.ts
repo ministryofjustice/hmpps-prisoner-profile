@@ -31,6 +31,13 @@ context('Offences Page Sentenced', () => {
     cy.request('/prisoner/G6123VU/offences').its('body').should('contain', 'Offences')
   })
 
+  it('should contain elements with CSS classes linked to Google Analytics', () => {
+    visitOffencesPage()
+    cy.get('.info__links').should('exist')
+    cy.get('.hmpps-profile-tab-links').should('exist')
+    cy.get('.hmpps-sidebar').should('exist')
+  })
+
   it('Displays the Offences tab as active', () => {
     visitOffencesPage()
     const offencesPage = Page.verifyOnPage(OffencesPage)
