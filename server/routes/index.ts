@@ -14,7 +14,7 @@ import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
-import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import ActivePunishmentsService from '../services/activePunishmentsService'
 import { saveBackLink } from '../controllers/backLinkController'
@@ -177,6 +177,20 @@ export default function routes(): Router {
   get('/prisoner/:prisonerNumber/adjudications', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
       res.redirect(`${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
+    })
+  })
+
+  get('/prisoner/:prisonerNumber/x-ray-body-scans', async (req, res, next) => {
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
+      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
+
+      res.render('pages/xrayBodyScans', {
+        pageTitle: 'X-ray body scans',
+        ...mapHeaderData(prisonerData, res.locals.user, 'x-ray-body-scans', true),
+        prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
+        bodyScans: personalCareNeeds,
+      })
     })
   })
 
