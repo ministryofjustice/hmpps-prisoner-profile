@@ -13,7 +13,7 @@
       })
     }}
   {% else %}
-    <p>{{ prisonerName }} has no work or activities.</p>
+    <p>{{ workAndSkillsPrisonerName }} has no work or activities.</p>
   {% endif %}
 
   {% if not prisonerData.restrictedPatient %}
@@ -39,6 +39,6 @@
   </div>
   <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-3" />
   {% if(unacceptableAbsences.unacceptableAbsenceLastSixMonths === 0) %}
-    <p>{{ prisonerName }} has no unacceptable absences in the last 6 months.</p>
+    <p>{{ workAndSkillsPrisonerName }} has no unacceptable absences in the last 6 months.</p>
   {% endif %}
 {%- endcall -%}
