@@ -24,13 +24,14 @@ $govuk-page-width: $moj-page-width;
 @import './components/sidebar';
 @import './components/status';
 @import './components/summary-card';
+@import './pages/active-punishments-page';
 @import './pages/alerts-page';
 @import './pages/case-notes-page';
-@import './pages/personal-page';
 @import './pages/overview-page';
-@import './pages/active-punishments-page';
+@import './pages/personal-page';
+@import './pages/work-and-skills-page';
 @import './local';
 @import './helpers';
 @import './typography';
 @import './components/courtCasesAndOffences';
-@import './components/xrays'
+@import './components/xrays';

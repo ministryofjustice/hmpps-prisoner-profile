@@ -8,6 +8,7 @@
       {% elseif addresses and addresses.isPrimaryAddress %}
       <p class="govuk-body">Primary</p>
       {{ govukSummaryList({
+          classes: 'govuk-summary-list--bottom-border',
           rows: addressSummary
       }) }}
       <p class="govuk-body">Added on <span data-qa="address-added-on">{{ addresses.addedOn | formatDate }}</span></p>
