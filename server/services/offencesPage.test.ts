@@ -14,7 +14,7 @@ import {
 import { OffenceHistoryMock, OffenceHistoryMockA } from '../data/localMockData/offenceHistoryMock'
 import {
   GenericMapMock,
-  MappedSsentenceSummaryCourtCasesMock,
+  MappedSentenceSummaryCourtCasesMock,
   MappedUnsentencedCourtCasesMock,
   SentencedTermsMockA,
   sentenceTermsMock,
@@ -125,7 +125,7 @@ describe('OffencesPageService', () => {
         SentenceSummaryWithSentenceMock,
         SentencedTermsMockA,
       )
-      expect(res).toEqual(MappedSsentenceSummaryCourtCasesMock)
+      expect(res).toEqual(MappedSentenceSummaryCourtCasesMock)
     })
 
     describe('Next court appearance', () => {

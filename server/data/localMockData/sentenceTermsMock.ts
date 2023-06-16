@@ -149,7 +149,7 @@ export const SummaryDetailRowsMock: object[] = [
   undefined,
 ]
 
-export const MappedSsentenceSummaryCourtCasesMock: SentenceSummaryCourtCaseExtended[] = [
+export const MappedSentenceSummaryCourtCasesMock: SentenceSummaryCourtCaseExtended[] = [
   {
     beginDate: '2016-05-30',
     caseInfoNumber: 'T20167348',
