@@ -1,11 +1,36 @@
-@media (min-width: 40.0625em) {
-  .hmpps-alias-details th:first-of-type {
-    width: 41.5%;
+.hmpps-profile--personal-content {
+
+  @media (min-width: 40.0625em) {
+    .hmpps-alias-details th:first-of-type {
+      width: 41.5%;
+    }
+  }
+
+  .hmpps-distinguishing-marks {
+    img {
+      width: 100%;
+    }
+  }
+
+  .govuk-summary-list:not(.govuk-summary-list--bottom-border) {
+
+    // If it's the last-of-type that is not hidden remove bottom border
+    div.govuk-summary-list__row:last-of-type {
+      border-bottom: none;
+    }
+
+    // Or if it's followed by another div remove bottom border
+    div.govuk-summary-list__row:has(~ div) {
+      border-bottom: none;
+    }
+
+    // Unless it's also followed by another div with govuk-summary-list__row or hmpps-conditional-summary-row
+    div.govuk-summary-list__row:has(~ div.govuk-summary-list__row:not(.govuk-summary-list__row--hidden)),
+    div.govuk-summary-list__row:has(~ div.hmpps-conditional-summary-row),
+    div.hmpps-conditional-summary-row:has(~ div.govuk-summary-list__row),
+    div.hmpps-conditional-summary-row:has(~ div.hmpps-conditional-summary-row) {
+      border-bottom: 1px solid $govuk-border-colour;
+    }
   }
 }
 
-.hmpps-distinguishing-marks {
-  img {
-    width: 100%;
-  }
-}

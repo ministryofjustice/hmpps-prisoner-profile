@@ -42,11 +42,13 @@
     {% endif %}
 {% endmacro %}
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
+{% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length %}
   <div class="govuk-grid-row" data-qa="appearance">
     <div class="govuk-grid-column-full" data-qa="physical-characteristics">
       <h3 class="govuk-heading-m">Physical characteristics</h3>
       {{
         govukSummaryList({
+        classes: listClasses,
         rows: [
         {key: { text: "Height"}, value: { text: physicalCharacteristics.height } },
         {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
