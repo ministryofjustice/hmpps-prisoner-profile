@@ -33,14 +33,17 @@ export default class OffencesPageService {
       this.getReleaseDates(prisonerNumber),
     ])
 
-    const courtCasesSentenceDetailsId =
-      releaseDates.dates.length > 0 ? 'court-cases-sentence-details' : 'court-cases-upcoming-appearances'
+    if (courtCaseData && releaseDates) {
+      const courtCasesSentenceDetailsId =
+        releaseDates.dates.length > 0 ? 'court-cases-sentence-details' : 'court-cases-upcoming-appearances'
 
-    return {
-      courtCaseData,
-      releaseDates,
-      courtCasesSentenceDetailsId,
+      return {
+        courtCaseData,
+        releaseDates,
+        courtCasesSentenceDetailsId,
+      }
     }
+    return {}
   }
 
   getLengthTextLabels(data: Licence | OffenderSentenceTerms | SentenceSummaryTermDetail) {
@@ -447,222 +450,228 @@ export default class OffencesPageService {
 
   async getReleaseDates(prisonerNumber: string) {
     const releaseDates: PrisonerSentenceDetails = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
-    const sentenceDetails = releaseDates.sentenceDetail
-    const conditionalRelease: string =
-      sentenceDetails.conditionalReleaseOverrideDate || sentenceDetails.conditionalReleaseDate
-    const postRecallDate = sentenceDetails.postRecallReleaseOverrideDate || sentenceDetails.postRecallReleaseDate
-    const automaticReleaseDate = sentenceDetails.automaticReleaseOverrideDate || sentenceDetails.automaticReleaseDate
-    const nonParoleDate = sentenceDetails.nonParoleOverrideDate || sentenceDetails.nonParoleDate
-    const detentionTrainingOrderPostRecallDate =
-      sentenceDetails.dtoPostRecallReleaseDateOverride || sentenceDetails.dtoPostRecallReleaseDate
 
+    if (releaseDates.sentenceDetail) {
+      const sentenceDetails = releaseDates.sentenceDetail
+      const conditionalRelease: string =
+        sentenceDetails.conditionalReleaseOverrideDate || sentenceDetails.conditionalReleaseDate
+      const postRecallDate = sentenceDetails.postRecallReleaseOverrideDate || sentenceDetails.postRecallReleaseDate
+      const automaticReleaseDate = sentenceDetails.automaticReleaseOverrideDate || sentenceDetails.automaticReleaseDate
+      const nonParoleDate = sentenceDetails.nonParoleOverrideDate || sentenceDetails.nonParoleDate
+      const detentionTrainingOrderPostRecallDate =
+        sentenceDetails.dtoPostRecallReleaseDateOverride || sentenceDetails.dtoPostRecallReleaseDate
+
+      return {
+        dates: [
+          ...(sentenceDetails.homeDetentionCurfewActualDate
+            ? [
+                {
+                  key: {
+                    text: 'Approved for home detention curfew',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.homeDetentionCurfewActualDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(conditionalRelease
+            ? [
+                {
+                  key: {
+                    text: 'Conditional release',
+                  },
+                  value: {
+                    text: formatDate(conditionalRelease, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(postRecallDate
+            ? [
+                {
+                  key: {
+                    text: 'Post recall release',
+                  },
+                  value: {
+                    text: formatDate(postRecallDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.midTermDate
+            ? [
+                {
+                  key: {
+                    text: 'Mid transfer',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.midTermDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(automaticReleaseDate
+            ? [
+                {
+                  key: {
+                    text: 'Automatic release',
+                  },
+                  value: {
+                    text: formatDate(automaticReleaseDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(nonParoleDate
+            ? [
+                {
+                  key: {
+                    text: 'Non parole',
+                  },
+                  value: {
+                    text: formatDate(nonParoleDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(detentionTrainingOrderPostRecallDate
+            ? [
+                {
+                  key: {
+                    text: 'Detention training post recall',
+                  },
+                  value: {
+                    text: formatDate(detentionTrainingOrderPostRecallDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.paroleEligibilityDate
+            ? [
+                {
+                  key: {
+                    text: 'Parole eligibility',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.paroleEligibilityDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.homeDetentionCurfewEligibilityDate
+            ? [
+                {
+                  key: {
+                    text: 'Home detention curfew',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.homeDetentionCurfewEligibilityDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.releaseOnTemporaryLicenceDate
+            ? [
+                {
+                  key: {
+                    text: 'Release on temporary licence',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.releaseOnTemporaryLicenceDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.earlyRemovalSchemeEligibilityDate
+            ? [
+                {
+                  key: {
+                    text: 'Early removal scheme',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate
+            ? [
+                {
+                  key: {
+                    text: 'Tariff early removal scheme',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.actualParoleDate
+            ? [
+                {
+                  key: {
+                    text: 'Approved for parole',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.actualParoleDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.earlyTermDate
+            ? [
+                {
+                  key: {
+                    text: 'Early transfer',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.earlyTermDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.topupSupervisionExpiryDate
+            ? [
+                {
+                  key: {
+                    text: 'Top up supervision expiry',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.topupSupervisionExpiryDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.lateTermDate
+            ? [
+                {
+                  key: {
+                    text: 'Late transfer',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.lateTermDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.tariffDate
+            ? [
+                {
+                  key: {
+                    text: 'Tariff',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.tariffDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+        ],
+      }
+    }
     return {
-      dates: [
-        ...(sentenceDetails.homeDetentionCurfewActualDate
-          ? [
-              {
-                key: {
-                  text: 'Approved for home detention curfew',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.homeDetentionCurfewActualDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(conditionalRelease
-          ? [
-              {
-                key: {
-                  text: 'Conditional release',
-                },
-                value: {
-                  text: formatDate(conditionalRelease, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(postRecallDate
-          ? [
-              {
-                key: {
-                  text: 'Post recall release',
-                },
-                value: {
-                  text: formatDate(postRecallDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.midTermDate
-          ? [
-              {
-                key: {
-                  text: 'Mid transfer',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.midTermDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(automaticReleaseDate
-          ? [
-              {
-                key: {
-                  text: 'Automatic release',
-                },
-                value: {
-                  text: formatDate(automaticReleaseDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(nonParoleDate
-          ? [
-              {
-                key: {
-                  text: 'Non parole',
-                },
-                value: {
-                  text: formatDate(nonParoleDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(detentionTrainingOrderPostRecallDate
-          ? [
-              {
-                key: {
-                  text: 'Detention training post recall',
-                },
-                value: {
-                  text: formatDate(detentionTrainingOrderPostRecallDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.paroleEligibilityDate
-          ? [
-              {
-                key: {
-                  text: 'Parole eligibility',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.paroleEligibilityDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.homeDetentionCurfewEligibilityDate
-          ? [
-              {
-                key: {
-                  text: 'Home detention curfew',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.homeDetentionCurfewEligibilityDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.releaseOnTemporaryLicenceDate
-          ? [
-              {
-                key: {
-                  text: 'Release on temporary licence',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.releaseOnTemporaryLicenceDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.earlyRemovalSchemeEligibilityDate
-          ? [
-              {
-                key: {
-                  text: 'Early removal scheme',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate
-          ? [
-              {
-                key: {
-                  text: 'Tariff early removal scheme',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.actualParoleDate
-          ? [
-              {
-                key: {
-                  text: 'Approved for parole',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.actualParoleDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.earlyTermDate
-          ? [
-              {
-                key: {
-                  text: 'Early transfer',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.earlyTermDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.topupSupervisionExpiryDate
-          ? [
-              {
-                key: {
-                  text: 'Top up supervision expiry',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.topupSupervisionExpiryDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.lateTermDate
-          ? [
-              {
-                key: {
-                  text: 'Late transfer',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.lateTermDate, 'long'),
-                },
-              },
-            ]
-          : []),
-        ...(sentenceDetails.tariffDate
-          ? [
-              {
-                key: {
-                  text: 'Tariff',
-                },
-                value: {
-                  text: formatDate(sentenceDetails.tariffDate, 'long'),
-                },
-              },
-            ]
-          : []),
-      ],
+      dates: [],
     }
   }
 }
