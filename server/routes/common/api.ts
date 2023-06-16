@@ -18,6 +18,8 @@ export default class CommonApiRoutes {
       offenderService
         .getPrisonerImage(res.locals.user.token, prisonerNumber)
         .then(data => {
+          res.set('Cache-control', 'private, max-age=86400')
+          res.removeHeader('pragma')
           res.type('image/jpeg')
           data.pipe(res)
         })
@@ -37,6 +39,8 @@ export default class CommonApiRoutes {
       offenderService
         .getImage(res.locals.user.token, imageId)
         .then(data => {
+          res.set('Cache-control', 'private, max-age=86400')
+          res.removeHeader('pragma')
           res.type('image/jpeg')
           data.pipe(res)
         })

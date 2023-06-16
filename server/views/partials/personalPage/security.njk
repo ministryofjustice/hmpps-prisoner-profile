@@ -25,7 +25,7 @@
             </div>
           {% endif %}
           <div class="hmpps-xray__total">
-            <div class="govuk-grid-row govuk-!-margin-top-3">
+            <div class="govuk-grid-row govuk-!-margin-top-3 govuk-!-margin-bottom-1">
               <div class="govuk-grid-column-one-third">
                 <p class="govuk-body hmpps-xray__label">X-ray body scans</p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0" data-qa="xrays-since">
@@ -35,6 +35,8 @@
               <div class="govuk-grid-column-two-thirds">
                 <p class="govuk-body hmpps-xray__total" data-qa="total-xrays">{{ security.xrays.total }}</p>
               </div>
+            </div>
+            <div class="govuk-grid-row">
               <div class="govuk-grid-column-full">
                 <p class="govuk-body">
                   <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/x-ray-body-scans">All X-ray body scans</a>
