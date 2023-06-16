@@ -14,7 +14,7 @@ import {
 import { OffenceHistoryMock, OffenceHistoryMockA } from '../data/localMockData/offenceHistoryMock'
 import {
   GenericMapMock,
-  MappedSentencedCourtCasesMock,
+  MappedSsentenceSummaryCourtCasesMock,
   MappedUnsentencedCourtCasesMock,
   SentencedTermsMockA,
   sentenceTermsMock,
@@ -34,11 +34,11 @@ import {
   CourtDateResultsUnsentencedMockB,
   UniqueCourtDateResultsUnsentencedMockA,
 } from '../data/localMockData/courtDateResultsMock'
-import { CourtCaseDataMapped } from '../interfaces/courtCaseDataMapped'
 import {
   SentenceSummaryWithSentenceMock,
   SentenceSummaryWithoutSentenceMock,
 } from '../data/localMockData/sentenceSummaryMock'
+import { SentenceSummaryCourtCaseExtended } from '../interfaces/prisonApi/sentenceSummary'
 
 describe('OffencesPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -48,16 +48,16 @@ describe('OffencesPageService', () => {
     return new OffencesPageService(prisonApiClient)
   })
 
-  beforeEach(() => {
-    prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
-    prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
-    prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
-    prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
-    prisonApiClient.getSentenceSummary = jest.fn(async () => SentenceSummaryWithSentenceMock)
-  })
-
   describe('Offences Page', () => {
+    beforeEach(() => {
+      prisonApiClient = prisonApiClientMock()
+      prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
+      prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
+      prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
+      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
+      prisonApiClient.getSentenceSummary = jest.fn(async () => SentenceSummaryWithSentenceMock)
+    })
+
     it('Get all data for the offences page for the sentences', async () => {
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.get({ prisonerNumber: 'G6123VU', bookingId: 1102484 } as Prisoner)
@@ -104,19 +104,6 @@ describe('OffencesPageService', () => {
       const res = await offencesPageService.getReleaseDates('G6123VU')
       expect(res).toEqual(GetReleaseDates)
     })
-    it('Get map for sentenced court cases', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getMapForSentencedCourtCases(
-        CourtCasesSentencedMockA,
-        [1520515],
-        todaysDate,
-        SentencedTermsMockA,
-        OffenceHistoryMockA,
-        CourtDateResultsMockA,
-        SentenceSummaryWithSentenceMock,
-      )
-      expect(res).toEqual(MappedSentencedCourtCasesMock)
-    })
 
     it('Get map for unsentenced court cases', async () => {
       const offencesPageService = offencesPageServiceConstruct()
@@ -124,9 +111,21 @@ describe('OffencesPageService', () => {
         CourtCasesUnsentencedMockB,
         todaysDate,
         CourtDateResultsUnsentencedMockB,
-        [] as CourtCaseDataMapped[],
+        [123456],
       )
       expect(res).toEqual(MappedUnsentencedCourtCasesMock)
+    })
+
+    it('Get map for sentence summary court cases', async () => {
+      const offencesPageService = offencesPageServiceConstruct()
+      const res = await offencesPageService.getMapForSentenceSummaryCourtCases(
+        CourtCasesSentencedMockA,
+        [1434365],
+        OffenceHistoryMockA,
+        SentenceSummaryWithSentenceMock,
+        SentencedTermsMockA,
+      )
+      expect(res).toEqual(MappedSsentenceSummaryCourtCasesMock)
     })
 
     describe('Next court appearance', () => {

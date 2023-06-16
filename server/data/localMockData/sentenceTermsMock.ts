@@ -1,5 +1,6 @@
 import { CourtCaseDataMapped, CourtCaseDataMappedUnsentenced } from '../../interfaces/courtCaseDataMapped'
 import { CourtHearing } from '../../interfaces/prisonApi/courtHearing'
+import { SentenceSummaryCourtCaseExtended } from '../../interfaces/prisonApi/sentenceSummary'
 import { SentenceTerm } from '../../interfaces/prisonApi/sentenceTerms'
 
 export const sentenceTermsMock: SentenceTerm[] = [
@@ -109,6 +110,7 @@ export const SentencedTermsMockA: SentenceTerm[] = [
 
 export const GenericMapMock: object = {
   caseInfoNumber: 'T20161014',
+  id: 1520515,
   courtHearings: [
     {
       dateTime: '2017-01-17T10:00:00',
@@ -147,13 +149,25 @@ export const SummaryDetailRowsMock: object[] = [
   undefined,
 ]
 
-export const MappedSentencedCourtCasesMock: CourtCaseDataMapped[] = [
+export const MappedSsentenceSummaryCourtCasesMock: SentenceSummaryCourtCaseExtended[] = [
   {
-    caseInfoNumber: 'T20161014',
+    beginDate: '2016-05-30',
+    caseInfoNumber: 'T20167348',
+    caseSeq: 1,
+    caseStatus: 'ACTIVE',
+    caseType: 'Adult',
+    court: {
+      active: true,
+      agencyId: 'SHEFCC',
+      agencyType: 'CRT',
+      courtType: 'CC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+    },
     courtHearings: [
       {
-        dateTime: '2017-01-17T10:00:00',
-        id: 329257623,
+        dateTime: '2020-06-18T10:00:00',
+        id: 407072650,
         location: {
           active: true,
           agencyId: 'SHEFCC',
@@ -164,8 +178,32 @@ export const MappedSentencedCourtCasesMock: CourtCaseDataMapped[] = [
         },
       },
       {
-        dateTime: '2018-09-21T10:00:00',
-        id: 349392356,
+        dateTime: '2016-05-30T10:00:00',
+        id: 304966745,
+        location: {
+          active: true,
+          agencyId: 'DONCMC',
+          agencyType: 'CRT',
+          courtType: 'MC',
+          description: 'Doncaster Magistrates Court',
+          longDescription: 'Doncaster Magistrates Court',
+        },
+      },
+      {
+        dateTime: '2016-06-27T10:00:00',
+        id: 304966783,
+        location: {
+          active: true,
+          agencyId: 'SHEFCC',
+          agencyType: 'CRT',
+          courtType: 'CC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+        },
+      },
+      {
+        dateTime: '2016-06-30T10:00:00',
+        id: 305411026,
         location: {
           active: true,
           agencyId: 'SHEFCC',
@@ -176,119 +214,53 @@ export const MappedSentencedCourtCasesMock: CourtCaseDataMapped[] = [
         },
       },
     ],
-    courtName: 'Sheffield Crown Court',
-    nextCourtAppearance: {} as CourtHearing,
-    sentenceTerms: [
+    id: 1434365,
+    issuingCourt: {
+      active: true,
+      agencyId: 'SHEFCC',
+      agencyType: 'CRT',
+      courtType: 'CC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+    },
+    issuingCourtDate: '2016-06-30',
+    sentences: [
       {
+        concurrentConsecutive: 'Concurrent',
+        lineSeq: 1,
         offences: [
           {
-            bookingId: 1167133,
-            caseId: 1520515,
-            courtDate: '2018-09-21',
-            mostSerious: false,
-            offenceCode: 'RT88026',
-            offenceDate: '2016-07-23',
-            offenceDescription: '(CP TEST) Drive a motor vehicle dangerously',
-            primaryResultCode: '1002',
-            primaryResultConviction: true,
-            primaryResultDescription: 'Imprisonment',
-            secondaryResultConviction: false,
-            statuteCode: 'RT88',
-          },
-          {
-            bookingId: 1167133,
-            caseId: 1520515,
-            courtDate: '2018-09-21',
-            mostSerious: true,
-            offenceCode: 'RT88526',
-            offenceDate: '2016-08-04',
-            offenceDescription: 'Cause serious injury by dangerous driving',
-            primaryResultCode: '1002',
-            primaryResultConviction: true,
-            primaryResultDescription: 'Imprisonment',
-            secondaryResultConviction: false,
-            statuteCode: 'RT88',
-          },
-          {
-            bookingId: 1167133,
-            caseId: 1520515,
-            courtDate: '2018-09-21',
-            mostSerious: false,
-            offenceCode: 'RT88007',
-            offenceDescription: 'Drive motor vehicle when alcohol level above limit',
-            primaryResultCode: '1002',
-            primaryResultConviction: true,
-            primaryResultDescription: 'Imprisonment',
-            secondaryResultConviction: false,
-            statuteCode: 'RT88',
+            indicators: ['D', '40'],
+            offenceCode: 'TH68026',
+            offenceDate: '2016-07-14',
+            offenceDescription: 'Burglary dwelling - with intent to steal',
+            offenceRangeDate: undefined,
+            offenceStartDate: '2016-07-14',
+            offenderChargeId: 3557385,
+            statuteCode: 'TH68',
           },
         ],
-        sentenceHeader: 'Count 2',
-        sentenceTypeDescription: 'ORA CJA03 Standard Determinate Sentence',
-        summaryDetailRows: [
-          { label: 'Sentence date', value: '13 March 2017' },
-          { label: 'Length', value: '4 months' },
-          { label: 'Concurrent or consecutive', value: 'Concurrent' },
-          undefined,
-          undefined,
-        ],
-      },
-      {
-        offences: [
-          {
-            bookingId: 1167133,
-            caseId: 1520515,
-            courtDate: '2018-09-21',
-            mostSerious: false,
-            offenceCode: 'RT88026',
-            offenceDate: '2016-07-23',
-            offenceDescription: '(CP TEST) Drive a motor vehicle dangerously',
-            primaryResultCode: '1002',
-            primaryResultConviction: true,
-            primaryResultDescription: 'Imprisonment',
-            secondaryResultConviction: false,
-            statuteCode: 'RT88',
-          },
-          {
-            bookingId: 1167133,
-            caseId: 1520515,
-            courtDate: '2018-09-21',
-            mostSerious: true,
-            offenceCode: 'RT88526',
-            offenceDate: '2016-08-04',
-            offenceDescription: 'Cause serious injury by dangerous driving',
-            primaryResultCode: '1002',
-            primaryResultConviction: true,
-            primaryResultDescription: 'Imprisonment',
-            secondaryResultConviction: false,
-            statuteCode: 'RT88',
-          },
-          {
-            bookingId: 1167133,
-            caseId: 1520515,
-            courtDate: '2018-09-21',
-            mostSerious: false,
-            offenceCode: 'RT88007',
-            offenceDescription: 'Drive motor vehicle when alcohol level above limit',
-            primaryResultCode: '1002',
-            primaryResultConviction: true,
-            primaryResultDescription: 'Imprisonment',
-            secondaryResultConviction: false,
-            statuteCode: 'RT88',
-          },
-        ],
+        sentenceCalculationType: 'ADIMP',
+        sentenceCategory: '2003',
+        sentenceEndDate: '2019-12-23',
         sentenceHeader: 'Count 1',
-        sentenceTypeDescription: 'ORA CJA03 Standard Determinate Sentence',
-        summaryDetailRows: [
-          { label: 'Sentence date', value: '2 March 2017' },
-          { label: 'Length', value: '20 months' },
-          { label: 'Concurrent or consecutive', value: 'Concurrent' },
-          undefined,
-          undefined,
+        sentenceLength: '40 months',
+        sentenceSequence: 1,
+        sentenceStartDate: '24 August 2016',
+        sentenceStatus: 'I',
+        sentenceTypeDescription: 'CJA03 Standard Determinate Sentence',
+        sentenced: true,
+        terms: [
+          {
+            lifeSentence: false,
+            months: 40,
+            sentenceTermCode: 'IMP',
+            startDate: '2016-08-24',
+            termSequence: 1,
+          },
         ],
       },
     ],
-    sentenced: true,
   },
 ]
 
@@ -370,6 +342,7 @@ export const MappedUnsentencedCourtCasesMock: CourtCaseDataMappedUnsentenced[] =
       },
     ],
     courtName: 'Nottingham Crown Court',
+    id: 1445307,
     caseInfoNumber: 'T20167429',
     sentenced: false,
     sentenceHeader: 'Count 1',

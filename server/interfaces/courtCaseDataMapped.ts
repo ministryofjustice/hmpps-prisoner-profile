@@ -1,4 +1,5 @@
 import { CourtDateResults } from './courtDateResults'
+import { Court } from './prisonApi/courtCase'
 import { CourtHearing } from './prisonApi/courtHearing'
 import { OffenceHistoryDetail } from './prisonApi/offenceHistoryDetail'
 
@@ -9,6 +10,14 @@ export interface CourtCaseDataMapped {
   caseInfoNumber: string
   courtName: string
   sentenceTerms: CourtCaseSentenceTerm[]
+  beginDate?: string
+  caseSeq?: number
+  caseStatus: string
+  caseType: string
+  court: Court
+  id?: number
+  issuingCourt: Court
+  issuingCourtDate?: string
 }
 
 export interface CourtCaseDataMappedUnsentenced {
@@ -19,6 +28,7 @@ export interface CourtCaseDataMappedUnsentenced {
   courtName: string
   sentenceHeader: string
   courtDateResults: CourtDateResults[]
+  id?: number
 }
 
 export interface CourtCaseSentenceTerm {
