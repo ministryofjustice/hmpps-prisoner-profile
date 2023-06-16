@@ -38,7 +38,6 @@ import {
   SentenceSummaryWithSentenceMock,
   SentenceSummaryWithoutSentenceMock,
 } from '../data/localMockData/sentenceSummaryMock'
-import { SentenceSummaryCourtCaseExtended } from '../interfaces/prisonApi/sentenceSummary'
 
 describe('OffencesPageService', () => {
   let prisonApiClient: PrisonApiClient
