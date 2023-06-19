@@ -27,7 +27,7 @@ export const personalCareNeedsMock: PersonalCareNeeds = {
 }
 
 const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
-  commentText: '',
+  commentText: 'There was a body scan',
   problemCode: 'BSC5.5',
   problemDescription: 'Body scan',
   problemStatus: 'ON',

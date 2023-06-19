@@ -1,0 +1,41 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{%
+  set breadCrumbs = [
+  { text: 'Home', href: '/' },
+  { text: prisonerName, href: "/prisoner/" + prisonerNumber },
+  { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal"}
+  ]
+%}
+{% set scanRows = [] %}
+{% for scan in bodyScans %}
+  {%
+    set scanRows = (scanRows.push(
+    [
+    { text: scan.startDate | formatDate, classes: 'govuk-!-width-one-quarter' },
+    { text: scan.commentText, classes: 'govuk-!-width-three-quarters' }
+    ]
+    ), scanRows)
+  %}
+{% endfor %}
+{% extends "../partials/layout.njk" %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">{{ prisonerDisplayName | apostrophe }} X-ray body scans</h1>
+      {% if bodyScans.length > 0 %}
+        {{
+          govukTable({
+          firstCellIsHeader: false,
+          head: [{text: 'Date'}, {text: 'Comments'}],
+          rows: scanRows
+          })
+        }}
+      {% else %}
+        <p class="govuk-body">No X-ray body scans have been entered.</p>
+      {% endif %}
+      <p class="govuk-body">
+        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/personal">Return to the prisoner's profile</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
