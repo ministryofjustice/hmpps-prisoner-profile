@@ -11,7 +11,7 @@ import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDeta
 import { Charge } from '../data/enums/chargeCodes'
 import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import { CourtDateResults } from '../interfaces/courtDateResults'
-import { CourtCaseDataMapped, CourtCaseDataMappedUnsentenced } from '../interfaces/courtCaseDataMapped'
+import { CourtCaseDataMappedUnsentenced } from '../interfaces/courtCaseDataMapped'
 import {
   SentenceSummary,
   SentenceSummaryCourtCaseExtended,
@@ -129,16 +129,6 @@ export default class OffencesPageService {
     const caseIds = [...new Set(this.chargeCodesFilter(offenceHistory))]
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
-    const courtCaseDataMapped: CourtCaseDataMapped[] = this.getMapForSentencedCourtCases(
-      courtCaseData,
-      caseIds,
-      todaysDate,
-      sentenceTermsData,
-      offenceHistory,
-      courtDateResults,
-      sentenceSummary,
-    )
-
     const summarySentencedCourtCasesMapped = this.getMapForSentenceSummaryCourtCases(
       courtCaseData,
       caseIds,
@@ -147,11 +137,17 @@ export default class OffencesPageService {
       sentenceTermsData,
     )
 
+    const courtCaseIdsToExclude: number[] = [] as number[]
+
+    summarySentencedCourtCasesMapped.forEach(sentenceSummaryCourtCase => {
+      courtCaseIdsToExclude.push(sentenceSummaryCourtCase.id)
+    })
+
     const courtCaseDataMappedUnsentenced: CourtCaseDataMappedUnsentenced[] = this.getMapForUnsentencedCourtCases(
       courtCaseData,
       todaysDate,
       courtDateResults,
-      courtCaseDataMapped,
+      courtCaseIdsToExclude,
     )
 
     return [...summarySentencedCourtCasesMapped, ...courtCaseDataMappedUnsentenced]
@@ -301,31 +297,18 @@ export default class OffencesPageService {
     courtCaseData: CourtCase[],
     todaysDate: string,
     courtDateResults: CourtDateResults[],
-    courtCaseDataMapped: CourtCaseDataMapped[],
+    courtCaseIdsToExclude: number[],
   ) {
-    return (
-      courtCaseData
-        .map(courtCase => ({
-          ...this.getGenericMaps(courtCase, todaysDate),
-          sentenced: false,
-          sentenceHeader: this.getCountForUnsentencedCourtCase(courtCase),
-          courtDateResults: this.getUniqueChargesFromCourtDateResults(courtDateResults)?.filter(
-            courtDateResult => courtDateResult.charge.courtCaseId === courtCase.id,
-          ),
-        }))
-        // Hide unsentenced court cases if sentenced court case is available
-        // eslint-disable-next-line array-callback-return,consistent-return
-        .filter(value => {
-          if (
-            !courtCaseDataMapped.filter(
-              courtCaseDataSentenced => courtCaseDataSentenced.caseInfoNumber === value.caseInfoNumber,
-            ) ||
-            courtCaseDataMapped.length === 0
-          ) {
-            return value
-          }
-        })
-    )
+    return courtCaseData
+      .filter(courtCase => !courtCaseIdsToExclude.includes(courtCase.id))
+      .map(courtCase => ({
+        ...this.getGenericMaps(courtCase, todaysDate),
+        sentenced: false,
+        sentenceHeader: this.getCountForUnsentencedCourtCase(courtCase),
+        courtDateResults: this.getUniqueChargesFromCourtDateResults(courtDateResults)?.filter(
+          courtDateResult => courtDateResult.charge.courtCaseId === courtCase.id,
+        ),
+      }))
   }
 
   getGenericMaps(courtCase: CourtCase, todaysDate: string) {
@@ -334,37 +317,8 @@ export default class OffencesPageService {
       courtHearings: this.getCourtHearings(courtCase),
       courtName: this.getCourtName(courtCase),
       caseInfoNumber: this.getCourtInfoNumber(courtCase),
+      id: courtCase.id,
     }
-  }
-
-  getMapForSentencedCourtCases(
-    courtCaseData: CourtCase[],
-    caseIds: number[],
-    todaysDate: string,
-    sentenceTermsData: OffenderSentenceTerms[],
-    offenceHistory: OffenceHistoryDetail[],
-    courtDateResults: CourtDateResults[],
-    sentenceSummary: SentenceSummary,
-  ) {
-    return courtCaseData
-      .filter(courtCase => caseIds.includes(courtCase.id))
-      .map(courtCase => ({
-        ...this.getGenericMaps(courtCase, todaysDate),
-        sentenced: true,
-        sentenceTerms: this.getSentenceTerms(
-          courtCase,
-          sentenceTermsData,
-          offenceHistory,
-          courtDateResults,
-          sentenceSummary,
-        ),
-      }))
-      .filter(courtCase => courtCase.sentenceTerms.length)
-      .map(courtCase => {
-        return {
-          ...courtCase,
-        }
-      })
   }
 
   getMapForSentenceSummaryCourtCases(
@@ -460,7 +414,6 @@ export default class OffencesPageService {
       const nonParoleDate = sentenceDetails.nonParoleOverrideDate || sentenceDetails.nonParoleDate
       const detentionTrainingOrderPostRecallDate =
         sentenceDetails.dtoPostRecallReleaseDateOverride || sentenceDetails.dtoPostRecallReleaseDate
-
       return {
         dates: [
           ...(sentenceDetails.homeDetentionCurfewActualDate
