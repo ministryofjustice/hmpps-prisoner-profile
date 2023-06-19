@@ -1,0 +1,31 @@
+.hmpps-goal-container {
+  border-bottom: 1px solid $govuk-border-colour;
+  margin-bottom: 15px;
+
+  dl {
+    margin-bottom: 0;
+
+    & > div:last-of-type {
+      border-bottom: none;
+    }
+  }
+
+  p {
+    padding-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  &--no-border {
+    border-bottom: none;
+
+    p {
+      margin-bottom: 25px;
+    }
+  }
+}
+
+.hmpps-employability-card {
+  .hmpps-summary-card__body > div:last-of-type {
+    margin-bottom: 10px;
+  }
+}

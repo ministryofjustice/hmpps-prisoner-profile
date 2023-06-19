@@ -126,30 +126,38 @@
   width: 100%;
   display: flex!important;
   flex-wrap: wrap;
+  border-bottom: 1px solid $govuk-border-colour;
+
   .location-bar__location {
     @include govuk-font($size: 19, $weight: 'bold');
     @include govuk-responsive-margin(3, 'right');
     @include govuk-responsive-margin(0, 'bottom');
   }
-  a{
+
+  a {
     @include govuk-link-common;
     @include govuk-link-style-default;
     @include govuk-font($size: 19, $weight: 'normal');
     height: fit-content;
   }
 
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  border-bottom: 1px solid $govuk-border-colour;
-  
   @media print {
     display: none;
   }
 }
 
 .hmpps-profile-banner-alert {
-  background-color: #fbc9af;
+  padding: 20px 30px;
+  margin: 0 -15px;
+  background-color: rgba(govuk-colour("orange"), 0.25);
+
+  p {
+    margin: 0 0 10px 0;
+
+    & + p {
+      margin: 0;
+    }
+  }
 }
 
 .hmpps-profile-banner {

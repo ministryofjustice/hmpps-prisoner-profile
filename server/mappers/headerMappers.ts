@@ -71,7 +71,7 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
       })
     })
   }
-  return [...new Set(alerts)]
+  return [...new Set(alerts)].sort((a, b) => a.label.localeCompare(b.label))
 }
 
 export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string, hideBanner?: boolean) {

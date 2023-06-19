@@ -27,7 +27,7 @@ export default class WorkAndSkillsPageService {
 
   public async get(prisonerData: Prisoner) {
     const { prisonerNumber, firstName, lastName } = prisonerData
-    const prisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
+    const workAndSkillsPrisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
 
     const [
       learnerEmployabilitySkills,
@@ -56,7 +56,7 @@ export default class WorkAndSkillsPageService {
       learnerLatestAssessments,
       learnerGoals,
       learnerNeurodivergence,
-      prisonerName,
+      workAndSkillsPrisonerName,
       offenderActivitiesHistory,
       unacceptableAbsences,
     }
