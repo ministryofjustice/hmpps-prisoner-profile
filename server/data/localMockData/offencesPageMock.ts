@@ -469,7 +469,7 @@ export const OffencesPageMockSentences = {
     dates: [
       {
         key: {
-          text: 'Conditional release',
+          text: 'Conditional release date(CRD)',
         },
         value: {
           text: '29 January 2076',
@@ -485,7 +485,7 @@ export const OffencesPageMockSentences = {
       },
       {
         key: {
-          text: 'Parole eligibility',
+          text: 'Parole eligibility date(PED)',
         },
         value: {
           text: '12 December 2021',
@@ -1017,7 +1017,7 @@ export const GetReleaseDates = {
   dates: [
     {
       key: {
-        text: 'Conditional release',
+        text: 'Conditional release date(CRD)',
       },
       value: {
         text: '29 January 2076',
@@ -1033,7 +1033,7 @@ export const GetReleaseDates = {
     },
     {
       key: {
-        text: 'Parole eligibility',
+        text: 'Parole eligibility date(PED)',
       },
       value: {
         text: '12 December 2021',
