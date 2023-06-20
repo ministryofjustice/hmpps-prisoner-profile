@@ -2,7 +2,6 @@ import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import PrisonApiRestClient from '../data/prisonApiClient'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import CommonApiRoutes from './common/api'
 import { Prisoner } from '../interfaces/prisoner'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 
@@ -18,8 +17,9 @@ import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../uti
 import { Role } from '../data/enums/role'
 import ActivePunishmentsService from '../services/activePunishmentsService'
 import { saveBackLink } from '../controllers/backLinkController'
+import { Services } from '../services'
 
-export default function routes(): Router {
+export default function routes(services: Services): Router {
   const router = Router()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +56,7 @@ export default function routes(): Router {
   })
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  const commonApiRoutes = new CommonApiRoutes()
+  const { commonApiRoutes } = services
 
   const commonRoutes = () => {
     get('/api/prisoner/:prisonerNumber/image', commonApiRoutes.prisonerImage)
