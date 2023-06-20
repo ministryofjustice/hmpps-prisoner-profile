@@ -432,7 +432,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Conditional release date(CRD)',
+                    text: 'Conditional release date (CRD)',
                   },
                   value: {
                     text: formatDate(conditionalRelease, 'long'),
@@ -504,7 +504,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Parole eligibility date(PED)',
+                    text: 'Parole eligibility date (PED)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.paroleEligibilityDate, 'long'),
@@ -516,7 +516,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Home detention curfew eligibility date(HDCED)',
+                    text: 'Home detention curfew eligibility date (HDCED)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.homeDetentionCurfewEligibilityDate, 'long'),
