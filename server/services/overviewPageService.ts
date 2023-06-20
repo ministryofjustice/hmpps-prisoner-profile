@@ -390,35 +390,32 @@ export default class OverviewPageService {
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
 
-    const [assessments, incentiveReviews] = await Promise.all([
-      this.prisonApiClient.getAssessments(bookingId),
-      this.incentivesApiClient.getReviews(bookingId),
+    const incentiveReviews = await this.incentivesApiClient.getReviews(bookingId)
+
+    const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
+      this.prisonApiClient.getCaseNoteCount(
+        bookingId,
+        CaseNoteType.PositiveBehaviour,
+        CaseNoteSubType.IncentiveEncouragement,
+        incentiveReviews.iepDate,
+        formatDateISO(new Date()),
+      ),
+      this.prisonApiClient.getCaseNoteCount(
+        bookingId,
+        CaseNoteType.NegativeBehaviour,
+        CaseNoteSubType.IncentiveWarning,
+        incentiveReviews.iepDate,
+        formatDateISO(new Date()),
+      ),
     ])
 
-    const positiveBehaviourCount = await this.prisonApiClient.getCaseNoteCount(
-      bookingId,
-      CaseNoteType.PositiveBehaviour,
-      CaseNoteSubType.IncentiveEncouragement,
-      incentiveReviews.iepDate,
-      formatDateISO(new Date()),
-    )
-    const negativeBehaviourCount = await this.prisonApiClient.getCaseNoteCount(
-      bookingId,
-      CaseNoteType.NegativeBehaviour,
-      CaseNoteSubType.IncentiveWarning,
-      incentiveReviews.iepDate,
-      formatDateISO(new Date()),
-    )
-
-    if (!Array.isArray(assessments)) {
-      // TODO handle api call returning error???
-      return null
-    }
-
     const category: Assessment =
-      assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category) || null
+      prisonerData.assessments?.find(
+        (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category,
+      ) || null
     const csra: Assessment =
-      assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) || null
+      prisonerData.assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) ||
+      null
 
     const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
 

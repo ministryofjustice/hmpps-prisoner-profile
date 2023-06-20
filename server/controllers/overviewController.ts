@@ -50,16 +50,13 @@ export default class OverviewController {
     this.manageSocCasesApiClient = new ManageSocCasesApiRestClient(clientToken)
   }
 
-  public async displayOverview(req: Request, res: Response) {
+  public async displayOverview(req: Request, res: Response, prisonerData: Prisoner) {
     const overviewPageService = new OverviewPageService(
       this.prisonApiClient,
       this.allocationManagerClient,
       this.keyWorkersClient,
       this.incentivesApiClient,
     )
-
-    // Get prisoner data for banner and for use in alerts generation
-    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
       overviewPageService.get(

@@ -1,3 +1,5 @@
+import { Assessment } from './prisonApi/assessment'
+
 export interface Prisoner {
   prisonerNumber: string
   pncNumber?: string
@@ -26,6 +28,7 @@ export interface Prisoner {
   aliases?: Alias[]
   alerts?: Alert[]
   csra?: string
+  assessments?: Assessment[]
   category?: string
   legalStatus?:
     | 'RECALL'

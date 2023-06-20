@@ -34,17 +34,13 @@ describe('Alerts Controller', () => {
   })
 
   it('should get active alerts', async () => {
-    const getPrisonerDetailsSpy = jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(PrisonerMockDataA)
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedActiveAlertsMock)
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, PrisonerMockDataA)
 
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getAlertsSpy).toHaveBeenCalledWith(
       PrisonerMockDataA,
       {
@@ -64,17 +60,13 @@ describe('Alerts Controller', () => {
     req.path = 'alerts/inactive'
     controller['isActive'] = false
 
-    const getPrisonerDetailsSpy = jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(PrisonerMockDataA)
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedInactiveAlertsMock)
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, PrisonerMockDataA)
 
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getAlertsSpy).toHaveBeenCalledWith(
       PrisonerMockDataA,
       {
@@ -91,15 +83,12 @@ describe('Alerts Controller', () => {
   })
 
   it('should set canUpdateAlert to true if user has role and caseload', async () => {
-    jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(PrisonerMockDataA)
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, PrisonerMockDataA)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       PrisonerMockDataA,
@@ -116,9 +105,6 @@ describe('Alerts Controller', () => {
   })
 
   it('should set canUpdateAlert to false if user does not have role', async () => {
-    jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(PrisonerMockDataA)
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedActiveAlertsMock)
@@ -126,7 +112,7 @@ describe('Alerts Controller', () => {
 
     res.locals.user.userRoles = ['ROLE_OTHER']
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, PrisonerMockDataA)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       PrisonerMockDataA,
@@ -143,15 +129,12 @@ describe('Alerts Controller', () => {
   })
 
   it('should set canUpdateAlert to false if user does not have caseload', async () => {
-    jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue({ ...PrisonerMockDataA, prisonId: 'XYZ' })
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'XYZ' })
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       { ...PrisonerMockDataA, prisonId: 'XYZ' },
@@ -169,15 +152,12 @@ describe('Alerts Controller', () => {
 
   it('should set canUpdateAlert to true if user does not have caseload but prisoner is OUT', async () => {
     res.locals.user.userRoles.push(Role.InactiveBookings)
-    jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue({ ...PrisonerMockDataA, prisonId: 'OUT' })
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       { ...PrisonerMockDataA, prisonId: 'OUT' },
@@ -195,15 +175,12 @@ describe('Alerts Controller', () => {
 
   it('should set canUpdateAlert to true if user does not have caseload but prisoner is TRN', async () => {
     res.locals.user.userRoles.push(Role.InactiveBookings)
-    jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue({ ...PrisonerMockDataA, prisonId: 'TRN' })
     const getAlertsSpy = jest
       .spyOn<any, string>(controller['alertsPageService'], 'get')
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res)
+    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       { ...PrisonerMockDataA, prisonId: 'TRN' },

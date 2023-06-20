@@ -6,6 +6,7 @@ import { PrisonerSearchService } from '../services'
 import { Role } from '../data/enums/role'
 import config from '../config'
 import { userCanEdit, userHasRoles } from '../utils/utils'
+import { Prisoner } from '../interfaces/prisoner'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -23,7 +24,7 @@ export default class AlertsController {
     this.isActive = isActive
   }
 
-  public async displayAlerts(req: Request, res: Response) {
+  public async displayAlerts(req: Request, res: Response, prisonerData: Prisoner) {
     // Parse query params for paging, sorting and filtering data
     const queryParams: PagedListQueryParams = {}
     if (req.query.page) queryParams.page = +req.query.page
@@ -34,9 +35,6 @@ export default class AlertsController {
     if (this.isActive) queryParams.alertStatus = 'ACTIVE'
     if (!this.isActive) queryParams.alertStatus = 'INACTIVE'
     if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
-
-    // Get prisoner data for banner and for use in alerts generation
-    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
 
     // Set role based permissions
     const canUpdateAlert =
