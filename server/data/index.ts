@@ -5,7 +5,7 @@
  */
 import config, { ApiConfig } from '../config'
 import { buildAppInsightsClient, initialiseAppInsights } from '../utils/azureAppInsights'
-import HmppsAuthClient from './hmppsAuthClient'
+import HmppsAuthClient, { systemTokenBuilder } from './hmppsAuthClient'
 import { PrisonApiClient } from './interfaces/prisonApiClient'
 import PrisonApiRestClientTwo from './prisonApiClientTwo'
 
@@ -28,7 +28,13 @@ export default function restClientBuilder<T>(
 }
 
 export const dataAccess = {
-  hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
+  // hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
+  systemToken: systemTokenBuilder(new TokenStore(createRedisClient())),
+  hmppsAuthClientBuilder: restClientBuilder<HmppsAuthClient>(
+    'HMPPS AuthClient',
+    config.apis.hmppsAuth,
+    HmppsAuthClient,
+  ),
   prisonApiClientBuilder: restClientBuilder<PrisonApiClient>(
     'Prison API',
     config.apis.prisonApi,
