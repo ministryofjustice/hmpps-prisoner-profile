@@ -5,7 +5,7 @@ import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 
 export const services = () => {
-  const { hmppsAuthClient, prisonApiClientBuilder } = dataAccess()
+  const { hmppsAuthClient, prisonApiClientBuilder } = dataAccess
   const userService = new UserService(hmppsAuthClient)
   const offenderService = new OffenderService(prisonApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService)

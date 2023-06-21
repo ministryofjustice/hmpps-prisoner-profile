@@ -27,15 +27,15 @@ export default function restClientBuilder<T>(
   return token => new constructor(restClient(token))
 }
 
-export const dataAccess = () => ({
+export const dataAccess = {
   hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
   prisonApiClientBuilder: restClientBuilder<PrisonApiClient>(
     'Prison API',
     config.apis.prisonApi,
     PrisonApiRestClientTwo,
   ),
-})
+}
 
-export type DataAccess = ReturnType<typeof dataAccess>
+export type DataAccess = typeof dataAccess
 
 export { HmppsAuthClient, RestClientBuilder }

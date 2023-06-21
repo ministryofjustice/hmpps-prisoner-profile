@@ -5,7 +5,7 @@ import { dataAccess } from '../data'
 export default function populateClientToken(): RequestHandler {
   return async (req, res, next) => {
     try {
-      const { hmppsAuthClient } = dataAccess()
+      const { hmppsAuthClient } = dataAccess
       if (res.locals.user) {
         const clientToken = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         if (clientToken) {
