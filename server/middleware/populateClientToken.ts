@@ -5,9 +5,9 @@ import { dataAccess } from '../data'
 export default function populateClientToken(): RequestHandler {
   return async (req, res, next) => {
     try {
-      const { hmppsAuthClient } = dataAccess()
+      const { systemToken } = dataAccess
       if (res.locals.user) {
-        const clientToken = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const clientToken = await systemToken(res.locals.user.username)
         if (clientToken) {
           res.locals.clientToken = clientToken
         } else {
