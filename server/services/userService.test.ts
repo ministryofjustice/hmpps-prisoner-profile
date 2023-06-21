@@ -23,7 +23,7 @@ describe('User service', () => {
       MockedPrisonApiClient.mockImplementation(_ => prisonApiClient as PrisonApiClient)
       prisonApiClient.getUserCaseLoads = jest.fn(async () => [])
 
-      userService = new UserService(hmppsAuthClient)
+      userService = new UserService(() => hmppsAuthClient)
     })
 
     it('Retrieves and formats user name', async () => {

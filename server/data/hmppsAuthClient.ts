@@ -44,34 +44,36 @@ export interface UserRole {
 }
 
 export default class HmppsAuthClient {
-  constructor(private readonly tokenStore: TokenStore) {}
+  constructor(private readonly restClient: RestClient) {}
 
   private static restClient(token: string): RestClient {
     return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
   }
 
-  getUser(token: string): Promise<User> {
+  getUser(): Promise<User> {
     logger.info(`Getting user details: calling HMPPS Auth`)
-    return HmppsAuthClient.restClient(token).get({ path: '/api/user/me' }) as Promise<User>
+    return this.restClient.get({ path: '/api/user/me' }) as Promise<User>
   }
 
-  getUserRoles(token: string): Promise<string[]> {
-    return HmppsAuthClient.restClient(token)
+  getUserRoles(): Promise<string[]> {
+    return this.restClient
       .get({ path: '/api/user/me/roles' })
       .then(roles => (<UserRole[]>roles).map(role => role.roleCode))
   }
+}
 
-  async getSystemClientToken(username?: string): Promise<string> {
+export const systemTokenBuilder =
+  (tokenStore: TokenStore) =>
+  async (username?: string): Promise<string> => {
     const key = username || '%ANONYMOUS%'
-    const token = await this.tokenStore.getToken(key)
+    const token = await tokenStore.getToken(key)
     if (token) {
       return token
     }
 
     const newToken = await getSystemClientTokenFromHmppsAuth(username)
     // set TTL slightly less than expiry of token. Async but no need to wait
-    await this.tokenStore.setToken(key, newToken.body.access_token, newToken.body.expires_in - 60)
+    await tokenStore.setToken(key, newToken.body.access_token, newToken.body.expires_in - 60)
 
     return newToken.body.access_token
   }
-}
