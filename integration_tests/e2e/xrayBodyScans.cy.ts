@@ -4,7 +4,7 @@ import { permissionsTests } from './permissionsTests'
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
-const prisonerName = 'John Middle Names Saunders'
+const prisonerName = 'John Saunders'
 
 context('X-ray body scans - Permissions', () => {
   const visitPage = prisonerDataOverrides => {
