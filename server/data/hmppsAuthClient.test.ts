@@ -3,7 +3,6 @@ import nock from 'nock'
 import config from '../config'
 import HmppsAuthClient, { systemTokenBuilder } from './hmppsAuthClient'
 import TokenStore from './tokenStore'
-import RestClient from './restClient'
 import restClientBuilder from '.'
 
 jest.mock('./tokenStore')
@@ -42,7 +41,7 @@ describe('hmppsAuthClient', () => {
         HmppsAuthClient,
       )(token.access_token)
 
-      const output = await hmppsAuthClient.getUser(token.access_token)
+      const output = await hmppsAuthClient.getUser()
       expect(output).toEqual(response)
     })
   })

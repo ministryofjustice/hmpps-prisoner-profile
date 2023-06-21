@@ -15,7 +15,7 @@ export default class UserService {
   constructor(private readonly hmppsAuthClientBuilder: RestClientBuilder<HmppsAuthClient>) {}
 
   async getUser(token: string): Promise<UserDetails> {
-    const user = await this.hmppsAuthClientBuilder(token).getUser(token)
+    const user = await this.hmppsAuthClientBuilder(token).getUser()
     return { ...user, displayName: convertToTitleCase(user.name) }
   }
 
