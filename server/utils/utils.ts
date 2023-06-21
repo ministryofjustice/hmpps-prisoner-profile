@@ -424,3 +424,25 @@ export const formatCategoryCodeDescription = (code: string): string => {
       return code
   }
 }
+
+// eslint-disable-next-line no-shadow
+export enum SortType {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: string, sortType: SortType): object[] => {
+  // eslint-disable-next-line
+  let array = arrayOfObjects.sort(function (a, b) {
+    const dateA = new Date(a[dateKey]).getTime()
+    const dateB = new Date(b[dateKey]).getTime()
+    if (sortType === SortType.DESC) {
+      return dateA < dateB ? 1 : -1
+    }
+    if (sortType === SortType.ASC) {
+      return dateA < dateB ? -1 : 1
+    }
+    return 0
+  })
+  return array
+}
