@@ -13,11 +13,18 @@ import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
-import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import {
+  SortType,
+  formatName,
+  prisonerBelongsToUsersCaseLoad,
+  sortArrayOfObjectsByDate,
+  userHasRoles,
+} from '../utils/utils'
 import { Role } from '../data/enums/role'
 import ActivePunishmentsService from '../services/activePunishmentsService'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 
@@ -195,8 +202,10 @@ export default function routes(services: Services): Router {
       res.render('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
         ...mapHeaderData(prisonerData, res.locals.user, 'x-ray-body-scans', true),
-        prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
-        bodyScans: personalCareNeeds,
+        prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
+          style: NameFormatStyle.firstLast,
+        }),
+        bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
       })
     })
   })

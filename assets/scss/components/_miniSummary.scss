@@ -16,30 +16,33 @@
 
   .hmpps-mini-card__big {
     font-size: 36px;
+    line-height: 36px;
+    margin-bottom: 17px;
   }
 
   .hmpps-mini-card__small {
     margin-bottom: 5px;
 
     &.hmpps-mini-card__filler {
-      margin-bottom: 42px;
+      margin-bottom: 28px;
     }
   }
 
   .hmpps-mini-card__sub-text {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     color: govuk-colour('dark-grey');
   }
 
   .hmpps-mini-card__error {
     font-weight: 700;
     color: $govuk-error-colour;
-    margin-bottom: 12px;
-    margin-top: -7px;
+    margin-bottom: 10px;
+    margin-top: -5px;
   }
 
   .hmpps-mini-card__link {
     margin-top: auto;
+    margin-bottom: 12px;
   }
 }
 
@@ -54,15 +57,23 @@
     height: 100%;
     margin-bottom: 0;
 
-    &__body {
-      height: 100%;
+    &__no-header {
+      padding-top: 10px;
+    }
 
-      .card-body:not(.hmpps-summary-card__no-header) {
-        height: calc(100% - 65px);
+    &__header {
+      margin-bottom: 10px;
+    }
+
+    &__body {
+      height: calc(100% - 60px);
+
+      &:has(.hmpps-summary-card__no-header) {
+        height: calc(100% - 10px);
       }
 
-      .card-body.hmpps-summary-card__no-header {
-        height: calc(100% - 15px);
+      .card-body {
+        height: 100%;
       }
 
       .card-body .govuk-grid-column-full {
