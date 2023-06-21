@@ -17,6 +17,8 @@ import {
   prisonerIsOut,
   prisonerIsTRN,
   properCaseName,
+  sortArrayOfObjectsByDate,
+  SortType,
   summaryListOneHalfWidth,
   SummaryListRow,
   userHasRoles,
@@ -28,6 +30,11 @@ import { HmppsError } from '../interfaces/hmppsError'
 import { CaseLoad } from '../interfaces/caseLoad'
 
 import config from '../config'
+import {
+  xrayCareNeedsASCMock,
+  xrayCareNeedsDESCMock,
+  xrayCareNeedsMock,
+} from '../data/localMockData/personalCareNeedsMock'
 
 describe('convert to title case', () => {
   it.each([
@@ -370,5 +377,18 @@ describe('findError', () => {
   describe('prisonerIsTRN', () => {
     expect(prisonerIsOut('TRN')).toEqual(false)
     expect(prisonerIsOut('OUT')).toEqual(true)
+  })
+
+  describe('sortArrayOfObjectsByDate', () => {
+    it('Should return array of objects sorted in ascending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
+        xrayCareNeedsASCMock.personalCareNeeds,
+      )
+    })
+    it('Should return array of objects sorted in descending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
+        xrayCareNeedsDESCMock.personalCareNeeds,
+      )
+    })
   })
 })
