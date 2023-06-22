@@ -43,7 +43,10 @@ describe('WorkAndSkillsService', () => {
     }
 
     const workAndSkillsPageServiceConstruct = jest.fn(() => {
-      return new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
+      return new WorkAndSkillsPageService(
+        () => curiousApiClient,
+        () => prisonApiClient,
+      )
     })
 
     beforeEach(() => {
@@ -66,14 +69,14 @@ describe('WorkAndSkillsService', () => {
     describe('Work and skills', () => {
       it.each(['ABC123', 'DEF321'])('Gets the activities history for the prisoner', async (prisonerNumber: string) => {
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+        await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
       })
 
       it.each(['ABC123', 'DEF321'])('Gets the attendance history for the prisoner', async (prisonerNumber: string) => {
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
         const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
         const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
-        const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
         expect(prisonApiClient.getOffenderAttendanceHistory).toHaveBeenCalledWith(
           prisonerNumber,
           sixMonthsAgo,
@@ -88,7 +91,7 @@ describe('WorkAndSkillsService', () => {
         'Gets the courses and qualifications for the prisoner',
         async (prisonerNumber: string) => {
           const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-          const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+          const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
           expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonerNumber)
           expect(res.learnerEducation).toEqual([
             { key: { text: 'string' }, value: { text: 'Planned end date on 1 March 2023' } },
@@ -100,7 +103,7 @@ describe('WorkAndSkillsService', () => {
         'Gets the employability skills for the prisoner',
         async (prisonerNumber: string) => {
           const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-          const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+          const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
           expect(curiousApiClient.getLearnerEmployabilitySkills).toHaveBeenCalledWith(prisonerNumber)
           expect(res.learnerEmployabilitySkills).toEqual({
             content: [
@@ -142,7 +145,7 @@ describe('WorkAndSkillsService', () => {
         'Gets the employability skills for the prisoner',
         async (prisonerNumber: string) => {
           const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-          const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+          const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
           expect(curiousApiClient.getLearnerProfile).toHaveBeenCalledWith(prisonerNumber)
           expect(res.learnerEmployabilitySkills).toEqual({
             content: [
@@ -194,7 +197,10 @@ describe('WorkAndSkillsService', () => {
     }
 
     const workAndSkillsPageServiceConstruct = jest.fn(() => {
-      return new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
+      return new WorkAndSkillsPageService(
+        () => curiousApiClient,
+        () => prisonApiClient,
+      )
     })
 
     beforeEach(() => {
@@ -205,7 +211,7 @@ describe('WorkAndSkillsService', () => {
       it('Prisoner without learner goals', async () => {
         const prisonerNumber = '123123'
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        const res = await workAndSkillsPageService.get({ prisonerNumber } as Prisoner)
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
         expect(res.learnerGoals).toEqual(LearnerGoalsMockB)
       })
     })

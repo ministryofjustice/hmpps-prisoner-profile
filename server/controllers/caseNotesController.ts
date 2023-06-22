@@ -3,32 +3,29 @@ import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
 import CaseNotesService from '../services/caseNotesService'
-import PrisonApiRestClient from '../data/prisonApiClient'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Role } from '../data/enums/role'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import config from '../config'
 import { userHasRoles } from '../utils/utils'
+import { RestClientBuilder } from '../data'
 
 /**
  * Parse request for case notes page and orchestrate response
  */
 export default class CaseNotesController {
-  private prisonerSearchService: PrisonerSearchService
-
-  private caseNotesService: CaseNotesService
-
-  private prisonApiClient: PrisonApiClient
-
-  constructor(clientToken: string, userToken: string) {
-    this.prisonerSearchService = new PrisonerSearchService(clientToken)
-    this.prisonApiClient = new PrisonApiRestClient(clientToken)
-    this.caseNotesService = new CaseNotesService(userToken) // Requires user token as API includes logic to return different results based on role
-  }
+  constructor(
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly prisonerSearchService: PrisonerSearchService,
+    private readonly caseNotesService: CaseNotesService,
+  ) {}
 
   public async displayCaseNotes(req: Request, res: Response) {
     // Parse query params for paging, sorting and filtering data
     const queryParams: PagedListQueryParams = {}
+    const { clientToken } = res.locals
+    const userToken = res.locals.user.token
+
     if (req.query.page) queryParams.page = +req.query.page
     if (req.query.sort) queryParams.sort = req.query.sort as string
     if (req.query.type) queryParams.type = req.query.type as string
@@ -38,7 +35,7 @@ export default class CaseNotesController {
     if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
     // Get prisoner data for banner and for use in alerts generation
-    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(clientToken, req.params.prisonerNumber)
 
     // Set role based permissions
     const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
@@ -56,11 +53,16 @@ export default class CaseNotesController {
     }
 
     // Get total count of case notes ignoring filters
-    const caseNotesUsage = await this.prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber)
+    const caseNotesUsage = await this.prisonApiClientBuilder(clientToken).getCaseNotesUsage(req.params.prisonerNumber)
     const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
 
     // Get case notes based on given query params
-    const caseNotesPageData = await this.caseNotesService.get(prisonerData, queryParams, canDeleteSensitiveCaseNotes)
+    const caseNotesPageData = await this.caseNotesService.get(
+      userToken,
+      prisonerData,
+      queryParams,
+      canDeleteSensitiveCaseNotes,
+    )
     const showingAll = queryParams.showAll
 
     // Get staffId to use in conditional logic for amend link

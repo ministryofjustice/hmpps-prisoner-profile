@@ -7,6 +7,7 @@ import { LearnerGoalsMock } from './localMockData/learnerGoalsMock'
 import { LearnerLatestAssessmentsMock } from './localMockData/learnerLatestAssessmentsMock'
 import { LearnerNeurodivergenceMock } from './localMockData/learnerNeurodivergenceMock'
 import { LearnerProfiles } from './localMockData/learnerProfiles'
+import restClientBuilder from '.'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -16,7 +17,7 @@ describe('curiousApiClient', () => {
 
   beforeEach(() => {
     fakeCuriousApi = nock(config.apis.curiousApiUrl.url)
-    curiousApiClient = new CuriousApiClient(token.access_token)
+    curiousApiClient = restClientBuilder('Curious API', config.apis.curiousApiUrl, CuriousApiClient)(token.access_token)
   })
 
   afterEach(() => {

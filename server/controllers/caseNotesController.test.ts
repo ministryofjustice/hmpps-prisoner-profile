@@ -5,6 +5,10 @@ import { caseNoteUsageMock } from '../data/localMockData/caseNoteUsageMock'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { PrisonerSearchService } from '../services'
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import CaseNotesService from '../services/caseNotesService'
 
 let req: any
 let res: any
@@ -15,6 +19,8 @@ jest.mock('../services/caseNotesService.ts')
 jest.mock('../data/prisonApiClient.ts')
 
 describe('Case Notes Controller', () => {
+  let prisonApiClient: PrisonApiClient
+
   beforeEach(() => {
     req = {
       params: { prisonerNumber: '' },
@@ -39,25 +45,30 @@ describe('Case Notes Controller', () => {
       },
       render: jest.fn(),
     }
-    controller = new CaseNotesController(res.locals.clientToken, res.locals.user.token)
+
+    prisonApiClient = prisonApiClientMock()
+    prisonApiClient.getCaseNotesUsage = jest.fn(async () => caseNoteUsageMock)
+    controller = new CaseNotesController(
+      () => prisonApiClient,
+      new PrisonerSearchService(null),
+      new CaseNotesService(null),
+    )
   })
 
   it('should get case notes', async () => {
     const getPrisonerDetailsSpy = jest
       .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
       .mockResolvedValue(PrisonerMockDataA)
-    const getgetCaseNotesUsageSpy = jest
-      .spyOn<any, string>(controller['prisonApiClient'], 'getCaseNotesUsage')
-      .mockResolvedValue(caseNoteUsageMock)
     const getCaseNotesSpy = jest
       .spyOn<any, string>(controller['caseNotesService'], 'get')
       .mockResolvedValue(pagedCaseNotesMock)
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
     await controller.displayCaseNotes(req, res)
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
-    expect(getgetCaseNotesUsageSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
+    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, req.params.prisonerNumber)
+    expect(prisonApiClient.getCaseNotesUsage).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getCaseNotesSpy).toHaveBeenCalledWith(
+      res.locals.user.token,
       PrisonerMockDataA,
       {
         page: 0,

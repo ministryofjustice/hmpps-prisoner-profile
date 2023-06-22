@@ -1,11 +1,6 @@
 import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
-import PrisonApiRestClient from '../data/prisonApiClient'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import AllocationManagerClient from '../data/allocationManagerApiClient'
-import KeyWorkersClient from '../data/keyWorkersApiClient'
-import IncentivesApiRestClient from '../data/incentivesApiClient'
 import OverviewPageService from '../services/overviewPageService'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import { Prisoner } from '../interfaces/prisoner'
@@ -15,54 +10,37 @@ import config from '../config'
 import { User } from '../data/hmppsAuthClient'
 import { prisonerBelongsToUsersCaseLoad, userCanEdit, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
-import PathfinderApiRestClient from '../data/pathfinderApiClient'
 import { Nominal } from '../interfaces/pathfinderApi/nominal'
-import ManageSocCasesApiRestClient from '../data/manageSocCasesApiClient'
-import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
+import { RestClientBuilder } from '../data'
 
 /**
  * Parse request for overview page and orchestrate response
  */
 export default class OverviewController {
-  private prisonerSearchService: PrisonerSearchService
-
-  private prisonApiClient: PrisonApiClient
-
-  private allocationManagerClient: AllocationManagerClient
-
-  private keyWorkersClient: KeyWorkersClient
-
-  private incentivesApiClient: IncentivesApiClient
-
   private pathfinderApiClient: PathfinderApiClient
 
   private manageSocCasesApiClient: ManageSocCasesApiClient
 
-  constructor(clientToken: string) {
-    this.prisonerSearchService = new PrisonerSearchService(clientToken)
-    this.prisonApiClient = new PrisonApiRestClient(clientToken)
-    this.allocationManagerClient = new AllocationManagerClient(clientToken)
-    this.keyWorkersClient = new KeyWorkersClient(clientToken)
-    this.incentivesApiClient = new IncentivesApiRestClient(clientToken)
-    this.pathfinderApiClient = new PathfinderApiRestClient(clientToken)
-    this.manageSocCasesApiClient = new ManageSocCasesApiRestClient(clientToken)
-  }
+  constructor(
+    private readonly prisonerSearchService: PrisonerSearchService,
+    private readonly overviewPageService: OverviewPageService,
+    private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
+    private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
+  ) {}
 
   public async displayOverview(req: Request, res: Response) {
-    const overviewPageService = new OverviewPageService(
-      this.prisonApiClient,
-      this.allocationManagerClient,
-      this.keyWorkersClient,
-      this.incentivesApiClient,
-    )
+    const { clientToken } = res.locals
+    this.pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
+    this.manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
 
     // Get prisoner data for banner and for use in alerts generation
-    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(clientToken, req.params.prisonerNumber)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
-      overviewPageService.get(
+      this.overviewPageService.get(
+        clientToken,
         prisonerData,
         res.locals.user.staffId,
         res.locals.user.caseLoads,
