@@ -1,14 +1,9 @@
-import config from '../config'
 import RestClient from './restClient'
 import { PathfinderApiClient } from './interfaces/pathfinderApiClient'
 import { Nominal } from '../interfaces/pathfinderApi/nominal'
 
 export default class PathfinderApiRestClient implements PathfinderApiClient {
-  restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('Pathfinder API', config.apis.pathfinderApi, token)
-  }
+  constructor(private readonly restClient: RestClient) {}
 
   async getNominal(offenderNumber: string): Promise<Nominal> {
     try {

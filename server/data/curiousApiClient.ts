@@ -9,11 +9,7 @@ import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import CuriousApiClient from './interfaces/curiousApiClient'
 
 export default class CuriousRestApiClient implements CuriousApiClient {
-  restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token)
-  }
+  constructor(private readonly restClient: RestClient) {}
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {

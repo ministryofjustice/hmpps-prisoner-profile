@@ -44,7 +44,7 @@ describe('OffencesPageService', () => {
   const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
   const offencesPageServiceConstruct = jest.fn(() => {
-    return new OffencesPageService(prisonApiClient)
+    return new OffencesPageService(() => prisonApiClient)
   })
 
   describe('Offences Page', () => {
@@ -59,7 +59,7 @@ describe('OffencesPageService', () => {
 
     it('Get all data for the offences page for the sentences', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.get({ prisonerNumber: 'G6123VU', bookingId: 1102484 } as Prisoner)
+      const res = await offencesPageService.get('token', { prisonerNumber: 'G6123VU', bookingId: 1102484 } as Prisoner)
 
       expect(res).toEqual(OffencesPageMockSentences)
     })
@@ -95,12 +95,12 @@ describe('OffencesPageService', () => {
     })
     it('Get court case details', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getCourtCasesData(1102484, 'G6123VU')
+      const res = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
       expect(res).toEqual(GetCourtCaseData)
     })
     it('Get release dates', async () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getReleaseDates('G6123VU')
+      const res = await offencesPageService.getReleaseDates('token', 'G6123VU')
       expect(res).toEqual(GetReleaseDates)
     })
 

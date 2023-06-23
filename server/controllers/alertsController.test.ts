@@ -4,6 +4,8 @@ import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
+import PrisonerSearchService from '../services/prisonerSearch'
+import AlertsPageService from '../services/alertsPageService'
 
 let req: any
 let res: any
@@ -30,7 +32,7 @@ describe('Alerts Controller', () => {
       },
       render: jest.fn(),
     }
-    controller = new AlertsController(res.locals.clientToken, true)
+    controller = new AlertsController(true, new PrisonerSearchService(null), new AlertsPageService(null))
   })
 
   it('should get active alerts', async () => {
@@ -44,8 +46,9 @@ describe('Alerts Controller', () => {
 
     await controller.displayAlerts(req, res)
 
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
+    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, req.params.prisonerNumber)
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       PrisonerMockDataA,
       {
         alertStatus: 'ACTIVE',
@@ -74,8 +77,9 @@ describe('Alerts Controller', () => {
 
     await controller.displayAlerts(req, res)
 
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(req.params.prisonerNumber)
+    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, req.params.prisonerNumber)
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       PrisonerMockDataA,
       {
         alertStatus: 'INACTIVE',
@@ -102,6 +106,7 @@ describe('Alerts Controller', () => {
     await controller.displayAlerts(req, res)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       PrisonerMockDataA,
       {
         alertStatus: 'ACTIVE',
@@ -129,6 +134,7 @@ describe('Alerts Controller', () => {
     await controller.displayAlerts(req, res)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       PrisonerMockDataA,
       {
         alertStatus: 'ACTIVE',
@@ -154,6 +160,7 @@ describe('Alerts Controller', () => {
     await controller.displayAlerts(req, res)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       { ...PrisonerMockDataA, prisonId: 'XYZ' },
       {
         alertStatus: 'ACTIVE',
@@ -180,6 +187,7 @@ describe('Alerts Controller', () => {
     await controller.displayAlerts(req, res)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       { ...PrisonerMockDataA, prisonId: 'OUT' },
       {
         alertStatus: 'ACTIVE',
@@ -206,6 +214,7 @@ describe('Alerts Controller', () => {
     await controller.displayAlerts(req, res)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
+      res.locals.clientToken,
       { ...PrisonerMockDataA, prisonId: 'TRN' },
       {
         alertStatus: 'ACTIVE',

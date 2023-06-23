@@ -3,14 +3,10 @@ import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
 import { PagedListQueryParams, PagedList } from '../interfaces/prisonApi/pagedList'
 import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
-import { CaseNoteReferenceCode } from '../interfaces/caseNotesApi/CaseNoteReferenceCode'
+import { CaseNoteType } from '../interfaces/caseNoteType'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
-  restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('Case Notes API', config.apis.caseNotesApi, token)
-  }
+  constructor(private readonly restClient: RestClient) {}
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {
@@ -32,7 +28,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<PagedList>({ path: `/case-notes/${offenderNumber}`, query: mapToQueryString(params) })
   }
 
-  async getCaseNoteTypes(): Promise<CaseNoteReferenceCode[]> {
-    return this.get<CaseNoteReferenceCode[]>({ path: `/case-notes/types` })
+  async getCaseNoteTypes(): Promise<CaseNoteType[]> {
+    return this.get<CaseNoteType[]>({ path: `/case-notes/types` })
   }
 }

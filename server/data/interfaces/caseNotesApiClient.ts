@@ -1,7 +1,7 @@
 import { PagedListQueryParams, PagedList } from '../../interfaces/prisonApi/pagedList'
-import { CaseNoteReferenceCode } from '../../interfaces/caseNotesApi/CaseNoteReferenceCode'
+import { CaseNoteType } from '../../interfaces/caseNoteType'
 
 export interface CaseNotesApiClient {
   getCaseNotes(offenderNumber: string, queryParams: PagedListQueryParams): Promise<PagedList>
-  getCaseNoteTypes(): Promise<CaseNoteReferenceCode[]>
+  getCaseNoteTypes(): Promise<CaseNoteType[]>
 }
