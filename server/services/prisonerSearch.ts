@@ -1,14 +1,11 @@
-import PrisonerSearchClient from '../data/prisonerSearchClient'
+import { RestClientBuilder } from '../data'
+import { PrisonerSearchClient } from '../data/interfaces/prisonerSearchClient'
 import { Prisoner } from '../interfaces/prisoner'
 
 export default class PrisonerSearchService {
-  private prisonerSearchClient: PrisonerSearchClient
+  constructor(private readonly prisonerSearchClientBuilder: RestClientBuilder<PrisonerSearchClient>) {}
 
-  constructor(clientToken: string) {
-    this.prisonerSearchClient = new PrisonerSearchClient(clientToken)
-  }
-
-  getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {
-    return this.prisonerSearchClient.getPrisonerDetails(prisonerNumber)
+  getPrisonerDetails(clientToken: string, prisonerNumber: string): Promise<Prisoner> {
+    return this.prisonerSearchClientBuilder(clientToken).getPrisonerDetails(prisonerNumber)
   }
 }

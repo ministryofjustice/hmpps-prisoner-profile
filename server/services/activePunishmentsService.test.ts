@@ -8,7 +8,7 @@ describe('ActivePunishmentsPageService', () => {
   let prisonApiClient: PrisonApiClient
 
   const activePunishmentsPageServiceConstruct = jest.fn(() => {
-    return new ActivePunishmentsService(prisonApiClient)
+    return new ActivePunishmentsService(() => prisonApiClient)
   })
 
   beforeEach(() => {
@@ -19,7 +19,10 @@ describe('ActivePunishmentsPageService', () => {
   describe('Active Punishments Page', () => {
     it('Get all data for the active punishments page', async () => {
       const activePunishmentsPageService = activePunishmentsPageServiceConstruct()
-      const res = await activePunishmentsPageService.get({ prisonerNumber: 'G6123VU', bookingId: 1102484 } as Prisoner)
+      const res = await activePunishmentsPageService.get('token', {
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+      } as Prisoner)
       expect(res).toEqual({ adjudications: adjudicationSummaryWithActiveMock, name: '' })
     })
   })

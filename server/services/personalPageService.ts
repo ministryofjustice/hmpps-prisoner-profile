@@ -30,15 +30,15 @@ import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import { GovSummaryItem } from '../interfaces/govSummaryItem'
 import { HealthDomainReferenceCode, PersonalCareNeed } from '../interfaces/personalCareNeeds'
 import { ReasonableAdjustment } from '../interfaces/prisonApi/reasonableAdjustment'
+import { RestClientBuilder } from '../data'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
 
-  constructor(prisonApiClient: PrisonApiClient) {
-    this.prisonApiClient = prisonApiClient
-  }
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  public async get(prisonerData: Prisoner): Promise<PersonalPage> {
+  public async get(token: string, prisonerData: Prisoner): Promise<PersonalPage> {
+    this.prisonApiClient = this.prisonApiClientBuilder(token)
     const { bookingId, prisonerNumber } = prisonerData
     const [
       inmateDetail,

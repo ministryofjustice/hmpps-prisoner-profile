@@ -43,7 +43,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCurrentUser(services))
   app.use(populateClientToken())
 
-  app.use(routes())
+  app.use(routes(services))
 
   app.use(setUpPageNotFound)
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

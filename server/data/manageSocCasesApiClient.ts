@@ -1,14 +1,9 @@
-import config from '../config'
 import RestClient from './restClient'
 import { Nominal } from '../interfaces/pathfinderApi/nominal'
 import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApiClient'
 
 export default class ManageSocCasesApiRestClient implements ManageSocCasesApiClient {
-  restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('Manage SOC Cases API', config.apis.manageSocCasesApi, token)
-  }
+  constructor(private readonly restClient: RestClient) {}
 
   async getNominal(offenderNumber: string): Promise<Nominal> {
     try {

@@ -31,6 +31,7 @@ import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
 import { mockStaffRoles } from './localMockData/staffRoles'
+import restClientBuilder from '.'
 
 jest.mock('./tokenStore')
 
@@ -42,7 +43,7 @@ describe('prisonApiClient', () => {
 
   beforeEach(() => {
     fakePrisonApi = nock(config.apis.prisonApi.url)
-    prisonApiClient = new PrisonApiClient(token.access_token)
+    prisonApiClient = restClientBuilder('Prison API', config.apis.prisonApi, PrisonApiClient)(token.access_token)
   })
 
   afterEach(() => {

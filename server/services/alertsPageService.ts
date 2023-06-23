@@ -8,16 +8,12 @@ import { SortOption } from '../interfaces/sortSelector'
 import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import PrisonApiRestClient from '../data/prisonApiClient'
 import { Alert } from '../interfaces/prisonApi/alert'
 import config from '../config'
+import { RestClientBuilder } from '../data'
 
 export default class AlertsPageService {
-  private prisonApiClient: PrisonApiClient
-
-  constructor(clientToken: string) {
-    this.prisonApiClient = new PrisonApiRestClient(clientToken)
-  }
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   /**
    * Validate alert filters and return errors if appropriate
@@ -70,13 +66,14 @@ export default class AlertsPageService {
    * @param canUpdateAlert
    */
   public async get(
+    clientToken: string,
     prisonerData: Prisoner,
     queryParams: PagedListQueryParams,
     canUpdateAlert: boolean,
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
-
-    const { activeAlertCount, inactiveAlertCount, alerts } = await this.prisonApiClient.getInmateDetail(
+    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(
       prisonerData.bookingId,
     )
 
@@ -117,7 +114,7 @@ export default class AlertsPageService {
 
     if (!errors.length) {
       if ((activeAlertCount && isActiveAlertsQuery) || (inactiveAlertCount && !isActiveAlertsQuery)) {
-        pagedAlerts = await this.prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
+        pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
         pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
           ...alert,
           updateLinkUrl:

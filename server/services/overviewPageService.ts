@@ -44,6 +44,7 @@ import { Role } from '../data/enums/role'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
+import { RestClientBuilder } from '../data'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -55,18 +56,15 @@ export default class OverviewPageService {
   private incentivesApiClient: IncentivesApiClient
 
   constructor(
-    prisonApiClient: PrisonApiClient,
-    allocationManagerClient: AllocationManagerClient,
-    keyWorkerClient: KeyWorkerClient,
-    incentivesApiClient: IncentivesApiClient,
-  ) {
-    this.prisonApiClient = prisonApiClient
-    this.allocationManagerClient = allocationManagerClient
-    this.keyWorkerClient = keyWorkerClient
-    this.incentivesApiClient = incentivesApiClient
-  }
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
+    private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
+    private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
+    private readonly offencesPageService: OffencesPageService,
+  ) {}
 
   public async get(
+    clientToken: string,
     prisonerData: Prisoner,
     staffId: number,
     userCaseLoads: CaseLoad[] = [],
@@ -74,6 +72,11 @@ export default class OverviewPageService {
   ): Promise<OverviewPage> {
     const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
       prisonerData
+
+    this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    this.allocationManagerClient = this.allocationManagerApiClientBuilder(clientToken)
+    this.keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
+    this.incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
 
     const [
       nonAssociations,
@@ -150,13 +153,12 @@ export default class OverviewPageService {
   }
 
   async getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {
-    const offencesPageService = new OffencesPageService(this.prisonApiClient)
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     let nextCourtAppearance: CourtHearing = {} as CourtHearing
     if (Array.isArray(courtCaseData)) {
       await Promise.all(
         courtCaseData.map(async (courtCase: CourtCase) => {
-          const courtAppearance = await offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
+          const courtAppearance = this.offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
 
           if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
             nextCourtAppearance = courtAppearance
@@ -390,35 +392,32 @@ export default class OverviewPageService {
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
 
-    const [assessments, incentiveReviews] = await Promise.all([
-      this.prisonApiClient.getAssessments(bookingId),
-      this.incentivesApiClient.getReviews(bookingId),
+    const incentiveReviews = await this.incentivesApiClient.getReviews(bookingId)
+
+    const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
+      this.prisonApiClient.getCaseNoteCount(
+        bookingId,
+        CaseNoteType.PositiveBehaviour,
+        CaseNoteSubType.IncentiveEncouragement,
+        incentiveReviews.iepDate,
+        formatDateISO(new Date()),
+      ),
+      this.prisonApiClient.getCaseNoteCount(
+        bookingId,
+        CaseNoteType.NegativeBehaviour,
+        CaseNoteSubType.IncentiveWarning,
+        incentiveReviews.iepDate,
+        formatDateISO(new Date()),
+      ),
     ])
 
-    const positiveBehaviourCount = await this.prisonApiClient.getCaseNoteCount(
-      bookingId,
-      CaseNoteType.PositiveBehaviour,
-      CaseNoteSubType.IncentiveEncouragement,
-      incentiveReviews.iepDate,
-      formatDateISO(new Date()),
-    )
-    const negativeBehaviourCount = await this.prisonApiClient.getCaseNoteCount(
-      bookingId,
-      CaseNoteType.NegativeBehaviour,
-      CaseNoteSubType.IncentiveWarning,
-      incentiveReviews.iepDate,
-      formatDateISO(new Date()),
-    )
-
-    if (!Array.isArray(assessments)) {
-      // TODO handle api call returning error???
-      return null
-    }
-
     const category: Assessment =
-      assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category) || null
+      prisonerData.assessments?.find(
+        (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category,
+      ) || null
     const csra: Assessment =
-      assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) || null
+      prisonerData.assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) ||
+      null
 
     const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
 

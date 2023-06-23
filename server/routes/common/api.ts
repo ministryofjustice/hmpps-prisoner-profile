@@ -6,16 +6,17 @@ const placeHolderImage = path.join(process.cwd(), '/assets/images/prisoner-profi
 const categoryAImage = path.join(process.cwd(), '/assets/images/category-a-prisoner-image.png')
 
 export default class CommonApiRoutes {
+  public constructor(private readonly offenderService: OffenderService) {}
+
   public prisonerImage: RequestHandler = (req: Request, res: Response) => {
     const { prisonerNumber } = req.params
-    const offenderService = new OffenderService()
 
     if (prisonerNumber === 'placeholder') {
       res.sendFile(placeHolderImage)
     } else if (prisonerNumber === 'photoWithheld') {
       res.sendFile(categoryAImage)
     } else {
-      offenderService
+      this.offenderService
         .getPrisonerImage(res.locals.user.token, prisonerNumber)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')
@@ -31,12 +32,11 @@ export default class CommonApiRoutes {
 
   public image: RequestHandler = (req: Request, res: Response) => {
     const { imageId } = req.params
-    const offenderService = new OffenderService()
 
     if (imageId === 'placeholder') {
       res.sendFile(placeHolderImage)
     } else {
-      offenderService
+      this.offenderService
         .getImage(res.locals.user.token, imageId)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')

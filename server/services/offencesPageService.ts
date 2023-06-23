@@ -18,19 +18,19 @@ import {
   SentenceSummaryCourtSentence,
   SentenceSummaryTermDetail,
 } from '../interfaces/prisonApi/sentenceSummary'
+import { RestClientBuilder } from '../data'
 
 export default class OffencesPageService {
   private prisonApiClient: PrisonApiClient
 
-  constructor(prisonApiClient: PrisonApiClient) {
-    this.prisonApiClient = prisonApiClient
-  }
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  public async get(prisonerData: Prisoner) {
+  public async get(token: string, prisonerData: Prisoner) {
+    this.prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, bookingId } = prisonerData
     const [courtCaseData, releaseDates] = await Promise.all([
-      this.getCourtCasesData(bookingId, prisonerNumber),
-      this.getReleaseDates(prisonerNumber),
+      this.getCourtCasesData(token, bookingId, prisonerNumber),
+      this.getReleaseDates(token, prisonerNumber),
     ])
 
     if (courtCaseData && releaseDates) {
@@ -117,7 +117,8 @@ export default class OffencesPageService {
       .map(offence => offence.caseId)
   }
 
-  async getCourtCasesData(bookingId: number, prisonerNumber: string) {
+  async getCourtCasesData(token: string, bookingId: number, prisonerNumber: string) {
+    this.prisonApiClient = this.prisonApiClient ? this.prisonApiClient : this.prisonApiClientBuilder(token)
     const [courtCaseData, offenceHistory, sentenceTermsData, courtDateResults, sentenceSummary] = await Promise.all([
       this.prisonApiClient.getCourtCases(bookingId),
       this.prisonApiClient.getOffenceHistory(prisonerNumber),
@@ -402,7 +403,8 @@ export default class OffencesPageService {
     })
   }
 
-  async getReleaseDates(prisonerNumber: string) {
+  async getReleaseDates(token: string, prisonerNumber: string) {
+    this.prisonApiClient = this.prisonApiClient ? this.prisonApiClient : this.prisonApiClientBuilder(token)
     const releaseDates: PrisonerSentenceDetails = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
 
     if (releaseDates.sentenceDetail) {
@@ -432,7 +434,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Conditional release',
+                    text: 'Conditional release date (CRD)',
                   },
                   value: {
                     text: formatDate(conditionalRelease, 'long'),
@@ -504,7 +506,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Parole eligibility',
+                    text: 'Parole eligibility date (PED)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.paroleEligibilityDate, 'long'),
@@ -516,7 +518,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Home detention curfew',
+                    text: 'Home detention curfew eligibility date (HDCED)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.homeDetentionCurfewEligibilityDate, 'long'),
