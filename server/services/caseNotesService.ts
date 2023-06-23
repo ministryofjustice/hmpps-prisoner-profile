@@ -5,19 +5,15 @@ import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedLi
 import { SortOption } from '../interfaces/sortSelector'
 import { formatDateTimeISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import CaseNotesApiRestClient from '../data/caseNotesApiClient'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
 import { CaseNote, CaseNoteAmendment } from '../interfaces/caseNotesApi/caseNote'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
+import { RestClientBuilder } from '../data'
 
 export default class CaseNotesService {
-  private caseNotesApiClient: CaseNotesApiClient
-
-  constructor(clientToken: string) {
-    this.caseNotesApiClient = new CaseNotesApiRestClient(clientToken)
-  }
+  constructor(private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>) {}
 
   /**
    * Validate filters and return errors if appropriate
@@ -73,6 +69,7 @@ export default class CaseNotesService {
    * @param canDeleteSensitiveCaseNotes
    */
   public async get(
+    token: string,
     prisonerData: Prisoner,
     queryParams: PagedListQueryParams,
     canDeleteSensitiveCaseNotes: boolean,
@@ -84,6 +81,7 @@ export default class CaseNotesService {
       { value: 'occurrenceDateTime,ASC', description: 'Happened (oldest)' },
     ]
 
+    const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const errors: HmppsError[] = this.validateFilters(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList
@@ -92,7 +90,7 @@ export default class CaseNotesService {
     const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = {}
 
     if (!errors.length) {
-      const caseNoteTypes = await this.caseNotesApiClient.getCaseNoteTypes()
+      const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
       types = caseNoteTypes?.map(type => ({ value: type.code, text: type.description }))
       caseNoteTypes.forEach(type => {
         typeSubTypeMap[type.code] = type.subCodes?.map(s => ({ value: s.code, text: s.description }))
@@ -107,7 +105,7 @@ export default class CaseNotesService {
         }
       }
 
-      pagedCaseNotes = await this.caseNotesApiClient.getCaseNotes(
+      pagedCaseNotes = await caseNotesApiClient.getCaseNotes(
         prisonerData.prisonerNumber,
         this.mapToApiParams(queryParams),
       )

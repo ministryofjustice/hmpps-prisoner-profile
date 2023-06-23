@@ -3,11 +3,12 @@ import request from 'supertest'
 import config from '../config'
 
 import { appWithAllRoutes } from './testutils/appSetup'
+import { services } from '../services'
 
 let app: Express
 
 beforeEach(() => {
-  app = appWithAllRoutes({})
+  app = appWithAllRoutes({ services: services() })
 })
 
 afterEach(() => {

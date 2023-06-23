@@ -3,18 +3,19 @@ import AlertsPageService from './alertsPageService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 
 jest.mock('../data/prisonApiClient')
 
 describe('Alerts Page', () => {
-  let getInmateDetailsSpy: jest.SpyInstance
-  let getAlertsSpy: jest.SpyInstance
+  let prisonApiClientSpy: PrisonApiClient
   let prisonerData: Prisoner
   let alertsPageService: AlertsPageService
 
   beforeEach(() => {
     prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
-    alertsPageService = new AlertsPageService(null)
+    prisonApiClientSpy = prisonApiClientMock()
   })
 
   afterEach(() => {
@@ -24,21 +25,18 @@ describe('Alerts Page', () => {
   describe('Get Alerts', () => {
     it('should call Prison API tp get active alerts when queryParams includes ACTIVE', async () => {
       const queryParams: PagedListQueryParams = { alertStatus: 'ACTIVE' }
-      getInmateDetailsSpy = jest
-        .spyOn<any, string>(alertsPageService['prisonApiClient'], 'getInmateDetail')
-        .mockResolvedValue({
-          ...inmateDetailMock,
-          activeAlertCount: pagedActiveAlertsMock.totalElements,
-          inactiveAlertCount: 0,
-        })
-      getAlertsSpy = jest
-        .spyOn<any, string>(alertsPageService['prisonApiClient'], 'getAlerts')
-        .mockResolvedValue(pagedActiveAlertsMock)
+      prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
+        ...inmateDetailMock,
+        activeAlertCount: pagedActiveAlertsMock.totalElements,
+        inactiveAlertCount: 0,
+      }))
+      prisonApiClientSpy.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
 
-      const alertsPageData = await alertsPageService.get(prisonerData, queryParams, true)
+      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
+      const alertsPageData = await alertsPageService.get('', prisonerData, queryParams, true)
 
-      expect(getInmateDetailsSpy).toHaveBeenCalledWith(prisonerData.bookingId)
-      expect(getAlertsSpy).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'ACTIVE' })
+      expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
+      expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'ACTIVE' })
 
       expect(alertsPageData.pagedAlerts).toEqual(pagedActiveAlertsMock)
       expect(alertsPageData.activeAlertCount).toEqual(80)
@@ -48,21 +46,18 @@ describe('Alerts Page', () => {
 
     it('should call Prison API to get inactive alerts when queryParams includes INACTIVE', async () => {
       const queryParams: PagedListQueryParams = { alertStatus: 'INACTIVE' }
-      getInmateDetailsSpy = jest
-        .spyOn<any, string>(alertsPageService['prisonApiClient'], 'getInmateDetail')
-        .mockResolvedValue({
-          ...inmateDetailMock,
-          activeAlertCount: 0,
-          inactiveAlertCount: pagedActiveAlertsMock.totalElements,
-        })
-      getAlertsSpy = jest
-        .spyOn<any, string>(alertsPageService['prisonApiClient'], 'getAlerts')
-        .mockResolvedValue(pagedInactiveAlertsMock)
+      prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
+        ...inmateDetailMock,
+        activeAlertCount: 0,
+        inactiveAlertCount: pagedActiveAlertsMock.totalElements,
+      }))
+      prisonApiClientSpy.getAlerts = jest.fn(async () => pagedInactiveAlertsMock)
 
-      const alertsPageData = await alertsPageService.get(prisonerData, queryParams, true)
+      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
+      const alertsPageData = await alertsPageService.get('', prisonerData, queryParams, true)
 
-      expect(getInmateDetailsSpy).toHaveBeenCalledWith(prisonerData.bookingId)
-      expect(getAlertsSpy).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'INACTIVE' })
+      expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
+      expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'INACTIVE' })
 
       expect(alertsPageData.pagedAlerts).toEqual(pagedInactiveAlertsMock)
       expect(alertsPageData.activeAlertCount).toEqual(0)

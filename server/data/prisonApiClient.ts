@@ -43,11 +43,7 @@ import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
-  restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('Prison API', config.apis.prisonApi, token)
-  }
+  constructor(private restClient: RestClient) {}
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {
