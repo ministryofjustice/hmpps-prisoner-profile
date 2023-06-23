@@ -1,13 +1,9 @@
 import RestClient from './restClient'
 import { Prisoner } from '../interfaces/prisoner'
-import config from '../config'
+import { PrisonerSearchClient } from './interfaces/prisonerSearchClient'
 
-export default class PrisonerSearchClient {
-  restClient: RestClient
-
-  constructor(token: string) {
-    this.restClient = new RestClient('Prison Offender Search API', config.apis.prisonerSearchApi, token)
-  }
+export default class PrisonerSearchRestClient implements PrisonerSearchClient {
+  constructor(private readonly restClient: RestClient) {}
 
   getPrisonerDetails(prisonerNumber: string): Promise<Prisoner> {
     return this.restClient.get({ path: `/prisoner/${prisonerNumber}` }).catch(err => {

@@ -1,15 +1,8 @@
 import { Request, type RequestHandler, Response, Router } from 'express'
 import config from '../config'
-import PrisonApiRestClient from '../data/prisonApiClient'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { Prisoner } from '../interfaces/prisoner'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
-
 import { mapHeaderData } from '../mappers/headerMappers'
-import CuriousApiClient from '../data/curiousApiClient'
-import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
-import PersonalPageService from '../services/personalPageService'
-import OffencesPageService from '../services/offencesPageService'
 import AlertsController from '../controllers/alertsController'
 import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
@@ -21,10 +14,10 @@ import {
   userHasRoles,
 } from '../utils/utils'
 import { Role } from '../data/enums/role'
-import ActivePunishmentsService from '../services/activePunishmentsService'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { dataAccess } from '../data'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 
@@ -32,9 +25,9 @@ export default function routes(services: Services): Router {
   const router = Router()
 
   async function checkPrisonerInCaseLoad(req: Request, res: Response, func: (prisonerData: Prisoner) => Promise<void>) {
-    const prisonerSearchClient = new PrisonerSearchClient(res.locals.clientToken)
+    const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+    const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
     const assessments = await prisonApiClient.getAssessments(prisonerData.bookingId)
     if (assessments && Array.isArray(assessments)) {
       prisonerData.assessments = assessments
@@ -83,7 +76,12 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const overviewController = new OverviewController(res.locals.clientToken)
+      const overviewController = new OverviewController(
+        services.prisonerSearchService,
+        services.overviewPageService,
+        services.dataAccess.pathfinderApiClientBuilder,
+        services.dataAccess.manageSocCasesApiClientBuilder,
+      )
       return overviewController.displayOverview(req, res, prisonerData)
     })
   })
@@ -99,10 +97,8 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
     await checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
-      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-
-      const personalPageService = new PersonalPageService(prisonApiClient)
-      const personalPageData = await personalPageService.get(prisonerData)
+      const { personalPageService } = services
+      const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
@@ -114,11 +110,8 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const curiousApiClient = new CuriousApiClient(res.locals.clientToken)
-      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-
-      const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClient, prisonApiClient)
-      const workAndSkillsPageData = await workAndSkillsPageService.get(prisonerData)
+      const { workAndSkillsPageService } = services
+      const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
 
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
@@ -141,23 +134,22 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const alertsController = new AlertsController(res.locals.clientToken, true)
+      const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
       return alertsController.displayAlerts(req, res, prisonerData)
     })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const alertsController = new AlertsController(res.locals.clientToken, false)
+      const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
       return alertsController.displayAlerts(req, res, prisonerData)
     })
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-      const offencesPageService = new OffencesPageService(prisonApiClient)
-      const offencesPageData = await offencesPageService.get(prisonerData)
+      const { offencesPageService } = services
+      const offencesPageData = await offencesPageService.get(res.locals.clientToken, prisonerData)
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
@@ -169,15 +161,18 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
-    const caseNotesController = new CaseNotesController(res.locals.clientToken, res.locals.user.token)
+    const caseNotesController = new CaseNotesController(
+      dataAccess.prisonApiClientBuilder,
+      services.prisonerSearchService,
+      services.caseNotesService,
+    )
     return caseNotesController.displayCaseNotes(req, res)
   })
 
   get('/prisoner/:prisonerNumber/active-punishments', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
-      const activePunishmentsService = new ActivePunishmentsService(prisonApiClient)
-      const activePunishmentsPageData = await activePunishmentsService.get(prisonerData)
+      const { activePunishmentsPageService } = services
+      const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
 
       res.render('pages/activePunishments', {
         pageTitle: 'Active punishments',
@@ -196,7 +191,7 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/x-ray-body-scans', async (req, res, next) => {
     checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const prisonApiClient = new PrisonApiRestClient(res.locals.clientToken)
+      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
       const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 
       res.render('pages/xrayBodyScans', {

@@ -12,20 +12,19 @@ import { Prisoner } from '../interfaces/prisoner'
  * Parse request for alerts page and orchestrate response
  */
 export default class AlertsController {
-  private prisonerSearchService: PrisonerSearchService
-
-  private alertsPageService: AlertsPageService
-
   private isActive: boolean
 
-  constructor(clientToken: string, isActive: boolean) {
-    this.prisonerSearchService = new PrisonerSearchService(clientToken)
-    this.alertsPageService = new AlertsPageService(clientToken)
+  constructor(
+    isActive: boolean,
+    private readonly prisonerSearchService: PrisonerSearchService,
+    private readonly alertsPageService: AlertsPageService,
+  ) {
     this.isActive = isActive
   }
 
   public async displayAlerts(req: Request, res: Response, prisonerData: Prisoner) {
     // Parse query params for paging, sorting and filtering data
+    const { clientToken } = res.locals
     const queryParams: PagedListQueryParams = {}
     if (req.query.page) queryParams.page = +req.query.page
     if (req.query.sort) queryParams.sort = req.query.sort as string
@@ -46,7 +45,7 @@ export default class AlertsController {
     }
 
     // Get alerts based on given query params
-    const alertsPageData = await this.alertsPageService.get(prisonerData, queryParams, canUpdateAlert)
+    const alertsPageData = await this.alertsPageService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
     const showingAll = queryParams.showAll
 
     // Render page

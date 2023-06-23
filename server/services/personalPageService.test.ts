@@ -49,22 +49,24 @@ describe('PersonalPageService', () => {
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
   }
 
+  const constructService = () => new PersonalPageService(() => prisonApiClient)
+
   describe('Getting information from the Prison API', () => {
     it('Gets inmate details from the api', async () => {
-      const service = new PersonalPageService(prisonApiClient)
-      await service.get(PrisonerMockDataA)
+      const service = constructService()
+      await service.get('token', PrisonerMockDataA)
       expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(PrisonerMockDataA.bookingId)
     })
 
     it('Gets secondary languages from the api', async () => {
-      const service = new PersonalPageService(prisonApiClient)
-      await service.get(PrisonerMockDataA)
+      const service = constructService()
+      await service.get('token', PrisonerMockDataA)
       expect(prisonApiClient.getSecondaryLanguages).toHaveBeenCalledWith(PrisonerMockDataA.bookingId)
     })
 
     it('Gets prisoner detail from the api', async () => {
-      const service = new PersonalPageService(prisonApiClient)
-      await service.get(PrisonerMockDataA)
+      const service = constructService()
+      await service.get('token', PrisonerMockDataA)
       expect(prisonApiClient.getPrisoner).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
     })
   })
@@ -72,8 +74,8 @@ describe('PersonalPageService', () => {
   describe('Personal details', () => {
     describe('Age', () => {
       it('Uses the age from the inmate detail when provided', async () => {
-        const service = new PersonalPageService(prisonApiClient)
-        const response = await service.get(PrisonerMockDataA)
+        const service = constructService()
+        const response = await service.get('token', PrisonerMockDataA)
         expect(response.personalDetails.age).toEqual(inmateDetailMock.age.toString())
       })
 
@@ -81,8 +83,8 @@ describe('PersonalPageService', () => {
         const inmateDetail = { ...inmateDetailMock }
         inmateDetail.age = undefined
         const expectedAge = yearsBetweenDateStrings(PrisonerMockDataA.dateOfBirth, new Date().toISOString()).toString()
-        const service = new PersonalPageService(prisonApiClient)
-        const response = await service.get(PrisonerMockDataA)
+        const service = constructService()
+        const response = await service.get('token', PrisonerMockDataA)
         expect(response.personalDetails.age).toEqual(expectedAge)
       })
     })
@@ -91,8 +93,8 @@ describe('PersonalPageService', () => {
       const getResponseWithAliases = async (aliases: Alias[]) => {
         const prisonerData = { ...PrisonerMockDataA }
         prisonerData.aliases = aliases
-        const service = new PersonalPageService(prisonApiClient)
-        return service.get(prisonerData)
+        const service = constructService()
+        return service.get('token', prisonerData)
       }
 
       it('Handles no aliases', async () => {
@@ -118,49 +120,49 @@ describe('PersonalPageService', () => {
 
     describe('Data from profile information', () => {
       it('Maps the domestic abuse perpetrator field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.domesticAbusePerpetrator).toEqual('Not stated')
       })
 
       it('Maps the domestic abuse victim field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.domesticAbuseVictim).toEqual('Not stated')
       })
 
       it('Maps the number of children field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.numberOfChildren).toEqual('2')
       })
 
       it('Maps the other nationalities field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.otherNationalities).toEqual('multiple nationalities field')
       })
 
       it('Maps the sexual orientation field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.sexualOrientation).toEqual('Heterosexual / Straight')
       })
 
       it('Maps the smoker or vaper field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.smokerOrVaper).toEqual('No')
       })
 
       it('Maps the social care needed field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.socialCareNeeded).toEqual('No')
       })
 
       it('Maps the type of diet field', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         expect(response.personalDetails.typeOfDiet).toEqual('Voluntary - Pork Free/Fish Free')
       })
     })
 
     describe('Languages', () => {
       it('Maps the primary language and interpreter requirement', async () => {
-        const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const response = await constructService().get('token', PrisonerMockDataA)
         const { languages } = response.personalDetails
         expect(languages.written).toEqual(inmateDetailMock.writtenLanguage)
         expect(languages.spoken).toEqual(inmateDetailMock.language)
@@ -170,12 +172,12 @@ describe('PersonalPageService', () => {
       describe('Other languages', () => {
         it('Correctly handles no secondary languages', async () => {
           prisonApiClient.getSecondaryLanguages = jest.fn(async () => [])
-          const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          const response = await constructService().get('token', PrisonerMockDataA)
           expect(response.personalDetails.otherLanguages).toEqual([])
         })
 
         it('Maps the other languages from the secondary languages provided', async () => {
-          const response = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          const response = await constructService().get('token', PrisonerMockDataA)
           expect(response.personalDetails.otherLanguages.length).toEqual(5)
           const [first, second] = response.personalDetails.otherLanguages
           expect(first).toEqual({
@@ -198,7 +200,7 @@ describe('PersonalPageService', () => {
 
     describe('One-to-one mapped data', () => {
       it('Maps the data from the API', async () => {
-        const { personalDetails } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+        const { personalDetails } = await constructService().get('token', PrisonerMockDataA)
         expect(personalDetails.dateOfBirth).toEqual(formatDate(PrisonerMockDataA.dateOfBirth, 'short'))
         expect(personalDetails.ethnicGroup).toEqual(
           `${PrisonerMockDataA.ethnicity} (${prisonerDetailMock.ethnicityCode})`,
@@ -220,7 +222,7 @@ describe('PersonalPageService', () => {
 
   describe('Identity numbers', () => {
     it('Maps the data from the API', async () => {
-      const { identityNumbers } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { identityNumbers } = await constructService().get('token', PrisonerMockDataA)
       expect(identityNumbers.croNumber).toEqual(PrisonerMockDataA.croNumber)
       expect(identityNumbers.drivingLicenceNumber).toEqual('ABCD/123456/AB9DE')
       expect(identityNumbers.homeOfficeReferenceNumber).toEqual('A1234567')
@@ -232,7 +234,7 @@ describe('PersonalPageService', () => {
 
   describe('Property', () => {
     it('Maps the data from the API', async () => {
-      const { property } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { property } = await constructService().get('token', PrisonerMockDataA)
       expect(property[0].containerType).toEqual('Valuables')
       expect(property[0].sealMark).toEqual('MDA646165646')
       expect(property[0].location).toEqual('Property Box 14')
@@ -244,7 +246,7 @@ describe('PersonalPageService', () => {
 
   describe('Addresses', () => {
     it('Maps the data from the API for the primary address', async () => {
-      const { addresses, addressSummary } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
       const expectedAddress = mockAddresses[0]
       const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
       const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
@@ -271,12 +273,12 @@ describe('PersonalPageService', () => {
 
   describe('Next of kin', () => {
     it('Only maps the active next of kin', async () => {
-      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
       expect(nextOfKin.length).toEqual(3)
     })
 
     it('Gets the addresses for each active next of kin', async () => {
-      await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      await constructService().get('token', PrisonerMockDataA)
       expect(prisonApiClient.getAddressesForPerson).toHaveBeenCalledTimes(3)
 
       const expectedPersonIds = mockOffenderContacts.offenderContacts
@@ -289,7 +291,7 @@ describe('PersonalPageService', () => {
     })
 
     it('Maps the primary address for the contact', async () => {
-      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
       const expectedAddress = mockAddresses[0]
       const expectedPhones = ['4444555566', '0113444444', '0113 333444', '0800 222333']
       const expectedTypes = ['Discharge - Permanent Housing', 'HDC Address', 'Other']
@@ -342,7 +344,7 @@ describe('PersonalPageService', () => {
         ],
       }
       prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
-      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
       const contact = nextOfKin[0]
 
       expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
@@ -385,7 +387,7 @@ describe('PersonalPageService', () => {
       }
       prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
       prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
-      const { nextOfKin } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
       const contact = nextOfKin[0]
 
       expect(contact.emails).toEqual(['example@one.com', 'example@two.com'])
@@ -400,7 +402,7 @@ describe('PersonalPageService', () => {
 
   describe('Appearance', () => {
     it('Maps the data from the API', async () => {
-      const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
       expect(physicalCharacteristics.height).toEqual('1.88m')
       expect(physicalCharacteristics.weight).toEqual('86kg')
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
@@ -436,14 +438,14 @@ describe('PersonalPageService', () => {
       const inmateDetail = { ...inmateDetailMock }
       inmateDetail.physicalMarks = []
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetail)
-      const { physicalCharacteristics } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
       expect(physicalCharacteristics.distinguishingMarks.length).toEqual(0)
     })
   })
 
   describe('Security', () => {
     it('Maps the data from the API', async () => {
-      const { security } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { security } = await constructService().get('token', PrisonerMockDataA)
       expect(security.interestToImmigration).toEqual('Yes')
       expect(security.travelRestrictions).toEqual('some travel restrictions')
     })
@@ -474,7 +476,7 @@ describe('PersonalPageService', () => {
           setPersonalCareNeeds([])
           const {
             security: { xrays },
-          } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          } = await constructService().get('token', PrisonerMockDataA)
           expect(xrays.total).toEqual(0)
           expect(xrays.since).toBeUndefined()
         })
@@ -485,7 +487,7 @@ describe('PersonalPageService', () => {
           setPersonalCareNeeds([xrayNeed(0), xrayNeed(10), xrayNeed(20), xrayNeed(40)])
           const {
             security: { xrays },
-          } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          } = await constructService().get('token', PrisonerMockDataA)
           expect(xrays.total).toEqual(4)
           expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
         })
@@ -504,7 +506,7 @@ describe('PersonalPageService', () => {
           ])
           const {
             security: { xrays },
-          } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+          } = await constructService().get('token', PrisonerMockDataA)
           expect(xrays.total).toEqual(4)
           expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
         })
@@ -516,7 +518,7 @@ describe('PersonalPageService', () => {
     it('Handles empty personal care needs', async () => {
       setPersonalCareNeeds([])
 
-      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
       expect(careNeeds.personalCareNeeds.length).toEqual(0)
     })
 
@@ -549,7 +551,7 @@ describe('PersonalPageService', () => {
         },
       ])
 
-      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
       expect(careNeeds.personalCareNeeds.length).toEqual(1)
     })
 
@@ -574,7 +576,7 @@ describe('PersonalPageService', () => {
         },
       ])
 
-      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
       expect(careNeeds.personalCareNeeds.length).toEqual(0)
     })
 
@@ -599,7 +601,7 @@ describe('PersonalPageService', () => {
         },
       ])
 
-      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
       expect(careNeeds.personalCareNeeds.length).toEqual(0)
     })
 
@@ -624,7 +626,7 @@ describe('PersonalPageService', () => {
         },
       ])
 
-      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
       expect(careNeeds.personalCareNeeds.length).toEqual(0)
     })
 
@@ -649,7 +651,7 @@ describe('PersonalPageService', () => {
         },
       ])
 
-      const { careNeeds } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
       expect(careNeeds.personalCareNeeds.length).toEqual(1)
       expect(careNeeds.personalCareNeeds[0].description).toEqual('problem description')
       expect(careNeeds.personalCareNeeds[0].startDate).toEqual('start date')
@@ -681,7 +683,7 @@ describe('PersonalPageService', () => {
             },
           ] as ReferenceCode[],
       )
-      await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      await constructService().get('token', PrisonerMockDataA)
       expect(prisonApiClient.getReasonableAdjustments).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, [
         'AC',
         'AMP TEL',
@@ -704,7 +706,7 @@ describe('PersonalPageService', () => {
 
       const {
         careNeeds: { reasonableAdjustments },
-      } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      } = await constructService().get('token', PrisonerMockDataA)
 
       expect(reasonableAdjustments.length).toEqual(1)
       expect(reasonableAdjustments[0].description).toEqual('Behavioural responses/Body language')
@@ -717,7 +719,7 @@ describe('PersonalPageService', () => {
   describe('Addresses returns undefined', () => {
     it('Sets the address to empty', async () => {
       prisonApiClient.getAddresses = jest.fn(async () => undefined)
-      const { addresses } = await new PersonalPageService(prisonApiClient).get(PrisonerMockDataA)
+      const { addresses } = await constructService().get('token', PrisonerMockDataA)
       expect(addresses).toBeUndefined()
     })
   })

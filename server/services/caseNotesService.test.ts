@@ -2,18 +2,22 @@ import { Prisoner } from '../interfaces/prisoner'
 import CaseNotesService from './caseNotesService'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
+import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 
 jest.mock('../data/caseNotesApiClient')
 
 describe('Case Notes Page', () => {
-  let getCaseNoteTypesSpy: jest.SpyInstance
-  let getCaseNotesSpy: jest.SpyInstance
   let prisonerData: Prisoner
   let caseNotesService: CaseNotesService
+  let caseNotesApiClientSpy: CaseNotesApiClient
 
   beforeEach(() => {
     prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
-    caseNotesService = new CaseNotesService(null)
+    caseNotesApiClientSpy = {
+      getCaseNoteTypes: jest.fn(async () => caseNoteTypesMock),
+      getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
+    }
+    caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
   })
 
   afterEach(() => {
@@ -22,17 +26,10 @@ describe('Case Notes Page', () => {
 
   describe('Get Case Notes', () => {
     it('should call Case Notes API tp get case notes', async () => {
-      getCaseNoteTypesSpy = jest
-        .spyOn<any, string>(caseNotesService['caseNotesApiClient'], 'getCaseNoteTypes')
-        .mockResolvedValue(caseNoteTypesMock)
-      getCaseNotesSpy = jest
-        .spyOn<any, string>(caseNotesService['caseNotesApiClient'], 'getCaseNotes')
-        .mockResolvedValue(pagedCaseNotesMock)
+      const caseNotesPageData = await caseNotesService.get('', prisonerData, {}, true)
 
-      const caseNotesPageData = await caseNotesService.get(prisonerData, {}, true)
-
-      expect(getCaseNoteTypesSpy).toHaveBeenCalled()
-      expect(getCaseNotesSpy).toHaveBeenCalledWith(prisonerData.prisonerNumber, {})
+      expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {})
 
       expect(caseNotesPageData.pagedCaseNotes).toEqual(pagedCaseNotesMock)
       expect(caseNotesPageData.fullName).toEqual('John Smith')

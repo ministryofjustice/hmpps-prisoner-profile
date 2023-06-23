@@ -14,18 +14,21 @@ import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHisto
 import { Prisoner } from '../interfaces/prisoner'
 import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
+import { RestClientBuilder } from '../data'
 
 export default class WorkAndSkillsPageService {
   private curiousApiClient: CuriousApiClient
 
   private prisonApiClient: PrisonApiClient
 
-  constructor(curiousApiClient: CuriousApiClient, prisonApiClient: PrisonApiClient) {
-    this.curiousApiClient = curiousApiClient
-    this.prisonApiClient = prisonApiClient
-  }
+  constructor(
+    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+  ) {}
 
-  public async get(prisonerData: Prisoner) {
+  public async get(token: string, prisonerData: Prisoner) {
+    this.curiousApiClient = this.curiousApiClientBuilder(token)
+    this.prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, firstName, lastName } = prisonerData
     const workAndSkillsPrisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
 
