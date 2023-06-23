@@ -1,4 +1,4 @@
-import { type RequestHandler, Router } from 'express'
+import { Request, type RequestHandler, Response, Router } from 'express'
 import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { Prisoner } from '../interfaces/prisoner'
@@ -18,14 +18,23 @@ import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { dataAccess } from '../data'
+import { AssessmentCode } from '../data/enums/assessmentCode'
+import { Assessment } from '../interfaces/prisonApi/assessment'
 
 export default function routes(services: Services): Router {
   const router = Router()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function checkPrisonerInCaseLoad(req: any, res: any, func: (prisonerData: Prisoner) => Promise<void>) {
+  async function checkPrisonerInCaseLoad(req: Request, res: Response, func: (prisonerData: Prisoner) => Promise<void>) {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
+    const assessments = await prisonApiClient.getAssessments(prisonerData.bookingId)
+    if (assessments && Array.isArray(assessments)) {
+      prisonerData.assessments = assessments
+    }
+    prisonerData.csra = prisonerData.assessments?.find(
+      (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra,
+    )?.classification
     const globalSearchUser = userHasRoles([Role.GlobalSearch], res.locals.user.userRoles)
 
     if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) && !globalSearchUser) {
@@ -66,14 +75,14 @@ export default function routes(services: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async () => {
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
       const overviewController = new OverviewController(
         services.prisonerSearchService,
         services.overviewPageService,
         services.dataAccess.pathfinderApiClientBuilder,
         services.dataAccess.manageSocCasesApiClientBuilder,
       )
-      return overviewController.displayOverview(req, res)
+      return overviewController.displayOverview(req, res, prisonerData)
     })
   })
 
@@ -120,22 +129,20 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/alerts', (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async () => {
-      res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
-    })
+    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
   })
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    checkPrisonerInCaseLoad(req, res, async () => {
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
       const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
-      return alertsController.displayAlerts(req, res)
+      return alertsController.displayAlerts(req, res, prisonerData)
     })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    checkPrisonerInCaseLoad(req, res, async () => {
+    checkPrisonerInCaseLoad(req, res, async prisonerData => {
       const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
-      return alertsController.displayAlerts(req, res)
+      return alertsController.displayAlerts(req, res, prisonerData)
     })
   })
 

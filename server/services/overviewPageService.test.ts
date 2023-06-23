@@ -237,10 +237,17 @@ describe('OverviewPageService', () => {
       const overviewPageService = overviewPageServiceConstruct()
       await overviewPageService.get(
         'token',
-        { ...PrisonerMockDataA, prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        {
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: 'MDI',
+          csra: 'Standard',
+          assessments: assessmentsMock,
+        } as Prisoner,
         1,
       )
-      expect(prisonApiClient.getAssessments).toHaveBeenCalledWith(bookingId)
+      expect(incentivesApiClient.getReviews).toHaveBeenCalledWith(bookingId)
     })
 
     it('should map api results into page data', async () => {
@@ -255,6 +262,8 @@ describe('OverviewPageService', () => {
           prisonerNumber,
           bookingId,
           prisonId: 'MDI',
+          csra: 'Standard',
+          assessments: assessmentsMock,
         } as Prisoner,
         1,
         CaseLoadsDummyDataA,
@@ -281,6 +290,8 @@ describe('OverviewPageService', () => {
             prisonerNumber,
             bookingId,
             prisonId: '123',
+            csra: 'Standard',
+            assessments: assessmentsMock,
           } as Prisoner,
           1,
         )

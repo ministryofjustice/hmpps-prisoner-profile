@@ -30,13 +30,10 @@ export default class OverviewController {
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
   ) {}
 
-  public async displayOverview(req: Request, res: Response) {
+  public async displayOverview(req: Request, res: Response, prisonerData: Prisoner) {
     const { clientToken } = res.locals
     this.pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     this.manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
-
-    // Get prisoner data for banner and for use in alerts generation
-    const prisonerData = await this.prisonerSearchService.getPrisonerDetails(clientToken, req.params.prisonerNumber)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
       this.overviewPageService.get(
