@@ -29,6 +29,7 @@ export default function routes(services: Services): Router {
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
     const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
     const assessments = await prisonApiClient.getAssessments(prisonerData.bookingId)
+
     if (assessments && Array.isArray(assessments)) {
       prisonerData.assessments = assessments
     }
@@ -56,6 +57,17 @@ export default function routes(services: Services): Router {
     return func(prisonerData)
   }
 
+  async function checkPrisonerExists(req: Request, res: Response, func: (prisonerData: Prisoner) => Promise<void>) {
+    const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    if (prisonerData.status && parseInt(prisonerData.status, 3) === 404) {
+      return res.render('notFound.njk', {
+        url: req.headers.referer,
+      })
+    }
+    return func(prisonerData)
+  }
+
   router.use(async (req, res, next) => {
     res.locals = {
       ...res.locals,
@@ -75,132 +87,156 @@ export default function routes(services: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const overviewController = new OverviewController(
-        services.prisonerSearchService,
-        services.overviewPageService,
-        services.dataAccess.pathfinderApiClientBuilder,
-        services.dataAccess.manageSocCasesApiClientBuilder,
-      )
-      return overviewController.displayOverview(req, res, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const overviewController = new OverviewController(
+          services.prisonerSearchService,
+          services.overviewPageService,
+          services.dataAccess.pathfinderApiClientBuilder,
+          services.dataAccess.manageSocCasesApiClientBuilder,
+        )
+        return overviewController.displayOverview(req, res, prisonerData)
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
-      res.render('pages/photoPage', {
-        pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-        ...mapHeaderData(prisonerData, res.locals.user),
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+        res.render('pages/photoPage', {
+          pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
+          ...mapHeaderData(prisonerData, res.locals.user),
+        })
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
-    await checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
-      const { personalPageService } = services
-      const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      await checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+        const { personalPageService } = services
+        const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
 
-      res.render('pages/personalPage', {
-        pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
-        ...personalPageData,
+        res.render('pages/personalPage', {
+          pageTitle: 'Personal',
+          ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
+          ...personalPageData,
+        })
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const { workAndSkillsPageService } = services
-      const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const { workAndSkillsPageService } = services
+        const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
 
-      const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
-      const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
-      const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
+        const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+        const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
+        const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
 
-      res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
-        ...workAndSkillsPageData,
-        pageTitle: 'Work and skills',
-        fullCourseHistoryLinkUrl,
-        workAndActivities12MonthLinkUrl,
-        workAndActivities7DayLinkUrl,
+        res.render('pages/workAndSkills', {
+          ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
+          ...workAndSkillsPageData,
+          pageTitle: 'Work and skills',
+          fullCourseHistoryLinkUrl,
+          workAndActivities12MonthLinkUrl,
+          workAndActivities7DayLinkUrl,
+        })
       })
     })
   })
 
-  get('/prisoner/:prisonerNumber/alerts', (req, res, next) => {
-    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+  get('/prisoner/:prisonerNumber/alerts', async (req, res, next) => {
+    await checkPrisonerExists(req, res, async () => {
+      res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
   })
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
-      return alertsController.displayAlerts(req, res, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
+        return alertsController.displayAlerts(req, res, prisonerData)
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
-      return alertsController.displayAlerts(req, res, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
+        return alertsController.displayAlerts(req, res, prisonerData)
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const { offencesPageService } = services
-      const offencesPageData = await offencesPageService.get(res.locals.clientToken, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      await checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const { offencesPageService } = services
+        const offencesPageData = await offencesPageService.get(res.locals.clientToken, prisonerData)
 
-      res.render('pages/offences', {
-        pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
-        ...offencesPageData,
-        activeTab: true,
+        res.render('pages/offences', {
+          pageTitle: 'Offences',
+          ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
+          ...offencesPageData,
+          activeTab: true,
+        })
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
-    const caseNotesController = new CaseNotesController(
-      dataAccess.prisonApiClientBuilder,
-      services.prisonerSearchService,
-      services.caseNotesService,
-    )
-    return caseNotesController.displayCaseNotes(req, res)
+    await checkPrisonerExists(req, res, async () => {
+      const caseNotesController = new CaseNotesController(
+        dataAccess.prisonApiClientBuilder,
+        services.prisonerSearchService,
+        services.caseNotesService,
+      )
+      return caseNotesController.displayCaseNotes(req, res)
+    })
   })
 
   get('/prisoner/:prisonerNumber/active-punishments', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const { activePunishmentsPageService } = services
-      const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const { activePunishmentsPageService } = services
+        const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
 
-      res.render('pages/activePunishments', {
-        pageTitle: 'Active punishments',
-        ...mapHeaderData(prisonerData, res.locals.user, 'active-punishments', true),
-        ...activePunishmentsPageData,
-        activeTab: false,
+        res.render('pages/activePunishments', {
+          pageTitle: 'Active punishments',
+          ...mapHeaderData(prisonerData, res.locals.user, 'active-punishments', true),
+          ...activePunishmentsPageData,
+          activeTab: false,
+        })
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/adjudications', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      res.redirect(`${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        res.redirect(`${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
+      })
     })
   })
 
   get('/prisoner/:prisonerNumber/x-ray-body-scans', async (req, res, next) => {
-    checkPrisonerInCaseLoad(req, res, async prisonerData => {
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
-      const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
+    await checkPrisonerExists(req, res, async () => {
+      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+        const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
+        const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 
-      res.render('pages/xrayBodyScans', {
-        pageTitle: 'X-ray body scans',
-        ...mapHeaderData(prisonerData, res.locals.user, 'x-ray-body-scans', true),
-        prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
-          style: NameFormatStyle.firstLast,
-        }),
-        bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
+        res.render('pages/xrayBodyScans', {
+          pageTitle: 'X-ray body scans',
+          ...mapHeaderData(prisonerData, res.locals.user, 'x-ray-body-scans', true),
+          prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
+            style: NameFormatStyle.firstLast,
+          }),
+          bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
+        })
       })
     })
   })

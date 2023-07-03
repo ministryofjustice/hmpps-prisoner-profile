@@ -196,5 +196,9 @@ context('Offences Page Sentenced', () => {
       offencesPage.paroleEligibilityValue().should('exist')
       offencesPage.paroleEligibilityValue().contains('12 December 2021')
     })
+    it('Offences page should go to 404 not found page', () => {
+      cy.visit(`/prisoner/asudhsdudhid/offences`)
+      cy.request(`/prisoner/asudhsdudhid/offences`).its('body').should('contain', 'Page not found')
+    })
   })
 })
