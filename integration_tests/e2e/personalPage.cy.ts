@@ -68,6 +68,11 @@ context('When signed in', () => {
       cy.getDataQa('hidden-sexual-orientation').should('exist')
       cy.getDataQa('hidden-personal-details').should('exist')
     })
+
+    it('Personal page should go to 404 not found page', () => {
+      cy.visit(`/prisoner/asudhsdudhid/personal`)
+      cy.request(`/prisoner/asudhsdudhid/personal`).its('body').should('contain', 'Page not found')
+    })
   })
 
   context('As a user belonging to the prisoners case load', () => {

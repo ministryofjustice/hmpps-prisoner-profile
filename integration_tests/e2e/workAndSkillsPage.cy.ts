@@ -66,6 +66,13 @@ context('Work and skills page', () => {
         workAndSkillsPage.activeTab().should('contain', 'Work and skills')
       })
 
+      context('404 page', () => {
+        it('Photo page should go to 404 not found page', () => {
+          cy.visit(`/prisoner/asudhsdudhid/work-and-skills`)
+          cy.request(`/prisoner/asudhsdudhid/work-and-skills`).its('body').should('contain', 'Page not found')
+        })
+      })
+
       context('Sidebar', () => {
         it('Sidebar is displayed', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
