@@ -64,6 +64,13 @@ context('Case Notes Page', () => {
       caseNotesPage.paginationSummaryFooter().contains('Showing 1 to 20 of 80 case notes')
       caseNotesPage.viewAllLink().should('exist')
     })
+
+    it('Display correct filter labels', () => {
+      caseNotesPage.filterDateFromLabel().should('exist')
+      caseNotesPage.filterDateFromLabel().should('contain', 'Date from')
+      caseNotesPage.filterDateToLabel().should('exist')
+      caseNotesPage.filterDateToLabel().should('contain', 'Date to')
+    })
   })
 
   context('No Case Notes', () => {
