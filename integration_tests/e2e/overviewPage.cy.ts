@@ -17,11 +17,6 @@ const visitOverviewPageOnRemand = (): OverviewPage => {
   return Page.verifyOnPage(OverviewPage)
 }
 
-const visitOverviewPageUrlNotfound = () => {
-  cy.signIn({ redirectPath: '/prisoner/hsdifuhsifub' })
-}
-const unavailablePrisonerNumber = 'hsdifuhsifub'
-
 context('Overview Page', () => {
   context('Permissions', () => {
     const prisonerNumber = 'G6123VU'
@@ -574,8 +569,9 @@ context('Overview Page - Prisoner not found', () => {
       })
 
       it('The 404 page should display', () => {
-        visitOverviewPageUrlNotfound()
-        cy.request(`/prisoner/${unavailablePrisonerNumber}`).its('body').should('contain', 'Page not found')
+        cy.signIn({ redirectPath: '/prisoner/G6123VU' })
+        cy.visit(`/prisoner/asudhsdudhid`)
+        cy.request(`/prisoner/asudhsdudhid`).its('body').should('contain', 'Page not found')
       })
     })
   })

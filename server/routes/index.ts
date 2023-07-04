@@ -60,7 +60,8 @@ export default function routes(services: Services): Router {
   async function checkPrisonerExists(req: Request, res: Response, func: (prisonerData: Prisoner) => Promise<void>) {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
-    if (prisonerData.status && parseInt(prisonerData.status, 3) === 404) {
+
+    if (prisonerData.prisonerNumber === undefined) {
       return res.render('notFound.njk', {
         url: req.headers.referer,
       })
