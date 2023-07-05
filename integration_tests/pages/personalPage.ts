@@ -50,6 +50,7 @@ export default class PersonalPage extends Page {
       domesticAbusePerpetrator: () => cardData('domestic-abuse-perpetrator'),
       domesticAbuseVictim: () => cardData('domestic-abuse-victim'),
       socialCareNeeded: () => cardData('social-care-needed'),
+      youthOffender: () => cardData('youth-offender'),
     }
   }
 

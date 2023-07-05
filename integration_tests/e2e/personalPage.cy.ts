@@ -120,6 +120,7 @@ context('When signed in', () => {
         page.personalDetails().domesticAbusePerpetrator().should('have.text', 'Not stated')
         page.personalDetails().domesticAbuseVictim().should('have.text', 'Not stated')
         page.personalDetails().socialCareNeeded().should('have.text', 'No')
+        page.personalDetails().youthOffender().should('have.text', 'Yes')
       })
 
       it('Displays all the information from the API: Languages', () => {

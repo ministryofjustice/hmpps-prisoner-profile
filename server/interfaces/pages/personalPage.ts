@@ -36,6 +36,7 @@ export interface PersonalDetails {
   smokerOrVaper: string
   socialCareNeeded: string
   typeOfDiet: string
+  youthOffender: string
 }
 export interface IdentityNumbers {
   croNumber: string
