@@ -246,50 +246,6 @@ export default class OffencesPageService {
     ]
   }
 
-  getSummaryDetailRow(sentence: OffenderSentenceTerms, sentenceTermsData: OffenderSentenceTerms[]) {
-    return [
-      {
-        label: 'Sentence date',
-        value: formatDate(sentence.sentenceStartDate && sentence.sentenceStartDate, 'long'),
-      },
-      {
-        label: 'Length',
-        value: this.getLengthTextLabels(sentence),
-      },
-      {
-        label: 'Concurrent or consecutive',
-        value: this.findConsecutiveSentence({
-          sentences: sentenceTermsData,
-          consecutiveTo: sentence.consecutiveTo,
-        }),
-      },
-      // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
-      sentence.fineAmount && { label: 'Fine', value: formatCurrency(sentence.fineAmount) },
-      sentence.licence && {
-        label: 'Licence',
-        value: this.getLengthTextLabels(sentence.licence),
-      },
-    ]
-  }
-
-  getSentenceTerms(
-    courtCase: CourtCase,
-    sentenceTermsData: OffenderSentenceTerms[],
-    offenceHistory: OffenceHistoryDetail[],
-    courtDateResults: CourtDateResults[],
-    sentenceSummary: SentenceSummary,
-  ) {
-    return this.groupSentencesBySequence(sentenceTermsData)
-      .filter((group: GroupedSentence) => Number(group.caseId) === courtCase.id)
-      .map((groupedSentence: GroupedSentence) => this.mergeMostRecentLicenceTerm(groupedSentence.items))
-      .map((sentence: OffenderSentenceTerms) => ({
-        sentenceHeader: this.getCountForSentencedCourtCase(sentence),
-        sentenceTypeDescription: sentence.sentenceTypeDescription,
-        summaryDetailRows: this.getSummaryDetailRow(sentence, sentenceTermsData),
-        offences: this.getOffences(courtCase, offenceHistory, courtDateResults, sentenceSummary),
-      }))
-  }
-
   getUniqueChargesFromCourtDateResults(courtDateResults: CourtDateResults[]) {
     return [...new Map(courtDateResults?.map(item => [item.charge.chargeId, item])).values()]
   }
@@ -378,7 +334,8 @@ export default class OffencesPageService {
           sentenceValue.sentenceStartDate && sentenceValue.sentenceStartDate,
           'long',
         )
-        sentenceValue.sentenceLength = this.getLengthTextLabels(sentenceValue.terms[0])
+        sentenceValue.sentenceLength =
+          sentenceValue && sentenceValue.terms ? this.getLengthTextLabels(sentenceValue.terms[0]) : undefined
         sentenceValue.concurrentConsecutive = this.findConsecutiveSentence({
           sentences: sentenceTermsData,
           consecutiveTo: sentenceValue.consecutiveToSequence,
@@ -392,7 +349,7 @@ export default class OffencesPageService {
             Number(term.caseId) === courtSentence.id &&
             sentenceValue.sentenceTypeDescription === term.sentenceTypeDescription
           ) {
-            if (term.licence) {
+            if (term && term.licence) {
               sentenceValue.sentenceLicence = this.getLengthTextLabels(term.licence)
             }
           }

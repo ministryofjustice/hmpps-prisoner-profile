@@ -192,36 +192,6 @@ describe('OffencesPageService', () => {
       expect(res).toEqual(OffenceHistoryMockA)
     })
 
-    it('Get summary detail rows', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getSummaryDetailRow(SentencedTermsMockA[0], SentencedTermsMockA)
-      expect(res).toEqual(SummaryDetailRowsMock)
-    })
-
-    it('Get sentence terms - data with offences', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getSentenceTerms(
-        CourtCasesSentencedMockA[0],
-        SentencedTermsMockA,
-        OffenceHistoryMockA,
-        CourtDateResultsMockA,
-        SentenceSummaryWithSentenceMock,
-      )
-      expect(res).toEqual(SentenceTermsWithOffences)
-    })
-
-    it('Get sentence terms - data without offences', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getSentenceTerms(
-        CourtCasesSentencedMockA[0],
-        SentencedTermsMockA,
-        OffenceHistoryMock,
-        CourtDateResultsMockA,
-        SentenceSummaryWithoutSentenceMock,
-      )
-      expect(res).toEqual(SentenceTermsWithoutOffences)
-    })
-
     it('Get generic maps', async () => {
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getGenericMaps(CourtCasesSentencedMockA[0], todaysDate)
