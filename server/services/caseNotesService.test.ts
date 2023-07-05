@@ -4,7 +4,6 @@ import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-import { formatDateTimeISO } from '../utils/dateHelpers'
 
 jest.mock('../data/caseNotesApiClient')
 
