@@ -8,8 +8,6 @@ import {
   CourtCasesUnsentencedMockA,
   CourtCasesUnsentencedMockB,
   CourtCaseWithNextCourtAppearance,
-  SentenceTermsWithOffences,
-  SentenceTermsWithoutOffences,
 } from '../data/localMockData/courtCaseMock'
 import { OffenceHistoryMock, OffenceHistoryMockA } from '../data/localMockData/offenceHistoryMock'
 import {
@@ -18,7 +16,6 @@ import {
   MappedUnsentencedCourtCasesMock,
   SentencedTermsMockA,
   sentenceTermsMock,
-  SummaryDetailRowsMock,
 } from '../data/localMockData/sentenceTermsMock'
 import { prisonerSentenceDetailsMock } from '../data/localMockData/prisonerSentenceDetails'
 import {
@@ -34,10 +31,7 @@ import {
   CourtDateResultsUnsentencedMockB,
   UniqueCourtDateResultsUnsentencedMockA,
 } from '../data/localMockData/courtDateResultsMock'
-import {
-  SentenceSummaryWithSentenceMock,
-  SentenceSummaryWithoutSentenceMock,
-} from '../data/localMockData/sentenceSummaryMock'
+import { SentenceSummaryWithSentenceMock } from '../data/localMockData/sentenceSummaryMock'
 
 describe('OffencesPageService', () => {
   let prisonApiClient: PrisonApiClient
