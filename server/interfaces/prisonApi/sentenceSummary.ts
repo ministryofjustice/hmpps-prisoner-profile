@@ -57,7 +57,6 @@ export interface SentenceSummaryCourtCaseExtended {
 export interface SentenceSummary {
   prisonerNumber: string
   latestPrisonTerm: SentenceSumaryTerm
-  previousPrisonTerms: SentenceSumaryTerm[]
 }
 
 export interface SentenceSummaryCourtSentencesOverview {

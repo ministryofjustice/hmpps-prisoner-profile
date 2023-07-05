@@ -68,6 +68,11 @@ context('When signed in', () => {
       cy.getDataQa('hidden-sexual-orientation').should('exist')
       cy.getDataQa('hidden-personal-details').should('exist')
     })
+
+    it('Personal page should go to 404 not found page', () => {
+      cy.visit(`/prisoner/asudhsdudhid/personal`)
+      cy.request(`/prisoner/asudhsdudhid/personal`).its('body').should('contain', 'Page not found')
+    })
   })
 
   context('As a user belonging to the prisoners case load', () => {
@@ -115,6 +120,7 @@ context('When signed in', () => {
         page.personalDetails().domesticAbusePerpetrator().should('have.text', 'Not stated')
         page.personalDetails().domesticAbuseVictim().should('have.text', 'Not stated')
         page.personalDetails().socialCareNeeded().should('have.text', 'No')
+        page.personalDetails().youthOffender().should('have.text', 'Yes')
       })
 
       it('Displays all the information from the API: Languages', () => {

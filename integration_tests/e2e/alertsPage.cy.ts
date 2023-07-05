@@ -222,4 +222,9 @@ context('Alerts Page - User has Update Alert role', () => {
   it('Displays the update alert link for each alert', () => {
     alertsPage.updateAlertLink().should('have.length', 20)
   })
+
+  it('Alert page should go to 404 not found page', () => {
+    cy.visit(`/prisoner/asudhsdudhid/alerts/active`)
+    cy.request(`/prisoner/asudhsdudhid/alerts/active`).its('body').should('contain', 'Page not found')
+  })
 })

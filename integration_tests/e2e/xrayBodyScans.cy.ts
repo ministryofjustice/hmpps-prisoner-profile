@@ -39,4 +39,12 @@ context('X-Ray body scans', () => {
     page.bodyScan(1).date().should('include.text', new Date().getFullYear())
     page.bodyScan(1).comment().should('include.text', 'There was a body scan')
   })
+
+  context('404 page', () => {
+    it('Photo page should go to 404 not found page', () => {
+      cy.signIn({ redirectPath: `prisoner/asudhsdudhid/x-ray-body-scans` })
+      cy.visit(`/prisoner/asudhsdudhid/x-ray-body-scans`)
+      cy.request(`/prisoner/asudhsdudhid/x-ray-body-scans`).its('body').should('contain', 'Page not found')
+    })
+  })
 })

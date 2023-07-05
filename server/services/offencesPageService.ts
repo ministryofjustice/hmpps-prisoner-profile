@@ -246,50 +246,6 @@ export default class OffencesPageService {
     ]
   }
 
-  getSummaryDetailRow(sentence: OffenderSentenceTerms, sentenceTermsData: OffenderSentenceTerms[]) {
-    return [
-      {
-        label: 'Sentence date',
-        value: formatDate(sentence.sentenceStartDate && sentence.sentenceStartDate, 'long'),
-      },
-      {
-        label: 'Length',
-        value: this.getLengthTextLabels(sentence),
-      },
-      {
-        label: 'Concurrent or consecutive',
-        value: this.findConsecutiveSentence({
-          sentences: sentenceTermsData,
-          consecutiveTo: sentence.consecutiveTo,
-        }),
-      },
-      // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
-      sentence.fineAmount && { label: 'Fine', value: formatCurrency(sentence.fineAmount) },
-      sentence.licence && {
-        label: 'Licence',
-        value: this.getLengthTextLabels(sentence.licence),
-      },
-    ]
-  }
-
-  getSentenceTerms(
-    courtCase: CourtCase,
-    sentenceTermsData: OffenderSentenceTerms[],
-    offenceHistory: OffenceHistoryDetail[],
-    courtDateResults: CourtDateResults[],
-    sentenceSummary: SentenceSummary,
-  ) {
-    return this.groupSentencesBySequence(sentenceTermsData)
-      .filter((group: GroupedSentence) => Number(group.caseId) === courtCase.id)
-      .map((groupedSentence: GroupedSentence) => this.mergeMostRecentLicenceTerm(groupedSentence.items))
-      .map((sentence: OffenderSentenceTerms) => ({
-        sentenceHeader: this.getCountForSentencedCourtCase(sentence),
-        sentenceTypeDescription: sentence.sentenceTypeDescription,
-        summaryDetailRows: this.getSummaryDetailRow(sentence, sentenceTermsData),
-        offences: this.getOffences(courtCase, offenceHistory, courtDateResults, sentenceSummary),
-      }))
-  }
-
   getUniqueChargesFromCourtDateResults(courtDateResults: CourtDateResults[]) {
     return [...new Map(courtDateResults?.map(item => [item.charge.chargeId, item])).values()]
   }
@@ -378,7 +334,8 @@ export default class OffencesPageService {
           sentenceValue.sentenceStartDate && sentenceValue.sentenceStartDate,
           'long',
         )
-        sentenceValue.sentenceLength = this.getLengthTextLabels(sentenceValue.terms[0])
+        sentenceValue.sentenceLength =
+          sentenceValue && sentenceValue.terms ? this.getLengthTextLabels(sentenceValue.terms[0]) : undefined
         sentenceValue.concurrentConsecutive = this.findConsecutiveSentence({
           sentences: sentenceTermsData,
           consecutiveTo: sentenceValue.consecutiveToSequence,
@@ -392,7 +349,7 @@ export default class OffencesPageService {
             Number(term.caseId) === courtSentence.id &&
             sentenceValue.sentenceTypeDescription === term.sentenceTypeDescription
           ) {
-            if (term.licence) {
+            if (term && term.licence) {
               sentenceValue.sentenceLicence = this.getLengthTextLabels(term.licence)
             }
           }
@@ -416,16 +373,35 @@ export default class OffencesPageService {
       const nonParoleDate = sentenceDetails.nonParoleOverrideDate || sentenceDetails.nonParoleDate
       const detentionTrainingOrderPostRecallDate =
         sentenceDetails.dtoPostRecallReleaseDateOverride || sentenceDetails.dtoPostRecallReleaseDate
+      const paroleEligibilityCalculatedDate: string =
+        sentenceDetails.paroleEligibilityOverrideDate || sentenceDetails.paroleEligibilityCalculatedDate
+      const topupSupervisionExpiryDate: string =
+        sentenceDetails.topupSupervisionExpiryOverrideDate || sentenceDetails.topupSupervisionExpiryDate
+      const earlyTransferDate: string = sentenceDetails.etdOverrideDate || sentenceDetails.etdCalculatedDate
+      const midTransferDate: string = sentenceDetails.mtdOverrideDate || sentenceDetails.mtdCalculatedDate
+      const lateTransferDate: string = sentenceDetails.ltdOverrideDate || sentenceDetails.ltdCalculatedDate
       return {
         dates: [
           ...(sentenceDetails.homeDetentionCurfewActualDate
             ? [
                 {
                   key: {
-                    text: 'Approved for home detention curfew',
+                    text: 'Home Detention Curfew approved date (HDCAD)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.homeDetentionCurfewActualDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(automaticReleaseDate
+            ? [
+                {
+                  key: {
+                    text: 'Automatic release date (ARD)',
+                  },
+                  value: {
+                    text: formatDate(automaticReleaseDate, 'long'),
                   },
                 },
               ]
@@ -446,7 +422,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Post recall release',
+                    text: 'Post-recall release date (PRRD)',
                   },
                   value: {
                     text: formatDate(postRecallDate, 'long'),
@@ -458,22 +434,10 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Mid transfer',
+                    text: 'Mid-term date (MTD)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.midTermDate, 'long'),
-                  },
-                },
-              ]
-            : []),
-          ...(automaticReleaseDate
-            ? [
-                {
-                  key: {
-                    text: 'Automatic release',
-                  },
-                  value: {
-                    text: formatDate(automaticReleaseDate, 'long'),
                   },
                 },
               ]
@@ -482,7 +446,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Non parole',
+                    text: 'Non-parole date (NPD)',
                   },
                   value: {
                     text: formatDate(nonParoleDate, 'long'),
@@ -494,22 +458,10 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Detention training post recall',
+                    text: 'Detention and training order post-recall release date (DTOPRRD)',
                   },
                   value: {
                     text: formatDate(detentionTrainingOrderPostRecallDate, 'long'),
-                  },
-                },
-              ]
-            : []),
-          ...(sentenceDetails.paroleEligibilityDate
-            ? [
-                {
-                  key: {
-                    text: 'Parole eligibility date (PED)',
-                  },
-                  value: {
-                    text: formatDate(sentenceDetails.paroleEligibilityDate, 'long'),
                   },
                 },
               ]
@@ -530,7 +482,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Release on temporary licence',
+                    text: 'Release on temporary licence (ROTL)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.releaseOnTemporaryLicenceDate, 'long'),
@@ -542,7 +494,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Early removal scheme',
+                    text: 'Early Removal Scheme eligibility date (ERSED)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'long'),
@@ -554,7 +506,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Tariff early removal scheme',
+                    text: 'Tariff Expired Removal Scheme eligibility date (TERSED)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate, 'long'),
@@ -566,7 +518,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Approved for parole',
+                    text: 'Approved parole date (APD)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.actualParoleDate, 'long'),
@@ -578,22 +530,10 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Early transfer',
+                    text: 'Early-term date (ETD)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.earlyTermDate, 'long'),
-                  },
-                },
-              ]
-            : []),
-          ...(sentenceDetails.topupSupervisionExpiryDate
-            ? [
-                {
-                  key: {
-                    text: 'Top up supervision expiry',
-                  },
-                  value: {
-                    text: formatDate(sentenceDetails.topupSupervisionExpiryDate, 'long'),
                   },
                 },
               ]
@@ -602,7 +542,7 @@ export default class OffencesPageService {
             ? [
                 {
                   key: {
-                    text: 'Late transfer',
+                    text: 'Late-term date (LTD)',
                   },
                   value: {
                     text: formatDate(sentenceDetails.lateTermDate, 'long'),
@@ -622,7 +562,127 @@ export default class OffencesPageService {
                 },
               ]
             : []),
-        ],
+          ...(sentenceDetails.actualParoleDate
+            ? [
+                {
+                  key: {
+                    text: 'Approved parole date (APD)',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.actualParoleDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(detentionTrainingOrderPostRecallDate
+            ? [
+                {
+                  key: {
+                    text: 'Detention and training order post-recall release date (DTOPRRD)',
+                  },
+                  value: {
+                    text: formatDate(detentionTrainingOrderPostRecallDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.nonDtoReleaseDate
+            ? [
+                {
+                  key: {
+                    text: 'Detention post-recall release date (DPRRD)',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.nonDtoReleaseDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.earlyRemovalSchemeEligibilityDate
+            ? [
+                {
+                  key: {
+                    text: 'Early Removal Scheme eligibility date (ERSED)',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(sentenceDetails.effectiveSentenceEndDate
+            ? [
+                {
+                  key: {
+                    text: 'Effective sentence end date (ESED)',
+                  },
+                  value: {
+                    text: formatDate(sentenceDetails.effectiveSentenceEndDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(paroleEligibilityCalculatedDate
+            ? [
+                {
+                  key: {
+                    text: 'Parole eligibility date (PED)',
+                  },
+                  value: {
+                    text: formatDate(paroleEligibilityCalculatedDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(topupSupervisionExpiryDate
+            ? [
+                {
+                  key: {
+                    text: 'Top-up supervision expiry date (TUSED)',
+                  },
+                  value: {
+                    text: formatDate(topupSupervisionExpiryDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(earlyTransferDate
+            ? [
+                {
+                  key: {
+                    text: 'Early-transfer date (ETD)',
+                  },
+                  value: {
+                    text: formatDate(earlyTransferDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(midTransferDate
+            ? [
+                {
+                  key: {
+                    text: 'Mid-transfer date (MTD)',
+                  },
+                  value: {
+                    text: formatDate(midTransferDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+          ...(lateTransferDate
+            ? [
+                {
+                  key: {
+                    text: 'Late-transfer date (LTD)',
+                  },
+                  value: {
+                    text: formatDate(lateTransferDate, 'long'),
+                  },
+                },
+              ]
+            : []),
+        ].sort((a, b) => (a.key.text < b.key.text ? -1 : 1)),
       }
     }
     return {

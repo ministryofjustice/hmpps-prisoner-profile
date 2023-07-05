@@ -477,7 +477,23 @@ export const OffencesPageMockSentences = {
       },
       {
         key: {
-          text: 'Post recall release',
+          text: 'Detention post-recall release date (DPRRD)',
+        },
+        value: {
+          text: '29 January 2076',
+        },
+      },
+      {
+        key: {
+          text: 'Effective sentence end date (ESED)',
+        },
+        value: {
+          text: '12 March 2132',
+        },
+      },
+      {
+        key: {
+          text: 'Parole eligibility date (PED)',
         },
         value: {
           text: '12 December 2021',
@@ -485,7 +501,7 @@ export const OffencesPageMockSentences = {
       },
       {
         key: {
-          text: 'Parole eligibility date (PED)',
+          text: 'Post-recall release date (PRRD)',
         },
         value: {
           text: '12 December 2021',
@@ -1025,7 +1041,23 @@ export const GetReleaseDates = {
     },
     {
       key: {
-        text: 'Post recall release',
+        text: 'Detention post-recall release date (DPRRD)',
+      },
+      value: {
+        text: '29 January 2076',
+      },
+    },
+    {
+      key: {
+        text: 'Effective sentence end date (ESED)',
+      },
+      value: {
+        text: '12 March 2132',
+      },
+    },
+    {
+      key: {
+        text: 'Parole eligibility date (PED)',
       },
       value: {
         text: '12 December 2021',
@@ -1033,7 +1065,7 @@ export const GetReleaseDates = {
     },
     {
       key: {
-        text: 'Parole eligibility date (PED)',
+        text: 'Post-recall release date (PRRD)',
       },
       value: {
         text: '12 December 2021',
