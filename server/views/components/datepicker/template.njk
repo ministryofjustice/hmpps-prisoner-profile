@@ -3,7 +3,7 @@
 {% from "govuk/components/hint/macro.njk" import govukHint %}
 {% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 
-<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} hmpps-datepicker" data-module="hmpps-datepicker">
+<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} hmpps-datepicker {{ params.classes }}" data-module="hmpps-datepicker">
   {{ govukLabel({
     html: params.label.html,
     text: params.label.text,

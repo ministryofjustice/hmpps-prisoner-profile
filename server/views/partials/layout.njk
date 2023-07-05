@@ -53,9 +53,15 @@
 
   <div class="prisoner-profile-breadcrumbs">
 
-  {% if user.backLink %}
+    {% if refererUrl %}
+      <div class="prisoner-profile-breadcrumbs__back">
+        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="referer-back-link">
+          Back
+        </a>
+      </div>
+    {% elseif user.backLink and not hideBackLink %}
       <div class="prisoner-profile-breadcrumbs__search">
-        <a href="{{ user.backLink.url }}" class="govuk-link govuk-link--no-visited-state" data-test="back-link">
+        <a href="{{ user.backLink.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="back-link">
           {{ user.backLink.text }}
         </a>
       </div>

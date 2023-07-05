@@ -5,6 +5,7 @@ import CaseNotesApiRestClient from './caseNotesApiClient'
 import { pagedCaseNotesMock } from './localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
 import restClientBuilder from '.'
+import { CaseNote } from '../interfaces/caseNotesApi/caseNote'
 
 jest.mock('./tokenStore')
 
@@ -31,6 +32,9 @@ describe('caseNotesApiClient', () => {
   const mockSuccessfulCaseNotesApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakeCaseNotesApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
+  const mockSuccessfulCaseNotesPostApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
+    fakeCaseNotesApi.post(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
+  }
 
   describe('getCaseNotes', () => {
     it('Should return data from the API', async () => {
@@ -48,6 +52,25 @@ describe('caseNotesApiClient', () => {
 
       const output = await caseNotesApiClient.getCaseNoteTypes()
       expect(output).toEqual(caseNoteTypesMock)
+    })
+  })
+
+  describe('getCaseNoteTypesForUser', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulCaseNotesApiCall(`/case-notes/types-for-user`, caseNoteTypesMock)
+
+      const output = await caseNotesApiClient.getCaseNoteTypesForUser()
+      expect(output).toEqual(caseNoteTypesMock)
+    })
+  })
+
+  describe('addCaseNote', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234Y'
+      mockSuccessfulCaseNotesPostApiCall(`/case-notes/${prisonerNumber}`, pagedCaseNotesMock.content[0])
+
+      const output = await caseNotesApiClient.addCaseNote(prisonerNumber, {} as CaseNote)
+      expect(output).toEqual(pagedCaseNotesMock.content[0])
     })
   })
 })

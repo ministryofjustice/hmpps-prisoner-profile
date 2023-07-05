@@ -114,6 +114,22 @@ export default {
     })
   },
 
+  stubGetCaseNoteTypesForUser: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/casenotes/case-notes/types-for-user`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: caseNoteTypesMock,
+      },
+    })
+  },
+
   stubGetSensitiveCaseNotesPage: (prisonerNumber: string) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
@@ -132,6 +148,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubAddCaseNote: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/casenotes/case-notes/G6123VU`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedCaseNotesMock.content[0],
       },
     })
   },

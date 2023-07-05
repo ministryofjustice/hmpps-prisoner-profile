@@ -119,7 +119,6 @@
 
 .hmpps-location-bar {
   @include govuk-width-container;
-  @include govuk-responsive-margin(3, 'bottom');
   @include govuk-responsive-padding(3, 'top');
   @include govuk-responsive-padding(3, 'bottom');
 

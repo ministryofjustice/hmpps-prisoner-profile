@@ -42,4 +42,6 @@ export default class CaseNotesPage extends Page {
   addCaseNoteButton = (): PageElement => cy.get('#add-case-note-action-button a')
 
   viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
+
+  successMessage = (): PageElement => cy.get('.hmpps-flash-message--success > p')
 }

@@ -1,4 +1,4 @@
-import { formatISO, isValid, parse } from 'date-fns'
+import { format, formatISO, isValid, parse } from 'date-fns'
 import logger from '../../logger'
 
 /**
@@ -31,15 +31,13 @@ export const formatDateTimeISO = (date: Date, options?: { startOfDay?: boolean; 
     adjustedDate.setHours(0)
     adjustedDate.setMinutes(0)
     adjustedDate.setSeconds(0)
-    adjustedDate.setMilliseconds(0)
   } else if (options?.endOfDay) {
     adjustedDate.setHours(23)
     adjustedDate.setMinutes(59)
     adjustedDate.setSeconds(59)
-    adjustedDate.setMilliseconds(999)
   }
   try {
-    dateStr = formatISO(adjustedDate, { representation: 'complete' })
+    dateStr = format(adjustedDate, "yyyy-MM-dd'T'HH:mm:ss'Z")
   } catch (error) {
     logger.error(`Error: formatDateTimeISO - ${error.message}`)
   }
