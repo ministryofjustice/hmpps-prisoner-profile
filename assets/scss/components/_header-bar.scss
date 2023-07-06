@@ -339,6 +339,14 @@
         span {
           color: govuk-colour('black');
         }
+
+        a {
+          color: govuk-colour('black');
+        }
+
+        a:hover {
+          text-decoration: none;
+        }
       }
 
       a:hover,
