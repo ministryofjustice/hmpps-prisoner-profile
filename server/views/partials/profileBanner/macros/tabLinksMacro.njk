@@ -4,8 +4,6 @@
       {% if tabLink.active %}
         <li class="govuk-heading-s hmpps-profile-tab-link-selected" data-qa="active-tab">
           <span
-            href="{{ tabLink.href | default('#') }}"
-            class="govuk-link govuk-link--no-visited-state govuk-link--no-underline"
             data-qa="{{tabLink.label}}"
             >{{ tabLink.label }}</span
           >
