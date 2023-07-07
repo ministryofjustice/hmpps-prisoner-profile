@@ -3,16 +3,24 @@
     {% for tabLink in tabLinks %}
       {% if tabLink.active %}
         <li class="govuk-heading-s hmpps-profile-tab-link-selected" data-qa="active-tab">
+          <span
+            href="{{ tabLink.href | default('#') }}"
+            class="govuk-link govuk-link--no-visited-state govuk-link--no-underline"
+            data-qa="{{tabLink.label}}"
+            >{{ tabLink.label }}</span
+          >
+        </li>
       {% else %}
         <li class="govuk-heading-s">
+          <a
+            href="{{ tabLink.href | default('#') }}"
+            class="govuk-link govuk-link--no-visited-state govuk-link--no-underline"
+            data-qa="{{tabLink.label}}"
+            >{{ tabLink.label }}</a
+          >
+        </li>
       {% endif %}
-        <a
-          href="{{ tabLink.href | default('#') }}"
-          class="govuk-link govuk-link--no-visited-state govuk-link--no-underline"
-          data-qa="{{tabLink.label}}"
-          >{{ tabLink.label }}</a
-        >
-      </li>
+
     {% endfor %}
   </ul>
 {% endmacro %}
