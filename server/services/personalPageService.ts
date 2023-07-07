@@ -185,6 +185,7 @@ export default class PersonalPageService {
         getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
+      youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
     }
   }
 

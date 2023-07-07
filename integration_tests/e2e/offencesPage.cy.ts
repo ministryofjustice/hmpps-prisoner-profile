@@ -176,12 +176,34 @@ context('Offences Page Sentenced', () => {
       offencesPage.conditionalReleaseValue().should('exist')
       offencesPage.conditionalReleaseValue().contains('29 January 2076')
     })
-    it('Post recall release key should display', () => {
+    it('Detention post-recall release date (DPRRD) key should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.detentionPostRecallReleaseDateKey().should('exist')
+      offencesPage.detentionPostRecallReleaseDateKey().contains('Detention post-recall release date (DPRRD)')
+    })
+    it('Detention post-recall release date (DPRRD) value should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.detentionPostRecallReleaseDateValue().should('exist')
+      offencesPage.detentionPostRecallReleaseDateValue().contains('29 January 2076')
+    })
+    it('Effective sentence end date (ESED) key should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.effectiveSentenceEndDateKey().should('exist')
+      offencesPage.effectiveSentenceEndDateKey().contains('Effective sentence end date (ESED)')
+    })
+    it('Effective sentence end date (ESED) value should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.effectiveSentenceEndDateValue().should('exist')
+      offencesPage.effectiveSentenceEndDateValue().contains('12 March 2132')
+    })
+
+    it('Post-recall release date (PRRD) key should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
       offencesPage.postRecallKey().should('exist')
-      offencesPage.postRecallKey().contains('Post recall release')
+      offencesPage.postRecallKey().contains('Post-recall release date (PRRD)')
     })
-    it('Post recall release value should display', () => {
+
+    it('Post-recall release date (PRRD) value should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
       offencesPage.postRecallValue().should('exist')
       offencesPage.postRecallValue().contains('12 December 2021')
@@ -195,6 +217,10 @@ context('Offences Page Sentenced', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
       offencesPage.paroleEligibilityValue().should('exist')
       offencesPage.paroleEligibilityValue().contains('12 December 2021')
+    })
+    it('Offences page should go to 404 not found page', () => {
+      cy.visit(`/prisoner/asudhsdudhid/offences`)
+      cy.request(`/prisoner/asudhsdudhid/offences`).its('body').should('contain', 'Page not found')
     })
   })
 })

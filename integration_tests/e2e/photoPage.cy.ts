@@ -31,4 +31,10 @@ context('Photo Page', () => {
     photoPage.breadcrumbToOverview().click()
     cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
   })
+
+  it('Photo page should go to 404 not found page', () => {
+    cy.signIn({ redirectPath: 'prisoner/asudhsdudhid/image' })
+    cy.visit(`/prisoner/asudhsdudhid/image`)
+    cy.request(`/prisoner/asudhsdudhid/image`).its('body').should('contain', 'Page not found')
+  })
 })

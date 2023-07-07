@@ -8,6 +8,11 @@ context('Active punishments', () => {
 
   const prisonerNumber = 'G6123VU'
 
+  const activePunishmentsPageUrlNotfound = () => {
+    cy.signIn({ redirectPath: '/prisoner/hsdifuhsifub/active-punishments' })
+  }
+  const unavailablePrisonerNumber = 'hsdifuhsifub'
+
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
@@ -38,5 +43,12 @@ context('Active punishments', () => {
     const activePunishmentsPage = Page.verifyOnPageWithTitle(ActivePunishmentsPage, 'active Punishments')
 
     activePunishmentsPage.viewHistoryLink().click()
+  })
+
+  it('View history link should go to 404 not found page', () => {
+    activePunishmentsPageUrlNotfound()
+    cy.request(`/prisoner/${unavailablePrisonerNumber}/active-punishments`)
+      .its('body')
+      .should('contain', 'Page not found')
   })
 })
