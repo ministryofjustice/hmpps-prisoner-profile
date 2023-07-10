@@ -476,7 +476,7 @@ export default class OverviewPageService {
 
     summaryData.push({ data: categorySummaryData, classes: 'govuk-grid-row card-body' })
 
-    if (belongsToCaseLoad) {
+    if (belongsToCaseLoad || userHasRoles([Role.GlobalSearch], userRoles)) {
       summaryData.push({ data: incentiveSummaryData, classes: 'govuk-grid-row card-body' })
     }
 
