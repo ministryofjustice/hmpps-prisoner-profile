@@ -1,5 +1,4 @@
 import { Request, RequestHandler, Response } from 'express'
-import { isFuture } from 'date-fns'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
@@ -10,13 +9,11 @@ import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import { formatName, userHasRoles } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { formatDate, isRealDate, parseDate } from '../utils/dateHelpers'
-import { HmppsError } from '../interfaces/hmppsError'
+import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { Prisoner } from '../interfaces/prisoner'
 import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 
 /**
@@ -57,28 +54,22 @@ export default class CaseNotesController {
         })
       }
 
-      let addCaseNoteLinkUrl: string
-      if (canAddCaseNotes(res.locals.user, prisonerData)) {
-        addCaseNoteLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
-      }
+      const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
+        ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
+        : undefined
 
       // Get total count of case notes ignoring filters
-      const caseNotesUsage = await this.prisonApiClientBuilder(clientToken).getCaseNotesUsage(req.params.prisonerNumber)
-      const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
-
       // Get case notes based on given query params
-      const caseNotesPageData = await this.caseNotesService.get(
-        userToken,
-        prisonerData,
-        queryParams,
-        canDeleteSensitiveCaseNotes,
-      )
+      const [caseNotesUsage, caseNotesPageData] = await Promise.all([
+        this.prisonApiClientBuilder(clientToken).getCaseNotesUsage(req.params.prisonerNumber),
+        this.caseNotesService.get(userToken, prisonerData, queryParams, canDeleteSensitiveCaseNotes),
+      ])
 
+      const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(
         caseNotesPageData.caseNoteTypes,
         queryParams.type,
       )
-
       const showingAll = queryParams.showAll
 
       // Get staffId to use in conditional logic for amend link
@@ -109,7 +100,7 @@ export default class CaseNotesController {
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
       // If user cannot view this prisoner's case notes, redirect to 404 page
-      if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient } as Prisoner)) {
+      if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient })) {
         return res.render('notFound.njk', {
           url: req.headers.referer || `/prisoner/${prisonerNumber}`,
         })
@@ -167,20 +158,20 @@ export default class CaseNotesController {
         hours,
         minutes,
       }
-      const errors = this.validate(type, subType, text, date, hours, minutes)
+      const errors = req.errors || []
       if (!errors.length) {
         try {
           await this.caseNotesService.addCaseNote(res.locals.user.token, prisonerNumber, caseNote)
         } catch (error) {
           if (error.status === 400) {
-            errors.push({ text: error.message, href: '' })
+            errors.push({ text: error.message })
           } else throw error
         }
       }
 
       if (errors.length) {
-        req.flash('caseNote', caseNote as never)
-        req.flash('errors', errors as never[])
+        req.flash('caseNote', caseNote)
+        req.flash('errors', errors)
         req.flash('addCaseNoteRefererUrl', refererUrl)
         return res.redirect(`/prisoner/${prisonerNumber}/add-case-note`)
       }
@@ -191,7 +182,7 @@ export default class CaseNotesController {
         )
       }
 
-      req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success } as never)
+      req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
       return res.redirect(refererUrl || `/prisoner/${prisonerNumber}/case-notes`)
     }
   }
@@ -204,15 +195,19 @@ export default class CaseNotesController {
    * @param onlyActive - if true, filter out types/subtypes where activeFlag !== 'Y'
    */
   private mapCaseNoteTypes(caseNoteTypes: CaseNoteType[], type?: string, onlyActive = false) {
-    const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = {}
-    let subTypes: { value: string; text: string }[] = []
-
     const types = caseNoteTypes
       ?.filter(t => !onlyActive || t.activeFlag === 'Y')
       .map(t => ({ value: t.code, text: t.description }))
-    caseNoteTypes.forEach(t => {
-      typeSubTypeMap[t.code] = t.subCodes?.map(s => ({ value: s.code, text: s.description }))
-    })
+
+    const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = caseNoteTypes.reduce(
+      (ts, t) => ({
+        ...ts,
+        [t.code]: t.subCodes?.map(s => ({ value: s.code, text: s.description })),
+      }),
+      {},
+    )
+
+    let subTypes: { value: string; text: string }[] = []
     if (type) {
       const selectedType = caseNoteTypes.find(t => t.code === type)
       if (selectedType) {
@@ -238,123 +233,5 @@ export default class CaseNotesController {
         return [type, prompts[index]]
       }),
     )
-  }
-
-  /**
-   * Validate case note.
-   *
-   * @param type
-   * @param subType
-   * @param text
-   * @param date
-   * @param hours
-   * @param minutes
-   */
-  private validate(type: string, subType: string, text: string, date: string, hours: string, minutes: string) {
-    const errors: HmppsError[] = []
-    let invalidTime = false
-
-    if (!type) {
-      errors.push({
-        text: 'Select the case note type',
-        href: '#type',
-      })
-    }
-
-    if (!subType) {
-      errors.push({
-        text: 'Select the case note sub-type',
-        href: '#subType',
-      })
-    }
-
-    if (text && text.length > 4000) {
-      errors.push({
-        text: 'Enter what happened using 4,000 characters or less',
-        href: '#text',
-      })
-    }
-
-    if (!text || !text.trim()) {
-      errors.push({
-        text: 'Enter what happened',
-        href: '#text',
-      })
-    }
-
-    if (!date) {
-      errors.push({
-        text: 'Select the date when this happened',
-        href: '#date',
-      })
-    }
-
-    if (date && !isRealDate(date)) {
-      errors.push({
-        text: 'Enter a real date in the format DD/MM/YYYY - for example, 27/03/2023',
-        href: '#date',
-      })
-    }
-
-    if (date && isRealDate(date) && isFuture(parseDate(date))) {
-      errors.push({
-        text: 'Enter a date which is not in the future in the format DD/MM/YYYY - for example, 27/03/2020',
-        href: '#date',
-      })
-    }
-
-    // eslint-disable-next-line no-restricted-globals
-    if (hours && isNaN(parseInt(hours, 10))) {
-      invalidTime = true
-      errors.push({
-        text: 'Enter an hour using numbers only',
-        href: '#hours',
-      })
-    }
-
-    // eslint-disable-next-line no-restricted-globals
-    if (minutes && isNaN(parseInt(minutes, 10))) {
-      invalidTime = true
-      errors.push({
-        text: 'Enter the minutes using numbers only',
-        href: '#minutes',
-      })
-    }
-
-    if ((hours && parseInt(hours, 10) > 23) || !hours) {
-      invalidTime = true
-      errors.push({
-        text: 'Enter an hour which is 23 or less',
-        href: '#hours',
-      })
-    }
-
-    if ((minutes && parseInt(minutes, 10) > 59) || !minutes) {
-      invalidTime = true
-      errors.push({
-        text: 'Enter the minutes using 59 or less',
-        href: '#minutes',
-      })
-    }
-
-    if (!hours && !minutes) {
-      invalidTime = true
-      errors.push({
-        text: 'Select the time when this happened',
-        href: '#hours',
-      })
-    }
-
-    if (!invalidTime) {
-      const dateTime = date && parseDate(date).setHours(+hours, +minutes, 0)
-      if (dateTime && dateTime > new Date().getTime()) {
-        errors.push({
-          text: 'Enter a time which is not in the future',
-          href: '#hours',
-        })
-      }
-    }
-
-    return errors
   }
 }

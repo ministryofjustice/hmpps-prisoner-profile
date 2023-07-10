@@ -370,7 +370,7 @@ export const userHasAllRoles = (rolesToCheck: string[], userRoles: string[]): bo
  * @param user
  * @param prisoner
  */
-export const userCanEdit = (user: User, prisoner: Prisoner): boolean => {
+export const userCanEdit = (user: User, prisoner: Partial<Prisoner>): boolean => {
   return (
     user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId) ||
     (['OUT', 'TRN'].includes(prisoner.prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||

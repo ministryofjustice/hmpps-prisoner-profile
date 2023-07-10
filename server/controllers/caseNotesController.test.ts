@@ -115,8 +115,8 @@ describe('Case Notes Controller', () => {
       prisonerNumber: PrisonerMockDataA.prisonerNumber,
       formValues: {
         date: formatDate(new Date().toISOString(), 'short'),
-        hours: new Date().getHours().toString(),
-        minutes: new Date().getMinutes().toString(),
+        hours: new Date().getHours().toString().padStart(2, '0'),
+        minutes: new Date().getMinutes().toString().padStart(2, '0'),
         subType: 'ASSESSMENT',
         text: '',
         type: 'ACP',
@@ -157,92 +157,6 @@ describe('Case Notes Controller', () => {
   })
 
   describe('Handle add case note POST', () => {
-    it('should pass validation with good data and save case note', async () => {
-      const caseNoteForm = {
-        type: 'TYPE',
-        subType: 'SUBTYPE',
-        text: 'Note text',
-        date: '01/01/2023',
-        hours: '16',
-        minutes: '30',
-      }
-      req = {
-        params: {
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        },
-        body: {
-          ...caseNoteForm,
-          refererUrl: 'http://referer',
-        },
-        flash: jest.fn(),
-      }
-      const validateSpy = jest.spyOn(controller, 'validate')
-      const addCaseNoteSpy = jest
-        .spyOn<any, string>(controller['caseNotesService'], 'addCaseNote')
-        .mockResolvedValue(pagedCaseNotesMock.content[0])
-
-      await controller.post()(req, res)
-
-      expect(validateSpy).toHaveBeenCalledWith(
-        caseNoteForm.type,
-        caseNoteForm.subType,
-        caseNoteForm.text,
-        caseNoteForm.date,
-        caseNoteForm.hours,
-        caseNoteForm.minutes,
-      )
-      expect(validateSpy).toReturnWith([])
-      expect(addCaseNoteSpy).toHaveBeenCalledWith(res.locals.user.token, PrisonerMockDataA.prisonerNumber, caseNoteForm)
-      expect(res.redirect).toHaveBeenCalledWith(req.body.refererUrl)
-    })
-
-    it('should fail validation with no data and not save case note', async () => {
-      const caseNoteForm = {
-        type: '',
-        subType: '',
-        text: '',
-        date: '',
-        hours: '',
-        minutes: '',
-      }
-      req = {
-        params: {
-          prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        },
-        body: {
-          ...caseNoteForm,
-          refererUrl: 'http://referer',
-        },
-        flash: jest.fn(),
-      }
-      const validateSpy = jest.spyOn(controller, 'validate')
-      const addCaseNoteSpy = jest
-        .spyOn<any, string>(controller['caseNotesService'], 'addCaseNote')
-        .mockResolvedValue(pagedCaseNotesMock.content[0])
-
-      await controller.post()(req, res)
-
-      expect(validateSpy).toHaveBeenCalledWith(
-        caseNoteForm.type,
-        caseNoteForm.subType,
-        caseNoteForm.text,
-        caseNoteForm.date,
-        caseNoteForm.hours,
-        caseNoteForm.minutes,
-      )
-      expect(validateSpy).toReturnWith([
-        { text: 'Select the case note type', href: '#type' },
-        { text: 'Select the case note sub-type', href: '#subType' },
-        { text: 'Enter what happened', href: '#text' },
-        { text: 'Select the date when this happened', href: '#date' },
-        { text: 'Enter an hour which is 23 or less', href: '#hours' },
-        { text: 'Enter the minutes using 59 or less', href: '#minutes' },
-        { text: 'Select the time when this happened', href: '#hours' },
-      ])
-      expect(addCaseNoteSpy).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note`)
-    })
-
     it('should save case note and redirect to record incentive level page', async () => {
       const caseNoteForm = {
         type: 'REPORTS',
