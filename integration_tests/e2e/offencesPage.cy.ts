@@ -1,13 +1,14 @@
 import OffencesPage from '../pages/offencesPage'
 import Page from '../pages/page'
 import { permissionsTests } from './permissionsTests'
+import NotFoundPage from '../pages/notFoundPage'
 
 context('Offenses page - Permissions', () => {
   const prisonerNumber = 'G6123VU'
   const visitPage = prisonerDataOverrides => {
     cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
     cy.setupOffencesPageSentencedStubs({ prisonerNumber, bookingId: 1102484 })
-    cy.signIn({ redirectPath: '/prisoner/G6123VU/offences' })
+    cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/offences' })
   }
   permissionsTests({ prisonerNumber, visitPage, pageToDisplay: OffencesPage })
 })
@@ -219,8 +220,8 @@ context('Offences Page Sentenced', () => {
       offencesPage.paroleEligibilityValue().contains('12 December 2021')
     })
     it('Offences page should go to 404 not found page', () => {
-      cy.visit(`/prisoner/asudhsdudhid/offences`)
-      cy.request(`/prisoner/asudhsdudhid/offences`).its('body').should('contain', 'Page not found')
+      cy.visit(`/prisoner/asudhsdudhid/offences`, { failOnStatusCode: false })
+      Page.verifyOnPage(NotFoundPage)
     })
   })
 })

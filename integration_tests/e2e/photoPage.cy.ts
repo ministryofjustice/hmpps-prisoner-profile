@@ -1,12 +1,14 @@
 import PrisonerPhotoPage from '../pages/photoPage'
 import { permissionsTests } from './permissionsTests'
+import Page from '../pages/page'
+import NotFoundPage from '../pages/notFoundPage'
 
 context('Photo Page', () => {
   const prisonerNumber = 'G6123VU'
   const bookingId = 1102484
 
   context('Permissions', () => {
-    const visitPage = () => cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
+    const visitPage = () => cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image' })
     permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoPage })
   })
 
@@ -33,8 +35,7 @@ context('Photo Page', () => {
   })
 
   it('Photo page should go to 404 not found page', () => {
-    cy.signIn({ redirectPath: 'prisoner/asudhsdudhid/image' })
-    cy.visit(`/prisoner/asudhsdudhid/image`)
-    cy.request(`/prisoner/asudhsdudhid/image`).its('body').should('contain', 'Page not found')
+    cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/asudhsdudhid/image' })
+    Page.verifyOnPage(NotFoundPage)
   })
 })

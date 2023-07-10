@@ -2,9 +2,10 @@ import WorkAndSkillsPage from '../pages/workAndSkillsPage'
 
 import Page from '../pages/page'
 import { permissionsTests } from './permissionsTests'
+import NotFoundPage from '../pages/notFoundPage'
 
-const visitWorkAndSkillsPage = () => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/work-and-skills' })
+const visitWorkAndSkillsPage = ({ failOnStatusCode = true } = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/work-and-skills' })
 }
 
 context('Work and skills page', () => {
@@ -13,7 +14,7 @@ context('Work and skills page', () => {
     const visitPage = prisonerDataOverrides => {
       cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
       cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
-      visitWorkAndSkillsPage()
+      visitWorkAndSkillsPage({ failOnStatusCode: false })
     }
 
     permissionsTests({ prisonerNumber, pageToDisplay: WorkAndSkillsPage, visitPage })
@@ -68,8 +69,8 @@ context('Work and skills page', () => {
 
       context('404 page', () => {
         it('Photo page should go to 404 not found page', () => {
-          cy.visit(`/prisoner/asudhsdudhid/work-and-skills`)
-          cy.request(`/prisoner/asudhsdudhid/work-and-skills`).its('body').should('contain', 'Page not found')
+          cy.visit(`/prisoner/asudhsdudhid/work-and-skills`, { failOnStatusCode: false })
+          Page.verifyOnPage(NotFoundPage)
         })
       })
 
