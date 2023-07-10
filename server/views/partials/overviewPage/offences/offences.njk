@@ -10,7 +10,7 @@
         <hr class="govuk-section-break govuk-section-break--visible" />
         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Imprisonment status</p>
         <p> {{ offencesOverview.imprisonmentStatusDescription}}</p>
-        {% if offencesOverview.fullStatus.legalStatus == "REMAND" and offencesOverview.nextCourtAppearance.dateTime %}
+        {% if offencesOverview.nextCourtAppearance.dateTime %}
             <hr class="govuk-section-break govuk-section-break--visible" />
             <p data-qa="overview-next-court-appearance" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Next court appearance</p>
             <p> {{ offencesOverview.nextCourtAppearance.dateTime | formatDate }}</p>
