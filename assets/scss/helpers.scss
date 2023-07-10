@@ -55,6 +55,10 @@
   color: govuk-colour("dark-grey")
 }
 
+.hmpps-white-font {
+  color: govuk-colour("white")
+}
+
 @media (min-width: 40.0625em) {
   .hmpps-conditional-summary-row {
     display: table-row-group;

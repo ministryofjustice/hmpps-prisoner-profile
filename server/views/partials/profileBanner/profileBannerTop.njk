@@ -43,9 +43,13 @@
             {% for link in  profileBannerTopLinks %}
               <div class="{{ link.classes }}">
                 <h3 class="govuk-heading-s">{{ link.heading }}</h3>
-                <a href="{{ link.url }}" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse"
-                  >{{ link.info }}</a
-                >
+                {% if  link.url === undefined %}
+                  <span data-qa="prisoner-csra-info-without-link" class="hmpps-white-font">{{ link.info }}</span>
+                {% else %}
+                  <a data-qa="prisoner-csra-info-with-link" href="{{ link.url }}" aria-label="{{ link.hiddenLabel }}" class="govuk-link govuk-link--inverse"
+                    >{{ link.info }}</a
+                  >
+                {% endif %}
               </div>
             {% endfor %}
           </div>

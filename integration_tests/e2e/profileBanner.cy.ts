@@ -23,6 +23,12 @@ context('Profile banner', () => {
         visitOverviewPage()
         cy.getDataQa('visible-outside-establishment-banner').should('exist')
       })
+
+      it('Displays CSRA info without the link', () => {
+        visitOverviewPage()
+        const overviewPage = new OverviewPage()
+        overviewPage.csraWithoutLink().should('exist')
+      })
     })
   })
 
@@ -105,6 +111,12 @@ context('Profile banner', () => {
       cy.getDataQa('TRN-establishment-banner').should('exist')
       const indexPage = new IndexPage()
       indexPage.prisonerTRNBanner().should('exist')
+    })
+
+    it('Displays CSRA info with the link', () => {
+      visitOverviewPage()
+      const overviewPage = new OverviewPage()
+      overviewPage.csraWithLink().should('exist')
     })
   })
 })
