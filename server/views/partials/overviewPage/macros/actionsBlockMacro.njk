@@ -5,7 +5,7 @@
       {% for action in actions %}
       <li>
         <img src="/assets/images/{{ action.icon }}.svg" role="presentation" alt="" width="40px" height="40px" />
-        <a href="{{ action.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="{{ action.dataQA }}">{{ action.text }}</a>
+        <a href="{{ action.url }}" class="govuk-link govuk-link--no-visited-state" data-qa="{{ action.dataQA }}" referrerpolicy="no-referrer-when-downgrade">{{ action.text }}</a>
       </li>
       {% endfor %}
     </ul>

@@ -66,16 +66,54 @@
 
 .prisoner-profile-breadcrumbs {
   @include govuk-clearfix;
+  margin-top: 15px;
+  margin-bottom: 15px;
+
+  &__back {
+    float: left;
+
+    a::before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 2px;
+      width: 0.4375em;
+      height: 0.4375em;
+      margin: auto 0;
+      -ms-transform: rotate(225deg);
+      transform: rotate(225deg);
+      border: solid;
+      border-width: 1px 1px 0 0;
+      border-color: govuk-colour('black');
+    }
+
+    a:link, a:visited {
+      display: inline-block;
+      position: relative;
+      padding-left: 12px;
+      color: govuk-colour('black');
+    }
+  }
 
   &__search {
     @include govuk-font($size: 16);
     float: left;
-    margin: govuk-spacing(3) govuk-spacing(3) govuk-spacing(2) 0;
-    border-right: 1px solid $govuk-secondary-text-colour;
-    padding-right: govuk-spacing(3);
+
+    &:has(+ .prisoner-profile-breadcrumbs__breadcrumbs ol > li > a) {
+      border-right: 1px solid $govuk-secondary-text-colour;
+      padding-right: govuk-spacing(3);
+      margin-right: govuk-spacing(3);
+    }
   }
 
   &__breadcrumbs {
     float: left;
+  }
+
+  .govuk-breadcrumbs {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }

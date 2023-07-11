@@ -46,4 +46,6 @@ export default class CaseNotesPage extends Page {
   filterDateFromLabel = (): PageElement => cy.get(':nth-child(3) > .govuk-label')
 
   filterDateToLabel = (): PageElement => cy.get(':nth-child(4) > .govuk-label')
+
+  successMessage = (): PageElement => cy.get('.hmpps-flash-message--success > p')
 }

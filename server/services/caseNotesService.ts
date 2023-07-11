@@ -7,7 +7,7 @@ import { formatDateTimeISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
-import { CaseNote, CaseNoteAmendment } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNote, CaseNoteAmendment, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
@@ -64,6 +64,7 @@ export default class CaseNotesService {
   /**
    * Handle request for case notes
    *
+   * @param token
    * @param prisonerData
    * @param queryParams
    * @param canDeleteSensitiveCaseNotes
@@ -85,26 +86,9 @@ export default class CaseNotesService {
     const errors: HmppsError[] = this.validateFilters(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList
-    let types: { value: string; text: string }[] = []
-    let subTypes: { value: string; text: string }[] = []
-    const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = {}
+    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
 
     if (!errors.length) {
-      const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
-      types = caseNoteTypes?.map(type => ({ value: type.code, text: type.description }))
-      caseNoteTypes.forEach(type => {
-        typeSubTypeMap[type.code] = type.subCodes?.map(s => ({ value: s.code, text: s.description }))
-      })
-      if (queryParams.type) {
-        const selectedType = caseNoteTypes.find(type => type.code === queryParams.type)
-        if (selectedType) {
-          subTypes = selectedType.subCodes?.map(subType => ({
-            value: subType.code,
-            text: subType.description,
-          }))
-        }
-      }
-
       pagedCaseNotes = await caseNotesApiClient.getCaseNotes(
         prisonerData.prisonerNumber,
         this.mapToApiParams(queryParams),
@@ -133,11 +117,27 @@ export default class CaseNotesService {
         sortOptions,
         'Sort by',
       ),
-      types,
-      subTypes,
-      typeSubTypeMap,
+      caseNoteTypes,
       fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
       errors,
     }
+  }
+
+  public async getCaseNoteTypesForUser(token: string) {
+    const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
+    return caseNotesApiClient.getCaseNoteTypesForUser()
+  }
+
+  public async addCaseNote(token: string, prisonerNumber: string, caseNote: CaseNoteForm) {
+    const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
+    const dateTime = parseDate(caseNote.date).setHours(+caseNote.hours, +caseNote.minutes, 0)
+    const occurrenceDateTime = formatDateTimeISO(new Date(dateTime))
+
+    return caseNotesApiClient.addCaseNote(prisonerNumber, {
+      type: caseNote.type,
+      subType: caseNote.subType,
+      text: caseNote.text,
+      occurrenceDateTime,
+    })
   }
 }
