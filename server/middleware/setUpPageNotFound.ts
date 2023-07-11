@@ -10,5 +10,5 @@ export default (req: Request, res: Response) => {
     },
     hideBackLink: true,
   }
-  res.render('notFound.njk', { url: req.headers.referer || '/' })
+  res.render('notFound', { url: req.headers.referer || '/' })
 }
