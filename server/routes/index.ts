@@ -1,4 +1,4 @@
-import { Request, type RequestHandler, Response, Router } from 'express'
+import { NextFunction, Request, type RequestHandler, Response, Router } from 'express'
 import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { Prisoner } from '../interfaces/prisoner'
@@ -23,7 +23,12 @@ import caseNotesRouter from './caseNotesRouter'
 export default function routes(services: Services): Router {
   const router = Router()
 
-  async function checkPrisonerInCaseLoad(req: Request, res: Response, func: (prisonerData: Prisoner) => Promise<void>) {
+  async function checkPrisonerInCaseLoad(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    func: (prisonerData: Prisoner) => Promise<void>,
+  ) {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
     const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
@@ -42,28 +47,27 @@ export default function routes(services: Services): Router {
 
       if (inactiveBooking) {
         if (!userHasRoles([Role.InactiveBookings], res.locals.user.userRoles)) {
-          return res.render('notFound.njk', {
-            url: req.headers.referer,
-          })
+          return next()
         }
       } else {
-        return res.render('notFound.njk', {
-          url: req.headers.referer,
-        })
+        return next()
       }
     }
 
     return func(prisonerData)
   }
 
-  async function checkPrisonerExists(req: Request, res: Response, func: (prisonerData: Prisoner) => Promise<void>) {
+  async function checkPrisonerExists(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    func: (prisonerData: Prisoner) => Promise<void>,
+  ) {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     if (prisonerData.prisonerNumber === undefined) {
-      return res.render('notFound.njk', {
-        url: req.headers.referer,
-      })
+      return next()
     }
     return func(prisonerData)
   }
@@ -87,8 +91,8 @@ export default function routes(services: Services): Router {
   commonRoutes()
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const overviewController = new OverviewController(
           services.prisonerSearchService,
           services.overviewPageService,
@@ -101,8 +105,8 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData: Prisoner) => {
         res.render('pages/photoPage', {
           pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
           ...mapHeaderData(prisonerData, res.locals.user),
@@ -112,8 +116,8 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      await checkPrisonerInCaseLoad(req, res, async (prisonerData: Prisoner) => {
+    await checkPrisonerExists(req, res, next, async () => {
+      await checkPrisonerInCaseLoad(req, res, next, async (prisonerData: Prisoner) => {
         const { personalPageService } = services
         const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
 
@@ -127,8 +131,8 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const { workAndSkillsPageService } = services
         const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
 
@@ -149,23 +153,23 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/alerts', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
+    await checkPrisonerExists(req, res, next, async () => {
       res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
     })
   })
 
-  get('/prisoner/:prisonerNumber/alerts/active', async (req, res) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+  get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
         return alertsController.displayAlerts(req, res, prisonerData)
       })
     })
   })
 
-  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+  get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
         return alertsController.displayAlerts(req, res, prisonerData)
       })
@@ -173,8 +177,8 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      await checkPrisonerInCaseLoad(req, res, async prisonerData => {
+    await checkPrisonerExists(req, res, next, async () => {
+      await checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const { offencesPageService } = services
         const offencesPageData = await offencesPageService.get(res.locals.clientToken, prisonerData)
 
@@ -191,8 +195,8 @@ export default function routes(services: Services): Router {
   router.use(caseNotesRouter(services))
 
   get('/prisoner/:prisonerNumber/active-punishments', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const { activePunishmentsPageService } = services
         const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
 
@@ -207,16 +211,16 @@ export default function routes(services: Services): Router {
   })
 
   get('/prisoner/:prisonerNumber/adjudications', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         res.redirect(`${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/adjudications`)
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/x-ray-body-scans', async (req, res, next) => {
-    await checkPrisonerExists(req, res, async () => {
-      checkPrisonerInCaseLoad(req, res, async prisonerData => {
+    await checkPrisonerExists(req, res, next, async () => {
+      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
         const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
         const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 

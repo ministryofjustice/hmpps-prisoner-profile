@@ -6,9 +6,10 @@ import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
 import { permissionsTests } from './permissionsTests'
 import { formatDate } from '../../server/utils/dateHelpers'
+import NotFoundPage from '../pages/notFoundPage'
 
-const visitPersonalDetailsPage = () => {
-  cy.signIn({ redirectPath: 'prisoner/G6123VU/personal' })
+const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
 }
 
 context('When signed in', () => {
@@ -18,7 +19,7 @@ context('When signed in', () => {
   context('Permissions', () => {
     const visitPage = prisonerDataOverrides => {
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId, prisonerDataOverrides })
-      visitPersonalDetailsPage()
+      visitPersonalDetailsPage({ failOnStatusCode: false })
     }
 
     permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PersonalPage })
@@ -70,8 +71,8 @@ context('When signed in', () => {
     })
 
     it('Personal page should go to 404 not found page', () => {
-      cy.visit(`/prisoner/asudhsdudhid/personal`)
-      cy.request(`/prisoner/asudhsdudhid/personal`).its('body').should('contain', 'Page not found')
+      cy.visit(`/prisoner/asudhsdudhid/personal`, { failOnStatusCode: false })
+      Page.verifyOnPage(NotFoundPage)
     })
   })
 

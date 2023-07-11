@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
@@ -27,7 +27,7 @@ export default class CaseNotesController {
   ) {}
 
   public displayCaseNotes(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: PagedListQueryParams = {}
       const { clientToken } = res.locals
@@ -49,9 +49,7 @@ export default class CaseNotesController {
 
       // If user cannot view this prisoner's case notes, redirect to 404 page
       if (!canViewCaseNotes(res.locals.user, prisonerData)) {
-        return res.render('notFound.njk', {
-          url: req.headers.referer || `/prisoner/${prisonerData.prisonerNumber}`,
-        })
+        return next()
       }
 
       const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
@@ -92,7 +90,7 @@ export default class CaseNotesController {
   }
 
   public displayAddCaseNote(): RequestHandler {
-    return async (req: Request, res: Response) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const { clientToken } = res.locals
       const userToken = res.locals.user.token
       const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient } =
@@ -101,9 +99,7 @@ export default class CaseNotesController {
 
       // If user cannot view this prisoner's case notes, redirect to 404 page
       if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient })) {
-        return res.render('notFound.njk', {
-          url: req.headers.referer || `/prisoner/${prisonerNumber}`,
-        })
+        return next()
       }
 
       const now = new Date()

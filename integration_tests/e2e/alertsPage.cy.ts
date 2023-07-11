@@ -2,9 +2,10 @@ import Page from '../pages/page'
 import AlertsPage from '../pages/alertsPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
+import NotFoundPage from '../pages/notFoundPage'
 
-const visitActiveAlertsPage = () => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/active' })
+const visitActiveAlertsPage = ({ failOnStatusCode = true } = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/alerts/active' })
 }
 
 const visitInactiveAlertsPage = () => {
@@ -19,7 +20,7 @@ context('Alerts Page - Permissions', () => {
   context('Active alerts', () => {
     const visitPage = prisonerDataOverrides => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonerDataOverrides })
-      visitActiveAlertsPage()
+      visitActiveAlertsPage({ failOnStatusCode: false })
     }
 
     permissionsTests({
@@ -224,7 +225,7 @@ context('Alerts Page - User has Update Alert role', () => {
   })
 
   it('Alert page should go to 404 not found page', () => {
-    cy.visit(`/prisoner/asudhsdudhid/alerts/active`)
-    cy.request(`/prisoner/asudhsdudhid/alerts/active`).its('body').should('contain', 'Page not found')
+    cy.visit(`/prisoner/asudhsdudhid/alerts/active`, { failOnStatusCode: false })
+    Page.verifyOnPage(NotFoundPage)
   })
 })
