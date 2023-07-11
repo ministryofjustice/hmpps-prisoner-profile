@@ -7,7 +7,7 @@ const visitOverviewPage = (): OverviewPage => {
 }
 
 context('Feedback banner', () => {
-  context.skip('Given the active caseload matches a feedback enabled prison', () => {
+  context('Given the active caseload matches a feedback enabled prison', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
