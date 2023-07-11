@@ -26,8 +26,8 @@ export const caseNoteTypesMock: CaseNoteType[] = [
     activeFlag: 'Y',
     subCodes: [
       {
-        code: 'OMiC',
-        description: 'OMiC',
+        code: 'OPEN_COMM',
+        description: 'Open Case Note',
         activeFlag: 'Y',
         subCodes: [],
         sensitive: true,

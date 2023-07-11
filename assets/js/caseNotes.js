@@ -17,6 +17,21 @@ function toggleBehaviourPrompts() {
 
 toggleBehaviourPrompts()
 
+function toggleOpenCaseNoteWarning() {
+  const openCaseNoteWarning = document.querySelectorAll('.case-notes-omic-open')
+  const subTypeElement = document.getElementById('subType')
+
+  if (!openCaseNoteWarning?.length) return
+
+  openCaseNoteWarning.forEach(el => el.classList.remove('is-visible'))
+  const entryType = subTypeElement.value
+  if (entryType === 'OPEN_COMM') {
+    openCaseNoteWarning.forEach(el => el.classList.add('is-visible'))
+  }
+}
+
+toggleOpenCaseNoteWarning()
+
 function initTypeSubTypeDropdowns() {
   const typeElement = document.getElementById('type')
   const subTypeElement = document.getElementById('subType')
@@ -24,11 +39,16 @@ function initTypeSubTypeDropdowns() {
 
   typeElement.addEventListener('change', () => {
     toggleBehaviourPrompts()
+    toggleOpenCaseNoteWarning()
     subTypeElement.length = 1
     if (typeElement.value === '') return
     typeSubTypeMap[typeElement.value]?.forEach(subType => {
       subTypeElement.add(new Option(subType.text, subType.value))
     })
+  })
+
+  subTypeElement.addEventListener('change', () => {
+    toggleOpenCaseNoteWarning()
   })
 }
 

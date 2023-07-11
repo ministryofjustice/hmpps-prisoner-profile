@@ -62,6 +62,15 @@ context('Add Case Note Page', () => {
       })
     })
 
+    context('Choosing OMiC Open Case Note', () => {
+      it('should show OMiC Open Case Note warning and hint', () => {
+        addCaseNotePage.typeField().select('OMiC')
+        addCaseNotePage.subTypeField().select('Open Case Note')
+        addCaseNotePage.omicWarning().should('be.visible')
+        addCaseNotePage.omicHint().should('be.visible')
+      })
+    })
+
     context('Attempting to add an invalid case note', () => {
       it('should show validation messages when no data is entered', () => {
         addCaseNotePage.dateField().clear()

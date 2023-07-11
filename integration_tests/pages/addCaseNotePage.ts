@@ -24,4 +24,8 @@ export default class AddCaseNotePage extends Page {
   backLink = (): PageElement => cy.get('[data-qa=referer-back-link]')
 
   errorBlock = (): PageElement => cy.get('.govuk-error-summary')
+
+  omicWarning = (): PageElement => cy.get('[data-qa=omic-open-warning]')
+
+  omicHint = (): PageElement => cy.get('[data-qa=omic-open-hint]')
 }
