@@ -5,6 +5,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 {% extends "../index.njk" %}
 {% set pageTitle = 'Add a case note' %}
@@ -58,6 +59,13 @@
                 items: subTypes | addDefaultSelectedValue('Choose sub-type') | setSelected(formValues.subType)
             }) }}
 
+            {{ govukWarningText({
+                text: "This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.",
+                iconFallbackText: "Warning",
+                classes: 'case-notes-omic-open case-notes-omic-open-warning',
+                attributes: { 'data-qa': 'omic-open-warning'}
+            }) }}
+
             {{ govukCharacterCount({
                 name: "text",
                 id: "text",
@@ -68,6 +76,11 @@
                 label: {
                     text: "What happened?",
                     classes: "govuk-!-font-weight-bold govuk-!-margin-top-8"
+                },
+                hint: {
+                    text: 'Do not save any sensitive information as an OMiC open case note.',
+                    classes: 'case-notes-omic-open',
+                    attributes: { 'data-qa': 'omic-open-hint'}
                 }
             }) }}
 
