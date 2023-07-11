@@ -32,7 +32,7 @@ generic-service:
     PATHFINDER_UI_URL: "https://dev.pathfinder.service.justice.gov.uk"
     MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases-dev.hmpps.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-dev.prison.service.justice.gov.uk"
-    FEEDBACK_ENABLED_PRISONS: "LEI"
+    FEEDBACK_ENABLED_PRISONS: ""
     SYSTEM_PHASE: "DEV"
 
 generic-prometheus-alerts:
