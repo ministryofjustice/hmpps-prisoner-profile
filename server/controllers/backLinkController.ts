@@ -32,9 +32,14 @@ export const saveBackLink =
     const registeredService = registeredServices.find(e => e.name === service)
     if (!registeredService) throw new Error(`Could not find service: [${service}]`)
 
-    req.session.userBackLink = {
-      url: registeredService.hostname + returnPath,
-      text: backLinkText || registeredService.defaultBackLinkText,
+    if (registeredService.name === 'welcome-people-into-prison' && redirectPath.includes('add-case-note')) {
+      req.flash('addCaseNoteRefererUrl', registeredService.hostname + returnPath)
+    } else {
+      req.session.userBackLink = {
+        url: registeredService.hostname + returnPath,
+        text: backLinkText || registeredService.defaultBackLinkText,
+      }
     }
+
     res.redirect(sanitizeUrl(config.domain) + redirectPath)
   }
