@@ -1,6 +1,12 @@
 .hmpps-datepicker {
   position: relative;
 
+  &--fixed-width {
+    .hmpps-datepicker-input__wrapper {
+      width: 215px;
+    }
+  }
+
   &__dialog {
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
 
@@ -211,6 +217,7 @@
 
 .hmpps-datepicker-input__wrapper {
   display: flex;
+  position: relative;
   margin-bottom: 24px;
   overflow: visible;
 

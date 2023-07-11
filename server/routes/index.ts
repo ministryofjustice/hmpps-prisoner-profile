@@ -4,22 +4,21 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import { Prisoner } from '../interfaces/prisoner'
 import { mapHeaderData } from '../mappers/headerMappers'
 import AlertsController from '../controllers/alertsController'
-import CaseNotesController from '../controllers/caseNotesController'
 import OverviewController from '../controllers/overviewController'
 import {
-  SortType,
   formatName,
   prisonerBelongsToUsersCaseLoad,
   sortArrayOfObjectsByDate,
+  SortType,
   userHasRoles,
 } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { dataAccess } from '../data'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Assessment } from '../interfaces/prisonApi/assessment'
+import caseNotesRouter from './caseNotesRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -189,16 +188,7 @@ export default function routes(services: Services): Router {
     })
   })
 
-  get('/prisoner/:prisonerNumber/case-notes', async (req, res) => {
-    await checkPrisonerExists(req, res, async () => {
-      const caseNotesController = new CaseNotesController(
-        dataAccess.prisonApiClientBuilder,
-        services.prisonerSearchService,
-        services.caseNotesService,
-      )
-      return caseNotesController.displayCaseNotes(req, res)
-    })
-  })
+  router.use(caseNotesRouter(services))
 
   get('/prisoner/:prisonerNumber/active-punishments', async (req, res, next) => {
     await checkPrisonerExists(req, res, async () => {

@@ -1,14 +1,19 @@
 .govuk-main-wrapper {
   min-height: 600px;
   padding-top: 0;
+
+  & > .govuk-error-summary {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
 }
 
 .govuk-link, a.govuk-tabs__tab {
   text-underline-offset: .1em;
 }
 
-.govuk-error-summary {
-  margin-top: 50px;
+.hmpps-profile-banner + .govuk-error-summary {
+  margin-top: 35px;
   margin-bottom: 0;
 }
 

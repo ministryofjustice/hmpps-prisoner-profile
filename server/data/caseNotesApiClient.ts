@@ -1,22 +1,23 @@
-import config from '../config'
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-import { PagedListQueryParams, PagedList } from '../interfaces/prisonApi/pagedList'
+import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import { CaseNoteType } from '../interfaces/caseNoteType'
+import { CaseNote } from '../interfaces/caseNotesApi/caseNote'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   constructor(private readonly restClient: RestClient) {}
 
-  private async get<T>(args: object, localMockData?: T): Promise<T> {
+  private async get<T>(args: object): Promise<T> {
     try {
       return await this.restClient.get<T>(args)
     } catch (error) {
-      if (config.localMockData === 'true' && localMockData) {
-        return localMockData
-      }
       return error
     }
+  }
+
+  private async post(args: object): Promise<unknown> {
+    return this.restClient.post(args)
   }
 
   async getCaseNotes(offenderNumber: string, queryParams?: PagedListQueryParams): Promise<PagedList> {
@@ -30,5 +31,13 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
 
   async getCaseNoteTypes(): Promise<CaseNoteType[]> {
     return this.get<CaseNoteType[]>({ path: `/case-notes/types` })
+  }
+
+  async getCaseNoteTypesForUser(): Promise<CaseNoteType[]> {
+    return this.get<CaseNoteType[]>({ path: `/case-notes/types-for-user` })
+  }
+
+  async addCaseNote(prisonerNumber: string, caseNote: CaseNote): Promise<CaseNote> {
+    return (await this.post({ path: `/case-notes/${prisonerNumber}`, data: caseNote })) as Promise<CaseNote>
   }
 }

@@ -1,0 +1,60 @@
+.hmpps-flash-message {
+  position: absolute;
+  left: 50%;
+
+  p {
+    position: relative;
+    left: -50%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    @include govuk-font($size: 19, $weight: 'bold');
+    padding: 10px 30px;
+    margin-bottom: 0;
+  }
+
+  &--success p {
+    background-color: $govuk-success-colour;
+    color: govuk-colour("white");
+
+    &::before {
+      content: url("/assets/images/tick-icon.svg");
+      height: 25px;
+      margin-right: 12px;
+    }
+  }
+
+  &--info p {
+    background-color: govuk-colour("light-blue");
+    color: govuk-colour("white");
+
+    &::before {
+      content: url("/assets/images/info-icon.svg");
+      height: 25px;
+      margin-right: 12px;
+    }
+  }
+
+  &--warn p {
+    background-color: govuk-colour("orange");
+    color: govuk-colour("white");
+
+    &::before {
+      content: url("/assets/images/warn-icon.svg");
+      height: 25px;
+      margin-right: 12px;
+    }
+  }
+
+  &--error p {
+    background-color: $govuk-error-colour;
+    color: govuk-colour("white");
+
+    &::before {
+      content: url("/assets/images/cross-icon.svg");
+      height: 25px;
+      margin-right: 12px;
+    }
+  }
+
+}

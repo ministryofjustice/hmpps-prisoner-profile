@@ -16,6 +16,9 @@ export default function setUpWebSecurity(): Router {
     helmet({
       contentSecurityPolicy: {
         directives: {
+          // FIXME (at some point) Need to use '*' for form-action directive as implementation is "broken" when the server redirects after processing form POST
+          // As of 03/07/2023 there seems to be no good resolution for this. See https://github.com/w3c/webappsec-csp/issues/8
+          formAction: ['*'],
           defaultSrc: ["'self'"],
           // This nonce allows us to use scripts with the use of the `cspNonce` local, e.g (in a Nunjucks template):
           // <script nonce="{{ cspNonce }}">

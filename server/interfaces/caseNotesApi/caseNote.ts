@@ -7,20 +7,29 @@ export interface CaseNoteAmendment {
 }
 
 export interface CaseNote extends PagedListItem {
-  caseNoteId: number
-  offenderIdentifier: string
+  caseNoteId?: number
+  offenderIdentifier?: string
   type: string
-  typeDescription: string
+  typeDescription?: string
   subType: string
-  subTypeDescription: string
-  source: string
-  creationDateTime: string
+  subTypeDescription?: string
+  source?: string
+  creationDateTime?: string
   occurrenceDateTime: string
-  authorName: string
-  authorUserId: number
+  authorName?: string
+  authorUserId?: number
   text: string
-  locationId: string
-  eventId: number
-  sensitive: boolean
-  amendments: CaseNoteAmendment[]
+  locationId?: string
+  eventId?: number
+  sensitive?: boolean
+  amendments?: CaseNoteAmendment[]
+}
+
+export interface CaseNoteForm {
+  type: string
+  subType: string
+  text: string
+  date: string
+  hours: string
+  minutes: string
 }
