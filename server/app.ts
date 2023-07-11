@@ -19,9 +19,9 @@ import setUpWebSession from './middleware/setUpWebSession'
 import routes from './routes'
 import type { Services } from './services'
 import populateClientToken from './middleware/populateClientToken'
+import setUpPageNotFound from './middleware/setUpPageNotFound'
 import setUpPhaseName from './middleware/setUpPhaseName'
 import flashMessageMiddleware from './middleware/flashMessageMiddleware'
-import setUpPageNotFound from './middleware/setUpPageNotFound'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
