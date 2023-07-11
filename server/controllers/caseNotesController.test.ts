@@ -146,8 +146,8 @@ describe('Case Notes Controller', () => {
         ],
         OMIC: [
           {
-            text: 'OMiC',
-            value: 'OMiC',
+            text: 'Open Case Note',
+            value: 'OPEN_COMM',
           },
         ],
       },
