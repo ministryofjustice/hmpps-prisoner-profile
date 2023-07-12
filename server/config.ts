@@ -1,7 +1,7 @@
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
-  if (process.env[name]) {
+  if (process.env[name] !== undefined) {
     return process.env[name]
   }
   if (fallback !== undefined && (!production || !options.requireInProduction)) {
