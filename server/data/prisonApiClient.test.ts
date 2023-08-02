@@ -67,7 +67,7 @@ describe('prisonApiClient', () => {
   describe('getNonAssociations', () => {
     it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
       mockSuccessfulPrisonApiCall(
-        `/api/offenders/${prisonerNumber}/non-association-details`,
+        `/api/offenders/${prisonerNumber}/non-association-details?currentPrisonOnly=true&excludeInactive=true`,
         nonAssociationDetailsDummyData,
       )
 
