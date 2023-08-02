@@ -19,6 +19,11 @@ export const registeredBackLinkServices: RegisteredService[] = [
     hostname: sanitizeUrl(config.serviceUrls.welcomePeopleIntoPrison),
     defaultBackLinkText: 'Back to Welcome people into prison',
   },
+  {
+    name: 'create-and-vary-a-licence',
+    hostname: sanitizeUrl(config.serviceUrls.createAndVaryALicence),
+    defaultBackLinkText: 'Back to Create and vary a licence',
+  },
 ]
 
 export const saveBackLink =
