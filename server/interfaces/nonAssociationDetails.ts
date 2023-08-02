@@ -2,9 +2,9 @@ export type NonAssociation = {
   offenderNo: string
   firstName: string
   lastName: string
+  agencyId: string
   agencyDescription: string
   assignedLivingUnitDescription: string
-  assignedLivingUnitId: number
   reasonCode: string
   reasonDescription: string
 }
@@ -25,8 +25,8 @@ export type NonAssociationDetails = {
   offenderNo: string
   firstName: string
   lastName: string
+  agencyId: string
   agencyDescription: string
   assignedLivingUnitDescription: string
   nonAssociations: NonAssociationDetail[]
-  assignedLivingUnitId: number
 }

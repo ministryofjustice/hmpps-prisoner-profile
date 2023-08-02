@@ -6,9 +6,9 @@ const nonAssociationA: NonAssociation = {
   lastName: 'Doe',
   reasonCode: 'VIC',
   reasonDescription: 'Victim',
+  agencyId: 'MDI',
   agencyDescription: 'Moorland (HMP & YOI)',
   assignedLivingUnitDescription: 'NMI-RECP',
-  assignedLivingUnitId: 1234,
 }
 
 const nonAssociationDetailA: NonAssociationDetail = {
@@ -29,9 +29,9 @@ const nonAssociationB: NonAssociation = {
   lastName: 'Incognito',
   reasonCode: 'RIV',
   reasonDescription: 'Rival Gang',
+  agencyId: 'MDI',
   agencyDescription: 'Moorland (HMP & YOI)',
   assignedLivingUnitDescription: 'NMI-RECP',
-  assignedLivingUnitId: 1234,
 }
 
 const nonAssociationDetailB: NonAssociationDetail = {
@@ -50,9 +50,9 @@ const nonAssociationDetailsDummyData: NonAssociationDetails = {
   offenderNo: 'G6123VU',
   firstName: 'John',
   lastName: 'Saunders',
+  agencyId: 'MDI',
   agencyDescription: 'Moorland (HMP & YOI)',
   assignedLivingUnitDescription: 'MDI-5-1-A-012',
-  assignedLivingUnitId: 26019,
   nonAssociations: [nonAssociationDetailA, nonAssociationDetailB],
 }
 
