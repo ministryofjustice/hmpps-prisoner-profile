@@ -148,8 +148,7 @@ export default class OverviewPageService {
   }
 
   async getMainOffenceDescription(mainOffence: MainOffence[]): Promise<string> {
-    const desc = mainOffence[0] && mainOffence[0].offenceDescription ? mainOffence[0].offenceDescription : 'Not entered'
-    return desc
+    return mainOffence[0] && mainOffence[0].offenceDescription ? mainOffence[0].offenceDescription : 'Not entered'
   }
 
   async getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {
@@ -206,7 +205,7 @@ export default class OverviewPageService {
       (allocationManager as Pom).secondary_pom.name &&
       getNamesFromString((allocationManager as Pom).secondary_pom.name)
 
-    const staffContacts = {
+    return {
       keyWorker: {
         name:
           offenderKeyWorker && offenderKeyWorker.firstName
@@ -233,8 +232,6 @@ export default class OverviewPageService {
           : 'Not assigned',
       linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
     }
-
-    return staffContacts
   }
 
   public async getPersonalDetails(prisonerData: Prisoner): Promise<PersonalDetails> {
@@ -512,22 +509,18 @@ export default class OverviewPageService {
     const nonAssociations = await this.prisonApiClient.getNonAssociationDetails(prisonerNumber)
     if (!nonAssociations?.nonAssociations) return []
 
-    return nonAssociations.nonAssociations
-      .filter(nonassociation => {
-        return nonassociation.offenderNonAssociation.agencyDescription === nonAssociations.agencyDescription
-      })
-      .map(nonAssocation => {
-        const { offenderNonAssociation } = nonAssocation
-        const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
-        return [
-          {
-            html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${offenderNonAssociation.offenderNo}">${nonAssociationName}</a>`,
-          },
-          { text: offenderNonAssociation.offenderNo },
-          { text: offenderNonAssociation.assignedLivingUnitDescription },
-          { text: offenderNonAssociation.reasonDescription },
-        ]
-      })
+    return nonAssociations.nonAssociations.map(nonAssocation => {
+      const { offenderNonAssociation } = nonAssocation
+      const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
+      return [
+        {
+          html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${offenderNonAssociation.offenderNo}">${nonAssociationName}</a>`,
+        },
+        { text: offenderNonAssociation.offenderNo },
+        { text: offenderNonAssociation.assignedLivingUnitDescription },
+        { text: offenderNonAssociation.reasonDescription },
+      ]
+    })
   }
 
   private async getStatuses(prisonerData: Prisoner): Promise<Status[]> {

@@ -134,17 +134,6 @@ describe('OverviewPageService', () => {
       expect(associationRowTwo[3].text).toEqual('Rival Gang')
     })
 
-    it('Only shows non associations that are part of the same prison', async () => {
-      const nonAssocations = { ...nonAssociationDetailsDummyData }
-      nonAssocations.nonAssociations[0].offenderNonAssociation.agencyDescription = 'Somewhere else'
-      prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssocations)
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get('token', { prisonerNumber: 'ABC123' } as Prisoner, 1)
-      const expectedPrisonNumber = nonAssocations.nonAssociations[1].offenderNonAssociation.offenderNo
-      expect(res.nonAssociations.length).toEqual(1)
-      expect(res.nonAssociations[0][1].text).toEqual(expectedPrisonNumber)
-    })
-
     it('Returns an empty list if no non-associations are returned', async () => {
       const nonAssocations = { ...nonAssociationDetailsDummyData }
       nonAssocations.nonAssociations = []

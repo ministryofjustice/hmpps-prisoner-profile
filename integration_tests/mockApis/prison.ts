@@ -69,7 +69,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offenders/${prisonerNumber}/non-association-details`,
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/non-association-details.*`,
       },
       response: {
         status: 200,
