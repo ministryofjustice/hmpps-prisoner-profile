@@ -1,5 +1,5 @@
-import { Request, RequestHandler, Response } from 'express'
 import path from 'path'
+import { Request, RequestHandler, Response } from 'express'
 import OffenderService from '../../services/offenderService'
 
 const placeHolderImage = path.join(process.cwd(), '/assets/images/prisoner-profile-image.png')
