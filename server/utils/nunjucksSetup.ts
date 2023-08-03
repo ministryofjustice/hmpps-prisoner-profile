@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
+import * as pathModule from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
-import * as pathModule from 'path'
 import {
   addressToLines,
   findError,
