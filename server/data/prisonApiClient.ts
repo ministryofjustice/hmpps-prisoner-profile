@@ -82,7 +82,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails> {
     return this.get<NonAssociationDetails>(
-      { path: `/api/offenders/${prisonerNumber}/non-association-details` },
+      { path: `/api/offenders/${prisonerNumber}/non-association-details?currentPrisonOnly=true&excludeInactive=true` },
       nonAssociationDetailsDummyData,
     )
   }
