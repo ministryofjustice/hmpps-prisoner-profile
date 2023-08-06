@@ -490,18 +490,6 @@ export default class OffencesPageService {
                 },
               ]
             : []),
-          ...(sentenceDetails.earlyRemovalSchemeEligibilityDate
-            ? [
-                {
-                  key: {
-                    text: 'Early Removal Scheme eligibility date (ERSED)',
-                  },
-                  value: {
-                    text: formatDate(sentenceDetails.earlyRemovalSchemeEligibilityDate, 'long'),
-                  },
-                },
-              ]
-            : []),
           ...(sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate
             ? [
                 {

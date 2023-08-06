@@ -1,4 +1,5 @@
 import { UserDetails } from '../../services/userService'
+import { HmppsError } from '../../interfaces/hmppsError'
 
 export default {}
 
@@ -23,7 +24,9 @@ export declare global {
     interface Request {
       verified?: boolean
       id: string
+      errors?: HmppsError[]
       logout(done: (err: unknown) => void): void
+      flash(type: string, message: unknown): number
     }
   }
 }

@@ -253,7 +253,7 @@ context('Case Notes Page Not Found', () => {
     })
 
     it('Displays Page Not Found', () => {
-      cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
+      cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/case-notes' })
       Page.verifyOnPage(NotFoundPage)
     })
   })

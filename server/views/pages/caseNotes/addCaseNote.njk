@@ -1,0 +1,188 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% extends "../index.njk" %}
+{% set pageTitle = 'Add a case note' %}
+{% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })}}
+    {% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 id="addCaseNote">Add a case note for {{ prisonerDisplayName }}</h1>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body govuk-!-margin-bottom-6" data-qa="prison-number"><span class="govuk-!-font-weight-bold">Prison number:</span> {{ prisonerNumber }}</p>
+
+        <form method="post" novalidate="novalidate" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
+            {{ govukSelect({
+                id: "type",
+                name: "type",
+                label: {
+                    text: "Type"
+                },
+                errorMessage: errors | findError('type'),
+                items: types | addDefaultSelectedValue('Choose type') | setSelected(formValues.type)
+            }) }}
+
+            {% for behaviourType, prompt in behaviourPrompts %}
+                {{ govukDetails({
+                    summaryText: prompt.summary,
+                    text: prompt.text,
+                    classes: "case-notes-behaviour-prompt case-notes-behaviour-prompt--" + behaviourType
+                }) }}
+            {% endfor %}
+
+            {{ govukSelect({
+                id: "subType",
+                name: "subType",
+                label: {
+                    text: "Sub-type"
+                },
+                errorMessage: errors | findError('subType'),
+                items: subTypes | addDefaultSelectedValue('Choose sub-type') | setSelected(formValues.subType)
+            }) }}
+
+            {{ govukWarningText({
+                text: "This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.",
+                iconFallbackText: "Warning",
+                classes: 'case-notes-omic-open case-notes-omic-open-warning',
+                attributes: { 'data-qa': 'omic-open-warning'}
+            }) }}
+
+            {{ govukCharacterCount({
+                name: "text",
+                id: "text",
+                maxlength: 4000,
+                rows: 10,
+                value: formValues.text,
+                errorMessage: errors | findError('text'),
+                label: {
+                    text: "What happened?",
+                    classes: "govuk-!-font-weight-bold govuk-!-margin-top-8"
+                },
+                hint: {
+                    text: 'Do not save any sensitive information as an OMiC open case note.',
+                    classes: 'case-notes-omic-open',
+                    attributes: { 'data-qa': 'omic-open-hint'}
+                }
+            }) }}
+
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">When this happened</p>
+
+            {{ hmppsDatepicker({
+                id: "date",
+                name: "date",
+                label: {
+                    text: "Date"
+                },
+                errorMessage: errors | findError('date'),
+                classes: 'hmpps-datepicker--fixed-width',
+                value: formValues.date,
+                maxDate: today
+            }) }}
+
+            {% set hoursErrors = errors | findError('hours') %}
+            {% set minutesErrors = errors | findError('minutes') %}
+            {% set timeErrors = [hoursErrors.text, minutesErrors.text] | select() | join('<br>') | safe %}
+            {% set hoursClasses = ("govuk-input govuk-date-input__input govuk-input--width-2 govuk-input--error" if hoursErrors else "govuk-input govuk-date-input__input govuk-input--width-2") %}
+            {% set minutesClasses = ("govuk-input govuk-date-input__input govuk-input--width-2 govuk-input--error" if minutesErrors else "govuk-input govuk-date-input__input govuk-input--width-2") %}
+
+            <div class="govuk-form-group govuk-!-margin-bottom-8 {{ 'govuk-form-group govuk-form-group--error' if hoursErrors or minutesErrors }}">
+                <fieldset class="govuk-fieldset" role="group" aria-describedby="case-note-time-hint">
+                    <legend class="govuk-fieldset__legend govuk-!-margin-bottom-0">
+                        <p class="govuk-fieldset__heading govuk-!-font-weight-regular">
+                            Time
+                        </p>
+                    </legend>
+                    <span id="case-note-time-hint" class="govuk-hint">
+                      This is in the 24 hour clock. For example, 09 08 or 17 32.
+                    </span>
+                    {% if hoursErrors or minutesErrors %}
+                    {{ govukErrorMessage({
+                        id: 'time-error',
+                        text: timeErrors,
+                        visuallyHiddenText: 'Error'
+                    }) }}
+                    {% endif %}
+                    <div class="govuk-date-input govuk-!-margin-top-2">
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                {{ govukInput({
+                                    label: {
+                                        text: "Hours"
+                                    },
+                                    id: "hours",
+                                    name: "hours",
+                                    value: formValues.hours,
+                                    classes: hoursClasses,
+                                    attributes: {
+                                        pattern: "[0-9]*",
+                                        inputmode: "numeric",
+                                        maxlength: "2"
+                                    }
+                                }) }}
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                {{ govukInput({
+                                    label: {
+                                        text: "Minutes"
+                                    },
+                                    id: "minutes",
+                                    name: "minutes",
+                                    value: formValues.minutes,
+                                    classes: minutesClasses,
+                                    attributes: {
+                                        pattern: "[0-9]*",
+                                        inputmode: "numeric",
+                                        maxlength: "2"
+                                    }
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                    text: "Save",
+                    type: "submit",
+                    preventDoubleClick: true,
+                    attributes: { "data-qa": "add-case-note-submit-button" }
+                }) }}
+                {{ govukButton({
+                    text: "Cancel",
+                    href: refererUrl,
+                    classes: "govuk-button--secondary",
+                    attributes: { "data-qa": "add-case-note-cancel-button" }
+                }) }}
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+{% block pageScripts %}
+    <script id="typeData" type="application/json">{{ typeSubTypeMap | dump | safe }}</script>
+    <script src="/assets/js/caseNotes.js"></script>
+{% endblock %}

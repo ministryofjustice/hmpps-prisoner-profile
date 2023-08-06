@@ -33,6 +33,12 @@
   </div>
 </header>
 
+{% if flashMessage %}
+  <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}">
+    <p role="alert">{{ flashMessage.text }}</p>
+  </div>
+{% endif %}
+
 <div class="hmpps-header__container">
   <div class="hmpps-location-bar location-bar">
     {% if phaseName %}

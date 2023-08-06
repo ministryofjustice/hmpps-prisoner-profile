@@ -7,11 +7,11 @@ const visitOverviewPage = (): OverviewPage => {
 }
 
 context('Feedback banner', () => {
-  context('Given the active caseload matches a feedback enabled prison', () => {
+  context('Given the active caseload does not matche a feedback disabled prison', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        activeCaseLoadId: 'LEI',
+        activeCaseLoadId: 'FNI',
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
@@ -22,11 +22,11 @@ context('Feedback banner', () => {
     })
   })
 
-  context('Given the active caseload matches a feedback enabled prison', () => {
+  context('Given the active caseload matches a feedback disabled prison', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        activeCaseLoadId: 'ZZZ',
+        activeCaseLoadId: 'LEI',
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })

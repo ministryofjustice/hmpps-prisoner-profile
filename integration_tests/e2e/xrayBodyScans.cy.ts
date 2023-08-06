@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import XrayBodyScans from '../pages/xrayBodyScans'
 import { permissionsTests } from './permissionsTests'
+import NotFoundPage from '../pages/notFoundPage'
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
@@ -10,7 +11,7 @@ context('X-ray body scans - Permissions', () => {
   const visitPage = prisonerDataOverrides => {
     cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
     cy.task('stubXrayCareNeeds', { bookingId, numberOfXrays: 10 })
-    cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
+    cy.signIn({ failOnStatusCode: false, redirectPath: `prisoner/${prisonerNumber}/x-ray-body-scans` })
   }
 
   permissionsTests({
@@ -42,9 +43,8 @@ context('X-Ray body scans', () => {
 
   context('404 page', () => {
     it('Photo page should go to 404 not found page', () => {
-      cy.signIn({ redirectPath: `prisoner/asudhsdudhid/x-ray-body-scans` })
-      cy.visit(`/prisoner/asudhsdudhid/x-ray-body-scans`)
-      cy.request(`/prisoner/asudhsdudhid/x-ray-body-scans`).its('body').should('contain', 'Page not found')
+      cy.signIn({ failOnStatusCode: false, redirectPath: `prisoner/asudhsdudhid/x-ray-body-scans` })
+      Page.verifyOnPage(NotFoundPage)
     })
   })
 })

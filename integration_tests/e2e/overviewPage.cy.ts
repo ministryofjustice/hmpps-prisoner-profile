@@ -2,9 +2,10 @@ import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
+import NotFoundPage from '../pages/notFoundPage'
 
-const visitOverviewPage = () => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU' })
+const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
 }
 
 const visitOverviewPageAlt = (): OverviewPage => {
@@ -22,7 +23,7 @@ context('Overview Page', () => {
     const prisonerNumber = 'G6123VU'
     const visitPage = prisonerDataOverrides => {
       cy.setupOverviewPageStubs({ prisonerNumber, bookingId: 1102484, prisonerDataOverrides })
-      visitOverviewPage()
+      visitOverviewPage({ failOnStatusCode: false })
     }
 
     permissionsTests({ prisonerNumber, pageToDisplay: OverviewPage, visitPage })
@@ -569,9 +570,8 @@ context('Overview Page - Prisoner not found', () => {
       })
 
       it('The 404 page should display', () => {
-        cy.signIn({ redirectPath: '/prisoner/G6123VU' })
-        cy.visit(`/prisoner/asudhsdudhid`)
-        cy.request(`/prisoner/asudhsdudhid`).its('body').should('contain', 'Page not found')
+        cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/asudhsdudhid' })
+        Page.verifyOnPage(NotFoundPage)
       })
     })
   })

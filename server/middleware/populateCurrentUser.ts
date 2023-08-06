@@ -17,7 +17,7 @@ export function populateCurrentUser(userService: UserService): RequestHandler {
         }
       }
       const showFeedbackBanner =
-        req.session.userDetails && config.feedbackEnabledPrisons.includes(req.session.userDetails.activeCaseLoadId)
+        req.session.userDetails && !config.feedbackDisabledPrisons.includes(req.session.userDetails.activeCaseLoadId)
 
       res.locals.user = {
         ...req.session.userDetails,

@@ -32,7 +32,7 @@ generic-service:
     PATHFINDER_UI_URL: "https://pathfinder.service.justice.gov.uk"
     MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases.hmpps.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome.prison.service.justice.gov.uk"
-    FEEDBACK_ENABLED_PRISONS: "LEI"
+    FEEDBACK_DISABLED_PRISONS: "LEI"
 
   allowlist:
     office: "217.33.148.210/32"

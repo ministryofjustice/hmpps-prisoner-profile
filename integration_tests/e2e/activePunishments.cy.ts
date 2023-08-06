@@ -1,5 +1,6 @@
 import ActivePunishmentsPage from '../pages/activePunishments'
 import Page from '../pages/page'
+import NotFoundPage from '../pages/notFoundPage'
 
 context('Active punishments', () => {
   const activePunishmentsPageUrl = () => {
@@ -9,9 +10,8 @@ context('Active punishments', () => {
   const prisonerNumber = 'G6123VU'
 
   const activePunishmentsPageUrlNotfound = () => {
-    cy.signIn({ redirectPath: '/prisoner/hsdifuhsifub/active-punishments' })
+    cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/hsdifuhsifub/active-punishments' })
   }
-  const unavailablePrisonerNumber = 'hsdifuhsifub'
 
   beforeEach(() => {
     cy.task('reset')
@@ -47,8 +47,6 @@ context('Active punishments', () => {
 
   it('View history link should go to 404 not found page', () => {
     activePunishmentsPageUrlNotfound()
-    cy.request(`/prisoner/${unavailablePrisonerNumber}/active-punishments`)
-      .its('body')
-      .should('contain', 'Page not found')
+    Page.verifyOnPage(NotFoundPage)
   })
 })

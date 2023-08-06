@@ -84,7 +84,7 @@ export default class OverviewController {
       actions.push({
         text: 'Add case note',
         icon: Icon.AddCaseNote,
-        url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
+        url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
         dataQA: 'add-case-note-action-link',
       })
     }
@@ -92,7 +92,7 @@ export default class OverviewController {
       actions.push({
         text: 'Add key worker session',
         icon: Icon.AddKeyWorkerSession,
-        url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA&subType=KS`,
+        url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA&subType=KS`,
         dataQA: 'add-key-worker-session-action-link',
       })
     }

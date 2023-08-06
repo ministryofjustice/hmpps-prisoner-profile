@@ -1,7 +1,7 @@
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
-  if (process.env[name]) {
+  if (process.env[name] !== undefined) {
     return process.env[name]
   }
   if (fallback !== undefined && (!production || !options.requireInProduction)) {
@@ -162,6 +162,6 @@ export default {
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   localMockData: get('LOCAL_MOCK_DATA', false),
-  feedbackEnabledPrisons: get('FEEDBACK_ENABLED_PRISONS', [], requiredInProduction),
+  feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   phaseName: get('SYSTEM_PHASE', ''),
 }
