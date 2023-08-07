@@ -67,9 +67,9 @@ context('Case Notes Page', () => {
 
     it('Display correct filter labels', () => {
       caseNotesPage.filterDateFromLabel().should('exist')
-      caseNotesPage.filterDateFromLabel().should('contain', 'Date from')
+      caseNotesPage.filterDateFromLabel().should('contain', 'Date from (earliest)')
       caseNotesPage.filterDateToLabel().should('exist')
-      caseNotesPage.filterDateToLabel().should('contain', 'Date to')
+      caseNotesPage.filterDateToLabel().should('contain', 'Date to (latest)')
     })
   })
 

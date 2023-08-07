@@ -18,7 +18,7 @@ export default class AlertsPageService {
   /**
    * Validate alert filters and return errors if appropriate
    *
-   * Only `Date from` and `Date to` can be in error
+   * Only `Date from` and `Date to (latest)` can be in error
    *
    * @param from
    * @param to
@@ -28,15 +28,15 @@ export default class AlertsPageService {
     const errors: HmppsError[] = []
 
     if (from && !isRealDate(from)) {
-      errors.push({ text: `'Date from' must be a real date`, href: '#from' })
+      errors.push({ text: `'Date from (earliest)' must be a real date`, href: '#from' })
     } else if (from && isFuture(parseDate(from))) {
-      errors.push({ text: `'Date from' must be today or in the past`, href: '#from' })
+      errors.push({ text: `'Date from (earliest)' must be today or in the past`, href: '#from' })
     }
 
     if (to && !isRealDate(to)) {
-      errors.push({ text: `'Date to' must be a real date`, href: '#to' })
+      errors.push({ text: `'Date to (latest)' must be a real date`, href: '#to' })
     } else if (to && from && isBefore(parseDate(to), parseDate(from))) {
-      errors.push({ text: `'Date to' must be after or the same as 'Date from'`, href: '#to' })
+      errors.push({ text: `'Date to (latest)' must be after or the same as 'Date from'`, href: '#to' })
     }
 
     return errors

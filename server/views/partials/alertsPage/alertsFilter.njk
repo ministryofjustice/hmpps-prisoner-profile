@@ -31,11 +31,11 @@
             id: "from",
             name: "from",
             label: {
-                text: "Date from",
+                text: "Date from (earliest)",
                 classes: "govuk-label--m"
             },
             hint: {
-              text: "For example, 31/3/2023."
+              text: "For example, 31/3/2022"
             },
             errorMessage: errors | findError('from'),
             value: listMetadata.filtering.from
@@ -44,7 +44,7 @@
             id: "to",
             name: "to",
             label: {
-                text: "Date to",
+                text: "Date to (latest)",
                 classes: "govuk-label--m"
             },
             hint: {
