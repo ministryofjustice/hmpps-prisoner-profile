@@ -36,7 +36,7 @@ export default class AlertsPageService {
     if (to && !isRealDate(to)) {
       errors.push({ text: `'Date to (latest)' must be a real date`, href: '#to' })
     } else if (to && from && isBefore(parseDate(to), parseDate(from))) {
-      errors.push({ text: `'Date to (latest)' must be after or the same as 'Date from'`, href: '#to' })
+      errors.push({ text: `'Date to (latest)' must be after or the same as 'Date from (earliest)'`, href: '#to' })
     }
 
     return errors

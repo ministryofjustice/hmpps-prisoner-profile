@@ -36,7 +36,7 @@ export default class CaseNotesService {
     if (endDate && !isRealDate(endDate)) {
       errors.push({ text: `'Date to (latest)' must be a real date`, href: '#endDate' })
     } else if (endDate && startDate && isBefore(parseDate(endDate), parseDate(startDate))) {
-      errors.push({ text: `'Date to (latest)' must be after or the same as 'Date from'`, href: '#endDate' })
+      errors.push({ text: `'Date to (latest)' must be after or the same as 'Date from (earliest) '`, href: '#endDate' })
     }
 
     return errors
