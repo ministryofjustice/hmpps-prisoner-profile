@@ -15,6 +15,8 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
   const { userRoles, caseLoads } = user
   const profileBannerTopLinks = []
 
+  const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads)
+
   if (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads)) {
     profileBannerTopLinks.push({
       heading: 'Location',
@@ -48,7 +50,9 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
     hiddenLabel: 'View CSRA history',
     info: prisonerData.csra ? prisonerData.csra : 'Not entered',
     classes: '',
-    url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/csra-history`,
+    url: !belongsToCaseLoad
+      ? undefined
+      : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/csra-history`,
   })
   profileBannerTopLinks.push({
     heading: 'Incentive level',
