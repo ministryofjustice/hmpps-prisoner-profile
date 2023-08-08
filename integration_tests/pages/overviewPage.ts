@@ -148,4 +148,9 @@ export default class OverviewPage extends Page {
 
   // On remand
   nextAppearanceDate = (): PageElement => cy.get('[data-qa="overview-next-court-appearance"]')
+
+  // CSRA
+  csraWithoutLink = (): PageElement => cy.get('[data-qa="prisoner-csra-info-without-link"]')
+
+  csraWithLink = (): PageElement => cy.get(':nth-child(3) > [data-qa="prisoner-csra-info-with-link"]')
 }
