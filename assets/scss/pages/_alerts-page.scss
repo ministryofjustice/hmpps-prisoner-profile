@@ -56,7 +56,7 @@
   justify-content: space-between;
   flex-basis: min-content;
   padding-bottom: 30px;
-  border-bottom: 1px solid govuk-colour('black');
+  border-bottom: 1px solid govuk-colour('dark-grey');
   margin-bottom: 30px;
 
   &__content {
@@ -92,7 +92,7 @@
   &__metadata {
     font-size: 16px;
     font-weight: 300;
-    color: $govuk-secondary-text-colour;
+    color: $govuk-text-colour;
   }
 
   &__link {
