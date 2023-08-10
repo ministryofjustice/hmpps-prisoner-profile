@@ -355,8 +355,10 @@ describe('OverviewPageService', () => {
       expect(personalDetailsMain[3].value.text).toEqual(PrisonerMockDataB.nationality)
       expect(personalDetailsMain[4].value.text).toEqual(inmateDetailMock.language)
 
-      expect(personalDetailsSide[0].value.text).toEqual(PrisonerMockDataB.croNumber)
-      expect(personalDetailsSide[1].value.text).toEqual(PrisonerMockDataB.pncNumber)
+      expect(personalDetailsSide[0].value.text).toEqual(PrisonerMockDataB.ethnicity)
+      expect(personalDetailsSide[1].value.text).toEqual(PrisonerMockDataB.religion)
+      expect(personalDetailsSide[2].value.text).toEqual(PrisonerMockDataB.croNumber)
+      expect(personalDetailsSide[3].value.text).toEqual(PrisonerMockDataB.pncNumber)
     })
   })
 

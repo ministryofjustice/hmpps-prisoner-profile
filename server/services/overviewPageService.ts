@@ -283,6 +283,22 @@ export default class OverviewPageService {
     const personalDetailsSide = [
       {
         key: {
+          text: 'Ethnic group',
+        },
+        value: {
+          text: prisonerData.ethnicity ? prisonerData.ethnicity : 'Not entered',
+        },
+      },
+      {
+        key: {
+          text: 'Religion or belief',
+        },
+        value: {
+          text: prisonerData.religion ? prisonerData.religion : 'Not entered',
+        },
+      },
+      {
+        key: {
           text: 'CRO number',
         },
         value: {
