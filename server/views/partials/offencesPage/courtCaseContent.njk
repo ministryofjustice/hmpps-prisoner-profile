@@ -4,11 +4,11 @@
 <div class="govuk-accordion__section ">
     <div class="govuk-accordion__section-header">
       <h3 class="govuk-accordion__section-heading">
-        <div class="govuk-accordion__section-button govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-5" id="accordion-with-summary-sections-heading-1">
+        <div class="govuk-accordion__section-button govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-5" id="accordion-with-summary-sections-heading-{{index}}">
           <span class="govuk-!-static-margin-bottom-2 hmpps-display-block govuk-!-static-padding-bottom-1">Court case {{index}}</span>
         </div>
       </h3>
-      <div class="govuk-accordion__section-summary" id="accordion-with-summary-sections-summary-1">
+      <div class="govuk-accordion__section-summary" id="accordion-with-summary-sections-summary-{{index}}">
         <div class="hmpps-grid-container">
             <div class="grid-item"><h4 class="govuk-!-static-margin-0 govuk-!-font-size-19">Court case number</h4></div>
             <div class="grid-item">
@@ -48,7 +48,7 @@
         </div>
       </div>
     </div>
-    <div id="accordion-with-summary-sections-content-1" class="govuk-accordion__section-content govuk-!-static-padding-bottom-0" aria-labelledby="accordion-with-summary-sections-heading-1">  
+    <div id="accordion-with-summary-sections-content-{{index}}" class="govuk-accordion__section-content govuk-!-static-padding-bottom-0" aria-labelledby="accordion-with-summary-sections-heading-{{index}}">
     {% if courtCase.sentences.length > 0 %}
         {% for sentence in courtCase.sentences %}
 
