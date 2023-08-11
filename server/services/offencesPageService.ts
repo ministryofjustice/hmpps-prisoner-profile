@@ -47,7 +47,18 @@ export default class OffencesPageService {
   }
 
   getLengthTextLabels(data: Licence | OffenderSentenceTerms | SentenceSummaryTermDetail) {
+    if (!data) return null
+
+    if (
+      'lifeSentence' in data &&
+      data.lifeSentence === true &&
+      !(data.years || data.months || data.weeks || data.days)
+    ) {
+      return 'Not entered'
+    }
+
     const { years, months, weeks, days } = data
+
     const yearsLabel = years > 0 && `${years} ${years === 1 ? 'year' : 'years'}`
     const monthsLabel = months > 0 && `${months} ${months === 1 ? 'month' : 'months'}`
     const weeksLabel = weeks > 0 && `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`
