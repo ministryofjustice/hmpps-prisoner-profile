@@ -1,19 +1,19 @@
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
-import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import ActivePunishmentsService from './activePunishmentsService'
 import { adjudicationSummaryWithActiveMock } from '../data/localMockData/miniSummaryMock'
+import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
+import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
 
 describe('ActivePunishmentsPageService', () => {
-  let prisonApiClient: PrisonApiClient
+  let adjudicationsApiClient: AdjudicationsApiClient
 
   const activePunishmentsPageServiceConstruct = jest.fn(() => {
-    return new ActivePunishmentsService(() => prisonApiClient)
+    return new ActivePunishmentsService(() => adjudicationsApiClient)
   })
 
   beforeEach(() => {
-    prisonApiClient = prisonApiClientMock()
-    prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryWithActiveMock)
+    adjudicationsApiClient = adjudicationsApiClientMock()
+    adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryWithActiveMock)
   })
 
   describe('Active Punishments Page', () => {
