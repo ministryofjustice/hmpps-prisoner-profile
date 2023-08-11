@@ -61,8 +61,12 @@ describe('OffencesPageService', () => {
       const offencesPageService = offencesPageServiceConstruct()
       const sentence1 = await offencesPageService.getLengthTextLabels(sentenceTermsMock[0])
       const sentence2 = await offencesPageService.getLengthTextLabels(sentenceTermsMock[1])
+      const lifeSentence = await offencesPageService.getLengthTextLabels(sentenceTermsMock[4])
+      const undefinedSentenceData = await offencesPageService.getLengthTextLabels(undefined)
       expect(sentence1).toEqual('100 years')
       expect(sentence2).toEqual('10 years')
+      expect(lifeSentence).toEqual('Not entered')
+      expect(undefinedSentenceData).toEqual(null)
     })
     it('Merge most recent licence term', async () => {
       const offencesPageService = offencesPageServiceConstruct()
