@@ -73,5 +73,8 @@ export default class OffencesPage extends Page {
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value')
 
   countFiveCard = (): PageElement =>
-    cy.get('#accordion-with-summary-sections-content-1 > :nth-child(3) > .govuk-grid-column-full')
+    cy.get('#accordion-with-summary-sections-content-3 > :nth-child(3) > .govuk-grid-column-full')
+
+  lifeSentenceOffenceCard = (): PageElement =>
+    cy.get('#accordion-with-summary-sections-content-2 > :nth-child(1) > .govuk-grid-column-full')
 }
