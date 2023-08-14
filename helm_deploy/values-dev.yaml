@@ -34,7 +34,7 @@ generic-service:
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-dev.prison.service.justice.gov.uk"
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
-    FEEDBACK_DISABLED_PRISONS: "LEI,FNI"
+    FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI"
     SYSTEM_PHASE: "DEV"
 
 generic-prometheus-alerts:
