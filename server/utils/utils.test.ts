@@ -347,6 +347,7 @@ describe('findError', () => {
       { code: 'I', result: 'I' },
       { code: 'U', result: 'Unsentenced' },
       { code: 'P', result: 'A (provisional)' },
+      { code: 'H', result: 'A High' },
     ])('Should return the correct description', ({ code, result }) => {
       expect(formatCategoryCodeDescription(code)).toEqual(result)
     })
