@@ -147,14 +147,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('MANAGE_SOC_CASES_API_TIMEOUT_DEADLINE', 20000))),
     },
-    adjudicationsApi: {
-      url: get('MANAGE_ADJUDICATIONS_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('MANAGE_ADJUDICATIONS_API_TIMEOUT_RESPONSE', 20000)),
-        deadline: Number(get('MANAGE_ADJUDICATIONS_API_TIMEOUT_DEADLINE', 20000)),
-      },
-      agent: new AgentConfig(Number(get('MANAGE_ADJUDICATIONS_API_TIMEOUT_DEADLINE', 20000))),
-    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),

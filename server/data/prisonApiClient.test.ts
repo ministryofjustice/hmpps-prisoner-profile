@@ -6,6 +6,7 @@ import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
 import {
   accountBalancesMock,
+  adjudicationSummaryMock,
   assessmentsMock,
   visitBalancesMock,
   visitSummaryMock,
@@ -85,6 +86,19 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getAccountBalances(bookingId)
       expect(output).toEqual(accountBalancesMock)
+    })
+  })
+
+  describe('getAdjudications', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      fakePrisonApi
+        .get(`/api/bookings/${bookingId}/adjudications`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, adjudicationSummaryMock)
+
+      const output = await prisonApiClient.getAdjudications(bookingId)
+      expect(output).toEqual(adjudicationSummaryMock)
     })
   })
 

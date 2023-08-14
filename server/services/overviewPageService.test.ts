@@ -54,8 +54,6 @@ import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/lo
 import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
 import OffencesPageService from './offencesPageService'
-import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
-import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -72,15 +70,12 @@ describe('OverviewPageService', () => {
     getReviews: jest.fn(async () => incentiveReviewsMock),
   }
 
-  let adjudicationsApiClient: AdjudicationsApiClient
-
   const overviewPageServiceConstruct = jest.fn(() => {
     return new OverviewPageService(
       () => prisonApiClient,
       () => allocationManagerApiClient,
       () => keyWorkerApiClient,
       () => incentivesApiClient,
-      () => adjudicationsApiClient,
       new OffencesPageService(null),
     )
   })
@@ -88,6 +83,7 @@ describe('OverviewPageService', () => {
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
+    prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
     prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
     prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
     prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
@@ -103,9 +99,6 @@ describe('OverviewPageService', () => {
     prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
     prisonApiClient.getFullStatus = jest.fn(async () => fullStatusMock)
     prisonApiClient.getStaffRoles = jest.fn(async () => [])
-
-    adjudicationsApiClient = adjudicationsApiClientMock()
-    adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
   })
 
   describe('Prison name', () => {
@@ -159,7 +152,7 @@ describe('OverviewPageService', () => {
       const overviewPageService = overviewPageServiceConstruct()
       await overviewPageService.get('token', { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner, 1)
       expect(prisonApiClient.getAccountBalances).toHaveBeenCalledWith(bookingId)
-      expect(adjudicationsApiClient.getAdjudications).toHaveBeenCalledWith(bookingId)
+      expect(prisonApiClient.getAdjudications).toHaveBeenCalledWith(bookingId)
       expect(prisonApiClient.getVisitSummary).toHaveBeenCalledWith(bookingId)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledWith(prisonerNumber)
     })
