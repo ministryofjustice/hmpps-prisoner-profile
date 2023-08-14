@@ -21,6 +21,7 @@ export const services = () => {
     keyworkerApiClientBuilder,
     incentivesApiClientBuilder,
     curiousApiClientBuilder,
+    adjudicationsApiClientBuilder,
   } = dataAccess
 
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
@@ -35,11 +36,12 @@ export const services = () => {
     allocationManagerApiClientBuilder,
     keyworkerApiClientBuilder,
     incentivesApiClientBuilder,
+    adjudicationsApiClientBuilder,
     offencesPageService,
   )
   const personalPageService = new PersonalPageService(prisonApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)
-  const activePunishmentsPageService = new ActivePunishmentsService(prisonApiClientBuilder)
+  const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
 
   return {
     dataAccess,
