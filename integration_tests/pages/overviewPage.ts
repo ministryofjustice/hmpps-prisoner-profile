@@ -97,6 +97,8 @@ export default class OverviewPage extends Page {
 
   addCaseNoteActionLink = (): PageElement => cy.get('[data-qa=add-case-note-action-link]')
 
+  calculateReleaseDatesActionLink = (): PageElement => cy.get('[data-qa=calculate-release-dates-action-link]')
+
   addAppointmentActionLink = (): PageElement => cy.get('[data-qa=add-appointment-action-link]')
 
   reportUseOfForceActionLink = (): PageElement => cy.get('[data-qa=report-use-of-force-action-link]')
