@@ -45,6 +45,7 @@ import { CaseLoad } from '../interfaces/caseLoad'
 import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { RestClientBuilder } from '../data'
+import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -55,11 +56,14 @@ export default class OverviewPageService {
 
   private incentivesApiClient: IncentivesApiClient
 
+  private adjudicationsApiClient: AdjudicationsApiClient
+
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
     private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
+    private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>,
     private readonly offencesPageService: OffencesPageService,
   ) {}
 
@@ -77,6 +81,7 @@ export default class OverviewPageService {
     this.allocationManagerClient = this.allocationManagerApiClientBuilder(clientToken)
     this.keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
     this.incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
+    this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
 
     const [
       nonAssociations,
@@ -326,7 +331,7 @@ export default class OverviewPageService {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
     const [accountBalances, adjudicationSummary, visitSummary, visitBalances] = await Promise.all([
       this.prisonApiClient.getAccountBalances(bookingId),
-      this.prisonApiClient.getAdjudications(bookingId),
+      this.adjudicationsApiClient.getAdjudications(bookingId),
       this.prisonApiClient.getVisitSummary(bookingId),
       this.prisonApiClient.getVisitBalances(prisonerNumber),
     ])
