@@ -7,6 +7,7 @@ import nonAssociationDetailsDummyData from '../data/localMockData/nonAssociation
 import { Prisoner } from '../interfaces/prisoner'
 import {
   accountBalancesMock,
+  adjudicationSummaryMock,
   assessmentsMock,
   visitBalancesMock,
   visitSummaryMock,
@@ -51,6 +52,7 @@ describe('WorkAndSkillsService', () => {
     beforeEach(() => {
       prisonApiClient = prisonApiClientMock()
       prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
+      prisonApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
       prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
       prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
       prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)

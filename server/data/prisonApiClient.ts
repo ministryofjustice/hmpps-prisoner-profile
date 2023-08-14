@@ -7,6 +7,7 @@ import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import { PrisonApiClient } from './interfaces/prisonApiClient'
 import { AccountBalances } from '../interfaces/accountBalances'
+import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import { VisitSummary } from '../interfaces/visitSummary'
 import { VisitBalances } from '../interfaces/visitBalances'
 import { Assessment } from '../interfaces/prisonApi/assessment'
@@ -90,6 +91,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<AccountBalances>({
       path: `/api/bookings/${bookingId}/balances`,
     })
+  }
+
+  async getAdjudications(bookingId: number): Promise<AdjudicationSummary> {
+    return this.get<AdjudicationSummary>({ path: `/api/bookings/${bookingId}/adjudications` })
   }
 
   async getVisitSummary(bookingId: number): Promise<VisitSummary> {

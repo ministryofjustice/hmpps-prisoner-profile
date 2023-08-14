@@ -23,12 +23,10 @@ import ManageSocCasesApiRestClient from './manageSocCasesApiClient'
 import PathfinderApiRestClient from './pathfinderApiClient'
 import PrisonApiRestClient from './prisonApiClient'
 import PrisonerSearchClient from './prisonerSearchClient'
-import { AdjudicationsApiClient } from './interfaces/adjudicationsApiClient'
 
 import { createRedisClient } from './redisClient'
 import RestClient, { RestClientBuilder as CreateRestClientBuilder } from './restClient'
 import TokenStore from './tokenStore'
-import AdjudicationsApiRestClient from './adjudicationsApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient()
@@ -85,11 +83,6 @@ export const dataAccess = {
     'Pathfinder API',
     config.apis.pathfinderApi,
     PathfinderApiRestClient,
-  ),
-  adjudicationsApiClientBuilder: restClientBuilder<AdjudicationsApiClient>(
-    'Adjudications API',
-    config.apis.adjudicationsApi,
-    AdjudicationsApiRestClient,
   ),
   prisonApiClientBuilder: restClientBuilder<PrisonApiClient>('Prison API', config.apis.prisonApi, PrisonApiRestClient),
   prisonerSearchApiClientBuilder: restClientBuilder<PrisonerSearchClient>(

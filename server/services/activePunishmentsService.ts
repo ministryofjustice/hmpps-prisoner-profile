@@ -1,16 +1,16 @@
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { RestClientBuilder } from '../data'
-import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
 
 export default class ActivePunishmentsService {
-  private adjudicationsApiClient: AdjudicationsApiClient
+  private prisonApiClient: PrisonApiClient
 
-  constructor(private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>) {}
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   public async get(token: string, prisonerData: Prisoner) {
-    this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(token)
+    this.prisonApiClient = this.prisonApiClientBuilder(token)
     const { bookingId, firstName, middleNames, lastName } = prisonerData
 
     const adjudications = await this.getAdjudications(bookingId)
@@ -23,7 +23,7 @@ export default class ActivePunishmentsService {
   }
 
   private async getAdjudications(bookingId: number) {
-    const adjudications = await this.adjudicationsApiClient.getAdjudications(bookingId)
+    const adjudications = await this.prisonApiClient.getAdjudications(bookingId)
     return adjudications
   }
 }
