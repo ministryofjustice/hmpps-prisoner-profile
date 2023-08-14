@@ -34,6 +34,7 @@ generic-service:
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome.prison.service.justice.gov.uk"
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence.hmpps.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api.hmpps.service.justice.gov.uk"
+    CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates.hmpps.service.justice.gov.uk"
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI"
 
   allowlist:

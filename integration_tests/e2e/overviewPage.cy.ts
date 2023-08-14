@@ -286,6 +286,22 @@ context('Overview Page', () => {
     })
   })
 
+  context('Given the user has RELEASE_DATES_CALCULATOR role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
+    })
+
+    it('should display calculate release dates link', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.calculateReleaseDatesActionLink().should('exist')
+    })
+  })
+
   context('Given the user has PF_USER role', () => {
     beforeEach(() => {
       cy.task('reset')
