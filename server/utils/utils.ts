@@ -419,9 +419,9 @@ export const formatCategoryCodeDescription = (code: string): string => {
     case 'U':
       return 'Unsentenced'
     case 'P':
-      return 'A (provisional)'
+      return 'A – provisional'
     case 'H':
-      return 'A High'
+      return 'A – high'
     default:
       return code
   }
