@@ -13,4 +13,14 @@ export const suitableListenerStatusMock: Status = {
   label: 'Suitable Listener',
 }
 
-export const statusesMock: Status[] = [pregnantStatusMock, recognisedListenerStatusMock, suitableListenerStatusMock]
+export const neurodiversityStatusMock: Status = {
+  label: 'Support needed',
+  subText: 'Has neurodiversity needs',
+}
+
+export const statusesMock: Status[] = [
+  pregnantStatusMock,
+  recognisedListenerStatusMock,
+  suitableListenerStatusMock,
+  neurodiversityStatusMock,
+]

@@ -46,6 +46,8 @@ import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { RestClientBuilder } from '../data'
 import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
+import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
+import CuriousApiClient from '../data/interfaces/curiousApiClient'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -58,6 +60,8 @@ export default class OverviewPageService {
 
   private adjudicationsApiClient: AdjudicationsApiClient
 
+  private curiousApiClient: CuriousApiClient
+
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
@@ -65,6 +69,7 @@ export default class OverviewPageService {
     private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
     private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>,
     private readonly offencesPageService: OffencesPageService,
+    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
   ) {}
 
   public async get(
@@ -82,6 +87,7 @@ export default class OverviewPageService {
     this.keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
     this.incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
     this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
+    this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
 
     const [
       nonAssociations,
@@ -602,6 +608,17 @@ export default class OverviewPageService {
     if ((recognised === BooleanString.Yes || recognised === BooleanString.No) && suitable !== BooleanString.No) {
       statusList.push({
         label: 'Recognised Listener',
+      })
+    }
+
+    // Neurodiversity support needed
+    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
+      prisonerData.prisonerNumber,
+    )
+    if (learnerNeurodivergence?.length) {
+      statusList.push({
+        label: 'Support needed',
+        subText: 'Has neurodiversity needs',
       })
     }
 
