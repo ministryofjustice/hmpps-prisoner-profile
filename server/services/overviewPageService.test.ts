@@ -56,6 +56,13 @@ import { Role } from '../data/enums/role'
 import OffencesPageService from './offencesPageService'
 import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
 import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
+import CuriousApiClient from '../data/interfaces/curiousApiClient'
+import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
+import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
+import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
+import { learnerEducation } from '../data/localMockData/learnerEducation'
+import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
+import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -72,6 +79,15 @@ describe('OverviewPageService', () => {
     getReviews: jest.fn(async () => incentiveReviewsMock),
   }
 
+  const curiousApiClient: CuriousApiClient = {
+    getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
+    getLearnerProfile: jest.fn(async () => LearnerProfiles),
+    getLearnerEducation: jest.fn(async () => learnerEducation),
+    getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
+    getLearnerGoals: jest.fn(async () => LearnerGoalsMock),
+    getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
+  }
+
   let adjudicationsApiClient: AdjudicationsApiClient
 
   const overviewPageServiceConstruct = jest.fn(() => {
@@ -82,6 +98,7 @@ describe('OverviewPageService', () => {
       () => incentivesApiClient,
       () => adjudicationsApiClient,
       new OffencesPageService(null),
+      () => curiousApiClient,
     )
   })
 
@@ -433,7 +450,7 @@ describe('OverviewPageService', () => {
   })
 
   describe('getStatuses', () => {
-    it('should get statuses for Current Location, Pregnant, Recognised Listener and Suitable Listener', async () => {
+    it('should get statuses for Current Location, Pregnant, Recognised Listener and Suitable Listener, Neurodiversity', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
@@ -441,6 +458,7 @@ describe('OverviewPageService', () => {
       await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
       expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(bookingId)
       expect(prisonApiClient.getPersonalCareNeeds).toHaveBeenCalledWith(bookingId, [ProblemType.MaternityStatus])
+      expect(curiousApiClient.getLearnerNeurodivergence).toHaveBeenCalledWith(prisonerNumber)
     })
 
     describe('should map api results into page data', () => {
@@ -585,6 +603,35 @@ describe('OverviewPageService', () => {
           expect(res.statuses.some(status => status.label === 'Recognised Listener')).toEqual(displayRecognised)
         },
       )
+
+      it('should have neurodiversity support status if returned from API', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
+
+        expect(
+          res.statuses.some(
+            status => status.label === 'Support needed' && status.subText === 'Has neurodiversity needs',
+          ),
+        ).toBeTruthy()
+      })
+
+      it('should not have neurodiversity support status if not returned from API', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+        curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => null)
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
+
+        expect(
+          res.statuses.some(
+            status => status.label === 'Support needed' && status.subText === 'Has neurodiversity needs',
+          ),
+        ).toBeFalsy()
+      })
     })
   })
   describe('getOffenceOverview', () => {

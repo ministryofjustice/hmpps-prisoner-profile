@@ -55,6 +55,7 @@ export default class CuriousRestApiClient implements CuriousApiClient {
   async getLearnerNeurodivergence(offenderNumber: string): Promise<LearnerNeurodivergence[]> {
     return this.get<LearnerNeurodivergence[]>({
       path: `/learnerNeurodivergence/${offenderNumber}`,
+      ignore404: true,
     })
   }
 }

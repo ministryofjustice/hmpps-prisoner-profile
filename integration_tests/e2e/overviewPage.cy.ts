@@ -224,6 +224,7 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.statusList().should('exist')
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
+        overviewPage.statusList().contains('li > p', 'Support needed')
       })
     })
 
