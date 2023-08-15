@@ -33,8 +33,10 @@ generic-service:
     MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases.hmpps.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome.prison.service.justice.gov.uk"
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence.hmpps.service.justice.gov.uk"
-    FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI"
+    MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates.hmpps.service.justice.gov.uk"
+    FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI"
+
   allowlist:
     office: "217.33.148.210/32"
     quantum: "62.25.109.197/32"
