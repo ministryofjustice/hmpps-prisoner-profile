@@ -60,7 +60,13 @@ export default class CaseNotesController {
       // Get case notes based on given query params
       const [caseNotesUsage, caseNotesPageData] = await Promise.all([
         this.prisonApiClientBuilder(clientToken).getCaseNotesUsage(req.params.prisonerNumber),
-        this.caseNotesService.get(userToken, prisonerData, queryParams, canDeleteSensitiveCaseNotes),
+        this.caseNotesService.get(
+          userToken,
+          prisonerData,
+          queryParams,
+          canDeleteSensitiveCaseNotes,
+          req.session.userDetails,
+        ),
       ])
 
       const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
