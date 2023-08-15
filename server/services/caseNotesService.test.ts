@@ -29,7 +29,10 @@ describe('Case Notes Page', () => {
 
   describe('Get Case Notes', () => {
     it('should call Case Notes API tp get case notes', async () => {
-      const caseNotesPageData = await caseNotesService.get('', prisonerData, {}, true)
+      const caseNotesPageData = await caseNotesService.get('', prisonerData, {}, true, {
+        displayName: 'A Name',
+        name: 'Name',
+      })
 
       expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
       expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {})

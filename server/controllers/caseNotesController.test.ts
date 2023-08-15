@@ -39,6 +39,9 @@ describe('Case Notes Controller', () => {
         referer: 'http://referer',
       },
       path: 'case-notes',
+      session: {
+        userDetails: { displayName: 'A Name' },
+      },
       flash: jest.fn(),
     }
     res = {
@@ -92,6 +95,7 @@ describe('Case Notes Controller', () => {
         endDate: '02/02/2023',
       },
       true,
+      { displayName: 'A Name' },
     )
     expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'case-notes')
   })
