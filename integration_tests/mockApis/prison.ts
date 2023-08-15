@@ -1,8 +1,6 @@
 import { stubFor } from './wiremock'
 import {
   accountBalancesMock,
-  adjudicationSummaryMock,
-  adjudicationSummaryWithActiveMock,
   assessmentsMock,
   visitBalancesMock,
   visitSummaryMock,
@@ -92,36 +90,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: accountBalancesMock,
-      },
-    })
-  },
-  stubAdjudications: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/adjudications`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: adjudicationSummaryMock,
-      },
-    })
-  },
-  stubAdjudicationsWithActive: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/adjudications`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: adjudicationSummaryWithActiveMock,
       },
     })
   },
