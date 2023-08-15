@@ -99,7 +99,7 @@
   "dependencies": {
     "@ministryofjustice/frontend": "^1.8.0",
     "agentkeepalive": "^4.3.0",
-    "applicationinsights": "^2.7.0",
+    "applicationinsights": "^2.7.1",
     "body-parser": "^1.20.2",
     "bunyan": "^1.8.15",
     "bunyan-format": "^0.2.1",
