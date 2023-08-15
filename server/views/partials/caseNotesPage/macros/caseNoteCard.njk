@@ -24,6 +24,13 @@
         {% if caseNote.deleteLinkUrl %}
             <a href="{{ caseNote.deleteLinkUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="delete-case-note-link">Delete case note</a>
         {% endif %}
+        {% if caseNote.printIncentiveLink %}
+            <p class="govuk-body">
+                <a class="govuk-link" data-qa="print-slip" href={{ caseNote.printIncentiveLink }} target="_blank" rel="noopener noreferrer">
+                    Print a copy of the incentive level warning
+                </a>
+            <p>
+        {% endif %}
     </div>
 </div>
 {% endmacro %}
