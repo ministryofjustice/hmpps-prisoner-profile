@@ -97,7 +97,6 @@ export default class CaseNotesService {
         this.mapToApiParams(queryParams),
       )
       pagedCaseNotes.content = pagedCaseNotes.content?.map((caseNote: CaseNote) => {
-        const showPrintIncentiveLink = ['IEP_WARN', 'IEP_ENC'].includes(caseNote.subType)
         return {
           ...caseNote,
           authorName: convertNameCommaToHuman(caseNote.authorName),
@@ -110,8 +109,15 @@ export default class CaseNotesService {
             caseNote.source === CaseNoteSource.SecureCaseNoteSource &&
             canDeleteSensitiveCaseNotes &&
             `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/case-notes/delete-case-note/${caseNote.caseNoteId}`,
-          printIncentiveLink:
-            showPrintIncentiveLink &&
+          printIncentiveWarningLink:
+            caseNote.subType === 'IEP_WARN' &&
+            `${config.serviceUrls.digitalPrison}/iep-slip?offenderNo=${
+              prisonerData.prisonerNumber
+            }&offenderName=${encodeURIComponent(prisonerFullName)}&location=${encodeURIComponent(
+              prisonerData.cellLocation,
+            )}&casenoteId=${caseNote.caseNoteId}&issuedBy=${encodeURIComponent(currentUserDetails.displayName)}`,
+          printIncentiveEncouragementLink:
+            caseNote.subType === 'IEP_ENC' &&
             `${config.serviceUrls.digitalPrison}/iep-slip?offenderNo=${
               prisonerData.prisonerNumber
             }&offenderName=${encodeURIComponent(prisonerFullName)}&location=${encodeURIComponent(
