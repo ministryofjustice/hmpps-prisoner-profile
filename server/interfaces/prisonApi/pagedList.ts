@@ -5,7 +5,7 @@ export interface PagedListItem {
   // CaseNote
 }
 
-export interface PagedList<TPagedListItem> {
+export interface PagedList<TPagedListItem extends PagedListItem> {
   content: TPagedListItem[]
   pageable?: {
     sort: {

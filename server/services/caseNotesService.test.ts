@@ -3,7 +3,8 @@ import CaseNotesService from './caseNotesService'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import { PagedList } from '../interfaces/prisonApi/pagedList'
 
 jest.mock('../data/caseNotesApiClient')
 
@@ -28,7 +29,7 @@ describe('Case Notes Page', () => {
   })
 
   describe('Get Case Notes', () => {
-    it('should call Case Notes API tp get case notes', async () => {
+    it('should call Case Notes API to get case notes', async () => {
       const caseNotesPageData = await caseNotesService.get('', prisonerData, {}, true, {
         displayName: 'A Name',
         name: 'Name',
@@ -36,8 +37,6 @@ describe('Case Notes Page', () => {
 
       expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
       expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {})
-
-      expect(caseNotesPageData.pagedCaseNotes).toEqual(pagedCaseNotesMock)
       expect(caseNotesPageData.fullName).toEqual('John Smith')
     })
   })
@@ -69,6 +68,33 @@ describe('Case Notes Page', () => {
         subType: 'SUBTYPE',
         text: 'Text',
         occurrenceDateTime,
+      })
+    })
+  })
+
+  describe('Case note incentive links', () => {
+    describe('Given an incentive warning', () => {
+      it('Returns an incentive warning link', async () => {
+        const foundCaseNotes: PagedList<CaseNote> = { ...pagedCaseNotesMock }
+        foundCaseNotes.content = foundCaseNotes.content.slice(0, 3)
+        foundCaseNotes.content[0].subType = 'IEP_WARN'
+        foundCaseNotes.content[1].subType = 'IEP_ENC'
+        foundCaseNotes.content[2].subType = 'OTHER'
+        caseNotesApiClientSpy.getCaseNotes = jest.fn(async () => foundCaseNotes)
+
+        const {
+          pagedCaseNotes: { content },
+        } = await caseNotesService.get('', prisonerData, {}, true, {
+          displayName: 'A Name',
+          name: 'Name',
+        })
+
+        expect(content[0].printIncentiveWarningLink).toBeTruthy()
+        expect(content[0].printIncentiveEncouragementLink).toBeFalsy()
+        expect(content[1].printIncentiveWarningLink).toBeFalsy()
+        expect(content[1].printIncentiveEncouragementLink).toBeTruthy()
+        expect(content[2].printIncentiveWarningLink).toBeFalsy()
+        expect(content[2].printIncentiveEncouragementLink).toBeFalsy()
       })
     })
   })
