@@ -6,13 +6,6 @@ export default class ManageSocCasesApiRestClient implements ManageSocCasesApiCli
   constructor(private readonly restClient: RestClient) {}
 
   async getNominal(offenderNumber: string): Promise<Nominal> {
-    try {
-      return await this.restClient.get<Nominal>({ path: `/soc/nominal/nomsId/${offenderNumber}` })
-    } catch (error) {
-      if (error.status === 404) {
-        return null
-      }
-      return error
-    }
+    return this.restClient.get<Nominal>({ path: `/soc/nominal/nomsId/${offenderNumber}`, ignore404: true })
   }
 }

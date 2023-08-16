@@ -227,14 +227,12 @@ export default class OverviewPageService {
             ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
             : '',
       },
-      prisonOffenderManager:
-        prisonOffenderManager !== undefined
-          ? `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`
-          : 'Not assigned',
-      coworkingPrisonOffenderManager:
-        coworkingPrisonOffenderManager !== undefined
-          ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
-          : 'Not assigned',
+      prisonOffenderManager: prisonOffenderManager
+        ? `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`
+        : 'Not assigned',
+      coworkingPrisonOffenderManager: coworkingPrisonOffenderManager
+        ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
+        : 'Not assigned',
       communityOffenderManager:
         communityOffenderManager && communityOffenderManager[0] !== undefined
           ? `${convertToTitleCase(communityOffenderManager[0].firstName)} ${convertToTitleCase(
