@@ -25,30 +25,35 @@ export default class CuriousRestApiClient implements CuriousApiClient {
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills> {
     return this.get<LearnerEmployabilitySkills>({
       path: `/learnerEmployabilitySkills/${offenderNumber}`,
+      ignore404: true,
     })
   }
 
   async getLearnerProfile(offenderNumber: string): Promise<LearnerProfile[]> {
     return this.get<LearnerProfile[]>({
       path: `/learnerProfile/${offenderNumber}`,
+      ignore404: true,
     })
   }
 
   async getLearnerEducation(offenderNumber: string): Promise<LearnerEducation> {
     return this.get<LearnerEducation>({
       path: `/learnerEducation/${offenderNumber}`,
+      ignore404: true,
     })
   }
 
   async getLearnerLatestAssessments(offenderNumber: string): Promise<LearnerLatestAssessment[]> {
     return this.get<LearnerLatestAssessment[]>({
       path: `/latestLearnerAssessments/${offenderNumber}`,
+      ignore404: true,
     })
   }
 
   async getLearnerGoals(offenderNumber: string): Promise<LearnerGoals> {
     return this.get<LearnerGoals>({
       path: `/learnerGoals/${offenderNumber}`,
+      ignore404: true,
     })
   }
 

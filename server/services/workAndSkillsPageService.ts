@@ -121,15 +121,13 @@ export default class WorkAndSkillsPageService {
   private async getLearnerEducation(prisonerNumber: string) {
     const learnerEducation: LearnerEducation = await this.curiousApiClient.getLearnerEducation(prisonerNumber)
     const coursesAndQualifications: GovSummaryItem[] = []
-    if (learnerEducation !== undefined) {
-      learnerEducation.content?.forEach(content => {
-        const item = {
-          key: { text: content.courseName },
-          value: { text: `Planned end date on ${formatDate(content.learningPlannedEndDate, 'long')}` },
-        }
-        coursesAndQualifications.push(item)
-      })
-    }
+    learnerEducation?.content?.forEach(content => {
+      const item = {
+        key: { text: content.courseName },
+        value: { text: `Planned end date on ${formatDate(content.learningPlannedEndDate, 'long')}` },
+      }
+      coursesAndQualifications.push(item)
+    })
     return coursesAndQualifications
   }
 
@@ -140,7 +138,7 @@ export default class WorkAndSkillsPageService {
 
     const multiListArray: GovSummaryGroup[][] = []
 
-    if (learnerLatestAssessments !== undefined) {
+    if (learnerLatestAssessments) {
       const list: GovSummaryGroup[] = []
       learnerLatestAssessments[0]?.qualifications?.forEach(content => {
         const type = {
@@ -168,16 +166,16 @@ export default class WorkAndSkillsPageService {
     let longTermGoals: GovSummaryItem[] = []
     let shortTermGoals: GovSummaryItem[] = []
 
-    if (learnerGoals.employmentGoals) {
+    if (learnerGoals?.employmentGoals) {
       employmentGoals = this.strArrayToGovList(learnerGoals.employmentGoals)
     }
-    if (learnerGoals.personalGoals) {
+    if (learnerGoals?.personalGoals) {
       personalGoals = this.strArrayToGovList(learnerGoals.personalGoals)
     }
-    if (learnerGoals.longTermGoals) {
+    if (learnerGoals?.longTermGoals) {
       longTermGoals = this.strArrayToGovList(learnerGoals.longTermGoals)
     }
-    if (learnerGoals.shortTermGoals) {
+    if (learnerGoals?.shortTermGoals) {
       shortTermGoals = this.strArrayToGovList(learnerGoals.shortTermGoals)
     }
 
