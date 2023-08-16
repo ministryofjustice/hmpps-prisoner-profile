@@ -1,6 +1,7 @@
+import { CaseNote } from '../../interfaces/caseNotesApi/caseNote'
 import { PagedList } from '../../interfaces/prisonApi/pagedList'
 
-export const pagedCaseNotesMock: PagedList = {
+export const pagedCaseNotesMock: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47023806',
@@ -402,7 +403,7 @@ export const pagedCaseNotesMock: PagedList = {
   empty: false,
 }
 
-export const pagedCaseNotesMockPage2: PagedList = {
+export const pagedCaseNotesMockPage2: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47018169',
@@ -798,7 +799,7 @@ export const pagedCaseNotesMockPage2: PagedList = {
   empty: false,
 }
 
-export const pagedCaseNotesMockSorted: PagedList = {
+export const pagedCaseNotesMockSorted: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47018169',
@@ -1194,7 +1195,7 @@ export const pagedCaseNotesMockSorted: PagedList = {
   empty: false,
 }
 
-export const pagedCaseNotesMockFiltered: PagedList = {
+export const pagedCaseNotesMockFiltered: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47018169',
@@ -1242,7 +1243,7 @@ export const pagedCaseNotesMockFiltered: PagedList = {
   empty: false,
 }
 
-export const emptyCaseNotesMock: PagedList = {
+export const emptyCaseNotesMock: PagedList<CaseNote> = {
   content: [],
   pageable: {
     sort: {
@@ -1271,7 +1272,7 @@ export const emptyCaseNotesMock: PagedList = {
   empty: true,
 }
 
-export const pomCaseNotesMock: PagedList = {
+export const pomCaseNotesMock: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: 'f81d31cd-c2d9-4718-843f-dfade96ca468',

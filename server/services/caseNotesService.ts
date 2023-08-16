@@ -87,7 +87,7 @@ export default class CaseNotesService {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const errors: HmppsError[] = this.validateFilters(queryParams.startDate, queryParams.endDate)
 
-    let pagedCaseNotes: PagedList
+    let pagedCaseNotes: PagedList<CaseNote>
     const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 

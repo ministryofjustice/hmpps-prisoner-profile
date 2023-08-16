@@ -3,7 +3,7 @@ import CaseNotesService from './caseNotesService'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 
 jest.mock('../data/caseNotesApiClient')
 
@@ -18,7 +18,7 @@ describe('Case Notes Page', () => {
       getCaseNoteTypes: jest.fn(async () => caseNoteTypesMock),
       getCaseNoteTypesForUser: jest.fn(async () => caseNoteTypesMock),
       getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
-      addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0] as CaseNote),
+      addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
     }
     caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
   })

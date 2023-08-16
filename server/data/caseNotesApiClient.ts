@@ -20,13 +20,13 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.restClient.post(args)
   }
 
-  async getCaseNotes(offenderNumber: string, queryParams?: PagedListQueryParams): Promise<PagedList> {
+  async getCaseNotes(offenderNumber: string, queryParams?: PagedListQueryParams): Promise<PagedList<CaseNote>> {
     // Set defaults then apply queryParams
     const params: PagedListQueryParams = {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }
-    return this.get<PagedList>({ path: `/case-notes/${offenderNumber}`, query: mapToQueryString(params) })
+    return this.get<PagedList<CaseNote>>({ path: `/case-notes/${offenderNumber}`, query: mapToQueryString(params) })
   }
 
   async getCaseNoteTypes(): Promise<CaseNoteType[]> {
