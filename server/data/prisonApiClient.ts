@@ -40,6 +40,7 @@ import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
+import { Alert } from '../interfaces/prisonApi/alert'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -169,13 +170,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
   }
 
-  async getAlerts(bookingId: number, queryParams?: PagedListQueryParams): Promise<PagedList> {
+  async getAlerts(bookingId: number, queryParams?: PagedListQueryParams): Promise<PagedList<Alert>> {
     // Set defaults then apply queryParams
     const params: PagedListQueryParams = {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }
-    return this.get<PagedList>({ path: `/api/bookings/${bookingId}/alerts/v2`, query: mapToQueryString(params) })
+    return this.get<PagedList<Alert>>({ path: `/api/bookings/${bookingId}/alerts/v2`, query: mapToQueryString(params) })
   }
 
   async getProperty(bookingId: number): Promise<PropertyContainer[]> {

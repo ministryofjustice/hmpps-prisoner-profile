@@ -232,6 +232,46 @@ context('Sensitive Case Notes', () => {
   })
 })
 
+context('Incentive slips', () => {
+  let caseNotesPage
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+    cy.task('stubGetCaseNoteTypes')
+    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+    cy.task('stubInmateDetail', 1102484)
+    cy.task('stubPrisonerDetail', 'G6123VU')
+    cy.task('stubGetCaseNotesUsage', 'G6123VU')
+    cy.task('stubGetCaseNotes', 'G6123VU')
+  })
+
+  context('Positive encouragement', () => {
+    beforeEach(() => {
+      cy.task('stubSingleCaseNoteWithType', { prisonerNumber: 'G6123VU', type: 'POS', subType: 'IEP_ENC' })
+      caseNotesPage = visitCaseNotesPage()
+    })
+
+    it('Displays the delete link for the sensitive case note', () => {
+      caseNotesPage.filterType().select('POS')
+      caseNotesPage.filterApplyButton().click()
+      caseNotesPage.encouragementPrintSlip().should('exist')
+    })
+  })
+
+  context('Negative warning', () => {
+    beforeEach(() => {
+      cy.task('stubSingleCaseNoteWithType', { prisonerNumber: 'G6123VU', type: 'NEG', subType: 'IEP_WARN' })
+      caseNotesPage = visitCaseNotesPage()
+    })
+
+    it('Displays the delete link for the sensitive case note', () => {
+      caseNotesPage.filterType().select('NEG')
+      caseNotesPage.filterApplyButton().click()
+      caseNotesPage.warningPrintSlip().should('exist')
+    })
+  })
+})
+
 context('Case Notes Page Not Found', () => {
   beforeEach(() => {
     cy.task('reset')

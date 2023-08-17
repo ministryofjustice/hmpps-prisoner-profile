@@ -1,6 +1,6 @@
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
 import { Address } from '../interfaces/address'
 import { HmppsError } from '../interfaces/hmppsError'
@@ -196,7 +196,7 @@ export const convertNameCommaToHuman = (name: string): string => {
  * @param sortLabel
  */
 export const generateListMetadata = (
-  pagedList: PagedList,
+  pagedList: PagedList<PagedListItem>,
   queryParams: PagedListQueryParams,
   itemDescription: string,
   sortOptions: SortOption[],

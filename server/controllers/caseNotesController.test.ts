@@ -106,7 +106,7 @@ describe('Case Notes Controller', () => {
       .mockResolvedValue(PrisonerMockDataA)
     const getCaseNoteTypesForUserSpy = jest
       .spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser')
-      .mockResolvedValue(caseNoteTypesMock)
+      .mockResolvedValue(caseNoteTypesMock.slice(0, 2))
 
     await controller.displayAddCaseNote()(req, res)
 

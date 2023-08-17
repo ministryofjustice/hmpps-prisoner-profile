@@ -37,4 +37,38 @@ export const caseNoteTypesMock: CaseNoteType[] = [
     sensitive: true,
     restrictedUse: false,
   },
+  {
+    code: 'POS',
+    description: 'Positive Behaviour',
+    activeFlag: 'Y',
+    subCodes: [
+      {
+        code: 'IEP_ENC',
+        description: 'Incentive Encouragement',
+        activeFlag: 'Y',
+        subCodes: [],
+        sensitive: false,
+        restrictedUse: false,
+      },
+    ],
+    sensitive: false,
+    restrictedUse: false,
+  },
+  {
+    code: 'NEG',
+    description: 'Negative Behaviour',
+    activeFlag: 'Y',
+    subCodes: [
+      {
+        code: 'IEP_WARN',
+        description: 'Incentive warning',
+        activeFlag: 'Y',
+        subCodes: [],
+        sensitive: false,
+        restrictedUse: false,
+      },
+    ],
+    sensitive: false,
+    restrictedUse: false,
+  },
 ]

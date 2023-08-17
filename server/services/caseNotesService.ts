@@ -6,7 +6,7 @@ import { SortOption } from '../interfaces/sortSelector'
 import { formatDateTimeISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
+import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
 import { CaseNote, CaseNoteAmendment, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
@@ -87,16 +87,17 @@ export default class CaseNotesService {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const errors: HmppsError[] = this.validateFilters(queryParams.startDate, queryParams.endDate)
 
-    let pagedCaseNotes: PagedList
+    let pagedCaseNotes: PagedList<CaseNotePageData>
     const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {
-      pagedCaseNotes = await caseNotesApiClient.getCaseNotes(
+      const { content, ...rest } = await caseNotesApiClient.getCaseNotes(
         prisonerData.prisonerNumber,
         this.mapToApiParams(queryParams),
       )
-      pagedCaseNotes.content = pagedCaseNotes.content?.map((caseNote: CaseNote) => {
+
+      const pagedCaseNotesContent = content?.map((caseNote: CaseNote) => {
         return {
           ...caseNote,
           authorName: convertNameCommaToHuman(caseNote.authorName),
@@ -125,6 +126,8 @@ export default class CaseNotesService {
             )}&casenoteId=${caseNote.caseNoteId}&issuedBy=${encodeURIComponent(currentUserDetails.displayName)}`,
         }
       })
+
+      pagedCaseNotes = { ...rest, content: pagedCaseNotesContent }
     }
 
     return {
