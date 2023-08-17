@@ -19,6 +19,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 import caseNotesRouter from './caseNotesRouter'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -27,12 +28,15 @@ export default function routes(services: Services): Router {
     req: Request,
     res: Response,
     next: NextFunction,
-    func: (prisonerData: Prisoner) => Promise<void>,
+    func: (prisonerData: Prisoner, inmateDetail: InmateDetail) => Promise<void>,
   ) {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
     const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
-    const assessments = await prisonApiClient.getAssessments(prisonerData.bookingId)
+    const [assessments, inmateDetail] = await Promise.all([
+      await prisonApiClient.getAssessments(prisonerData.bookingId),
+      await prisonApiClient.getInmateDetail(prisonerData.bookingId),
+    ])
 
     if (assessments && Array.isArray(assessments)) {
       prisonerData.assessments = assessments
@@ -54,7 +58,7 @@ export default function routes(services: Services): Router {
       }
     }
 
-    return func(prisonerData)
+    return func(prisonerData, inmateDetail)
   }
 
   async function checkPrisonerExists(
@@ -92,14 +96,14 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const overviewController = new OverviewController(
           services.prisonerSearchService,
           services.overviewPageService,
           services.dataAccess.pathfinderApiClientBuilder,
           services.dataAccess.manageSocCasesApiClientBuilder,
         )
-        return overviewController.displayOverview(req, res, prisonerData)
+        return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
       })
     })
   })
@@ -117,13 +121,13 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/personal', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      await checkPrisonerInCaseLoad(req, res, next, async (prisonerData: Prisoner) => {
+      await checkPrisonerInCaseLoad(req, res, next, async (prisonerData: Prisoner, inmateDetail: InmateDetail) => {
         const { personalPageService } = services
         const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
 
         res.render('pages/personalPage', {
           pageTitle: 'Personal',
-          ...mapHeaderData(prisonerData, res.locals.user, 'personal'),
+          ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'personal'),
           ...personalPageData,
         })
       })
@@ -132,7 +136,7 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/work-and-skills', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const { workAndSkillsPageService } = services
         const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
 
@@ -141,7 +145,7 @@ export default function routes(services: Services): Router {
         const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
 
         res.render('pages/workAndSkills', {
-          ...mapHeaderData(prisonerData, res.locals.user, 'work-and-skills'),
+          ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'work-and-skills'),
           ...workAndSkillsPageData,
           pageTitle: 'Work and skills',
           fullCourseHistoryLinkUrl,
@@ -160,31 +164,31 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/alerts/active', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
-        return alertsController.displayAlerts(req, res, prisonerData)
+        return alertsController.displayAlerts(req, res, prisonerData, inmateDetail)
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/alerts/inactive', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
-        return alertsController.displayAlerts(req, res, prisonerData)
+        return alertsController.displayAlerts(req, res, prisonerData, inmateDetail)
       })
     })
   })
 
   get('/prisoner/:prisonerNumber/offences', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      await checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      await checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const { offencesPageService } = services
         const offencesPageData = await offencesPageService.get(res.locals.clientToken, prisonerData)
 
         res.render('pages/offences', {
           pageTitle: 'Offences',
-          ...mapHeaderData(prisonerData, res.locals.user, 'offences'),
+          ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'offences'),
           ...offencesPageData,
           activeTab: true,
         })
@@ -196,13 +200,13 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/active-punishments', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const { activePunishmentsPageService } = services
         const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
 
         res.render('pages/activePunishments', {
           pageTitle: 'Active punishments',
-          ...mapHeaderData(prisonerData, res.locals.user, 'active-punishments', true),
+          ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'active-punishments', true),
           ...activePunishmentsPageData,
           activeTab: false,
         })
@@ -220,13 +224,13 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/x-ray-body-scans', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async prisonerData => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData, inmateDetail) => {
         const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
         const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 
         res.render('pages/xrayBodyScans', {
           pageTitle: 'X-ray body scans',
-          ...mapHeaderData(prisonerData, res.locals.user, 'x-ray-body-scans', true),
+          ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'x-ray-body-scans', true),
           prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
             style: NameFormatStyle.firstLast,
           }),

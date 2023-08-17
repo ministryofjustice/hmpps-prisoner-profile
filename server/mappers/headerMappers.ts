@@ -8,6 +8,7 @@ import config from '../config'
 import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import { User } from '../data/hmppsAuthClient'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
@@ -78,7 +79,13 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return [...new Set(alerts)].sort((a, b) => a.label.localeCompare(b.label))
 }
 
-export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string, hideBanner?: boolean) {
+export function mapHeaderData(
+  prisonerData: Prisoner,
+  inmateDetail: InmateDetail,
+  user?: User,
+  pageId?: string,
+  hideBanner?: boolean,
+) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 

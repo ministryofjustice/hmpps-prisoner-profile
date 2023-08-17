@@ -6,10 +6,11 @@ import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
 import PrisonerSearchService from '../services/prisonerSearch'
 import AlertsPageService from '../services/alertsPageService'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 let req: any
 let res: any
-let controller: any
+let controller: AlertsController
 
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/alertsPageService.ts')
@@ -41,7 +42,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedActiveAlertsMock)
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res, PrisonerMockDataA)
+    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
@@ -56,7 +57,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'alerts')
   })
 
   it('should get inactive alerts', async () => {
@@ -68,7 +69,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedInactiveAlertsMock)
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res, PrisonerMockDataA)
+    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
@@ -83,7 +84,7 @@ describe('Alerts Controller', () => {
       },
       true,
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'alerts')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'alerts')
   })
 
   it('should set canUpdateAlert to true if user has role and caseload', async () => {
@@ -92,7 +93,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res, PrisonerMockDataA)
+    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
@@ -117,7 +118,7 @@ describe('Alerts Controller', () => {
 
     res.locals.user.userRoles = ['ROLE_OTHER']
 
-    await controller.displayAlerts(req, res, PrisonerMockDataA)
+    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
@@ -140,7 +141,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'XYZ' })
+    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'XYZ' }, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
@@ -164,7 +165,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
+    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' }, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
@@ -188,7 +189,7 @@ describe('Alerts Controller', () => {
       .mockResolvedValue(pagedActiveAlertsMock)
     jest.spyOn(headerMappers, 'mapHeaderData')
 
-    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
+    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' }, inmateDetailMock)
 
     expect(getAlertsSpy).toHaveBeenCalledWith(
       res.locals.clientToken,
