@@ -12,7 +12,7 @@ import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
-export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
+export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
   const { userRoles, caseLoads } = user
   const profileBannerTopLinks = []
 
@@ -42,7 +42,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
       ? 'Manage category'
       : 'View category',
     // eslint-disable-next-line no-nested-ternary
-    info: formatCategoryCodeDescription(prisonerData.category),
+    info: formatCategoryCodeDescription(prisonerData.category, inmateDetail.category),
     classes: '',
     url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
   })
@@ -99,7 +99,7 @@ export function mapHeaderData(
       style: NameFormatStyle.lastCommaFirst,
     }),
     prisonerNumber: prisonerData.prisonerNumber,
-    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, user),
+    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks: tabs,
     photoType,

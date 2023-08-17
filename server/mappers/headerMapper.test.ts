@@ -7,7 +7,7 @@ describe('HeaderMapping', () => {
   describe('Header data', () => {
     describe('If the prisoner is part of the users case loads', () => {
       it('Contains the location', () => {
-        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, userMock)
+        const topLinks = mapProfileBannerTopLinks(PrisonerMockDataA, inmateDetailMock, userMock)
         expect(topLinks.length).toEqual(4)
         expect(topLinks[0].heading).toEqual('Location')
       })

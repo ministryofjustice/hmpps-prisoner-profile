@@ -103,7 +103,7 @@ export const visitsSummaryDataMock: MiniSummaryData = {
 
 export const categorySummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Category',
-  bottomContentLine1: 'B',
+  bottomContentLine1: 'Cat C',
   bottomContentLine3: `Next review: ${formatDate('2023-02-19', 'short')}`,
   bottomClass: 'small',
   linkLabel: 'View category',
