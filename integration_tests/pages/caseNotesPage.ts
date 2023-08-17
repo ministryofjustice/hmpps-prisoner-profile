@@ -48,4 +48,8 @@ export default class CaseNotesPage extends Page {
   filterDateToLabel = (): PageElement => cy.get(':nth-child(4) > .govuk-label')
 
   successMessage = (): PageElement => cy.get('.hmpps-flash-message--success > p')
+
+  warningPrintSlip = (): PageElement => cy.getDataQa('print-slip-warning')
+
+  encouragementPrintSlip = (): PageElement => cy.getDataQa('print-slip-encouragement')
 }

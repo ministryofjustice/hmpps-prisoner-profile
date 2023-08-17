@@ -7,14 +7,14 @@
         <pre class="hmpps-case-note-card-list-item__notes govuk-body">{{ caseNote.text }}</pre>
         {% if caseNote.printIncentiveWarningLink %}
             <div class="hmpps-case-note-card-list-item__notes govuk-body">
-                <a class="govuk-link" data-qa="print-slip" href={{ caseNote.printIncentiveWarningLink }} target="_blank" rel="noopener noreferrer">
+                <a class="govuk-link" data-qa="print-slip-warning" href={{ caseNote.printIncentiveWarningLink }} target="_blank" rel="noopener noreferrer">
                     Print a copy of the incentive level warning
                 </a>
             </div>
         {% endif %}
         {% if caseNote.printIncentiveEncouragementLink %}
             <div class="hmpps-case-note-card-list-item__notes govuk-body">
-                <a class="govuk-link" data-qa="print-slip" href={{ caseNote.printIncentiveEncouragementLink }} target="_blank" rel="noopener noreferrer">
+                <a class="govuk-link" data-qa="print-slip-encouragement" href={{ caseNote.printIncentiveEncouragementLink }} target="_blank" rel="noopener noreferrer">
                     Print a copy of the incentive level encouragement
                 </a>
             </div>

@@ -6,6 +6,7 @@ import {
   pagedCaseNotesMockPage2,
   pagedCaseNotesMockSorted,
   pomCaseNotesMock,
+  singleCaseNoteWithTypes,
 } from '../../server/data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../../server/data/localMockData/caseNoteTypesMock'
 
@@ -141,6 +142,32 @@ export default {
       request: {
         method: 'GET',
         urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=OMIC`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubSingleCaseNoteWithType: ({
+    prisonerNumber,
+    type,
+    subType,
+  }: {
+    prisonerNumber: string
+    type: string
+    subType: string
+  }) => {
+    const jsonResp = singleCaseNoteWithTypes(prisonerNumber, type, subType)
+
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=${type}`,
       },
       response: {
         status: 200,
