@@ -110,10 +110,10 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/:prisonerNumber/image', async (req, res, next) => {
     await checkPrisonerExists(req, res, next, async () => {
-      checkPrisonerInCaseLoad(req, res, next, async (prisonerData: Prisoner) => {
+      checkPrisonerInCaseLoad(req, res, next, async (prisonerData: Prisoner, inmateDetail: InmateDetail) => {
         res.render('pages/photoPage', {
           pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-          ...mapHeaderData(prisonerData, res.locals.user),
+          ...mapHeaderData(prisonerData, inmateDetail, res.locals.user),
         })
       })
     })

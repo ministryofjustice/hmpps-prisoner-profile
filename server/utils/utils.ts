@@ -412,6 +412,9 @@ export const prependHmppsAuthBaseUrl = (url: string): string => {
  * @param code
  */
 export const formatCategoryCodeDescription = (code: string, categoryText: string): string => {
+  if (['A', 'B', 'C', 'D'].includes(code)) {
+    return code
+  }
   switch (code) {
     case null:
     case undefined:

@@ -343,7 +343,10 @@ describe('findError', () => {
     it.each([
       { code: undefined, categoryText: undefined, result: 'Not entered' },
       { code: null, categoryText: null, result: 'Not entered' },
-      { code: 'C', categoryText: 'Cat C', result: 'Cat C' },
+      { code: 'A', categoryText: 'Cat A', result: 'A' },
+      { code: 'B', categoryText: 'Cat B', result: 'B' },
+      { code: 'C', categoryText: 'Cat C', result: 'C' },
+      { code: 'D', categoryText: 'Cat D', result: 'D' },
       { code: 'I', categoryText: 'Cat I', result: 'Cat I' },
       { code: 'U', categoryText: 'Some text', result: 'Unsentenced' },
       { code: 'P', categoryText: 'text', result: 'A – provisional' },
