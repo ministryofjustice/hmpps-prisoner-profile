@@ -47,7 +47,7 @@ import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { RestClientBuilder } from '../data'
 import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import CuriousApiClient from '../data/interfaces/curiousApiClient'
+import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 
