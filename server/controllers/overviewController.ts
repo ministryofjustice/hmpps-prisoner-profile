@@ -14,6 +14,7 @@ import { Nominal } from '../interfaces/pathfinderApi/nominal'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -30,7 +31,7 @@ export default class OverviewController {
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
   ) {}
 
-  public async displayOverview(req: Request, res: Response, prisonerData: Prisoner) {
+  public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = res.locals
     this.pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     this.manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
@@ -63,7 +64,7 @@ export default class OverviewController {
 
     res.render('pages/overviewPage', {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, res.locals.user, 'overview'),
+      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
       ...overviewPageData,
       overviewActions,
       overviewInfoLinks,

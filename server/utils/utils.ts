@@ -411,7 +411,10 @@ export const prependHmppsAuthBaseUrl = (url: string): string => {
  *
  * @param code
  */
-export const formatCategoryCodeDescription = (code: string): string => {
+export const formatCategoryCodeDescription = (code: string, categoryText: string): string => {
+  if (['A', 'B', 'C', 'D'].includes(code)) {
+    return code
+  }
   switch (code) {
     case null:
     case undefined:
@@ -423,7 +426,7 @@ export const formatCategoryCodeDescription = (code: string): string => {
     case 'H':
       return 'A – high'
     default:
-      return code
+      return categoryText
   }
 }
 

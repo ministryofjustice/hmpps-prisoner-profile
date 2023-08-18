@@ -341,15 +341,18 @@ describe('findError', () => {
 
   describe('formatCategoryCodeDescription', () => {
     it.each([
-      { code: undefined, result: 'Not entered' },
-      { code: null, result: 'Not entered' },
-      { code: 'C', result: 'C' },
-      { code: 'I', result: 'I' },
-      { code: 'U', result: 'Unsentenced' },
-      { code: 'P', result: 'A – provisional' },
-      { code: 'H', result: 'A – high' },
-    ])('Should return the correct description', ({ code, result }) => {
-      expect(formatCategoryCodeDescription(code)).toEqual(result)
+      { code: undefined, categoryText: undefined, result: 'Not entered' },
+      { code: null, categoryText: null, result: 'Not entered' },
+      { code: 'A', categoryText: 'Cat A', result: 'A' },
+      { code: 'B', categoryText: 'Cat B', result: 'B' },
+      { code: 'C', categoryText: 'Cat C', result: 'C' },
+      { code: 'D', categoryText: 'Cat D', result: 'D' },
+      { code: 'I', categoryText: 'Cat I', result: 'Cat I' },
+      { code: 'U', categoryText: 'Some text', result: 'Unsentenced' },
+      { code: 'P', categoryText: 'text', result: 'A – provisional' },
+      { code: 'H', categoryText: 'other text', result: 'A – high' },
+    ])('Should return the correct description', ({ code, categoryText, result }) => {
+      expect(formatCategoryCodeDescription(code, categoryText)).toEqual(result)
     })
   })
 

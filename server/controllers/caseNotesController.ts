@@ -58,8 +58,10 @@ export default class CaseNotesController {
 
       // Get total count of case notes ignoring filters
       // Get case notes based on given query params
-      const [caseNotesUsage, caseNotesPageData] = await Promise.all([
-        this.prisonApiClientBuilder(clientToken).getCaseNotesUsage(req.params.prisonerNumber),
+      // Get inmate detail for header
+      const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+      const [caseNotesUsage, caseNotesPageData, inmateDetail] = await Promise.all([
+        prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber),
         this.caseNotesService.get(
           userToken,
           prisonerData,
@@ -67,6 +69,7 @@ export default class CaseNotesController {
           canDeleteSensitiveCaseNotes,
           req.session.userDetails,
         ),
+        prisonApiClient.getInmateDetail(prisonerData.bookingId),
       ])
 
       const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
@@ -82,7 +85,7 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, res.locals.user, 'case-notes'),
+        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'case-notes'),
         ...caseNotesPageData,
         types,
         subTypes,

@@ -8,10 +8,11 @@ import config from '../config'
 import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import { User } from '../data/hmppsAuthClient'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
-export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
+export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
   const { userRoles, caseLoads } = user
   const profileBannerTopLinks = []
 
@@ -41,7 +42,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, user: User) {
       ? 'Manage category'
       : 'View category',
     // eslint-disable-next-line no-nested-ternary
-    info: formatCategoryCodeDescription(prisonerData.category),
+    info: formatCategoryCodeDescription(prisonerData.category, inmateDetail.category),
     classes: '',
     url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
   })
@@ -78,7 +79,13 @@ export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) 
   return [...new Set(alerts)].sort((a, b) => a.label.localeCompare(b.label))
 }
 
-export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: string, hideBanner?: boolean) {
+export function mapHeaderData(
+  prisonerData: Prisoner,
+  inmateDetail: InmateDetail,
+  user?: User,
+  pageId?: string,
+  hideBanner?: boolean,
+) {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 
@@ -92,7 +99,7 @@ export function mapHeaderData(prisonerData: Prisoner, user?: User, pageId?: stri
       style: NameFormatStyle.lastCommaFirst,
     }),
     prisonerNumber: prisonerData.prisonerNumber,
-    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, user),
+    profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
     alerts: mapAlerts(prisonerData, alertFlagLabels),
     tabLinks: tabs,
     photoType,
