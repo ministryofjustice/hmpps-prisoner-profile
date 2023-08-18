@@ -110,7 +110,7 @@ export default class AlertsPageService {
 
     const errors = this.validateFilters(queryParams.from, queryParams.to)
 
-    let pagedAlerts: PagedList
+    let pagedAlerts: PagedList<Alert>
 
     if (!errors.length) {
       if ((activeAlertCount && isActiveAlertsQuery) || (inactiveAlertCount && !isActiveAlertsQuery)) {

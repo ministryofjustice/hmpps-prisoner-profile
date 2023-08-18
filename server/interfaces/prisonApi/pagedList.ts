@@ -5,8 +5,8 @@ export interface PagedListItem {
   // CaseNote
 }
 
-export interface PagedList {
-  content: PagedListItem[]
+export interface PagedList<TPagedListItem extends PagedListItem> {
+  content: TPagedListItem[]
   pageable?: {
     sort: {
       empty: boolean

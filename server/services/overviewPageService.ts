@@ -46,6 +46,10 @@ import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { RestClientBuilder } from '../data'
 import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
+import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
+import CuriousApiClient from '../data/interfaces/curiousApiClient'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -58,6 +62,8 @@ export default class OverviewPageService {
 
   private adjudicationsApiClient: AdjudicationsApiClient
 
+  private curiousApiClient: CuriousApiClient
+
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
@@ -65,6 +71,7 @@ export default class OverviewPageService {
     private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
     private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>,
     private readonly offencesPageService: OffencesPageService,
+    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
   ) {}
 
   public async get(
@@ -82,6 +89,13 @@ export default class OverviewPageService {
     this.keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
     this.incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
     this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
+    this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
+
+    const [inmateDetail, personalCareNeeds, staffRoles] = await Promise.all([
+      this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
+      this.prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, [ProblemType.MaternityStatus]),
+      this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
+    ])
 
     const [
       nonAssociations,
@@ -92,15 +106,14 @@ export default class OverviewPageService {
       schedule,
       statuses,
       offencesOverview,
-      staffRoles,
     ] = await Promise.all([
       this.getNonAssociations(prisonerNumber),
       this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles),
-      this.getMiniSummaryGroupB(prisonerData, userCaseLoads, userRoles),
-      this.getPersonalDetails(prisonerData),
+      this.getMiniSummaryGroupB(prisonerData, inmateDetail, userCaseLoads, userRoles),
+      this.getPersonalDetails(prisonerData, inmateDetail),
       this.getStaffContacts(prisonerData),
       this.getSchedule(prisonerData),
-      this.getStatuses(prisonerData),
+      this.getStatuses(prisonerData, inmateDetail, personalCareNeeds),
       this.getOffencesOverview(
         bookingId,
         prisonerNumber,
@@ -108,7 +121,6 @@ export default class OverviewPageService {
         conditionalReleaseDate,
         confirmedReleaseDate,
       ),
-      this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
     ])
 
     return {
@@ -221,14 +233,12 @@ export default class OverviewPageService {
             ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
             : '',
       },
-      prisonOffenderManager:
-        prisonOffenderManager !== undefined
-          ? `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`
-          : 'Not assigned',
-      coworkingPrisonOffenderManager:
-        coworkingPrisonOffenderManager !== undefined
-          ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
-          : 'Not assigned',
+      prisonOffenderManager: prisonOffenderManager
+        ? `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`
+        : 'Not assigned',
+      coworkingPrisonOffenderManager: coworkingPrisonOffenderManager
+        ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
+        : 'Not assigned',
       communityOffenderManager:
         communityOffenderManager && communityOffenderManager[0] !== undefined
           ? `${convertToTitleCase(communityOffenderManager[0].firstName)} ${convertToTitleCase(
@@ -239,9 +249,7 @@ export default class OverviewPageService {
     }
   }
 
-  public async getPersonalDetails(prisonerData: Prisoner): Promise<PersonalDetails> {
-    const inmateDetail = await this.prisonApiClient.getInmateDetail(prisonerData.bookingId)
-
+  public async getPersonalDetails(prisonerData: Prisoner, inmateDetail: InmateDetail): Promise<PersonalDetails> {
     const personalDetailsMain = [
       {
         key: {
@@ -405,6 +413,7 @@ export default class OverviewPageService {
 
   private async getMiniSummaryGroupB(
     prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
     userCaseLoads: CaseLoad[],
     userRoles: string[],
   ): Promise<MiniSummary[]> {
@@ -441,7 +450,7 @@ export default class OverviewPageService {
 
     const categorySummaryData: MiniSummaryData = {
       bottomLabel: 'Category',
-      bottomContentLine1: formatCategoryCodeDescription(category?.classificationCode),
+      bottomContentLine1: formatCategoryCodeDescription(category?.classificationCode, inmateDetail.category),
       bottomContentLine3: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
       bottomClass: 'small',
       linkLabel: undefined,
@@ -544,13 +553,12 @@ export default class OverviewPageService {
     })
   }
 
-  private async getStatuses(prisonerData: Prisoner): Promise<Status[]> {
+  private async getStatuses(
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+    personalCareNeeds: PersonalCareNeeds,
+  ): Promise<Status[]> {
     const statusList: Status[] = []
-
-    const [inmateDetail, personalCareNeeds] = await Promise.all([
-      this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
-      this.prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, [ProblemType.MaternityStatus]),
-    ])
 
     // Current Location
     let currentLocation = ''
@@ -602,6 +610,17 @@ export default class OverviewPageService {
     if ((recognised === BooleanString.Yes || recognised === BooleanString.No) && suitable !== BooleanString.No) {
       statusList.push({
         label: 'Recognised Listener',
+      })
+    }
+
+    // Neurodiversity support needed
+    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
+      prisonerData.prisonerNumber,
+    )
+    if (learnerNeurodivergence?.length) {
+      statusList.push({
+        label: 'Support needed',
+        subText: 'Has neurodiversity needs',
       })
     }
 

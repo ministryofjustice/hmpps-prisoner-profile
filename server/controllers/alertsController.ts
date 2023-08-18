@@ -7,6 +7,7 @@ import { Role } from '../data/enums/role'
 import config from '../config'
 import { userCanEdit, userHasRoles } from '../utils/utils'
 import { Prisoner } from '../interfaces/prisoner'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -22,7 +23,7 @@ export default class AlertsController {
     this.isActive = isActive
   }
 
-  public async displayAlerts(req: Request, res: Response, prisonerData: Prisoner) {
+  public async displayAlerts(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     // Parse query params for paging, sorting and filtering data
     const { clientToken } = res.locals
     const queryParams: PagedListQueryParams = {}
@@ -51,7 +52,7 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(prisonerData, res.locals.user, 'alerts'),
+      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'alerts'),
       ...alertsPageData,
       showingAll,
       addAlertLinkUrl,

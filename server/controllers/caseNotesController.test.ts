@@ -12,6 +12,7 @@ import CaseNotesService from '../services/caseNotesService'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
+import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
 let req: any
 let res: any
@@ -39,6 +40,9 @@ describe('Case Notes Controller', () => {
         referer: 'http://referer',
       },
       path: 'case-notes',
+      session: {
+        userDetails: { displayName: 'A Name' },
+      },
       flash: jest.fn(),
     }
     res = {
@@ -75,6 +79,7 @@ describe('Case Notes Controller', () => {
       fullName: 'John Middle Names Saunders',
     })
     const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
+    prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
 
     await controller.displayCaseNotes()(req, res)
 
@@ -92,8 +97,9 @@ describe('Case Notes Controller', () => {
         endDate: '02/02/2023',
       },
       true,
+      { displayName: 'A Name' },
     )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, res.locals.user, 'case-notes')
+    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'case-notes')
   })
 
   it('should display add case note page', async () => {
@@ -102,7 +108,7 @@ describe('Case Notes Controller', () => {
       .mockResolvedValue(PrisonerMockDataA)
     const getCaseNoteTypesForUserSpy = jest
       .spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser')
-      .mockResolvedValue(caseNoteTypesMock)
+      .mockResolvedValue(caseNoteTypesMock.slice(0, 2))
 
     await controller.displayAddCaseNote()(req, res)
 

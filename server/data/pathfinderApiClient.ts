@@ -6,13 +6,9 @@ export default class PathfinderApiRestClient implements PathfinderApiClient {
   constructor(private readonly restClient: RestClient) {}
 
   async getNominal(offenderNumber: string): Promise<Nominal> {
-    try {
-      return await this.restClient.get<Nominal>({ path: `/pathfinder/nominal/noms-id/${offenderNumber}` })
-    } catch (error) {
-      if (error.status === 404) {
-        return null
-      }
-      return error
-    }
+    return this.restClient.get<Nominal>({
+      path: `/pathfinder/nominal/noms-id/${offenderNumber}`,
+      ignore404: true,
+    })
   }
 }

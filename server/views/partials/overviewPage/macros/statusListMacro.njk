@@ -4,10 +4,12 @@
       <li>
         <p>{{ status.label }}</p>
         {% if status.date %}
-        <p>
-          Last Updated:
-          <span aria-label="{{ status.date | formatDate }}">{{ status.date | formatDate('short') }}</span>
-        </p>
+            <p>
+              Last Updated:
+              <span aria-label="{{ status.date | formatDate }}">{{ status.date | formatDate('short') }}</span>
+            </p>
+        {% elseif status.subText %}
+            <p>{{ status.subText }}</p>
         {% endif %}
       </li>
     {% endfor %}

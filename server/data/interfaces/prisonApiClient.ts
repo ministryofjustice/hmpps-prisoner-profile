@@ -32,6 +32,7 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
+import { Alert } from '../../interfaces/prisonApi/alert'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -53,7 +54,7 @@ export interface PrisonApiClient {
     toDate: string,
   ): Promise<OffenderAttendanceHistory>
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
-  getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList>
+  getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList<Alert>>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
   getCourtCases(bookingId: number): Promise<CourtCase[]>
   getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]>

@@ -1,6 +1,7 @@
+import { CaseNote } from '../../interfaces/caseNotesApi/caseNote'
 import { PagedList } from '../../interfaces/prisonApi/pagedList'
 
-export const pagedCaseNotesMock: PagedList = {
+export const pagedCaseNotesMock: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47023806',
@@ -402,7 +403,7 @@ export const pagedCaseNotesMock: PagedList = {
   empty: false,
 }
 
-export const pagedCaseNotesMockPage2: PagedList = {
+export const pagedCaseNotesMockPage2: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47018169',
@@ -798,7 +799,7 @@ export const pagedCaseNotesMockPage2: PagedList = {
   empty: false,
 }
 
-export const pagedCaseNotesMockSorted: PagedList = {
+export const pagedCaseNotesMockSorted: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47018169',
@@ -1194,7 +1195,7 @@ export const pagedCaseNotesMockSorted: PagedList = {
   empty: false,
 }
 
-export const pagedCaseNotesMockFiltered: PagedList = {
+export const pagedCaseNotesMockFiltered: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: '47018169',
@@ -1242,7 +1243,7 @@ export const pagedCaseNotesMockFiltered: PagedList = {
   empty: false,
 }
 
-export const emptyCaseNotesMock: PagedList = {
+export const emptyCaseNotesMock: PagedList<CaseNote> = {
   content: [],
   pageable: {
     sort: {
@@ -1271,7 +1272,58 @@ export const emptyCaseNotesMock: PagedList = {
   empty: true,
 }
 
-export const pomCaseNotesMock: PagedList = {
+export const singleCaseNoteWithTypes = (
+  prisonerNumber: string,
+  type: string,
+  subType: string,
+): PagedList<CaseNote> => ({
+  content: [
+    {
+      caseNoteId: 'f81d31cd-c2d9-4718-843f-dfade96ca468',
+      offenderIdentifier: prisonerNumber,
+      type,
+      typeDescription: type,
+      subType,
+      subTypeDescription: subType,
+      source: 'INST',
+      creationDateTime: '2023-04-18T17:15:16.410402327',
+      occurrenceDateTime: '2023-04-18T17:15:00',
+      authorName: 'Name, A',
+      authorUserId: '487023',
+      text: 'This is a case note',
+      locationId: 'MDI',
+      eventId: -241,
+      sensitive: false,
+    },
+  ],
+  pageable: {
+    sort: {
+      empty: false,
+      sorted: true,
+      unsorted: false,
+    },
+    offset: 0,
+    pageSize: 20,
+    pageNumber: 0,
+    paged: true,
+    unpaged: false,
+  },
+  totalElements: 1,
+  last: true,
+  totalPages: 1,
+  size: 1,
+  number: 0,
+  sort: {
+    empty: false,
+    sorted: true,
+    unsorted: false,
+  },
+  first: true,
+  numberOfElements: 1,
+  empty: false,
+})
+
+export const pomCaseNotesMock: PagedList<CaseNote> = {
   content: [
     {
       caseNoteId: 'f81d31cd-c2d9-4718-843f-dfade96ca468',

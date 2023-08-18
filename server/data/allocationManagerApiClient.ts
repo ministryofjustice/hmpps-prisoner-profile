@@ -6,10 +6,6 @@ export default class AllocationManagerApiClient implements AllocationManagerClie
   constructor(private readonly restClient: RestClient) {}
 
   async getPomByOffenderNo(offenderNumber: string): Promise<Pom> {
-    try {
-      return await this.restClient.get<Pom>({ path: `/api/allocation/${offenderNumber}` })
-    } catch (error) {
-      return error
-    }
+    return this.restClient.get<Pom>({ path: `/api/allocation/${offenderNumber}`, ignore404: true })
   }
 }
