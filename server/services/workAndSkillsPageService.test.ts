@@ -15,7 +15,7 @@ import {
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
-import CuriousApiClient from '../data/interfaces/curiousApiClient'
+import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
 import { OffenderActivitiesMock } from '../data/localMockData/offenderActivitiesMock'
 import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'

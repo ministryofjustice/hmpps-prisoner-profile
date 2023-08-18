@@ -19,9 +19,13 @@ import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMo
 import { formatDate } from '../utils/dateHelpers'
 import { identifiersMock } from '../data/localMockData/identifiersMock'
 import { addressSummaryMock } from '../data/localMockData/addressSummary'
+import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
+import { curiousApiClientMock } from '../../tests/mocks/curiousApiClientMock'
+import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
+  let curiousApiClient: CuriousApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -36,6 +40,10 @@ describe('PersonalPageService', () => {
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
+
+    curiousApiClient = curiousApiClientMock()
+
+    curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
   })
 
   const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
@@ -49,7 +57,11 @@ describe('PersonalPageService', () => {
     prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
   }
 
-  const constructService = () => new PersonalPageService(() => prisonApiClient)
+  const constructService = () =>
+    new PersonalPageService(
+      () => prisonApiClient,
+      () => curiousApiClient,
+    )
 
   describe('Getting information from the Prison API', () => {
     it('Gets inmate details from the api', async () => {
@@ -721,6 +733,14 @@ describe('PersonalPageService', () => {
       prisonApiClient.getAddresses = jest.fn(async () => undefined)
       const { addresses } = await constructService().get('token', PrisonerMockDataA)
       expect(addresses).toBeUndefined()
+    })
+  })
+
+  describe('Get Learner Neurodivergence information', () => {
+    it('Sets the address to empty', async () => {
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
+      const data = await constructService().get('token', PrisonerMockDataA)
+      expect(data.learnerNeurodivergence).toBe(LearnerNeurodivergenceMock)
     })
   })
 })

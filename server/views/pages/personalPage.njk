@@ -55,12 +55,11 @@
           {% include "../partials/personalPage/careNeeds.njk" %}
         </div>
       </div>
-      {# This is hidden deliberately for now #}
-      {# <div class="govuk-grid-row">
+      <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
           {% include "../partials/personalPage/neurodiversity.njk" %}
         </div>
-      </div> #}
+      </div>
       {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">

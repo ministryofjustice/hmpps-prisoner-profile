@@ -1,5 +1,6 @@
 import { Address } from '../address'
 import { GovSummaryItem } from '../govSummaryItem'
+import { LearnerNeurodivergence } from '../learnerNeurodivergence'
 
 export interface PersonalDetails {
   age: string
@@ -132,4 +133,5 @@ export interface PersonalPage {
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
   careNeeds: CareNeeds
+  learnerNeurodivergence: LearnerNeurodivergence[]
 }

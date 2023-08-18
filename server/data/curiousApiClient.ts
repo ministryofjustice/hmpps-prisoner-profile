@@ -6,7 +6,7 @@ import { LearnerEducation } from '../interfaces/learnerEducation'
 import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
 import { LearnerGoals } from '../interfaces/learnerGoals'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import CuriousApiClient from './interfaces/curiousApiClient'
+import { CuriousApiClient } from './interfaces/curiousApiClient'
 
 export default class CuriousRestApiClient implements CuriousApiClient {
   constructor(private readonly restClient: RestClient) {}
