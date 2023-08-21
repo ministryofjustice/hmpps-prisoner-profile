@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
 import OverviewPageService from '../services/overviewPageService'
-import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
+import { canAddCaseNotes, canViewCalculateReleaseDates, canViewCaseNotes } from '../utils/roleHelpers'
 import { Prisoner } from '../interfaces/prisoner'
 import { HmppsAction } from '../interfaces/hmppsAction'
 import { Icon } from '../data/enums/icon'
@@ -81,6 +81,14 @@ export default class OverviewController {
     staffRoles: string[] = [],
   ): HmppsAction[] {
     const actions: HmppsAction[] = []
+    if (canViewCalculateReleaseDates(user)) {
+      actions.push({
+        text: 'Calculate release dates',
+        icon: Icon.CalculateReleaseDates,
+        url: `${config.serviceUrls.calculateReleaseDates}/?prisonId=${prisonerData.prisonerNumber}`,
+        dataQA: 'calculate-release-dates-action-link',
+      })
+    }
     if (canAddCaseNotes(user, prisonerData)) {
       actions.push({
         text: 'Add case note',
