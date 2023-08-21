@@ -181,4 +181,20 @@ export default class PersonalPage extends Page {
   backToTopLink = (): PageElement => cy.get('[data-module=hmpps-back-to-top] a')
 
   backToTopLinkHidden = (): PageElement => cy.get('.hmpps-back-to-top--hidden')
+
+  neurodiversity = () => {
+    const cardData = () => cy.get('#neurodiversity')
+    return {
+      neurodivergenceExists: () => cardData().findDataQa('neurodivergence-exists'),
+      neurodivergenceSupport: () => cardData().findDataQa('neurodivergence-support'),
+      neurodiversitySupportNeeded: () => cardData().findDataQa('neurodiversity-support-needed'),
+      neurodiversityTitle: () => cardData().findDataQa('neurodiversity-title'),
+      neurodiversitySelfAssessment: () => cardData().findDataQa('neurodiversity-self-assessment'),
+      neurodiversitySelfDeclaredDate: () => cardData().findDataQa('neurodiversity-self-declared-date'),
+      noNeurodiversityReported: () => cardData().findDataQa('no-neurodiversity-reported'),
+      fromNeurodiversityAssessment: () => cardData().findDataQa('from-neurodiversity-assessment'),
+      neurodiversityAssessed: () => cardData().findDataQa('neurodiversity-assessed'),
+      neurodiversityAssessmentDate: () => cardData().findDataQa('neurodiversity-assessment-date'),
+    }
+  }
 }

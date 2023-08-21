@@ -2,7 +2,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {%- call summaryCard({title: "Neurodiversity", id: "neurodiversity"}) -%}
-  <div class="govuk-grid-row" data-qa="personal-details">
+  <div class="govuk-grid-row" data-qa="neurodiversity">
     <div class="govuk-grid-column-full">
       {% if not learnerNeurodivergence.length %}
         <p class="govuk-body">
@@ -14,7 +14,7 @@
           prison.
         </p>
       {% elseif learnerNeurodivergence.length %}
-        <p class="govuk-body">
+        <p class="govuk-body" data-qa="neurodivergence-exists">
           Information from the local education team - not a medical diagnosis.
         </p>
 
@@ -38,7 +38,7 @@
 
         {# Self assessment #}
           <hr/>
-          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0" data-qa="neurodiversity-title">
             {{ summaryListRow("Neurodiversity", "From self-assessment") }}
           </dl>
           {% if learnerNeurodivergence[0].neurodivergenceSelfDeclared.length %}
@@ -53,8 +53,8 @@
               </dl>
             {% endif %}
           {% else %}
-            <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" >
-              {{ summaryListRow("", "No neurodiversity reported by th prisoner yet") }}
+            <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="no-neurodiversity-reported">
+              {{ summaryListRow("", "No neurodiversity reported by the prisoner yet") }}
             </dl>
           {% endif %}
 
@@ -66,7 +66,7 @@
               <dd class="govuk-summary-list__value govuk-!-padding-top-0" ><hr class="govuk-!-padding-top-0"/></dd>
             </div>
           </dl>
-          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0" data-qa="from-neurodiversity-assessment">
             {{ summaryListRow("", "From neurodiversity assessment") }}
           </dl>
           <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-assessed">
