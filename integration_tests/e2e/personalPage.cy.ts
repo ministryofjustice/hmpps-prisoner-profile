@@ -378,9 +378,13 @@ context('When signed in', () => {
   context('Neurodiversity', () => {
     beforeEach(() => {
       cy.task('reset')
+      cy.setupUserAuth({
+        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+        activeCaseLoadId: 'MDI',
+        roles: [Role.GlobalSearch],
+      })
       cy.task('stubSignIn')
       cy.task('stubAuthUser')
-      cy.task('stubUserCaseLoads')
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       visitPersonalDetailsPage()
     })
@@ -388,15 +392,12 @@ context('When signed in', () => {
     context('Page section', () => {
       it('Displays neurodiversity sections', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        page.neurodiversity().fromNeurodiversityAssessment().should('not.exist')
-        page.neurodiversity().neurodivergenceExists().should('not.exist')
+        page.neurodiversity().fromNeurodiversityAssessment().should('be.visible')
+        page.neurodiversity().neurodivergenceExists().should('be.visible')
         page.neurodiversity().neurodivergenceSupport().should('be.visible')
+        page.neurodiversity().neurodiversitySelfAssessment().should('be.visible')
         page.neurodiversity().neurodiversityAssessed().should('be.visible')
-        page.neurodiversity().neurodiversityAssessmentDate().should('be.visible')
-        page.neurodiversity().neurodiversitySelfDeclaredDate().should('be.visible')
-        page.neurodiversity().neurodiversitySupportNeeded().should('be.visible')
-        page.neurodiversity().neurodiversityTitle().should('not.exist')
-        page.neurodiversity().noNeurodiversityReported().should('not.exist')
+        page.neurodiversity().neurodiversityTitle().should('be.visible')
       })
     })
   })

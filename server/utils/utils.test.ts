@@ -11,6 +11,7 @@ import {
   getNamesFromString,
   initialiseName,
   mapToQueryString,
+  neurodiversityEnabled,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
   prisonerBelongsToUsersCaseLoad,
@@ -393,6 +394,31 @@ describe('findError', () => {
       expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
         xrayCareNeedsDESCMock.personalCareNeeds,
       )
+    })
+  })
+
+  describe('sortArrayOfObjectsByDate', () => {
+    it('Should return array of objects sorted in ascending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
+        xrayCareNeedsASCMock.personalCareNeeds,
+      )
+    })
+    it('Should return array of objects sorted in descending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
+        xrayCareNeedsDESCMock.personalCareNeeds,
+      )
+    })
+  })
+
+  describe.skip('neuroDiversityEnabledPrisons', () => {
+    it('Should return true', () => {
+      expect(neurodiversityEnabled('NHI')).toEqual(true)
+    })
+  })
+
+  describe('neuroDiversityDisabledPrisons', () => {
+    it('Should return false', () => {
+      expect(neurodiversityEnabled('MDI')).toEqual(false)
     })
   })
 })

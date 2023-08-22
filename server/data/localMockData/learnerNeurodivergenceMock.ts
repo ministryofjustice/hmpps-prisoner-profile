@@ -3,7 +3,7 @@ import { LearnerNeurodivergence } from '../../interfaces/learnerNeurodivergence'
 export const LearnerNeurodivergenceMock: LearnerNeurodivergence[] = [
   {
     prn: 'G6123VU',
-    establishmentId: 'string',
+    establishmentId: 'MDI',
     establishmentName: 'string',
     neurodivergenceSelfDeclared: ['string'],
     selfDeclaredDate: '2023-03-02',

@@ -183,18 +183,13 @@ export default class PersonalPage extends Page {
   backToTopLinkHidden = (): PageElement => cy.get('.hmpps-back-to-top--hidden')
 
   neurodiversity = () => {
-    const cardData = () => cy.get('#neurodiversity')
     return {
-      neurodivergenceExists: () => cardData().findDataQa('neurodivergence-exists'),
-      neurodivergenceSupport: () => cardData().findDataQa('neurodivergence-support'),
-      neurodiversitySupportNeeded: () => cardData().findDataQa('neurodiversity-support-needed'),
-      neurodiversityTitle: () => cardData().findDataQa('neurodiversity-title'),
-      neurodiversitySelfAssessment: () => cardData().findDataQa('neurodiversity-self-assessment'),
-      neurodiversitySelfDeclaredDate: () => cardData().findDataQa('neurodiversity-self-declared-date'),
-      noNeurodiversityReported: () => cardData().findDataQa('no-neurodiversity-reported'),
-      fromNeurodiversityAssessment: () => cardData().findDataQa('from-neurodiversity-assessment'),
-      neurodiversityAssessed: () => cardData().findDataQa('neurodiversity-assessed'),
-      neurodiversityAssessmentDate: () => cardData().findDataQa('neurodiversity-assessment-date'),
+      neurodivergenceExists: () => cy.get('#neurodiversity'),
+      neurodivergenceSupport: () => cy.get('[data-qa="neurodivergence-support"] > [data-qa="-row"] > [data-qa="-key"]'),
+      neurodiversityTitle: () => cy.get(':nth-child(5) > [data-qa="-row"] > [data-qa="-key"]'),
+      neurodiversitySelfAssessment: () => cy.get(':nth-child(5) > [data-qa="-row"] > .govuk-summary-list__value'),
+      fromNeurodiversityAssessment: () => cy.get(':nth-child(9) > [data-qa="-row"] > .govuk-summary-list__value'),
+      neurodiversityAssessed: () => cy.get(':nth-child(9) > [data-qa="-row"] > .govuk-summary-list__value'),
     }
   }
 }

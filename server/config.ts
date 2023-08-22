@@ -174,4 +174,5 @@ export default {
   localMockData: get('LOCAL_MOCK_DATA', false),
   feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   phaseName: get('SYSTEM_PHASE', ''),
+  neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
 }

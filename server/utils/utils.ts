@@ -451,3 +451,10 @@ export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: stri
   })
   return array
 }
+
+export const { neurodiversityEnabledPrisons } = config
+
+export const neurodiversityEnabled = (agencyId: string): boolean => {
+  const isEnabled = neurodiversityEnabledPrisons?.includes(agencyId)
+  return isEnabled
+}

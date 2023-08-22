@@ -37,6 +37,7 @@ generic-service:
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI"
     SYSTEM_PHASE: "DEV"
+    NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
