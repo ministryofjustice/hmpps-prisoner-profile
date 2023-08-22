@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import type { HTTPError } from 'superagent'
 import logger from '../logger'
 
@@ -9,6 +9,14 @@ export default function createErrorHandler(production: boolean) {
     if (error.status === 401 || error.status === 403) {
       logger.info('Logging user out')
       return res.redirect('/sign-out')
+    }
+
+    res.locals.user.showFeedbackBanner = false
+    res.locals.hideBackLink = true
+
+    if (error.status === 404) {
+      res.status(404)
+      return res.render('notFound', { url: req.headers.referer || '/' })
     }
 
     res.locals.message = production

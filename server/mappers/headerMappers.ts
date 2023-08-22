@@ -108,3 +108,13 @@ export function mapHeaderData(
     hideBanner: hideBanner || false,
   }
 }
+
+export function mapHeaderNoBannerData(prisonerData: Prisoner) {
+  return {
+    prisonerName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
+      style: NameFormatStyle.lastCommaFirst,
+    }),
+    prisonerNumber: prisonerData.prisonerNumber,
+    prisonId: prisonerData.prisonId,
+  }
+}

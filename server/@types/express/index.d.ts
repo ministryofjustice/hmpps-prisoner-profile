@@ -25,6 +25,7 @@ export declare global {
       verified?: boolean
       id: string
       errors?: HmppsError[]
+      middleware?: Record
       logout(done: (err: unknown) => void): void
       flash(type: string, message: unknown): number
     }
