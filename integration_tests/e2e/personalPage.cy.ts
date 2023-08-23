@@ -374,4 +374,31 @@ context('When signed in', () => {
       })
     })
   })
+
+  context('Neurodiversity', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+        activeCaseLoadId: 'MDI',
+        roles: [Role.GlobalSearch],
+      })
+      cy.task('stubSignIn')
+      cy.task('stubAuthUser')
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      visitPersonalDetailsPage()
+    })
+
+    context('Page section', () => {
+      it('Displays neurodiversity sections', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.neurodiversity().fromNeurodiversityAssessment().should('be.visible')
+        page.neurodiversity().neurodivergenceExists().should('be.visible')
+        page.neurodiversity().neurodivergenceSupport().should('be.visible')
+        page.neurodiversity().neurodiversitySelfAssessment().should('be.visible')
+        page.neurodiversity().neurodiversityAssessed().should('be.visible')
+        page.neurodiversity().neurodiversityTitle().should('be.visible')
+      })
+    })
+  })
 })

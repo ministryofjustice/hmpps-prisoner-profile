@@ -1,6 +1,6 @@
 import { format, startOfToday, sub } from 'date-fns'
 import { AbsenceOutcomeCodes } from '../data/enums/absenceOutcomeCodes'
-import CuriousApiClient from '../data/interfaces/curiousApiClient'
+import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { GovSummaryGroup, GovSummaryItem } from '../interfaces/govSummaryItem'
 import { LearnerEducation } from '../interfaces/learnerEducation'
@@ -191,7 +191,7 @@ export default class WorkAndSkillsPageService {
     return govList
   }
 
-  private async getLearnerNeurodivergence(prisonerNumber: string) {
+  public async getLearnerNeurodivergence(prisonerNumber: string) {
     const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
       prisonerNumber,
     )

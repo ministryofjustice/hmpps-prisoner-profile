@@ -31,6 +31,7 @@ declare global {
         prisonerNumber: string
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
+        caseLoads?: CaseLoad[]
       })
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>

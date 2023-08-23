@@ -40,7 +40,7 @@ export const services = () => {
     offencesPageService,
     curiousApiClientBuilder,
   )
-  const personalPageService = new PersonalPageService(prisonApiClientBuilder)
+  const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)
   const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
 
