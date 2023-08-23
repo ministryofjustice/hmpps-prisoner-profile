@@ -61,7 +61,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith()
+      expect(next).toHaveBeenCalledWith('route')
     })
 
     it('should add middleware error if inactive booking and allowInactive is false', () => {
@@ -70,7 +70,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       checkPrisonerInCaseload({ allowInactive: false })(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith()
+      expect(next).toHaveBeenCalledWith('route')
     })
 
     it('should return next() if inactive booking and user does have role', () => {
@@ -99,7 +99,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith()
+      expect(next).toHaveBeenCalledWith('route')
     })
 
     it('should add middleware error if prisoner not in caseload and allowGlobal is false', () => {
@@ -108,7 +108,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       checkPrisonerInCaseload({ allowGlobal: false })(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith()
+      expect(next).toHaveBeenCalledWith('route')
     })
 
     it('should return next() if prisoner not in caseload and allowGlobal is true and user has role', () => {
@@ -128,11 +128,10 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
       checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
-      expect(next).toHaveBeenCalledTimes(2)
+      expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
         new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [OUT]'),
       )
-      expect(next).toHaveBeenCalledWith()
     })
 
     it('should return NotFoundError if inactive booking and allowInactive is false', () => {
@@ -140,11 +139,10 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
       checkPrisonerInCaseload({ allowInactive: false })(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
-      expect(next).toHaveBeenCalledTimes(2)
+      expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
         new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [OUT]'),
       )
-      expect(next).toHaveBeenCalledWith()
     })
 
     it('should return next() if inactive booking and user does have role', () => {
@@ -172,11 +170,10 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
       checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
-      expect(next).toHaveBeenCalledTimes(2)
+      expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
         new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseload'),
       )
-      expect(next).toHaveBeenCalledWith()
     })
 
     it('should return NotFoundError if prisoner not in caseload and allowGlobal is false', () => {
@@ -184,11 +181,10 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
       checkPrisonerInCaseload({ allowGlobal: false })(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
-      expect(next).toHaveBeenCalledTimes(2)
+      expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
         new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseload'),
       )
-      expect(next).toHaveBeenCalledWith()
     })
 
     it('should return next() if prisoner not in caseload and allowGlobal is true and user has role', () => {

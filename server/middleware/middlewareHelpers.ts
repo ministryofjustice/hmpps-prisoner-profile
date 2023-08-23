@@ -6,7 +6,7 @@ export function addMiddlewareError(req: Request, next: NextFunction, error: Erro
   const usingGuard = req.middleware?.usingGuard
 
   if (!usingGuard) {
-    return next(error)
+    return error
   }
 
   logger.debug(error.message)
@@ -18,5 +18,5 @@ export function addMiddlewareError(req: Request, next: NextFunction, error: Erro
       [usingGuard]: errors && errors[usingGuard] ? [...errors[usingGuard], error] : [error],
     },
   }
-  return null
+  return 'route'
 }

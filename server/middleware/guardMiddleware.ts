@@ -29,10 +29,7 @@ export default function guardMiddleware(operator: GuardOperator, ...handlers: Re
 
     await Promise.all(
       handlers.map(handler =>
-        handler(req, res, error => {
-          if (error) {
-            return next(error)
-          }
+        handler(req, res, () => {
           return null
         }),
       ),
@@ -52,8 +49,7 @@ export default function guardMiddleware(operator: GuardOperator, ...handlers: Re
 
     // Nested guard error handling
     if (guardNumber > 1) {
-      addMiddlewareError(req, next, new NotFoundError(`GuardMiddleware: Guard #${guardNumber} Fail`))
-      return next()
+      return next(addMiddlewareError(req, next, new NotFoundError(`GuardMiddleware: Guard #${guardNumber} Fail`)))
     }
 
     return next(new NotFoundError(`GuardMiddleware: Guard #${guardNumber} Fail`))

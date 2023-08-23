@@ -46,7 +46,7 @@ describe('CheckHasSomeRolesMiddleware', () => {
       checkHasSomeRoles([Role.InactiveBookings, Role.CategorisationSecurity])(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith()
+      expect(next).toHaveBeenCalledWith('route')
     })
   })
 
@@ -60,9 +60,8 @@ describe('CheckHasSomeRolesMiddleware', () => {
     it('should return next(error) on fail', () => {
       checkHasSomeRoles([Role.InactiveBookings, Role.CategorisationSecurity])(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
-      expect(next).toHaveBeenCalledTimes(2)
+      expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(new RoleError('CheckHasSomeRolesMiddleware: not authorised for test/path'))
-      expect(next).toHaveBeenCalledWith()
     })
   })
 })

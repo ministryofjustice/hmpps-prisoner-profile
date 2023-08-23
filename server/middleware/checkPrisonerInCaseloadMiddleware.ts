@@ -19,10 +19,12 @@ export default function checkPrisonerInCaseload({ allowGlobal = true, allowInact
 
     if (inactiveBooking) {
       if (!(allowInactive && canViewInactiveBookings) && !(allowGlobal && globalSearchUser)) {
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
+        return next(
+          addMiddlewareError(
+            req,
+            next,
+            new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
+          ),
         )
       }
       return next()
@@ -32,7 +34,9 @@ export default function checkPrisonerInCaseload({ allowGlobal = true, allowInact
       !prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) &&
       !(allowGlobal && globalSearchUser)
     ) {
-      addMiddlewareError(req, next, new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseload'))
+      return next(
+        addMiddlewareError(req, next, new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseload')),
+      )
     }
 
     return next()
