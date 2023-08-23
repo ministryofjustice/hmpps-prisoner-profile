@@ -31,14 +31,23 @@ import { GovSummaryItem } from '../interfaces/govSummaryItem'
 import { HealthDomainReferenceCode, PersonalCareNeed } from '../interfaces/personalCareNeeds'
 import { ReasonableAdjustment } from '../interfaces/prisonApi/reasonableAdjustment'
 import { RestClientBuilder } from '../data'
+import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
+import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 
 export default class PersonalPageService {
   private prisonApiClient: PrisonApiClient
 
-  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+  private curiousApiClient: CuriousApiClient
+
+  constructor(
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+  ) {}
 
   public async get(token: string, prisonerData: Prisoner): Promise<PersonalPage> {
     this.prisonApiClient = this.prisonApiClientBuilder(token)
+    this.curiousApiClient = this.curiousApiClientBuilder(token)
+
     const { bookingId, prisonerNumber } = prisonerData
     const [
       inmateDetail,
@@ -90,6 +99,7 @@ export default class PersonalPageService {
         xrays: this.xrays(personalCareNeeds),
       },
       careNeeds: await this.careNeeds(healthReferenceCodes, personalCareNeeds, reasonableAdjustments),
+      learnerNeurodivergence: await this.getLearnerNeurodivergence(prisonerNumber),
     }
   }
 
@@ -353,5 +363,12 @@ export default class PersonalPageService {
       total: xrayNeeds.length,
       since: xrayNeeds.length > 0 ? yearStart.toISOString() : undefined,
     }
+  }
+
+  private async getLearnerNeurodivergence(prisonerNumber: string) {
+    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
+      prisonerNumber,
+    )
+    return learnerNeurodivergence
   }
 }

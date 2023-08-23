@@ -5,7 +5,7 @@ import { LearnerLatestAssessment } from '../../interfaces/learnerLatestAssessmen
 import { LearnerNeurodivergence } from '../../interfaces/learnerNeurodivergence'
 import { LearnerProfile } from '../../interfaces/learnerProfile'
 
-export default interface CuriousApiClient {
+export interface CuriousApiClient {
   getLearnerEmployabilitySkills(prisonerNumber: string): Promise<LearnerEmployabilitySkills>
   getLearnerProfile(prisonerNumber: string): Promise<LearnerProfile[]>
   getLearnerEducation(prisonerNumber: string): Promise<LearnerEducation>

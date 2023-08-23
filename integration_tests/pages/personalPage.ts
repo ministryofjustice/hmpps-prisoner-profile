@@ -181,4 +181,15 @@ export default class PersonalPage extends Page {
   backToTopLink = (): PageElement => cy.get('[data-module=hmpps-back-to-top] a')
 
   backToTopLinkHidden = (): PageElement => cy.get('.hmpps-back-to-top--hidden')
+
+  neurodiversity = () => {
+    return {
+      neurodivergenceExists: () => cy.get('#neurodiversity'),
+      neurodivergenceSupport: () => cy.get('[data-qa="neurodivergence-support"] > [data-qa="-row"] > [data-qa="-key"]'),
+      neurodiversityTitle: () => cy.get(':nth-child(5) > [data-qa="-row"] > [data-qa="-key"]'),
+      neurodiversitySelfAssessment: () => cy.get(':nth-child(5) > [data-qa="-row"] > .govuk-summary-list__value'),
+      fromNeurodiversityAssessment: () => cy.get(':nth-child(9) > [data-qa="-row"] > .govuk-summary-list__value'),
+      neurodiversityAssessed: () => cy.get(':nth-child(9) > [data-qa="-row"] > .govuk-summary-list__value'),
+    }
+  }
 }

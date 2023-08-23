@@ -1,16 +1,87 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {%- call summaryCard({title: "Neurodiversity", id: "neurodiversity"}) -%}
-  <div class="govuk-grid-row" data-qa="personal-details">
+  <div class="govuk-grid-row" data-qa="neurodiversity">
     <div class="govuk-grid-column-full">
-      <p class="govuk-body">
-        DPS currently includes neurodiversity information recorded for prisoners in HMPs Bristol, Lincoln, New Hall and
-        Swaleside.
-      </p>
-      <p class="govuk-body">
-        To check for neurodiversity information for someone in another prison, contact the education team in that
-        prison.
-      </p>
+      {% if not learnerNeurodivergence.length %}
+        <p class="govuk-body">
+          DPS currently includes neurodiversity information recorded for prisoners in HMPs Bristol, Lincoln, New Hall and
+          Swaleside.
+        </p>
+        <p class="govuk-body">
+          To check for neurodiversity information for someone in another prison, contact the education team in that
+          prison.
+        </p>
+      {% elseif learnerNeurodivergence.length %}
+        <p class="govuk-body" data-qa="neurodivergence-exists">
+          Information from the local education team - not a medical diagnosis.
+        </p>
+
+        {# Support needed #}
+        {% if learnerNeurodivergence[0].neurodivergenceSupport.length %}
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border hmpps-neurodivergence-support govuk-!-margin-bottom-0" data-qa="neurodivergence-support">
+            {% for support in learnerNeurodivergence[0].neurodivergenceSupport %}
+              {% set rowLabel = "" %}
+              {% if loop.index === 1 %}
+                {% set rowLabel = "Support needed" %}
+              {% endif %}
+              {{ summaryListRow(rowLabel, support) }}
+            {% endfor %}
+          </dl>
+          {%if learnerNeurodivergence[0].supportDate %}
+            <dl class="govuk-body-s-dd hmpps-recorded-on hmpps-secondary-text govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-support-needed">
+              {{ summaryListRow("", "Recorded on " + learnerNeurodivergence[0].supportDate | formatDate ) }}
+            </dl>
+           {% endif %}
+        {% endif %}
+
+        {# Self assessment #}
+          <hr/>
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0" data-qa="neurodiversity-title">
+            {{ summaryListRow("Neurodiversity", "From self-assessment") }}
+          </dl>
+          {% if learnerNeurodivergence[0].neurodivergenceSelfDeclared.length %}
+            <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-self-assessment">
+              {% for selfDeclared in learnerNeurodivergence[0].neurodivergenceSelfDeclared %}
+                {{ summaryListRow("", selfDeclared) }}
+              {% endfor %}
+            </dl>
+            {% if learnerNeurodivergence[0].selfDeclaredDate%}
+              <dl class="govuk-body-s-dd hmpps-recorded-on hmpps-secondary-text govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-self-declared-date">
+                {{ summaryListRow("", "Recorded on " + learnerNeurodivergence[0].selfDeclaredDate | formatDate ) }}
+              </dl>
+            {% endif %}
+          {% else %}
+            <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="no-neurodiversity-reported">
+              {{ summaryListRow("", "No neurodiversity reported by the prisoner yet") }}
+            </dl>
+          {% endif %}
+
+        {# Neurodiversity assessment #}
+        {% if learnerNeurodivergence[0].neurodivergenceAssessed.length %}
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0">
+            <div class="govuk-summary-list__row" data-qa="-row">
+              <dt class="govuk-summary-list__key" data-qa="-key"></dt>
+              <dd class="govuk-summary-list__value govuk-!-padding-top-0" ><hr class="govuk-!-padding-top-0"/></dd>
+            </div>
+          </dl>
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0" data-qa="from-neurodiversity-assessment">
+            {{ summaryListRow("", "From neurodiversity assessment") }}
+          </dl>
+          <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-assessed">
+            {% for assessed in learnerNeurodivergence[0].neurodivergenceAssessed %}
+              {{ summaryListRow("", assessed) }}
+            {% endfor %}
+          </dl>
+          {% if learnerNeurodivergence[0].assessmentDate %}
+            <dl class="govuk-body-s-dd hmpps-recorded-on hmpps-secondary-text govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-3" data-qa="neurodiversity-assessment-date">
+              {{ summaryListRow("", "Recorded on " + learnerNeurodivergence[0].assessmentDate | formatDate ) }}
+            </dl>
+          {% endif %}
+        {% endif %}
+
+      {% endif%}
     </div>
   </div>
 {%- endcall -%}

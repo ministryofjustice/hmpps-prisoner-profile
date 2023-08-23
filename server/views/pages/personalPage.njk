@@ -55,12 +55,13 @@
           {% include "../partials/personalPage/careNeeds.njk" %}
         </div>
       </div>
-      {# This is hidden deliberately for now #}
-      {# <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/personalPage/neurodiversity.njk" %}
+      {%- call conditionallyShow({condition: neurodiversityEnabled(user.activeCaseLoad.caseLoadId ), id: 'neurodiversity'}) -%}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            {% include "../partials/personalPage/neurodiversity.njk" %}
+          </div>
         </div>
-      </div> #}
+      {%- endcall -%}
       {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">

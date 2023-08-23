@@ -12,6 +12,19 @@
     }
   }
 
+
+  .govuk-summary-list__row--no-border .govuk-summary-list__row {
+    border-bottom: none!important;
+  }
+
+  .govuk-body-s-dd {
+    font-size: 1rem;
+  }
+
+  .hmpps-recorded-on dd {
+    padding-top: 0;
+  }
+
   .govuk-summary-list:not(.govuk-summary-list--bottom-border) {
 
     // If it's the last-of-type that is not hidden remove bottom border
