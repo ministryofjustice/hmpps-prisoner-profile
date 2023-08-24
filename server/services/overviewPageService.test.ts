@@ -63,6 +63,7 @@ import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
 import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
+import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -90,6 +91,11 @@ describe('OverviewPageService', () => {
 
   let adjudicationsApiClient: AdjudicationsApiClient
 
+
+  const nonAssociationsApiClient: NonAssociationsApiClient = {
+    getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
+  }
+
   const overviewPageServiceConstruct = jest.fn(() => {
     return new OverviewPageService(
       () => prisonApiClient,
@@ -99,6 +105,7 @@ describe('OverviewPageService', () => {
       () => adjudicationsApiClient,
       new OffencesPageService(null),
       () => curiousApiClient,
+      () => nonAssociationsApiClient,
     )
   })
 

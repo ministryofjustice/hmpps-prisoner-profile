@@ -29,6 +29,8 @@ import { createRedisClient } from './redisClient'
 import RestClient, { RestClientBuilder as CreateRestClientBuilder } from './restClient'
 import TokenStore from './tokenStore'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
+import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
+import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient()
@@ -98,6 +100,7 @@ export const dataAccess = {
     PrisonerSearchClient,
   ),
   systemToken: systemTokenBuilder(new TokenStore(createRedisClient())),
+  nonAssociationsApiClientBuilder: restClientBuilder<NonAssociationsApiClient>('Non associations API', config.apis.nonAssociationsApi, NonAssociationsApiRestClient),
 }
 
 export type DataAccess = typeof dataAccess
