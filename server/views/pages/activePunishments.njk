@@ -1,4 +1,5 @@
 {% extends "./index.njk" %}
+{% set hideBackLink = true %}
 {% set breadCrumbs = [
   {
     text: 'Home',
@@ -29,7 +30,7 @@
         <tbody class="govuk-table__body">
             {% for award in adjudications.awards %}
                 <tr class="govuk-table__row">
-                    <td class="govuk-table__cell">{{ award.days | pluralise('day') }} {{award.sanctionCodeDescription}}</th>
+                    <td class="govuk-table__cell">{{ award.days | pluralise('day') }} {{award.sanctionCodeDescription}}</td>
                     <td class="govuk-table__cell">{% if award.comment %}{{award.comment}}{%else%}None entered{% endif %}</td>
                     <td class="govuk-table__cell">{{award.effectiveDate | formatDate('short') }}</td>
                 </tr>
