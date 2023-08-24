@@ -91,7 +91,6 @@ describe('OverviewPageService', () => {
 
   let adjudicationsApiClient: AdjudicationsApiClient
 
-
   const nonAssociationsApiClient: NonAssociationsApiClient = {
     getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
   }

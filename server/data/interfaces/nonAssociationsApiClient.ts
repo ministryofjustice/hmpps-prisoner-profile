@@ -1,6 +1,5 @@
-import { NonAssociationDetails } from "../../interfaces/nonAssociationDetails";
+import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
 
 export interface NonAssociationsApiClient {
-    getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails>
+  getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails>
 }
-  

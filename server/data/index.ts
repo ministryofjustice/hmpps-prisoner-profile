@@ -100,7 +100,11 @@ export const dataAccess = {
     PrisonerSearchClient,
   ),
   systemToken: systemTokenBuilder(new TokenStore(createRedisClient())),
-  nonAssociationsApiClientBuilder: restClientBuilder<NonAssociationsApiClient>('Non associations API', config.apis.nonAssociationsApi, NonAssociationsApiRestClient),
+  nonAssociationsApiClientBuilder: restClientBuilder<NonAssociationsApiClient>(
+    'Non associations API',
+    config.apis.nonAssociationsApi,
+    NonAssociationsApiRestClient,
+  ),
 }
 
 export type DataAccess = typeof dataAccess
