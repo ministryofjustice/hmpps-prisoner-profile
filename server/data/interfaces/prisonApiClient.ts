@@ -1,6 +1,5 @@
 import { Readable } from 'stream'
 import { CaseLoad } from '../../interfaces/caseLoad'
-import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
 import { AccountBalances } from '../../interfaces/accountBalances'
 import { VisitSummary } from '../../interfaces/visitSummary'
 import { VisitBalances } from '../../interfaces/visitBalances'
