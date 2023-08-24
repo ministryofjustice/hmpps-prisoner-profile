@@ -421,14 +421,14 @@ export default class OverviewPageService {
         bookingId,
         CaseNoteType.PositiveBehaviour,
         CaseNoteSubType.IncentiveEncouragement,
-        incentiveReviews.iepDate,
+        incentiveReviews?.iepDate,
         formatDateISO(new Date()),
       ),
       this.prisonApiClient.getCaseNoteCount(
         bookingId,
         CaseNoteType.NegativeBehaviour,
         CaseNoteSubType.IncentiveWarning,
-        incentiveReviews.iepDate,
+        incentiveReviews?.iepDate,
         formatDateISO(new Date()),
       ),
     ])
@@ -471,9 +471,9 @@ export default class OverviewPageService {
       bottomLabel: 'Incentives: since last review',
       bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
       bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
-      bottomContentLine3: `Next review by: ${formatDate(incentiveReviews.nextReviewDate, 'short')}`,
-      bottomContentError: isAfter(new Date(), new Date(incentiveReviews.nextReviewDate))
-        ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews.nextReviewDate)), 'day')} overdue`
+      bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
+      bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
+        ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
         : undefined,
       bottomClass: 'small',
       linkLabel: 'Incentive level details',
