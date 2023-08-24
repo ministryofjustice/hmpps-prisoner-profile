@@ -1,5 +1,5 @@
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
-import { mapHeaderData, mapProfileBannerTopLinks } from './headerMappers'
+import { mapHeaderData, mapHeaderNoBannerData, mapProfileBannerTopLinks } from './headerMappers'
 import { userMock } from '../data/localMockData/user'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
@@ -21,6 +21,22 @@ describe('HeaderMapping', () => {
     it('Photo type should return as placeholder if the category is not A', async () => {
       const headerData = mapHeaderData(PrisonerMockDataB, inmateDetailMock, userMock)
       expect(headerData.photoType).toBe('placeholder')
+    })
+  })
+
+  describe('No banner', () => {
+    it('should return prisonerName, prisonerNumber and prisonId', async () => {
+      const headerData = mapHeaderNoBannerData(PrisonerMockDataA)
+      expect(headerData.prisonerName).toBe('Saunders, John')
+      expect(headerData.prisonerNumber).toBe('G6123VU')
+      expect(headerData.prisonId).toBe('MDI')
+      expect(headerData['backLinkLabel']).not.toBeDefined()
+      expect(headerData['profileBannerTopLinks']).not.toBeDefined()
+      expect(headerData['alerts']).not.toBeDefined()
+      expect(headerData['tabLinks']).not.toBeDefined()
+      expect(headerData['photoType']).not.toBeDefined()
+      expect(headerData['restrictedPatient']).not.toBeDefined()
+      expect(headerData['hideBanner']).not.toBeDefined()
     })
   })
 })

@@ -28,9 +28,6 @@ import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 import { Status } from '../interfaces/status'
 import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
-import { ProblemType } from '../data/enums/problemType'
-import { ProblemStatus } from '../data/enums/problemStatus'
-import { pregnantProblemCodes } from '../data/constants'
 import { BooleanString } from '../data/enums/booleanString'
 import { pluralise } from '../utils/pluralise'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
@@ -49,7 +46,6 @@ import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClien
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 
 export default class OverviewPageService {
@@ -96,9 +92,8 @@ export default class OverviewPageService {
     this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
     this.nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
 
-    const [inmateDetail, personalCareNeeds, staffRoles] = await Promise.all([
+    const [inmateDetail, staffRoles] = await Promise.all([
       this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
-      this.prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, [ProblemType.MaternityStatus]),
       this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
     ])
 
@@ -118,7 +113,7 @@ export default class OverviewPageService {
       this.getPersonalDetails(prisonerData, inmateDetail),
       this.getStaffContacts(prisonerData),
       this.getSchedule(prisonerData),
-      this.getStatuses(prisonerData, inmateDetail, personalCareNeeds),
+      this.getStatuses(prisonerData, inmateDetail),
       this.getOffencesOverview(
         bookingId,
         prisonerNumber,
@@ -558,11 +553,7 @@ export default class OverviewPageService {
     })
   }
 
-  private async getStatuses(
-    prisonerData: Prisoner,
-    inmateDetail: InmateDetail,
-    personalCareNeeds: PersonalCareNeeds,
-  ): Promise<Status[]> {
+  private async getStatuses(prisonerData: Prisoner, inmateDetail: InmateDetail): Promise<Status[]> {
     const statusList: Status[] = []
 
     // Current Location
@@ -580,21 +571,6 @@ export default class OverviewPageService {
     statusList.push({
       label: currentLocation,
     })
-
-    // Pregnant
-    const pregnantNeed = personalCareNeeds?.personalCareNeeds?.find(
-      need =>
-        pregnantProblemCodes.includes(need.problemCode) &&
-        !need.endDate &&
-        need.problemStatus === ProblemStatus.Ongoing,
-    )
-
-    if (pregnantNeed) {
-      statusList.push({
-        label: 'Pregnant',
-        date: formatDate(pregnantNeed.startDate, 'short'),
-      })
-    }
 
     // Listener - Recognised and Suitable
     const recognised = getProfileInformationValue(

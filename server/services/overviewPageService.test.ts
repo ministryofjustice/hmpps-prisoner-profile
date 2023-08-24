@@ -28,12 +28,6 @@ import {
   suitableListenerNo,
   suitableListenerYes,
 } from '../data/localMockData/inmateDetailMock'
-import {
-  notPregnantCareNeedMock,
-  personalCareNeedsMock,
-  pregnantCareNeedMock,
-} from '../data/localMockData/personalCareNeedsMock'
-import { ProblemType } from '../data/enums/problemType'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { ProfileInformation } from '../interfaces/prisonApi/profileInformation'
 
@@ -116,7 +110,6 @@ describe('OverviewPageService', () => {
     prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
     prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
     prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
     prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
     prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
@@ -456,14 +449,13 @@ describe('OverviewPageService', () => {
   })
 
   describe('getStatuses', () => {
-    it('should get statuses for Current Location, Pregnant, Recognised Listener and Suitable Listener, Neurodiversity', async () => {
+    it('should get statuses for Current Location, Recognised Listener and Suitable Listener, Neurodiversity', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
       await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
       expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(bookingId)
-      expect(prisonApiClient.getPersonalCareNeeds).toHaveBeenCalledWith(bookingId, [ProblemType.MaternityStatus])
       expect(curiousApiClient.getLearnerNeurodivergence).toHaveBeenCalledWith(prisonerNumber)
     })
 
@@ -545,34 +537,6 @@ describe('OverviewPageService', () => {
         )
 
         expect(res.statuses.some(status => status.label === 'Being transferred')).toBeTruthy()
-      })
-
-      it('should have pregnant status if care need is one of the pregnant types', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-        prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
-          offenderNo: prisonerNumber,
-          personalCareNeeds: [pregnantCareNeedMock],
-        }))
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
-
-        expect(res.statuses.some(status => status.label === 'Pregnant' && status.date === '21/06/2010')).toBeTruthy()
-      })
-
-      it('should not have pregnant status if care need is one of the not pregnant types', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-        prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
-          offenderNo: prisonerNumber,
-          personalCareNeeds: [notPregnantCareNeedMock],
-        }))
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
-
-        expect(res.statuses.some(status => status.label === 'Pregnant')).toBeFalsy()
       })
 
       it.each([

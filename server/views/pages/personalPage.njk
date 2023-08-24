@@ -22,8 +22,9 @@
         <li><a class="govuk-link govuk-link--no-visited-state" href="#personal-details">Personal details</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#identity-numbers">Identity numbers</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#care-needs">Care needs</a></li>
-        {# Hidden as the section is hidden below #}
-        {# <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li> #}
+        {%- call conditionallyShow({condition: neurodiversityEnabled(user.activeCaseLoad.caseLoadId ), id: 'neurodiversity'}) -%}
+          <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
+        {%- endcall -%}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
         {%- endcall -%}
