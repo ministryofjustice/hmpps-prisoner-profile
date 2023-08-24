@@ -36,7 +36,6 @@ import { Alert } from '../../interfaces/prisonApi/alert'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
-  getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails>
   getAccountBalances(bookingId: number): Promise<AccountBalances>
   getVisitSummary(bookingId: number): Promise<VisitSummary>
   getVisitBalances(prisonerNumber: string): Promise<VisitBalances>

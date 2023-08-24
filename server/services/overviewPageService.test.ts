@@ -109,7 +109,6 @@ describe('OverviewPageService', () => {
     prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
     prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
     prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
-    prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
     prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
     prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
     prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
@@ -122,6 +121,8 @@ describe('OverviewPageService', () => {
 
     adjudicationsApiClient = adjudicationsApiClientMock()
     adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
+
+    nonAssociationsApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
   })
 
   describe('Prison name', () => {
@@ -136,7 +137,7 @@ describe('OverviewPageService', () => {
     it.each(['ABC123', 'DEF321'])('Gets the non-associations for the prisoner', async (prisonerNumber: string) => {
       const overviewPageService = overviewPageServiceConstruct()
       await overviewPageService.get('token', { prisonerNumber } as Prisoner, 1)
-      expect(prisonApiClient.getNonAssociationDetails).toHaveBeenCalledWith(prisonerNumber)
+      expect(nonAssociationsApiClient.getNonAssociationDetails).toHaveBeenCalledWith(prisonerNumber)
     })
 
     it('Converts the non-associations into the correct rows', async () => {
@@ -160,7 +161,7 @@ describe('OverviewPageService', () => {
     it('Returns an empty list if no non-associations are returned', async () => {
       const nonAssocations = { ...nonAssociationDetailsDummyData }
       nonAssocations.nonAssociations = []
-      prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssocations)
+      nonAssociationsApiClient.getNonAssociationDetails = jest.fn(async () => nonAssocations)
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get('token', { prisonerNumber: 'ABC123' } as Prisoner, 1)
       expect(res.nonAssociations.length).toEqual(0)
