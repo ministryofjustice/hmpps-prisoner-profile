@@ -5,7 +5,6 @@ import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import NotFoundError from '../utils/notFoundError'
 import { addMiddlewareError } from './middlewareHelpers'
-import logger from '../../logger'
 
 let req: any
 let res: any
@@ -33,17 +32,14 @@ describe('GuardMiddleware', () => {
       },
       render: jest.fn(),
     }
-    next = jest.fn((error: any) => {
-      // TODO added to try to figure out why tests fail - remove when tests are fixed
-      logger.fatal(`Calling next(${error})`)
-    })
+    next = jest.fn()
 
     successHandler = (reqSuccess: Request, resSuccess: Response, nextSuccess: NextFunction) => {
       return nextSuccess()
     }
 
     failHandler = (reqFail: Request, resFail: Response, nextFail: NextFunction) => {
-      addMiddlewareError(reqFail, nextFail, new NotFoundError('Fail handler'))
+      addMiddlewareError(reqFail, nextFail, new NotFoundError())
       return nextFail()
     }
   })
@@ -57,41 +53,41 @@ describe('GuardMiddleware', () => {
     expect(next).toHaveBeenCalledWith()
   })
 
-  describe.skip('Guard with OR operator', () => {
-    it('should return NotFoundError if all handlers fail', () => {
-      guardMiddleware(GuardOperator.OR, failHandler, failHandler)(req, res, next)
+  describe('Guard with OR operator', () => {
+    it('should return NotFoundError if all handlers fail', async () => {
+      await guardMiddleware(GuardOperator.OR, failHandler, failHandler)(req, res, next)
 
       expect(next).toHaveBeenCalledWith(new NotFoundError('GuardMiddleware: Guard #1 Fail'))
     })
 
-    it('should return next() if one handler succeeds', () => {
-      guardMiddleware(GuardOperator.OR, successHandler, failHandler)(req, res, next)
+    it('should return next() if one handler succeeds', async () => {
+      await guardMiddleware(GuardOperator.OR, successHandler, failHandler)(req, res, next)
 
       expect(next).toHaveBeenCalledWith()
     })
 
-    it('should return next() if all handlers succeed', () => {
-      guardMiddleware(GuardOperator.OR, successHandler, successHandler)(req, res, next)
+    it('should return next() if all handlers succeed', async () => {
+      await guardMiddleware(GuardOperator.OR, successHandler, successHandler)(req, res, next)
 
       expect(next).toHaveBeenCalledWith()
     })
   })
 
-  describe.skip('Guard with AND operator', () => {
-    it('should return NotFoundError if all handlers fail', () => {
-      guardMiddleware(GuardOperator.AND, failHandler, failHandler)(req, res, next)
+  describe('Guard with AND operator', () => {
+    it('should return NotFoundError if all handlers fail', async () => {
+      await guardMiddleware(GuardOperator.AND, failHandler, failHandler)(req, res, next)
 
       expect(next).toHaveBeenCalledWith(new NotFoundError('GuardMiddleware: Guard #1 Fail'))
     })
 
-    it('should return NotFoundError if one handler fails', () => {
-      guardMiddleware(GuardOperator.AND, successHandler, failHandler)(req, res, next)
+    it('should return NotFoundError if one handler fails', async () => {
+      await guardMiddleware(GuardOperator.AND, successHandler, failHandler)(req, res, next)
 
-      expect(next).toHaveBeenCalledWith()
+      expect(next).toHaveBeenCalledWith(new NotFoundError('GuardMiddleware: Guard #1 Fail'))
     })
 
-    it('should return next() if all handlers succeed', () => {
-      guardMiddleware(GuardOperator.AND, successHandler, successHandler)(req, res, next)
+    it('should return next() if all handlers succeed', async () => {
+      await guardMiddleware(GuardOperator.AND, successHandler, successHandler)(req, res, next)
 
       expect(next).toHaveBeenCalledWith()
     })

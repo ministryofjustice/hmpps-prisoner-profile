@@ -28,8 +28,8 @@ describe('CheckHasSomeRolesMiddleware', () => {
     next = jest.fn()
   })
 
-  it('should return next() on success', () => {
-    checkHasSomeRoles([Role.PomUser, Role.ReceptionUser])(req, res, next)
+  it('should return next() on success', async () => {
+    await checkHasSomeRoles([Role.PomUser, Role.ReceptionUser])(req, res, next)
     expect(req.middleware).not.toBeDefined()
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith()
@@ -42,8 +42,8 @@ describe('CheckHasSomeRolesMiddleware', () => {
       }
     })
 
-    it('should populate middleware.errors on fail', () => {
-      checkHasSomeRoles([Role.InactiveBookings, Role.CategorisationSecurity])(req, res, next)
+    it('should populate middleware.errors on fail', async () => {
+      await checkHasSomeRoles([Role.InactiveBookings, Role.CategorisationSecurity])(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith('route')
@@ -57,8 +57,8 @@ describe('CheckHasSomeRolesMiddleware', () => {
       }
     })
 
-    it('should return next(error) on fail', () => {
-      checkHasSomeRoles([Role.InactiveBookings, Role.CategorisationSecurity])(req, res, next)
+    it('should return next(error) on fail', async () => {
+      await checkHasSomeRoles([Role.InactiveBookings, Role.CategorisationSecurity])(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(new RoleError('CheckHasSomeRolesMiddleware: not authorised for test/path'))
