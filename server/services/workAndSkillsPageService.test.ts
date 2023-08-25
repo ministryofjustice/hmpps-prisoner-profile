@@ -3,7 +3,6 @@ import moment from 'moment'
 
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
-import nonAssociationDetailsDummyData from '../data/localMockData/nonAssociations'
 import { Prisoner } from '../interfaces/prisoner'
 import {
   accountBalancesMock,
@@ -55,7 +54,6 @@ describe('WorkAndSkillsService', () => {
       prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
       prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
-      prisonApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
       prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
       prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock)
       prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)

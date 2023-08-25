@@ -155,6 +155,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('MANAGE_ADJUDICATIONS_API_TIMEOUT_DEADLINE', 20000))),
     },
+    nonAssociationsApi: {
+      url: get('HMPPS_NON_ASSOCIATIONS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_RESPONSE', 20000)),
+        deadline: Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_DEADLINE', 20000)),
+      },
+      agent: new AgentConfig(Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_DEADLINE', 20000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
