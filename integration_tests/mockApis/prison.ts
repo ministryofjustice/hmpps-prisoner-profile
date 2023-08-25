@@ -6,7 +6,6 @@ import {
   visitSummaryMock,
 } from '../../server/data/localMockData/miniSummaryMock'
 import dummyScheduledEvents from '../../server/data/localMockData/eventsForToday'
-import nonAssociationsDummyData from '../../server/data/localMockData/nonAssociations'
 import { inmateDetailMock } from '../../server/data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../../server/data/localMockData/prisonerDetailMock'
 import { secondaryLanguagesMock } from '../../server/data/localMockData/secondaryLanguages'
