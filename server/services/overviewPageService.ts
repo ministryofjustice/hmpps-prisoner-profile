@@ -46,6 +46,7 @@ import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClien
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -60,6 +61,8 @@ export default class OverviewPageService {
 
   private curiousApiClient: CuriousApiClient
 
+  private nonAssociationsApiClient: NonAssociationsApiClient
+
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
@@ -68,6 +71,7 @@ export default class OverviewPageService {
     private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>,
     private readonly offencesPageService: OffencesPageService,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly nonAssociationsApiClientBuilder: RestClientBuilder<NonAssociationsApiClient>,
   ) {}
 
   public async get(
@@ -86,6 +90,7 @@ export default class OverviewPageService {
     this.incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
     this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
     this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
+    this.nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
 
     const [inmateDetail, staffRoles] = await Promise.all([
       this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
@@ -531,7 +536,7 @@ export default class OverviewPageService {
   }
 
   private async getNonAssociations(prisonerNumber: string): Promise<OverviewNonAssociation[]> {
-    const nonAssociations = await this.prisonApiClient.getNonAssociationDetails(prisonerNumber)
+    const nonAssociations = await this.nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber)
     if (!nonAssociations?.nonAssociations) return []
 
     return nonAssociations.nonAssociations.map(nonAssocation => {

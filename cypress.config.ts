@@ -14,6 +14,7 @@ import incentivesMockApi from './integration_tests/mockApis/incentivesMockApi'
 import pathfinderApi from './integration_tests/mockApis/pathfinderApi'
 import socApi from './integration_tests/mockApis/socApi'
 import adjudicationsApi from './integration_tests/mockApis/adjudications'
+import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -47,6 +48,7 @@ export default defineConfig({
         ...pathfinderApi,
         ...socApi,
         ...adjudicationsApi,
+        ...nonAssociationsApi,
       })
     },
     baseUrl: 'http://localhost:3007',

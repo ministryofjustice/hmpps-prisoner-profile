@@ -3,8 +3,6 @@ import config from '../config'
 import RestClient from './restClient'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
-import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
-import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import { PrisonApiClient } from './interfaces/prisonApiClient'
 import { AccountBalances } from '../interfaces/accountBalances'
 import { VisitSummary } from '../interfaces/visitSummary'
@@ -82,13 +80,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     } catch (error) {
       return error
     }
-  }
-
-  async getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails> {
-    return this.get<NonAssociationDetails>(
-      { path: `/api/offenders/${prisonerNumber}/non-association-details?currentPrisonOnly=true&excludeInactive=true` },
-      nonAssociationDetailsDummyData,
-    )
   }
 
   async getAccountBalances(bookingId: number): Promise<AccountBalances> {

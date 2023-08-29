@@ -38,6 +38,7 @@ generic-service:
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI"
     SYSTEM_PHASE: "PRE-PRODUCTION"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
+    HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-preprod.hmpps.service.justice.gov.uk"
 
   allowlist:
     office: "217.33.148.210/32"

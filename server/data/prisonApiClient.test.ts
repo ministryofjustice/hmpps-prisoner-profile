@@ -2,7 +2,6 @@ import nock from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import dummyScheduledEvents from './localMockData/eventsForToday'
-import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
 import {
   accountBalancesMock,
@@ -65,18 +64,6 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getUserCaseLoads()
       expect(output).toEqual(CaseLoadsDummyDataA)
-    })
-  })
-
-  describe('getNonAssociations', () => {
-    it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
-      mockSuccessfulPrisonApiCall(
-        `/api/offenders/${prisonerNumber}/non-association-details?currentPrisonOnly=true&excludeInactive=true`,
-        nonAssociationDetailsDummyData,
-      )
-
-      const output = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
-      expect(output).toEqual(nonAssociationDetailsDummyData)
     })
   })
 
