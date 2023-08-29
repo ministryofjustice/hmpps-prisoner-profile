@@ -19,7 +19,7 @@ import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
-import { PagedListQueryParams, PagedList } from '../interfaces/prisonApi/pagedList'
+import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
@@ -38,7 +38,7 @@ import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
-import { Alert } from '../interfaces/prisonApi/alert'
+import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -52,6 +52,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       }
       return error
     }
+  }
+
+  private async post(args: object): Promise<unknown> {
+    return this.restClient.post(args)
   }
 
   async getOffenderAttendanceHistory(
@@ -280,5 +284,16 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]> {
     return this.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles` })
+  }
+
+  async getAlertTypes(): Promise<AlertType[]> {
+    return this.get<AlertType[]>({
+      path: `/api/reference-domains/domains/ALERT?withSubCodes=true`,
+      headers: { 'page-limit': '1000' },
+    })
+  }
+
+  async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
+    return (await this.post({ path: `/api/bookings/${bookingId}/alert`, data: alert })) as Alert
   }
 }

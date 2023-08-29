@@ -13,7 +13,7 @@ import { PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../../interfaces/offenderAttendanceHistory'
 import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
-import { PagedListQueryParams, PagedList } from '../../interfaces/prisonApi/pagedList'
+import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
 import { CourtCase } from '../../interfaces/prisonApi/courtCase'
 import { OffenderSentenceTerms } from '../../interfaces/prisonApi/offenderSentenceTerms'
@@ -31,7 +31,7 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
-import { Alert } from '../../interfaces/prisonApi/alert'
+import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -79,4 +79,6 @@ export interface PrisonApiClient {
   getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
   getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]>
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
+  getAlertTypes(): Promise<AlertType[]>
+  createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
 }

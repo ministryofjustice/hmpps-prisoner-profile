@@ -46,18 +46,19 @@ import { CaseLoad } from '../../server/interfaces/caseLoad'
 import { CaseNoteUsage } from '../../server/interfaces/prisonApi/caseNoteUsage'
 
 import {
-  mainOffenceMock,
   fullStatusMock,
   fullStatusRemandMock,
+  mainOffenceMock,
 } from '../../server/data/localMockData/offenceOverviewMock'
 import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
 import { StaffRole } from '../../server/interfaces/prisonApi/staffRole'
 
 import {
-  SentenceSummaryWithSentenceMock,
   SentenceSummaryWithoutSentenceMock,
+  SentenceSummaryWithSentenceMock,
 } from '../../server/data/localMockData/sentenceSummaryMock'
+import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -809,6 +810,38 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: roles,
+      },
+    })
+  },
+
+  stubGetAlertTypes: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/reference-domains/domains/ALERT\\?withSubCodes=true`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: alertTypesMock,
+      },
+    })
+  },
+
+  stubCreateAlert: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/prison/api/bookings/1102484/alert`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedActiveAlertsMock.content[0],
       },
     })
   },

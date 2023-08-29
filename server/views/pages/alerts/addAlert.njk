@@ -1,0 +1,100 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% extends "../index.njk" %}
+{% set pageTitle = 'Create an alert' %}
+{% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })}}
+    {% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 id="addCaseNote">Create an alert for {{ prisonerDisplayName }}</h1>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body govuk-!-margin-bottom-6" data-qa="prison-number"><span class="govuk-!-font-weight-bold">Prison number:</span> {{ prisonerNumber }}</p>
+
+        <form method="post" novalidate="novalidate" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
+            <input type="hidden" name="existingAlerts" value="{{ formValues.existingAlerts }}" />
+            {{ govukSelect({
+                id: "alertType",
+                name: "alertType",
+                label: {
+                    text: "Type of alert"
+                },
+                errorMessage: errors | findError('alertType'),
+                items: alertTypes | addDefaultSelectedValue('Choose alert type') | setSelected(formValues.alertType)
+            }) }}
+
+            {{ govukSelect({
+                id: "alertCode",
+                name: "alertCode",
+                label: {
+                    text: "Alert"
+                },
+                errorMessage: errors | findError('alertCode'),
+                items: alertCodes | addDefaultSelectedValue('Choose alert code') | setSelected(formValues.alertCode)
+            }) }}
+
+            {{ govukCharacterCount({
+                name: "comment",
+                id: "comment",
+                maxlength: 1000,
+                rows: 10,
+                value: formValues.comment,
+                errorMessage: errors | findError('comment'),
+                label: {
+                    text: "Why are you creating this alert?",
+                    classes: "govuk-!-font-weight-bold govuk-!-margin-top-8"
+                }
+            }) }}
+
+            {{ hmppsDatepicker({
+                id: "alertDate",
+                name: "alertDate",
+                label: {
+                    text: "Alert start date"
+                },
+                errorMessage: errors | findError('alertDate'),
+                classes: 'hmpps-datepicker--fixed-width',
+                value: formValues.alertDate,
+                minDate: todayMinus8,
+                maxDate: today
+            }) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                    text: "Save",
+                    type: "submit",
+                    preventDoubleClick: true,
+                    attributes: { "data-qa": "add-alert-submit-button" }
+                }) }}
+                {{ govukButton({
+                    text: "Cancel",
+                    href: refererUrl,
+                    classes: "govuk-button--secondary",
+                    attributes: { "data-qa": "add-alert-cancel-button" }
+                }) }}
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+{% block pageScripts %}
+    <script id="typeCodeMap" type="application/json">{{ typeCodeMap | dump | safe }}</script>
+    <script src="/assets/js/alerts.js"></script>
+{% endblock %}

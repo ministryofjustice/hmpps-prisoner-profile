@@ -30,6 +30,8 @@ import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
 import { mockStaffRoles } from './localMockData/staffRoles'
 import restClientBuilder from '.'
+import { AlertForm } from '../interfaces/prisonApi/alert'
+import { alertTypesMock } from './localMockData/alertTypesMock'
 
 jest.mock('./tokenStore')
 
@@ -51,6 +53,9 @@ describe('prisonApiClient', () => {
 
   const mockSuccessfulPrisonApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakePrisonApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
+  }
+  const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, returnData: TReturnData) => {
+    fakePrisonApi.post(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
   describe('getCaseLoads', () => {
@@ -294,6 +299,31 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/staff/${staffNumber}/${agencyId}/roles`, mockStaffRoles)
       const output = await prisonApiClient.getStaffRoles(staffNumber, agencyId)
       expect(output).toEqual(mockStaffRoles)
+    })
+  })
+
+  describe('getAlertTypes', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/ALERT?withSubCodes=true`, alertTypesMock)
+      const output = await prisonApiClient.getAlertTypes()
+      expect(output).toEqual(alertTypesMock)
+    })
+  })
+
+  describe('createAlert', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      const alert = pagedActiveAlertsMock.content[0]
+      const alertForm: AlertForm = {
+        alertType: alert.alertType,
+        alertCode: alert.alertCode,
+        comment: alert.comment,
+        alertDate: alert.dateCreated,
+      }
+      mockSuccessfulPrisonApiPost(`/api/bookings/${bookingId}/alert`, alert)
+
+      const output = await prisonApiClient.createAlert(bookingId, alertForm)
+      expect(output).toEqual(alert)
     })
   })
 })
