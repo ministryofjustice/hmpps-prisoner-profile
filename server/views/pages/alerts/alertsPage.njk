@@ -1,6 +1,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "../macros/hmppsActionButton.njk" import hmppsActionButton %}
-{% extends "./index.njk" %}
+{% from "../../macros/hmppsActionButton.njk" import hmppsActionButton %}
+{% extends "../index.njk" %}
 {% set breadCrumbs = [
   {
     text: 'Home',
@@ -60,10 +60,10 @@
     {% if (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter app-sidebar">
-            {% include '../partials/alertsPage/alertsFilter.njk' %}
+            {% include '../../partials/alertsPage/alertsFilter.njk' %}
         </div>
         <div class="govuk-grid-column-three-quarters ">
-            {% include '../partials/alertsPage/alertsList.njk' %}
+            {% include '../../partials/alertsPage/alertsList.njk' %}
         </div>
     </div>
     {% else %}
@@ -74,6 +74,6 @@
     </div>
     {% endif %}
 
-    {% include "../partials/backToTop.njk" %}
+    {% include "../../partials/backToTop.njk" %}
 
 {% endblock %}

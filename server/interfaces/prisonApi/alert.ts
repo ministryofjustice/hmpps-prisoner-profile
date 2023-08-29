@@ -22,3 +22,28 @@ export interface Alert extends PagedListItem {
   expiredByFullName?: string
   updateLinkUrl?: string
 }
+
+export interface AlertForm {
+  bookingId?: number
+  existingAlerts?: string
+  alertType: string
+  alertCode: string
+  comment: string
+  alertDate: string
+  expiryDate?: string
+  expired?: boolean
+}
+
+export interface AlertType {
+  code: string
+  description: string
+  activeFlag: boolean
+  subCodes: AlertCode[]
+}
+
+export interface AlertCode {
+  code: string
+  description: string
+  activeFlag: boolean
+  parentCode: string
+}

@@ -8,7 +8,7 @@ import { SortOption } from '../interfaces/sortSelector'
 import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import { Alert } from '../interfaces/prisonApi/alert'
+import { Alert, AlertForm } from '../interfaces/prisonApi/alert'
 import config from '../config'
 import { RestClientBuilder } from '../data'
 
@@ -61,6 +61,7 @@ export default class AlertsPageService {
   /**
    * Handle request for alerts
    *
+   * @param clientToken
    * @param prisonerData
    * @param queryParams
    * @param canUpdateAlert
@@ -141,5 +142,11 @@ export default class AlertsPageService {
       fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
       errors,
     }
+  }
+
+  public async createAlert(token: string, bookingId: number, alert: AlertForm) {
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+
+    return prisonApiClient.createAlert(bookingId, { ...alert, alertDate: formatDateISO(parseDate(alert.alertDate)) })
   }
 }

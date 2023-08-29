@@ -46,4 +46,6 @@ export default class AlertsPage extends Page {
   updateAlertLink = (): PageElement => cy.get('.hmpps-alert-card-list-item__link a')
 
   viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
+
+  successMessage = (): PageElement => cy.get('.hmpps-flash-message--success > p')
 }

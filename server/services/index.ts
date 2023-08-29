@@ -10,6 +10,7 @@ import PersonalPageService from './personalPageService'
 import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
+import ReferenceDataService from './referenceDataService'
 
 export const services = () => {
   const {
@@ -43,6 +44,7 @@ export const services = () => {
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)
   const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
+  const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
 
   return {
     dataAccess,
@@ -57,6 +59,7 @@ export const services = () => {
     workAndSkillsPageService,
     activePunishmentsPageService,
     offencesPageService,
+    referenceDataService,
   }
 }
 
