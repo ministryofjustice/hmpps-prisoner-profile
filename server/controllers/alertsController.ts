@@ -102,7 +102,7 @@ export default class AlertsController {
         typeCodeMap,
         alertTypes,
         alertCodes,
-        refererUrl: `${config.domain}/prisoner/${prisonerNumber}/alerts/active`,
+        refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
         errors,
       })
     }
