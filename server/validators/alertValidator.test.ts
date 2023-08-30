@@ -68,7 +68,7 @@ describe('Validation middleware', () => {
     ])
   })
 
-  it('should fail validation with date more than 8 days in the past', async () => {
+  it('should fail validation with date more than 7 days in the past', async () => {
     const alertForm = {
       alertType: 'X',
       alertCode: 'X',
@@ -80,7 +80,7 @@ describe('Validation middleware', () => {
 
     expect(result).toEqual([
       {
-        text: 'Enter a date that is not more than 8 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
+        text: 'Enter a date that is not more than 7 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
         href: '#alertDate',
       },
     ])
