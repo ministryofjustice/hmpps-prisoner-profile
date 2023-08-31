@@ -64,9 +64,9 @@ export const AlertValidator: Validator = (body: Record<string, string>) => {
     })
   }
 
-  if (alertDate && differenceInDays(new Date(), parseDate(alertDate)) > 8) {
+  if (alertDate && differenceInDays(new Date(), parseDate(alertDate)) > 7) {
     errors.push({
-      text: 'Enter a date that is not more than 8 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
+      text: 'Enter a date that is not more than 7 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
       href: '#alertDate',
     })
   }

@@ -94,7 +94,7 @@ export default class AlertsController {
 
       return res.render('pages/alerts/addAlert', {
         today: formatDate(now.toISOString(), 'short'),
-        todayMinus8: formatDate(subDays(now, 8).toISOString(), 'short'),
+        todayMinus8: formatDate(subDays(now, 7).toISOString(), 'short'),
         prisonerDisplayName,
         prisonerNumber,
         formValues,
