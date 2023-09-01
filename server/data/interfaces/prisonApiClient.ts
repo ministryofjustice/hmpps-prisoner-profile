@@ -1,6 +1,5 @@
 import { Readable } from 'stream'
 import { CaseLoad } from '../../interfaces/caseLoad'
-import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
 import { AccountBalances } from '../../interfaces/accountBalances'
 import { VisitSummary } from '../../interfaces/visitSummary'
 import { VisitBalances } from '../../interfaces/visitBalances'
@@ -14,7 +13,7 @@ import { PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../../interfaces/offenderAttendanceHistory'
 import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
-import { PagedListQueryParams, PagedList } from '../../interfaces/prisonApi/pagedList'
+import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
 import { CourtCase } from '../../interfaces/prisonApi/courtCase'
 import { OffenderSentenceTerms } from '../../interfaces/prisonApi/offenderSentenceTerms'
@@ -32,15 +31,14 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
-import { Alert } from '../../interfaces/prisonApi/alert'
 import { Agencies } from '../../interfaces/prisonApi/agencies'
 import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
 import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
+import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
-  getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails>
   getAccountBalances(bookingId: number): Promise<AccountBalances>
   getVisitSummary(bookingId: number): Promise<VisitSummary>
   getVisitBalances(prisonerNumber: string): Promise<VisitBalances>
@@ -89,4 +87,6 @@ export interface PrisonApiClient {
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
   getStaffDetails(staffId: string): Promise<StaffDetails>
   getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]>
+  getAlertTypes(): Promise<AlertType[]>
+  createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
 }

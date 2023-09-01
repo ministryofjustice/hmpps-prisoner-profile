@@ -5,6 +5,7 @@ import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMoc
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { alertFormMock } from '../data/localMockData/alertFormMock'
 
 jest.mock('../data/prisonApiClient')
 
@@ -63,6 +64,17 @@ describe('Alerts Page', () => {
       expect(alertsPageData.activeAlertCount).toEqual(0)
       expect(alertsPageData.inactiveAlertCount).toEqual(80)
       expect(alertsPageData.fullName).toEqual('John Smith')
+    })
+  })
+
+  describe('Create alert', () => {
+    it('should call Prison API to create the alert', async () => {
+      prisonApiClientSpy.createAlert = jest.fn(async () => pagedActiveAlertsMock.content[0])
+
+      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
+      const alert = await alertsPageService.createAlert('', 123456, alertFormMock)
+
+      expect(alert).toEqual(pagedActiveAlertsMock.content[0])
     })
   })
 })

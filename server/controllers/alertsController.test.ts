@@ -4,205 +4,284 @@ import * as headerMappers from '../mappers/headerMappers'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
-import PrisonerSearchService from '../services/prisonerSearch'
 import AlertsPageService from '../services/alertsPageService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import ReferenceDataService from '../services/referenceDataService'
+import { alertTypesMock } from '../data/localMockData/alertTypesMock'
+import { alertFormMock } from '../data/localMockData/alertFormMock'
 
 let req: any
 let res: any
+let next: any
 let controller: AlertsController
 
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/alertsPageService.ts')
+jest.mock('../services/referenceDataService.ts')
 
 describe('Alerts Controller', () => {
-  beforeEach(() => {
-    req = {
-      params: { prisonerNumber: '' },
-      query: { page: '0', sort: 'dateCreated,ASC', alertType: 'R', from: '01/01/2023', to: '02/02/2023' },
-      path: 'alerts/active',
-    }
-    res = {
-      locals: {
-        user: {
-          activeCaseLoadId: 'MDI',
-          userRoles: [Role.UpdateAlert],
-          caseLoads: CaseLoadsDummyDataA,
+  describe('Alerts page', () => {
+    beforeEach(() => {
+      req = {
+        params: { prisonerNumber: '' },
+        query: { page: '0', sort: 'dateCreated,ASC', alertType: 'R', from: '01/01/2023', to: '02/02/2023' },
+        path: 'alerts/active',
+        middleware: {
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
         },
-        clientToken: 'CLIENT_TOKEN',
-      },
-      render: jest.fn(),
-    }
-    controller = new AlertsController(true, new PrisonerSearchService(null), new AlertsPageService(null))
+      }
+      res = {
+        locals: {
+          user: {
+            activeCaseLoadId: 'MDI',
+            userRoles: [Role.UpdateAlert],
+            caseLoads: CaseLoadsDummyDataA,
+            token: 'TOKEN',
+          },
+          clientToken: 'CLIENT_TOKEN',
+        },
+        render: jest.fn(),
+      }
+      next = jest.fn()
+      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null))
+    })
+
+    it('should get active alerts', async () => {
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedActiveAlertsMock)
+      const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
+
+      await controller.displayAlerts(true)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        PrisonerMockDataA,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        true,
+      )
+      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'alerts')
+    })
+
+    it('should get inactive alerts', async () => {
+      req.path = 'alerts/inactive'
+
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedInactiveAlertsMock)
+      const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
+
+      await controller.displayAlerts(false)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        PrisonerMockDataA,
+        {
+          alertStatus: 'INACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        true,
+      )
+      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'alerts')
+    })
+
+    it('should set canUpdateAlert to true if user has role and caseload', async () => {
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedActiveAlertsMock)
+      jest.spyOn(headerMappers, 'mapHeaderData')
+
+      await controller.displayAlerts(true)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        PrisonerMockDataA,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        true,
+      )
+    })
+
+    it('should set canUpdateAlert to false if user does not have role', async () => {
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedActiveAlertsMock)
+      jest.spyOn(headerMappers, 'mapHeaderData')
+
+      res.locals.user.userRoles = ['ROLE_OTHER']
+
+      await controller.displayAlerts(true)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        PrisonerMockDataA,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        false,
+      )
+    })
+
+    it('should set canUpdateAlert to false if user does not have caseload', async () => {
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedActiveAlertsMock)
+      jest.spyOn(headerMappers, 'mapHeaderData')
+
+      req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'XYZ' }
+      req.middleware.inmateDetail = inmateDetailMock
+
+      await controller.displayAlerts(true)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        { ...PrisonerMockDataA, prisonId: 'XYZ' },
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        false,
+      )
+    })
+
+    it('should set canUpdateAlert to true if user does not have caseload but prisoner is OUT', async () => {
+      res.locals.user.userRoles.push(Role.InactiveBookings)
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedActiveAlertsMock)
+      jest.spyOn(headerMappers, 'mapHeaderData')
+
+      req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'OUT' }
+      req.middleware.inmateDetail = inmateDetailMock
+
+      await controller.displayAlerts(true)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        { ...PrisonerMockDataA, prisonId: 'OUT' },
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        true,
+      )
+    })
+
+    it('should set canUpdateAlert to true if user does not have caseload but prisoner is TRN', async () => {
+      res.locals.user.userRoles.push(Role.InactiveBookings)
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'get')
+        .mockResolvedValue(pagedActiveAlertsMock)
+      jest.spyOn(headerMappers, 'mapHeaderData')
+
+      req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'TRN' }
+      req.middleware.inmateDetail = inmateDetailMock
+
+      await controller.displayAlerts(true)(req, res, next)
+
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        res.locals.clientToken,
+        { ...PrisonerMockDataA, prisonId: 'TRN' },
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+        true,
+      )
+    })
   })
 
-  it('should get active alerts', async () => {
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
-    const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
+  describe('Add alert page', () => {
+    beforeEach(() => {
+      req = {
+        params: { prisonerNumber: 'G6123VU' },
+        query: {},
+        path: 'alerts/add-alert',
+        middleware: {
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+        },
+        flash: jest.fn(),
+      }
+      res = {
+        locals: {
+          user: {
+            activeCaseLoadId: 'MDI',
+            userRoles: [Role.UpdateAlert],
+            caseLoads: CaseLoadsDummyDataA,
+          },
+          clientToken: 'CLIENT_TOKEN',
+        },
+        render: jest.fn(),
+        redirect: jest.fn(),
+        send: jest.fn(),
+        sendStatus: jest.fn(),
+      }
+      next = jest.fn()
+      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null))
+    })
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
 
-    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
+    it('should get ref data for alert form', async () => {
+      const getAlertTypes = jest
+        .spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes')
+        .mockResolvedValue(alertTypesMock)
 
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      PrisonerMockDataA,
-      {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      true,
-    )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'alerts')
-  })
+      await controller.displayAddAlert()(req, res, next)
 
-  it('should get inactive alerts', async () => {
-    req.path = 'alerts/inactive'
-    controller['isActive'] = false
+      expect(getAlertTypes).toHaveBeenCalled()
+      expect(res.render).toHaveBeenCalled()
+    })
 
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedInactiveAlertsMock)
-    const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
+    it('should add alert', async () => {
+      req.body = { ...alertFormMock, bookingId: 123456 }
 
-    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
+      const createAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'createAlert')
+        .mockResolvedValue(pagedActiveAlertsMock.content[0])
+      jest.spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      PrisonerMockDataA,
-      {
-        alertStatus: 'INACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      true,
-    )
-    expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'alerts')
-  })
+      await controller.post()(req, res, next)
 
-  it('should set canUpdateAlert to true if user has role and caseload', async () => {
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
-    jest.spyOn(headerMappers, 'mapHeaderData')
-
-    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
-
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      PrisonerMockDataA,
-      {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      true,
-    )
-  })
-
-  it('should set canUpdateAlert to false if user does not have role', async () => {
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
-    jest.spyOn(headerMappers, 'mapHeaderData')
-
-    res.locals.user.userRoles = ['ROLE_OTHER']
-
-    await controller.displayAlerts(req, res, PrisonerMockDataA, inmateDetailMock)
-
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      PrisonerMockDataA,
-      {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      false,
-    )
-  })
-
-  it('should set canUpdateAlert to false if user does not have caseload', async () => {
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
-    jest.spyOn(headerMappers, 'mapHeaderData')
-
-    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'XYZ' }, inmateDetailMock)
-
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      { ...PrisonerMockDataA, prisonId: 'XYZ' },
-      {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      false,
-    )
-  })
-
-  it('should set canUpdateAlert to true if user does not have caseload but prisoner is OUT', async () => {
-    res.locals.user.userRoles.push(Role.InactiveBookings)
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
-    jest.spyOn(headerMappers, 'mapHeaderData')
-
-    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' }, inmateDetailMock)
-
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      { ...PrisonerMockDataA, prisonId: 'OUT' },
-      {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      true,
-    )
-  })
-
-  it('should set canUpdateAlert to true if user does not have caseload but prisoner is TRN', async () => {
-    res.locals.user.userRoles.push(Role.InactiveBookings)
-    const getAlertsSpy = jest
-      .spyOn<any, string>(controller['alertsPageService'], 'get')
-      .mockResolvedValue(pagedActiveAlertsMock)
-    jest.spyOn(headerMappers, 'mapHeaderData')
-
-    await controller.displayAlerts(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' }, inmateDetailMock)
-
-    expect(getAlertsSpy).toHaveBeenCalledWith(
-      res.locals.clientToken,
-      { ...PrisonerMockDataA, prisonId: 'TRN' },
-      {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      },
-      true,
-    )
+      expect(createAlertsSpy).toHaveBeenCalledWith(res.locals.user.token, 123456, alertFormMock)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
   })
 })

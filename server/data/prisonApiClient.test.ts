@@ -2,7 +2,6 @@ import nock from 'nock'
 import config from '../config'
 import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import dummyScheduledEvents from './localMockData/eventsForToday'
-import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import PrisonApiClient from './prisonApiClient'
 import {
   accountBalancesMock,
@@ -35,6 +34,8 @@ import AgenciesMock from './localMockData/agenciesDetails'
 import OffenderCellHistoryMock from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
 import LocationsInmatesMock from './localMockData/locationsInmates'
+import { AlertForm } from '../interfaces/prisonApi/alert'
+import { alertTypesMock } from './localMockData/alertTypesMock'
 
 jest.mock('./tokenStore')
 
@@ -57,6 +58,9 @@ describe('prisonApiClient', () => {
   const mockSuccessfulPrisonApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
     fakePrisonApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
+  const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, returnData: TReturnData) => {
+    fakePrisonApi.post(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
+  }
 
   describe('getCaseLoads', () => {
     it('should return data from api', async () => {
@@ -64,18 +68,6 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.getUserCaseLoads()
       expect(output).toEqual(CaseLoadsDummyDataA)
-    })
-  })
-
-  describe('getNonAssociations', () => {
-    it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
-      mockSuccessfulPrisonApiCall(
-        `/api/offenders/${prisonerNumber}/non-association-details?currentPrisonOnly=true&excludeInactive=true`,
-        nonAssociationDetailsDummyData,
-      )
-
-      const output = await prisonApiClient.getNonAssociationDetails(prisonerNumber)
-      expect(output).toEqual(nonAssociationDetailsDummyData)
     })
   })
 
@@ -350,6 +342,31 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates?${mapToQueryString({})}`, LocationsInmatesMock)
       const output = await prisonApiClient.getInmatesAtLocation(locationId, {})
       expect(output).toEqual(LocationsInmatesMock)
+    })
+  })
+
+  describe('getAlertTypes', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/ALERT?withSubCodes=true`, alertTypesMock)
+      const output = await prisonApiClient.getAlertTypes()
+      expect(output).toEqual(alertTypesMock)
+    })
+  })
+
+  describe('createAlert', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      const alert = pagedActiveAlertsMock.content[0]
+      const alertForm: AlertForm = {
+        alertType: alert.alertType,
+        alertCode: alert.alertCode,
+        comment: alert.comment,
+        alertDate: alert.dateCreated,
+      }
+      mockSuccessfulPrisonApiPost(`/api/bookings/${bookingId}/alert`, alert)
+
+      const output = await prisonApiClient.createAlert(bookingId, alertForm)
+      expect(output).toEqual(alert)
     })
   })
 })

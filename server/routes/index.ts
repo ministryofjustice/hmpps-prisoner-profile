@@ -2,7 +2,6 @@ import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
-import AlertsController from '../controllers/alertsController'
 import OverviewController from '../controllers/overviewController'
 import { formatName, sortArrayOfObjectsByDate, SortType } from '../utils/utils'
 import { Role } from '../data/enums/role'
@@ -15,6 +14,7 @@ import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
+import alertsRouter from './alertsRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -114,34 +114,6 @@ export default function routes(services: Services): Router {
     },
   )
 
-  get('/prisoner/:prisonerNumber/alerts', async (req, res, next) => {
-    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
-  })
-
-  get(
-    '/prisoner/:prisonerNumber/alerts/active',
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertsController = new AlertsController(true, services.prisonerSearchService, services.alertsPageService)
-      return alertsController.displayAlerts(req, res, prisonerData, inmateDetail)
-    },
-  )
-
-  get(
-    '/prisoner/:prisonerNumber/alerts/inactive',
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertsController = new AlertsController(false, services.prisonerSearchService, services.alertsPageService)
-      return alertsController.displayAlerts(req, res, prisonerData, inmateDetail)
-    },
-  )
-
   get(
     '/prisoner/:prisonerNumber/offences',
     getPrisonerData(services),
@@ -162,6 +134,7 @@ export default function routes(services: Services): Router {
   )
 
   router.use(caseNotesRouter(services))
+  router.use(alertsRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
