@@ -1,20 +1,11 @@
 import { Request, Response } from 'express'
-import moment from 'moment'
+
 import { mapHeaderData } from '../mappers/headerMappers'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { Prisoner } from '../interfaces/prisoner'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import {
-  extractLocation,
-  formatName,
-  formatTimestampToDate,
-  formatTimestampToDateTime,
-  groupBy,
-  hasLength,
-  isTemporaryLocation,
-  sortByDateTime,
-  userHasRoles,
-} from '../utils/utils'
+import { extractLocation, formatName, groupBy, hasLength, isTemporaryLocation, userHasRoles } from '../utils/utils'
+import { formatDate, formatDateTime } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
@@ -63,8 +54,8 @@ export default class PrisonerCellHistoryController {
         // eslint-disable-next-line no-unused-vars
         ([key, value]) => {
           // @ts-expect-error ts-migrate(2339) FIXME: Property 'slice' does not exist on type 'unknown'.
-          const fromDateString = formatTimestampToDate(value.slice(-1)[0].assignmentDateTime)
-          const toDateString = formatTimestampToDate(value[0].assignmentEndDateTime) || 'Unknown'
+          const fromDateString = formatDate(value.slice(-1)[0].assignmentDateTime, 'short')
+          const toDateString = formatDate(value[0].assignmentEndDateTime, 'short') || 'Unknown'
 
           return {
             isValidAgency: !!value[0].establishment,
@@ -104,11 +95,11 @@ export default class PrisonerCellHistoryController {
           establishment: agencyDescription,
           location: extractLocation(cell.description, agencyName),
           isTemporaryLocation: isTemporaryLocation(cell.description),
-          movedIn: cell.assignmentDateTime && formatTimestampToDateTime(cell.assignmentDateTime),
-          movedOut: cell.assignmentEndDateTime && formatTimestampToDateTime(cell.assignmentEndDateTime),
-          assignmentDateTime: moment(cell.assignmentDateTime).format('YYYY-MM-DDTHH:mm:ss'),
+          movedIn: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short'),
+          movedOut: cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short'),
+          assignmentDateTime: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short'),
           assignmentEndDateTime: cell.assignmentEndDateTime
-            ? moment(cell.assignmentEndDateTime).format('YYYY-MM-DDTHH:mm:ss')
+            ? cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short')
             : undefined,
           livingUnitId: cell.livingUnitId,
           agencyId: agencyName,
@@ -116,9 +107,10 @@ export default class PrisonerCellHistoryController {
         }
       })
 
-      const cellDataLatestFirst = cellData.sort((left, right) =>
-        sortByDateTime(right.assignmentDateTime, left.assignmentDateTime),
+      const cellDataLatestFirst = cellData.sort(
+        (a, b) => new Date(a.assignmentDateTime).getTime() - new Date(b.assignmentDateTime).getTime(),
       )
+
       const currentLocation = cellDataLatestFirst.slice(0, 1)[0]
       const occupants =
         (currentLocation && (await this.prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
@@ -144,7 +136,7 @@ export default class PrisonerCellHistoryController {
           : [],
         currentLocation: {
           ...currentLocation,
-          assignmentEndDateTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
+          assignmentEndDateTime: undefined,
         },
         occupants: occupants
           .filter(occupant => occupant.offenderNo !== offenderNo)

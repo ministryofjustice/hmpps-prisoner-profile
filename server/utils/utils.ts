@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
@@ -489,25 +488,10 @@ export const isTemporaryLocation = (locationName: string): boolean => {
   return false
 }
 
-export const formatTimestampToDate = (timestamp: moment.MomentInput, outputFormat = 'DD/MM/YYYY'): moment.MomentInput =>
-  timestamp && moment(timestamp).format(outputFormat)
-
-export const formatTimestampToDateTime = (
-  timestamp: moment.MomentInput,
-  format = 'DD/MM/YYYY - HH:mm',
-): moment.MomentInput => timestamp && moment(timestamp).format(format)
-
 export const extractLocation = (location: string, agencyId: string): string => {
   if (!location || !agencyId) return undefined
   const withoutAgency = stripAgencyPrefix(location, agencyId)
   return formatLocation(withoutAgency)
-}
-
-export const sortByDateTime = (t1: moment.MomentInput, t2: moment.MomentInput): number => {
-  if (t1 && t2) return moment(t1).valueOf() - moment(t2).valueOf()
-  if (t1) return -1
-  if (t2) return 1
-  return 0
 }
 
 // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
