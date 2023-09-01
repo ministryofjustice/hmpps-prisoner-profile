@@ -1,0 +1,132 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "moj/components/pagination/macro.njk" import mojPagination -%}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "../macros/hmppsActionButton.njk" import hmppsActionButton %}
+{% extends "./index.njk" %}
+{% set breadCrumbs = [
+  {
+    text: 'Home',
+    href:  "/" | prependBaseUrl
+  },  
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  },
+  {
+    text: 'Location details'
+  }
+] %}
+
+{% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })
+        }}
+    {% endif %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h1>{{name |  apostrophe}} location details</h1>
+    </div>
+  </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter"><h2>Current location</h1></div>
+        <div class="govuk-grid-column-three-quarters">
+        {% if canViewCellMoveButton %}
+            <div class="hmpps-action-header">
+                {{ hmppsActionButton({ text: 'Change cell', iconName: 'add-case-note', id: 'add-case-note-action-button', url:  changeCellLink }) }}
+            </div>
+        {% endif %}
+        </div>
+    </div>
+  <div class="horizontal-information horizontal-information--with-border govuk-!-margin-bottom-6">
+    <div class="horizontal-information__item">
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Establishment</h3>
+      <p class="govuk-body" data-test="establishment"> {{ currentLocation.establishment }} </p>
+    </div>
+    <div class="horizontal-information__item">
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Location</h3>
+      <p class="govuk-body" data-test="location"> {{ currentLocation.location }} </p>
+    </div>
+    <div class="horizontal-information__item">
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved in</h3>
+      <p class="govuk-body" data-test="current-location-moved-in-date"> {{ currentLocation.movedIn }} </p>
+    </div>
+    <div class="horizontal-information__item">
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved in by</h3>
+      <p class="govuk-body" data-test="current-location-moved-in-by"> {{ currentLocation.movedInBy }} </p>
+    </div>
+    {% if occupants.length %}
+      <div class="horizontal-information__item">
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Currently sharing with</h3>
+        {% for occupant in occupants %}
+          <p class="govuk-body" data-test="occupants">
+            <a class="govuk-link" href={{occupant.profileUrl}}>{{ occupant.name }}</a>
+          </p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="horizontal-information__item">
+      {% if not currentLocation.isTemporaryLocation %}
+        <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body" data-test="cell-details-link">
+        View details<span class="govuk-visually-hidden"> for location {{ currentLocation.location }}</span>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <h2 class="govuk-heading-m govuk-!-font-size-36">Previous locations</h2>
+
+  {% for agency in cellHistoryGroupedByAgency %}
+    {% if agency.isValidAgency %}
+      {% set rows = [] %}
+
+      {% for cell in agency.cellHistory %}
+        {% set rows = (rows.push([  
+          { text: cell.location },
+          { text: cell.movedIn },
+          { text: cell.movedInBy },
+          { text: cell.movedOut },
+          { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + cell.assignmentDateTime + '&toDate=' + cell.assignmentEndDateTime + '&locationId=' + cell.livingUnitId + '&agencyId=' + cell.agencyId + '" class="govuk-link">View details<span class="govuk-visually-hidden"> for location ' + cell.location + '</span></a>' if not cell.isTemporaryLocation }
+        ]), rows) %}
+      {% endfor %}
+
+      <h3 class="govuk-heading-m" data-test="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agency.datePeriod }}</span></h2>
+
+      {{ govukTable({
+        head: [
+          { text: "Location" },
+          { text: "Moved in" },
+          { text: "Moved in by" },
+          { text: "Moved out" },
+          { html: '<span class="govuk-visually-hidden">Details link</span>' }
+        ],
+        rows: rows,
+        attributes: { "data-test": "prisoner-cell-history" }
+      }) }}
+    {% else %}
+      <h3 class="govuk-heading-m" data-test="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agency.datePeriod }}</span></h2>
+    {% endif %}
+  {% endfor %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">
+        <a class="govuk-link" href={{ profileUrl }} data-test="back-link">Return to prisoner profile</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+    {% include "../partials/backToTop.njk" %}
+
+{% endblock %}

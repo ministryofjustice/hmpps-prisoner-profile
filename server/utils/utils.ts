@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
@@ -458,3 +459,64 @@ export const neurodiversityEnabled = (agencyId: string): boolean => {
   const isEnabled = neurodiversityEnabledPrisons?.includes(agencyId)
   return isEnabled
 }
+
+export const stripAgencyPrefix = (location: string, agency: string): string => {
+  const parts = location && location.split('-')
+  if (parts && parts.length > 0) {
+    const index = parts.findIndex(p => p === agency)
+    if (index >= 0) {
+      return location.substring(parts[index].length + 1, location.length)
+    }
+  }
+
+  return null
+}
+
+export const formatLocation = (locationName: string): string => {
+  if (!locationName) return undefined
+  if (locationName.includes('RECP')) return 'Reception'
+  if (locationName.includes('CSWAP')) return 'No cell allocated'
+  if (locationName.includes('COURT')) return 'Court'
+  return locationName
+}
+
+export const isTemporaryLocation = (locationName: string): boolean => {
+  if (!locationName) return false
+  if (locationName.endsWith('RECP')) return true
+  if (locationName.endsWith('CSWAP')) return true
+  if (locationName.endsWith('COURT')) return true
+  if (locationName.endsWith('TAP')) return true
+  return false
+}
+
+export const formatTimestampToDate = (timestamp: moment.MomentInput, outputFormat = 'DD/MM/YYYY'): moment.MomentInput =>
+  timestamp && moment(timestamp).format(outputFormat)
+
+export const formatTimestampToDateTime = (
+  timestamp: moment.MomentInput,
+  format = 'DD/MM/YYYY - HH:mm',
+): moment.MomentInput => timestamp && moment(timestamp).format(format)
+
+export const extractLocation = (location: string, agencyId: string): string => {
+  if (!location || !agencyId) return undefined
+  const withoutAgency = stripAgencyPrefix(location, agencyId)
+  return formatLocation(withoutAgency)
+}
+
+export const sortByDateTime = (t1: moment.MomentInput, t2: moment.MomentInput): number => {
+  if (t1 && t2) return moment(t1).valueOf() - moment(t2).valueOf()
+  if (t1) return -1
+  if (t2) return 1
+  return 0
+}
+
+// eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
+export const groupBy = (array: any[], key: string): Record<string, unknown> =>
+  array &&
+  array.reduce((acc, current) => {
+    const group = current[key]
+
+    return { ...acc, [group]: [...(acc[group] || []), current] }
+  }, {})
+
+export const hasLength = (array: unknown[]): boolean => array && array.length > 0

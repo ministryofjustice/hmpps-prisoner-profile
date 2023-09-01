@@ -41,6 +41,10 @@ import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
 import { Alert } from '../interfaces/prisonApi/alert'
+import { Agencies } from '../interfaces/prisonApi/agencies'
+import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
+import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -289,5 +293,23 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]> {
     return this.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles` })
+  }
+
+  async getAgencyDetails(agencyId: string): Promise<Agencies> {
+    return this.get<Agencies>({ path: `/api/agencies/${agencyId}?activeOnly=false` })
+  }
+
+  async getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory> {
+    return this.get<OffenderCellHistory>({
+      path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
+    })
+  }
+
+  async getStaffDetails(staffId: string): Promise<StaffDetails> {
+    return this.get<StaffDetails>({ path: `/api/users/${staffId}` })
+  }
+
+  async getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]> {
+    return this.get<LocationsInmate[]>({ path: `/api/locations/${locationId}/inmates?${mapToQueryString(params)}` })
   }
 }

@@ -14,6 +14,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
+import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -206,6 +207,20 @@ export default function routes(services: Services): Router {
         }),
         bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
       })
+    },
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/cell-history',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    async (req, res, next) => {
+      const prisonerData = req.middleware?.prisonerData
+      const inmateDetail = req.middleware?.inmateDetail
+      const prisonerCellHistoryController = new PrisonerCellHistoryController(
+        services.dataAccess.prisonApiClientBuilder,
+      )
+      return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData, inmateDetail)
     },
   )
 

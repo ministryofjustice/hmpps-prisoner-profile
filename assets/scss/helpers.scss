@@ -121,3 +121,36 @@
     margin-bottom: 0;
   }
 }
+
+
+.horizontal-information {
+  @media print, (min-width: #{map-get($govuk-breakpoints, 'tablet')}) {
+    padding-bottom: 0;
+    display: flex;
+  }
+
+  &--with-border {
+    padding: govuk-spacing(3) 0;
+    border-top: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+
+  &__item {
+    @media print, (min-width: #{map-get($govuk-breakpoints, 'tablet')}) {
+      flex: 1 1 0;
+      padding-right: govuk-spacing(3);
+
+      &--tenth {
+        flex-basis: 10%;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

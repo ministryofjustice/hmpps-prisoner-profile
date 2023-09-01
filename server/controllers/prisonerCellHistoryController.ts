@@ -1,0 +1,168 @@
+import { Request, Response } from 'express'
+import moment from 'moment'
+import { mapHeaderData } from '../mappers/headerMappers'
+import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import { Prisoner } from '../interfaces/prisoner'
+import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import {
+  extractLocation,
+  formatName,
+  formatTimestampToDate,
+  formatTimestampToDateTime,
+  groupBy,
+  hasLength,
+  isTemporaryLocation,
+  sortByDateTime,
+  userHasRoles,
+} from '../utils/utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { RestClientBuilder } from '../data'
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
+import config from '../config'
+
+/**
+ * Parse request for alerts page and orchestrate response
+ */
+export default class PrisonerCellHistoryController {
+  private prisonApiClient: PrisonApiClient
+
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+
+  public async displayPrisonerCellHistory(
+    req: Request,
+    res: Response,
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+  ) {
+    const offenderNo = prisonerData.prisonerNumber
+
+    const enrichLocationsWithAgencyLeaveDate = (locations: LocationsInmate[]) => {
+      const locationsWithAgencyLeaveDate: object[] = []
+      let previousLocationEstablishmentName = locations[0].establishment
+      let previousLocationEstablishmentNameAndLeaveDate =
+        previousLocationEstablishmentName + locations[0].assignmentEndDateTime
+      locations.forEach(location => {
+        const locationEstablishmentNameAndLeaveDate =
+          previousLocationEstablishmentName !== location.establishment
+            ? (previousLocationEstablishmentNameAndLeaveDate = location.establishment + location.assignmentEndDateTime)
+            : previousLocationEstablishmentNameAndLeaveDate
+        locationsWithAgencyLeaveDate.push({
+          ...location,
+          establishmentWithAgencyLeaveDate: locationEstablishmentNameAndLeaveDate,
+        })
+        previousLocationEstablishmentName = location.establishment
+        previousLocationEstablishmentNameAndLeaveDate = locationEstablishmentNameAndLeaveDate
+      })
+      return locationsWithAgencyLeaveDate
+    }
+
+    const getCellHistoryGroupedByPeriodAtAgency = (locations: LocationsInmate[]) => {
+      const locationsWithAgencyLeaveDate = enrichLocationsWithAgencyLeaveDate(locations)
+      return Object.entries(groupBy(locationsWithAgencyLeaveDate, 'establishmentWithAgencyLeaveDate')).map(
+        // eslint-disable-next-line no-unused-vars
+        ([key, value]) => {
+          // @ts-expect-error ts-migrate(2339) FIXME: Property 'slice' does not exist on type 'unknown'.
+          const fromDateString = formatTimestampToDate(value.slice(-1)[0].assignmentDateTime)
+          const toDateString = formatTimestampToDate(value[0].assignmentEndDateTime) || 'Unknown'
+
+          return {
+            isValidAgency: !!value[0].establishment,
+            name: value[0].establishment,
+            datePeriod: `from ${fromDateString} to ${toDateString}`,
+            cellHistory: value,
+            key,
+          }
+        },
+      )
+    }
+
+    try {
+      // Parse query params for paging, sorting and filtering data
+      const { clientToken } = res.locals
+      const queryParams: PagedListQueryParams = {}
+
+      const { bookingId, firstName, middleNames, lastName } = prisonerData
+      const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+
+      this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
+
+      const page = 0
+      const cells = await this.prisonApiClient.getOffenderCellHistory(bookingId, { page, size: 10000 })
+      const agencyData = await this.prisonApiClient.getAgencyDetails((await cells).content[page].agencyId)
+      const staff = await Promise.all(
+        (await cells).content.map(cell => this.prisonApiClient.getStaffDetails(cell.movementMadeBy)),
+      )
+
+      const cellData = cells.content.map(cell => {
+        const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
+        const agencyName = cell.agencyId
+        const agency = agencyData
+        const agencyDescription = agency ? agency.description : null
+
+        return {
+          establishment: agencyDescription,
+          location: extractLocation(cell.description, agencyName),
+          isTemporaryLocation: isTemporaryLocation(cell.description),
+          movedIn: cell.assignmentDateTime && formatTimestampToDateTime(cell.assignmentDateTime),
+          movedOut: cell.assignmentEndDateTime && formatTimestampToDateTime(cell.assignmentEndDateTime),
+          assignmentDateTime: moment(cell.assignmentDateTime).format('YYYY-MM-DDTHH:mm:ss'),
+          assignmentEndDateTime: cell.assignmentEndDateTime
+            ? moment(cell.assignmentEndDateTime).format('YYYY-MM-DDTHH:mm:ss')
+            : undefined,
+          livingUnitId: cell.livingUnitId,
+          agencyId: agencyName,
+          movedInBy: formatName(staffDetails.firstName, '', staffDetails.lastName),
+        }
+      })
+
+      const cellDataLatestFirst = cellData.sort((left, right) =>
+        sortByDateTime(right.assignmentDateTime, left.assignmentDateTime),
+      )
+      const currentLocation = cellDataLatestFirst.slice(0, 1)[0]
+      const occupants =
+        (currentLocation && (await this.prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
+
+      const previousLocations = cellDataLatestFirst.slice(1)
+
+      const prisonerProfileUrl = `/prisoner/${offenderNo}`
+
+      if (req.query.page) queryParams.page = +req.query.page
+      if (req.query.sort) queryParams.sort = req.query.sort as string
+      if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
+      if (req.query.from) queryParams.from = req.query.from as string
+      if (req.query.to) queryParams.to = req.query.to as string
+      if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
+
+      // Render page
+      return res.render('pages/prisonerCellHistoryPage', {
+        pageTitle: 'Location details',
+        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'location-details'),
+        name,
+        cellHistoryGroupedByAgency: hasLength(previousLocations)
+          ? getCellHistoryGroupedByPeriodAtAgency(previousLocations)
+          : [],
+        currentLocation: {
+          ...currentLocation,
+          assignmentEndDateTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
+        },
+        occupants: occupants
+          .filter(occupant => occupant.offenderNo !== offenderNo)
+          .map(occupant => ({
+            name: formatName(occupant.firstName, '', occupant.lastName, { style: NameFormatStyle.firstLast }),
+            profileUrl: `/prisoner/${occupant.offenderNo}`,
+          })),
+        prisonerName: formatName(firstName, '', lastName),
+        profileUrl: `/prisoner/${offenderNo}`,
+        breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
+        changeCellLink: `${config.serviceUrls.digitalPrison}/cell-move/search-for-cell?returnUrl=${prisonerProfileUrl}`,
+        canViewCellMoveButton: userHasRoles(['CELL_MOVE'], res.locals.user.userRoles),
+        prisonerNumber: offenderNo,
+        dpsBaseUrl: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}`,
+      })
+    } catch (error) {
+      res.locals.redirectUrl = `/prisoner/${offenderNo}`
+      throw error
+    }
+  }
+}
