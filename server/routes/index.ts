@@ -189,7 +189,6 @@ export default function routes(services: Services): Router {
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
       const prisonerCellHistoryController = new PrisonerCellHistoryController(
         services.dataAccess.prisonApiClientBuilder,
       )

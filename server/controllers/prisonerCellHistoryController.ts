@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { Prisoner } from '../interfaces/prisoner'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { extractLocation, formatName, groupBy, hasLength, isTemporaryLocation, userHasRoles } from '../utils/utils'
 import { formatDate, formatDateTime } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
