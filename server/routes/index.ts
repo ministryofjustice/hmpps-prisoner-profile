@@ -193,7 +193,7 @@ export default function routes(services: Services): Router {
       const prisonerCellHistoryController = new PrisonerCellHistoryController(
         services.dataAccess.prisonApiClientBuilder,
       )
-      return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData, inmateDetail)
+      return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData)
     },
   )
 

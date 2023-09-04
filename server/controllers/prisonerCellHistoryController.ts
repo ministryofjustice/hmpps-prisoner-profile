@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 
-import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { Prisoner } from '../interfaces/prisoner'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { extractLocation, formatName, groupBy, hasLength, isTemporaryLocation, userHasRoles } from '../utils/utils'
@@ -20,12 +19,7 @@ export default class PrisonerCellHistoryController {
 
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  public async displayPrisonerCellHistory(
-    req: Request,
-    res: Response,
-    prisonerData: Prisoner,
-    inmateDetail: InmateDetail,
-  ) {
+  public async displayPrisonerCellHistory(req: Request, res: Response, prisonerData: Prisoner) {
     const offenderNo = prisonerData.prisonerNumber
 
     const enrichLocationsWithAgencyLeaveDate = (locations: LocationsInmate[]) => {
@@ -71,7 +65,6 @@ export default class PrisonerCellHistoryController {
     try {
       // Parse query params for paging, sorting and filtering data
       const { clientToken } = res.locals
-      const queryParams: PagedListQueryParams = {}
 
       const { bookingId, firstName, middleNames, lastName } = prisonerData
       const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
