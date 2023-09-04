@@ -6,17 +6,15 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "../macros/hmppsActionButton.njk" import hmppsActionButton %}
 {% extends "./index.njk" %}
+{% set hideBackLink = true %}
 {% set breadCrumbs = [
   {
-    text: 'Home',
+    text: 'Digital Prison Services',
     href:  "/" | prependBaseUrl
   },  
   {
     text: prisonerName,
     href: "/prisoner/" + prisonerNumber
-  },
-  {
-    text: 'Location details'
   }
 ] %}
 
@@ -34,16 +32,16 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <h1>{{name |  apostrophe}} location details</h1>
+      <h1 class="ovuk-!-font-size-36">{{name |  apostrophe}} location details</h1>
     </div>
   </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter"><h2>Current location</h1></div>
+        <div class="govuk-grid-column-one-quarter"><h2 class="govuk-!-font-size-36">Current location</h1></div>
         <div class="govuk-grid-column-three-quarters">
         {% if canViewCellMoveButton %}
             <div class="hmpps-action-header">
-                {{ hmppsActionButton({ text: 'Change cell', iconName: 'add-case-note', id: 'add-case-note-action-button', url:  changeCellLink }) }}
+                {{ hmppsActionButton({ text: 'Change cell', iconName: 'change-cell', id: 'change-cell-action-button', url:  changeCellLink }) }}
             </div>
         {% endif %}
         </div>
@@ -84,7 +82,7 @@
     </div>
   </div>
 
-  <h2 class="govuk-heading-m govuk-!-font-size-36">Previous locations</h2>
+  <h2 class="govuk-!-font-size-36">Previous locations</h2>
 
   {% for agency in cellHistoryGroupedByAgency %}
     {% if agency.isValidAgency %}

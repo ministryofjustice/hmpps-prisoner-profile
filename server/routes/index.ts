@@ -184,7 +184,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/cell-history',
+    '/prisoner/:prisonerNumber/location-details',
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {

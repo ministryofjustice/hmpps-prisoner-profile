@@ -1,4 +1,4 @@
-export interface Agencies {
+export interface AgencyLocationDetails {
   agencyId: string
   description: string
   longDescription: string

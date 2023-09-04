@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 
-import { mapHeaderData } from '../mappers/headerMappers'
+import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { Prisoner } from '../interfaces/prisoner'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
@@ -111,25 +111,17 @@ export default class PrisonerCellHistoryController {
         (a, b) => new Date(a.assignmentDateTime).getTime() - new Date(b.assignmentDateTime).getTime(),
       )
 
-      const currentLocation = cellDataLatestFirst.slice(0, 1)[0]
+      const currentLocation = cellDataLatestFirst[0]
       const occupants =
         (currentLocation && (await this.prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
 
       const previousLocations = cellDataLatestFirst.slice(1)
-
       const prisonerProfileUrl = `/prisoner/${offenderNo}`
-
-      if (req.query.page) queryParams.page = +req.query.page
-      if (req.query.sort) queryParams.sort = req.query.sort as string
-      if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
-      if (req.query.from) queryParams.from = req.query.from as string
-      if (req.query.to) queryParams.to = req.query.to as string
-      if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
       // Render page
       return res.render('pages/prisonerCellHistoryPage', {
         pageTitle: 'Location details',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'location-details'),
+        ...mapHeaderNoBannerData(prisonerData),
         name,
         cellHistoryGroupedByAgency: hasLength(previousLocations)
           ? getCellHistoryGroupedByPeriodAtAgency(previousLocations)
@@ -147,7 +139,7 @@ export default class PrisonerCellHistoryController {
         prisonerName: formatName(firstName, '', lastName),
         profileUrl: `/prisoner/${offenderNo}`,
         breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
-        changeCellLink: `${config.serviceUrls.digitalPrison}/cell-move/search-for-cell?returnUrl=${prisonerProfileUrl}`,
+        changeCellLink: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}/cell-move/search-for-cell?returnUrl=${prisonerProfileUrl}`,
         canViewCellMoveButton: userHasRoles(['CELL_MOVE'], res.locals.user.userRoles),
         prisonerNumber: offenderNo,
         dpsBaseUrl: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}`,
