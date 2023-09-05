@@ -38,6 +38,10 @@ import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
+import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
+import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
+import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
@@ -284,6 +288,25 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]> {
     return this.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles` })
+  }
+
+  async getAgencyDetails(agencyId: string, isActiveOnly?: boolean): Promise<AgencyLocationDetails> {
+    const activeOnly = isActiveOnly || false
+    return this.get<AgencyLocationDetails>({ path: `/api/agencies/${agencyId}?activeOnly=${activeOnly}` })
+  }
+
+  async getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory> {
+    return this.get<OffenderCellHistory>({
+      path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
+    })
+  }
+
+  async getStaffDetails(staffId: string): Promise<StaffDetails> {
+    return this.get<StaffDetails>({ path: `/api/users/${staffId}` })
+  }
+
+  async getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]> {
+    return this.get<LocationsInmate[]>({ path: `/api/locations/${locationId}/inmates?${mapToQueryString(params)}` })
   }
 
   async getAlertTypes(): Promise<AlertType[]> {
