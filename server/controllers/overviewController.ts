@@ -124,7 +124,6 @@ export default class OverviewController {
     if (
       userHasRoles([Role.ActivityHub], user.userRoles) &&
       config.activitiesEnabledPrisons.includes(user.activeCaseLoadId) &&
-      config.appointmentsEnabledPrisons.includes(user.activeCaseLoadId) &&
       user.activeCaseLoadId === prisonerData.prisonId &&
       prisonerData.status !== 'ACTIVE OUT'
     ) {
