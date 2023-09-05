@@ -564,7 +564,7 @@ describe('OverviewPageService', () => {
             async () =>
               ({
                 profileInformation: [suitableListener, recognisedListener],
-              } as InmateDetail),
+              }) as InmateDetail,
           )
 
           const overviewPageService = overviewPageServiceConstruct()

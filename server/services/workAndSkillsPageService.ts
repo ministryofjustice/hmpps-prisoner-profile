@@ -132,9 +132,8 @@ export default class WorkAndSkillsPageService {
   }
 
   private async getLearnerLatestAssessments(prisonerNumber: string) {
-    const learnerLatestAssessments: LearnerLatestAssessment[] = await this.curiousApiClient.getLearnerLatestAssessments(
-      prisonerNumber,
-    )
+    const learnerLatestAssessments: LearnerLatestAssessment[] =
+      await this.curiousApiClient.getLearnerLatestAssessments(prisonerNumber)
 
     const multiListArray: GovSummaryGroup[][] = []
 
@@ -192,9 +191,8 @@ export default class WorkAndSkillsPageService {
   }
 
   public async getLearnerNeurodivergence(prisonerNumber: string) {
-    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
-      prisonerNumber,
-    )
+    const learnerNeurodivergence: LearnerNeurodivergence[] =
+      await this.curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
     return learnerNeurodivergence
   }
 }
