@@ -122,6 +122,20 @@ export default class OverviewController {
       })
     }
     if (
+      userHasRoles([Role.ActivityHub], user.userRoles) &&
+      config.activitiesEnabledPrisons.includes(user.activeCaseLoadId) &&
+      config.appointmentsEnabledPrisons.includes(user.activeCaseLoadId) &&
+      user.activeCaseLoadId === prisonerData.prisonId &&
+      prisonerData.status !== 'ACTIVE OUT'
+    ) {
+      actions.push({
+        text: 'Log an activity application',
+        icon: Icon.LogActivityApplication,
+        url: `${config.serviceUrls.activities}/waitlist/${prisonerData.prisonerNumber}/apply`,
+        dataQA: 'log-an-activity-application-link',
+      })
+    }
+    if (
       userHasRoles(
         [Role.PathfinderApproval, Role.PathfinderStdPrison, Role.PathfinderStdProbation, Role.PathfinderHQ],
         user.userRoles,

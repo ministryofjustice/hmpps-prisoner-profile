@@ -174,6 +174,8 @@ export default {
     welcomePeopleIntoPrison: get('WELCOME_PEOPLE_INTO_PRISON_UI_URL', 'http://localhost:3001', requiredInProduction),
     createAndVaryALicence: get('CREATE_AND_VARY_A_LICENCE_UI_URL', 'http://localhost:3001', requiredInProduction),
     calculateReleaseDates: get('CALCULATE_RELEASE_DATES_UI_URL', 'http://localhost:3001', requiredInProduction),
+    activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
+    appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -183,4 +185,6 @@ export default {
   feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   phaseName: get('SYSTEM_PHASE', ''),
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
+  activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
+  appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
 }

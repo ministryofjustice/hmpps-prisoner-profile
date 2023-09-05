@@ -39,6 +39,10 @@ generic-service:
     SYSTEM_PHASE: "PRE-PRODUCTION"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-preprod.hmpps.service.justice.gov.uk"
+    ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
+    ACTIVITIES_ENABLED_PRISONS: "LEI,RSI"
+    APPOINTMENTS_URL: "https://activities-preprod.prison.service.justice.gov.uk/appointments"
+    APPOINTMENTS_ENABLED_PRISONS: "LEI,RSI"
 
   allowlist:
     office: "217.33.148.210/32"

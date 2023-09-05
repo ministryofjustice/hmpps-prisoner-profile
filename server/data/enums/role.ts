@@ -24,4 +24,5 @@ export enum Role {
   PrisonUser = 'ROLE_PRISON',
   ReceptionUser = 'ROLE_PRISON_RECEPTION',
   ReleaseDatesCalculator = 'ROLE_RELEASE_DATES_CALCULATOR',
+  ActivityHub = 'ROLE_ACTIVITY_HUB',
 }
