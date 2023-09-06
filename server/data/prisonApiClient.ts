@@ -39,6 +39,7 @@ import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
+import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -296,4 +297,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
     return (await this.post({ path: `/api/bookings/${bookingId}/alert`, data: alert })) as Alert
   }
+
+  async getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]> {
+    return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/thisWeek` })
+  }
+
+  async getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]> {
+    return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/nextWeek`})
+  }
+
 }

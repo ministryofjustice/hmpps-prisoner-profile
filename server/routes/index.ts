@@ -14,6 +14,7 @@ import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import alertsRouter from './alertsRouter'
+import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -154,6 +155,19 @@ export default function routes(services: Services): Router {
         ...activePunishmentsPageData,
         activeTab: false,
       })
+    },
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/schedule',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    async (req, res, next) => {
+      const prisonerData = req.middleware?.prisonerData
+      const prisonerScheduleController = new PrisonerScheduleController(
+        services.dataAccess.prisonApiClientBuilder,
+      )
+      return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
     },
   )
 

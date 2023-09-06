@@ -32,6 +32,7 @@ import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
 import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
+import { GetEventScheduleItem } from '../../interfaces/prisonApi/getEventScheduleItem'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -81,4 +82,6 @@ export interface PrisonApiClient {
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
+  getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]>
+  getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]>
 }

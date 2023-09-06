@@ -458,3 +458,23 @@ export const neurodiversityEnabled = (agencyId: string): boolean => {
   const isEnabled = neurodiversityEnabledPrisons?.includes(agencyId)
   return isEnabled
 }
+
+export const groupBy = (array: any[], key: string) =>
+  array &&
+  array.reduce((acc, current) => {
+    const group = current[key]
+
+    return { ...acc, [group]: [...(acc[group] || []), current] }
+  }, {})
+
+
+export const times =
+  (number: number) =>
+  (func: (index: unknown) => unknown): void => {
+    const iter = (index: number) => {
+      if (index === number) return
+      func(index)
+      iter(index + 1)
+    }
+    return iter(0)
+}
