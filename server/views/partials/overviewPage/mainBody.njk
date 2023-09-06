@@ -1,5 +1,6 @@
 {% from "./macros/statusListMacro.njk" import statusList %}
 {% from "./miniSummaryBoxes/miniSummaryBoxList.njk" import  miniSummaryListMacro %}
+{% from "./miniSummaryBoxes/macro.njk" import  miniSummaryMacro %}
 <div class="govuk-grid-row">
   <section class="govuk-grid-column-full" aria-label="Status List">
     {{ statusList(statuses) }}
@@ -10,8 +11,11 @@
     {{ miniSummaryListMacro(miniSummaryGroupA) }}
   </div>
 </div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
+<div class="govuk-grid-row hmpps-miniSummaryWrapper">
+  <div class="govuk-grid-column-one-third">
+    {% include "./alerts/alerts.njk" %}
+  </div>
+  <div class="govuk-grid-column-two-thirds">
     {% include "./staffContacts/staffContacts.njk" %}
   </div>
 </div>
