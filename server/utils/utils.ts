@@ -10,6 +10,7 @@ import { Prisoner } from '../interfaces/prisoner'
 import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
+import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -504,3 +505,14 @@ export const groupBy = (array: any[], key: string): Record<string, unknown> =>
   }, {})
 
 export const hasLength = (array: unknown[]): boolean => array && array.length > 0
+
+type NonAssociationTableRow = [{ html: string }, { text: string }, { text: string }, { text: string }]
+export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]): NonAssociationTableRow[] =>
+  nonAssociations.map(na => [
+    {
+      html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${na.offenderNo}">${na.nonAssociationName}</a>`,
+    },
+    { text: na.offenderNo },
+    { text: na.assignedLivingUnitDescription },
+    { text: na.reasonDescription },
+  ])

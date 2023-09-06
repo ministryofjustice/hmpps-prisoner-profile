@@ -38,11 +38,7 @@ export function RestClientBuilder(name: string, config: ApiConfig) {
 export default class RestClient {
   agent: Agent
 
-  constructor(
-    private readonly name: string,
-    private readonly config: ApiConfig,
-    private readonly token: string,
-  ) {
+  constructor(private readonly name: string, private readonly config: ApiConfig, private readonly token: string) {
     this.agent = config.url.startsWith('https') ? new HttpsAgent(config.agent) : new Agent(config.agent)
   }
 
@@ -80,7 +76,7 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
-      if (ignore404 && error.response.status === 404) {
+      if (ignore404 && error.response?.status === 404) {
         logger.info(`Returned null for 404 not found when calling ${this.name}: ${path}`)
         return null
       }
@@ -141,7 +137,7 @@ export default class RestClient {
             reject(error)
           } else if (response) {
             const s = new Readable()
-            // eslint-disable-next-line no-underscore-dangle,no-empty-function
+            // eslint-disable-next-line no-underscore-dangle,no-empty-function,@typescript-eslint/no-empty-function
             s._read = () => {}
             s.push(response.body)
             s.push(null)

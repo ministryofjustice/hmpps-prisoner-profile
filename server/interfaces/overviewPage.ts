@@ -19,9 +19,17 @@ export interface OverviewSchedule {
 }
 
 export type OverviewNonAssociation = {
-  html?: string
-  text?: string
-}[]
+  nonAssociationName: string
+  offenderNo: string
+  assignedLivingUnitDescription: string
+  reasonDescription: string
+  agencyId: string
+}
+
+export type AlertsSummary = {
+  activeAlertCount: number
+  nonAssociationsCount: number
+}
 
 export interface OverviewPage {
   miniSummaryGroupA: MiniSummary[]
@@ -42,4 +50,5 @@ export interface OverviewPage {
   }
   prisonName: string
   staffRoles: string[]
+  alertsSummary: AlertsSummary
 }

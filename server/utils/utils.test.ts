@@ -26,6 +26,7 @@ import {
   SummaryListRow,
   userHasRoles,
   yearsBetweenDateStrings,
+  toNonAssociationRows,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
@@ -462,6 +463,41 @@ describe('findError', () => {
       expect(formatLocation('RECP')).not.toEqual('RECP')
       expect(formatLocation('CSWAP')).not.toEqual('CSWAP')
       expect(formatLocation('COURT')).not.toEqual('COURT')
+    })
+  })
+
+  describe('toNonAssociationRows()', () => {
+    it('map non-associations to rows', () => {
+      const res = toNonAssociationRows([
+        {
+          agencyId: 'MDI',
+          assignedLivingUnitDescription: 'NMI-RECP',
+          nonAssociationName: 'John Doe',
+          offenderNo: 'ABC123',
+          reasonDescription: 'Victim',
+        },
+        {
+          agencyId: 'MDI',
+          assignedLivingUnitDescription: 'NMI-RECP',
+          nonAssociationName: 'Guy Incognito',
+          offenderNo: 'DEF321',
+          reasonDescription: 'Rival Gang',
+        },
+      ])
+      expect(res).toEqual([
+        [
+          { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/ABC123">John Doe</a>' },
+          { text: 'ABC123' },
+          { text: 'NMI-RECP' },
+          { text: 'Victim' },
+        ],
+        [
+          { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/DEF321">Guy Incognito</a>' },
+          { text: 'DEF321' },
+          { text: 'NMI-RECP' },
+          { text: 'Rival Gang' },
+        ],
+      ])
     })
   })
 })

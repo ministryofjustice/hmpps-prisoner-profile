@@ -285,6 +285,15 @@ context('Overview Page', () => {
         overviewPage.socProfileInfoLink().should('not.exist')
       })
     })
+
+    context('Alerts summary', () => {
+      it('Displays alerts summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.alertsSummary().panel().should('exist')
+        overviewPage.alertsSummary().alertCount().should('have.text', '80')
+        overviewPage.alertsSummary().nonAssociationCount().should('have.text', '2')
+      })
+    })
   })
 
   context('Given the user has RELEASE_DATES_CALCULATOR role', () => {

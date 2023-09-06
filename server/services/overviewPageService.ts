@@ -1,6 +1,7 @@
 import { differenceInDays, format, isAfter, startOfToday } from 'date-fns'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import {
+  AlertsSummary,
   OverviewNonAssociation,
   OverviewPage,
   OverviewSchedule,
@@ -78,8 +79,8 @@ export default class OverviewPageService {
     clientToken: string,
     prisonerData: Prisoner,
     staffId: number,
-    userCaseLoads: CaseLoad[] = [],
-    userRoles: string[] = [],
+    userCaseLoads: CaseLoad[],
+    userRoles: string[],
   ): Promise<OverviewPage> {
     const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
       prisonerData
@@ -134,6 +135,7 @@ export default class OverviewPageService {
       offencesOverview,
       prisonName: prisonerData.prisonName,
       staffRoles: staffRoles.map(role => role.role),
+      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations, userCaseLoads),
     }
   }
 
@@ -512,6 +514,19 @@ export default class OverviewPageService {
     return summaryData
   }
 
+  private getAlertsSummary(
+    { activeAlertCount }: InmateDetail,
+    nonAssociations: OverviewNonAssociation[],
+    userCaseloads: CaseLoad[],
+  ): AlertsSummary {
+    const activeCaseload = userCaseloads.find(caseload => caseload.currentlyActive)
+    const nonAssociationsCount = nonAssociations.filter(
+      nonAssociation => nonAssociation.agencyId === activeCaseload.caseLoadId,
+    ).length
+
+    return { activeAlertCount, nonAssociationsCount }
+  }
+
   private async getSchedule(prisonerData: Prisoner): Promise<OverviewSchedule> {
     const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
       const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
@@ -539,17 +554,16 @@ export default class OverviewPageService {
     const nonAssociations = await this.nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber)
     if (!nonAssociations?.nonAssociations) return []
 
-    return nonAssociations.nonAssociations.map(nonAssocation => {
-      const { offenderNonAssociation } = nonAssocation
-      const nonAssociationName = `${offenderNonAssociation.firstName} ${offenderNonAssociation.lastName}`
-      return [
-        {
-          html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${offenderNonAssociation.offenderNo}">${nonAssociationName}</a>`,
-        },
-        { text: offenderNonAssociation.offenderNo },
-        { text: offenderNonAssociation.assignedLivingUnitDescription },
-        { text: offenderNonAssociation.reasonDescription },
-      ]
+    return nonAssociations.nonAssociations.map(nonAssociation => {
+      const { firstName, lastName, offenderNo, assignedLivingUnitDescription, reasonDescription, agencyId } =
+        nonAssociation.offenderNonAssociation
+      return {
+        nonAssociationName: `${firstName} ${lastName}`,
+        offenderNo,
+        assignedLivingUnitDescription,
+        reasonDescription,
+        agencyId,
+      }
     })
   }
 
