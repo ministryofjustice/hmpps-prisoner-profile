@@ -35,7 +35,7 @@ generic-service:
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence.hmpps.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates.hmpps.service.justice.gov.uk"
-    FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI"
+    FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI,HMI,NHI"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"
