@@ -305,20 +305,37 @@ context('When signed in', () => {
 
         page
           .careNeeds()
+          .personalCareNeeds(0)
           .reasonableAdjustments(0)
           .description()
           .should('include.text', 'Behavioural responses/Body language')
         page
           .careNeeds()
+          .personalCareNeeds(0)
           .reasonableAdjustments(0)
           .comment()
           .should('include.text', 'psych care type adjustment comment goes here')
-        page.careNeeds().reasonableAdjustments(0).addedOn().should('include.text', '9 June 1999')
-        page.careNeeds().reasonableAdjustments(0).addedOn().should('include.text', 'Moorland (HMP & YOI)')
+        page
+          .careNeeds()
+          .personalCareNeeds(0)
+          .reasonableAdjustments(0)
+          .addedBy()
+          .should('include.text', 'Moorland (HMP & YOI)')
+        page.careNeeds().personalCareNeeds(0).reasonableAdjustments(0).addedOn().should('include.text', '9 June 1999')
 
-        page.careNeeds().reasonableAdjustments(1).description().should('include.text', 'Comfort and Dressing Aids')
-        page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', '9 June 2020')
-        page.careNeeds().reasonableAdjustments(1).addedOn().should('include.text', 'Moorland (HMP & YOI)')
+        page
+          .careNeeds()
+          .personalCareNeeds(0)
+          .reasonableAdjustments(1)
+          .description()
+          .should('include.text', 'Comfort and Dressing Aids')
+        page
+          .careNeeds()
+          .personalCareNeeds(0)
+          .reasonableAdjustments(1)
+          .addedBy()
+          .should('include.text', 'Moorland (HMP & YOI)')
+        page.careNeeds().personalCareNeeds(0).reasonableAdjustments(1).addedOn().should('include.text', '9 June 2020')
       })
     })
 

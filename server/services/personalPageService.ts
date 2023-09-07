@@ -9,6 +9,7 @@ import {
   PersonalPage,
   PhysicalCharacteristics,
   PropertyItem,
+  ReasonableAdjustment as PersonalPageReasonableAdjustment,
 } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
 import { addressToLines, formatName, yearsBetweenDateStrings } from '../utils/utils'
@@ -324,26 +325,41 @@ export default class PersonalPageService {
       return healthReferenceCodes.find(code => code.code === problemType)?.description || problemType
     }
 
+    function mapReasonableAdjustmentToCareNeed(careNeedId?: number): PersonalPageReasonableAdjustment[] {
+      if (careNeedId) {
+        return reasonableAdjustments
+          .filter(adjustment => adjustment.personalCareNeedId === careNeedId)
+          .map(adjustment => ({
+            type: 'Support needed',
+            description: adjustment.treatmentDescription,
+            startDate: adjustment.startDate,
+            comment: adjustment.commentText,
+            agency: adjustment.agencyDescription,
+          }))
+      }
+      return []
+    }
+
     const healthCodes = healthReferenceCodes.map(code => code.code)
     const excludedProblemCodes = ['NR']
     const excludedProblemTypes = [HealthDomainReferenceCode.XRayBodyScan.toString()]
 
     return {
-      personalCareNeeds:
-        personalCareNeeds
-          ?.filter(
-            careNeed =>
-              careNeed.problemStatus === 'ON' &&
-              healthCodes.includes(careNeed.problemType) &&
-              !excludedProblemCodes.includes(careNeed.problemCode) &&
-              !excludedProblemTypes.includes(careNeed.problemType),
-          )
-          .map(careNeed => ({
-            comment: careNeed.commentText,
-            startDate: careNeed.startDate,
-            type: careNeedType(careNeed.problemType),
-            description: careNeed.problemDescription,
-          })) || [],
+      personalCareNeeds: personalCareNeeds
+        ?.filter(
+          careNeed =>
+            careNeed.problemStatus === 'ON' &&
+            healthCodes.includes(careNeed.problemType) &&
+            !excludedProblemCodes.includes(careNeed.problemCode) &&
+            !excludedProblemTypes.includes(careNeed.problemType),
+        )
+        .map(careNeed => ({
+          comment: careNeed.commentText,
+          startDate: careNeed.startDate,
+          type: careNeedType(careNeed.problemType),
+          description: careNeed.problemDescription,
+          reasonableAdjustments: mapReasonableAdjustmentToCareNeed(careNeed.personalCareNeedId),
+        })),
       reasonableAdjustments: reasonableAdjustments.map(adjustment => ({
         type: 'Support needed',
         description: adjustment.treatmentDescription,

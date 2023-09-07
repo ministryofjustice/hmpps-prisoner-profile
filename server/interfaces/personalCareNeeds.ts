@@ -4,6 +4,8 @@ export interface PersonalCareNeeds {
 }
 
 export interface PersonalCareNeed {
+  // Temporarily optional
+  personalCareNeedId?: number
   problemType: string
   problemCode: string
   problemStatus: string

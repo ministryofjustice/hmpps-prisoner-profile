@@ -376,6 +376,7 @@ export const inmateDetailMock: InmateDetail = {
   ],
   personalCareNeeds: [
     {
+      personalCareNeedId: 1,
       problemType: 'PHY',
       problemCode: 'FALS',
       problemStatus: 'I',
@@ -385,6 +386,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 2,
       problemType: 'PSYCH',
       problemCode: 'DEP',
       problemStatus: 'ON',
@@ -394,6 +396,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 3,
       problemType: 'PSYCH',
       problemCode: 'BIP',
       problemStatus: 'I',
@@ -403,6 +406,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 4,
       problemType: 'SC',
       problemCode: 'BAC',
       problemStatus: 'ON',
@@ -412,6 +416,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 5,
       problemType: 'MATSTAT',
       problemCode: 'NO9U18',
       problemStatus: 'ON',
@@ -421,6 +426,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 6,
       problemType: 'PHY',
       problemCode: 'DI',
       problemStatus: 'ON',
@@ -430,6 +436,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 7,
       problemType: 'DISAB',
       problemCode: 'LD',
       problemStatus: 'ON',
@@ -439,6 +446,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 8,
       problemType: 'SC',
       problemCode: 'BAC',
       problemStatus: 'I',
@@ -448,6 +456,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 9,
       problemType: 'PHY',
       problemCode: 'ASTH',
       problemStatus: 'I',
@@ -457,6 +466,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 10,
       problemType: 'DISAB',
       problemCode: 'VI',
       problemStatus: 'ON',
@@ -466,6 +476,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 11,
       problemType: 'DISAB',
       problemCode: 'NR',
       problemStatus: 'ON',
@@ -475,6 +486,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 12,
       problemType: 'PHY',
       problemCode: 'DI',
       problemStatus: 'ON',
@@ -484,6 +496,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 13,
       problemType: 'DISAB',
       problemCode: 'HDS',
       problemStatus: 'I',
@@ -493,6 +506,7 @@ export const inmateDetailMock: InmateDetail = {
       endDate: null,
     },
     {
+      personalCareNeedId: 14,
       problemType: 'SC',
       problemCode: 'TTG',
       problemStatus: 'I',
