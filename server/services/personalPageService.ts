@@ -375,9 +375,8 @@ export default class PersonalPageService {
   }
 
   private async getLearnerNeurodivergence(prisonerNumber: string) {
-    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
-      prisonerNumber,
-    )
+    const learnerNeurodivergence: LearnerNeurodivergence[] =
+      await this.curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
     return learnerNeurodivergence
   }
 }
