@@ -4,6 +4,7 @@ export interface PersonalCareNeeds {
 }
 
 export interface PersonalCareNeed {
+  personalCareNeedId: number
   problemType: string
   problemCode: string
   problemStatus: string

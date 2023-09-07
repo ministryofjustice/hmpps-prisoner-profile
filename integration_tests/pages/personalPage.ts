@@ -168,6 +168,15 @@ export default class PersonalPage extends Page {
         description: () => careNeedValue(row).findDataQa('description'),
         comment: () => careNeedValue(row).findDataQa('comment'),
         addedOn: () => careNeedValue(row).findDataQa('added-on'),
+        reasonableAdjustments: (adjustmentRow: number) => {
+          const adjustmentItem = careNeedItem(row).findDataQa('reasonable-adjustment').eq(adjustmentRow)
+          return {
+            description: () => adjustmentItem.findDataQa('adjustment-description'),
+            comment: () => adjustmentItem.findDataQa('adjustment-comment'),
+            addedBy: () => adjustmentItem.findDataQa('adjustment-added-by'),
+            addedOn: () => adjustmentItem.findDataQa('adjustment-added-on'),
+          }
+        },
       }),
       reasonableAdjustments: (row: number) => ({
         type: () => reasonableAdjustmentItem(row).findDataQa('reasonable-adjustment-key'),
