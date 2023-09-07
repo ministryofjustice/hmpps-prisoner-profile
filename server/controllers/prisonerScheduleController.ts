@@ -27,7 +27,7 @@ export default class PrisonerScheduleController {
 
     let schedule: GetEventScheduleItem[]
     const { when } = req.query
-    const { offenderNo } = req.params
+
     const { bookingId } = prisonerData
 
     if (when === 'nextWeek') {
@@ -123,7 +123,8 @@ export default class PrisonerScheduleController {
       pageTitle: 'Location details',
       ...mapHeaderNoBannerData(prisonerData),
       days: days,
-      name
+      name,
+      nextWeekStartDate: oneWeekToday
     })
   }
 }
