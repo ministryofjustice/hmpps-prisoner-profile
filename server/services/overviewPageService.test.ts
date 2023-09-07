@@ -43,7 +43,7 @@ import { convertToTitleCase } from '../utils/utils'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
-import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
+import { CaseLoadsDummyDataA, CaseLoadsDummyDataB } from '../data/localMockData/caseLoad'
 import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
 import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
@@ -140,22 +140,31 @@ describe('OverviewPageService', () => {
       expect(nonAssociationsApiClient.getNonAssociationDetails).toHaveBeenCalledWith(prisonerNumber)
     })
 
-    it('Converts the non-associations into the correct rows', async () => {
+    it('Maps the non-associations to correct shape', async () => {
       const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get('token', { prisonerNumber: 'ABC123' } as Prisoner, 1)
+      const res = await overviewPageService.get(
+        'token',
+        { prisonerNumber: 'ABC123' } as Prisoner,
+        1,
+        CaseLoadsDummyDataA,
+        [],
+      )
       expect(res.nonAssociations.length).toEqual(2)
-      const associationRowOne = res.nonAssociations[0]
-      const associationRowTwo = res.nonAssociations[1]
-      expect(associationRowOne[0].html).toContain('John Doe')
-      expect(associationRowOne[0].html).toContain('/prisoner/ABC123')
-      expect(associationRowOne[1].text).toEqual('ABC123')
-      expect(associationRowOne[2].text).toEqual('NMI-RECP')
-      expect(associationRowOne[3].text).toEqual('Victim')
-      expect(associationRowTwo[0].html).toContain('Guy Incognito')
-      expect(associationRowTwo[0].html).toContain('/prisoner/DEF321')
-      expect(associationRowTwo[1].text).toEqual('DEF321')
-      expect(associationRowTwo[2].text).toEqual('NMI-RECP')
-      expect(associationRowTwo[3].text).toEqual('Rival Gang')
+      const [associationOne, associationTwo] = res.nonAssociations
+      expect(associationOne).toEqual({
+        agencyId: 'MDI',
+        assignedLivingUnitDescription: 'NMI-RECP',
+        nonAssociationName: 'John Doe',
+        offenderNo: 'ABC123',
+        reasonDescription: 'Victim',
+      })
+      expect(associationTwo).toEqual({
+        agencyId: 'MDI',
+        assignedLivingUnitDescription: 'NMI-RECP',
+        nonAssociationName: 'Guy Incognito',
+        offenderNo: 'DEF321',
+        reasonDescription: 'Rival Gang',
+      })
     })
 
     it('Returns an empty list if no non-associations are returned', async () => {
@@ -658,6 +667,26 @@ describe('OverviewPageService', () => {
       const overviewPageService = await overviewPageServiceConstruct()
       const desc = await overviewPageService.getMainOffenceDescription(mainOffenceMock)
       expect(desc).toEqual(mainOffenceMock[0].offenceDescription)
+    })
+  })
+
+  describe('Alerts summary', () => {
+    it('should return active alerts count from inmate detail and non-Associations count from same establishment', async () => {
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataA, [])
+      expect(res.alertsSummary).toEqual({
+        activeAlertCount: 1,
+        nonAssociationsCount: 2,
+      })
+    })
+
+    it('should filter non-associations from different establishment', async () => {
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
+      expect(res.alertsSummary).toEqual({
+        activeAlertCount: 1,
+        nonAssociationsCount: 0,
+      })
     })
   })
 })

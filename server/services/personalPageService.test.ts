@@ -13,7 +13,7 @@ import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
 import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PersonalCareNeed } from '../interfaces/personalCareNeeds'
-import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
+import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { formatDate } from '../utils/dateHelpers'
@@ -22,6 +22,7 @@ import { addressSummaryMock } from '../data/localMockData/addressSummary'
 import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { curiousApiClientMock } from '../../tests/mocks/curiousApiClientMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
+import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -36,7 +37,16 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => [])
+    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) => {
+      switch (domain) {
+        case ReferenceCodeDomain.Health:
+          return mockReferenceDomains.health
+        case ReferenceCodeDomain.HealthTreatments:
+          return mockReferenceDomains.healthTreatment
+        default:
+          return []
+      }
+    })
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
@@ -464,6 +474,7 @@ describe('PersonalPageService', () => {
 
     describe('X-ray information', () => {
       const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
+        personalCareNeedId: 1,
         commentText: '',
         problemCode: 'BSC5.5',
         problemDescription: 'Body scan',
@@ -537,6 +548,7 @@ describe('PersonalPageService', () => {
     it('Only maps care needs with problem status ON', async () => {
       setPersonalCareNeeds([
         {
+          personalCareNeedId: 1,
           problemCode: 'code',
           problemStatus: 'ON',
           commentText: 'Comment text',
@@ -545,6 +557,7 @@ describe('PersonalPageService', () => {
           problemDescription: 'problem description',
         },
         {
+          personalCareNeedId: 2,
           problemCode: 'code',
           problemStatus: 'OFF',
           commentText: 'Comment text',
@@ -570,6 +583,7 @@ describe('PersonalPageService', () => {
     it('Doesnt map care needs without matching health codes', async () => {
       setPersonalCareNeeds([
         {
+          personalCareNeedId: 1,
           problemCode: 'code',
           problemStatus: 'ON',
           commentText: 'Comment text',
@@ -595,6 +609,7 @@ describe('PersonalPageService', () => {
     it('Doesnt map care needs with problem code NR', async () => {
       setPersonalCareNeeds([
         {
+          personalCareNeedId: 1,
           problemCode: 'NR',
           problemStatus: 'ON',
           commentText: 'Comment text',
@@ -620,6 +635,7 @@ describe('PersonalPageService', () => {
     it('Doesnt map care needs with problem type BSCAN', async () => {
       setPersonalCareNeeds([
         {
+          personalCareNeedId: 1,
           problemCode: 'BSC5.5',
           problemStatus: 'ON',
           commentText: 'Comment text',
@@ -645,6 +661,7 @@ describe('PersonalPageService', () => {
     it('Maps the personal care needs', async () => {
       setPersonalCareNeeds([
         {
+          personalCareNeedId: 1,
           problemCode: 'code',
           problemStatus: 'ON',
           commentText: 'Comment text',
@@ -702,10 +719,41 @@ describe('PersonalPageService', () => {
       ])
     })
 
-    it('Maps the reasonable adjustments', async () => {
+    it('Maps the reasonable adjustments to the matching care needs', async () => {
+      setPersonalCareNeeds([
+        {
+          personalCareNeedId: 1,
+          problemCode: 'code',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+        {
+          personalCareNeedId: 2,
+          problemCode: 'code',
+          problemStatus: 'ON',
+          commentText: 'Comment text',
+          problemType: 'TYPE',
+          startDate: 'start date',
+          problemDescription: 'problem description',
+        },
+      ])
+
+      setCodeReferences([
+        {
+          description: 'Code reference description',
+          code: 'TYPE',
+          activeFlag: 'Y',
+          domain: 'HEALTH',
+        },
+      ])
+
       prisonApiClient.getReasonableAdjustments = jest.fn(async () => ({
         reasonableAdjustments: [
           {
+            personalCareNeedId: 1,
             treatmentCode: 'BEH/BODY LAN',
             commentText: 'psych care type adjustment comment goes here',
             startDate: '1999-06-09',
@@ -717,9 +765,11 @@ describe('PersonalPageService', () => {
       }))
 
       const {
-        careNeeds: { reasonableAdjustments },
+        careNeeds: { personalCareNeeds },
       } = await constructService().get('token', PrisonerMockDataA)
 
+      const { reasonableAdjustments } = personalCareNeeds[0]
+      expect(personalCareNeeds[1].reasonableAdjustments.length).toEqual(0)
       expect(reasonableAdjustments.length).toEqual(1)
       expect(reasonableAdjustments[0].description).toEqual('Behavioural responses/Body language')
       expect(reasonableAdjustments[0].comment).toEqual('psych care type adjustment comment goes here')

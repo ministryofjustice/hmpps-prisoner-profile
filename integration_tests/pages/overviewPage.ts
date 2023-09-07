@@ -155,4 +155,12 @@ export default class OverviewPage extends Page {
   csraWithoutLink = (): PageElement => cy.get('[data-qa="prisoner-csra-info-without-link"]')
 
   csraWithLink = (): PageElement => cy.get(':nth-child(3) > [data-qa="prisoner-csra-info-with-link"]')
+
+  // Alerts summary
+  alertsSummary = () => ({
+    panel: (): PageElement => cy.get('[data-qa=overview-alerts-summary]'),
+    alertCount: (): PageElement => this.alertsSummary().panel().get('[data-qa=overview-active-alerts]'),
+    nonAssociationCount: (): PageElement =>
+      this.alertsSummary().panel().get('[data-qa=overview-non-association-count]'),
+  })
 }

@@ -31,6 +31,10 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
+import { AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
+import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
+import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
+import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
 import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
 import { GetEventScheduleItem } from '../../interfaces/prisonApi/getEventScheduleItem'
 
@@ -80,6 +84,10 @@ export interface PrisonApiClient {
   getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
   getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]>
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
+  getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails>
+  getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
+  getStaffDetails(staffId: string): Promise<StaffDetails>
+  getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
   getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]>

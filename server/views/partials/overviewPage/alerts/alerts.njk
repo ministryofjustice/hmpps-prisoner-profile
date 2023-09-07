@@ -1,0 +1,21 @@
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{%- call summaryCard({title: "Alerts and security"}) -%}
+
+<dl class="govuk-summary-list" data-qa="overview-alerts-summary">
+    <div class="govuk-summary-list__row">
+        <div class="govuk-!-padding-bottom-3 govuk-!-padding-top-2">
+            <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Active alerts</dt>
+            <dd class="govuk-!-margin-left-0 govuk-!-margin-bottom-2" data-qa="overview-active-alerts" >{{alertsSummary.activeAlertCount}}</dd>
+            <dd class="govuk-!-margin-left-0"><a href="/prisoner/${prisonerData.prisonerNumber}/alerts/active" class="govuk-link govuk-link--no-visited-state">Alerts</a></dd>
+        </div>
+    </div>
+    <div class="govuk-summary-list__row--no-border">
+        <div class="govuk-!-padding-top-3">
+            <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Non-associations in {{ user.activeCaseLoad.description }}</dt>
+            <dd class="govuk-!-margin-left-0" data-qa="overview-non-association-count">{{alertsSummary.nonAssociationsCount}}</dd>
+        </div>
+    </div>
+</dl>
+
+{%- endcall -%}

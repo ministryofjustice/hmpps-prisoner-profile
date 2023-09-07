@@ -18,10 +18,18 @@ export interface OverviewSchedule {
   linkUrl: string
 }
 
-export type OverviewNonAssociation = {
-  html?: string
-  text?: string
-}[]
+export interface OverviewNonAssociation {
+  nonAssociationName: string
+  offenderNo: string
+  assignedLivingUnitDescription: string
+  reasonDescription: string
+  agencyId: string
+}
+
+export interface AlertsSummary {
+  activeAlertCount: number
+  nonAssociationsCount: number
+}
 
 export interface OverviewPage {
   miniSummaryGroupA: MiniSummary[]
@@ -42,4 +50,5 @@ export interface OverviewPage {
   }
   prisonName: string
   staffRoles: string[]
+  alertsSummary: AlertsSummary
 }

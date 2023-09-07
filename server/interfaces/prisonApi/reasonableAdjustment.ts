@@ -1,4 +1,5 @@
 export interface ReasonableAdjustment {
+  personalCareNeedId: number
   treatmentCode?: string
   commentText?: string
   startDate?: string

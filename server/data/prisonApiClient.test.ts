@@ -30,6 +30,10 @@ import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
 import { mockStaffRoles } from './localMockData/staffRoles'
 import restClientBuilder from '.'
+import AgenciesMock from './localMockData/agenciesDetails'
+import OffenderCellHistoryMock from './localMockData/offenderCellHistoryMock'
+import StaffDetailsMock from './localMockData/staffDetails'
+import LocationsInmatesMock from './localMockData/locationsInmates'
 import { AlertForm } from '../interfaces/prisonApi/alert'
 import { alertTypesMock } from './localMockData/alertTypesMock'
 
@@ -299,6 +303,45 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/staff/${staffNumber}/${agencyId}/roles`, mockStaffRoles)
       const output = await prisonApiClient.getStaffRoles(staffNumber, agencyId)
       expect(output).toEqual(mockStaffRoles)
+    })
+  })
+
+  describe('getAgencyDetails', () => {
+    it('Should return data from the API', async () => {
+      const agencyId = 'Agency'
+      mockSuccessfulPrisonApiCall(`/api/agencies/${agencyId}?activeOnly=false`, AgenciesMock)
+      const output = await prisonApiClient.getAgencyDetails(agencyId)
+      expect(output).toEqual(AgenciesMock)
+    })
+  })
+
+  describe('getOffenderCellHistory', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(
+        `/api/bookings/${bookingId}/cell-history?${mapToQueryString({})}`,
+        OffenderCellHistoryMock,
+      )
+      const output = await prisonApiClient.getOffenderCellHistory(bookingId, {})
+      expect(output).toEqual(OffenderCellHistoryMock)
+    })
+  })
+
+  describe('getStaffDetails', () => {
+    it('Should return data from the API', async () => {
+      const staffId = '123456'
+      mockSuccessfulPrisonApiCall(`/api/users/${staffId}`, StaffDetailsMock)
+      const output = await prisonApiClient.getStaffDetails(staffId)
+      expect(output).toEqual(StaffDetailsMock)
+    })
+  })
+
+  describe('getInmatesAtLocation', () => {
+    it('Should return data from the API', async () => {
+      const locationId = 123456
+      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates?${mapToQueryString({})}`, LocationsInmatesMock)
+      const output = await prisonApiClient.getInmatesAtLocation(locationId, {})
+      expect(output).toEqual(LocationsInmatesMock)
     })
   })
 

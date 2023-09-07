@@ -108,6 +108,7 @@ export interface CareNeed {
   description: string
   comment: string
   startDate: string
+  reasonableAdjustments: ReasonableAdjustment[]
 }
 
 export interface ReasonableAdjustment {
@@ -120,7 +121,6 @@ export interface ReasonableAdjustment {
 
 export interface CareNeeds {
   personalCareNeeds: CareNeed[]
-  reasonableAdjustments: ReasonableAdjustment[]
 }
 
 export interface PersonalPage {

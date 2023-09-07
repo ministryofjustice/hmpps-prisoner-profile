@@ -10,6 +10,7 @@ import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
 import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
+import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -459,6 +460,42 @@ export const neurodiversityEnabled = (agencyId: string): boolean => {
   return isEnabled
 }
 
+export const stripAgencyPrefix = (location: string, agency: string): string => {
+  const parts = location && location.split('-')
+  if (parts && parts.length > 0) {
+    const index = parts.findIndex(p => p === agency)
+    if (index >= 0) {
+      return location.substring(parts[index].length + 1, location.length)
+    }
+  }
+
+  return null
+}
+
+export const formatLocation = (locationName: string): string => {
+  if (!locationName) return undefined
+  if (locationName.includes('RECP')) return 'Reception'
+  if (locationName.includes('CSWAP')) return 'No cell allocated'
+  if (locationName.includes('COURT')) return 'Court'
+  return locationName
+}
+
+export const isTemporaryLocation = (locationName: string): boolean => {
+  if (!locationName) return false
+  if (locationName.endsWith('RECP')) return true
+  if (locationName.endsWith('CSWAP')) return true
+  if (locationName.endsWith('COURT')) return true
+  if (locationName.endsWith('TAP')) return true
+  return false
+}
+
+export const extractLocation = (location: string, agencyId: string): string => {
+  if (!location || !agencyId) return undefined
+  const withoutAgency = stripAgencyPrefix(location, agencyId)
+  return formatLocation(withoutAgency)
+}
+
+// eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
 export const groupBy = (array: GetEventScheduleItem[], key: string) =>
   array &&
   array.reduce((acc, current) => {
@@ -477,3 +514,15 @@ export const times =
     }
     return iter(0)
   }
+export const hasLength = (array: unknown[]): boolean => array && array.length > 0
+
+type NonAssociationTableRow = [{ html: string }, { text: string }, { text: string }, { text: string }]
+export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]): NonAssociationTableRow[] =>
+  nonAssociations.map(na => [
+    {
+      html: `<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/${na.offenderNo}">${na.nonAssociationName}</a>`,
+    },
+    { text: na.offenderNo },
+    { text: na.assignedLivingUnitDescription },
+    { text: na.reasonDescription },
+  ])

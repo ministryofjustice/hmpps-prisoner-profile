@@ -3,6 +3,7 @@ import { addDays, startOfYear } from 'date-fns'
 import { PersonalCareNeed, PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 
 export const pregnantCareNeedMock: PersonalCareNeed = {
+  personalCareNeedId: 1,
   problemType: 'MATSTAT',
   problemCode: 'ACCU9',
   problemStatus: 'ON',
@@ -12,6 +13,7 @@ export const pregnantCareNeedMock: PersonalCareNeed = {
 }
 
 export const notPregnantCareNeedMock: PersonalCareNeed = {
+  personalCareNeedId: 1,
   problemType: 'MATSTAT',
   problemCode: 'NU9',
   problemStatus: 'I',
@@ -27,6 +29,7 @@ export const personalCareNeedsMock: PersonalCareNeeds = {
 }
 
 const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
+  personalCareNeedId: 1,
   commentText: 'There was a body scan',
   problemCode: 'BSC5.5',
   problemDescription: 'Body scan',
@@ -44,6 +47,7 @@ export const xrayCareNeedsMock: PersonalCareNeeds = {
   offenderNo: 'string',
   personalCareNeeds: [
     {
+      personalCareNeedId: 1,
       problemType: 'MATSTAT',
       problemCode: 'ACCU9',
       problemStatus: 'ON',
@@ -53,6 +57,7 @@ export const xrayCareNeedsMock: PersonalCareNeeds = {
       endDate: '2010-06-21',
     },
     {
+      personalCareNeedId: 2,
       problemType: 'MATSTAT',
       problemCode: 'ACCU9',
       problemStatus: 'ON',
@@ -62,6 +67,7 @@ export const xrayCareNeedsMock: PersonalCareNeeds = {
       endDate: '2010-06-21',
     },
     {
+      personalCareNeedId: 3,
       problemType: 'MATSTAT',
       problemCode: 'ACCU9',
       problemStatus: 'ON',
@@ -71,6 +77,7 @@ export const xrayCareNeedsMock: PersonalCareNeeds = {
       endDate: '2010-06-21',
     },
     {
+      personalCareNeedId: 4,
       problemType: 'MATSTAT',
       problemCode: 'ACCU9',
       problemStatus: 'ON',
@@ -86,6 +93,7 @@ export const xrayCareNeedsASCMock: PersonalCareNeeds = {
   offenderNo: 'string',
   personalCareNeeds: [
     {
+      personalCareNeedId: 4,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -95,6 +103,7 @@ export const xrayCareNeedsASCMock: PersonalCareNeeds = {
       startDate: '2007-04-17',
     },
     {
+      personalCareNeedId: 1,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -104,6 +113,7 @@ export const xrayCareNeedsASCMock: PersonalCareNeeds = {
       startDate: '2010-06-21',
     },
     {
+      personalCareNeedId: 3,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -113,6 +123,7 @@ export const xrayCareNeedsASCMock: PersonalCareNeeds = {
       startDate: '2011-07-22',
     },
     {
+      personalCareNeedId: 2,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -128,6 +139,7 @@ export const xrayCareNeedsDESCMock: PersonalCareNeeds = {
   offenderNo: 'string',
   personalCareNeeds: [
     {
+      personalCareNeedId: 2,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -137,6 +149,7 @@ export const xrayCareNeedsDESCMock: PersonalCareNeeds = {
       startDate: '2012-08-23',
     },
     {
+      personalCareNeedId: 3,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -146,6 +159,7 @@ export const xrayCareNeedsDESCMock: PersonalCareNeeds = {
       startDate: '2011-07-22',
     },
     {
+      personalCareNeedId: 1,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',
@@ -155,6 +169,7 @@ export const xrayCareNeedsDESCMock: PersonalCareNeeds = {
       startDate: '2010-06-21',
     },
     {
+      personalCareNeedId: 4,
       commentText: 'a comment',
       endDate: '2010-06-21',
       problemCode: 'ACCU9',

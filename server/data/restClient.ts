@@ -76,7 +76,7 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
-      if (ignore404 && error.response.status === 404) {
+      if (ignore404 && error.response?.status === 404) {
         logger.info(`Returned null for 404 not found when calling ${this.name}: ${path}`)
         return null
       }

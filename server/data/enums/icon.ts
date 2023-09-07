@@ -8,4 +8,6 @@ export enum Icon {
   ManageCategory = 'manage-category',
   AddKeyWorkerSession = 'add-key-worker-session',
   CalculateReleaseDates = 'calculate-release-dates',
+  ChangeCell = 'change-cell',
+  LogActivityApplication = 'log-an-activity-appointment',
 }
