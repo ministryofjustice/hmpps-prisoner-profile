@@ -360,13 +360,6 @@ export default class PersonalPageService {
           description: careNeed.problemDescription,
           reasonableAdjustments: mapReasonableAdjustmentToCareNeed(careNeed.personalCareNeedId),
         })),
-      reasonableAdjustments: reasonableAdjustments.map(adjustment => ({
-        type: 'Support needed',
-        description: adjustment.treatmentDescription,
-        startDate: adjustment.startDate,
-        comment: adjustment.commentText,
-        agency: adjustment.agencyDescription,
-      })),
     }
   }
 
@@ -382,8 +375,9 @@ export default class PersonalPageService {
   }
 
   private async getLearnerNeurodivergence(prisonerNumber: string) {
-    const learnerNeurodivergence: LearnerNeurodivergence[] =
-      await this.curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
+    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
+      prisonerNumber,
+    )
     return learnerNeurodivergence
   }
 }

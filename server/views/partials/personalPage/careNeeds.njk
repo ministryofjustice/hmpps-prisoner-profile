@@ -12,28 +12,26 @@
     <p class="govuk-body-s hmpps-secondary-text" data-qa="added-on">Added on {{ info.startDate | formatDate }}</p>
   {% endif %}
 
-  {% if showReasonableAdjustmentsWithCareNeeds %}
-    {% if info.reasonableAdjustments.length > 0 %}
-      <details class="govuk-details" data-module="govuk-details" data-qa="reasonable-adjustments-list">
-        <summary class="govuk-details__summary">
-          <span class="govuk-details__summary-text">Support given</span>
-        </summary>
-        {% for adjustment in info.reasonableAdjustments %}
-          <div class="govuk-details__text" data-qa="reasonable-adjustment">
-            <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold" data-qa="adjustment-description">
-              {{ adjustment.description }}
-            </p>
-            <p class="govuk-body govuk-!-margin-bottom-1" data-qa="adjustment-comment">{{ adjustment.comment }}</p>
-            <p class="govuk-body-s  hmpps-secondary-text govuk-!-margin-bottom-1" data-qa="adjustment-added-by">
-              Added by {{ adjustment.agency }} on
-            </p>
-            <p class="govuk-body-s hmpps-secondary-text" data-qa="adjustment-added-on">
-              {{ adjustment.startDate | formatDate }}
-            </p>
-          </div>
-        {% endfor %}
-      </details>
-    {% endif %}
+  {% if info.reasonableAdjustments.length > 0 %}
+    <details class="govuk-details" data-module="govuk-details" data-qa="reasonable-adjustments-list">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Support given</span>
+      </summary>
+      {% for adjustment in info.reasonableAdjustments %}
+        <div class="govuk-details__text" data-qa="reasonable-adjustment">
+          <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold" data-qa="adjustment-description">
+            {{ adjustment.description }}
+          </p>
+          <p class="govuk-body govuk-!-margin-bottom-1" data-qa="adjustment-comment">{{ adjustment.comment }}</p>
+          <p class="govuk-body-s  hmpps-secondary-text govuk-!-margin-bottom-1" data-qa="adjustment-added-by">
+            Added by {{ adjustment.agency }} on
+          </p>
+          <p class="govuk-body-s hmpps-secondary-text" data-qa="adjustment-added-on">
+            {{ adjustment.startDate | formatDate }}
+          </p>
+        </div>
+      {% endfor %}
+    </details>
   {% endif %}
 {% endmacro %}
 {%- call summaryCard({title: "Care needs", id: "care-needs"}) -%}
@@ -44,11 +42,6 @@
           {% for need in careNeeds.personalCareNeeds %}
             {{ summaryListRow(need.type, careNeed(need), "care-need") }}
           {% endfor %}
-          {% if not showReasonableAdjustmentsWithCareNeeds %}
-            {% for need in careNeeds.reasonableAdjustments %}
-              {{ summaryListRow(need.type, careNeed(need), "reasonable-adjustment") }}
-            {% endfor %}
-          {% endif %}
         </dl>
       {% else %}
         <p>No care needs have been entered.</p>

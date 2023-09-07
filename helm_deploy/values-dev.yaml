@@ -43,7 +43,6 @@ generic-service:
     ACTIVITIES_ENABLED_PRISONS: "LEI,RSI"
     APPOINTMENTS_URL: "https://activities-dev.prison.service.justice.gov.uk/appointments"
     APPOINTMENTS_ENABLED_PRISONS: "LEI,RSI"
-    JOINED_UP_REASONABLE_ADJUSTMENTS: "true"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

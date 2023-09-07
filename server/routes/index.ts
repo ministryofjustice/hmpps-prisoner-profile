@@ -85,7 +85,6 @@ export default function routes(services: Services): Router {
         pageTitle: 'Personal',
         ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'personal'),
         ...personalPageData,
-        showReasonableAdjustmentsWithCareNeeds: config.features.joinedUpReasonableAdjustments === 'true',
       })
     },
   )

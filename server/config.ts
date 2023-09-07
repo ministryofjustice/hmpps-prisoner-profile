@@ -187,7 +187,4 @@ export default {
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
-  features: {
-    joinedUpReasonableAdjustments: get('JOINED_UP_REASONABLE_ADJUSTMENTS', false),
-  },
 }

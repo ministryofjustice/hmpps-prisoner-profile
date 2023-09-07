@@ -719,62 +719,6 @@ describe('PersonalPageService', () => {
       ])
     })
 
-    describe('TEMP: Handling feature toggle', () => {
-      it('Support reasonable adjustments without care need IDs', async () => {
-        setPersonalCareNeeds([
-          {
-            problemCode: 'code',
-            problemStatus: 'ON',
-            commentText: 'Comment text',
-            problemType: 'TYPE',
-            startDate: 'start date',
-            problemDescription: 'problem description',
-          },
-          {
-            problemCode: 'code',
-            problemStatus: 'ON',
-            commentText: 'Comment text',
-            problemType: 'TYPE',
-            startDate: 'start date',
-            problemDescription: 'problem description',
-          },
-        ])
-
-        setCodeReferences([
-          {
-            description: 'Code reference description',
-            code: 'TYPE',
-            activeFlag: 'Y',
-            domain: 'HEALTH',
-          },
-        ])
-
-        prisonApiClient.getReasonableAdjustments = jest.fn(async () => ({
-          reasonableAdjustments: [
-            {
-              treatmentCode: 'BEH/BODY LAN',
-              commentText: 'psych care type adjustment comment goes here',
-              startDate: '1999-06-09',
-              agencyId: 'MDI',
-              agencyDescription: 'Moorland (HMP & YOI)',
-              treatmentDescription: 'Behavioural responses/Body language',
-            },
-          ],
-        }))
-
-        const {
-          careNeeds: { personalCareNeeds, reasonableAdjustments },
-        } = await constructService().get('token', PrisonerMockDataA)
-
-        expect(personalCareNeeds[0].reasonableAdjustments.length).toEqual(0)
-        expect(personalCareNeeds[1].reasonableAdjustments.length).toEqual(0)
-        expect(reasonableAdjustments.length).toEqual(1)
-        expect(reasonableAdjustments[0].description).toEqual('Behavioural responses/Body language')
-        expect(reasonableAdjustments[0].comment).toEqual('psych care type adjustment comment goes here')
-        expect(reasonableAdjustments[0].startDate).toEqual('1999-06-09')
-        expect(reasonableAdjustments[0].agency).toEqual('Moorland (HMP & YOI)')
-      })
-    })
     it('Maps the reasonable adjustments to the matching care needs', async () => {
       setPersonalCareNeeds([
         {

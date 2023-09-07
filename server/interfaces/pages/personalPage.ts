@@ -121,7 +121,6 @@ export interface ReasonableAdjustment {
 
 export interface CareNeeds {
   personalCareNeeds: CareNeed[]
-  reasonableAdjustments: ReasonableAdjustment[]
 }
 
 export interface PersonalPage {
