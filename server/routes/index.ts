@@ -164,9 +164,7 @@ export default function routes(services: Services): Router {
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
-      const prisonerScheduleController = new PrisonerScheduleController(
-        services.dataAccess.prisonApiClientBuilder,
-      )
+      const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
     },
   )

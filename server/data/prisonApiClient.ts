@@ -303,7 +303,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]> {
-    return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/nextWeek`})
+    return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/nextWeek` })
   }
-
 }

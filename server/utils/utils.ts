@@ -1,4 +1,3 @@
-import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
@@ -10,6 +9,7 @@ import { Prisoner } from '../interfaces/prisoner'
 import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
+import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -39,7 +39,7 @@ export const initialiseName = (fullName?: string): string | null => {
  * Converts a ScheduleItem into a string displaying the time in the format
  * StartTime to EndTime
  */
-export const formatScheduleItem = (scheduleItem: ScheduleItem): string => {
+export const formatScheduleItem = (scheduleItem: GetEventScheduleItem): string => {
   if (scheduleItem.startTime) {
     const times = [scheduleItem.startTime]
     if (scheduleItem.endTime) times.push(scheduleItem.endTime)
@@ -459,14 +459,13 @@ export const neurodiversityEnabled = (agencyId: string): boolean => {
   return isEnabled
 }
 
-export const groupBy = (array: any[], key: string) =>
+export const groupBy = (array: GetEventScheduleItem[], key: string) =>
   array &&
   array.reduce((acc, current) => {
     const group = current[key]
 
     return { ...acc, [group]: [...(acc[group] || []), current] }
   }, {})
-
 
 export const times =
   (number: number) =>
@@ -477,4 +476,4 @@ export const times =
       iter(index + 1)
     }
     return iter(0)
-}
+  }
