@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { Prisoner } from '../interfaces/prisoner'
 import { extractLocation, formatName, groupBy, hasLength, isTemporaryLocation, userHasRoles } from '../utils/utils'
-import { formatDate, formatDateTime } from '../utils/dateHelpers'
+import { formatDate, formatDateTime, formatDateTimeISO } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
@@ -72,27 +72,29 @@ export default class PrisonerCellHistoryController {
 
       const page = 0
       const cells = await this.prisonApiClient.getOffenderCellHistory(bookingId, { page, size: 10000 })
-      const agencyData = await this.prisonApiClient.getAgencyDetails((await cells).content[page].agencyId)
-      const staff = await Promise.all(
-        (await cells).content.map(cell => this.prisonApiClient.getStaffDetails(cell.movementMadeBy)),
+
+      const uniqueAgencyIds = [...new Set(cells.content.map(cell => cell.agencyId))]
+      const prisons = await Promise.all(
+        uniqueAgencyIds.map(agencyId => this.prisonApiClient.getAgencyDetails(agencyId)),
       )
+
+      const uniqueStaffIds = [...new Set(cells.content.map(cell => cell.movementMadeBy))]
+      const staff = await Promise.all(uniqueStaffIds.map(staffId => this.prisonApiClient.getStaffDetails(staffId)))
 
       const cellData = cells.content.map(cell => {
         const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
         const agencyName = cell.agencyId
-        const agency = agencyData
+        const agency = prisons.find(prison => cell.agencyId === prison.agencyId)
         const agencyDescription = agency ? agency.description : null
 
         return {
           establishment: agencyDescription,
           location: extractLocation(cell.description, agencyName),
           isTemporaryLocation: isTemporaryLocation(cell.description),
-          movedIn: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short'),
-          movedOut: cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short'),
-          assignmentDateTime: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short'),
-          assignmentEndDateTime: cell.assignmentEndDateTime
-            ? cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short')
-            : undefined,
+          movedIn: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short', ' - '),
+          movedOut: cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short', ' - '),
+          assignmentDateTime: cell.assignmentDateTime,
+          assignmentEndDateTime: cell.assignmentEndDateTime,
           livingUnitId: cell.livingUnitId,
           agencyId: agencyName,
           movedInBy: formatName(staffDetails.firstName, '', staffDetails.lastName),
@@ -100,10 +102,13 @@ export default class PrisonerCellHistoryController {
       })
 
       const cellDataLatestFirst = cellData.sort(
-        (a, b) => new Date(a.assignmentDateTime).getTime() - new Date(b.assignmentDateTime).getTime(),
+        (a, b) => new Date(b.assignmentDateTime).getTime() - new Date(a.assignmentDateTime).getTime(),
       )
 
       const currentLocation = cellDataLatestFirst[0]
+      if (!currentLocation.assignmentEndDateTime) {
+        currentLocation.assignmentEndDateTime = formatDateTimeISO(new Date())
+      }
       const occupants =
         (currentLocation && (await this.prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
 
@@ -118,10 +123,7 @@ export default class PrisonerCellHistoryController {
         cellHistoryGroupedByAgency: hasLength(previousLocations)
           ? getCellHistoryGroupedByPeriodAtAgency(previousLocations)
           : [],
-        currentLocation: {
-          ...currentLocation,
-          assignmentEndDateTime: undefined,
-        },
+        currentLocation,
         occupants: occupants
           .filter(occupant => occupant.offenderNo !== offenderNo)
           .map(occupant => ({

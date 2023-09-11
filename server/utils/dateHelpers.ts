@@ -101,16 +101,25 @@ export const formatDate = (isoDate: string, style: 'short' | 'full' | 'long' | '
  *
  * @param isoDate ISO-8601 format date string
  * @param style formatting style to use - long (default), short, full, medium
+ * @param separator separator between date and time - default ' ' for short or ' at ' for others
  * @returns formatted datetime string
  */
-export const formatDateTime = (isoDate: string, style: 'short' | 'full' | 'long' | 'medium' = 'long'): string => {
+export const formatDateTime = (
+  isoDate: string,
+  style: 'short' | 'full' | 'long' | 'medium' = 'long',
+  separator: string = undefined,
+): string => {
   if (!isoDate) return ''
 
   let datetimeStr = new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })
-  if (style === 'short') {
-    datetimeStr += ' '
+  if (!separator) {
+    if (style === 'short') {
+      datetimeStr += ' '
+    } else {
+      datetimeStr += ' at '
+    }
   } else {
-    datetimeStr += ' at '
+    datetimeStr += separator
   }
   datetimeStr += new Date(isoDate).toLocaleTimeString('en-gb', { hour: '2-digit', minute: '2-digit' })
   return datetimeStr
