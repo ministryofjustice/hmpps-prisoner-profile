@@ -73,13 +73,11 @@ export default class PrisonerCellHistoryController {
       const page = 0
       const cells = await this.prisonApiClient.getOffenderCellHistory(bookingId, { page, size: 10000 })
 
-      const uniqueAgencyIds = [...new Set(cells.content.map(cell => cell.agencyId))]
-      const prisons = await Promise.all(
-        uniqueAgencyIds.map(agencyId => this.prisonApiClient.getAgencyDetails(agencyId)),
-      )
+      const uniqueAgencyIds = [...new Set(cells.content.filter(cell => cell.agencyId).map(cell => cell.agencyId))]
+      const prisons = await Promise.all(uniqueAgencyIds.map(this.prisonApiClient.getAgencyDetails))
 
       const uniqueStaffIds = [...new Set(cells.content.map(cell => cell.movementMadeBy))]
-      const staff = await Promise.all(uniqueStaffIds.map(staffId => this.prisonApiClient.getStaffDetails(staffId)))
+      const staff = await Promise.all(uniqueStaffIds.map(this.prisonApiClient.getStaffDetails))
 
       const cellData = cells.content.map(cell => {
         const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
