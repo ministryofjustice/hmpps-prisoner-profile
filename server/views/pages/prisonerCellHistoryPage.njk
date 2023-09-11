@@ -37,7 +37,7 @@
   </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter"><h2 class="govuk-!-font-size-36">Current location</h1></div>
+        <div class="govuk-grid-column-one-quarter"><h2 class="govuk-!-font-size-36">Current location</h2></div>
         <div class="govuk-grid-column-three-quarters">
         {% if canViewCellMoveButton %}
             <div class="hmpps-action-header">
@@ -98,7 +98,7 @@
         ]), rows) %}
       {% endfor %}
 
-      <h3 class="govuk-heading-m" data-test="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agency.datePeriod }}</span></h2>
+      <h3 class="govuk-heading-m" data-test="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agency.datePeriod }}</span></h3>
 
       {{ govukTable({
         head: [
@@ -112,14 +112,14 @@
         attributes: { "data-test": "prisoner-cell-history" }
       }) }}
     {% else %}
-      <h3 class="govuk-heading-m" data-test="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agency.datePeriod }}</span></h2>
+      <h3 class="govuk-heading-m" data-test="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agency.datePeriod }}</span></h3>
     {% endif %}
   {% endfor %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <p class="govuk-body">
-        <a class="govuk-link" href={{ profileUrl }} data-test="back-link">Return to prisoner profile</a>
+        <a class="govuk-link" href="{{ profileUrl }}" data-test="back-link">Return to prisoner's profile</a>
       </p>
     </div>
   </div>
