@@ -24,7 +24,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
       hiddenLabel: 'View location details',
       info: prisonerData.cellLocation,
       classes: '',
-      url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/cell-history`,
+      url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
     })
   }
 

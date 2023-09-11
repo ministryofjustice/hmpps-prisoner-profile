@@ -72,16 +72,16 @@
   }
 
   &__title {
-    font-size: 19px;
+    font-size: 24px;
     font-weight: bold;
     color: $govuk-text-colour;
     margin-bottom: 30px;
   }
 
   &__amendments-header {
-    font-size: 16px;
+    font-size: 19px;
     font-weight: bold;
-    color: govuk-colour('dark-grey');
+    color: govuk-colour('black');
     margin-top: 15px;
   }
 
@@ -115,7 +115,7 @@
   }
 
   &__metadata {
-    font-size: 16px;
+    font-size: 19px;
     font-weight: 300;
     color: $govuk-text-colour;
   }

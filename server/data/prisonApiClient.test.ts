@@ -309,7 +309,7 @@ describe('prisonApiClient', () => {
   describe('getAgencyDetails', () => {
     it('Should return data from the API', async () => {
       const agencyId = 'Agency'
-      mockSuccessfulPrisonApiCall(`/api/agencies/${agencyId}?activeOnly=false`, AgenciesMock)
+      mockSuccessfulPrisonApiCall(`/api/agencies/${agencyId}`, AgenciesMock)
       const output = await prisonApiClient.getAgencyDetails(agencyId)
       expect(output).toEqual(AgenciesMock)
     })
