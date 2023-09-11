@@ -19,14 +19,14 @@
                 </a>
             </div>
         {% endif %}
-        <div class="hmpps-case-note-card-list-item__metadata">Happened: {{ caseNote.occurrenceDateTime | formatDateTime('full') }}</div>
-        <div class="hmpps-case-note-card-list-item__metadata">Created: {{ caseNote.creationDateTime | formatDateTime('full') }} by {{ caseNote.authorName }}</div>
+        <div class="hmpps-case-note-card-list-item__metadata"><span class='govuk-!-font-weight-bold'>Happened:</span> {{ caseNote.occurrenceDateTime | formatDateTime('full') }}</div>
+        <div class="hmpps-case-note-card-list-item__metadata"><span class='govuk-!-font-weight-bold'>Created:</span> {{ caseNote.creationDateTime | formatDateTime('full') }} by {{ caseNote.authorName }}</div>
         {% if caseNote.amendments.length %}
             <div class="hmpps-case-note-card-list-item__amendments-header">More details added:</div>
             {% for amendment in caseNote.amendments %}
                 <div class="hmpps-case-note-card-list-item__amendment">
                     <pre class="hmpps-case-note-card-list-item__notes govuk-body">{{ amendment.additionalNoteText }}</pre>
-                    <div class="hmpps-case-note-card-list-item__metadata">Added: {{ amendment.creationDateTime | formatDateTime('full') }} by {{ amendment.authorName }}</div>
+                    <div class="hmpps-case-note-card-list-item__metadata"><span class='govuk-!-font-weight-bold'>Added:</span> {{ amendment.creationDateTime | formatDateTime('full') }} by {{ amendment.authorName }}</div>
                 </div>
             {% endfor %}
         {% endif %}
