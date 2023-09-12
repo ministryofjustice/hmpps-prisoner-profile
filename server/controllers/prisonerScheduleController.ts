@@ -114,7 +114,7 @@ export default class PrisonerScheduleController {
     }))
 
     return res.render('pages/prisonerSchedule', {
-      pageTitle: 'Location details',
+      pageTitle: 'Schedule',
       ...mapHeaderNoBannerData(prisonerData),
       days,
       name,

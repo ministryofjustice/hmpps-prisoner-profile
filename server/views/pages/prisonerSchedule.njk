@@ -35,19 +35,25 @@
     <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{name |  apostrophe}} schedule</h1>
     <p class="govuk-body govuk-!-font-size-24" data-test="schedule-dates">{{ firstDay.date }} to {{ lastDay.date }}</p>
 
-    <div>
-      {{ printLink() }}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+          {% set linkText = 'View 7 days from ' + nextWeekStartDate if when === nextWeek   else 'View 7 days from today'  %}
+          {% set linkLocation = './schedule?when=nextWeek' if when === nextWeek else './schedule'  %}
+
+          <a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ linkLocation }}" data-test="schedule-select-week">
+            {{ linkText }}
+          </a>
+        </div>
+        <div class="govuk-grid-column-three-quarters govuk-!-text-align-right">
+          <div>
+            {{ printLink() }}
+          </div>
+        </div>
     </div>
 
-    {% set linkText = 'View 7 days from ' + nextWeekStartDate if when === nextWeek   else 'View 7 days from today'  %}
-    
-    {% set linkLocation = './schedule?when=nextWeek' if when === nextWeek else './schedule'  %}
 
-    <a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ linkLocation }}" data-test="schedule-select-week">
-      {{ linkText }}
-    </a>
-
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
 
     {% for day in days %}
       <div class="prisoner-schedule__day" data-test="schedule-day">
