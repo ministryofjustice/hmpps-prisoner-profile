@@ -1,0 +1,95 @@
+{% from "../macros/printLink.njk" import printLink %}
+{% from "../macros/prisonerScheduledActivities.njk" import scheduledActivities %}
+
+{% extends "./index.njk" %}
+
+{% set title = 'Schedule' %}
+{% set htmlClasses = "printed-page" %}
+
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
+  },  
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
+
+{% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })
+        }}
+    {% endif %}
+
+{% block content %}
+  {% set firstDay = days | first %}
+  {% set lastDay = days | last %}
+  <div class="prisoner-schedule">
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{name |  apostrophe}} schedule</h1>
+    <p class="govuk-body govuk-!-font-size-24" data-test="schedule-dates">{{ firstDay.date }} to {{ lastDay.date }}</p>
+
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+          {% set linkText = 'View 7 days from ' + nextWeekStartDate if when === nextWeek   else 'View 7 days from today'  %}
+          {% set linkLocation = "/prisoner/" + prisonerNumber +  '/schedule?when=nextWeek' if when === nextWeek else './schedule'  %}
+
+          <a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ linkLocation | prependBaseUrl }}" data-test="schedule-select-week">
+            {{ linkText }}
+          </a>
+        </div>
+        <div class="govuk-grid-column-three-quarters govuk-!-text-align-right">
+          <div>
+            {{ printLink() }}
+          </div>
+        </div>
+    </div>
+
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
+
+    {% for day in days %}
+      <div class="prisoner-schedule__day" data-test="schedule-day">
+        <h2 class="govuk-heading-m">{{ day.date }}</h2>
+
+        <div class="prisoner-schedule__periods">
+          <div class="prisoner-schedule__periods__period" data-test="schedule-period">
+            <h3 class="govuk-heading-s">Morning</h3>
+            <div class="prisoner-schedule-events prisoner-schedule-events--morning govuk-body" data-test="schedule-morning-events">
+              {{ scheduledActivities(day.periods.morningActivities) }}
+            </div>
+          </div>
+
+          <div class="prisoner-schedule__periods__period">
+            <h3 class="govuk-heading-s">Afternoon</h3>
+            <div class="prisoner-schedule-events prisoner-schedule-events--afternoon govuk-body" data-test="schedule-afternoon-events">
+              {{ scheduledActivities(day.periods.afternoonActivities) }}
+            </div>
+          </div>
+
+          <div class="prisoner-schedule__periods__period">
+            <h3 class="govuk-heading-s">Evening</h3>
+            <div class="prisoner-schedule-events prisoner-schedule-events--evening govuk-body" data-test="schedule-evening-events">
+              {{ scheduledActivities(day.periods.eveningActivities) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if not loop.last %}
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+      {% endif %}
+    {% endfor %}
+
+    {{ printLink() }}
+  </div>
+{% endblock %}
+
+{% endblock %}

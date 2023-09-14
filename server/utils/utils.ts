@@ -1,4 +1,3 @@
-import { ScheduleItem } from '../data/overviewPage'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
@@ -10,6 +9,7 @@ import { Prisoner } from '../interfaces/prisoner'
 import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
+import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
 import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 
 const properCase = (word: string): string =>
@@ -40,7 +40,7 @@ export const initialiseName = (fullName?: string): string | null => {
  * Converts a ScheduleItem into a string displaying the time in the format
  * StartTime to EndTime
  */
-export const formatScheduleItem = (scheduleItem: ScheduleItem): string => {
+export const formatScheduleItem = (scheduleItem: GetEventScheduleItem): string => {
   if (scheduleItem.startTime) {
     const times = [scheduleItem.startTime]
     if (scheduleItem.endTime) times.push(scheduleItem.endTime)
@@ -496,13 +496,24 @@ export const extractLocation = (location: string, agencyId: string): string => {
 }
 
 // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
-export const groupBy = (array: any[], key: string): Record<string, unknown> =>
+export const groupBy = (array: GetEventScheduleItem[], key: string) =>
   array &&
   array.reduce((acc, current) => {
     const group = current[key]
 
     return { ...acc, [group]: [...(acc[group] || []), current] }
   }, {})
+
+export const times =
+  (number: number) =>
+  (func: (index: unknown) => unknown): void => {
+    const iter = (index: number) => {
+      if (index === number) return
+      func(index)
+      iter(index + 1)
+    }
+    return iter(0)
+  }
 
 export const hasLength = (array: unknown[]): boolean => array && array.length > 0
 

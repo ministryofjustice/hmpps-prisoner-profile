@@ -36,6 +36,7 @@ import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHist
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
 import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
 import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
+import { GetEventScheduleItem } from '../../interfaces/prisonApi/getEventScheduleItem'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -89,4 +90,6 @@ export interface PrisonApiClient {
   getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
+  getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]>
+  getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]>
 }
