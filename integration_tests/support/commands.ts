@@ -116,3 +116,17 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubGetIdentifiers', bookingId)
   cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
 })
+
+Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
+  cy.task('stubPrisonerData', { prisonerNumber })
+  cy.task('stubInmateDetail', bookingId)
+  cy.task('stubAssessments', bookingId)
+  cy.task('stubAccountBalances', bookingId)
+  cy.task('stubAgencyDetails', prisonId)
+  cy.task('stubSpendsTransactions', prisonerNumber)
+  cy.task('stubPrivateCashTransactions', prisonerNumber)
+  cy.task('stubSpendsHOATransactions', prisonerNumber)
+  cy.task('stubSpendsWHFTransactions', prisonerNumber)
+  cy.task('stubSavingsTransactions', prisonerNumber)
+  cy.task('stubDamageObligations', prisonerNumber)
+})

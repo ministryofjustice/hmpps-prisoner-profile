@@ -9,4 +9,14 @@ const AgencyMock: Agency = {
   courtType: 'CC',
 }
 
+// Prison
+export const agencyDetailsMock: Agency = {
+  agencyId: 'LEI',
+  description: 'Leeds (HMP)',
+  active: true,
+  agencyType: 'INST',
+  courtType: 'CC',
+  longDescription: 'Leeds (HMP)',
+}
+
 export default AgencyMock

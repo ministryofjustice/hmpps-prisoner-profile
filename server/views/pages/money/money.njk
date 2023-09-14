@@ -1,0 +1,20 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: breadcrumbPrisonerName,
+        href: "/prisoner/" + prisonerNumber
+    }
+] %}
+
+{% set mainClasses = "govuk-body" %}
+{% block content %}
+    {% include "./moneyHeader.njk" %}
+    {% block body %}{% endblock %}
+    <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}" data-qa="money-back-link">Return to prisoner's profile</a>
+{% endblock %}

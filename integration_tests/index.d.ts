@@ -32,7 +32,7 @@ declare global {
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
         caseLoads?: CaseLoad[]
-      })
+      }): Chainable<AUTWindow>
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates: boolean }): Chainable<AUTWindow>
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
@@ -44,6 +44,7 @@ declare global {
       getDataQa(id: string): Chainable<JQuery<HTMLElement>>
       findDataQa(id: string): Chainable<JQuery<HTMLElement>>
       setupActivePunishmentsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+      setupMoneyStubs(options: { prisonerNumber: string; bookingId: number; prisonId: string }): Chainable<AUTWindow>
     }
   }
 }

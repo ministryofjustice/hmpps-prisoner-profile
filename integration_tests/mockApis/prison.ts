@@ -59,6 +59,15 @@ import {
   SentenceSummaryWithSentenceMock,
 } from '../../server/data/localMockData/sentenceSummaryMock'
 import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
+import AgenciesMock from '../../server/data/localMockData/agenciesDetails'
+import {
+  cashHOATransactionsMock,
+  cashTransactionsMock,
+  cashWHFTransactionsMock,
+  savingsTransactionsMock,
+  transactionsMock,
+} from '../../server/data/localMockData/transactionsMock'
+import { damageObligationContainerMock } from '../../server/data/localMockData/damageObligationsMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -842,6 +851,149 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: pagedActiveAlertsMock.content[0],
+      },
+    })
+  },
+
+  stubAgencyDetails: (prisonId: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/agencies/${prisonId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: AgenciesMock,
+      },
+    })
+  },
+
+  stubSpendsTransactions: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/transaction-history.*`,
+        queryParameters: {
+          account_code: {
+            equalTo: 'spends',
+          },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: transactionsMock,
+      },
+    })
+  },
+
+  stubPrivateCashTransactions: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/transaction-history.*`,
+        queryParameters: {
+          account_code: {
+            equalTo: 'cash',
+          },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: cashTransactionsMock,
+      },
+    })
+  },
+
+  stubSpendsHOATransactions: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/transaction-history.*`,
+        queryParameters: {
+          account_code: {
+            equalTo: 'cash',
+          },
+          transaction_type: {
+            equalTo: 'HOA',
+          },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: cashHOATransactionsMock,
+      },
+    })
+  },
+
+  stubSpendsWHFTransactions: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/transaction-history.*`,
+        queryParameters: {
+          account_code: {
+            equalTo: 'cash',
+          },
+          transaction_type: {
+            equalTo: 'WHF',
+          },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: cashWHFTransactionsMock,
+      },
+    })
+  },
+
+  stubSavingsTransactions: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/transaction-history.*`,
+        queryParameters: {
+          account_code: {
+            equalTo: 'savings',
+          },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: savingsTransactionsMock,
+      },
+    })
+  },
+
+  stubDamageObligations: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/damage-obligations.*`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: damageObligationContainerMock,
       },
     })
   },

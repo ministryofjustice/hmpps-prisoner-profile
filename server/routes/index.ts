@@ -15,6 +15,7 @@ import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddle
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
 import alertsRouter from './alertsRouter'
+import moneyRouter from './moneyRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -194,6 +195,13 @@ export default function routes(services: Services): Router {
       )
       return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData)
     },
+  )
+
+  router.use(
+    '/prisoner/:prisonerNumber/money',
+    getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+    moneyRouter(services),
   )
 
   get('/', (req, res, next) => {

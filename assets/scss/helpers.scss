@@ -154,3 +154,13 @@
     }
   }
 }
+
+// Creates width helper classes to set input, paragraph or other element width based on EMs
+// e.g. hmpps-width-20 sets the width of the element to 20em
+// Classes created got from 1em to 40em
+@mixin hmpps-width-x {
+  @for $i from 1 through 40 {
+    .hmpps-width-#{$i} { width: #{$i}em; }
+  }
+}
+@include hmpps-width-x;

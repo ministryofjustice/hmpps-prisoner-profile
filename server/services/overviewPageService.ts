@@ -362,7 +362,7 @@ export default class OverviewPageService {
       bottomContentLine1: formatMoney(accountBalances.cash),
       bottomClass: 'big',
       linkLabel: 'Transactions and savings',
-      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/prisoner-finance-details/spends`,
+      linkHref: `/prisoner/${prisonerNumber}/money/spends`,
     }
 
     const adjudicationsSummaryData: MiniSummaryData = {

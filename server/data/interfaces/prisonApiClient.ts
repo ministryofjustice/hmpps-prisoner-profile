@@ -36,6 +36,8 @@ import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHist
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
 import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
 import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
+import { Transaction } from '../../interfaces/prisonApi/transaction'
+import { DamageObligationContainer } from '../../interfaces/prisonApi/damageObligation'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -89,4 +91,6 @@ export interface PrisonApiClient {
   getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
+  getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]>
+  getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
 }

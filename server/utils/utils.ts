@@ -17,6 +17,8 @@ const properCase = (word: string): string =>
 
 const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
+export const isEmpty = (array: Array<unknown>): boolean => !array || (Array.isArray(array) && !array.length)
+
 /**
  * Converts a name (first name, last name, middle name, etc.) to proper case equivalent, handling double-barreled names
  * correctly (i.e. each part in a double-barreled is converted to proper case).
@@ -73,16 +75,22 @@ export const summaryListOneHalfWidth = (rows: SummaryListRow[]) => {
 }
 
 /**
- * Format a numeric value stored in decimal number format into a decimal string with currency symbol.
+ * Format a numeric value into a decimal string with currency symbol.
+ *
+ * Set `usePence` to `true` if the value being formatted is in pence.
  *
  * @param val
  * @param emptyState - defaults to '0.00'
- * @param currencySymbol - defaults to '£'
+ * @param currency - defaults to 'GBP'
+ * @param usePence - defaults to false
  */
-export const formatMoney = (val: number, emptyState: string = undefined, currencySymbol = '£'): string => {
+export const formatMoney = (
+  val: number,
+  { emptyState = undefined, currency = 'GBP', usePence = false } = {},
+): string => {
   if (!val && emptyState) return emptyState
 
-  return `${currencySymbol}${val?.toFixed(2) || '0.00'}`
+  return ((val || 0) / (usePence ? 100 : 1)).toLocaleString('en-GB', { style: 'currency', currency })
 }
 
 /**

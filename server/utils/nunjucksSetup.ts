@@ -17,6 +17,7 @@ import {
   prisonerIsTRN,
   neurodiversityEnabled,
   toNonAssociationRows,
+  formatMoney,
 } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
@@ -71,6 +72,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
 
   njkEnv.addFilter('initialiseName', initialiseName)
+  njkEnv.addFilter('formatMoney', formatMoney)
   njkEnv.addFilter('formatDate', formatDate)
   njkEnv.addFilter('formatDateTime', formatDateTime)
   njkEnv.addFilter('formatScheduleItem', formatScheduleItem)

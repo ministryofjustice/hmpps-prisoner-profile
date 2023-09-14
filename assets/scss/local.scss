@@ -20,3 +20,12 @@
 .govuk-summary-list__key {
   width: 41%;
 }
+
+.hmpps-print-link {
+  font-size: 16px;
+  display: inline-block;
+  position: relative;
+  padding: 5px 5px 5px 38px;
+  background: url("/assets/images/printer_icon.svg") no-repeat 10px 50%;
+  background-size: 16px 18px;
+}

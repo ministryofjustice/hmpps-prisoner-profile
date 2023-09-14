@@ -1,0 +1,100 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% extends "./money.njk" %}
+
+{% block body %}
+
+    <header class="money-tab-summary">
+        <h2>{{ pageTitle }}</h2>
+
+        <div class="balance-summary">
+            <dl>
+                <dt>Current balance</dt>
+                <dd data-qa="current-balance">{{ currentBalance | formatMoney }}</dd>
+            </dl>
+
+
+            {% if pendingBalance %}
+                <dl>
+                    <dt>Pending balance</dt>
+                    <dd data-qa="pending-balance">{{ pendingBalance | formatMoney({ usePence: true }) }}</dd>
+                </dl>
+            {% endif %}
+        </div>
+
+    </header>
+
+    <div class="govuk-!-text-align-right">
+        <a href="#" class="govuk-link govuk-link--no-visited-state hmpps-print-link govuk-!-display-none-print">Print this page</a>
+    </div>
+
+    {% if pendingBalance %}
+        <h3 class="govuk-heading-m">Pending</h3>
+        <p class="govuk-body govuk-!-margin-bottom-1">This is all received money which has not yet been cleared from the account.</p>
+        <p class="govuk-body">This is not part of the current balance.</p>
+
+        {{ govukTable({
+            head: [
+                { text: "Date", classes: "hmpps-width-10" },
+                { text: "Amount", format: "numeric" },
+                { text: "Payment description" },
+                { text: "Location" }
+            ],
+            rows: pendingTransactions,
+            classes: "govuk-!-margin-bottom-9",
+            attributes: { "data-qa": "pending-table" }
+        }) }}
+
+        <h3 class="govuk-heading-m">Completed</h3>
+    {% endif %}
+
+    <div class="money-tab-filter govuk-!-display-none-print">
+        <div class="govuk-heading-m">View by</div>
+        <form>
+            {{ govukSelect({
+                id: "month",
+                name: "month",
+                label: {
+                    text: "Month"
+                },
+                items: months | setSelected(formValues.month)
+            }) }}
+            {{ govukSelect({
+                id: "year",
+                name: "year",
+                label: {
+                    text: "Year"
+                },
+                items: years | setSelected(formValues.year)
+            }) }}
+
+            {{ govukButton({
+                text: "View",
+                type: "submit",
+                preventDoubleClick: true,
+                attributes: { "data-qa": "money-filter-view-button" }
+            }) }}
+        </form>
+    </div>
+
+    <p class="govuk-heading-m print-only">Payments for {{ period }}</p>
+
+    {% if transactions.length %}
+        {{ govukTable({
+            head: [
+                { text: "Date" },
+                { text: "Money in", format: 'numeric' },
+                { text: "Money out", format: 'numeric' },
+                { text: "Balance", format: 'numeric' },
+                { text: "Payment description" },
+                { text: "Location" }
+            ],
+            rows: transactions,
+            attributes: { "data-qa": "transactions-table" }
+        }) }}
+    {% else %}
+        <p class="govuk-body govuk-!-margin-bottom-7" data-qa="{{ 'no-transactions-message' }}">There are no payments in or out of this account for the selected month.</p>
+    {% endif %}
+
+{% endblock %}

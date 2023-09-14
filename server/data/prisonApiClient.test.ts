@@ -36,6 +36,9 @@ import StaffDetailsMock from './localMockData/staffDetails'
 import LocationsInmatesMock from './localMockData/locationsInmates'
 import { AlertForm } from '../interfaces/prisonApi/alert'
 import { alertTypesMock } from './localMockData/alertTypesMock'
+import { transactionsMock } from './localMockData/transactionsMock'
+import { AccountCode } from './enums/accountCode'
+import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
 
 jest.mock('./tokenStore')
 
@@ -367,6 +370,31 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.createAlert(bookingId, alertForm)
       expect(output).toEqual(alert)
+    })
+  })
+
+  describe('getTransactionHistory', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      const params = { account_code: AccountCode.Spends }
+      mockSuccessfulPrisonApiCall(
+        `/api/offenders/${prisonerNumber}/transaction-history?account_code=spends`,
+        transactionsMock,
+      )
+      const output = await prisonApiClient.getTransactionHistory(prisonerNumber, params)
+      expect(output).toEqual(transactionsMock)
+    })
+  })
+
+  describe('getDamageObligations', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      mockSuccessfulPrisonApiCall(
+        `/api/offenders/${prisonerNumber}/damage-obligations?status=ACTIVE`,
+        damageObligationContainerMock,
+      )
+      const output = await prisonApiClient.getDamageObligations(prisonerNumber)
+      expect(output).toEqual(damageObligationContainerMock)
     })
   })
 })
