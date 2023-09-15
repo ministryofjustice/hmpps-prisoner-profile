@@ -1,7 +1,6 @@
 import IndexPage from '../pages/index'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
-import AuthManageDetailsPage from '../pages/authManageDetails'
 import DPSHomePage from '../pages/dpsHomePage'
 import AuthErrorPage from '../pages/autherror'
 
@@ -60,17 +59,6 @@ context('SignIn', () => {
     const indexPage = Page.verifyOnPage(IndexPage)
     indexPage.signOut().click()
     Page.verifyOnPage(AuthSignInPage)
-  })
-
-  it('User can manage their details', () => {
-    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
-    cy.signIn()
-    cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
-
-    indexPage.manageDetails().get('a').invoke('removeAttr', 'target')
-    indexPage.manageDetails().click({ multiple: true })
-    Page.verifyOnPage(AuthManageDetailsPage)
   })
 
   it('Token verification failure takes user to sign in page', () => {

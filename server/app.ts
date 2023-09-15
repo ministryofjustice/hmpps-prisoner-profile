@@ -19,8 +19,8 @@ import routes from './routes'
 import type { Services } from './services'
 import populateClientToken from './middleware/populateClientToken'
 import setUpPageNotFound from './middleware/setUpPageNotFound'
-import setUpPhaseName from './middleware/setUpPhaseName'
 import flashMessageMiddleware from './middleware/flashMessageMiddleware'
+import setUpEnvironmentName from './middleware/setUpEnvironmentName'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -36,7 +36,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
   nunjucksSetup(app, path)
-  setUpPhaseName(app)
+  setUpEnvironmentName(app)
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH']))
   app.use(setUpCsrf())

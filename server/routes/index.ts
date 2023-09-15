@@ -15,6 +15,7 @@ import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddle
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
 import alertsRouter from './alertsRouter'
+import getFrontendComponents from '../middleware/frontEndComponents'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -41,6 +42,8 @@ export default function routes(services: Services): Router {
   }
 
   commonRoutes()
+
+  get('/prisoner/*', getFrontendComponents(services))
 
   get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
     const prisonerData = req.middleware?.prisonerData
