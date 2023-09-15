@@ -1,0 +1,38 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% extends "./money.njk" %}
+
+{% block body %}
+
+    <header class="money-tab-summary">
+        <h2>{{ pageTitle }}</h2>
+
+        <div class="damage-summary">
+            <dl>
+                <dt>Currently owes</dt>
+                <dd data-qa="currently-owes">{{ currentlyOwes | formatMoney }}</dd>
+            </dl>
+        </div>
+    </header>
+
+    <div class="govuk-!-text-align-right">
+        <a href="#" class="govuk-link govuk-link--no-visited-state hmpps-print-link govuk-!-display-none-print">Print this page</a>
+    </div>
+
+    {{ govukTable({
+        head: [
+            { text: "Obligation number" },
+            { text: "Adjudication" },
+            { text: "Date" },
+            { text: "Amount" },
+            { text: "Paid" },
+            { text: "Owes" },
+            { text: "Location" }
+        ],
+        rows: obligations,
+        classes: "govuk-!-margin-top-2",
+        attributes: { "data-qa": "damage-obligations-table" }
+    }) }}
+
+{% endblock %}

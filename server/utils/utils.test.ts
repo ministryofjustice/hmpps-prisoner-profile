@@ -101,16 +101,24 @@ describe('summary list one half width', () => {
 
 describe('format money', () => {
   it.each([
-    [null, undefined, undefined, '£0.00'],
-    [null, 'Empty', undefined, 'Empty'],
-    [0, undefined, undefined, '£0.00'],
-    [1, undefined, undefined, '£1.00'],
-    [1.0, undefined, undefined, '£1.00'],
-    [2.3, undefined, undefined, '£2.30'],
-    [4.56, undefined, undefined, '£4.56'],
-  ])('%s: formatMoney(%s, %s, %s)', (val: number, emptyState: string, currencySymbol: string, expected: string) => {
-    expect(formatMoney(val, emptyState, currencySymbol)).toEqual(expected)
-  })
+    [null, undefined, undefined, undefined, '£0.00'],
+    [null, 'Empty', undefined, undefined, 'Empty'],
+    [0, undefined, undefined, undefined, '£0.00'],
+    [1, undefined, undefined, undefined, '£1.00'],
+    [1.0, undefined, undefined, undefined, '£1.00'],
+    [2.3, undefined, undefined, undefined, '£2.30'],
+    [4.56, undefined, undefined, undefined, '£4.56'],
+    [-4.56, undefined, undefined, undefined, '-£4.56'],
+    [1, undefined, undefined, true, '£0.01'],
+    [50, undefined, undefined, true, '£0.50'],
+    [6543, undefined, undefined, true, '£65.43'],
+    [-90, undefined, undefined, true, '-£0.90'],
+  ])(
+    '%s: formatMoney(%s, %s, %s, %s)',
+    (val: number, emptyState: string, currency: string, usePence: boolean, expected: string) => {
+      expect(formatMoney(val, { emptyState, currency, usePence })).toEqual(expected)
+    },
+  )
 })
 
 describe('properCaseName', () => {

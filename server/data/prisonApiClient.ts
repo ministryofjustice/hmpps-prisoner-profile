@@ -44,6 +44,9 @@ import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
 import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
+import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import { Transaction } from '../interfaces/prisonApi/transaction'
+import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -318,6 +321,26 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
     return (await this.post({ path: `/api/bookings/${bookingId}/alert`, data: alert })) as Alert
+  }
+
+  async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
+    return this.get<CsraAssessment>({
+      path: `/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
+    })
+  }
+
+  async getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]> {
+    return this.get<Transaction[]>({
+      path: `/api/offenders/${prisonerNumber}/transaction-history`,
+      query: mapToQueryString(params),
+    })
+  }
+
+  async getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer> {
+    return this.get<DamageObligationContainer>({
+      path: `/api/offenders/${prisonerNumber}/damage-obligations`,
+      query: mapToQueryString({ status: status || 'ACTIVE' }),
+    })
   }
 
   async getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]> {

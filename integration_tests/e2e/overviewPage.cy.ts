@@ -96,7 +96,7 @@ context('Overview Page', () => {
         overviewPage.moneyCard().contains('p', 'Spends')
         overviewPage.moneyCard().contains('p', '£240.51')
         overviewPage.moneyCard().contains('p', 'Private cash')
-        overviewPage.moneyCard().contains('p', '£0.00')
+        overviewPage.moneyCard().contains('p', '£35.00')
         overviewPage.moneyCard().contains('a', 'Transactions and savings')
       })
 

@@ -9,9 +9,9 @@ import { formatDate } from '../../utils/dateHelpers'
 
 export const accountBalancesMock: AccountBalances = {
   spends: 240.51,
-  cash: 0,
-  savings: 0,
-  damageObligations: 0,
+  cash: 35,
+  savings: 80,
+  damageObligations: 100,
   currency: 'GBP',
 }
 
@@ -73,7 +73,7 @@ export const moneySummaryDataMock: MiniSummaryData = {
   topContent: formatMoney(240.51),
   topClass: 'big',
   bottomLabel: 'Private cash',
-  bottomContentLine1: formatMoney(0),
+  bottomContentLine1: formatMoney(35.0),
   bottomClass: 'big',
   linkLabel: 'Transactions and savings',
 } as MiniSummaryData

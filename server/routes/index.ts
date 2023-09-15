@@ -16,6 +16,9 @@ import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
+import getFrontendComponents from '../middleware/frontEndComponents'
+import csraRouter from './csraRouter'
+import moneyRouter from './moneyRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -42,6 +45,8 @@ export default function routes(services: Services): Router {
   }
 
   commonRoutes()
+
+  get('/prisoner/*', getFrontendComponents(services))
 
   get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
     const prisonerData = req.middleware?.prisonerData
@@ -136,6 +141,7 @@ export default function routes(services: Services): Router {
 
   router.use(caseNotesRouter(services))
   router.use(alertsRouter(services))
+  router.use(csraRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
@@ -206,6 +212,13 @@ export default function routes(services: Services): Router {
       )
       return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData)
     },
+  )
+
+  router.use(
+    '/prisoner/:prisonerNumber/money',
+    getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+    moneyRouter(services),
   )
 
   get('/', (req, res, next) => {

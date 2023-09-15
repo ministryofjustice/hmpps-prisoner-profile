@@ -1,0 +1,81 @@
+h1 {
+  margin: 5px 0 50px 0;
+}
+
+.money-tab-summary {
+
+  margin-top: 35px;
+
+  h2 {
+    font-size: 27px;
+    margin: 0 15px 0 0;
+  }
+
+  .balance-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px 100px;
+
+    dl {
+      margin-top: 15px;
+      margin-bottom: 30px;
+    }
+
+    dt {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    dd {
+      font-size: 36px;
+      font-weight: 300;
+      margin-left: 0;
+    }
+  }
+
+  .damage-summary {
+    dl {
+      margin-top: 15px;
+      margin-bottom: 0;
+    }
+
+    dt {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    dd {
+      font-size: 36px;
+      font-weight: 300;
+      margin-left: 0;
+    }
+  }
+}
+
+.money-tab-filter {
+  margin-top: 15px;
+  margin-bottom: 50px;
+  padding: 15px;
+  background-color: govuk-colour('light-grey');
+
+  h3 {
+    margin-top: 0;
+  }
+
+  form {
+    display: flex;
+    flex-flow: row wrap;
+
+    div {
+      margin-right: 15px;
+      margin-bottom: 5px;
+    }
+
+    button {
+      align-self: flex-end;
+      margin-bottom: 7px;
+    }
+  }
+}
