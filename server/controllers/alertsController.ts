@@ -21,90 +21,86 @@ export default class AlertsController {
     private readonly referenceDataService: ReferenceDataService,
   ) {}
 
-  public displayAlerts(isActive: boolean): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
-      // Get data from middleware
-      const { prisonerData, inmateDetail } = req.middleware
+  public async displayAlerts(req: Request, res: Response, next: NextFunction, isActive: boolean) {
+    // Get data from middleware
+    const { prisonerData, inmateDetail } = req.middleware
 
-      // Parse query params for paging, sorting and filtering data
-      const { clientToken } = res.locals
-      const queryParams: PagedListQueryParams = {}
-      if (req.query.page) queryParams.page = +req.query.page
-      if (req.query.sort) queryParams.sort = req.query.sort as string
-      if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
-      if (req.query.from) queryParams.from = req.query.from as string
-      if (req.query.to) queryParams.to = req.query.to as string
-      if (isActive) queryParams.alertStatus = 'ACTIVE'
-      if (!isActive) queryParams.alertStatus = 'INACTIVE'
-      if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
+    // Parse query params for paging, sorting and filtering data
+    const { clientToken } = res.locals
+    const queryParams: PagedListQueryParams = {}
+    if (req.query.page) queryParams.page = +req.query.page
+    if (req.query.sort) queryParams.sort = req.query.sort as string
+    if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]
+    if (req.query.from) queryParams.from = req.query.from as string
+    if (req.query.to) queryParams.to = req.query.to as string
+    if (isActive) queryParams.alertStatus = 'ACTIVE'
+    if (!isActive) queryParams.alertStatus = 'INACTIVE'
+    if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
-      // Set role based permissions
-      const canUpdateAlert =
-        userHasRoles([Role.UpdateAlert], res.locals.user.userRoles) && userCanEdit(res.locals.user, prisonerData)
+    // Set role based permissions
+    const canUpdateAlert =
+      userHasRoles([Role.UpdateAlert], res.locals.user.userRoles) && userCanEdit(res.locals.user, prisonerData)
 
-      let addAlertLinkUrl: string
-      if (canUpdateAlert) {
-        addAlertLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/add-alert`
-      }
-
-      // Get alerts based on given query params
-      const alertsPageData = await this.alertsPageService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
-      const showingAll = queryParams.showAll
-
-      // Render page
-      return res.render('pages/alerts/alertsPage', {
-        pageTitle: 'Alerts',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'alerts'),
-        ...alertsPageData,
-        showingAll,
-        addAlertLinkUrl,
-        activeTab: isActive,
-      })
+    let addAlertLinkUrl: string
+    if (canUpdateAlert) {
+      addAlertLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/add-alert`
     }
+
+    // Get alerts based on given query params
+    const alertsPageData = await this.alertsPageService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
+    const showingAll = queryParams.showAll
+
+    // Render page
+    return res.render('pages/alerts/alertsPage', {
+      pageTitle: 'Alerts',
+      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'alerts'),
+      ...alertsPageData,
+      showingAll,
+      addAlertLinkUrl,
+      activeTab: isActive,
+    })
   }
 
-  public displayAddAlert(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const types = await this.referenceDataService.getAlertTypes(res.locals.clientToken)
+  public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
+    const types = await this.referenceDataService.getAlertTypes(res.locals.clientToken)
 
-      // Get data from middleware
-      const { firstName, lastName, prisonerNumber, bookingId, alerts } = req.middleware.prisonerData
-      const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+    // Get data from middleware
+    const { firstName, lastName, prisonerNumber, bookingId, alerts } = req.middleware.prisonerData
+    const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
-      const existingAlerts = alerts
-        .filter((alert: Alert) => !alert.expired)
-        .map((alert: Alert) => alert.alertCode)
-        .join(',')
+    const existingAlerts = alerts
+      .filter((alert: Alert) => !alert.expired)
+      .map((alert: Alert) => alert.alertCode)
+      .join(',')
 
-      // Initialise form
-      const now = new Date()
-      const alertFlash = req.flash('alert')
-      const formValues: AlertForm = alertFlash?.length
-        ? (alertFlash[0] as never)
-        : {
-            bookingId,
-            existingAlerts,
-            alertType: null,
-            alertCode: null,
-            comment: '',
-            alertDate: formatDate(now.toISOString(), 'short'),
-          }
-      const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType)
-      const errors = req.flash('errors')
+    // Initialise form
+    const now = new Date()
+    const alertFlash = req.flash('alert')
+    const formValues: AlertForm = alertFlash?.length
+      ? (alertFlash[0] as never)
+      : {
+          bookingId,
+          existingAlerts,
+          alertType: null,
+          alertCode: null,
+          comment: '',
+          alertDate: formatDate(now.toISOString(), 'short'),
+        }
+    const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType)
+    const errors = req.flash('errors')
 
-      return res.render('pages/alerts/addAlert', {
-        today: formatDate(now.toISOString(), 'short'),
-        todayMinus8: formatDate(subDays(now, 7).toISOString(), 'short'),
-        prisonerDisplayName,
-        prisonerNumber,
-        formValues,
-        typeCodeMap,
-        alertTypes,
-        alertCodes,
-        refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
-        errors,
-      })
-    }
+    return res.render('pages/alerts/addAlert', {
+      today: formatDate(now.toISOString(), 'short'),
+      todayMinus8: formatDate(subDays(now, 7).toISOString(), 'short'),
+      prisonerDisplayName,
+      prisonerNumber,
+      formValues,
+      typeCodeMap,
+      alertTypes,
+      alertCodes,
+      refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      errors,
+    })
   }
 
   public post(): RequestHandler {

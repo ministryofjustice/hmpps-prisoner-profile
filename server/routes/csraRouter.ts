@@ -20,7 +20,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/csra-review',
     getPrisonerData(services, { minimal: true }),
     checkPrisonerInCaseload(),
-    csraController.displayReview(),
+    (req, res, next) => csraController.displayReview(req, res, next),
   )
 
   return router
