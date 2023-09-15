@@ -38,12 +38,34 @@
     nonce="{{ cspNonce }}"
     crossorigin
   />
+
+  {% if feComponents.jsInclude %}
+    {% for js in feComponents.jsIncludes %}
+      <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+    {% endfor %}
+  {% endif %}
+
+  {% if feComponents.cssIncludes %}
+    {% for css in feComponents.cssIncludes %}
+      <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+    {% endfor %}
+  {% endif %}
+
 {% endblock %}
 
 {% block pageTitle %}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
 
 {% block header %}
-  {% include "./header.njk" %}
+  {% if feComponents.header %}
+    {{ feComponents.header | safe }}
+  {% else %}
+    {% include "./header.njk" %}
+  {% endif %}
+  {% if flashMessage %}
+    <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}">
+      <p role="alert">{{ flashMessage.text }}</p>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block beforeContent %}
@@ -100,4 +122,12 @@
   {% block pageScripts %}
   {% endblock %}
 
+{% endblock %}
+
+{% block footer %}
+  {% if feComponents.footer %}
+    {{ feComponents.footer | safe }}
+  {% else %}
+    {% include "./footer.njk" %}
+  {% endif %}
 {% endblock %}

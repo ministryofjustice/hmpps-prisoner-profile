@@ -31,6 +31,8 @@ import TokenStore from './tokenStore'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
+import { ComponentApiClient } from './interfaces/componentApiClient'
+import ComponentApiRestClient from './componentApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient()
@@ -104,6 +106,11 @@ export const dataAccess = {
     'Non associations API',
     config.apis.nonAssociationsApi,
     NonAssociationsApiRestClient,
+  ),
+  componentApiClientBuilder: restClientBuilder<ComponentApiClient>(
+    'Component API',
+    config.apis.frontendComponents,
+    ComponentApiRestClient,
   ),
 }
 

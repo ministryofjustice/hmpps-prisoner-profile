@@ -11,6 +11,7 @@ import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
 import ReferenceDataService from './referenceDataService'
+import ComponentService from './componentService'
 import MoneyService from './moneyService'
 
 export const services = () => {
@@ -25,6 +26,7 @@ export const services = () => {
     curiousApiClientBuilder,
     adjudicationsApiClientBuilder,
     nonAssociationsApiClientBuilder,
+    componentApiClientBuilder,
   } = dataAccess
 
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
@@ -48,6 +50,7 @@ export const services = () => {
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)
   const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
   const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
+  const componentService = new ComponentService(componentApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
 
   return {
@@ -64,6 +67,7 @@ export const services = () => {
     activePunishmentsPageService,
     offencesPageService,
     referenceDataService,
+    componentService,
     moneyService,
   }
 }

@@ -36,13 +36,14 @@ generic-service:
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI,HMI,NHI"
-    SYSTEM_PHASE: "DEV"
+    ENVIRONMENT_NAME: "DEV"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-dev.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
     ACTIVITIES_ENABLED_PRISONS: "LEI,RSI"
     APPOINTMENTS_URL: "https://activities-dev.prison.service.justice.gov.uk/appointments"
     APPOINTMENTS_ENABLED_PRISONS: "LEI,RSI"
+    COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

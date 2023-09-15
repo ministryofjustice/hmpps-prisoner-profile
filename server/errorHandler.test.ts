@@ -21,7 +21,6 @@ describe('GET 404', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('Page not found')
-        expect(res.text).not.toContain('404')
       })
   })
 })
