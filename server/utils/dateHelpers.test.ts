@@ -1,4 +1,12 @@
-import { formatDate, formatDateISO, formatDateTime, formatDateTimeISO, isRealDate, parseDate } from './dateHelpers'
+import {
+  formatDate,
+  formatDateISO,
+  formatDateTime,
+  formatDateTimeISO,
+  isRealDate,
+  parseDate,
+  timeFormat,
+} from './dateHelpers'
 
 describe('formatDateISO', () => {
   it('should return an ISO-8601 date string given a valid date', () => {
@@ -110,4 +118,15 @@ describe('format datetime', () => {
       expect(formatDateTime(a, b)).toEqual(expected)
     },
   )
+})
+
+describe('time format', () => {
+  it.each([
+    ['2023-01-20T12:13:14', '12:13'],
+    ['2023-03-23T14:30:14', '14:30'],
+    ['2022-01-10T07:45:14', '7:45'],
+    ['2020-11-01T19:10:14', '19:10'],
+  ])('For input %s parse to Date object %s', (date: string, expected: string) => {
+    expect(timeFormat(date)).toEqual(expected)
+  })
 })

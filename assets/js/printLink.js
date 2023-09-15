@@ -13,7 +13,5 @@ function PrintLinkComponent($module, config) {
   }
 }
 
-const $printLinkComponents = document.querySelectorAll('.printLink')
-nodeListForEach($printLinkComponents, function ($printLinkComponent) {
-  new PrintLinkComponent($printLinkComponent, {}).init()
-})
+const $printLinkComponents = document.querySelector('.printLink')
+new PrintLinkComponent($printLinkComponents, {})

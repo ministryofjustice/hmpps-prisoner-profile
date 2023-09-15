@@ -41,7 +41,7 @@
           {% set linkText = 'View 7 days from ' + nextWeekStartDate if when === nextWeek   else 'View 7 days from today'  %}
           {% set linkLocation = "/prisoner/" + prisonerNumber +  '/schedule?when=nextWeek' if when === nextWeek else './schedule'  %}
 
-          <a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ linkLocation | prependBaseUrl }}" data-test="schedule-select-week">
+          <a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ linkLocation }}" data-test="schedule-select-week">
             {{ linkText }}
           </a>
         </div>

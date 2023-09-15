@@ -116,3 +116,8 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubGetIdentifiers', bookingId)
   cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
 })
+
+Cypress.Commands.add('setupPrisonerSchedulePageStubs', ({ bookingId }) => {
+  cy.task('stubgetScheduledEventsForNextWeek', bookingId)
+  cy.task('stubgetScheduledEventsForThisWeek', bookingId)
+})

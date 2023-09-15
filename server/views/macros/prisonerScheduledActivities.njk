@@ -9,8 +9,8 @@
           <div class='highlight highlight--alert'>(cancelled)</div>
         {% endif %}
         <div>
-          {{ activity.startTime | getTime }}
-          {{ ' to ' + activity.endTime | getTime if activity.endTime }}
+          {{ activity.startTime | timeFormat }}
+          {{ ' to ' + activity.endTime | timeFormat  }}
         </div>
       </div>
     {% endfor %}

@@ -25,7 +25,40 @@ export default class PrisonerScheduleController {
     const { clientToken } = res.locals
     this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
-    let schedule: GetEventScheduleItem[]
+    const selectedWeekDates: {
+      date?: string
+      periods?: {
+        morningActivities: {
+          comment: string
+          startTime: string
+          endTime: string
+          eventStatus: string
+          type: string
+          shortComment: string
+          cancelled: boolean
+        }[]
+        afternoonActivities: {
+          comment: string
+          startTime: string
+          endTime: string
+          eventStatus: string
+          type: string
+          shortComment: string
+          cancelled: boolean
+        }[]
+        eveningActivities: {
+          comment: string
+          startTime: string
+          endTime: string
+          eventStatus: string
+          type: string
+          shortComment: string
+          cancelled: boolean
+        }[]
+      }
+    }[] = []
+
+    let schedule: GetEventScheduleItem[] = [] as GetEventScheduleItem[]
     const { when } = req.query
 
     const { bookingId } = prisonerData
@@ -38,7 +71,6 @@ export default class PrisonerScheduleController {
 
     const groupedByDate = groupBy(schedule, 'eventDate')
     const oneWeekToday = format(add(startOfToday(), { weeks: 1 }), 'yyyy-MM-dd')
-    const selectedWeekDates: { date: string }[] = []
 
     if (when === 'nextWeek') {
       times(7)((i: number) =>
@@ -108,9 +140,9 @@ export default class PrisonerScheduleController {
       }
     }
 
-    const days = selectedWeekDates.map(day => ({
-      date: formatDate(day.date),
-      periods: eventsAction(groupedByDate[day.date]),
+    const days = selectedWeekDates?.map(day => ({
+      date: formatDate(day?.date),
+      periods: groupedByDate ? eventsAction(groupedByDate[day?.date]) : undefined,
     }))
 
     return res.render('pages/prisonerSchedule', {

@@ -498,6 +498,7 @@ export const extractLocation = (location: string, agencyId: string): string => {
 // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
 export const groupBy = (array: GetEventScheduleItem[], key: string) =>
   array &&
+  array.length &&
   array.reduce((acc, current) => {
     const group = current[key]
 

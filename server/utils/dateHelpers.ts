@@ -124,3 +124,10 @@ export const formatDateTime = (
   datetimeStr += new Date(isoDate).toLocaleTimeString('en-gb', { hour: '2-digit', minute: '2-digit' })
   return datetimeStr
 }
+
+export const timeFormat = (dateTimeStr: string) => {
+  const date = new Date(dateTimeStr)
+  const hours = date.getUTCHours()
+  const minutes = date.getUTCMinutes() === 0 ? '00' : date.getUTCMinutes()
+  return `${hours}:${minutes}`
+}
