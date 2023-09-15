@@ -5,13 +5,18 @@ import NotFoundError from '../utils/notFoundError'
 import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 
-export default function getPrisonerData(services: Services): RequestHandler {
+export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     if (prisonerData.prisonerNumber === undefined) {
       return next(new NotFoundError())
+    }
+
+    if (options.minimal) {
+      req.middleware = { ...req.middleware, prisonerData }
+      return next()
     }
 
     // Get Assessment details and Inmate details, and add to prisonerData

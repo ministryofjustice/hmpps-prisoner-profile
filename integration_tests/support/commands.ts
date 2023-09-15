@@ -122,7 +122,7 @@ Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId =
   cy.task('stubInmateDetail', bookingId)
   cy.task('stubAssessments', bookingId)
   cy.task('stubAccountBalances', bookingId)
-  cy.task('stubAgencyDetails', prisonId)
+  cy.task('stubGetAgency', prisonId)
   cy.task('stubSpendsTransactions', prisonerNumber)
   cy.task('stubPrivateCashTransactions', prisonerNumber)
   cy.task('stubSpendsHOATransactions', prisonerNumber)

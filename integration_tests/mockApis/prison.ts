@@ -59,7 +59,8 @@ import {
   SentenceSummaryWithSentenceMock,
 } from '../../server/data/localMockData/sentenceSummaryMock'
 import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
-import AgenciesMock from '../../server/data/localMockData/agenciesDetails'
+import csraAssessmentMock from '../../server/data/localMockData/csraAssessmentMock'
+import staffDetails from '../../server/data/localMockData/staffDetails'
 import {
   cashHOATransactionsMock,
   cashTransactionsMock,
@@ -68,6 +69,7 @@ import {
   transactionsMock,
 } from '../../server/data/localMockData/transactionsMock'
 import { damageObligationContainerMock } from '../../server/data/localMockData/damageObligationsMock'
+import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -855,18 +857,50 @@ export default {
     })
   },
 
-  stubAgencyDetails: (prisonId: string) => {
+  stubCsraReview: ({ bookingId, assessmentSeq }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/agencies/${prisonId}`,
+        urlPattern: `/prison/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: AgenciesMock,
+        jsonBody: csraAssessmentMock,
+      },
+    })
+  },
+
+  stubGetAgency: agencyId => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/agencies/${agencyId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: agenciesDetails,
+      },
+    })
+  },
+
+  stubStaffDetails: staffId => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/users/${staffId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: staffDetails,
       },
     })
   },

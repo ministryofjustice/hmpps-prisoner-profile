@@ -36,6 +36,7 @@ import StaffDetailsMock from './localMockData/staffDetails'
 import LocationsInmatesMock from './localMockData/locationsInmates'
 import { AlertForm } from '../interfaces/prisonApi/alert'
 import { alertTypesMock } from './localMockData/alertTypesMock'
+import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
 import { AccountCode } from './enums/accountCode'
 import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
@@ -370,6 +371,20 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.createAlert(bookingId, alertForm)
       expect(output).toEqual(alert)
+    })
+  })
+
+  describe('getCsraAssessment', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123
+      const assessmentSeq = 456
+
+      mockSuccessfulPrisonApiCall(
+        `/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
+        CsraAssessmentMock,
+      )
+      const output = await prisonApiClient.getCsraAssessment(bookingId, assessmentSeq)
+      expect(output).toEqual(CsraAssessmentMock)
     })
   })
 

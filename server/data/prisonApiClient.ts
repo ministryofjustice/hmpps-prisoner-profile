@@ -43,6 +43,7 @@ import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
 import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
+import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
 
@@ -319,6 +320,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
     return (await this.post({ path: `/api/bookings/${bookingId}/alert`, data: alert })) as Alert
+  }
+
+  async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
+    return this.get<CsraAssessment>({
+      path: `/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
+    })
   }
 
   async getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]> {

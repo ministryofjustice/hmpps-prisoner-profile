@@ -1,0 +1,44 @@
+{% extends "../index.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: prisonerName,
+        href: "/prisoner/" + prisonerNumber
+    },
+    {
+        text: 'CSRA history',
+        href: "#"
+    }
+] %}
+
+{% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1>CSRA review on {{ reviewDate }}</h1>
+        </div>
+    </div>
+
+    {{ govukSummaryList({
+        classes: 'govuk-summary-list--no-border',
+        rows: details,
+        attributes: { "data-test": 'review-summary' }
+    }) }}
+
+    <h2 class="govuk-heading-m">Review questions</h2>
+
+
+
+    {% if reviewQuestions.length %}
+        {{ govukSummaryList({
+            classes: 'govuk-summary-list--no-border',
+            rows: reviewQuestions,
+            attributes: { "data-test": 'review-questions' }
+        }) }}
+    {% endif %}
+
+{% endblock %}
