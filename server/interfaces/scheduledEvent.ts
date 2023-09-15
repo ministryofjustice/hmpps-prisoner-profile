@@ -24,3 +24,36 @@ export interface ScheduledEvent {
   performance?: string
   startTime?: string
 }
+
+export interface SelectedWeekDates {
+  date?: string
+  periods?: {
+    morningActivities: {
+      comment: string
+      startTime: string
+      endTime: string
+      eventStatus: string
+      type: string
+      shortComment: string
+      cancelled: boolean
+    }[]
+    afternoonActivities: {
+      comment: string
+      startTime: string
+      endTime: string
+      eventStatus: string
+      type: string
+      shortComment: string
+      cancelled: boolean
+    }[]
+    eveningActivities: {
+      comment: string
+      startTime: string
+      endTime: string
+      eventStatus: string
+      type: string
+      shortComment: string
+      cancelled: boolean
+    }[]
+  }
+}

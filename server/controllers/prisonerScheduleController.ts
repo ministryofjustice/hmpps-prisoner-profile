@@ -8,6 +8,7 @@ import { formatName, groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
+import { SelectedWeekDates } from '../interfaces/scheduledEvent'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -25,38 +26,7 @@ export default class PrisonerScheduleController {
     const { clientToken } = res.locals
     this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
-    const selectedWeekDates: {
-      date?: string
-      periods?: {
-        morningActivities: {
-          comment: string
-          startTime: string
-          endTime: string
-          eventStatus: string
-          type: string
-          shortComment: string
-          cancelled: boolean
-        }[]
-        afternoonActivities: {
-          comment: string
-          startTime: string
-          endTime: string
-          eventStatus: string
-          type: string
-          shortComment: string
-          cancelled: boolean
-        }[]
-        eveningActivities: {
-          comment: string
-          startTime: string
-          endTime: string
-          eventStatus: string
-          type: string
-          shortComment: string
-          cancelled: boolean
-        }[]
-      }
-    }[] = []
+    const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]
 
     let schedule: GetEventScheduleItem[] = [] as GetEventScheduleItem[]
     const { when } = req.query
