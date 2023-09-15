@@ -89,7 +89,7 @@
       </div>
     {% endif %}
 
-    <div class="prisoner-profile-breadcrumbs__breadcrumbs">
+    <div class="prisoner-profile-breadcrumbs__breadcrumbs govuk-!-display-none-print">
     {{ govukBreadcrumbs({
         items: breadCrumbs | default([])
       }) }}
@@ -116,6 +116,7 @@
   <script src="/assets/moj/all.js"></script>
   <script src="/assets/datepicker.js"></script>
   <script src="/assets/backToTop.js"></script>
+  <script src="/assets/printPage.js"></script>
 
   {# Javascript block for individual pages #}
   {% block pageScripts %}
