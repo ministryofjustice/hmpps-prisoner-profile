@@ -11,6 +11,7 @@ import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
 import ReferenceDataService from './referenceDataService'
+import CsraService from './csraService'
 import ComponentService from './componentService'
 
 export const services = () => {
@@ -50,6 +51,7 @@ export const services = () => {
   const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
   const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
   const componentService = new ComponentService(componentApiClientBuilder)
+  const csraService = new CsraService(prisonApiClientBuilder)
 
   return {
     dataAccess,
@@ -66,6 +68,7 @@ export const services = () => {
     offencesPageService,
     referenceDataService,
     componentService,
+    csraService,
   }
 }
 

@@ -16,6 +16,7 @@ import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
 import alertsRouter from './alertsRouter'
 import getFrontendComponents from '../middleware/frontEndComponents'
+import csraRouter from './csraRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -138,6 +139,7 @@ export default function routes(services: Services): Router {
 
   router.use(caseNotesRouter(services))
   router.use(alertsRouter(services))
+  router.use(csraRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',

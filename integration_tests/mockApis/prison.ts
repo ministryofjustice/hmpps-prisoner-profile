@@ -59,6 +59,9 @@ import {
   SentenceSummaryWithSentenceMock,
 } from '../../server/data/localMockData/sentenceSummaryMock'
 import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
+import csraAssessmentMock from '../../server/data/localMockData/csraAssessmentMock'
+import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
+import staffDetails from '../../server/data/localMockData/staffDetails'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -842,6 +845,54 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: pagedActiveAlertsMock.content[0],
+      },
+    })
+  },
+
+  stubCsraReview: ({ bookingId, assessmentSeq }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offender-assessments/csra/${bookingId}/assessment/${assessmentSeq}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: csraAssessmentMock,
+      },
+    })
+  },
+
+  stubGetAgency: agencyId => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/agencies/${agencyId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: agenciesDetails,
+      },
+    })
+  },
+
+  stubStaffDetails: staffId => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/users/${staffId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: staffDetails,
       },
     })
   },
