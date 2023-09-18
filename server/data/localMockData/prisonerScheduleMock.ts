@@ -1,4 +1,5 @@
 import { add, format, startOfToday } from 'date-fns'
+import { formatDate } from '../../utils/dateHelpers'
 
 const month = [
   'January',
@@ -25,31 +26,31 @@ export const PrisonerScheduleThisWeekMock = {
   prisonId: 'MDI',
   days: [
     {
-      date: `${d.getDate()} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 0 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 1} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 1 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 2} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 2 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 3} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 3 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 4} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 4 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 5} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 5 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 6} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 6 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
   ],
@@ -64,31 +65,31 @@ export const PrisonerScheduleNextWeekMock = {
   prisonId: 'MDI',
   days: [
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 7} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 7 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 8} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 8 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 9} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 9 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 10} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 10 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 11} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 11 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 12} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 12 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
     {
-      date: `${parseInt(d.getDate().toString(), 10) + 13} ${currentMonth} ${currentYear}`,
+      date: format(add(startOfToday(), { days: 13 }), 'd MMMM yyyy'),
       periods: undefined as object,
     },
   ],
