@@ -1,23 +1,4 @@
 import { add, format, startOfToday } from 'date-fns'
-import { formatDate } from '../../utils/dateHelpers'
-
-const month = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
-const d = new Date()
-const currentMonth = month[d.getMonth()]
-const currentYear = d.getFullYear()
 
 export const PrisonerScheduleThisWeekMock = {
   pageTitle: 'Schedule',
