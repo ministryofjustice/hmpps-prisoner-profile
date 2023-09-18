@@ -66,9 +66,7 @@ export default class PrisonerScheduleController {
       activities && activities.filter(activity => getHours(parseInt(activity.startTime, 10)) >= 17)
 
     const byStartTimeThenByEndTime = (a: GetEventScheduleItem, b: GetEventScheduleItem) => {
-      isBefore(parseInt(a.startTime, 10), parseInt(b.startTime, 10))
       if (isBefore(parseInt(a.startTime, 10), parseInt(b.startTime, 10))) return -1
-
       if (isAfter(parseInt(a.startTime, 10), parseInt(b.startTime, 10))) return 1
 
       if (!a.endTime) return -1

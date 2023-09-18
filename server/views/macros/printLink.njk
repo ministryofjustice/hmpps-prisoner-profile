@@ -1,7 +1,7 @@
 {% macro printLink(linkText = 'Print this page', align = "left") %}
     <div>
-    <a href="" class="govuk-link--no-visited-state printLink govuk-link print-link govuk-!-display-none-print">
-        <img src="/assets/images/printer_icon.svg" role="presentation" alt="" width="23px" height="20px" class="hmpps-icon" data-qa="prisoner-photo-print-icon"/> {{ linkText }}
-    </a>
+        <a href="" class="govuk-link--no-visited-state hmpps-print-link govuk-link print-link govuk-!-display-none-print">
+            {{ linkText }}
+        </a>
     </div>
 {% endmacro %}
