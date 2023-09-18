@@ -25,6 +25,8 @@ export interface Transaction {
   currentBalance?: number
   holdingCleared?: boolean
   createDateTime?: string
+  isBonus?: boolean
+  isPieceWork?: boolean
 }
 
 export interface RelatedTransaction {
