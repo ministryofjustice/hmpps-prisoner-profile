@@ -34,7 +34,7 @@ export default class MoneyService {
       account_code: accountCode,
     }
 
-    if (month !== undefined && year !== undefined) {
+    if (month !== null && year !== null) {
       const selectedFromDate = new Date(year, month, 1)
       const today = new Date()
 

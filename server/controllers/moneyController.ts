@@ -178,12 +178,6 @@ export default class MoneyController {
       ...pieceWorkTransactions,
     ]
       .filter(transaction => transaction.penceAmount)
-      .filter(
-        transaction =>
-          ![TransactionType.Withheld.toString(), TransactionType.AddHold.toString()].includes(
-            transaction.transactionType,
-          ),
-      )
       .sort(this.transactionSort)
 
     return res.render('pages/money/transactions', {
