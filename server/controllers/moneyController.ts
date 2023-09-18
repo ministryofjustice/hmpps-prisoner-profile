@@ -119,7 +119,7 @@ export default class MoneyController {
       .flatMap(batchTransaction => {
         return batchTransaction.relatedOffenderTransactions.map(relatedTransaction => {
           // Account for bonusPay and pieceWork by adding a new transaction with desc "Bonus for <entryDescription>"
-          // and make id = -1 so it appears first in the group of related transactions
+          // or "Piece work for <entryDescription>"
           if (relatedTransaction.bonusPay) {
             bonusPayTransactions.push({
               id: relatedTransaction.id,
