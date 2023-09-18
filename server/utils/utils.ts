@@ -527,3 +527,5 @@ export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]):
     { text: na.assignedLivingUnitDescription },
     { text: na.reasonDescription },
   ])
+
+export const GetTimeFromDateString = (dateTimeString: string) => new Date(dateTimeString).getTime()

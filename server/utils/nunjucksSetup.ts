@@ -2,6 +2,7 @@
 import * as pathModule from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
+import { getTime } from 'date-fns'
 import {
   addressToLines,
   findError,
@@ -17,6 +18,7 @@ import {
   prisonerIsTRN,
   neurodiversityEnabled,
   toNonAssociationRows,
+  GetTimeFromDateString,
 } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime } from './dateHelpers'
@@ -105,4 +107,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('prependBaseUrl', prependBaseUrl)
   njkEnv.addFilter('prependHmppsAuthBaseUrl', prependHmppsAuthBaseUrl)
   njkEnv.addFilter('toNonAssociationTableRows', toNonAssociationRows)
+  njkEnv.addFilter('getTime', GetTimeFromDateString)
 }
