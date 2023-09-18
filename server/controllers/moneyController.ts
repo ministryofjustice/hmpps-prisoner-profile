@@ -119,10 +119,10 @@ export default class MoneyController {
       .flatMap(batchTransaction => {
         return batchTransaction.relatedOffenderTransactions.map(relatedTransaction => {
           // Account for bonusPay and pieceWork by adding a new transaction with desc "Bonus for <entryDescription>"
-          // and make id = -1 so it appears first in the group of related transactions
+          // or "Piece work for <entryDescription>"
           if (relatedTransaction.bonusPay) {
             bonusPayTransactions.push({
-              id: -1,
+              id: relatedTransaction.id,
               entryDate: batchTransaction.entryDate,
               calendarDate: relatedTransaction.calendarDate,
               agencyId: batchTransaction.agencyId,
@@ -134,12 +134,13 @@ export default class MoneyController {
                 'short',
               )}`,
               postingType: TransactionPostingType.Credit,
+              isBonus: true,
             })
           }
 
           if (relatedTransaction.pieceWork) {
             pieceWorkTransactions.push({
-              id: -1,
+              id: relatedTransaction.id,
               entryDate: batchTransaction.entryDate,
               calendarDate: relatedTransaction.calendarDate,
               agencyId: batchTransaction.agencyId,
@@ -151,6 +152,7 @@ export default class MoneyController {
                 'short',
               )}`,
               postingType: TransactionPostingType.Credit,
+              isPieceWork: true,
             })
           }
 
@@ -294,7 +296,9 @@ export default class MoneyController {
   }
 
   /**
-   * Sort transactions by Entry Date, Calendar Date and ID - In reverse order
+   * Sort transactions by Entry Date, Calendar Date - In reverse order
+   *
+   * If a transaction is a bonus or piece work, it must be earliest within the same set of entry dates
    *
    * @param a
    * @param b
@@ -303,6 +307,9 @@ export default class MoneyController {
   private transactionSort(a: Transaction, b: Transaction) {
     const entryDateDiff = parseISO(b.entryDate).getTime() - parseISO(a.entryDate).getTime()
     if (entryDateDiff !== 0) return entryDateDiff
+
+    if (a.isBonus || a.isPieceWork) return 1
+    if (b.isBonus || b.isPieceWork) return -1
 
     if (a.calendarDate && b.calendarDate) {
       const calendarDateDiff = parseISO(b.calendarDate).getTime() - parseISO(a.calendarDate).getTime()

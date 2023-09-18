@@ -473,7 +473,7 @@ export const cashWHFTransactionsMock: Transaction[] = [
 
 export const bonusPayTransactionsMock: Transaction[] = [
   {
-    id: -1,
+    id: 2,
     entryDate: '2023-09-11',
     calendarDate: '2023-09-11',
     agencyId: 'MDI',
@@ -481,12 +481,13 @@ export const bonusPayTransactionsMock: Transaction[] = [
     currentBalance: 1800,
     entryDescription: 'Bonus pay for A Payment 2 from 11/09/2023',
     postingType: TransactionPostingType.Credit,
+    isBonus: true,
   },
 ]
 
 export const pieceWorkTransactionsMock: Transaction[] = [
   {
-    id: -1,
+    id: 1,
     entryDate: '2023-09-16',
     calendarDate: '2023-09-15',
     agencyId: 'MDI',
@@ -494,5 +495,6 @@ export const pieceWorkTransactionsMock: Transaction[] = [
     currentBalance: 3780,
     entryDescription: 'Piece work for Some payment from 15/09/2023',
     postingType: TransactionPostingType.Credit,
+    isPieceWork: true,
   },
 ]
