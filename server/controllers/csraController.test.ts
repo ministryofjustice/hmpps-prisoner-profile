@@ -229,4 +229,61 @@ describe('CSRA Controller', () => {
       expect(res.render.mock.calls[0][1].details).toEqual(expectedDetails)
     })
   })
+
+  describe('CSRA history page', () => {
+    beforeEach(() => {
+      req = {
+        params: { prisonerNumber: '' },
+        path: 'alerts/active',
+        middleware: {
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+        },
+      }
+      res = {
+        locals: {
+          user: {
+            activeCaseLoadId: 'MDI',
+            userRoles: [Role.UpdateAlert],
+            caseLoads: CaseLoadsDummyDataA,
+            token: 'TOKEN',
+          },
+          clientToken: 'CLIENT_TOKEN',
+        },
+        render: jest.fn(),
+      }
+      next = jest.fn()
+      controller = new CsraController(new CsraService(null))
+    })
+
+    it('should map the csra assessments to summaries', async () => {
+      jest
+        .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+        .mockResolvedValue([{ ...csraAssessmentMock, assessmentAgencyId: AgencyMock.agencyId }, csraAssessmentMock])
+
+      jest
+        .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
+        .mockResolvedValue([AgencyMock, AgencyMock])
+
+      await controller.displayHistory(req, res, next)
+
+      const expectedOutput = {
+        assessmentComment: 'HiMEIesRHiMEIesR',
+        assessmentDate: '2017-01-12',
+        classification: 'Standard',
+        location: 'Sheffield Crown Court',
+        assessmentSeq: 4,
+        bookingId: 111111,
+        offenderNo: 'A11111',
+      }
+
+      expect(res.render.mock.calls[0][0]).toEqual('pages/csra/prisonerCsraHistoryPage')
+      expect(res.render.mock.calls[0][1].name).toEqual('John Saunders')
+      expect(res.render.mock.calls[0][1].prisonerNumber).toEqual('G6123VU')
+      expect(res.render.mock.calls[0][1].csraAssessments).toEqual([
+        expectedOutput,
+        { ...expectedOutput, location: 'Not entered' },
+      ])
+    })
+  })
 })
