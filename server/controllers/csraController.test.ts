@@ -48,7 +48,7 @@ describe('CSRA Controller', () => {
         staffDetails: StaffDetailsMock,
       })
 
-      await controller.displayReview()(req, res, next)
+      await controller.displayReview(req, res, next)
 
       const expectedDetails = [
         {
@@ -102,7 +102,7 @@ describe('CSRA Controller', () => {
         staffDetails: null,
       })
 
-      await controller.displayReview()(req, res, next)
+      await controller.displayReview(req, res, next)
 
       const expectedDetails = [
         {
@@ -160,7 +160,7 @@ describe('CSRA Controller', () => {
         staffDetails: StaffDetailsMock,
       })
 
-      await controller.displayReview()(req, res, next)
+      await controller.displayReview(req, res, next)
 
       const expectedDetails = [
         {
@@ -200,7 +200,7 @@ describe('CSRA Controller', () => {
         staffDetails: StaffDetailsMock,
       })
 
-      await controller.displayReview()(req, res, next)
+      await controller.displayReview(req, res, next)
 
       const expectedDetails = [
         {

@@ -53,7 +53,7 @@ describe('Alerts Controller', () => {
         .mockResolvedValue(pagedActiveAlertsMock)
       const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
-      await controller.displayAlerts(true)(req, res, next)
+      await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -79,7 +79,7 @@ describe('Alerts Controller', () => {
         .mockResolvedValue(pagedInactiveAlertsMock)
       const mapSpy = jest.spyOn(headerMappers, 'mapHeaderData')
 
-      await controller.displayAlerts(false)(req, res, next)
+      await controller.displayAlerts(req, res, next, false)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -103,7 +103,7 @@ describe('Alerts Controller', () => {
         .mockResolvedValue(pagedActiveAlertsMock)
       jest.spyOn(headerMappers, 'mapHeaderData')
 
-      await controller.displayAlerts(true)(req, res, next)
+      await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -128,7 +128,7 @@ describe('Alerts Controller', () => {
 
       res.locals.user.userRoles = ['ROLE_OTHER']
 
-      await controller.displayAlerts(true)(req, res, next)
+      await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -154,7 +154,7 @@ describe('Alerts Controller', () => {
       req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'XYZ' }
       req.middleware.inmateDetail = inmateDetailMock
 
-      await controller.displayAlerts(true)(req, res, next)
+      await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -181,7 +181,7 @@ describe('Alerts Controller', () => {
       req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'OUT' }
       req.middleware.inmateDetail = inmateDetailMock
 
-      await controller.displayAlerts(true)(req, res, next)
+      await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -208,7 +208,7 @@ describe('Alerts Controller', () => {
       req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'TRN' }
       req.middleware.inmateDetail = inmateDetailMock
 
-      await controller.displayAlerts(true)(req, res, next)
+      await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         res.locals.clientToken,
@@ -264,7 +264,7 @@ describe('Alerts Controller', () => {
         .spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes')
         .mockResolvedValue(alertTypesMock)
 
-      await controller.displayAddAlert()(req, res, next)
+      await controller.displayAddAlert(req, res, next)
 
       expect(getAlertTypes).toHaveBeenCalled()
       expect(res.render).toHaveBeenCalled()
