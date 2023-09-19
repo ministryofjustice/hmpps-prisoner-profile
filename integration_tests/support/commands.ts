@@ -130,3 +130,8 @@ Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId =
   cy.task('stubSavingsTransactions', prisonerNumber)
   cy.task('stubDamageObligations', prisonerNumber)
 })
+
+Cypress.Commands.add('setupPrisonerSchedulePageStubs', ({ bookingId }) => {
+  cy.task('stubgetScheduledEventsForNextWeek', bookingId)
+  cy.task('stubgetScheduledEventsForThisWeek', bookingId)
+})

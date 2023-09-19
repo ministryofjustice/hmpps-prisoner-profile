@@ -46,7 +46,6 @@ export default class PrisonerCellHistoryController {
       return Object.entries(groupBy(locationsWithAgencyLeaveDate, 'establishmentWithAgencyLeaveDate')).map(
         // eslint-disable-next-line no-unused-vars
         ([key, value]) => {
-          // @ts-expect-error ts-migrate(2339) FIXME: Property 'slice' does not exist on type 'unknown'.
           const fromDateString = formatDate(value.slice(-1)[0].assignmentDateTime, 'short')
           const toDateString = formatDate(value[0].assignmentEndDateTime, 'short') || 'Unknown'
 
