@@ -25,16 +25,16 @@ export const nonAssociationRows = [
   [{ text: 'Norton, Stephan' }, { text: 'A9585SD' }, { text: 'C-2-009' }, { text: 'Victim' }],
 ]
 
-export type ScheduleItem = {
+export interface GetEventScheduleItem {
   name: string
   startTime?: string
   endTime?: string
 }
 
-type Schedule = {
-  morning: ScheduleItem[]
-  afternoon: ScheduleItem[]
-  evening: ScheduleItem[]
+export interface Schedule {
+  morning: GetEventScheduleItem[]
+  afternoon: GetEventScheduleItem[]
+  evening: GetEventScheduleItem[]
 }
 
 export const schedule: Schedule = {

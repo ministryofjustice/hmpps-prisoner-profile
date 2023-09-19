@@ -59,6 +59,10 @@ import {
   SentenceSummaryWithSentenceMock,
 } from '../../server/data/localMockData/sentenceSummaryMock'
 import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
+import {
+  PrisonerScheduleNextWeekMock,
+  PrisonerScheduleThisWeekMock,
+} from '../../server/data/localMockData/prisonerScheduleMock'
 import csraAssessmentMock from '../../server/data/localMockData/csraAssessmentMock'
 import staffDetails from '../../server/data/localMockData/staffDetails'
 import {
@@ -1028,6 +1032,38 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: damageObligationContainerMock,
+      },
+    })
+  },
+
+  stubgetScheduledEventsForNextWeek: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/api/bookings/${bookingId}/events/nextWeek`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: PrisonerScheduleNextWeekMock,
+      },
+    })
+  },
+
+  stubgetScheduledEventsForThisWeek: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/api/bookings/${bookingId}/events/thisWeek`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: PrisonerScheduleThisWeekMock,
       },
     })
   },

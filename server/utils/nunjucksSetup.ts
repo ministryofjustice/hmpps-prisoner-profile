@@ -20,7 +20,7 @@ import {
   formatMoney,
 } from './utils'
 import { pluralise } from './pluralise'
-import { formatDate, formatDateTime } from './dateHelpers'
+import { formatDate, formatDateTime, timeFormat } from './dateHelpers'
 import config from '../config'
 
 const production = process.env.NODE_ENV === 'production'
@@ -107,4 +107,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('prependBaseUrl', prependBaseUrl)
   njkEnv.addFilter('prependHmppsAuthBaseUrl', prependHmppsAuthBaseUrl)
   njkEnv.addFilter('toNonAssociationTableRows', toNonAssociationRows)
+  njkEnv.addFilter('timeFormat', timeFormat)
 }
