@@ -877,6 +877,25 @@ export default {
     })
   },
 
+  stubCsraHistory: ({ prisonerNumber }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offender-assessments/csra/${prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [
+          { ...csraAssessmentMock, assessmentAgencyId: agenciesDetails.agencyId, offenderNo: prisonerNumber },
+          { ...csraAssessmentMock, assessmentAgencyId: agenciesDetails.agencyId, offenderNo: prisonerNumber },
+        ],
+      },
+    })
+  },
+
   stubGetAgency: agencyId => {
     return stubFor({
       request: {

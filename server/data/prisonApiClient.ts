@@ -329,6 +329,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
+  async getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessment[]> {
+    return this.get<CsraAssessment[]>({
+      path: `/api/offender-assessments/csra/${prisonerNumber}`,
+    })
+  }
+
   async getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]> {
     return this.get<Transaction[]>({
       path: `/api/offenders/${prisonerNumber}/transaction-history`,

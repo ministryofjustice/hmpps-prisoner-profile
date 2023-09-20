@@ -1,0 +1,30 @@
+{% extends "../index.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: name,
+        href: "/prisoner/" + prisonerNumber
+    }
+] %}
+
+{% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1>{{ name |  apostrophe }} CSRA history</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter app-sidebar">
+
+        </div>
+        <div class="govuk-grid-column-three-quarters ">
+            {% include './partials/csraList.njk' %}
+        </div>
+    </div>
+{% endblock %}
