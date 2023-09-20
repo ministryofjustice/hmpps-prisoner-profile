@@ -1,3 +1,4 @@
+import { addDays, format, startOfToday } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 import nonAssociationDetailsDummyData from '../data/localMockData/nonAssociations'
@@ -58,6 +59,7 @@ import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
+import movementsMock from '../data/localMockData/movementsData'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -118,6 +120,7 @@ describe('OverviewPageService', () => {
     prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
     prisonApiClient.getFullStatus = jest.fn(async () => fullStatusMock)
     prisonApiClient.getStaffRoles = jest.fn(async () => [])
+    prisonApiClient.getMovements = jest.fn(async () => [])
 
     adjudicationsApiClient = adjudicationsApiClientMock()
     adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
@@ -613,7 +616,65 @@ describe('OverviewPageService', () => {
         ).toBeFalsy()
       })
     })
+
+    describe('Displaying upcoming transfer', () => {
+      const scheduledTransferLabel = 'Scheduled transfer'
+
+      describe('Given a movement returned in the future for the prisoner', () => {
+        it('Adds a status', async () => {
+          const prisonerNumber = 'A1234BC'
+          const bookingId = 123456
+          const movements = movementsMock(prisonerNumber, format(addDays(startOfToday(), 10), 'yyyy-MM-dd'))
+          prisonApiClient.getMovements = jest.fn(async () => movements)
+
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get(
+            'token',
+            { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+            1,
+          )
+          const scheduledStatus = res.statuses.filter(s => s.label === scheduledTransferLabel)[0]
+          expect(scheduledStatus.label).toEqual(scheduledTransferLabel)
+          expect(scheduledStatus.subText).toEqual(`To ${movements[0].toAgencyDescription}`)
+        })
+      })
+
+      describe('Given a movement returned in the past for the prisoner', () => {
+        it('Does not add a status', async () => {
+          const prisonerNumber = 'A1234BC'
+          const bookingId = 123456
+          const movements = movementsMock(prisonerNumber, format(addDays(startOfToday(), -10), 'yyyy-MM-dd'))
+          prisonApiClient.getMovements = jest.fn(async () => movements)
+
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get(
+            'token',
+            { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+            1,
+          )
+
+          expect(res.statuses.filter(s => s.label === scheduledTransferLabel)).toEqual([])
+        })
+      })
+
+      describe('Given no movement', () => {
+        it('Does not add a status', async () => {
+          const prisonerNumber = 'A1234BC'
+          const bookingId = 123456
+
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get(
+            'token',
+            { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+            1,
+          )
+
+          expect(res.statuses.filter(s => s.label === scheduledTransferLabel)).toEqual([])
+        })
+      })
+    })
   })
+
   describe('getOffenceOverview', () => {
     it('should get the offence overview data', async () => {
       const prisonerNumber = 'A1234BC'

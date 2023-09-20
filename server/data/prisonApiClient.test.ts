@@ -40,6 +40,8 @@ import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
 import { AccountCode } from './enums/accountCode'
 import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
+import { MovementType } from './enums/movementType'
+import movementsMock from './localMockData/movementsData'
 
 jest.mock('./tokenStore')
 
@@ -410,6 +412,21 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getDamageObligations(prisonerNumber)
       expect(output).toEqual(damageObligationContainerMock)
+    })
+  })
+
+  describe('getMovement', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      const movements = movementsMock(prisonerNumber)
+      const apiRequest = fakePrisonApi
+        .post(`/api/movements/offenders?movementTypes=TRN&movementTypes=CRT&latestOnly=true`, [prisonerNumber])
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, movements)
+
+      const response = await prisonApiClient.getMovements([prisonerNumber], [MovementType.Transfer, MovementType.Court])
+      expect(apiRequest.isDone()).toBe(true)
+      expect(response).toEqual(movements)
     })
   })
 })

@@ -1,3 +1,4 @@
+import { format, addDays, startOfToday } from 'date-fns'
 import { stubFor } from './wiremock'
 import {
   accountBalancesMock,
@@ -74,6 +75,7 @@ import {
 } from '../../server/data/localMockData/transactionsMock'
 import { damageObligationContainerMock } from '../../server/data/localMockData/damageObligationsMock'
 import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
+import movementsMock from '../../server/data/localMockData/movementsData'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1059,7 +1061,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/bookings/${bookingId}/events/nextWeek`,
+        urlPattern: `/prison/api/bookings/${bookingId}/events/nextWeek`,
       },
       response: {
         status: 200,
@@ -1075,7 +1077,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/bookings/${bookingId}/events/thisWeek`,
+        urlPattern: `/prison/api/bookings/${bookingId}/events/thisWeek`,
       },
       response: {
         status: 200,
@@ -1083,6 +1085,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: PrisonerScheduleThisWeekMock,
+      },
+    })
+  },
+
+  stubMovements: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `/prison/api/movements/offenders.*`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: movementsMock(prisonerNumber, format(addDays(startOfToday(), 10), 'yyyy-MM-dd')),
       },
     })
   },

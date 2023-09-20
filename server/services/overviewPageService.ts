@@ -44,10 +44,10 @@ import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import { MainOffence } from '../interfaces/prisonApi/mainOffence'
 import { RestClientBuilder } from '../data'
 import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
-import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
+import { MovementType } from '../data/enums/movementType'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -609,14 +609,23 @@ export default class OverviewPageService {
     }
 
     // Neurodiversity support needed
-    const learnerNeurodivergence: LearnerNeurodivergence[] = await this.curiousApiClient.getLearnerNeurodivergence(
-      prisonerData.prisonerNumber,
-    )
+    const [learnerNeurodivergence, movements] = await Promise.all([
+      this.curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
+      this.prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
+    ])
+
     if (learnerNeurodivergence?.length) {
       statusList.push({
         label: 'Support needed',
         subText: 'Has neurodiversity needs',
       })
+    }
+
+    if (movements.length > 0) {
+      const movement = movements.find(m => m.offenderNo === prisonerData.prisonerNumber)
+      if (isAfter(new Date(movement.movementDate), startOfToday())) {
+        statusList.push({ label: 'Scheduled transfer', subText: `To ${movement.toAgencyDescription}` })
+      }
     }
 
     return statusList

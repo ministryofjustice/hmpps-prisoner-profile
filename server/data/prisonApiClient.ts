@@ -47,6 +47,8 @@ import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleIt
 import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
+import { Movement } from '../interfaces/prisonApi/movement'
+import { MovementType } from './enums/movementType'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -355,5 +357,17 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]> {
     return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/nextWeek` })
+  }
+
+  async getMovements(
+    prisonerNumbers: string[],
+    movementTypes: MovementType[],
+    latestOnly: boolean = true,
+  ): Promise<Movement[]> {
+    return (await this.post({
+      path: `/api/movements/offenders`,
+      query: mapToQueryString({ movementTypes, latestOnly }),
+      data: prisonerNumbers,
+    })) as Movement[]
   }
 }
