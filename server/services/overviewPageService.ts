@@ -21,7 +21,7 @@ import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Prisoner } from '../interfaces/prisoner'
 import { PersonalDetails } from '../interfaces/personalDetails'
-import { StaffContacts } from '../interfaces/staffContacts'
+import { ContactDetail, StaffContacts } from '../interfaces/staffContacts'
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { Pom } from '../interfaces/pom'
@@ -48,6 +48,12 @@ import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import { MovementType } from '../data/enums/movementType'
+import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
+import { Movement } from '../interfaces/prisonApi/movement'
+import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
+import { KeyWorker } from '../interfaces/keyWorker'
+import { CaseNote } from '../interfaces/caseNote'
+import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -93,44 +99,64 @@ export default class OverviewPageService {
     this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
     this.nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
 
-    const [inmateDetail, staffRoles] = await Promise.all([
+    const [
+      inmateDetail,
+      staffRoles,
+      learnerNeurodivergence,
+      movements,
+      nonAssociationDetails,
+      offenderContacts,
+      allocationManager,
+      offenderKeyWorker,
+      keyWorkerSessions,
+      mainOffence,
+      courtCaseData,
+      fullStatus,
+    ] = await Promise.all([
       this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
       this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
+      this.curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
+      this.prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
+      this.nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber),
+      this.prisonApiClient.getBookingContacts(prisonerData.bookingId),
+      this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
+      this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
+      this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+      this.prisonApiClient.getMainOffence(bookingId),
+      this.prisonApiClient.getCourtCases(bookingId),
+      this.prisonApiClient.getFullStatus(prisonerNumber),
     ])
 
-    const [
-      nonAssociations,
-      miniSummaryGroupA,
-      miniSummaryGroupB,
-      personalDetails,
-      staffContacts,
-      schedule,
-      statuses,
-      offencesOverview,
-    ] = await Promise.all([
-      this.getNonAssociations(prisonerNumber),
+    const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
       this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles),
       this.getMiniSummaryGroupB(prisonerData, inmateDetail, userCaseLoads, userRoles),
       this.getPersonalDetails(prisonerData, inmateDetail),
-      this.getStaffContacts(prisonerData),
       this.getSchedule(prisonerData),
-      this.getStatuses(prisonerData, inmateDetail),
       this.getOffencesOverview(
-        bookingId,
-        prisonerNumber,
         imprisonmentStatusDescription,
         conditionalReleaseDate,
         confirmedReleaseDate,
+        mainOffence,
+        courtCaseData,
+        fullStatus,
       ),
     ])
+
+    const nonAssociations = this.getNonAssociations(nonAssociationDetails)
 
     return {
       miniSummaryGroupA,
       miniSummaryGroupB,
-      statuses,
+      statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, movements),
       nonAssociations,
       personalDetails,
-      staffContacts,
+      staffContacts: this.getStaffContacts(
+        prisonerData,
+        offenderContacts,
+        allocationManager,
+        offenderKeyWorker,
+        keyWorkerSessions,
+      ),
       schedule,
       offencesOverview,
       prisonName: prisonerData.prisonName,
@@ -140,18 +166,13 @@ export default class OverviewPageService {
   }
 
   public async getOffencesOverview(
-    bookingId: number,
-    prisonerNumber: string,
     imprisonmentStatusDescription: string,
     conditionalReleaseDate: string,
     confirmedReleaseDate: string,
+    mainOffence: MainOffence[],
+    courtCaseData: CourtCase[],
+    fullStatus: FullStatus,
   ) {
-    const [mainOffence, courtCaseData, fullStatus] = await Promise.all([
-      this.prisonApiClient.getMainOffence(bookingId),
-      this.prisonApiClient.getCourtCases(bookingId),
-      this.prisonApiClient.getFullStatus(prisonerNumber),
-    ])
-
     const nextCourtAppearance = await this.getNextCourtAppearanceForOverview(courtCaseData)
 
     const mainOffenceDescription = await this.getMainOffenceDescription(mainOffence)
@@ -193,15 +214,13 @@ export default class OverviewPageService {
     return nextCourtAppearance
   }
 
-  public async getStaffContacts(prisonerData: Prisoner): Promise<StaffContacts> {
-    const { bookingId } = prisonerData
-    const [offenderContacts, allocationManager, offenderKeyWorker, keyWorkerSessions] = await Promise.all([
-      this.prisonApiClient.getBookingContacts(prisonerData.bookingId),
-      this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
-      this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
-    ])
-
+  public getStaffContacts(
+    prisonerData: Prisoner,
+    offenderContacts: ContactDetail,
+    allocationManager: Pom,
+    offenderKeyWorker: KeyWorker,
+    keyWorkerSessions: CaseNote[],
+  ): StaffContacts {
     const communityOffenderManager =
       offenderContacts && offenderContacts.otherContacts !== undefined
         ? offenderContacts.otherContacts
@@ -550,8 +569,7 @@ export default class OverviewPageService {
     }
   }
 
-  private async getNonAssociations(prisonerNumber: string): Promise<OverviewNonAssociation[]> {
-    const nonAssociations = await this.nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber)
+  private getNonAssociations(nonAssociations: NonAssociationDetails): OverviewNonAssociation[] {
     if (!nonAssociations?.nonAssociations) return []
 
     return nonAssociations.nonAssociations.map(nonAssociation => {
@@ -567,7 +585,12 @@ export default class OverviewPageService {
     })
   }
 
-  private async getStatuses(prisonerData: Prisoner, inmateDetail: InmateDetail): Promise<Status[]> {
+  private getStatuses(
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+    learnerNeurodivergence: LearnerNeurodivergence[],
+    movements: Movement[],
+  ): Status[] {
     const statusList: Status[] = []
 
     // Current Location
@@ -609,11 +632,6 @@ export default class OverviewPageService {
     }
 
     // Neurodiversity support needed
-    const [learnerNeurodivergence, movements] = await Promise.all([
-      this.curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
-      this.prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
-    ])
-
     if (learnerNeurodivergence?.length) {
       statusList.push({
         label: 'Support needed',
