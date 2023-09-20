@@ -95,7 +95,7 @@ describe('CSRA Controller', () => {
       })
     })
 
-    it('should handle stadd details and agency details being null', async () => {
+    it('should handle staff details and agency details being null', async () => {
       jest.spyOn<any, string>(controller['csraService'], 'getCsraAssessment').mockResolvedValue({
         csraAssessment: csraAssessmentMock,
         agencyDetails: null,
@@ -239,6 +239,7 @@ describe('CSRA Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
+        query: {},
       }
       res = {
         locals: {
@@ -268,6 +269,7 @@ describe('CSRA Controller', () => {
       await controller.displayHistory(req, res, next)
 
       const expectedOutput = {
+        ...csraAssessmentMock,
         assessmentComment: 'HiMEIesRHiMEIesR',
         assessmentDate: '2017-01-12',
         classification: 'Standard',
@@ -275,6 +277,8 @@ describe('CSRA Controller', () => {
         assessmentSeq: 4,
         bookingId: 111111,
         offenderNo: 'A11111',
+        classificationCode: 'STANDARD',
+        assessmentAgencyId: 'SHEFCC',
       }
 
       expect(res.render.mock.calls[0][0]).toEqual('pages/csra/prisonerCsraHistoryPage')
@@ -282,8 +286,123 @@ describe('CSRA Controller', () => {
       expect(res.render.mock.calls[0][1].prisonerNumber).toEqual('G6123VU')
       expect(res.render.mock.calls[0][1].csraAssessments).toEqual([
         expectedOutput,
-        { ...expectedOutput, location: 'Not entered' },
+        { ...expectedOutput, location: 'Not entered', assessmentAgencyId: 'HLI' },
       ])
+    })
+
+    describe('with filters', () => {
+      beforeEach(() => {
+        req = {
+          params: { prisonerNumber: '' },
+          path: 'alerts/active',
+          middleware: {
+            prisonerData: PrisonerMockDataA,
+            inmateDetail: inmateDetailMock,
+          },
+          query: {},
+        }
+        res = {
+          locals: {
+            user: {
+              activeCaseLoadId: 'MDI',
+              userRoles: [Role.UpdateAlert],
+              caseLoads: CaseLoadsDummyDataA,
+              token: 'TOKEN',
+            },
+            clientToken: 'CLIENT_TOKEN',
+          },
+          render: jest.fn(),
+        }
+        next = jest.fn()
+        controller = new CsraController(new CsraService(null))
+      })
+
+      it('should get values to use for filters', async () => {
+        const reqWithQuery = {
+          ...req,
+          query: {
+            csra: 'STANDARD',
+            location: [csraAssessmentMock.assessmentAgencyId, AgencyMock.agencyId],
+          },
+        }
+        jest
+          .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+          .mockResolvedValue([
+            { ...csraAssessmentMock, assessmentAgencyId: AgencyMock.agencyId, classificationCode: 'MED' },
+            csraAssessmentMock,
+          ])
+
+        jest
+          .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
+          .mockResolvedValue([AgencyMock, AgencyMock])
+
+        await controller.displayHistory(reqWithQuery, res, next)
+        expect(res.render.mock.calls[0][1].filterValues).toEqual({
+          establishments: [
+            { checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' },
+            { checked: true, text: 'Not entered', value: 'HLI' },
+          ],
+          from: undefined,
+          incentiveLevels: [
+            { checked: false, text: 'Medium', value: 'MED' },
+            { checked: true, text: 'Standard', value: 'STANDARD' },
+          ],
+          to: undefined,
+        })
+      })
+
+      it('should validate date filters', async () => {
+        const reqWithQuery = {
+          ...req,
+          query: {
+            to: '19/03/2020',
+            from: '20/03/2020',
+          },
+        }
+        jest
+          .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+          .mockResolvedValue([
+            { ...csraAssessmentMock, assessmentAgencyId: AgencyMock.agencyId, classificationCode: 'MED' },
+            csraAssessmentMock,
+          ])
+
+        jest
+          .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
+          .mockResolvedValue([AgencyMock, AgencyMock])
+
+        await controller.displayHistory(reqWithQuery, res, next)
+        expect(res.render.mock.calls[0][1].csraAssessments).toEqual([])
+        expect(res.render.mock.calls[0][1].errors).toEqual([
+          {
+            href: '#endDate',
+            text: "'Date to (latest)' must be after or the same as 'Date from (earliest) '",
+          },
+        ])
+      })
+
+      it('should return ther filtered assessments', async () => {
+        const reqWithQuery = {
+          ...req,
+          query: {
+            location: AgencyMock.agencyId,
+          },
+        }
+        jest
+          .spyOn<any, string>(controller['csraService'], 'getCsraHistory')
+          .mockResolvedValue([
+            { ...csraAssessmentMock, assessmentAgencyId: AgencyMock.agencyId, classificationCode: 'MED' },
+            csraAssessmentMock,
+          ])
+
+        jest
+          .spyOn<any, string>(controller['csraService'], 'getAgenciesForCsraAssessments')
+          .mockResolvedValue([AgencyMock, AgencyMock])
+
+        await controller.displayHistory(reqWithQuery, res, next)
+        expect(res.render.mock.calls[0][1].csraAssessments).toHaveLength(1)
+        expect(res.render.mock.calls[0][1].csraAssessments[0].assessmentAgencyId).toEqual(AgencyMock.agencyId)
+        expect(res.render.mock.calls[0][1].errors).toEqual(undefined)
+      })
     })
   })
 })

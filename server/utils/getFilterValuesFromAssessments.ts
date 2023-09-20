@@ -1,0 +1,44 @@
+import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
+
+interface CsraFilterValues {
+  incentiveLevels: { value: CsraAssessment['classificationCode']; text: string; checked: boolean }[]
+  establishments: { value: string; text: string; checked: boolean }[]
+  to?: string
+  from?: string
+}
+export default (
+  csraAssessments: CsraSummary[],
+  filters: {
+    csra?: CsraAssessment['classificationCode'] | CsraAssessment['classificationCode'][]
+    location?: string | string[]
+    to?: string
+    from?: string
+  },
+): CsraFilterValues => {
+  const csraFilters = [filters.csra].flat()
+  const locationFilters = [filters.location].flat()
+
+  const uniqueEstablishments = [...new Map(csraAssessments.map(csra => [csra.assessmentAgencyId, csra])).values()].map(
+    csra => ({
+      value: csra.assessmentAgencyId,
+      text: csra.location,
+      checked: locationFilters.includes(csra.assessmentAgencyId),
+    }),
+  )
+
+  const uniqueIncentiveLevels = [...new Map(csraAssessments.map(csra => [csra.classificationCode, csra])).values()].map(
+    csra => ({
+      value: csra.classificationCode,
+      text: csra.classification,
+      checked: csraFilters.includes(csra.classificationCode),
+    }),
+  )
+
+  return {
+    establishments: uniqueEstablishments,
+    incentiveLevels: uniqueIncentiveLevels,
+    to: filters.to,
+    from: filters.from,
+  }
+}
