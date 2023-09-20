@@ -29,10 +29,12 @@ export default function getPrisonerData(services: Services, options: { minimal?:
     ])
 
     if (assessments && Array.isArray(assessments)) {
-      prisonerData.assessments = assessments
+      prisonerData.assessments = assessments.sort(
+        (a, b) => new Date(b.assessmentDate).getTime() - new Date(a.assessmentDate).getTime(),
+      )
     }
-    prisonerData.csra = prisonerData.assessments?.find(
-      (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra,
+    prisonerData.csra = prisonerData.assessments?.find((assessment: Assessment) =>
+      assessment.assessmentDescription.includes(AssessmentCode.csra),
     )?.classification
     // End
 
