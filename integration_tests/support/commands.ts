@@ -37,6 +37,7 @@ Cypress.Commands.add(
     cy.task('stubGetStaffRoles', staffRoles)
     cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
     cy.task('stubInmateDetail', bookingId)
+    cy.task('stubMovements', prisonerNumber)
   },
 )
 
