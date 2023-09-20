@@ -464,8 +464,9 @@ export default class OverviewPageService {
         (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category,
       ) || null
     const csra: Assessment =
-      prisonerData.assessments?.find((assessment: Assessment) => assessment.assessmentCode === AssessmentCode.csra) ||
-      null
+      prisonerData.assessments?.find((assessment: Assessment) =>
+        assessment.assessmentDescription.includes(AssessmentCode.csra),
+      ) || null
 
     const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
 
