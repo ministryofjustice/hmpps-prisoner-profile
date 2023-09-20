@@ -96,6 +96,7 @@ export interface PrisonApiClient {
   getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]>
   getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]>
   getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment>
+  getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessment[]>
   getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]>
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
 }

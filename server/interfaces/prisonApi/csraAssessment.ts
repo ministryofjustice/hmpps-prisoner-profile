@@ -2,7 +2,7 @@ export interface CsraAssessment {
   bookingId: number
   assessmentSeq: number
   offenderNo: string
-  classificationCode?: string
+  classificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
   assessmentCode?: string
   cellSharingAlertFlag: boolean
   assessmentDate: string
@@ -15,7 +15,7 @@ export interface CsraAssessment {
   approvalDate?: string
   approvalCommitteeCode?: string
   approvalCommitteeName?: string
-  originalClassificationCode?: string
+  originalClassificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
   classificationReviewReason?: string
   questions: [
     {

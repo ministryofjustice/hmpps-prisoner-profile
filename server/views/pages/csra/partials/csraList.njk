@@ -1,0 +1,37 @@
+{% from '../../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
+{% from '../../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+
+{#{{ hmppsPagedListHeader(listMetadata) }}#}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div role="list">
+            {% for csra in csraAssessments %}
+                <div class='govuk-grid-row'>
+                    <div class='govuk-grid-column-three-quarters'>
+                        <p class='govuk-!-font-size-24 govuk-!-font-weight-bold'>{{ csra.classification }}</p>
+                        <p class='hmpps-dark-grey-font'>{{ csra.assessmentDate | formatDateTime('short', ' at ') }}</p>
+                        <p>{{ csra.assessmentComment or 'Not entered' }}</p>
+                        <p class='hmpps-dark-grey-font govuk-!-margin-bottom-0'>Recorded at {{ csra.location }}</p>
+                    </div>
+                    <div class='govuk-grid-column-one-quarter govuk-!-text-align-right'>
+                        <a href="/prisoner/{{ csra.offenderNo }}/csra-review?assessmentSeq={{ csra.assessmentSeq }}&bookingId={{ csra.bookingId }}" class="govuk-link govuk-link--no-visited-state">View details</a>
+                    </div>
+                </div>
+                <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m" />
+            {% endfor %}
+        </div>
+{#        {% if not listMetadata.pagination.totalElements %}#}
+{#            <div>#}
+{#                <p>No case notes have been found for the selected filters.</p>#}
+{#                <p>You can:</p>#}
+{#                <ul>#}
+{#                    <li>select different types and/or sub types</li>#}
+{#                    <li>choose different dates</li>#}
+{#                    <li>clear filters to view all case notes</li>#}
+{#                </ul>#}
+{#            </div>#}
+{#        {% endif %}#}
+    </div>
+</div>
+{#{{ hmppsPagedListFooter(listMetadata) }}#}
+
