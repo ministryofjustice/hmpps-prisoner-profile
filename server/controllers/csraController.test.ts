@@ -87,6 +87,7 @@ describe('CSRA Controller', () => {
       ]
 
       expect(res.render).toHaveBeenCalledWith('pages/csra/csraReviewPage', {
+        pageTitle: 'CSRA details',
         details: expectedDetails,
         prisonerName: 'John Saunders',
         prisonerNumber: 'G6123VU',
@@ -141,6 +142,7 @@ describe('CSRA Controller', () => {
       ]
 
       expect(res.render).toHaveBeenCalledWith('pages/csra/csraReviewPage', {
+        pageTitle: 'CSRA details',
         details: expectedDetails,
         prisonerName: 'John Saunders',
         prisonerNumber: 'G6123VU',

@@ -36,6 +36,7 @@ export default class CsraController {
     const filteredSummaries = this.csraService.filterCsraAssessments(allCsraSummaries, req.query)
 
     return res.render('pages/csra/prisonerCsraHistoryPage', {
+      pageTitle: 'CSRA history',
       name,
       prisonerNumber,
       csraAssessments: filteredSummaries,
@@ -55,6 +56,7 @@ export default class CsraController {
     )
 
     return res.render('pages/csra/csraReviewPage', {
+      pageTitle: 'CSRA details',
       details: mapCsraReviewToSummaryList(csraAssessment, agencyDetails, staffDetails),
       reviewDate: formatDate(new Date(csraAssessment.assessmentDate).toISOString(), 'long'),
       reviewQuestions: mapCsraQuestionsToSummaryList(csraAssessment.questions),
