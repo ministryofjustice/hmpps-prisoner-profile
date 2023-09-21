@@ -4,13 +4,8 @@ import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
 import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
 import { formatName } from '../utils/utils'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import getCsraClassificationName from './getCsraClassificationName'
 
-const csraTranslations = {
-  LOW: 'Low',
-  MED: 'Medium',
-  STANDARD: 'Standard',
-  HI: 'High',
-}
 export default (
   csraAssessment: CsraAssessment,
   agencyDetails: AgencyLocationDetails | null,
@@ -18,16 +13,15 @@ export default (
 ) => {
   const assessorAuthority = csraAssessment.assessmentCommitteeName || 'Not entered'
   const assessorName = formatName(staffDetails?.firstName, '', staffDetails?.lastName)
-
   return [
     {
       key: { text: 'CSRA' },
       value: {
         text: csraAssessment.originalClassificationCode
-          ? `${csraTranslations[csraAssessment.classificationCode]} - this is an override from ${
-              csraTranslations[csraAssessment.originalClassificationCode]
-            }`
-          : csraTranslations[csraAssessment.classificationCode],
+          ? `${getCsraClassificationName(
+              csraAssessment.classificationCode,
+            )} - this is an override from ${getCsraClassificationName(csraAssessment.originalClassificationCode)}`
+          : getCsraClassificationName(csraAssessment.classificationCode),
       },
     },
     ...(csraAssessment.originalClassificationCode

@@ -536,3 +536,8 @@ export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]):
     { text: na.assignedLivingUnitDescription },
     { text: na.reasonDescription },
   ])
+
+export const sortByDateTime = (t1: string, t2: string): number => {
+  const [date1, date2] = [new Date(t1).getTime(), new Date(t2).getTime()]
+  return date1 - date2
+}

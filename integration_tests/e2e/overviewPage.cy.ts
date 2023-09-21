@@ -225,6 +225,7 @@ context('Overview Page', () => {
         overviewPage.statusList().should('exist')
         overviewPage.statusList().contains('li > p', 'In Moorland (HMP & YOI)')
         overviewPage.statusList().contains('li > p', 'Support needed')
+        overviewPage.statusList().contains('li > p', 'Scheduled transfer')
       })
     })
 

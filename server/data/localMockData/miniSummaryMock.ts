@@ -54,6 +54,7 @@ export const assessmentsMock: Assessment[] = [
   {
     assessmentDate: '2023-02-19',
     assessmentCode: 'CATEGORY',
+    assessmentDescription: 'Category',
     classificationCode: 'B',
     classification: 'Cat B',
     nextReviewDate: '2023-02-19',
@@ -61,6 +62,7 @@ export const assessmentsMock: Assessment[] = [
   {
     assessmentDate: '2021-02-19',
     assessmentCode: 'CSR',
+    assessmentDescription: 'CSR Rating',
     classificationCode: 'STANDARD',
     classification: 'Standard',
     nextReviewDate: '2023-02-19',
