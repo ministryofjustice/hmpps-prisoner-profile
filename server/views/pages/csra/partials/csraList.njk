@@ -1,7 +1,6 @@
 {% from '../../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
 {% from '../../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
 
-{#{{ hmppsPagedListHeader(listMetadata) }}#}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <div role="list">
@@ -20,18 +19,16 @@
                 <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m" />
             {% endfor %}
         </div>
-{#        {% if not listMetadata.pagination.totalElements %}#}
-{#            <div>#}
-{#                <p>No case notes have been found for the selected filters.</p>#}
-{#                <p>You can:</p>#}
-{#                <ul>#}
-{#                    <li>select different types and/or sub types</li>#}
-{#                    <li>choose different dates</li>#}
-{#                    <li>clear filters to view all case notes</li>#}
-{#                </ul>#}
-{#            </div>#}
-{#        {% endif %}#}
+        {% if not csraAssessments.length %}
+            <div>
+                <p>No CSRA assessments have been found for the selected filters.</p>
+                <p>You can:</p>
+                <ul>
+                    <li>select different incentive levels and/or establishments</li>
+                    <li>choose different dates</li>
+                    <li>clear filters to view all CSRA assessments</li>
+                </ul>
+            </div>
+        {% endif %}
     </div>
 </div>
-{#{{ hmppsPagedListFooter(listMetadata) }}#}
-

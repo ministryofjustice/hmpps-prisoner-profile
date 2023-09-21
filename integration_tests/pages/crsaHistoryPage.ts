@@ -6,4 +6,8 @@ export default class CsraHistoryPage extends Page {
   csraList = (): PageElement => cy.get('[role="list"]')
 
   firstCsra = (): PageElement => cy.get('[role="list"] > :nth-child(1)')
+
+  filters = (): PageElement => cy.get('[data-qa="csra-filters"]')
+
+  applyFiltersBtn = (): PageElement => cy.get('[data-qa="apply-filter-button"]')
 }

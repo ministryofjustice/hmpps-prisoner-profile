@@ -6,6 +6,8 @@ import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper
 import mapCsraQuestionsToSummaryList from '../mappers/csraQuestionsToSummaryListMapper'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import csraAssessmentsToSummaryListMapper from '../mappers/csraAssessmentsToSummaryListMapper'
+import getFilterValuesFromAssessments from '../utils/getFilterValuesFromAssessments'
+import validateDateRange from '../utils/validateDateRange'
 
 export default class CsraController {
   constructor(private readonly csraService: CsraService) {}
@@ -15,13 +17,30 @@ export default class CsraController {
     const { clientToken } = res.locals
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const csraAssessments = await this.csraService.getCsraHistory(clientToken, prisonerNumber)
-    const agencies = await this.csraService.getAgenciesForCsraAssessments(clientToken, csraAssessments)
+    const filterErrors = validateDateRange(req.query.from as string, req.query.to as string)
+
+    const allCsraAssessments = await this.csraService.getCsraHistory(clientToken, prisonerNumber)
+    const agencies = await this.csraService.getAgenciesForCsraAssessments(clientToken, allCsraAssessments)
+    const allCsraSummaries = csraAssessmentsToSummaryListMapper(allCsraAssessments, agencies)
+    const filterValues = getFilterValuesFromAssessments(allCsraSummaries, req.query)
+
+    if (filterErrors.length)
+      return res.render('pages/csra/prisonerCsraHistoryPage', {
+        name,
+        prisonerNumber,
+        csraAssessments: [],
+        filterValues,
+        errors: filterErrors,
+      })
+
+    const filteredSummaries = this.csraService.filterCsraAssessments(allCsraSummaries, req.query)
 
     return res.render('pages/csra/prisonerCsraHistoryPage', {
+      pageTitle: 'CSRA history',
       name,
       prisonerNumber,
-      csraAssessments: csraAssessmentsToSummaryListMapper(csraAssessments, agencies),
+      csraAssessments: filteredSummaries,
+      filterValues,
     })
   }
 
@@ -37,6 +56,7 @@ export default class CsraController {
     )
 
     return res.render('pages/csra/csraReviewPage', {
+      pageTitle: 'CSRA details',
       details: mapCsraReviewToSummaryList(csraAssessment, agencyDetails, staffDetails),
       reviewDate: formatDate(new Date(csraAssessment.assessmentDate).toISOString(), 'long'),
       reviewQuestions: mapCsraQuestionsToSummaryList(csraAssessment.questions),

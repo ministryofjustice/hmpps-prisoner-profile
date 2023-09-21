@@ -1,9 +1,8 @@
-import { isBefore, isFuture } from 'date-fns'
 import { Prisoner } from '../interfaces/prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
-import { formatDateTimeISO, isRealDate, parseDate } from '../utils/dateHelpers'
+import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
@@ -12,36 +11,10 @@ import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
 import { UserDetails } from './userService'
+import validateDateRange from '../utils/validateDateRange'
 
 export default class CaseNotesService {
   constructor(private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>) {}
-
-  /**
-   * Validate filters and return errors if appropriate
-   *
-   * Only `Date from` and `Date to` can be in error
-   *
-   * @private
-   * @param startDate
-   * @param endDate
-   */
-  private validateFilters(startDate: string, endDate: string) {
-    const errors: HmppsError[] = []
-
-    if (startDate && !isRealDate(startDate)) {
-      errors.push({ text: `'Date from' must be a real date`, href: '#startDate' })
-    } else if (startDate && isFuture(parseDate(startDate))) {
-      errors.push({ text: `'Date from' must be today or in the past`, href: '#startDate' })
-    }
-
-    if (endDate && !isRealDate(endDate)) {
-      errors.push({ text: `'Date to (latest)' must be a real date`, href: '#endDate' })
-    } else if (endDate && startDate && isBefore(parseDate(endDate), parseDate(startDate))) {
-      errors.push({ text: `'Date to (latest)' must be after or the same as 'Date from (earliest) '`, href: '#endDate' })
-    }
-
-    return errors
-  }
 
   /**
    * Map query params from the browser to values suitable for sending to the API.
@@ -85,7 +58,7 @@ export default class CaseNotesService {
     ]
 
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
-    const errors: HmppsError[] = this.validateFilters(queryParams.startDate, queryParams.endDate)
+    const errors: HmppsError[] = validateDateRange(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList<CaseNotePageData>
     const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
