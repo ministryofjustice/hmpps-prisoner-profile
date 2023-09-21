@@ -10,6 +10,10 @@
 
 @include govuk-media-query($media-type: print) {
   // govuk-frontend overrides
+  .govuk-template {
+    background-color: govuk-colour('white');
+  }
+
   .govuk-heading-l {
     font-size: 19pt;
   }
