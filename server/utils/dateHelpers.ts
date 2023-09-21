@@ -126,8 +126,5 @@ export const formatDateTime = (
 }
 
 export const timeFormat = (dateTimeStr: string) => {
-  const date = new Date(dateTimeStr)
-  const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours()
-  const minutes = date.getMinutes() === 0 ? '00' : date.getMinutes()
-  return `${hours}:${minutes}`
+  return new Date(dateTimeStr).toLocaleTimeString('en-gb', { hour: '2-digit', minute: '2-digit' })
 }

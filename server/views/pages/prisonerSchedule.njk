@@ -28,15 +28,14 @@
     }}
   {% endif %}
 
-{% block content %}
-  {% set firstDay = days | first %}
-  {% set lastDay = days | last %}
-  <div class="prisoner-schedule">
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{name |  apostrophe}} schedule</h1>
-    <p class="govuk-body govuk-!-font-size-24" data-test="schedule-dates">{{ firstDay.date }} to {{ lastDay.date }}</p>
+  {% block content %}
+    {% set firstDay = days | first %}
+    {% set lastDay = days | last %}
+    <div class="prisoner-schedule">
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{name |  apostrophe}} schedule</h1>
+      <p class="govuk-body govuk-!-font-size-24" data-test="schedule-dates">{{ firstDay.date }} to {{ lastDay.date }}</p>
 
-
-    <div class="govuk-grid-row">
+      <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">
           {% if when === 'nextWeek' %}
             {% set linkText = 'View 7 days from today'  %}
@@ -50,47 +49,50 @@
           </a>
         </div>
         <div class="govuk-grid-column-three-quarters govuk-!-text-align-right">
-          <div>
             {{ printLink() }}
-          </div>
-        </div>
-    </div>
-
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
-    {% for day in days %}
-      <div class="prisoner-schedule__day" data-test="schedule-day">
-        <h2 class="govuk-heading-m">{{ day.date }}</h2>
-        <div class="prisoner-schedule__periods">
-          <div class="prisoner-schedule__periods__period" data-test="schedule-period">
-            <h3 class="govuk-heading-s">Morning</h3>
-            <div class="prisoner-schedule-events prisoner-schedule-events--morning govuk-body" data-test="schedule-morning-events">
-              {{ scheduledActivities(day.periods.morningActivities) }}
-            </div>
-          </div>
-
-          <div class="prisoner-schedule__periods__period">
-            <h3 class="govuk-heading-s">Afternoon</h3>
-            <div class="prisoner-schedule-events prisoner-schedule-events--afternoon govuk-body" data-test="schedule-afternoon-events">
-              {{ scheduledActivities(day.periods.afternoonActivities) }}
-            </div>
-          </div>
-
-          <div class="prisoner-schedule__periods__period">
-            <h3 class="govuk-heading-s">Evening</h3>
-            <div class="prisoner-schedule-events prisoner-schedule-events--evening govuk-body" data-test="schedule-evening-events">
-              {{ scheduledActivities(day.periods.eveningActivities) }}
-            </div>
-          </div>
         </div>
       </div>
 
-      {% if not loop.last %}
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-      {% endif %}
-    {% endfor %}
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
+      {% for day in days %}
+        <div class="prisoner-schedule__day" data-test="schedule-day">
+          <h2 class="govuk-heading-m">{{ day.date }}</h2>
+          <div class="prisoner-schedule__periods">
+            <div class="prisoner-schedule__periods__period" data-test="schedule-period">
+              <h3 class="govuk-heading-s">Morning</h3>
+              <div class="prisoner-schedule-events prisoner-schedule-events--morning govuk-body" data-test="schedule-morning-events">
+                {{ scheduledActivities(day.periods.morningActivities) }}
+              </div>
+            </div>
 
-    {{ printLink() }}
-  </div>
-{% endblock %}
+            <div class="prisoner-schedule__periods__period">
+              <h3 class="govuk-heading-s">Afternoon</h3>
+              <div class="prisoner-schedule-events prisoner-schedule-events--afternoon govuk-body" data-test="schedule-afternoon-events">
+                {{ scheduledActivities(day.periods.afternoonActivities) }}
+              </div>
+            </div>
+
+            <div class="prisoner-schedule__periods__period">
+              <h3 class="govuk-heading-s">Evening</h3>
+              <div class="prisoner-schedule-events prisoner-schedule-events--evening govuk-body" data-test="schedule-evening-events">
+                {{ scheduledActivities(day.periods.eveningActivities) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if not loop.last %}
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        {% endif %}
+      {% endfor %}
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full govuk-!-text-align-right">
+          {{ printLink() }}
+        </div>
+      </div>
+
+    </div>
+  {% endblock %}
 
 {% endblock %}

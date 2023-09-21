@@ -7,8 +7,7 @@ import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { formatName, groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
-import { SelectedWeekDates } from '../interfaces/scheduledEvent'
+import { ScheduledEvent, SelectedWeekDates } from '../interfaces/scheduledEvent'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -28,7 +27,7 @@ export default class PrisonerScheduleController {
 
     const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]
 
-    let schedule: GetEventScheduleItem[] = [] as GetEventScheduleItem[]
+    let schedule: ScheduledEvent[] = [] as ScheduledEvent[]
     const { when } = req.query
     const { bookingId } = prisonerData
 
@@ -55,19 +54,19 @@ export default class PrisonerScheduleController {
       )
     }
 
-    const filterMorning = (activities: GetEventScheduleItem[]) =>
+    const filterMorning = (activities: ScheduledEvent[]) =>
       activities && activities.filter(activity => new Date(activity.startTime).getHours() < 12)
 
-    const filterAfternoon = (activities: GetEventScheduleItem[]) =>
+    const filterAfternoon = (activities: ScheduledEvent[]) =>
       activities &&
       activities.filter(
         activity => new Date(activity.startTime).getHours() > 11 && new Date(activity.startTime).getHours() < 17,
       )
 
-    const filterEveningDuties = (activities: GetEventScheduleItem[]) =>
+    const filterEveningDuties = (activities: ScheduledEvent[]) =>
       activities && activities.filter(activity => new Date(activity.startTime).getHours() >= 17)
 
-    const byStartTimeThenByEndTime = (a: GetEventScheduleItem, b: GetEventScheduleItem) => {
+    const byStartTimeThenByEndTime = (a: ScheduledEvent, b: ScheduledEvent) => {
       if (isBefore(new Date(a.startTime), new Date(b.startTime))) return -1
       if (isAfter(new Date(a.startTime), new Date(b.startTime))) return 1
 
@@ -80,7 +79,7 @@ export default class PrisonerScheduleController {
       return 0
     }
 
-    function formatEvent(eventSchedule: GetEventScheduleItem) {
+    function formatEvent(eventSchedule: ScheduledEvent) {
       const { startTime, endTime, eventStatus, eventSubType, eventSubTypeDesc, eventSourceDesc } = eventSchedule
       const comment = eventSubType === 'PA' ? null : eventSourceDesc
 
@@ -95,7 +94,7 @@ export default class PrisonerScheduleController {
       }
     }
 
-    function eventsAction(events: GetEventScheduleItem[]) {
+    function eventsAction(events: ScheduledEvent[]) {
       const morningActivity = filterMorning(events)
       const afternoonActivity = filterAfternoon(events)
       const eveningDuties = filterEveningDuties(events)
@@ -112,7 +111,13 @@ export default class PrisonerScheduleController {
 
     const days = selectedWeekDates?.map(day => ({
       date: formatDate(day?.date, 'full').replace(',', ''),
-      periods: groupedByDate ? eventsAction(groupedByDate[day?.date]) : undefined,
+      periods: groupedByDate
+        ? eventsAction(groupedByDate[day?.date])
+        : {
+            afternoonActivities: undefined as ScheduledEvent[],
+            eveningActivities: undefined as ScheduledEvent[],
+            morningActivities: undefined as ScheduledEvent[],
+          },
     }))
 
     return res.render('pages/prisonerSchedule', {
