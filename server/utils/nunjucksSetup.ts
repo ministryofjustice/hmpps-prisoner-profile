@@ -4,20 +4,20 @@ import nunjucks from 'nunjucks'
 import express from 'express'
 import {
   addressToLines,
+  apostrophe,
   findError,
+  formatMoney,
   formatScheduleItem,
   initialiseName,
-  prisonerBelongsToUsersCaseLoad,
-  summaryListOneHalfWidth,
-  userHasRoles,
-  apostrophe,
+  neurodiversityEnabled,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
+  prisonerBelongsToUsersCaseLoad,
   prisonerIsOut,
   prisonerIsTRN,
-  neurodiversityEnabled,
+  summaryListOneHalfWidth,
   toNonAssociationRows,
-  formatMoney,
+  userHasRoles,
 } from './utils'
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime, timeFormat } from './dateHelpers'
@@ -30,6 +30,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
 
   app.locals.asset_path = '/assets/'
   app.locals.applicationName = 'Digital Prison Services'
+  app.locals.config = config
 
   // Cachebusting version string
   if (production) {
