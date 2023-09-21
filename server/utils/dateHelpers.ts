@@ -127,7 +127,7 @@ export const formatDateTime = (
 
 export const timeFormat = (dateTimeStr: string) => {
   const date = new Date(dateTimeStr)
-  const hours = date.getUTCHours()
-  const minutes = date.getUTCMinutes() === 0 ? '00' : date.getUTCMinutes()
+  const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours()
+  const minutes = date.getMinutes() === 0 ? '00' : date.getMinutes()
   return `${hours}:${minutes}`
 }

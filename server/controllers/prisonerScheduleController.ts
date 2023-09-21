@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { add, format, getHours, isAfter, isBefore, startOfToday } from 'date-fns'
+import { add, format, isAfter, isBefore, startOfToday } from 'date-fns'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Prisoner } from '../interfaces/prisoner'
@@ -30,7 +30,6 @@ export default class PrisonerScheduleController {
 
     let schedule: GetEventScheduleItem[] = [] as GetEventScheduleItem[]
     const { when } = req.query
-
     const { bookingId } = prisonerData
 
     if (when === 'nextWeek') {
@@ -40,7 +39,7 @@ export default class PrisonerScheduleController {
     }
 
     const groupedByDate = groupBy(schedule, 'eventDate')
-    const oneWeekToday = format(add(startOfToday(), { weeks: 1 }), 'yyyy-MM-dd')
+    const oneWeekToday = format(add(startOfToday(), { weeks: 1 }), 'd MMMM yyyy')
 
     if (when === 'nextWeek') {
       times(7)((i: number) =>
@@ -57,13 +56,16 @@ export default class PrisonerScheduleController {
     }
 
     const filterMorning = (activities: GetEventScheduleItem[]) =>
-      activities && activities.filter(activity => getHours(parseInt(activity.startTime, 10)) < 12)
+      activities && activities.filter(activity => new Date(activity.startTime).getHours() < 12)
 
     const filterAfternoon = (activities: GetEventScheduleItem[]) =>
-      activities && activities.filter(activity => getHours(parseInt(activity.startTime, 10)) < 17)
+      activities &&
+      activities.filter(
+        activity => new Date(activity.startTime).getHours() > 11 && new Date(activity.startTime).getHours() < 17,
+      )
 
     const filterEveningDuties = (activities: GetEventScheduleItem[]) =>
-      activities && activities.filter(activity => getHours(parseInt(activity.startTime, 10)) >= 17)
+      activities && activities.filter(activity => new Date(activity.startTime).getHours() >= 17)
 
     const byStartTimeThenByEndTime = (a: GetEventScheduleItem, b: GetEventScheduleItem) => {
       if (isBefore(new Date(a.startTime), new Date(b.startTime))) return -1
@@ -109,7 +111,7 @@ export default class PrisonerScheduleController {
     }
 
     const days = selectedWeekDates?.map(day => ({
-      date: formatDate(day?.date),
+      date: formatDate(day?.date, 'full').replace(',', ''),
       periods: groupedByDate ? eventsAction(groupedByDate[day?.date]) : undefined,
     }))
 
@@ -119,6 +121,7 @@ export default class PrisonerScheduleController {
       days,
       name,
       nextWeekStartDate: oneWeekToday,
+      when,
     })
   }
 }
