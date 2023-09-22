@@ -891,8 +891,19 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: [
-          { ...csraAssessmentMock, assessmentAgencyId: agenciesDetails.agencyId, offenderNo: prisonerNumber },
-          { ...csraAssessmentMock, assessmentAgencyId: agenciesDetails.agencyId, offenderNo: prisonerNumber },
+          {
+            ...csraAssessmentMock,
+            bookingId: 67891,
+            assessmentSeq: 12345,
+            assessmentAgencyId: agenciesDetails.agencyId,
+            offenderNo: prisonerNumber,
+          },
+          {
+            ...csraAssessmentMock,
+            classificationCode: 'MED',
+            assessmentAgencyId: agenciesDetails.agencyId,
+            offenderNo: prisonerNumber,
+          },
         ],
       },
     })
