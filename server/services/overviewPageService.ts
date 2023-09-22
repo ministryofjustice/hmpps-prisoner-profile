@@ -566,7 +566,7 @@ export default class OverviewPageService {
       morning: groupedEvents.morningEvents.map(formatEventForOverview),
       afternoon: groupedEvents.afternoonEvents.map(formatEventForOverview),
       evening: groupedEvents.eveningEvents.map(formatEventForOverview),
-      linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`,
+      linkUrl: `/prisoner/${prisonerData.prisonerNumber}/schedule`,
     }
   }
 
