@@ -12,6 +12,10 @@ const sortByStartAndEndTime = (a: ScheduledEvent, b: ScheduledEvent) => {
   if (dateAStart > dateBStart) return 1
 
   const [dateAEnd, dateBEnd] = [new Date(a.endTime), new Date(b.endTime)]
+
+  if (!a.endTime) return -1
+  if (!b.endTime) return 1
+
   if (dateAEnd < dateBEnd) return -1
   if (dateAEnd > dateBEnd) return 1
 

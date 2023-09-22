@@ -1,3 +1,5 @@
+import { ScheduledEvent } from '../interfaces/scheduledEvent'
+
 export const personalDetails = {
   name: 'Dave',
   dateOfBirth: '1979-11-23',
@@ -25,16 +27,10 @@ export const nonAssociationRows = [
   [{ text: 'Norton, Stephan' }, { text: 'A9585SD' }, { text: 'C-2-009' }, { text: 'Victim' }],
 ]
 
-export interface GetEventScheduleItem {
-  name: string
-  startTime?: string
-  endTime?: string
-}
-
 export interface Schedule {
-  morning: GetEventScheduleItem[]
-  afternoon: GetEventScheduleItem[]
-  evening: GetEventScheduleItem[]
+  morning: ScheduledEvent[]
+  afternoon: ScheduledEvent[]
+  evening: ScheduledEvent[]
 }
 
 export const schedule: Schedule = {

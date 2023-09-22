@@ -43,7 +43,6 @@ import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
 import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
-import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
 import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
@@ -351,12 +350,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getScheduledEventsForThisWeek(bookingId: number): Promise<GetEventScheduleItem[]> {
-    return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/thisWeek` })
+  async getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]> {
+    return this.get<ScheduledEvent[]>({ path: `/api/bookings/${bookingId}/events/thisWeek` })
   }
 
-  async getScheduledEventsForNextWeek(bookingId: number): Promise<GetEventScheduleItem[]> {
-    return this.get<GetEventScheduleItem[]>({ path: `/api/bookings/${bookingId}/events/nextWeek` })
+  async getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]> {
+    return this.get<ScheduledEvent[]>({ path: `/api/bookings/${bookingId}/events/nextWeek` })
   }
 
   async getMovements(

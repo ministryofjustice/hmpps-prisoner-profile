@@ -1,6 +1,6 @@
-import { GetEventScheduleItem } from '../../interfaces/prisonApi/getEventScheduleItem'
+import { ScheduledEvent } from '../../interfaces/scheduledEvent'
 
-export const getEventsThisWeekMock: GetEventScheduleItem[] = [
+export const getEventsThisWeekMock: ScheduledEvent[] = [
   {
     bookingId: 0,
     eventClass: 'string',
@@ -185,7 +185,7 @@ export const getEventsThisWeekMock: GetEventScheduleItem[] = [
   },
 ]
 
-export const getEventsNextWeekMock: GetEventScheduleItem[] = [
+export const getEventsNextWeekMock: ScheduledEvent[] = [
   {
     bookingId: 0,
     eventClass: 'string',
