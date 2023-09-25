@@ -31,4 +31,10 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
   async addVideoLinkBooking(videoLinkBooking: VideoLinkBookingForm): Promise<number> {
     return (await this.post({ path: '/court/video-link-bookings', data: videoLinkBooking })) as number
   }
+
+  async getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<any> {
+    return this.get<any>({
+      path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
+    })
+  }
 }

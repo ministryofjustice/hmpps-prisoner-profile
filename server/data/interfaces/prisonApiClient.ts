@@ -136,4 +136,9 @@ export interface PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
+  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<any>
+  getAttributesForLocation(locationId: string): Promise<any>
+  getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<any>
+  getCellMoveReasonTypes(): Promise<any>
+  getPrisonerDetail(bookingId: number): Promise<any>
 }
