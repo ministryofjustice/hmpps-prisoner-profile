@@ -33,6 +33,8 @@ import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import { ComponentApiClient } from './interfaces/componentApiClient'
 import ComponentApiRestClient from './componentApiClient'
+import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
+import WhereaboutsRestApiClient from './whereaboutsClient'
 
 initialiseAppInsights()
 buildAppInsightsClient()
@@ -111,6 +113,11 @@ export const dataAccess = {
     'Component API',
     config.apis.frontendComponents,
     ComponentApiRestClient,
+  ),
+  whereAboutsApiClientBuilder: restClientBuilder<WhereaboutsApiClient>(
+    'Whereabouts API',
+    config.apis.whereaboutsApiUrl,
+    WhereaboutsRestApiClient,
   ),
 }
 

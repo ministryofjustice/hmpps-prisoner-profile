@@ -101,4 +101,9 @@ export interface PrisonApiClient {
   getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]>
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
   getMovements(prisonerNumbers: string[], movementTypes: MovementType[], latestOnly?: boolean): Promise<Movement[]>
+  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<any> 
+  getAttributesForLocation(locationId: string): Promise<any>
+  getHistoryForLocation(locationId: string, fromDate: string, toDate: string ): Promise<any>
+  getCellMoveReasonTypes(): Promise<any>
+  getPrisonerDetail(bookingId: number): Promise<any>
 }

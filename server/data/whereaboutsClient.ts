@@ -5,11 +5,8 @@ import { PageableQuery } from '../interfaces/pageable'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
 
 export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
-  restClient: RestClient
 
-  constructor(token: string) {
-    this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApiUrl, token)
-  }
+  constructor(private restClient: RestClient) {}
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {
@@ -30,6 +27,15 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
   ): Promise<UnacceptableAbsences> {
     return this.get<UnacceptableAbsences>({
       path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
+    })
+  }
+
+  async getCellMoveReason(
+    bookingId: number,
+    bedAssignmentHistorySequence: number
+  ): Promise<any> {
+    return this.get<any>({
+      path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
     })
   }
 }

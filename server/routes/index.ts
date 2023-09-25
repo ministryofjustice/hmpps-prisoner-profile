@@ -19,6 +19,7 @@ import PrisonerScheduleController from '../controllers/prisonerScheduleControlle
 import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
+import PrisonerLocationHistoryController from '../controllers/prisonerLocationHistoryController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -211,6 +212,21 @@ export default function routes(services: Services): Router {
         services.dataAccess.prisonApiClientBuilder,
       )
       return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData)
+    },
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/location-history',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    async (req, res, next) => {
+      const prisonerData = req.middleware?.prisonerData
+      const prisonerLocationHistoryController  = new PrisonerLocationHistoryController(
+        services.dataAccess.prisonApiClientBuilder,
+        services.dataAccess.whereAboutsApiClientBuilder,
+        services.dataAccess.caseNotesApiClientBuilder
+      )
+      return prisonerLocationHistoryController.displayPrisonerLocationHistory(req, res, prisonerData)
     },
   )
 

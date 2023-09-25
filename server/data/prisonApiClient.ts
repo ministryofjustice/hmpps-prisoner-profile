@@ -372,4 +372,24 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       data: prisonerNumbers,
     })) as Movement[]
   }
+
+  async getDetails(prisonerNumber: string, fullInfo: boolean): Promise<any> {
+    return this.get<any>({ path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}` })
+  }
+
+  async getAttributesForLocation(locationId: string): Promise<any> {
+    return this.get<any>({ path: `/api/cell/${locationId}/attributes` })
+  }
+
+  async getHistoryForLocation(locationId: string, fromDate: string, toDate: string ): Promise<any> {
+    return this.get<any>({ path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}` })
+  }
+
+  async getCellMoveReasonTypes(): Promise<any> {
+    return this.get<any>({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' })
+  }
+
+  async getPrisonerDetail(bookingId: number): Promise<any> {
+    return this.get<any>({ path: `/api/bookings/${bookingId}`})
+  }
 }

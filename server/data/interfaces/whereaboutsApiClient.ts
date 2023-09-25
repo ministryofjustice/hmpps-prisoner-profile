@@ -8,4 +8,8 @@ export interface WhereaboutsApiClient {
     toDate: string,
     page: PageableQuery,
   ): Promise<UnacceptableAbsences>
+  getCellMoveReason(
+    bookingId: number,
+    bedAssignmentHistorySequence: number
+  ): Promise<any>
 }
