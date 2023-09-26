@@ -35,6 +35,7 @@ generic-service:
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence-preprod.hmpps.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api-preprod.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-preprod.hmpps.service.justice.gov.uk"
+    NON_ASSOCIATIONS_UI_URL: "https://non-associations-preprod.hmpps.service.justice.gov.uk"
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI,HMI,NHI"
     ENVIRONMENT_NAME: "PRE-PRODUCTION"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"

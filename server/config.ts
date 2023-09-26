@@ -185,6 +185,7 @@ export default {
     calculateReleaseDates: get('CALCULATE_RELEASE_DATES_UI_URL', 'http://localhost:3001', requiredInProduction),
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
+    nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
