@@ -29,7 +29,7 @@ context('Prisoner schedule for this week ', () => {
     prisonerSchedulePage.scheduleDates().contains(dateRangeText)
     prisonerSchedulePage
       .scheduleSelectWeek()
-      .contains(`View 7 days from ${format(add(startOfToday(), { days: 7 }), 'yyyy-MM-dd')}`)
+      .contains(`View 7 days from ${format(add(startOfToday(), { days: 7 }), 'd MMMM yyyy')}`)
     prisonerSchedulePage.firstActivity().contains(PrisonerScheduleThisWeekMock.days[0].date)
     prisonerSchedulePage.morning().contains('Morning')
     prisonerSchedulePage.afternoon().contains('Afternoon')
@@ -59,9 +59,7 @@ context('Prisoner schedule for next week', () => {
     const dateRangeText = `${PrisonerScheduleNextWeekMock.days[0].date} to ${PrisonerScheduleNextWeekMock.days[6].date}`
 
     prisonerSchedulePage.scheduleDates().contains(dateRangeText)
-    prisonerSchedulePage
-      .scheduleSelectWeek()
-      .contains(`View 7 days from ${format(add(startOfToday(), { days: 7 }), 'yyyy-MM-dd')}`)
+    prisonerSchedulePage.scheduleSelectWeek().contains(`View 7 days from today`)
     prisonerSchedulePage.firstActivity().contains(PrisonerScheduleNextWeekMock.days[0].date)
     prisonerSchedulePage.morning().contains('Morning')
     prisonerSchedulePage.afternoon().contains('Afternoon')

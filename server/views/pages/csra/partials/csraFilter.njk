@@ -1,0 +1,60 @@
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from '../../../macros/hmppsSideFilter.njk' import hmppsSideFilter %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+
+{%- call hmppsSideFilter({currentUrlPath: '/prisoner/' + prisonerNumber + '/csra-history'}) -%}
+    <div class="govuk-form-group" data-qa="csra-filters">
+
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                Filter
+            </legend>
+            {{ govukCheckboxes({
+                name: "csra",
+                classes: "govuk-checkboxes--small",
+                fieldset: {
+                    legend: {
+                        text: "Incentive level",
+                        isPageHeading: false,
+                        classes: "govuk-!-font-weight-bold"
+                    }
+                },
+                items: filterValues.incentiveLevels
+            }) }}
+
+            {{ govukCheckboxes({
+                name: "location",
+                classes: "govuk-checkboxes--small",
+                fieldset: {
+                    legend: {
+                        text: "Establishment",
+                        isPageHeading: false,
+                        classes: "govuk-!-font-weight-bold"
+                    }
+                },
+                items: filterValues.establishments
+            }) }}
+        </fieldset>
+
+        {{ hmppsDatepicker({
+            id: "startDate",
+            name: "from",
+            label: {
+                text: "Date from",
+                classes: "govuk-label--m"
+            },
+            errorMessage: errors | findError('startDate'),
+            value: filterValues.from
+        }) }}
+        {{ hmppsDatepicker({
+            id: "endDate",
+            name: "to",
+            label: {
+                text: "Date to",
+                classes: "govuk-label--m"
+            },
+            errorMessage: errors | findError('endDate'),
+            value: filterValues.to
+        }) }}
+    </div>
+{%- endcall -%}

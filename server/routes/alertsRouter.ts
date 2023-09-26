@@ -35,21 +35,27 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/active',
     getPrisonerData(services),
     checkPrisonerInCaseload(),
-    alertsController.displayAlerts(true),
+    (req, res, next) => {
+      alertsController.displayAlerts(req, res, next, true)
+    },
   )
 
   get(
     '/prisoner/:prisonerNumber/alerts/inactive',
     getPrisonerData(services),
     checkPrisonerInCaseload(),
-    alertsController.displayAlerts(false),
+    (req, res, next) => {
+      alertsController.displayAlerts(req, res, next, false)
+    },
   )
 
   get(
     '/prisoner/:prisonerNumber/add-alert',
     getPrisonerData(services),
     guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
-    alertsController.displayAddAlert(),
+    (req, res, next) => {
+      alertsController.displayAddAlert(req, res, next)
+    },
   )
 
   post('/prisoner/:prisonerNumber/add-alert', validationMiddleware(AlertValidator), alertsController.post())

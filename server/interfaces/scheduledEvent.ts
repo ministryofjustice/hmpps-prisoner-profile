@@ -1,28 +1,33 @@
 export interface ScheduledEvent {
-  agencyId?: string
-  bookingId: number
-  createUserId?: string
-  endTime?: string
-  eventClass: string
-  eventDate: string
+  bookingId?: number
+  eventClass?: string
   eventId?: number
-  eventLocationId?: number
+  eventStatus?: string
+  eventType?: string
+  eventTypeDesc?: string
+  eventSubType?: string
+  eventSubTypeDesc?: string
+  eventDate?: string
+  startTime?: string
+  endTime?: string
   eventLocation?: string
-  eventOutcome?: string
+  eventLocationId?: number
+  agencyId?: string
+  eventSource?: string
   eventSourceCode?: string
   eventSourceDesc?: string
-  eventSource: string
-  eventStatus: string
-  eventSubTypeDesc: string
-  eventSubType: string
-  eventTypeDesc: string
-  eventType: string
-  locationCode?: string
+  eventOutcome?: string
+  performance?: string
   outcomeComment?: string
   paid?: boolean
   payRate?: number
-  performance?: string
-  startTime?: string
+  locationCode?: string
+  createUserId?: string
+  comment?: string
+  type?: string
+  shortComment?: string
+  cancelled?: boolean
+  name?: string
 }
 
 export interface SelectedWeekDates {

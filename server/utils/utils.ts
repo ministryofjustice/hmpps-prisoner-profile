@@ -9,8 +9,8 @@ import { Prisoner } from '../interfaces/prisoner'
 import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
-import { GetEventScheduleItem } from '../interfaces/prisonApi/getEventScheduleItem'
 import { type OverviewNonAssociation } from '../interfaces/overviewPage'
+import { ScheduledEvent } from '../interfaces/scheduledEvent'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -42,7 +42,7 @@ export const initialiseName = (fullName?: string): string | null => {
  * Converts a ScheduleItem into a string displaying the time in the format
  * StartTime to EndTime
  */
-export const formatScheduleItem = (scheduleItem: GetEventScheduleItem): string => {
+export const formatScheduleItem = (scheduleItem: ScheduledEvent): string => {
   if (scheduleItem.startTime) {
     const times = [scheduleItem.startTime]
     if (scheduleItem.endTime) times.push(scheduleItem.endTime)
@@ -504,7 +504,7 @@ export const extractLocation = (location: string, agencyId: string): string => {
 }
 
 // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
-export const groupBy = (array: GetEventScheduleItem[], key: string) =>
+export const groupBy = (array: ScheduledEvent[], key: string) =>
   array &&
   array.length &&
   array.reduce((acc, current) => {
@@ -536,3 +536,8 @@ export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]):
     { text: na.assignedLivingUnitDescription },
     { text: na.reasonDescription },
   ])
+
+export const sortByDateTime = (t1: string, t2: string): number => {
+  const [date1, date2] = [new Date(t1).getTime(), new Date(t2).getTime()]
+  return date1 - date2
+}

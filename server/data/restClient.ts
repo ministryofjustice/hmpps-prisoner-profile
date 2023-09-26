@@ -23,6 +23,7 @@ interface PostRequest {
   responseType?: string
   data?: Record<string, unknown>
   raw?: boolean
+  query?: string
 }
 
 interface StreamRequest {
@@ -92,6 +93,7 @@ export default class RestClient {
 
   async post({
     path = null,
+    query = '',
     headers = {},
     responseType = '',
     data = {},
@@ -103,6 +105,7 @@ export default class RestClient {
         .post(`${this.apiUrl()}${path}`)
         .send(data)
         .agent(this.agent)
+        .query(query)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, res) => {
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)

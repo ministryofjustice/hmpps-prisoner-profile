@@ -4,6 +4,9 @@ import CsraService from './csraService'
 import csraAssessmentMock from '../data/localMockData/csraAssessmentMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
+import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import AgencyMock from '../data/localMockData/agency'
+import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
 
 jest.mock('../data/prisonApiClient')
 
@@ -59,6 +62,185 @@ describe('Csra Service', () => {
         agencyDetails: null,
         staffDetails: null,
       })
+    })
+  })
+
+  describe('getCsraHistory', () => {
+    it('should call Prison API to get csra history for prisoner', async () => {
+      prisonApiClientSpy.getCsraAssessmentsForPrisoner = jest.fn(async () => [csraAssessmentMock])
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.getCsraHistory('', '123456')
+
+      expect(output).toEqual([csraAssessmentMock])
+    })
+
+    it('should filter out if no classification code', async () => {
+      prisonApiClientSpy.getCsraAssessmentsForPrisoner = jest.fn(async () => [
+        csraAssessmentMock,
+        { ...csraAssessmentMock, classificationCode: undefined },
+      ])
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.getCsraHistory('', '123456')
+
+      expect(output).toEqual([csraAssessmentMock])
+    })
+  })
+
+  describe('getAgenciesForCsraAssessments', () => {
+    it('should get all location details for the csras passed in', async () => {
+      prisonApiClientSpy.getAgencyDetails = jest
+        .fn()
+        .mockResolvedValueOnce(AgencyMock)
+        .mockResolvedValueOnce(AgencyMock)
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.getAgenciesForCsraAssessments('', [
+        csraAssessmentMock,
+        { ...csraAssessmentMock, assessmentAgencyId: 'LEI' },
+      ])
+
+      expect(prisonApiClientSpy.getAgencyDetails).toBeCalledTimes(2)
+      expect(output).toEqual([AgencyMock, AgencyMock])
+    })
+
+    it('should not call api for same agency multiple times', async () => {
+      prisonApiClientSpy.getAgencyDetails = jest
+        .fn()
+        .mockResolvedValueOnce(AgencyMock)
+        .mockResolvedValueOnce(AgencyMock)
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      await csraService.getAgenciesForCsraAssessments('', [csraAssessmentMock, csraAssessmentMock])
+
+      expect(prisonApiClientSpy.getAgencyDetails).toBeCalledTimes(1)
+    })
+  })
+
+  describe('filterCsraAssessments', () => {
+    it('should filter by csra if passed in', () => {
+      const csraAssessments: CsraSummary[] = [
+        { ...csraAssessmentMock, classificationCode: 'STANDARD', classification: 'Standard', location: 'Holme' },
+        { ...csraAssessmentMock, classificationCode: 'MED', classification: 'Medium', location: 'Somewhere' },
+      ]
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = csraService.filterCsraAssessments(csraAssessments, {
+        csra: 'STANDARD' as CsraAssessment['classificationCode'],
+      })
+
+      expect(output).toEqual([csraAssessments[0]])
+    })
+
+    it('should filter by location if passed in', async () => {
+      const csraAssessments: CsraSummary[] = [
+        { ...csraAssessmentMock, classificationCode: 'STANDARD', classification: 'Standard', location: 'Holme' },
+        {
+          ...csraAssessmentMock,
+          classificationCode: 'MED',
+          classification: 'Medium',
+          assessmentAgencyId: 'LEI',
+          location: 'Somewhere',
+        },
+      ]
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.filterCsraAssessments(csraAssessments, { location: 'HLI' })
+
+      expect(output).toEqual([csraAssessments[0]])
+    })
+
+    it('should filter by csra and location if both passed in', async () => {
+      const csraAssessments: CsraSummary[] = [
+        {
+          ...csraAssessmentMock,
+          classificationCode: 'STANDARD',
+          classification: 'Standard',
+          location: 'Holme',
+          assessmentAgencyId: 'LEI',
+        },
+        {
+          ...csraAssessmentMock,
+          classificationCode: 'MED',
+          classification: 'Medium',
+          assessmentAgencyId: 'LEI',
+          location: 'Somewhere',
+        },
+        {
+          ...csraAssessmentMock,
+          classificationCode: 'MED',
+          classification: 'Medium',
+          location: 'Somewhere',
+          assessmentAgencyId: 'HLM',
+        },
+      ]
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.filterCsraAssessments(csraAssessments, {
+        csra: 'MED',
+        location: 'LEI',
+      })
+
+      expect(output).toEqual([csraAssessments[1]])
+    })
+
+    it('should filter by date from', async () => {
+      const csraAssessments: CsraSummary[] = [
+        { ...csraAssessmentMock, assessmentDate: '2020-03-12', classification: 'Standard', location: 'Holme' },
+        {
+          ...csraAssessmentMock,
+          assessmentDate: '2020-03-13',
+          classification: 'Medium',
+          location: 'Somewhere',
+        },
+      ]
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.filterCsraAssessments(csraAssessments, { from: '13/03/2020' })
+
+      expect(output).toEqual([csraAssessments[1]])
+    })
+
+    it('should filter by date to', async () => {
+      const csraAssessments: CsraSummary[] = [
+        { ...csraAssessmentMock, assessmentDate: '2020-03-12', classification: 'Standard', location: 'Holme' },
+        {
+          ...csraAssessmentMock,
+          assessmentDate: '2020-03-13',
+          classification: 'Medium',
+          location: 'Somewhere',
+        },
+      ]
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.filterCsraAssessments(csraAssessments, { to: '12/03/2020' })
+
+      expect(output).toEqual([csraAssessments[0]])
+    })
+
+    it('should combine filters', async () => {
+      const csraAssessments: CsraSummary[] = [
+        {
+          ...csraAssessmentMock,
+          assessmentDate: '2020-03-12',
+          classificationCode: 'STANDARD',
+          classification: 'Standard',
+          location: 'Holme',
+        },
+        {
+          ...csraAssessmentMock,
+          assessmentDate: '2020-03-13',
+          classificationCode: 'MED',
+          classification: 'Medium',
+          location: 'Somewhere',
+        },
+      ]
+      csraService = new CsraService(() => prisonApiClientSpy)
+
+      const output = await csraService.filterCsraAssessments(csraAssessments, { csra: 'MED', to: '12/03/2020' })
+
+      expect(output).toEqual([])
     })
   })
 })

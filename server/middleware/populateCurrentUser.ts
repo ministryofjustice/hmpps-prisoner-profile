@@ -37,7 +37,7 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
   return async (req, res, next) => {
     try {
       if (res.locals.user) {
-        const userCaseLoads = res.locals.user && (await userService.getUserCaseLoads(res.locals.user.token))
+        const userCaseLoads = await userService.getUserCaseLoads(res.locals.user.token)
         if (userCaseLoads && Array.isArray(userCaseLoads)) {
           const availableCaseLoads = userCaseLoads.filter(caseload => caseload.type !== 'APP')
           const activeCaseLoad = availableCaseLoads.filter((caseLoad: CaseLoad) => caseLoad.currentlyActive)[0]

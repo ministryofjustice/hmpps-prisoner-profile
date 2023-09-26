@@ -17,10 +17,17 @@ export default function alertsRouter(services: Services): Router {
   const csraController = new CsraController(services.csraService)
 
   get(
+    '/prisoner/:prisonerNumber/csra-history',
+    getPrisonerData(services, { minimal: true }),
+    checkPrisonerInCaseload(),
+    (req, res, next) => csraController.displayHistory(req, res, next),
+  )
+
+  get(
     '/prisoner/:prisonerNumber/csra-review',
     getPrisonerData(services, { minimal: true }),
     checkPrisonerInCaseload(),
-    csraController.displayReview(),
+    (req, res, next) => csraController.displayReview(req, res, next),
   )
 
   return router
