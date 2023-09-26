@@ -39,6 +39,7 @@ generic-service:
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI,HMI,NHI"
     ENVIRONMENT_NAME: "DEV"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
+    NON_ASSOCIATIONS_PRISONS: "LGI,FNI,ISI,RSI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-dev.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
     ACTIVITIES_ENABLED_PRISONS: "LEI,RSI"
