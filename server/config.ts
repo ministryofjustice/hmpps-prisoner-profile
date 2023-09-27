@@ -195,7 +195,7 @@ export default {
   feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
-  nonAssociationsPrisons: process.env.NON_ASSOCIATIONS_PRISONS.split(',') || [],
+  nonAssociationsPrisons: process.env.NON_ASSOCIATIONS_PRISONS?.split(',') || [],
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
 }
