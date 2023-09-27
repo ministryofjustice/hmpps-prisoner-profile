@@ -44,6 +44,7 @@ generic-service:
     APPOINTMENTS_URL: "https://activities-dev.prison.service.justice.gov.uk/appointments"
     APPOINTMENTS_ENABLED_PRISONS: "LEI,RSI"
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
+    COMPONENT_API_LATEST: "true"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

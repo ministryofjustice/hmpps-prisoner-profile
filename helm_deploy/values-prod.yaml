@@ -43,6 +43,7 @@ generic-service:
     APPOINTMENTS_URL: "https://activities.prison.service.justice.gov.uk/appointments"
     APPOINTMENTS_ENABLED_PRISONS: ""
     COMPONENT_API_URL: "https://frontend-components.hmpps.service.justice.gov.uk"
+    COMPONENT_API_LATEST: "false"
 
   allowlist:
     office: "217.33.148.210/32"

@@ -9,7 +9,8 @@ export default class ComponentService {
   async getComponents<T extends AvailableComponent[]>(
     components: T,
     userToken: string,
+    useLatest = false,
   ): Promise<Record<T[number], Component>> {
-    return this.componentApiClientBuilder(userToken).getComponents(components, userToken)
+    return this.componentApiClientBuilder(userToken).getComponents(components, userToken, useLatest)
   }
 }
