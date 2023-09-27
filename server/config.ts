@@ -170,6 +170,7 @@ export default {
         deadline: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000)),
       },
       agent: new AgentConfig(Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000))),
+      latest: get('COMPONENT_API_LATEST', 'false') === 'true',
     },
   },
   serviceUrls: {

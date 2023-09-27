@@ -39,7 +39,7 @@
     crossorigin
   />
 
-  {% if feComponents.jsInclude %}
+  {% if feComponents.jsIncludes %}
     {% for js in feComponents.jsIncludes %}
       <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
     {% endfor %}
