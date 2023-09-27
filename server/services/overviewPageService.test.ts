@@ -60,6 +60,7 @@ import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLates
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import movementsMock from '../data/localMockData/movementsData'
+import config from '../config'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -738,6 +739,8 @@ describe('OverviewPageService', () => {
       expect(res.alertsSummary).toEqual({
         activeAlertCount: 1,
         nonAssociationsCount: 2,
+        nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
+        showNonAssociationsLink: false,
       })
     })
 
@@ -747,6 +750,44 @@ describe('OverviewPageService', () => {
       expect(res.alertsSummary).toEqual({
         activeAlertCount: 1,
         nonAssociationsCount: 0,
+        nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
+        showNonAssociationsLink: false,
+      })
+    })
+
+    describe('Link to non-associations', () => {
+      describe('When non-associations is enabled for private beta', () => {
+        beforeEach(() => {
+          config.nonAssociationsPrisons = ['BAI', 'MDI']
+        })
+
+        it('should show non-associations link', async () => {
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
+          expect(res.alertsSummary).toEqual({
+            activeAlertCount: 1,
+            nonAssociationsCount: 0,
+            nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
+            showNonAssociationsLink: true,
+          })
+        })
+      })
+
+      describe('When non-associations is disabled for private beta', () => {
+        beforeEach(() => {
+          config.nonAssociationsPrisons = ['MDI']
+        })
+
+        it('should show non-associations link', async () => {
+          const overviewPageService = overviewPageServiceConstruct()
+          const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
+          expect(res.alertsSummary).toEqual({
+            activeAlertCount: 1,
+            nonAssociationsCount: 0,
+            nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
+            showNonAssociationsLink: false,
+          })
+        })
       })
     })
   })
