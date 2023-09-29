@@ -468,6 +468,10 @@ export const neurodiversityEnabled = (agencyId: string): boolean => {
   return isEnabled
 }
 
+export const nonAssociationsEnabled = (agencyId: string): boolean => {
+  return config.nonAssociationsPrisons?.includes(agencyId)
+}
+
 export const stripAgencyPrefix = (location: string, agency: string): string => {
   const parts = location && location.split('-')
   if (parts && parts.length > 0) {

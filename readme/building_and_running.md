@@ -69,6 +69,7 @@ USE_OF_FORCE_UI_URL=https://dev.use-of-force.service.justice.gov.uk
 MANAGE_A_WARRANT_FOLDER_UI_URL=https://manage-a-warrant-folder-dev.hmpps.service.justice.gov.uk
 PATHFINDER_UI_URL=https://dev.pathfinder.service.justice.gov.uk
 MANAGE_SOC_CASES_UI_URL=https://manage-soc-cases-dev.hmpps.service.justice.gov.uk
+NON_ASSOCIATIONS_UI_URL: "https://non-associations-dev.hmpps.service.justice.gov.uk"
 ```
 </details>
 
