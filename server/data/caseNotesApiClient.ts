@@ -49,5 +49,4 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   async getCaseNote(prisonerNumber: string, caseNoteId: string): Promise<CaseNote> {
     return this.get<CaseNote>({ path: `/case-notes/${prisonerNumber}/${caseNoteId}` })
   }
-
 }

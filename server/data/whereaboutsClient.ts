@@ -4,6 +4,9 @@ import { AppointmentDefaults } from '../interfaces/whereaboutsApi/appointment'
 import { CourtLocation } from '../interfaces/whereaboutsApi/courtLocation'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import config from '../config'
+import { CellMoveReason } from '../interfaces/cellMoveReason'
+import { PageableQuery } from '../interfaces/pageable'
+import { UnacceptableAbsences } from '../interfaces/unacceptableAbsences'
 
 export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
   private readonly restClient: RestClient
@@ -12,28 +15,31 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApi, token)
   }
 
-  private async get<T>(args: object): Promise<T> {
-    return this.restClient.get<T>(args)
-  }
-
-  private async post(args: object): Promise<unknown> {
-    return this.restClient.post(args)
-  }
-
   async getCourts(): Promise<CourtLocation[]> {
-    return this.get<CourtLocation[]>({ path: '/court/courts' })
+    return this.restClient.get<CourtLocation[]>({ path: '/court/courts' })
   }
 
   async createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults> {
-    return (await this.post({ path: `/appointment`, data: appointments })) as AppointmentDefaults
+    return (await this.restClient.post({ path: `/appointment`, data: appointments })) as AppointmentDefaults
   }
 
   async addVideoLinkBooking(videoLinkBooking: VideoLinkBookingForm): Promise<number> {
-    return (await this.post({ path: '/court/video-link-bookings', data: videoLinkBooking })) as number
+    return (await this.restClient.post({ path: '/court/video-link-bookings', data: videoLinkBooking })) as number
   }
 
-  async getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<any> {
-    return this.get<any>({
+  async getUnacceptableAbsences(
+    offenderNumber: string,
+    fromDate: string,
+    toDate: string,
+    page: PageableQuery,
+  ): Promise<UnacceptableAbsences> {
+    return this.restClient.get<UnacceptableAbsences>({
+      path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
+    })
+  }
+
+  async getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<CellMoveReason> {
+    return this.restClient.get<CellMoveReason>({
       path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
     })
   }

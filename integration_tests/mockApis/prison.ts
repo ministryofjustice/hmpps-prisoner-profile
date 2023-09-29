@@ -78,6 +78,11 @@ import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 
+import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
+import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
+import { GetHistoryForLocation } from '../../server/data/localMockData/getHistoryForLocationMock'
+import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
+
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
@@ -1145,6 +1150,70 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: identifiersMock,
+      },
+    })
+  },
+
+  stubGetDetails: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}?fullInfo=false&csraSummary=false`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: GetDetailsMock,
+      },
+    })
+  },
+
+  stubGetAttributesForLocation: (locationId: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/cell/${locationId}/attributes`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: GetAttributesForLocation,
+      },
+    })
+  },
+
+  stubGetHistoryForLocation: (locationId: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/cell/${locationId}/history?fromDate=2023-07-11T14:56:16&toDate=2023-08-17T12:00:00`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: GetHistoryForLocation,
+      },
+    })
+  },
+
+  stubGetCellMoveReasonTypes: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prison/api/reference-domains/domains/CHG_HOUS_RSN',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: getCellMoveReasonTypesMock,
       },
     })
   },

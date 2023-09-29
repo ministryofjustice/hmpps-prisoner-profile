@@ -140,3 +140,20 @@ Cypress.Commands.add('setupPrisonerSchedulePageStubs', ({ bookingId }) => {
   cy.task('stubgetScheduledEventsForNextWeek', bookingId)
   cy.task('stubgetScheduledEventsForThisWeek', bookingId)
 })
+
+Cypress.Commands.add(
+  'setupSpecificLocationHistoryPageStubs',
+  ({ prisonerNumber, bookingId, locationId, staffId, prisonId, caseLoads }) => {
+    cy.task('stubPrisonerData', { prisonerNumber })
+    cy.task('stubGetDetails', prisonerNumber)
+    cy.task('stubGetAttributesForLocation', locationId)
+    cy.task('stubGetHistoryForLocation', locationId)
+    cy.task('stubGetCellMoveReasonTypes')
+    cy.task('stubInmateDetail', bookingId)
+    cy.task('stubStaffDetails', staffId)
+    cy.task('stubGetCellMoveReason', bookingId)
+    cy.task('stubGetCaseNote', prisonerNumber)
+    cy.task('stubGetAgency', prisonId)
+    cy.task('stubUserCaseLoads', caseLoads)
+  },
+)

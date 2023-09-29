@@ -194,4 +194,20 @@ export default {
       },
     })
   },
+
+  stubGetCaseNote: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/case-notes/${prisonerNumber}/123`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedCaseNotesMock.content[0],
+      },
+    })
+  },
 }

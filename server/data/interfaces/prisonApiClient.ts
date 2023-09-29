@@ -44,6 +44,10 @@ import { MovementType } from '../enums/movementType'
 import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
 import { PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
 import { Location } from '../../interfaces/prisonApi/location'
+import { Details } from '../../interfaces/prisonApi/details'
+import { AttributesForLocation } from '../../interfaces/prisonApi/attributesForLocation'
+import { HistoryForLocationItem } from '../../interfaces/prisonApi/historyForLocation'
+import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTypes'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -136,9 +140,8 @@ export interface PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
-  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<any>
-  getAttributesForLocation(locationId: string): Promise<any>
-  getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<any>
-  getCellMoveReasonTypes(): Promise<any>
-  getPrisonerDetail(bookingId: number): Promise<any>
+  getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details>
+  getAttributesForLocation(locationId: string): Promise<AttributesForLocation>
+  getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]>
+  getCellMoveReasonTypes(): Promise<CellMoveReasonType[]>
 }

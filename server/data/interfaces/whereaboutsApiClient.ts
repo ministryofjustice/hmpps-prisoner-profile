@@ -1,3 +1,4 @@
+import { CellMoveReason } from '../../interfaces/cellMoveReason'
 import { PageableQuery } from '../../interfaces/pageable'
 import { UnacceptableAbsences } from '../../interfaces/unacceptableAbsences'
 import { AppointmentDefaults } from '../../interfaces/whereaboutsApi/appointment'
@@ -14,5 +15,5 @@ export interface WhereaboutsApiClient {
     toDate: string,
     page: PageableQuery,
   ): Promise<UnacceptableAbsences>
-  getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<any>
+  getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<CellMoveReason>
 }
