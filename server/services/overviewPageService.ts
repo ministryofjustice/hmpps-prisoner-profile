@@ -14,6 +14,7 @@ import {
   formatMoney,
   formatPrivilegedVisitsSummary,
   getNamesFromString,
+  nonAssociationsEnabled,
   prisonerBelongsToUsersCaseLoad,
   userHasRoles,
 } from '../utils/utils'
@@ -535,16 +536,16 @@ export default class OverviewPageService {
   }
 
   private getAlertsSummary(
-    { activeAlertCount }: InmateDetail,
+    { activeAlertCount, offenderNo }: InmateDetail,
     nonAssociations: OverviewNonAssociation[],
     userCaseloads: CaseLoad[],
   ): AlertsSummary {
     const activeCaseload = userCaseloads.find(caseload => caseload.currentlyActive)
-    const nonAssociationsCount = nonAssociations.filter(
-      nonAssociation => nonAssociation.agencyId === activeCaseload?.caseLoadId,
-    ).length
+    const nonAssociationsCount = nonAssociations.length
+    const showNonAssociationsLink = nonAssociationsEnabled(activeCaseload?.caseLoadId)
+    const nonAssociationsUrl = `${config.serviceUrls.nonAssociations}/prisoner/${offenderNo}/non-associations`
 
-    return { activeAlertCount, nonAssociationsCount }
+    return { activeAlertCount, nonAssociationsCount, showNonAssociationsLink, nonAssociationsUrl }
   }
 
   private async getSchedule(prisonerData: Prisoner): Promise<OverviewSchedule> {
