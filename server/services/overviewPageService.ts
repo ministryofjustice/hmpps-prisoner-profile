@@ -541,9 +541,7 @@ export default class OverviewPageService {
     userCaseloads: CaseLoad[],
   ): AlertsSummary {
     const activeCaseload = userCaseloads.find(caseload => caseload.currentlyActive)
-    const nonAssociationsCount = nonAssociations.filter(
-      nonAssociation => nonAssociation.agencyId === activeCaseload?.caseLoadId,
-    ).length
+    const nonAssociationsCount = nonAssociations.length
     const showNonAssociationsLink = nonAssociationsEnabled(activeCaseload?.caseLoadId)
     const nonAssociationsUrl = `${config.serviceUrls.nonAssociations}/prisoner/${offenderNo}/non-associations`
 
