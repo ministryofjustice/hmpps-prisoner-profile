@@ -12,8 +12,8 @@
     </div>
     <div class="govuk-summary-list__row--no-border">
         <div class="govuk-!-padding-top-3">
-            <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Non-associations in {{ prisonerData.prisonName }}</dt>
-            <dd class="govuk-!-margin-left-0" data-qa="overview-non-association-count">{{ alertsSummary.nonAssociationsCount }}</dd>
+            <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Non-associations in {{ prisonName }}</dt>
+            <dd class="govuk-!-margin-left-0 govuk-!-margin-bottom-2" data-qa="overview-non-association-count">{{ alertsSummary.nonAssociationsCount }}</dd>
             {% if alertsSummary.showNonAssociationsLink %}
                 <dd class="govuk-!-margin-left-0"><a href="{{ alertsSummary.nonAssociationsUrl }}" class="govuk-link govuk-link--no-visited-state">Non-associations</a></dd>
             {% endif %}
