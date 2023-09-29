@@ -749,7 +749,7 @@ describe('OverviewPageService', () => {
       const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
       expect(res.alertsSummary).toEqual({
         activeAlertCount: 1,
-        nonAssociationsCount: 0,
+        nonAssociationsCount: 2,
         nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
         showNonAssociationsLink: false,
       })
@@ -766,7 +766,7 @@ describe('OverviewPageService', () => {
           const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
           expect(res.alertsSummary).toEqual({
             activeAlertCount: 1,
-            nonAssociationsCount: 0,
+            nonAssociationsCount: 2,
             nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
             showNonAssociationsLink: true,
           })
@@ -783,7 +783,7 @@ describe('OverviewPageService', () => {
           const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
           expect(res.alertsSummary).toEqual({
             activeAlertCount: 1,
-            nonAssociationsCount: 0,
+            nonAssociationsCount: 2,
             nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
             showNonAssociationsLink: false,
           })
