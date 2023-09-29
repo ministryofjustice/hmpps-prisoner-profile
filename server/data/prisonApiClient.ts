@@ -48,6 +48,10 @@ import { Transaction } from '../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
 import { Movement } from '../interfaces/prisonApi/movement'
 import { MovementType } from './enums/movementType'
+import { Details } from '../interfaces/prisonApi/details'
+import { AttributesForLocation } from '../interfaces/prisonApi/attributesForLocation'
+import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
+import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -373,23 +377,23 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })) as Movement[]
   }
 
-  async getDetails(prisonerNumber: string, fullInfo: boolean): Promise<any> {
-    return this.get<any>({ path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}` })
+  async getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details> {
+    return this.get<Details>({
+      path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
+    })
   }
 
-  async getAttributesForLocation(locationId: string): Promise<any> {
-    return this.get<any>({ path: `/api/cell/${locationId}/attributes` })
+  async getAttributesForLocation(locationId: string): Promise<AttributesForLocation> {
+    return this.get<AttributesForLocation>({ path: `/api/cell/${locationId}/attributes` })
   }
 
-  async getHistoryForLocation(locationId: string, fromDate: string, toDate: string ): Promise<any> {
-    return this.get<any>({ path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}` })
+  async getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]> {
+    return this.get<HistoryForLocationItem[]>({
+      path: `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
+    })
   }
 
-  async getCellMoveReasonTypes(): Promise<any> {
-    return this.get<any>({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' })
-  }
-
-  async getPrisonerDetail(bookingId: number): Promise<any> {
-    return this.get<any>({ path: `/api/bookings/${bookingId}`})
+  async getCellMoveReasonTypes(): Promise<CellMoveReasonType[]> {
+    return this.get<CellMoveReasonType[]>({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' })
   }
 }

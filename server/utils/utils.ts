@@ -11,7 +11,6 @@ import { Role } from '../data/enums/role'
 import config from '../config'
 import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
-import moment from 'moment'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -546,12 +545,6 @@ export const sortByDateTime = (t1: string, t2: string): number => {
   const [date1, date2] = [new Date(t1).getTime(), new Date(t2).getTime()]
   return date1 - date2
 }
-
-
-export const formatTimestampToDateTime = (
-  timestamp: moment.MomentInput,
-  format = 'DD/MM/YYYY - HH:mm'
-): moment.MomentInput => timestamp && moment(timestamp).format(format)
 
 export const putLastNameFirst = (firstName: string, lastName: string): string => {
   if (!firstName && !lastName) return null

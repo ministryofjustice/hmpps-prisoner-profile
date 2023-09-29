@@ -50,4 +50,8 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getTransactionHistory: jest.fn(),
   getDamageObligations: jest.fn(),
   getMovements: jest.fn(),
+  getDetails: jest.fn(),
+  getAttributesForLocation: jest.fn(),
+  getHistoryForLocation: jest.fn(),
+  getCellMoveReasonTypes: jest.fn(),
 })

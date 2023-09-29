@@ -15,6 +15,7 @@ import pathfinderApi from './integration_tests/mockApis/pathfinderApi'
 import socApi from './integration_tests/mockApis/socApi'
 import adjudicationsApi from './integration_tests/mockApis/adjudications'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
+import whereAboutsApi from './integration_tests/mockApis/whereAboutsApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -49,6 +50,7 @@ export default defineConfig({
         ...socApi,
         ...adjudicationsApi,
         ...nonAssociationsApi,
+        ...whereAboutsApi,
       })
     },
     baseUrl: 'http://localhost:3007',

@@ -46,6 +46,14 @@ declare global {
       setupActivePunishmentsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupPrisonerSchedulePageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupMoneyStubs(options: { prisonerNumber: string; bookingId: number; prisonId: string }): Chainable<AUTWindow>
+      setupSpecificLocationHistoryPageStubs(options?: {
+        prisonerNumber?: string
+        bookingId?: number
+        locationId?: string
+        staffId?: number
+        prisonId: string
+        caseLoads: CaseLoad[]
+      }): Chainable<AUTWindow>
     }
   }
 }

@@ -3,9 +3,9 @@ import config from '../config'
 import { UnacceptableAbsences } from '../interfaces/unacceptableAbsences'
 import { PageableQuery } from '../interfaces/pageable'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
+import { CellMoveReason } from '../interfaces/cellMoveReason'
 
 export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
-
   constructor(private restClient: RestClient) {}
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
@@ -30,11 +30,8 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     })
   }
 
-  async getCellMoveReason(
-    bookingId: number,
-    bedAssignmentHistorySequence: number
-  ): Promise<any> {
-    return this.get<any>({
+  async getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<CellMoveReason> {
+    return this.get<CellMoveReason>({
       path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
     })
   }
