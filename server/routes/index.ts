@@ -46,7 +46,7 @@ export default function routes(services: Services): Router {
 
   commonRoutes()
 
-  get('/prisoner/*', getFrontendComponents(services))
+  get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
   get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
     const prisonerData = req.middleware?.prisonerData

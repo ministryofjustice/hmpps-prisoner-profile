@@ -170,6 +170,7 @@ export default {
         deadline: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000)),
       },
       agent: new AgentConfig(Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000))),
+      latest: get('COMPONENT_API_LATEST', 'false') === 'true',
     },
   },
   serviceUrls: {
@@ -184,6 +185,7 @@ export default {
     calculateReleaseDates: get('CALCULATE_RELEASE_DATES_UI_URL', 'http://localhost:3001', requiredInProduction),
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
+    nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -193,6 +195,7 @@ export default {
   feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
+  nonAssociationsPrisons: process.env.NON_ASSOCIATIONS_PRISONS?.split(',') || [],
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
 }

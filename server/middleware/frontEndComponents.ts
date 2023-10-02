@@ -3,10 +3,14 @@ import type { RequestHandler } from 'express'
 import logger from '../../logger'
 import { Services } from '../services'
 
-export default function getFrontendComponents({ componentService }: Services): RequestHandler {
+export default function getFrontendComponents({ componentService }: Services, useLatest: boolean): RequestHandler {
   return async (req, res, next) => {
     try {
-      const { header, footer } = await componentService.getComponents(['header', 'footer'], res.locals.user.token)
+      const { header, footer } = await componentService.getComponents(
+        ['header', 'footer'],
+        res.locals.user.token,
+        useLatest,
+      )
 
       res.locals.feComponents = {
         header: header.html,

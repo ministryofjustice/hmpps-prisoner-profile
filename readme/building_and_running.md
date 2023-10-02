@@ -53,7 +53,7 @@ SYSTEM_CLIENT_SECRET=
 TOKEN_VERIFICATION_ENABLED=true
 HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
 PRISON_API_URL=https://prison-api-dev.prison.service.justice.gov.uk
-PRISONER_SEARCH_API_URL=https://prisoner-offender-search-dev.prison.service.justice.gov.uk
+PRISONER_SEARCH_API_URL=https://prisoner-search-dev.prison.service.justice.gov.uk
 DPS_HOME_PAGE_URL=https://digital-dev.prison.service.justice.gov.uk
 ALLOCATION_MANAGER_ENDPOINT_URL=https://dev.moic.service.justice.gov.uk
 KEYWORKER_API_URL=https://keyworker-api-dev.prison.service.justice.gov.uk
@@ -69,6 +69,7 @@ USE_OF_FORCE_UI_URL=https://dev.use-of-force.service.justice.gov.uk
 MANAGE_A_WARRANT_FOLDER_UI_URL=https://manage-a-warrant-folder-dev.hmpps.service.justice.gov.uk
 PATHFINDER_UI_URL=https://dev.pathfinder.service.justice.gov.uk
 MANAGE_SOC_CASES_UI_URL=https://manage-soc-cases-dev.hmpps.service.justice.gov.uk
+NON_ASSOCIATIONS_UI_URL: "https://non-associations-dev.hmpps.service.justice.gov.uk"
 ```
 </details>
 

@@ -15,7 +15,7 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
     DPS_HOME_PAGE_URL: "https://digital-dev.prison.service.justice.gov.uk"
-    PRISONER_SEARCH_API_URL: "https://prisoner-offender-search-dev.prison.service.justice.gov.uk"
+    PRISONER_SEARCH_API_URL: "https://prisoner-search-dev.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api-dev.prison.service.justice.gov.uk"
     ALLOCATION_MANAGER_ENDPOINT_URL: "https://dev.moic.service.justice.gov.uk"
     KEYWORKER_API_URL: "https://keyworker-api-dev.prison.service.justice.gov.uk"
@@ -35,15 +35,18 @@ generic-service:
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
+    NON_ASSOCIATIONS_UI_URL: "https://non-associations-dev.hmpps.service.justice.gov.uk"
     FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI,HMI,NHI"
     ENVIRONMENT_NAME: "DEV"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
+    NON_ASSOCIATIONS_PRISONS: "LGI,FNI,ISI,RSI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-dev.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
     ACTIVITIES_ENABLED_PRISONS: "LEI,RSI"
     APPOINTMENTS_URL: "https://activities-dev.prison.service.justice.gov.uk/appointments"
     APPOINTMENTS_ENABLED_PRISONS: "LEI,RSI"
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
+    COMPONENT_API_LATEST: "true"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
