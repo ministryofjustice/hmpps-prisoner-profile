@@ -42,7 +42,7 @@ generic-service:
     NON_ASSOCIATIONS_PRISONS: "LGI,FNI,ISI,RSI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-preprod.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
-    ACTIVITIES_ENABLED_PRISONS: ""
+    ACTIVITIES_ENABLED_PRISONS: "RSI"
     APPOINTMENTS_URL: "https://activities-preprod.prison.service.justice.gov.uk/appointments"
     APPOINTMENTS_ENABLED_PRISONS: ""
     COMPONENT_API_URL: "https://frontend-components-preprod.hmpps.service.justice.gov.uk"
