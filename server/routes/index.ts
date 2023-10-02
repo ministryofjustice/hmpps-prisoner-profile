@@ -3,7 +3,13 @@ import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
-import { formatName, sortArrayOfObjectsByDate, SortType } from '../utils/utils'
+import {
+  formatName,
+  prisonerBelongsToUsersCaseLoad,
+  sortArrayOfObjectsByDate,
+  SortType,
+  userHasRoles,
+} from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
@@ -19,6 +25,7 @@ import PrisonerScheduleController from '../controllers/prisonerScheduleControlle
 import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
+import { Prisoner } from '../interfaces/prisoner'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -48,9 +55,14 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
-  get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
-    const prisonerData = req.middleware?.prisonerData
-    const inmateDetail = req.middleware?.inmateDetail
+  get('/prisoner/:prisonerNumber', async (req, res, next) => {
+    const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
+    const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+    const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
+    const inmateDetail = await prisonApiClient.getInmateDetail(prisonerData.bookingId)
+    const globalSearchUser = userHasRoles([Role.GlobalSearch], res.locals.user.userRoles)
+    const canViewInactiveBookings = userHasRoles([Role.InactiveBookings], res.locals.user.userRoles)
+    const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
 
     const overviewController = new OverviewController(
       services.prisonerSearchService,
@@ -58,6 +70,22 @@ export default function routes(services: Services): Router {
       services.dataAccess.pathfinderApiClientBuilder,
       services.dataAccess.manageSocCasesApiClientBuilder,
     )
+
+    if (inactiveBooking) {
+      if (!canViewInactiveBookings && !globalSearchUser) {
+        return res.render('notFound.njk', {
+          url: req.headers.referer,
+        })
+      }
+      return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
+    }
+
+    if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) && !globalSearchUser) {
+      return res.render('notFound.njk', {
+        url: req.headers.referer,
+      })
+    }
+
     return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
   })
 
