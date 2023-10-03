@@ -26,6 +26,8 @@ import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import { Prisoner } from '../interfaces/prisoner'
+import { Assessment } from '../interfaces/prisonApi/assessment'
+import { AssessmentCode } from '../data/enums/assessmentCode'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -58,8 +60,24 @@ export default function routes(services: Services): Router {
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
     const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+
+    if (prisonerData.prisonerNumber === undefined) {
+      return next('route')
+    }
+
     const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
-    const inmateDetail = await prisonApiClient.getInmateDetail(prisonerData.bookingId)
+    const [assessments, inmateDetail] = await Promise.all([
+      prisonApiClient.getAssessments(prisonerData.bookingId),
+      prisonApiClient.getInmateDetail(prisonerData.bookingId),
+    ])
+    if (assessments && Array.isArray(assessments)) {
+      prisonerData.assessments = assessments.sort(
+        (a, b) => new Date(b.assessmentDate).getTime() - new Date(a.assessmentDate).getTime(),
+      )
+    }
+    prisonerData.csra = prisonerData.assessments?.find((assessment: Assessment) =>
+      assessment.assessmentDescription.includes(AssessmentCode.csra),
+    )?.classification
     const globalSearchUser = userHasRoles([Role.GlobalSearch], res.locals.user.userRoles)
     const canViewInactiveBookings = userHasRoles([Role.InactiveBookings], res.locals.user.userRoles)
     const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
@@ -73,17 +91,13 @@ export default function routes(services: Services): Router {
 
     if (inactiveBooking) {
       if (!canViewInactiveBookings && !globalSearchUser) {
-        return res.render('notFound.njk', {
-          url: req.headers.referer,
-        })
+        return next('route')
       }
       return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
     }
 
     if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) && !globalSearchUser) {
-      return res.render('notFound.njk', {
-        url: req.headers.referer,
-      })
+      return next('route')
     }
 
     return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
