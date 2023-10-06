@@ -319,7 +319,7 @@ describe('CSRA Controller', () => {
         controller = new CsraController(new CsraService(null))
       })
 
-      it('should get values to use for filters', async () => {
+      it('should get values to use for filters and filter out those with no location', async () => {
         const reqWithQuery = {
           ...req,
           query: {
@@ -340,10 +340,7 @@ describe('CSRA Controller', () => {
 
         await controller.displayHistory(reqWithQuery, res, next)
         expect(res.render.mock.calls[0][1].filterValues).toEqual({
-          establishments: [
-            { checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' },
-            { checked: true, text: 'Not entered', value: 'HLI' },
-          ],
+          establishments: [{ checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' }],
           from: undefined,
           incentiveLevels: [
             { checked: false, text: 'Medium', value: 'MED' },

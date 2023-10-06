@@ -913,7 +913,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/agencies/${agencyId}`,
+        urlPattern: `/prison/api/agencies/${agencyId}\\?activeOnly=false`,
       },
       response: {
         status: 200,
