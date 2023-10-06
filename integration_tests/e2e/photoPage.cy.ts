@@ -8,14 +8,17 @@ context('Photo Page', () => {
   const bookingId = 1102484
 
   context('Permissions', () => {
-    const visitPage = () => cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image' })
+    const visitPage = prisonerDataOverrides => {
+      cy.setupBannerStubs({ prisonerNumber, bookingId, prisonerDataOverrides })
+      cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image' })
+    }
     permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoPage })
   })
 
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.setupBannerStubs({ prisonerNumber })
+    cy.setupBannerStubs({ prisonerNumber, bookingId })
     cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
   })
 

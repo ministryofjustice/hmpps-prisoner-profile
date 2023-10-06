@@ -1,18 +1,14 @@
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import PrisonerScheduleController from './prisonerScheduleController'
-import { dataAccess } from '../data'
 import { PrisonerScheduleThisWeekMock } from '../data/localMockData/prisonerScheduleMock'
 import { getEventsNextWeekMock, getEventsThisWeekMock } from '../data/localMockData/getEventsMock'
+import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('Prisoner schedule', () => {
   const offenderNo = 'ABC123'
-  const prisonApi = {
-    getDetails: jest.fn(),
-    getScheduledEventsForThisWeek: jest.fn(),
-    getScheduledEventsForNextWeek: jest.fn(),
-  }
-
+  let prisonApi: PrisonApiClient
   let req: any
   let res: any
   let controller: PrisonerScheduleController
@@ -31,9 +27,10 @@ describe('Prisoner schedule', () => {
     }
     res = { locals: {}, render: jest.fn(), status: jest.fn() }
 
+    prisonApi = prisonApiClientMock()
     prisonApi.getScheduledEventsForThisWeek = jest.fn().mockResolvedValue(getEventsThisWeekMock)
     prisonApi.getScheduledEventsForNextWeek = jest.fn().mockResolvedValue(getEventsNextWeekMock)
-    controller = new PrisonerScheduleController(dataAccess.prisonApiClientBuilder)
+    controller = new PrisonerScheduleController(() => prisonApi)
   })
 
   afterEach(() => {
