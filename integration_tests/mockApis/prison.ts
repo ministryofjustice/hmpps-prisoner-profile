@@ -1115,4 +1115,20 @@ export default {
       },
     })
   },
+
+  stubIdentifiers: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: identifiersMock,
+      },
+    })
+  },
 }

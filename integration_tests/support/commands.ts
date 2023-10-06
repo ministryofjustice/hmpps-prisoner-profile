@@ -4,9 +4,11 @@ Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath
   return cy.task('getSignInUrl').then((url: string) => cy.visit(url, { failOnStatusCode }))
 })
 
-Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverrides }) => {
+Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverrides, bookingId = 1102484 }) => {
   cy.task('stubPrisonerData', { prisonerNumber, overrides: prisonerDataOverrides })
   cy.task('stubEventsForProfileImage', prisonerNumber)
+  cy.task('stubAssessments', bookingId)
+  cy.task('stubInmateDetail', bookingId)
 })
 
 Cypress.Commands.add(
