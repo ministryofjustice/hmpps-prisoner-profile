@@ -283,12 +283,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails | null> {
-    try {
-      return await this.get<AgencyLocationDetails>({ path: `/api/agencies/${agencyId}?activeOnly=false` })
-    } catch (error) {
-      if (error.status === 404) return null
-      throw error
-    }
+    return this.get<AgencyLocationDetails>({
+      path: `/api/agencies/${agencyId}?activeOnly=false`,
+      ignore404: true,
+    })
   }
 
   async getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory> {
