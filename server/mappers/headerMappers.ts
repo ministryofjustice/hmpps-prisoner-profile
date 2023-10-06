@@ -51,9 +51,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
     hiddenLabel: 'View CSRA history',
     info: prisonerData.csra ? prisonerData.csra : 'Not entered',
     classes: '',
-    url: !belongsToCaseLoad
-      ? undefined
-      : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/csra-history`,
+    url: !belongsToCaseLoad ? undefined : `/prisoner/${prisonerData.prisonerNumber}/csra-history`,
   })
   profileBannerTopLinks.push({
     heading: 'Incentive level',

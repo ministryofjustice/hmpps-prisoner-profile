@@ -21,7 +21,7 @@ export default class CsraService {
     const csraAssessments = await prisonApi.getCsraAssessmentsForPrisoner(prisonerNumber)
 
     return csraAssessments
-      .filter(assessment => !!assessment.classificationCode)
+      .filter(assessment => assessment.classificationCode && assessment.assessmentAgencyId)
       .sort((left, right) => sortByDateTime(right.assessmentDate, left.assessmentDate))
   }
 
@@ -53,11 +53,11 @@ export default class CsraService {
     token: string,
     csraAssessments: CsraAssessment[],
   ): Promise<AgencyLocationDetails[]> {
+    const prisonApiClient = this.prisonApiClientBuilder(token)
     const agencyIds = [...new Set(csraAssessments.map(assessment => assessment.assessmentAgencyId))]
+
     return Promise.all(
-      agencyIds
-        .filter(agencyId => agencyId)
-        .map(agencyId => this.prisonApiClientBuilder(token).getAgencyDetails(agencyId)),
+      agencyIds.filter(agencyId => agencyId).map(agencyId => prisonApiClient.getAgencyDetails(agencyId)),
     )
   }
 
