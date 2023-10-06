@@ -105,7 +105,11 @@ export default class OverviewController {
         dataQA: 'add-key-worker-session-action-link',
       })
     }
-    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
+    if (
+      userCanEdit(user, prisonerData) &&
+      !prisonerData.restrictedPatient &&
+      !config.useOfForceDisabledPrisons.includes(user.activeCaseLoadId)
+    ) {
       actions.push({
         text: 'Add appointment',
         icon: Icon.AddAppointment,

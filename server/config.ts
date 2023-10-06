@@ -198,4 +198,5 @@ export default {
   nonAssociationsPrisons: process.env.NON_ASSOCIATIONS_PRISONS?.split(',') || [],
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
+  useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
 }
