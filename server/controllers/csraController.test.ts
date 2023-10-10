@@ -197,7 +197,7 @@ describe('CSRA Controller', () => {
 
     it('should handle details not being present', async () => {
       jest.spyOn<any, string>(controller['csraService'], 'getCsraAssessment').mockResolvedValue({
-        csraAssessment: { ...csraAssessmentMock, assessmentComment: '' },
+        csraAssessment: { ...csraAssessmentMock, assessmentComment: '', nextReviewDate: undefined },
         agencyDetails: { ...AgencyMock, description: '' },
         staffDetails: StaffDetailsMock,
       })
@@ -224,7 +224,7 @@ describe('CSRA Controller', () => {
         { key: { text: 'Reviewed by' }, value: { text: 'Reception - John Smith' } },
         {
           key: { text: 'Next review date' },
-          value: { text: '13 January 2018' },
+          value: { text: 'Not entered' },
         },
       ]
 
@@ -379,7 +379,7 @@ describe('CSRA Controller', () => {
         ])
       })
 
-      it('should return ther filtered assessments', async () => {
+      it('should return the filtered assessments', async () => {
         const reqWithQuery = {
           ...req,
           query: {
