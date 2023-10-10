@@ -9,7 +9,11 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   constructor(private readonly restClient: RestClient) {}
 
   private async get<T>(args: object): Promise<T> {
-    return this.restClient.get<T>(args)
+    try {
+      return await this.restClient.get<T>(args)
+    } catch (error) {
+      return error
+    }
   }
 
   private async post(args: object): Promise<unknown> {

@@ -1,5 +1,7 @@
 import { Readable } from 'stream'
+import config from '../config'
 import RestClient from './restClient'
+import { CaseLoadsDummyDataA } from './localMockData/caseLoad'
 import { CaseLoad } from '../interfaces/caseLoad'
 import { PrisonApiClient } from './interfaces/prisonApiClient'
 import { AccountBalances } from '../interfaces/accountBalances'
@@ -10,6 +12,7 @@ import { ContactDetail } from '../interfaces/staffContacts'
 import { mapToQueryString } from '../utils/utils'
 import { CaseNote } from '../interfaces/caseNote'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import dummyScheduledEvents from './localMockData/eventsForToday'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
@@ -49,8 +52,15 @@ import { MovementType } from './enums/movementType'
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
 
-  private async get<T>(args: object): Promise<T> {
-    return this.restClient.get<T>(args)
+  private async get<T>(args: object, localMockData?: T): Promise<T> {
+    try {
+      return await this.restClient.get<T>(args)
+    } catch (error) {
+      if (config.localMockData === 'true' && localMockData) {
+        return localMockData
+      }
+      return error
+    }
   }
 
   private async post(args: object): Promise<unknown> {
@@ -68,7 +78,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getUserCaseLoads(): Promise<CaseLoad[]> {
-    return this.get<CaseLoad[]>({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' })
+    return this.get<CaseLoad[]>({ path: '/api/users/me/caseLoads', query: 'allCaseloads=true' }, CaseLoadsDummyDataA)
   }
 
   async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
@@ -102,9 +112,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]> {
-    return this.get<ScheduledEvent[]>({
-      path: `/api/bookings/${bookingId}/events/today`,
-    })
+    return this.get<ScheduledEvent[]>(
+      {
+        path: `/api/bookings/${bookingId}/events/today`,
+      },
+      dummyScheduledEvents,
+    )
   }
 
   async getBookingContacts(bookingId: number): Promise<ContactDetail> {

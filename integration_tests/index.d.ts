@@ -13,7 +13,6 @@ declare global {
       setupBannerStubs(options: {
         prisonerNumber: string
         prisonerDataOverrides?: Partial<Prisoner>
-        bookingId?: number
       }): Chainable<AUTWindow>
       setupOverviewPageStubs(options: {
         prisonerNumber: string

@@ -19,7 +19,6 @@ const visitEmptyAlertsPage = () => {
 context('Alerts Page - Permissions', () => {
   context('Active alerts', () => {
     const visitPage = prisonerDataOverrides => {
-      cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonerDataOverrides })
       visitActiveAlertsPage({ failOnStatusCode: false })
     }
@@ -36,7 +35,6 @@ context('Alerts Page - User does not have Update Alerts role', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
   })
 
   context('Active Alerts', () => {
@@ -121,7 +119,6 @@ context('Alerts Page - User does not have Update Alerts role', () => {
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
-      cy.setupBannerStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
       visitEmptyAlertsPage()
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
@@ -212,7 +209,6 @@ context('Alerts Page - User has Update Alert role', () => {
       roles: [Role.PrisonUser, Role.UpdateAlert],
       caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
     })
-    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     visitActiveAlertsPage()
     alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
