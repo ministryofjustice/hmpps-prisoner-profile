@@ -47,40 +47,26 @@ export default class WorkAndSkillsPage extends Page {
     cy.get('#courses-and-qualifications > .hmpps-summary-card__body > .govuk-body > .govuk-link--no-visited-state')
 
   // WAA = Work and activities card
-  WAA_card = (): PageElement => cy.get('.govuk-grid-column-three-quarters > :nth-child(2) > .govuk-grid-column-full')
-
-  WAA_header = (): PageElement => cy.get('#work-and-activities > [data-qa="summary-header"] > h2')
-
-  WAA_info = (): PageElement => cy.get('#work-and-activities > .hmpps-summary-card__body > :nth-child(1)')
-
-  WAA_heading = (): PageElement => cy.get('#work-and-activities > .hmpps-summary-card__body > :nth-child(1)')
-
-  WAA_keyChild1 = (): PageElement =>
-    cy.get(
-      '#work-and-activities > .hmpps-summary-card__body > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__key',
-    )
-
-  WAA_valueChild1 = (): PageElement =>
-    cy.get(
-      '#work-and-activities > .hmpps-summary-card__body > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value',
-    )
-
-  WAA_viewWorkAndActivity = (): PageElement =>
-    cy.get('#work-and-activities > .hmpps-summary-card__body > :nth-child(5) > .govuk-link--no-visited-state')
-
-  WAA_viewSevenDay = (): PageElement => cy.get('#work-and-activities > .hmpps-summary-card__body > :nth-child(6)')
-
-  WAA_absences = (): PageElement => cy.get('#work-and-activities > .hmpps-summary-card__body > :nth-child(7)')
-
-  WAA_last30Days = (): PageElement => cy.get('.govuk-grid-column-one-third > .govuk-heading-s')
-
-  WAA_numberOfDays = (): PageElement =>
-    cy.get('#work-and-activities > .hmpps-summary-card__body > .govuk-grid-row > .govuk-grid-column-two-thirds')
-
-  WAA_label = (): PageElement => cy.get('.hmpps-summary-card__body > :nth-child(11)')
-
-  WAA_emptyStateMessage = (): PageElement =>
-    cy.get('#work-and-activities > .hmpps-summary-card__body > p:nth-of-type(2)')
+  workAndActivities = () => {
+    const cardData = dataQa => cy.get('[data-qa=work-and-activities]').findDataQa(dataQa)
+    return {
+      currentActivities: (activityNumber: number) => ({
+        activity: () =>
+          cardData('current-activities')
+            .find('.govuk-summary-list__row')
+            .eq(activityNumber)
+            .find('.govuk-summary-list__key'),
+        started: () =>
+          cardData('current-activities')
+            .find('.govuk-summary-list__row')
+            .eq(activityNumber)
+            .find('.govuk-summary-list__value'),
+      }),
+      unacceptableAbsenceLastMonth: () => cardData('unacceptable-absence-last-month'),
+      unacceptableAbsenceLast6Months: () => cardData('unacceptable-absence-last-six-months'),
+      emptyMessage: () => cardData('no-work-or-activities'),
+    }
+  }
 
   // ES = Employability skills card
   ES_card = (): PageElement => cy.get('#employability-skills')

@@ -132,44 +132,22 @@ context('Work and skills page', () => {
       })
 
       context('Work and activities card', () => {
-        it('The card is displayed', () => {
-          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_card().should('exist')
-        })
-
-        it('The card summary header contains Work and activities', () => {
-          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_header().contains('Work and activities')
-        })
-
-        it('The card summary header contains Work and activities', () => {
-          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_header().contains('Work and activities')
-        })
-
         it('The card has a list key that should contain Braille am', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_keyChild1().contains('Braille am')
+          workAndSkillsPage.workAndActivities().currentActivities(0).activity().contains('Braille am')
         })
 
-        it('The card contains the text Unacceptable absences', () => {
+        it('Displays the number of absenses in the last 30 days', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_absences().contains('Unacceptable absences')
-        })
-
-        it('The card contains a key with the text Last 30 days', () => {
-          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_last30Days().contains('Last 30 days')
-        })
-
-        it('The card contains a value with the text Work "0"', () => {
-          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_valueChild1().contains('0')
+          workAndSkillsPage.workAndActivities().unacceptableAbsenceLastMonth().contains('0')
         })
 
         it('The card contains the text John Saunders has no....', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_label().contains('John Saunders has no unacceptable absences in the last 6 months.')
+          workAndSkillsPage
+            .workAndActivities()
+            .unacceptableAbsenceLast6Months()
+            .contains('John Saunders has no unacceptable absences in the last 6 months.')
         })
       })
 
@@ -291,7 +269,7 @@ context('Work and skills page', () => {
       context('Empty Work and activities card', () => {
         it('The card shows an empty state message', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.WAA_emptyStateMessage().contains('John Saunders has no work or activities.')
+          workAndSkillsPage.workAndActivities().emptyMessage().contains('John Saunders has no work or activities.')
         })
       })
     })

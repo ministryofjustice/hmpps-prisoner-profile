@@ -73,7 +73,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     toDate: string,
   ): Promise<OffenderAttendanceHistory> {
     return this.get<OffenderAttendanceHistory>({
-      path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=20`,
+      path: `/api/offender-activities/${prisonerNumber}/attendance-history?fromDate=${fromDate}&toDate=${toDate}&page=0&size=1000`,
     })
   }
 
