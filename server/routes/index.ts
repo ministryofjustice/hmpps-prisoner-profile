@@ -58,18 +58,17 @@ export default function routes(services: Services): Router {
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
   get('/prisoner/:prisonerNumber', async (req, res, next) => {
-    const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
+    const { prisonerSearchApiClientBuilder, prisonApiClientBuilder } = services.dataAccess
+
+    const prisonerSearchClient = prisonerSearchApiClientBuilder(res.locals.clientToken)
     const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
     if (prisonerData.prisonerNumber === undefined) {
       return next('route')
     }
 
-    const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
-    const [assessments, inmateDetail] = await Promise.all([
-      prisonApiClient.getAssessments(prisonerData.bookingId),
-      prisonApiClient.getInmateDetail(prisonerData.bookingId),
-    ])
+    const prisonApiClient = prisonApiClientBuilder(res.locals.clientToken)
+    const assessments = await prisonApiClient.getAssessments(prisonerData.bookingId)
     if (assessments && Array.isArray(assessments)) {
       prisonerData.assessments = assessments.sort(
         (a, b) => new Date(b.assessmentDate).getTime() - new Date(a.assessmentDate).getTime(),
@@ -78,29 +77,25 @@ export default function routes(services: Services): Router {
     prisonerData.csra = prisonerData.assessments?.find((assessment: Assessment) =>
       assessment.assessmentDescription.includes(AssessmentCode.csra),
     )?.classification
+
     const globalSearchUser = userHasRoles([Role.GlobalSearch], res.locals.user.userRoles)
     const canViewInactiveBookings = userHasRoles([Role.InactiveBookings], res.locals.user.userRoles)
     const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
 
-    const overviewController = new OverviewController(
-      services.prisonerSearchService,
-      services.overviewPageService,
-      services.dataAccess.pathfinderApiClientBuilder,
-      services.dataAccess.manageSocCasesApiClientBuilder,
-    )
+    const overviewController = new OverviewController(services.overviewPageService)
 
     if (inactiveBooking) {
       if (!canViewInactiveBookings && !globalSearchUser) {
         return next('route')
       }
-      return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
+      return overviewController.displayOverview(res, prisonerData)
     }
 
     if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads) && !globalSearchUser) {
       return next('route')
     }
 
-    return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
+    return overviewController.displayOverview(res, prisonerData)
   })
 
   get(

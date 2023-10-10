@@ -14,6 +14,7 @@ import ReferenceDataService from './referenceDataService'
 import CsraService from './csraService'
 import ComponentService from './componentService'
 import MoneyService from './moneyService'
+import pathfinderApi from '../../integration_tests/mockApis/pathfinderApi'
 
 export const services = () => {
   const {
@@ -28,6 +29,8 @@ export const services = () => {
     adjudicationsApiClientBuilder,
     nonAssociationsApiClientBuilder,
     componentApiClientBuilder,
+    pathfinderApiClientBuilder,
+    manageSocCasesApiClientBuilder,
   } = dataAccess
 
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
@@ -46,6 +49,8 @@ export const services = () => {
     offencesPageService,
     curiousApiClientBuilder,
     nonAssociationsApiClientBuilder,
+    pathfinderApiClientBuilder,
+    manageSocCasesApiClientBuilder,
   )
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)

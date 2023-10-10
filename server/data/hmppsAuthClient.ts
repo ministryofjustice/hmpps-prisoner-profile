@@ -37,6 +37,7 @@ export interface User {
   activeCaseLoadId: string
   userRoles: string[]
   caseLoads: CaseLoad[]
+  staffId: number
 }
 
 export interface UserRole {

@@ -3,7 +3,6 @@ import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import {
   AlertsSummary,
   OverviewNonAssociation,
-  OverviewPage,
   OverviewSchedule,
   OverviewScheduleItem,
 } from '../interfaces/overviewPage'
@@ -16,6 +15,7 @@ import {
   getNamesFromString,
   nonAssociationsEnabled,
   prisonerBelongsToUsersCaseLoad,
+  userCanEdit,
   userHasRoles,
 } from '../utils/utils'
 import { Assessment } from '../interfaces/prisonApi/assessment'
@@ -55,6 +55,15 @@ import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import { KeyWorker } from '../interfaces/keyWorker'
 import { CaseNote } from '../interfaces/caseNote'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
+import { OverviewViewModel } from '../controllers/overviewController'
+import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
+import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
+import { Nominal } from '../interfaces/pathfinderApi/nominal'
+import { User } from '../data/hmppsAuthClient'
+import { HmppsAction } from '../interfaces/hmppsAction'
+import { canAddCaseNotes, canViewCalculateReleaseDates, canViewCaseNotes } from '../utils/roleHelpers'
+import { Icon } from '../data/enums/icon'
+import { mapHeaderData } from '../mappers/headerMappers'
 
 export default class OverviewPageService {
   private prisonApiClient: PrisonApiClient
@@ -71,6 +80,10 @@ export default class OverviewPageService {
 
   private nonAssociationsApiClient: NonAssociationsApiClient
 
+  private pathfinderApiClient: PathfinderApiClient
+
+  private manageSocCasesApiClient: ManageSocCasesApiClient
+
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
@@ -80,15 +93,12 @@ export default class OverviewPageService {
     private readonly offencesPageService: OffencesPageService,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly nonAssociationsApiClientBuilder: RestClientBuilder<NonAssociationsApiClient>,
+    private readonly pathfinderClientBuilder: RestClientBuilder<PathfinderApiClient>,
+    private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
   ) {}
 
-  public async get(
-    clientToken: string,
-    prisonerData: Prisoner,
-    staffId: number,
-    userCaseLoads: CaseLoad[] = [],
-    userRoles: string[] = [],
-  ): Promise<OverviewPage> {
+  public async get(clientToken: string, prisonerData: Prisoner, user: User): Promise<OverviewViewModel> {
+    const { staffId, caseLoads, userRoles } = user
     const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
       prisonerData
 
@@ -99,6 +109,8 @@ export default class OverviewPageService {
     this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
     this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
     this.nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
+    this.pathfinderApiClient = this.pathfinderClientBuilder(clientToken)
+    this.manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
 
     const [
       inmateDetail,
@@ -113,6 +125,8 @@ export default class OverviewPageService {
       mainOffence,
       courtCaseData,
       fullStatus,
+      pathfinderNominal,
+      socNominal,
     ] = await Promise.all([
       this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
       this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
@@ -126,11 +140,13 @@ export default class OverviewPageService {
       this.prisonApiClient.getMainOffence(bookingId),
       this.prisonApiClient.getCourtCases(bookingId),
       this.prisonApiClient.getFullStatus(prisonerNumber),
+      this.pathfinderApiClient.getNominal(prisonerNumber),
+      this.manageSocCasesApiClient.getNominal(prisonerNumber),
     ])
 
     const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
-      this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles),
-      this.getMiniSummaryGroupB(prisonerData, inmateDetail, userCaseLoads, userRoles),
+      this.getMiniSummaryGroupA(prisonerData, caseLoads, userRoles),
+      this.getMiniSummaryGroupB(prisonerData, inmateDetail, caseLoads, userRoles),
       this.getPersonalDetails(prisonerData, inmateDetail),
       this.getSchedule(prisonerData),
       this.getOffencesOverview(
@@ -144,8 +160,15 @@ export default class OverviewPageService {
     ])
 
     const nonAssociations = this.getNonAssociations(nonAssociationDetails)
+    const staffRolesRole = staffRoles.map(role => role.role)
+
+    const overviewActions = this.buildOverviewActions(prisonerData, pathfinderNominal, socNominal, user, staffRolesRole)
+    const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, user)
+    const canView = canViewCaseNotes(user, prisonerData)
+    const canAdd = canAddCaseNotes(user, prisonerData)
 
     return {
+      pageTitle: 'Overview',
       miniSummaryGroupA,
       miniSummaryGroupB,
       statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, movements),
@@ -161,8 +184,13 @@ export default class OverviewPageService {
       schedule,
       offencesOverview,
       prisonName: prisonerData.prisonName,
-      staffRoles: staffRoles.map(role => role.role),
-      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations, userCaseLoads),
+      staffRoles: staffRolesRole,
+      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations, caseLoads),
+      overviewActions,
+      overviewInfoLinks,
+      canView,
+      canAdd,
+      ...mapHeaderData(prisonerData, inmateDetail, user, 'overview'),
     }
   }
 
@@ -174,9 +202,9 @@ export default class OverviewPageService {
     courtCaseData: CourtCase[],
     fullStatus: FullStatus,
   ) {
-    const nextCourtAppearance = await this.getNextCourtAppearanceForOverview(courtCaseData)
+    const nextCourtAppearance = this.getNextCourtAppearanceForOverview(courtCaseData)
 
-    const mainOffenceDescription = await this.getMainOffenceDescription(mainOffence)
+    const mainOffenceDescription = this.getMainOffenceDescription(mainOffence)
     return {
       mainOffenceDescription,
       courtCaseData,
@@ -188,29 +216,27 @@ export default class OverviewPageService {
     }
   }
 
-  async getMainOffenceDescription(mainOffence: MainOffence[]): Promise<string> {
+  getMainOffenceDescription(mainOffence: MainOffence[]): string {
     return mainOffence[0] && mainOffence[0].offenceDescription ? mainOffence[0].offenceDescription : 'Not entered'
   }
 
-  async getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {
+  getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     let nextCourtAppearance: CourtHearing = {} as CourtHearing
     if (Array.isArray(courtCaseData)) {
-      await Promise.all(
-        courtCaseData.map(async (courtCase: CourtCase) => {
-          const courtAppearance = this.offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
+      courtCaseData.map((courtCase: CourtCase) => {
+        const courtAppearance = this.offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
 
-          if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
+        if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
+          nextCourtAppearance = courtAppearance
+        } else if (courtAppearance.dateTime && nextCourtAppearance.dateTime) {
+          const courtDate = format(new Date(courtAppearance.dateTime), 'yyyy-MM-dd')
+          const currentNextDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
+          if (courtDate < currentNextDate) {
             nextCourtAppearance = courtAppearance
-          } else if (courtAppearance.dateTime && nextCourtAppearance.dateTime) {
-            const courtDate = format(new Date(courtAppearance.dateTime), 'yyyy-MM-dd')
-            const currentNextDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
-            if (courtDate < currentNextDate) {
-              nextCourtAppearance = courtAppearance
-            }
           }
-        }),
-      )
+        }
+      })
     }
     return nextCourtAppearance
   }
@@ -649,5 +675,165 @@ export default class OverviewPageService {
     }
 
     return statusList
+  }
+
+  private buildOverviewActions(
+    prisonerData: Prisoner,
+    pathfinderNominal: Nominal,
+    socNominal: Nominal,
+    user: User,
+    staffRoles: string[] = [],
+  ): HmppsAction[] {
+    const actions: HmppsAction[] = []
+    if (canViewCalculateReleaseDates(user)) {
+      actions.push({
+        text: 'Calculate release dates',
+        icon: Icon.CalculateReleaseDates,
+        url: `${config.serviceUrls.calculateReleaseDates}/?prisonId=${prisonerData.prisonerNumber}`,
+        dataQA: 'calculate-release-dates-action-link',
+      })
+    }
+    if (canAddCaseNotes(user, prisonerData)) {
+      actions.push({
+        text: 'Add case note',
+        icon: Icon.AddCaseNote,
+        url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
+        dataQA: 'add-case-note-action-link',
+      })
+    }
+    if (staffRoles.includes('KW')) {
+      actions.push({
+        text: 'Add key worker session',
+        icon: Icon.AddKeyWorkerSession,
+        url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA&subType=KS`,
+        dataQA: 'add-key-worker-session-action-link',
+      })
+    }
+    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
+      actions.push({
+        text: 'Add appointment',
+        icon: Icon.AddAppointment,
+        url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`,
+        dataQA: 'add-appointment-action-link',
+      })
+    }
+    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
+      actions.push({
+        text: 'Report use of force',
+        icon: Icon.ReportUseOfForce,
+        url: `${config.serviceUrls.useOfForce}/report/${prisonerData.bookingId}/report-use-of-force`,
+        dataQA: 'report-use-of-force-action-link',
+      })
+    }
+    if (
+      userHasRoles([Role.ActivityHub], user.userRoles) &&
+      config.activitiesEnabledPrisons.includes(user.activeCaseLoadId) &&
+      user.activeCaseLoadId === prisonerData.prisonId &&
+      prisonerData.status !== 'ACTIVE OUT'
+    ) {
+      actions.push({
+        text: 'Log an activity application',
+        icon: Icon.LogActivityApplication,
+        url: `${config.serviceUrls.activities}/waitlist/${prisonerData.prisonerNumber}/apply`,
+        dataQA: 'log-an-activity-application-link',
+      })
+    }
+    if (
+      userHasRoles(
+        [Role.PathfinderApproval, Role.PathfinderStdPrison, Role.PathfinderStdProbation, Role.PathfinderHQ],
+        user.userRoles,
+      ) &&
+      !pathfinderNominal
+    ) {
+      actions.push({
+        text: 'Refer to Pathfinder',
+        icon: Icon.ReferToPathfinder,
+        url: `${config.serviceUrls.pathfinder}/refer/offender/${prisonerData.prisonerNumber}`,
+        dataQA: 'refer-to-pathfinder-action-link',
+      })
+    }
+    if (userHasRoles([Role.SocCustody, Role.SocCommunity], user.userRoles) && !socNominal) {
+      actions.push({
+        text: 'Add to SOC',
+        icon: Icon.AddToSOC,
+        url: `${config.serviceUrls.manageSocCases}/refer/offender/${prisonerData.prisonerNumber}`,
+        dataQA: 'add-to-soc-action-link',
+      })
+    }
+    if (
+      userHasRoles(
+        [
+          Role.CreateCategorisation,
+          Role.ApproveCategorisation,
+          Role.CreateRecategorisation,
+          Role.CategorisationSecurity,
+        ],
+        user.userRoles,
+      )
+    ) {
+      actions.push({
+        text: 'Manage category',
+        icon: Icon.ManageCategory,
+        url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
+        dataQA: 'manage-category-action-link',
+      })
+    }
+
+    return actions
+  }
+
+  private buildOverviewInfoLinks(
+    prisonerData: Prisoner,
+    pathfinderNominal: Nominal,
+    socNominal: Nominal,
+    user: User,
+  ): { text: string; url: string; dataQA: string }[] {
+    const links: { text: string; url: string; dataQA: string }[] = []
+
+    if (
+      userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
+      (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads) ||
+        ['OUT', 'TRN'].includes(prisonerData.prisonId))
+    ) {
+      links.push({
+        text: 'Probation documents',
+        url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/probation-documents`,
+        dataQA: 'probation-documents-info-link',
+      })
+    }
+
+    if (
+      userHasRoles(
+        [
+          Role.PathfinderApproval,
+          Role.PathfinderStdPrison,
+          Role.PathfinderStdProbation,
+          Role.PathfinderHQ,
+          Role.PathfinderUser,
+          Role.PathfinderLocalReader,
+          Role.PathfinderNationalReader,
+          Role.PathfinderPolice,
+          Role.PathfinderPsychologist,
+        ],
+        user.userRoles,
+      ) &&
+      pathfinderNominal
+    ) {
+      links.push({
+        text: 'Pathfinder profile',
+        url: `${config.serviceUrls.pathfinder}/nominal/${pathfinderNominal.id}`,
+        dataQA: 'pathfinder-profile-info-link',
+      })
+    }
+
+    if (userHasRoles([Role.SocCommunity, Role.SocCustody], user.userRoles) && socNominal) {
+      links.push({
+        text: 'SOC profile',
+        url: `${config.serviceUrls.manageSocCases}/nominal/${socNominal.id}`,
+        dataQA: 'soc-profile-info-link',
+      })
+    }
+
+    return links
   }
 }

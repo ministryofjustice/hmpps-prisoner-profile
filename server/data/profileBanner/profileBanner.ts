@@ -45,7 +45,7 @@ export const alerts = [
   },
 ]
 
-interface TabLink {
+export interface TabLink {
   label: string
   classes: string
   id: string

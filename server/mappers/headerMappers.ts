@@ -1,5 +1,5 @@
 import { Alert, Prisoner } from '../interfaces/prisoner'
-import { tabLinks } from '../data/profileBanner/profileBanner'
+import { TabLink, tabLinks } from '../data/profileBanner/profileBanner'
 import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 import { formatCategoryCodeDescription, formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
@@ -10,9 +10,31 @@ import { canViewCaseNotes } from '../utils/roleHelpers'
 import { User } from '../data/hmppsAuthClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 
-export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
+export interface HeaderData {
+  backLinkLabel: string
+  prisonerName: string
+  prisonerNumber: Prisoner['prisonerNumber']
+  profileBannerTopLinks: ProfileBannerTopLink[]
+  alerts: AlertFlagLabel[]
+  tabLinks: TabLink[]
+  photoType: 'photoWithheld' | 'placeholder'
+  prisonId: Prisoner['prisonId']
+  restrictedPatient: boolean
+  hideBanner: boolean
+}
+export interface ProfileBannerTopLink {
+  heading: string
+  hiddenLabel: string
+  info: Prisoner['cellLocation']
+  classes: string
+  url: string
+}
 
-export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
+export function mapProfileBannerTopLinks(
+  prisonerData: Prisoner,
+  inmateDetail: InmateDetail,
+  user: User,
+): ProfileBannerTopLink[] {
   const { userRoles, caseLoads } = user
   const profileBannerTopLinks = []
 
@@ -63,7 +85,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
   return profileBannerTopLinks
 }
 
-export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) {
+export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]): AlertFlagLabel[] {
   const alerts: AlertFlagLabel[] = []
   if (prisonerData.alerts) {
     prisonerData.alerts.forEach((alert: Alert) => {
@@ -83,7 +105,7 @@ export function mapHeaderData(
   user?: User,
   pageId?: string,
   hideBanner?: boolean,
-) {
+): HeaderData {
   const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 
