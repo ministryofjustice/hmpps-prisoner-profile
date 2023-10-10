@@ -17,7 +17,7 @@ export interface CsraAssessment {
   approvalCommitteeName?: string
   originalClassificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
   classificationReviewReason?: string
-  questions: [
+  questions?: [
     {
       question: string
       answer?: string

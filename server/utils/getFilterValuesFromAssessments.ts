@@ -19,13 +19,13 @@ export default (
   const csraFilters = [filters.csra].flat()
   const locationFilters = [filters.location].flat()
 
-  const uniqueEstablishments = [...new Map(csraAssessments.map(csra => [csra.assessmentAgencyId, csra])).values()].map(
-    csra => ({
+  const uniqueEstablishments = [...new Map(csraAssessments.map(csra => [csra.assessmentAgencyId, csra])).values()]
+    .filter(csra => csra.assessmentAgencyId && csra.location !== 'Not entered')
+    .map(csra => ({
       value: csra.assessmentAgencyId,
       text: csra.location,
       checked: locationFilters.includes(csra.assessmentAgencyId),
-    }),
-  )
+    }))
 
   const uniqueIncentiveLevels = [...new Map(csraAssessments.map(csra => [csra.classificationCode, csra])).values()].map(
     csra => ({

@@ -197,7 +197,7 @@ describe('CSRA Controller', () => {
 
     it('should handle details not being present', async () => {
       jest.spyOn<any, string>(controller['csraService'], 'getCsraAssessment').mockResolvedValue({
-        csraAssessment: { ...csraAssessmentMock, assessmentComment: '' },
+        csraAssessment: { ...csraAssessmentMock, assessmentComment: '', nextReviewDate: undefined },
         agencyDetails: { ...AgencyMock, description: '' },
         staffDetails: StaffDetailsMock,
       })
@@ -224,7 +224,7 @@ describe('CSRA Controller', () => {
         { key: { text: 'Reviewed by' }, value: { text: 'Reception - John Smith' } },
         {
           key: { text: 'Next review date' },
-          value: { text: '13 January 2018' },
+          value: { text: 'Not entered' },
         },
       ]
 
@@ -319,7 +319,7 @@ describe('CSRA Controller', () => {
         controller = new CsraController(new CsraService(null))
       })
 
-      it('should get values to use for filters', async () => {
+      it('should get values to use for filters and filter out those with no location', async () => {
         const reqWithQuery = {
           ...req,
           query: {
@@ -340,10 +340,7 @@ describe('CSRA Controller', () => {
 
         await controller.displayHistory(reqWithQuery, res, next)
         expect(res.render.mock.calls[0][1].filterValues).toEqual({
-          establishments: [
-            { checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' },
-            { checked: true, text: 'Not entered', value: 'HLI' },
-          ],
+          establishments: [{ checked: true, text: 'Sheffield Crown Court', value: 'SHEFCC' }],
           from: undefined,
           incentiveLevels: [
             { checked: false, text: 'Medium', value: 'MED' },
@@ -382,7 +379,7 @@ describe('CSRA Controller', () => {
         ])
       })
 
-      it('should return ther filtered assessments', async () => {
+      it('should return the filtered assessments', async () => {
         const reqWithQuery = {
           ...req,
           query: {

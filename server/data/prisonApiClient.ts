@@ -295,8 +295,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<StaffRole[]>({ path: `/api/staff/${staffId}/${agencyId}/roles` })
   }
 
-  async getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails> {
-    return this.get<AgencyLocationDetails>({ path: `/api/agencies/${agencyId}` })
+  async getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails | null> {
+    return this.get<AgencyLocationDetails>({
+      path: `/api/agencies/${agencyId}?activeOnly=false`,
+      ignore404: true,
+    })
   }
 
   async getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory> {
