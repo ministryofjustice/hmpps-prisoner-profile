@@ -55,9 +55,7 @@ export default (
     {
       key: { text: 'Next review date' },
       value: {
-        text: csraAssessment.nextReviewDate
-          ? formatDate(new Date(csraAssessment.nextReviewDate).toISOString(), 'long')
-          : 'Not entered',
+        text: csraAssessment.nextReviewDate ? formatDate(csraAssessment.nextReviewDate, 'long') : 'Not entered',
       },
     },
   ]
