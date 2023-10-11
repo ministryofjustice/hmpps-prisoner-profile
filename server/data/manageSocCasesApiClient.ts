@@ -5,7 +5,7 @@ import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApiClient'
 export default class ManageSocCasesApiRestClient implements ManageSocCasesApiClient {
   constructor(private readonly restClient: RestClient) {}
 
-  async getNominal(offenderNumber: string): Promise<Nominal> {
-    return this.restClient.get<Nominal>({ path: `/soc/nominal/nomsId/${offenderNumber}`, ignore404: true })
+  async getNominal(offenderNumber: string): Promise<Nominal | null> {
+    return this.restClient.get<Nominal | null>({ path: `/soc/nominal/nomsId/${offenderNumber}`, ignore404: true })
   }
 }

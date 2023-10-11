@@ -2,19 +2,18 @@ import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { PrisonerSearchService } from '../services'
 import OverviewPageService from '../services/overviewPageService'
-import { canAddCaseNotes, canViewCalculateReleaseDates, canViewCaseNotes } from '../utils/roleHelpers'
+import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import { Prisoner } from '../interfaces/prisoner'
-import { HmppsAction } from '../interfaces/hmppsAction'
-import { Icon } from '../data/enums/icon'
 import config from '../config'
 import { User } from '../data/hmppsAuthClient'
-import { prisonerBelongsToUsersCaseLoad, userCanEdit, userHasRoles } from '../utils/utils'
+import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { Nominal } from '../interfaces/pathfinderApi/nominal'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import buildOverviewActions from './utils/buildOverviewActions'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -48,12 +47,13 @@ export default class OverviewController {
       this.manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
     ])
 
-    const overviewActions = this.buildOverviewActions(
+    const overviewActions = buildOverviewActions(
       prisonerData,
       pathfinderNominal,
       socNominal,
       res.locals.user,
-      overviewPageData.staffRoles,
+      overviewPageData.staffRoles ?? [],
+      config,
     )
 
     const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
@@ -71,111 +71,6 @@ export default class OverviewController {
       canView,
       canAdd,
     })
-  }
-
-  private buildOverviewActions(
-    prisonerData: Prisoner,
-    pathfinderNominal: Nominal,
-    socNominal: Nominal,
-    user: User,
-    staffRoles: string[] = [],
-  ): HmppsAction[] {
-    const actions: HmppsAction[] = []
-    if (canViewCalculateReleaseDates(user)) {
-      actions.push({
-        text: 'Calculate release dates',
-        icon: Icon.CalculateReleaseDates,
-        url: `${config.serviceUrls.calculateReleaseDates}/?prisonId=${prisonerData.prisonerNumber}`,
-        dataQA: 'calculate-release-dates-action-link',
-      })
-    }
-    if (canAddCaseNotes(user, prisonerData)) {
-      actions.push({
-        text: 'Add case note',
-        icon: Icon.AddCaseNote,
-        url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note`,
-        dataQA: 'add-case-note-action-link',
-      })
-    }
-    if (staffRoles.includes('KW')) {
-      actions.push({
-        text: 'Add key worker session',
-        icon: Icon.AddKeyWorkerSession,
-        url: `/prisoner/${prisonerData.prisonerNumber}/add-case-note?type=KA&subType=KS`,
-        dataQA: 'add-key-worker-session-action-link',
-      })
-    }
-    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
-      actions.push({
-        text: 'Add appointment',
-        icon: Icon.AddAppointment,
-        url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`,
-        dataQA: 'add-appointment-action-link',
-      })
-    }
-    if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
-      actions.push({
-        text: 'Report use of force',
-        icon: Icon.ReportUseOfForce,
-        url: `${config.serviceUrls.useOfForce}/report/${prisonerData.bookingId}/report-use-of-force`,
-        dataQA: 'report-use-of-force-action-link',
-      })
-    }
-    if (
-      userHasRoles([Role.ActivityHub], user.userRoles) &&
-      config.activitiesEnabledPrisons.includes(user.activeCaseLoadId) &&
-      user.activeCaseLoadId === prisonerData.prisonId &&
-      prisonerData.status !== 'ACTIVE OUT'
-    ) {
-      actions.push({
-        text: 'Log an activity application',
-        icon: Icon.LogActivityApplication,
-        url: `${config.serviceUrls.activities}/waitlist/${prisonerData.prisonerNumber}/apply`,
-        dataQA: 'log-an-activity-application-link',
-      })
-    }
-    if (
-      userHasRoles(
-        [Role.PathfinderApproval, Role.PathfinderStdPrison, Role.PathfinderStdProbation, Role.PathfinderHQ],
-        user.userRoles,
-      ) &&
-      !pathfinderNominal
-    ) {
-      actions.push({
-        text: 'Refer to Pathfinder',
-        icon: Icon.ReferToPathfinder,
-        url: `${config.serviceUrls.pathfinder}/refer/offender/${prisonerData.prisonerNumber}`,
-        dataQA: 'refer-to-pathfinder-action-link',
-      })
-    }
-    if (userHasRoles([Role.SocCustody, Role.SocCommunity], user.userRoles) && !socNominal) {
-      actions.push({
-        text: 'Add to SOC',
-        icon: Icon.AddToSOC,
-        url: `${config.serviceUrls.manageSocCases}/refer/offender/${prisonerData.prisonerNumber}`,
-        dataQA: 'add-to-soc-action-link',
-      })
-    }
-    if (
-      userHasRoles(
-        [
-          Role.CreateCategorisation,
-          Role.ApproveCategorisation,
-          Role.CreateRecategorisation,
-          Role.CategorisationSecurity,
-        ],
-        user.userRoles,
-      )
-    ) {
-      actions.push({
-        text: 'Manage category',
-        icon: Icon.ManageCategory,
-        url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
-        dataQA: 'manage-category-action-link',
-      })
-    }
-
-    return actions
   }
 
   private buildOverviewInfoLinks(

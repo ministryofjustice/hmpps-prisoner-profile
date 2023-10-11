@@ -28,6 +28,7 @@ generic-service:
 
     OFFENDER_CATEGORISATION_UI_URL: "https://preprod.offender-categorisation.service.justice.gov.uk"
     USE_OF_FORCE_UI_URL: "https://preprod.use-of-force.service.justice.gov.uk"
+    USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
     MANAGE_A_WARRANT_FOLDER_UI_URL: "https://manage-a-warrant-folder-preprod.hmpps.service.justice.gov.uk"
     PATHFINDER_UI_URL: "https://preprod.pathfinder.service.justice.gov.uk"
     MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases-preprod.hmpps.service.justice.gov.uk"
