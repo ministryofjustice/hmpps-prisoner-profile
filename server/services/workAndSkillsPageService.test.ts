@@ -55,7 +55,7 @@ describe('WorkAndSkillsService', () => {
       prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
       prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
       prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
-      prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock)
+      prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock())
       prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
       prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
       prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)

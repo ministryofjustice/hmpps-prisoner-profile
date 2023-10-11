@@ -61,6 +61,7 @@ Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStat
   cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
   cy.task('stubGetOffenderAttendanceHistory', prisonerNumber)
   cy.task('stubGetOffenderActivities', { prisonerNumber, emptyStates })
+  cy.task('stubAttendanceHistory', prisonerNumber)
 })
 
 Cypress.Commands.add('getDataQa', id => {

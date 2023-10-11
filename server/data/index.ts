@@ -71,7 +71,7 @@ export const dataAccess = {
     HmppsAuthClient,
   ),
   incentivesApiClientBuilder: restClientBuilder<IncentivesApiClient>(
-    'Case Notes API',
+    'Incentives API',
     config.apis.incentivesApi,
     IncentivesApiRestClient,
   ),

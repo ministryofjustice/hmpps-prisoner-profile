@@ -76,6 +76,7 @@ import {
 import { damageObligationContainerMock } from '../../server/data/localMockData/damageObligationsMock'
 import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
+import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1112,6 +1113,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: movementsMock(prisonerNumber, format(addDays(startOfToday(), 10), 'yyyy-MM-dd')),
+      },
+    })
+  },
+
+  stubAttendanceHistory: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offender-activities/${prisonerNumber}/attendance-history.*`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: OffenderAttendanceHistoryMock(),
       },
     })
   },
