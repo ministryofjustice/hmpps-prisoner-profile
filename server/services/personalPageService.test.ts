@@ -104,7 +104,10 @@ describe('PersonalPageService', () => {
       it('Uses calculates the age from the date of birth when no age is given', async () => {
         const inmateDetail = { ...inmateDetailMock }
         inmateDetail.age = undefined
-        const expectedAge = yearsBetweenDateStrings(PrisonerMockDataA.dateOfBirth, new Date().toISOString()).toString()
+        const expectedAge = yearsBetweenDateStrings(
+          PrisonerMockDataA.dateOfBirth,
+          new Date('2023-01-01').toISOString(),
+        ).toString()
         const service = constructService()
         const response = await service.get('token', PrisonerMockDataA)
         expect(response.personalDetails.age).toEqual(expectedAge)
