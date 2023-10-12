@@ -11,6 +11,7 @@ import { Role } from '../data/enums/role'
 import config from '../config'
 import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -544,4 +545,26 @@ export const toNonAssociationRows = (nonAssociations: OverviewNonAssociation[]):
 export const sortByDateTime = (t1: string, t2: string): number => {
   const [date1, date2] = [new Date(t1).getTime(), new Date(t2).getTime()]
   return date1 - date2
+}
+
+export interface SelectOption {
+  text: string
+  value: string | number
+  selected?: boolean
+  attributes?: {
+    hidden?: 'hidden'
+  }
+}
+export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {
+  return refData.map(r => ({
+    text: r.description,
+    value: r.code,
+  }))
+}
+
+export const objectToSelectOptions = (array: object[], id: string, description: string): SelectOption[] => {
+  return array.map(obj => ({
+    text: obj[description],
+    value: obj[id],
+  }))
 }

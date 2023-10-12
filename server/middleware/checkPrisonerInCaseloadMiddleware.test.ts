@@ -172,7 +172,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
-        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseload'),
+        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'),
       )
     })
 
@@ -183,7 +183,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
-        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseload'),
+        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'),
       )
     })
 

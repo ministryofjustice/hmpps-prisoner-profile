@@ -41,6 +41,9 @@ import { Transaction } from '../../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../../interfaces/prisonApi/damageObligation'
 import { Movement } from '../../interfaces/prisonApi/movement'
 import { MovementType } from '../enums/movementType'
+import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
+import { PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
+import { Location } from '../../interfaces/prisonApi/location'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -101,4 +104,36 @@ export interface PrisonApiClient {
   getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]>
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
   getMovements(prisonerNumbers: string[], movementTypes: MovementType[], latestOnly?: boolean): Promise<Movement[]>
+  getLocationsForAppointments(agencyId: string): Promise<Location[]>
+  getAppointmentTypes(): Promise<ReferenceCode[]>
+  getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]>
+  getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
+  getVisits(offenderNumbers: string[], agencyId: string, date: string, timeSlot?: TimeSlot): Promise<PrisonerSchedule[]>
+  getAppointments(
+    offenderNumbers: string[],
+    agencyId: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]>
+  getActivities(
+    offenderNumbers: string[],
+    agencyId: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]>
+  getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
+  getLocation(locationId: number): Promise<Location>
+  getActivitiesAtLocation(
+    locationId: number,
+    date: string,
+    timeSlot?: TimeSlot,
+    includeSuspended?: boolean,
+  ): Promise<PrisonerSchedule[]>
+  getActivityList(
+    agencyId: string,
+    locationId: number,
+    usage: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]>
 }

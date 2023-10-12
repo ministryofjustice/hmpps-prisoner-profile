@@ -1,0 +1,19 @@
+{% macro miniBanner(data) %}
+<div class="hmpps-mini-banner">
+    <img
+        class="hmpps-mini-banner__photo"
+        src="/api/prisoner/{{ data.prisonerNumber or data.photoType }}/image?fullSizeImage=false"
+        alt="{{ data.prisonerName }}"
+        width="80"
+        height="100"
+    />
+    <div class="hmpps-mini-banner__name">
+        <div class="govuk-!-font-weight-bold">{{ data.prisonerName }}</div>
+        <div id="prisonerNumber">{{ data.prisonerNumber }}</div>
+    </div>
+    <dl class="hmpps-mini-banner__location">
+        <dt>Location</dt>
+        <dd>{{ data.cellLocation }}</dd>
+    </dl>
+</div>
+{% endmacro %}

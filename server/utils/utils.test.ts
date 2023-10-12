@@ -14,19 +14,21 @@ import {
   isTemporaryLocation,
   mapToQueryString,
   neurodiversityEnabled,
+  objectToSelectOptions,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
   prisonerBelongsToUsersCaseLoad,
   prisonerIsOut,
   prisonerIsTRN,
   properCaseName,
+  refDataToSelectOptions,
   sortArrayOfObjectsByDate,
   SortType,
   summaryListOneHalfWidth,
   SummaryListRow,
+  toNonAssociationRows,
   userHasRoles,
   yearsBetweenDateStrings,
-  toNonAssociationRows,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
@@ -39,6 +41,7 @@ import {
   xrayCareNeedsDESCMock,
   xrayCareNeedsMock,
 } from '../data/localMockData/personalCareNeedsMock'
+import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
 
 describe('convert to title case', () => {
   it.each([
@@ -507,5 +510,51 @@ describe('findError', () => {
         ],
       ])
     })
+  })
+})
+
+describe('refDataToSelectOptions', () => {
+  it('should map ref data objects to select options', () => {
+    const refData: ReferenceCode[] = [
+      {
+        code: 'code1',
+        description: 'description1',
+        activeFlag: 'Y',
+      },
+      {
+        code: 'code2',
+        description: 'description2',
+        activeFlag: 'Y',
+      },
+    ]
+    const selectOptions = refDataToSelectOptions(refData)
+
+    expect(selectOptions).toEqual([
+      { value: 'code1', text: 'description1' },
+      { value: 'code2', text: 'description2' },
+    ])
+  })
+})
+
+describe('objectToSelectOptions', () => {
+  it('should map objects to select options', () => {
+    const data: object[] = [
+      {
+        id: 'id1',
+        desc: 'desc1',
+        random: 'random1',
+      },
+      {
+        id: 'id2',
+        desc: 'desc2',
+        random: 'random2',
+      },
+    ]
+    const selectOptions = objectToSelectOptions(data, 'id', 'desc')
+
+    expect(selectOptions).toEqual([
+      { value: 'id1', text: 'desc1' },
+      { value: 'id2', text: 'desc2' },
+    ])
   })
 })

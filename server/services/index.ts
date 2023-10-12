@@ -14,6 +14,7 @@ import ReferenceDataService from './referenceDataService'
 import CsraService from './csraService'
 import ComponentService from './componentService'
 import MoneyService from './moneyService'
+import AppointmentService from './appointmentService'
 
 export const services = () => {
   const {
@@ -28,6 +29,7 @@ export const services = () => {
     adjudicationsApiClientBuilder,
     nonAssociationsApiClientBuilder,
     componentApiClientBuilder,
+    whereaboutsApiClientBuilder,
   } = dataAccess
 
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
@@ -54,6 +56,7 @@ export const services = () => {
   const componentService = new ComponentService(componentApiClientBuilder)
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
+  const appointmentService = new AppointmentService(prisonApiClientBuilder, whereaboutsApiClientBuilder)
 
   return {
     dataAccess,
@@ -72,6 +75,7 @@ export const services = () => {
     componentService,
     csraService,
     moneyService,
+    appointmentService,
   }
 }
 

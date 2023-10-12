@@ -60,7 +60,7 @@ describe('Case Notes Page', () => {
         hours: '12',
         minutes: '30',
       } as CaseNoteForm
-      const occurrenceDateTime = '2023-01-01T12:30:00Z'
+      const occurrenceDateTime = '2023-01-01T12:30:00'
       await caseNotesService.addCaseNote('', prisonerNumber, caseNoteForm)
 
       expect(caseNotesApiClientSpy.addCaseNote).toHaveBeenCalledWith(prisonerNumber, {

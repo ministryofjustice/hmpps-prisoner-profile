@@ -1,8 +1,11 @@
 import {
+  calculateEndDate,
+  dateToIsoDate,
   formatDate,
   formatDateISO,
   formatDateTime,
   formatDateTimeISO,
+  formatDateWithTime,
   isRealDate,
   parseDate,
   timeFormat,
@@ -23,21 +26,26 @@ describe('formatDateISO', () => {
 describe('formatDateTimeISO', () => {
   it('should return an ISO-8601 datetime string given a valid date', () => {
     const dateStr = formatDateTimeISO(new Date(2023, 0, 1, 11, 12, 13)) // 1 Jan 2023
-    expect(dateStr).toEqual('2023-01-01T11:12:13Z')
+    expect(dateStr).toEqual('2023-01-01T11:12:13')
+  })
+
+  it('should return an ISO-8601 datetime string given a valid date', () => {
+    const dateStr = formatDateTimeISO(new Date(2023, 6, 1, 11, 12, 13)) // 1 Jan 2023
+    expect(dateStr).toEqual('2023-07-01T11:12:13')
   })
 
   it('should return an ISO-8601 datetime string with time set to 00:00:00 if startOfDay flag is true', () => {
     const dateStr = formatDateTimeISO(new Date(2023, 0, 1, 11, 12, 13), { startOfDay: true }) // 1 Jan 2023
-    expect(dateStr).toEqual('2023-01-01T00:00:00Z')
+    expect(dateStr).toEqual('2023-01-01T00:00:00')
   })
 
   it('should return an ISO-8601 datetime string with time set to 23:59:59 if endOfDay flag is true', () => {
     const dateStr = formatDateTimeISO(new Date(2023, 0, 1, 11, 12, 13), { endOfDay: true }) // 1 Jan 2023
-    expect(dateStr).toEqual('2023-01-01T23:59:59Z')
+    expect(dateStr).toEqual('2023-01-01T23:59:59')
   })
 
   it('should return undefined given an invalid date', () => {
-    const dateStr = formatDateTimeISO(null)
+    const dateStr = formatDateTimeISO(undefined)
     expect(dateStr).toBeUndefined()
   })
 })
@@ -128,5 +136,38 @@ describe('time format', () => {
     ['2020-11-01T19:05:14', '19:05'],
   ])('For input %s parse to Date object %s', (date: string, expected: string) => {
     expect(timeFormat(date)).toEqual(expected)
+  })
+})
+
+describe('dateToIsoDate', () => {
+  it.each([
+    ['20/01/2023', '2023-01-20'],
+    ['01/12/2023', '2023-12-01'],
+  ])('For UI date %s return ISO date %s', (date: string, expected: string) => {
+    expect(dateToIsoDate(date)).toEqual(expected)
+  })
+})
+
+describe('formatDateWithTime', () => {
+  it.each([
+    ['2023-01-20', '09', '30', '2023-01-20T09:30'],
+    ['2023-12-01', '12', '00', '2023-12-01T12:00'],
+  ])('Format date %s with time %s %s', (date: string, hours: string, minutes: string, expected: string) => {
+    expect(formatDateWithTime(date, hours, minutes)).toEqual(expected)
+  })
+})
+
+describe('calculateEndDate', () => {
+  it.each([
+    [new Date('2023-01-02'), 'DAILY', 0, new Date('2023-01-02')],
+    [new Date('2023-01-02'), 'DAILY', 1, new Date('2023-01-02')],
+    [new Date('2023-01-02'), 'DAILY', 2, new Date('2023-01-03')],
+    [new Date('2023-01-02'), 'DAILY', 7, new Date('2023-01-08')],
+    [new Date('2023-01-02'), 'WEEKDAYS', 7, new Date('2023-01-10')],
+    [new Date('2023-01-02'), 'WEEKLY', 3, new Date('2023-01-16')],
+    [new Date('2023-01-02'), 'FORTNIGHTLY', 3, new Date('2023-01-30')],
+    [new Date('2023-01-02'), 'MONTHLY', 3, new Date('2023-03-02')],
+  ])('Calculate end date from %s %s %s times', (date: Date, repeatPeriod: string, times: number, expected: Date) => {
+    expect(calculateEndDate(date, repeatPeriod, times)).toEqual(expected)
   })
 })

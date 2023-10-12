@@ -48,6 +48,9 @@ import { Transaction } from '../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
 import { Movement } from '../interfaces/prisonApi/movement'
 import { MovementType } from './enums/movementType'
+import { OffenderSentenceDetail } from '../interfaces/prisonApi/offenderSentenceDetail'
+import { PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSchedule'
+import { Location } from '../interfaces/prisonApi/location'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   constructor(private restClient: RestClient) {}
@@ -371,5 +374,99 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       query: mapToQueryString({ movementTypes, latestOnly }),
       data: prisonerNumbers,
     })) as Movement[]
+  }
+
+  async getLocationsForAppointments(agencyId: string): Promise<Location[]> {
+    return this.get<Location[]>({ path: `/api/agencies/${agencyId}/locations?eventType=APP` })
+  }
+
+  async getAppointmentTypes(): Promise<ReferenceCode[]> {
+    return this.get<ReferenceCode[]>({ path: '/api/reference-domains/scheduleReasons?eventType=APP' })
+  }
+
+  async getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]> {
+    return (await this.post({ path: '/api/offender-sentences', data: offenderNumbers })) as OffenderSentenceDetail[]
+  }
+
+  async getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
+    return (await this.post({
+      path: `/api/schedules/${agencyId}/courtEvents?date=${date}`,
+      data: offenderNumbers,
+    })) as PrisonerSchedule[]
+  }
+
+  async getVisits(
+    offenderNumbers: string[],
+    agencyId: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]> {
+    return (await this.post({
+      path: `/api/schedules/${agencyId}/visits`,
+      query: mapToQueryString({ date, timeSlot }),
+      data: offenderNumbers,
+    })) as PrisonerSchedule[]
+  }
+
+  async getAppointments(
+    offenderNumbers: string[],
+    agencyId: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]> {
+    return (await this.post({
+      path: `/api/schedules/${agencyId}/appointments`,
+      query: mapToQueryString({ date, timeSlot }),
+      data: offenderNumbers,
+    })) as PrisonerSchedule[]
+  }
+
+  async getActivities(
+    offenderNumbers: string[],
+    agencyId: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]> {
+    return (await this.post({
+      path: `/api/schedules/${agencyId}/activities`,
+      query: mapToQueryString({ date, timeSlot }),
+      data: offenderNumbers,
+    })) as PrisonerSchedule[]
+  }
+
+  async getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]> {
+    return (await this.post({
+      path: `/api/schedules/${agencyId}/externalTransfers?date=${date}`,
+      data: offenderNumbers,
+    })) as PrisonerSchedule[]
+  }
+
+  async getLocation(locationId: number): Promise<Location> {
+    return this.get<Location>({ path: `/api/locations/${locationId}` })
+  }
+
+  async getActivitiesAtLocation(
+    locationId: number,
+    date: string,
+    timeSlot?: TimeSlot,
+    includeSuspended = false,
+  ): Promise<PrisonerSchedule[]> {
+    return this.get<PrisonerSchedule[]>({
+      path: `/api/schedules/locations/${locationId}/activities`,
+      query: mapToQueryString({ date, timeSlot, includeSuspended }),
+    })
+  }
+
+  async getActivityList(
+    agencyId: string,
+    locationId: number,
+    usage: string,
+    date: string,
+    timeSlot?: TimeSlot,
+  ): Promise<PrisonerSchedule[]> {
+    return this.get<PrisonerSchedule[]>({
+      path: `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
+      query: mapToQueryString({ date, timeSlot }),
+    })
   }
 }

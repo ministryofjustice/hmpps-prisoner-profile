@@ -11,7 +11,9 @@ export default function createErrorHandler(production: boolean) {
       return res.redirect('/sign-out')
     }
 
-    res.locals.user.showFeedbackBanner = false
+    if (res.locals.user) {
+      res.locals.user.showFeedbackBanner = false
+    }
     res.locals.hideBackLink = true
 
     if (error.status === 404) {

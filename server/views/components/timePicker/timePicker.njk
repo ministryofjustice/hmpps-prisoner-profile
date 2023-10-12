@@ -1,0 +1,57 @@
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/label/macro.njk" import govukLabel %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+
+{%  macro timePicker(params) %}
+
+    {%  set hours = [
+        '00','01','02','03','04','05','06','07',
+        '08','09','10','11','12','13','14','15',
+        '16','17','18','19','20','21','22','23'
+    ] %}
+
+    {% set minutes = [
+        '00','05','10','15','20',
+        '25','30','35','40','45',
+        '50', '55'
+    ] %}
+
+<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %}{%- if params.classes %} {{ params.classes }}{% endif %}">
+    <div class="time-picker">
+            {% if params.label %}
+                {{ govukLabel({
+                    text: params.label
+                }) }}
+            {% endif %}
+
+            {% if params.errorMessage %}
+                {{ govukErrorMessage({
+                    text: params.errorMessage.text
+                }) }}
+            {%  endif %}
+
+            <div class="time-picker-container">
+                {{ govukSelect({
+                    id: params.id +'-hours',
+                    name: params.name + 'Hours',
+                    classes: ['time-picker-hours'],
+                    items: hours | toTextValue(params.hour),
+                    attributes: {
+                        'aria-label': 'Hours'
+                    }
+                }) }}
+
+                {{ govukSelect({
+                    id: params.id +'-minutes',
+                    name: params.name + 'Minutes',
+                    classes: ['time-picker-minutes'],
+                    items: minutes | toTextValue(params.minute),
+                    attributes: {
+                        'aria-label': 'Minutes'
+                    }
+                }) }}
+            </div>
+    </div>
+</div>
+
+{% endmacro %}

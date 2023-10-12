@@ -1,0 +1,220 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "components/scheduledEvents/scheduledEvents.njk" import scheduledEvents %}
+
+{% extends "../../partials/layout.njk" %}
+
+{% macro appointment(params) %}
+    <div class="govuk-grid-row">
+        <div>
+            {{ govukSelect({
+                name: params.name + "Location",
+                id: params.name + "Location",
+                label: {
+                    text: "Prison room for briefing"
+                },
+                items: locations | addDefaultSelectedValue('Choose room') | setSelected(params.location),
+                errorMessage: errors | findError(params.name + "Location")
+            }) }}
+        </div>
+
+        <div id="{{ params.name + 'EventsContainer' }}">
+            {% if formValues[params.name + "Location"] %}
+                {{ scheduledEvents(events[params.name].events, 'location', 'Schedule for ' + events[params.name].locationName) }}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% set preAppointmentHtml %}
+    {{ appointment({name:"preAppointment",locations: locations, location: formValues.preAppointmentLocation }) }}
+{% endset -%}
+
+{% set postAppointmentHtml %}
+    {{ appointment({name:"postAppointment",locations: locations, location: formValues.postAppointmentLocation }) }}
+{% endset -%}
+
+{% set mainClasses = "govuk-body" %}
+{% block content %}
+    {% block body %}
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })}}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">{{ pageTitle }}</h1>
+            </div>
+        </div>
+
+        {{ miniBanner(miniBannerData) }}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border appointment-details-list',
+                    rows: [
+                        {
+                            key: {
+                            text: "Location"
+                        },
+                            value: {
+                            text: location,
+                            classes: 'govuk-!-padding-bottom-6'
+                        }
+                        },
+                        {
+                            key: {
+                            text: "Date"
+                        },
+                            value: {
+                            text: appointmentDate
+                        }
+                        },
+                        {
+                            key: {
+                            text: "Court hearing start time"
+                        },
+                            value: {
+                            text: startTime
+                        }
+                        },
+                        {
+                            key: {
+                            text: "Court hearing end time"
+                        },
+                            value: {
+                            text: endTime
+                        }
+                        }
+                    ]
+                }) }}
+
+                <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Comments
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <pre class="govuk-body">{{ comments }}</pre>
+                        </dd>
+                    </div>
+                </dl>
+
+                <form method="post">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                    <input type="hidden" id="date" name="date" value="{{ date }}"/>
+                    <input type="hidden" id="bookingId" name="bookingId" value="{{ bookingId }}"/>
+
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ govukRadios({
+                                idPrefix: "preAppointment",
+                                name: "preAppointment",
+                                errorMessage: errors | findError('preAppointment'),
+                                fieldset: {
+                                    legend: {
+                                        text: "Do you want to add a pre-court hearing briefing?",
+                                        classes: "govuk-fieldset__legend--s"
+                                    }
+                                },
+                                items: [{
+                                    value: "yes",
+                                    text: "Yes",
+                                    checked: formValues.preAppointment == 'yes',
+                                    conditional: {
+                                        html: preAppointmentHtml
+                                    }
+                                },
+                                    {
+                                        value: "no",
+                                        text: "No",
+                                        checked: formValues.preAppointment == 'no'
+                                    }
+                                ]
+                            }) }}
+                        </div>
+                    </div>
+
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ govukRadios({
+                                idPrefix: "postAppointment",
+                                name: "postAppointment",
+                                errorMessage: errors | findError('postAppointment'),
+                                fieldset: {
+                                    legend: {
+                                        text: "Do you want to add a post-court hearing briefing?",
+                                        classes: "govuk-fieldset__legend--s"
+                                    }
+                                },
+                                items: [{
+                                    value: "yes",
+                                    text: "Yes",
+                                    checked: formValues.postAppointment == 'yes',
+                                    conditional: {
+                                        html: postAppointmentHtml
+                                    }
+                                },
+                                    {
+                                        value: "no",
+                                        text: "No",
+                                        checked: formValues.postAppointment == 'no'
+                                    }
+                                ]
+                            }) }}
+                        </div>
+                    </div>
+
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ govukSelect({
+                                name: "court",
+                                id: "court",
+                                label: {
+                                    text: "Which court is the booking for?"
+                                },
+                                items: courts | addDefaultSelectedValue('Choose court') | setSelected(formValues.court),
+                                errorMessage: errors | findError("court")
+                            }) }}
+                        </div>
+                    </div>
+
+                    <div id="otherCourtContainer" class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ govukInput({
+                                id: "otherCourt",
+                                name: "otherCourt",
+                                label: {
+                                    text: "What is the name of the court?"
+                                },
+                                value: formValues.otherCourt,
+                                errorMessage: errors | findError('otherCourt')
+                            }) }}
+                        </div>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({ text: "Save and continue" }) }}
+                        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    {% endblock %}
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/prePostAppointment.js"></script>
+{% endblock %}
