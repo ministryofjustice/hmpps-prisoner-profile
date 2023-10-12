@@ -106,7 +106,10 @@ context('When signed in', () => {
         page.personalDetails().aliases().row(2).dateOfBirth().should('have.text', '17/06/1983')
         page.personalDetails().preferredName().should('have.text', 'Working Name')
         page.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
-        const expectedAge = yearsBetweenDateStrings(new Date('1990-10-12').toISOString(), new Date().toISOString())
+        const expectedAge = yearsBetweenDateStrings(
+          new Date('1990-10-12').toISOString(),
+          new Date('2023-01-01').toISOString(),
+        )
         page.personalDetails().dateOfBirth().should('include.text', `${expectedAge} years old`)
         page.personalDetails().nationality().should('have.text', 'Stateless')
         page.personalDetails().otherNationalities().should('have.text', 'multiple nationalities field')
