@@ -199,4 +199,5 @@ export default {
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
   useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
+  profileAddAppointmentEnabled: get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false') === 'true',
 }

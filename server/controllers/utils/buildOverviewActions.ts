@@ -17,6 +17,10 @@ export default (
   config: typeof conf,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
+  const addAppointmentUrl = config.profileAddAppointmentEnabled
+    ? `/prisoner/${prisonerData.prisonerNumber}/add-appointment`
+    : `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`
+
   if (canViewCalculateReleaseDates(user)) {
     actions.push({
       text: 'Calculate release dates',
@@ -41,11 +45,11 @@ export default (
       dataQA: 'add-key-worker-session-action-link',
     })
   }
-  if (userCanEdit(user, prisonerData) && !prisonerData.restrictedPatient) {
+  if (user.activeCaseLoadId === prisonerData.prisonId && !prisonerData.restrictedPatient) {
     actions.push({
       text: 'Add appointment',
       icon: Icon.AddAppointment,
-      url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`,
+      url: addAppointmentUrl,
       dataQA: 'add-appointment-action-link',
     })
   }
