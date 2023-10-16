@@ -10,7 +10,6 @@ import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import { LearnerProfile } from '../interfaces/learnerProfile'
 import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
-import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 import { Prisoner } from '../interfaces/prisoner'
 import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
@@ -69,8 +68,11 @@ export default class WorkAndSkillsPageService {
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
     const oneMonthAgo = format(sub(startOfToday(), { months: 1 }), 'yyyy-MM-dd')
-    const offenderAttendanceHistory: OffenderAttendanceHistory =
-      await this.prisonApiClient.getOffenderAttendanceHistory(prisonerNumber, sixMonthsAgo, todaysDate)
+    const offenderAttendanceHistory = await this.prisonApiClient.getOffenderAttendanceHistory(
+      prisonerNumber,
+      sixMonthsAgo,
+      todaysDate,
+    )
 
     let unacceptableAbsenceLastSixMonths = 0
     let unacceptableAbsenceLastMonth = 0

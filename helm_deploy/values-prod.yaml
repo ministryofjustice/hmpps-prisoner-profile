@@ -28,6 +28,7 @@ generic-service:
 
     OFFENDER_CATEGORISATION_UI_URL: "https://offender-categorisation.service.justice.gov.uk"
     USE_OF_FORCE_UI_URL: "https://use-of-force.service.justice.gov.uk"
+    USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
     MANAGE_A_WARRANT_FOLDER_UI_URL: "https://manage-a-warrant-folder.hmpps.service.justice.gov.uk"
     PATHFINDER_UI_URL: "https://pathfinder.service.justice.gov.uk"
     MANAGE_SOC_CASES_UI_URL: "https://manage-soc-cases.hmpps.service.justice.gov.uk"
@@ -36,7 +37,7 @@ generic-service:
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates.hmpps.service.justice.gov.uk"
     NON_ASSOCIATIONS_UI_URL: "https://non-associations.hmpps.service.justice.gov.uk"
-    FEEDBACK_DISABLED_PRISONS: "LEI,FNI,RSI,HMI,NHI"
+    FEEDBACK_DISABLED_PRISONS: "AGI,DNI,FNI,HDI,HLI,HMI,LEI,LHI,MDI,NHI,RSI,WDI,WEI,WYI"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
     NON_ASSOCIATIONS_PRISONS: "FNI,ISI,LGI,RSI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api.hmpps.service.justice.gov.uk"
