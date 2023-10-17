@@ -224,9 +224,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(
-        services.dataAccess.prisonApiClientBuilder,
-        services.dataAccess.whereaboutsApiClientBuilder,
-        services.dataAccess.caseNotesApiClientBuilder,
+        services.prisonerLocationHistoryService,
       )
       return prisonerLocationHistoryController.displayPrisonerLocationHistory(req, res, prisonerData)
     },

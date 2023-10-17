@@ -1,3 +1,6 @@
+import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/historyForLocation'
+import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
+
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
   cy.request(redirectPath)
@@ -38,7 +41,7 @@ Cypress.Commands.add(
     cy.task('stubGetSocNominal404')
     cy.task('stubGetStaffRoles', staffRoles)
     cy.task('stubGetLearnerNeurodivergence', prisonerNumber)
-    cy.task('stubInmateDetail', bookingId)
+    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
     cy.task('stubMovements', prisonerNumber)
     cy.task('stubGetCommunityManager')
   },
@@ -52,7 +55,11 @@ Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, priso
   cy.task('stubActiveAlertsSorted', bookingId)
   cy.task('stubActiveAlertsFiltered', bookingId)
   cy.task('stubInactiveAlerts', bookingId)
-  cy.task('stubInmateDetail', bookingId)
+  if (bookingId === 1234567) {
+    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 0, inactiveAlertCount: 0 } })
+  } else {
+    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
+  }
 })
 
 Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStates }) => {
@@ -106,7 +113,7 @@ Cypress.Commands.add('setupActivePunishmentsPageStubs', ({ prisonerNumber, booki
 
 Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
-  cy.task('stubInmateDetail', bookingId)
+  cy.task('stubInmateDetail', { bookingId })
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)
   cy.task('stubProperty', bookingId)
@@ -124,7 +131,7 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
   cy.task('stubPrisonerData', { prisonerNumber })
-  cy.task('stubInmateDetail', bookingId)
+  cy.task('stubInmateDetail', { bookingId })
   cy.task('stubAssessments', bookingId)
   cy.task('stubAccountBalances', bookingId)
   cy.task('stubGetAgency', prisonId)
@@ -143,17 +150,41 @@ Cypress.Commands.add('setupPrisonerSchedulePageStubs', ({ bookingId }) => {
 
 Cypress.Commands.add(
   'setupSpecificLocationHistoryPageStubs',
-  ({ prisonerNumber, bookingId, locationId, staffId, prisonId, caseLoads }) => {
+  ({ prisonerNumber, bookingId, locationId, staffId, prisonId, caseLoads, sharingHistory }) => {
     cy.task('stubPrisonerData', { prisonerNumber })
     cy.task('stubGetDetails', prisonerNumber)
     cy.task('stubGetAttributesForLocation', locationId)
-    cy.task('stubGetHistoryForLocation', locationId)
+    cy.task('stubGetHistoryForLocation', {
+      locationId,
+      locationHistories: [
+        { bookingId },
+        ...sharingHistory.map(i => {
+          return {
+            bookingId: i.bookingId,
+            assignmentDateTime: i.movedIn,
+            assignmentEndDateTime: i.movedOut,
+          } as HistoryForLocationItem
+        }),
+      ],
+    })
     cy.task('stubGetCellMoveReasonTypes')
-    cy.task('stubInmateDetail', bookingId)
+    cy.task('stubInmateDetail', { bookingId })
     cy.task('stubStaffDetails', staffId)
     cy.task('stubGetCellMoveReason', bookingId)
-    cy.task('stubGetCaseNote', prisonerNumber)
+    cy.task('stubGetCaseNote', { prisonerNumber, caseNoteId: 2 })
+    cy.task('stubGetCaseNote', { prisonerNumber, caseNoteId: 0 })
     cy.task('stubGetAgency', prisonId)
     cy.task('stubUserCaseLoads', caseLoads)
+    cy.task('stubAssessments', bookingId)
+    sharingHistory.forEach(i => {
+      cy.task('stubInmateDetail', {
+        bookingId: i.bookingId,
+        inmateDetail: {
+          offenderNo: i.prisonerNumber,
+          firstName: i.firstName,
+          lastName: i.lastName,
+        } as Partial<InmateDetail>,
+      })
+    })
   },
 )

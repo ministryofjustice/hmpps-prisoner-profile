@@ -47,7 +47,7 @@ import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDet
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
 import { GetDetailsMock } from './localMockData/getDetailsMock'
 import { GetAttributesForLocation } from './localMockData/getAttributesForLocationMock'
-import { GetHistoryForLocation } from './localMockData/getHistoryForLocationMock'
+import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 
 jest.mock('./tokenStore')
@@ -613,10 +613,10 @@ describe('prisonApiClient', () => {
 
       mockSuccessfulPrisonApiCall(
         `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
-        GetHistoryForLocation,
+        mockHistoryForLocation(),
       )
       const output = await prisonApiClient.getHistoryForLocation(locationId, fromDate, toDate)
-      expect(output).toEqual(GetHistoryForLocation)
+      expect(output).toEqual(mockHistoryForLocation())
     })
   })
 

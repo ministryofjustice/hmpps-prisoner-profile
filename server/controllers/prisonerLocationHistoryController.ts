@@ -1,159 +1,24 @@
 import { Request, Response } from 'express'
-import { format } from 'date-fns'
-import { notEnteredMessage } from '../data/constants/common-messages'
-
-import { formatName, sortByDateTime, putLastNameFirst, hasLength, extractLocation } from '../utils/utils'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { RestClientBuilder } from '../data'
 import { Prisoner } from '../interfaces/prisoner'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
-import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
-import { CaseLoad } from '../interfaces/caseLoad'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
-import { CellMoveReason } from '../interfaces/cellMoveReason'
-import { CaseNote } from '../interfaces/caseNote'
+import { PrisonerLocationHistoryService } from '../services/prisonerLocationHistoryService'
 
 export default class PrisonerLocationHistoryController {
-  private prisonApiClient: PrisonApiClient
-
-  private whereaboutsApiClient: WhereaboutsApiClient
-
-  private caseNotesApiClient: CaseNotesApiClient
-
-  constructor(
-    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly whereAboutsClientBuilder: RestClientBuilder<WhereaboutsApiClient>,
-    private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>,
-  ) {}
+  constructor(private readonly prisonerLocationHistoryService: PrisonerLocationHistoryService) {}
 
   public async displayPrisonerLocationHistory(req: Request, res: Response, prisonerData: Prisoner) {
     const { clientToken } = res.locals
-    this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
-    this.whereaboutsApiClient = this.whereAboutsClientBuilder(clientToken)
-    this.caseNotesApiClient = this.caseNotesApiClientBuilder(clientToken)
-
-    const fetchStaffName = (staffId: string, prisonApi: PrisonApiClient) =>
-      prisonApi.getStaffDetails(staffId).then((staff: StaffDetails) => formatName(staff.firstName, '', staff.lastName))
-
-    const fetchWhatHappened = async (
-      offenderNo: string,
-      bookingId: number,
-      bedAssignmentHistorySequence: number,
-      caseNotesApi: CaseNotesApiClient,
-      whereaboutsApi: WhereaboutsApiClient,
-    ) => {
-      try {
-        return await whereaboutsApi
-          .getCellMoveReason(bookingId, bedAssignmentHistorySequence)
-          .then((cellMoveReason: CellMoveReason) =>
-            caseNotesApi.getCaseNote(offenderNo, cellMoveReason.cellMoveReason?.caseNoteId.toString()),
-          )
-          .then((caseNote: CaseNote) => caseNote.text)
-      } catch (err) {
-        if (err?.response?.status === 404) return null
-        throw err
-      }
-    }
-
-    const mapReasonToCellMoveReasonDescription = (
-      cellMoveReasonTypes: CellMoveReasonType[],
-      assignmentReason: string,
-    ) => cellMoveReasonTypes.find((type: CellMoveReasonType) => type.code === assignmentReason)?.description
-
-    const offenderNo = prisonerData.prisonerNumber
     const { agencyId, locationId, fromDate, toDate } = req.query
 
-    try {
-      const [prisonerDetails, locationAttributes, locationHistory, agencyDetails, userCaseLoads] = await Promise.all([
-        this.prisonApiClient.getDetails(offenderNo, false),
-        this.prisonApiClient.getAttributesForLocation(locationId.toString()),
-        this.prisonApiClient.getHistoryForLocation(locationId as string, fromDate as string, toDate as string),
-        this.prisonApiClient.getAgencyDetails(agencyId.toString()),
-        this.prisonApiClient.getUserCaseLoads(),
-      ])
+    const pageData = await this.prisonerLocationHistoryService(
+      clientToken,
+      prisonerData,
+      agencyId as string,
+      locationId as string,
+      fromDate as string,
+      toDate as string,
+      res.locals.user.caseLoads,
+    )
 
-      const userCaseLoadIds = userCaseLoads.length
-        ? userCaseLoads.map((caseLoad: CaseLoad) => caseLoad.caseLoadId)
-        : ([] as string[])
-      const { bookingId, firstName, lastName } = prisonerDetails
-
-      const currentPrisonerDetails = locationHistory.length
-        ? locationHistory.find((record: HistoryForLocationItem) => record.bookingId === bookingId) ||
-          ({} as HistoryForLocationItem)
-        : ({} as HistoryForLocationItem)
-
-      const { movementMadeBy, assignmentReason, bedAssignmentHistorySequence } = currentPrisonerDetails
-
-      const movementMadeByName = await fetchStaffName(movementMadeBy, this.prisonApiClient)
-      const whatHappenedDetails = await fetchWhatHappened(
-        offenderNo,
-        bookingId,
-        bedAssignmentHistorySequence,
-        this.caseNotesApiClient,
-        this.whereaboutsApiClient,
-      )
-
-      const isDpsCellMove = Boolean(whatHappenedDetails)
-
-      const assignmentReasonName =
-        isDpsCellMove &&
-        mapReasonToCellMoveReasonDescription(await this.prisonApiClient.getCellMoveReasonTypes(), assignmentReason)
-
-      const locationHistoryWithPrisoner =
-        hasLength(locationHistory) &&
-        (await Promise.all(
-          locationHistory.map(async (record: HistoryForLocationItem) => ({
-            ...record,
-            ...(await this.prisonApiClient.getInmateDetail(record.bookingId)),
-          })),
-        ))
-
-      const prisonerName = formatName(firstName, '', lastName)
-      const getMovedOutText = (sharingOffenderEndTime: string) => {
-        if (!currentPrisonerDetails.assignmentEndDateTime && !sharingOffenderEndTime) return 'Currently sharing'
-        if (currentPrisonerDetails.assignmentEndDateTime && !sharingOffenderEndTime) return `${prisonerName} moved out`
-        if (sharingOffenderEndTime) return format(new Date(sharingOffenderEndTime), 'dd/MM/yyyy - HH:mm')
-        return null
-      }
-
-      return res.render('pages/prisonerLocationHistory.njk', {
-        breadcrumbPrisonerName: putLastNameFirst(firstName, lastName),
-        locationDetails: {
-          description: agencyDetails.description,
-          movedIn:
-            currentPrisonerDetails.assignmentDateTime &&
-            format(new Date(currentPrisonerDetails.assignmentDateTime), 'dd/MM/yyyy - HH:mm'),
-          movedOut: currentPrisonerDetails.assignmentEndDateTime
-            ? format(new Date(currentPrisonerDetails.assignmentEndDateTime), 'dd/MM/yyyy - HH:mm')
-            : 'Current cell',
-          movedBy: movementMadeByName,
-          reasonForMove: assignmentReasonName || notEnteredMessage,
-          whatHappened: whatHappenedDetails || notEnteredMessage,
-          attributes: locationAttributes.attributes,
-        },
-        locationSharingHistory:
-          hasLength(locationHistoryWithPrisoner) &&
-          locationHistoryWithPrisoner
-            .filter(prisoner => prisoner.bookingId !== bookingId)
-            .sort((left, right) => sortByDateTime(right.assignmentDateTime, left.assignmentDateTime))
-            .map(prisoner => ({
-              shouldLink: hasLength(userCaseLoadIds) && userCaseLoadIds.includes(prisoner.agencyId),
-              name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
-              number: prisoner.offenderNo,
-              movedIn:
-                prisoner.assignmentDateTime && format(new Date(prisoner.assignmentDateTime), 'dd/MM/yyyy - HH:mm'),
-              movedOut: getMovedOutText(prisoner.assignmentEndDateTime),
-            })),
-        profileUrl: `/prisoner/${offenderNo}`,
-        prisonerName,
-        locationName: extractLocation(locationAttributes.description, agencyId.toString()),
-        prisonerNumber: offenderNo,
-      })
-    } catch (error) {
-      res.locals.redirectUrl = `/prisoner/${offenderNo}`
-      throw error
-    }
+    return res.render('pages/prisonerLocationHistory.njk', pageData)
   }
 }

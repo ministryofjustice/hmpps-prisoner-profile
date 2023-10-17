@@ -102,7 +102,7 @@ context('Add Alert Page', () => {
     context('Page Not Found', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-        cy.task('stubInmateDetail', 1102484)
+        cy.task('stubInmateDetail', { bookingId: 1102484 })
         cy.task('stubPrisonerDetail', 'G6123VU')
       })
 

@@ -15,6 +15,7 @@ import CsraService from './csraService'
 import ComponentService from './componentService'
 import MoneyService from './moneyService'
 import AppointmentService from './appointmentService'
+import prisonerLocationHistoryService from './prisonerLocationHistoryService'
 
 export const services = () => {
   const {
@@ -78,6 +79,11 @@ export const services = () => {
     csraService,
     moneyService,
     appointmentService,
+    prisonerLocationHistoryService: prisonerLocationHistoryService({
+      prisonApiClientBuilder,
+      whereaboutsApiClientBuilder,
+      caseNotesApiClientBuilder,
+    }),
   }
 }
 

@@ -51,9 +51,17 @@ declare global {
         prisonerNumber?: string
         bookingId?: number
         locationId?: string
-        staffId?: number
+        staffId?: string
         prisonId: string
         caseLoads: CaseLoad[]
+        sharingHistory: {
+          bookingId: number
+          prisonerNumber: string
+          movedIn: string
+          movedOut: string
+          firstName: string
+          lastName: string
+        }[]
       }): Chainable<AUTWindow>
     }
   }
