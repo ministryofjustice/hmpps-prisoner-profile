@@ -3,7 +3,7 @@ import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTyp
 export const getCellMoveReasonTypesMock: CellMoveReasonType[] = [
   {
     domain: 'TASK_TYPE',
-    code: 'MISC',
+    code: 'ADM',
     description: 'Some description',
     parentDomain: 'TASK_TYPE',
     parentCode: 'MIGRATION',

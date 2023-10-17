@@ -114,7 +114,7 @@ export const dataAccess = {
     config.apis.frontendComponents,
     ComponentApiRestClient,
   ),
-  whereAboutsApiClientBuilder: restClientBuilder<WhereaboutsApiClient>(
+  whereaboutsApiClientBuilder: restClientBuilder<WhereaboutsApiClient>(
     'Whereabouts API',
     config.apis.whereaboutsApiUrl,
     WhereaboutsRestApiClient,

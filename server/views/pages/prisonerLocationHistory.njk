@@ -17,39 +17,37 @@
   },
   {
     text: 'Location details',
-    href: profileUrl + '/location-details'
+    href: '/prisoner/' + prisonerNumber + '/location-details'
   }
 ] 
 %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% block body %}
 
-<h1 class="govuk-heading-l" data-test="title">{{ prisonerName }} history in location {{ locationName }}</h1>
-
+<h1 class="govuk-heading-l" data-qa="title">{{ prisonerName | apostrophe}} history in location {{ locationName }}</h1>
   <h2 class="govuk-heading-m">Location details</h2>
-
   <div class="horizontal-information horizontal-information--with-border govuk-!-margin-bottom-6">
     <div class="horizontal-information__item">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Location</h3>
-      <p class="govuk-body" data-test="establishment">
+      <p class="govuk-body" data-qa="cell-location">
         {{ locationDetails.description }}
       </p>
     </div>
     <div class="horizontal-information__item">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved in</h3>
-      <p class="govuk-body" data-test="moved-in">
+      <p class="govuk-body" data-qa="cell-moved-in">
         {{ locationDetails.movedIn }}
       </p>
     </div>
     <div class="horizontal-information__item">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved out</h3>
-      <p class="govuk-body" data-test="moved-out">
+      <p class="govuk-body" data-qa="cell-moved-out">
         {{ locationDetails.movedOut }}
       </p>
     </div>
     <div class="horizontal-information__item">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Cell type</h3>
-      <p class="govuk-body" data-test="cell-type">
+      <p class="govuk-body" data-qa="cell-type">
         {{ locationDetails.attributes | join(', ', 'description') | safe }}
       </p>
     </div>
@@ -76,21 +74,21 @@
 
   <div>
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved by</h3>
-    <p class="govuk-body" data-test="moved-by">
+    <p class="govuk-body" data-qa="cell-moved-by">
       {{ locationDetails.movedBy }}
     </p>
   </div>
 
   <div>
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Reason for move</h3>
-    <p class="govuk-body" data-test="reason-for-move">
+    <p class="govuk-body" data-qa="cell-reason-for-move">
       {{ locationDetails.reasonForMove }}
     </p>
   </div>
 
   <div>
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">What happened</h3>
-    <p class="govuk-body" data-test="what-happened">
+    <p class="govuk-body" data-qa="cell-what-happened">
       {{ locationDetails.whatHappened }}
     </p>
   </div>
@@ -112,7 +110,7 @@
 
     {{ govukInsetText({
       text: prisonerName + " has not shared this cell with anyone else.",
-      attributes: { "data-test": "no-history-message" }
+      attributes: { "data-qa": "no-history-message" }
     }) }}
 
   {% endif %}

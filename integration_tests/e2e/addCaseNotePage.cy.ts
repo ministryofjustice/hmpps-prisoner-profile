@@ -25,7 +25,7 @@ context('Add Case Note Page', () => {
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
       caseNotesPage.addCaseNoteButton().click()
@@ -127,7 +127,7 @@ context('Add Case Note Page', () => {
     context('Page Not Found', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-        cy.task('stubInmateDetail', 1102484)
+        cy.task('stubInmateDetail', { bookingId: 1102484 })
         cy.task('stubPrisonerDetail', 'G6123VU')
         cy.task('stubGetCaseNotesUsage', 'G6123VU')
         cy.task('stubGetCaseNotes', 'G6123VU')

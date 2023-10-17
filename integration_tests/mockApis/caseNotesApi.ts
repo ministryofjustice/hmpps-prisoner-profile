@@ -195,11 +195,11 @@ export default {
     })
   },
 
-  stubGetCaseNote: (prisonerNumber: string) => {
+  stubGetCaseNote: ({ prisonerNumber, caseNoteId }: { prisonerNumber: string; caseNoteId: string }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/case-notes/${prisonerNumber}/123`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}/${caseNoteId}`,
       },
       response: {
         status: 200,

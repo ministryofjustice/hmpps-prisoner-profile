@@ -1,7 +1,7 @@
 import { HistoryForLocationItem } from '../../interfaces/prisonApi/historyForLocation'
 
-export const GetHistoryForLocation: HistoryForLocationItem[] = [
-  {
+export const mockHistoryForLocation = (overrides: Partial<HistoryForLocationItem>[] = []): HistoryForLocationItem[] => {
+  const defaultItem = {
     bookingId: 1234134,
     livingUnitId: 123123,
     assignmentDate: '2020-10-12',
@@ -14,9 +14,10 @@ export const GetHistoryForLocation: HistoryForLocationItem[] = [
     bedAssignmentHistorySequence: 2,
     movementMadeBy: 'KQJ74F',
     offenderNo: 'A1234AA',
-  },
-]
+  }
+  return overrides.map(override => ({ ...defaultItem, ...override }))
+}
 
 export default {
-  GetHistoryForLocation,
+  mockHistoryForLocation,
 }
