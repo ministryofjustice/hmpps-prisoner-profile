@@ -14,6 +14,8 @@ import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveRea
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
+import NotFoundError from '../utils/notFoundError'
+import NotFoundApiError from '../../tests/errors/notFoundApiError'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient
@@ -146,6 +148,26 @@ describe('prisonerLocationHistoryService', () => {
       expect(history.name).toEqual('Person, Second')
       expect(history.number).toEqual('A1234BC')
       expect(history.shouldLink).toEqual(true)
+    })
+  })
+
+  describe('Given no cell move reason', () => {
+    it('Puts placeholder text in for the what happened', async () => {
+      whereaboutsApiClient.getCellMoveReason = jest.fn(async () => {
+        throw new NotFoundApiError()
+      })
+
+      const pageData = await service(
+        'token',
+        PrisonerMockDataA,
+        'LEI',
+        'locationId',
+        '2022-01-01',
+        '2023-01-01',
+        CaseLoadsDummyDataA,
+      )
+
+      expect(pageData.locationDetails.whatHappened).toEqual('Not entered')
     })
   })
 })

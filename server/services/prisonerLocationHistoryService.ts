@@ -40,9 +40,14 @@ export default ({
     caseNotesApi: CaseNotesApiClient,
     whereaboutsApi: WhereaboutsApiClient,
   ) => {
-    const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence)
-    const caseNote = await caseNotesApi.getCaseNote(offenderNo, cellMoveReason.cellMoveReason?.caseNoteId.toString())
-    return caseNote.text
+    try {
+      const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence)
+      const caseNote = await caseNotesApi.getCaseNote(offenderNo, cellMoveReason.cellMoveReason?.caseNoteId.toString())
+      return caseNote.text
+    } catch (err) {
+      if (err?.response?.status === 404) return null
+      throw err
+    }
   }
 
   const mapReasonToCellMoveReasonDescription = (cellMoveReasonTypes: CellMoveReasonType[], assignmentReason: string) =>
