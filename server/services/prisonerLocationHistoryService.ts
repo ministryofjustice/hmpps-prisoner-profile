@@ -45,7 +45,8 @@ export default ({
       const caseNote = await caseNotesApi.getCaseNote(offenderNo, cellMoveReason.cellMoveReason?.caseNoteId.toString())
       return caseNote.text
     } catch (err) {
-      if (err?.response?.status === 404) return null
+      console.log(err)
+      if (err?.status === 404) return null
       throw err
     }
   }
@@ -95,7 +96,7 @@ export default ({
     ])
 
     const currentPrisonerDetails =
-      locationHistory.find((record: HistoryForLocationItem) => record.bookingId === bookingId) ||
+      locationHistory.find((record: HistoryForLocationItem) => record.bookingId.toString() === bookingId.toString()) ||
       ({} as HistoryForLocationItem)
 
     const { movementMadeBy, assignmentReason, bedAssignmentHistorySequence } = currentPrisonerDetails
@@ -134,7 +135,7 @@ export default ({
       },
 
       locationSharingHistory: locationHistoryWithPrisoner
-        .filter(prisoner => prisoner.bookingId !== bookingId)
+        .filter(prisoner => prisoner.bookingId.toString() !== bookingId.toString())
         .sort((left, right) => sortByDateTime(right.assignmentDateTime, left.assignmentDateTime))
         .map(prisoner => ({
           shouldLink: hasLength(userCaseLoadIds) && userCaseLoadIds.includes(prisoner.agencyId),
