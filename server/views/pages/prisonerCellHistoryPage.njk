@@ -94,7 +94,7 @@
           { text: cell.movedIn },
           { text: cell.movedInBy },
           { text: cell.movedOut },
-          { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + cell.assignmentDateTime + '&toDate=' + cell.assignmentEndDateTime + '&locationId=' + cell.livingUnitId + '&agencyId=' + cell.agencyId + '" class="govuk-link">View details<span class="govuk-visually-hidden"> for location ' + cell.location + '</span></a>' if not cell.isTemporaryLocation }
+          { html: '<a href="' + profileUrl + '/location-history?fromDate=' + cell.assignmentDateTime + '&toDate=' + cell.assignmentEndDateTime + '&locationId=' + cell.livingUnitId + '&agencyId=' + cell.agencyId + '" class="govuk-link">View details<span class="govuk-visually-hidden"> for location ' + cell.location + '</span></a>' if not cell.isTemporaryLocation }
         ]), rows) %}
       {% endfor %}
 
