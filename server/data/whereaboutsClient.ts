@@ -1,12 +1,12 @@
 import RestClient from './restClient'
+import { UnacceptableAbsences } from '../interfaces/unacceptableAbsences'
+import { PageableQuery } from '../interfaces/pageable'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
 import { AppointmentDefaults } from '../interfaces/whereaboutsApi/appointment'
 import { CourtLocation } from '../interfaces/whereaboutsApi/courtLocation'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import config from '../config'
 import { CellMoveReason } from '../interfaces/cellMoveReason'
-import { PageableQuery } from '../interfaces/pageable'
-import { UnacceptableAbsences } from '../interfaces/unacceptableAbsences'
 
 export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
   private readonly restClient: RestClient
