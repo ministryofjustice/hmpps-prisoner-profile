@@ -14,7 +14,6 @@ import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveRea
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
-import NotFoundError from '../utils/notFoundError'
 import NotFoundApiError from '../../tests/errors/notFoundApiError'
 
 describe('prisonerLocationHistoryService', () => {

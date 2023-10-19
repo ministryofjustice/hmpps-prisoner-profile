@@ -45,7 +45,6 @@ export default ({
       const caseNote = await caseNotesApi.getCaseNote(offenderNo, cellMoveReason.cellMoveReason?.caseNoteId.toString())
       return caseNote.text
     } catch (err) {
-      console.log(err)
       if (err?.status === 404) return null
       throw err
     }
