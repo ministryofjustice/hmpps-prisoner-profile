@@ -1,4 +1,4 @@
-import { format, formatISO, isValid, parse } from 'date-fns'
+import { add, addBusinessDays, addDays, addMonths, addWeeks, format, formatISO, isValid, parse } from 'date-fns'
 import logger from '../../logger'
 
 /**
@@ -37,7 +37,7 @@ export const formatDateTimeISO = (date: Date, options?: { startOfDay?: boolean; 
     adjustedDate.setSeconds(59)
   }
   try {
-    dateStr = format(adjustedDate, "yyyy-MM-dd'T'HH:mm:ss'Z")
+    dateStr = format(adjustedDate, "yyyy-MM-dd'T'HH:mm:ss")
   } catch (error) {
     logger.error(`Error: formatDateTimeISO - ${error.message}`)
   }
@@ -127,4 +127,35 @@ export const formatDateTime = (
 
 export const timeFormat = (dateTimeStr: string) => {
   return new Date(dateTimeStr).toLocaleTimeString('en-gb', { hour: '2-digit', minute: '2-digit' })
+}
+
+export const dateToIsoDate = (date: string) => {
+  return formatDateISO(parseDate(date))
+}
+
+export const formatDateWithTime = (date: string, hours: string, minutes: string) => {
+  return `${date}T${hours}:${minutes}`
+}
+
+export const calculateEndDate = (startDate: Date, repeatPeriod: string, times: number): Date => {
+  const adjustedTimes = times - 1 // Appointments include the initial one
+
+  if (adjustedTimes < 1) {
+    return startDate
+  }
+
+  switch (repeatPeriod) {
+    case 'DAILY':
+      return addDays(startDate, adjustedTimes)
+    case 'WEEKDAYS':
+      return addBusinessDays(startDate, adjustedTimes)
+    case 'WEEKLY':
+      return addWeeks(startDate, adjustedTimes)
+    case 'FORTNIGHTLY':
+      return add(startDate, { weeks: adjustedTimes * 2 })
+    case 'MONTHLY':
+      return addMonths(startDate, adjustedTimes)
+    default:
+      return null
+  }
 }

@@ -1,35 +1,29 @@
 import RestClient from './restClient'
-import config from '../config'
-import { UnacceptableAbsences } from '../interfaces/unacceptableAbsences'
-import { PageableQuery } from '../interfaces/pageable'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
+import { AppointmentDefaults } from '../interfaces/whereaboutsApi/appointment'
+import { CourtLocation } from '../interfaces/whereaboutsApi/courtLocation'
+import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 
 export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
-  restClient: RestClient
+  constructor(private readonly restClient: RestClient) {}
 
-  constructor(token: string) {
-    this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApiUrl, token)
+  private async get<T>(args: object): Promise<T> {
+    return this.restClient.get<T>(args)
   }
 
-  private async get<T>(args: object, localMockData?: T): Promise<T> {
-    try {
-      return await this.restClient.get<T>(args)
-    } catch (error) {
-      if (config.localMockData === 'true' && localMockData) {
-        return localMockData
-      }
-      return error
-    }
+  private async post(args: object): Promise<unknown> {
+    return this.restClient.post(args)
   }
 
-  async getUnacceptableAbsences(
-    offenderNumber: string,
-    fromDate: string,
-    toDate: string,
-    page: PageableQuery,
-  ): Promise<UnacceptableAbsences> {
-    return this.get<UnacceptableAbsences>({
-      path: `/attendances/offender/${offenderNumber}/unacceptable-absences?fromDate=${fromDate}&toDate=${toDate}&page=${page}`,
-    })
+  async getCourts(): Promise<CourtLocation[]> {
+    return this.get<CourtLocation[]>({ path: '/court/courts' })
+  }
+
+  async createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults> {
+    return (await this.post({ path: `/appointment`, data: appointments })) as AppointmentDefaults
+  }
+
+  async addVideoLinkBooking(videoLinkBooking: VideoLinkBookingForm): Promise<number> {
+    return (await this.post({ path: '/court/video-link-bookings', data: videoLinkBooking })) as number
   }
 }

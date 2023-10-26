@@ -1,0 +1,29 @@
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% macro scheduledEvents(events, type, header, prisonerName, date) %}
+    {% set eventsHtml %}
+        {% if prisonerName != null %}
+            <h2 class="govuk-heading-m">{{ prisonerName | apostrophe }} schedule</h2>
+        {% else %}
+            <h2 class="govuk-heading-m">{{ header }}</h2>
+        {% endif %}
+
+        {% if events.length %}
+            {% for event in events %}
+                <div class="scheduled-event govuk-!-margin-bottom-3" data-qa="{{type + '-events'}}">
+                    <div class="scheduled-event__time">{{ event.startTime + ' to ' + event.endTime if event.endTime else event.startTime }}</div>
+                    <pre class="govuk-body">{{event.eventDescription}}</pre>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="govuk-body">Nothing scheduled on {{ date }} </p>
+        {% endif %}
+    {% endset %}
+
+  {{ govukInsetText({
+      html: eventsHtml
+  }) }}
+{% endmacro %}
+
+{#  Used when rendering events via controller  #}
+{{ scheduledEvents(events, type, header, prisonerName, date) }}

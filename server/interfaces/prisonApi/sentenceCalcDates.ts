@@ -20,7 +20,7 @@ export interface SentenceCalcDates {
   tariffEarlyRemovalSchemeEligibilityDate?: string
   effectiveSentenceEndDate?: string
   bookingId: number
-  sentenceStartDate: string
+  sentenceStartDate?: string
   additionalDaysAwarded?: number
   automaticReleaseOverrideDate?: string
   conditionalReleaseOverrideDate?: string
@@ -38,7 +38,7 @@ export interface SentenceCalcDates {
   topupSupervisionExpiryOverrideDate?: string
   homeDetentionCurfewEligibilityCalculatedDate?: string
   homeDetentionCurfewEligibilityOverrideDate?: string
-  nonDtoReleaseDateType: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
+  nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
   confirmedReleaseDate?: string
   releaseDate?: string
   topupSupervisionStartDate?: string

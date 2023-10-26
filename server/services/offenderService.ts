@@ -5,8 +5,8 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 export default class OffenderService {
   constructor(private readonly prisonClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  getPrisonerImage(token: string, offenderNumber: string): Promise<Readable> {
-    return this.prisonClientBuilder(token).getPrisonerImage(offenderNumber, true)
+  getPrisonerImage(token: string, offenderNumber: string, fullSizeImage = true): Promise<Readable> {
+    return this.prisonClientBuilder(token).getPrisonerImage(offenderNumber, fullSizeImage)
   }
 
   getImage(token: string, imageId: string): Promise<Readable> {

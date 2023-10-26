@@ -89,6 +89,9 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
         text,
         value: '',
         selected: true,
+        attributes: {
+          hidden: 'hidden',
+        },
       },
       ...items,
     ]
@@ -100,7 +103,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       items &&
       items.map(entry => ({
         ...entry,
-        selected: entry && entry.value === selected,
+        selected: entry && String(entry.value) === String(selected),
       })),
   )
 
@@ -109,4 +112,25 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('prependHmppsAuthBaseUrl', prependHmppsAuthBaseUrl)
   njkEnv.addFilter('toNonAssociationTableRows', toNonAssociationRows)
   njkEnv.addFilter('timeFormat', timeFormat)
+  njkEnv.addFilter('toTextValue', (array: string[], selected: string) => {
+    if (!array) return null
+
+    const items = array.map(entry => ({
+      text: entry,
+      value: entry,
+      selected: entry && entry === selected,
+    }))
+
+    return [
+      {
+        text: '--',
+        value: '',
+        selected: true,
+        attributes: {
+          hidden: 'hidden',
+        },
+      },
+      ...items,
+    ]
+  })
 }

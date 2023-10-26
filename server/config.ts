@@ -107,7 +107,7 @@ export default {
       },
       agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 20000))),
     },
-    whereaboutsApiUrl: {
+    whereaboutsApi: {
       url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('WHEREABOUTS_API_URL_TIMEOUT_SECONDS', 20000)),
@@ -199,4 +199,5 @@ export default {
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
   useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
+  profileAddAppointmentEnabled: get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false') === 'true',
 }

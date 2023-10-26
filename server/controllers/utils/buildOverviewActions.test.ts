@@ -72,27 +72,46 @@ describe('buildOverviewActions', () => {
     })
   })
 
+  describe('Log an activity application', () => {
+    test.each`
+      roles                 | activeCaseLoadId | prisonId | activitiesEnabledPrisons | prisonerStatus  | visible
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${true}
+      ${[Role.ActivityHub]} | ${'LEI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'LEI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['LEI']}               | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'ACTIVE OUT'} | ${false}
+      ${[]}                 | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
+    `(
+      'user can see: $visible',
+      ({ roles, activeCaseLoadId, prisonId, activitiesEnabledPrisons, prisonerStatus, visible }) => {
+        const user = { ...userMock, userRoles: roles, activeCaseLoadId }
+        const prisoner = { ...PrisonerMockDataA, status: prisonerStatus, prisonId }
+
+        const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, {
+          ...config,
+          activitiesEnabledPrisons,
+        })
+        expect(
+          !!resp.find(
+            action => action.url === `${config.serviceUrls.activities}/waitlist/${prisoner.prisonerNumber}/apply`,
+          ),
+        ).toEqual(visible)
+      },
+    )
+  })
+
   describe('Add appointment', () => {
     test.each`
-      roles                      | caseLoads  | prisonId | restrictedPatient | visible
-      ${[]}                      | ${['MDI']} | ${'MDI'} | ${false}          | ${true}
-      ${[]}                      | ${['LEI']} | ${'OUT'} | ${false}          | ${false}
-      ${[]}                      | ${['LEI']} | ${'TRN'} | ${false}          | ${false}
-      ${[Role.InactiveBookings]} | ${['LEI']} | ${'OUT'} | ${false}          | ${true}
-      ${[Role.InactiveBookings]} | ${['LEI']} | ${'TRN'} | ${false}          | ${true}
-      ${[]}                      | ${['LEI']} | ${'MDI'} | ${true}           | ${false}
-      ${[Role.PomUser]}          | ${['LEI']} | ${'MDI'} | ${true}           | ${false}
-    `('user can see: $visible', ({ roles, caseLoads, prisonId, restrictedPatient, visible }) => {
-      const user = { ...userMock, userRoles: roles, caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })) }
+      activeCaseLoadId | prisonId | restrictedPatient | visible
+      ${'MDI'}         | ${'MDI'} | ${false}          | ${true}
+      ${'MDI'}         | ${'MDI'} | ${true}           | ${false}
+      ${'LEI'}         | ${'MDI'} | ${false}          | ${false}
+    `('user can see: $visible', ({ activeCaseLoadId, prisonId, restrictedPatient, visible }) => {
+      const user = { ...userMock, activeCaseLoadId }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
       const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config)
-      expect(
-        !!resp.find(
-          action =>
-            action.url === `${config.serviceUrls.digitalPrison}/offenders/${prisoner.prisonerNumber}/add-appointment`,
-        ),
-      ).toEqual(visible)
+      expect(!!resp.find(action => action.dataQA === 'add-appointment-action-link')).toEqual(visible)
     })
   })
 

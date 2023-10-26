@@ -1,0 +1,17 @@
+.appointment-details-list {
+  .govuk-summary-list__key,
+  .govuk-summary-list__value,
+  .govuk-summary-list__actions {
+    margin: 0; // Reset default user agent styles
+
+    @include govuk-media-query($from: tablet) {
+      display: table-cell;
+      padding-top: 2px;
+      padding-right: govuk-spacing(4);
+      padding-bottom: 2px;
+    }
+  }
+
+}
+
+

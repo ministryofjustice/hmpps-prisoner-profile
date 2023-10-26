@@ -1,0 +1,155 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% extends "../../partials/layout.njk" %}
+
+{% set mainClasses = "govuk-body" %}
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: prisonerName,
+        href: "/prisoner/" + prisonerNumber
+    }
+] %}
+
+{% block content %}
+    {% block body %}
+
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">The video link has been booked</h1>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h2>Video link details</h2>
+
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border appointment-details-list',
+                    rows: [
+                        {
+                            key: {
+                                text: "Name"
+                            },
+                            value: {
+                                text: prisonerName
+                            }
+                        },
+                        {
+                            key: {
+                            text: "Prison"
+                        },
+                            value: {
+                            text: prisonName
+                        }
+                        },
+                        {
+                            key: {
+                            text: "Prison room",
+                            classes: 'govuk-!-padding-bottom-6'
+                        },
+                            value: {
+                            text: location
+                        }
+                        },
+                        {
+                            key: {
+                            text: "Date"
+                        },
+                            value: {
+                            text: date
+                        }
+                        },
+                        {
+                            key: {
+                            text: "Start time"
+                        },
+                            value: {
+                            text: startTime
+                        }
+                        },
+                        {
+                            key: {
+                            text: "End time"
+                        },
+                            value: {
+                            text: endTime
+                        }
+                        }
+                    ]
+                }) }}
+
+                <dl class="govuk-summary-list govuk-summary-list--no-border appointment-details-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Comments
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <pre class="govuk-body">{{ comments }}</pre>
+                        </dd>
+                    </div>
+                </dl>
+
+                {% set prePostClass = 'govuk-!-margin-bottom-0' if pre and post else '' %}
+
+                {% if pre %}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list ' + prePostClass,
+                        rows: [
+                            {
+                                key: {
+                                text: "Pre-court hearing briefing"
+                            },
+                                value: {
+                                text: pre
+                            }
+                            }
+                        ]
+                    }) }}
+                {% endif %}
+
+                {% if post %}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border appointment-details-list',
+                        rows: [
+                            {
+                                key: {
+                                text: "Post-court hearing briefing"
+                            },
+                                value: {
+                                text: post
+                            }
+                            }
+                        ]
+                    }) }}
+                {% endif %}
+
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border appointment-details-list',
+                    rows: [
+                        {
+                            key: {
+                            text: "Court location"
+                        },
+                            value: {
+                            text: court
+                        }
+                        }
+                    ]
+                }) }}
+
+                <div class="govuk-!-margin-bottom-4">
+                    <a href="{{ movementSlipUrl }}"  class="govuk-link govuk-link--no-visited-state" target="_blank" rel="noopener noreferrer">Print movement slip</a>
+                </div>
+
+                <div class="govuk-button-group">
+                    <a href="{{ profileUrl }}" class="govuk-link govuk-link--no-visited-state">Back to prisoner's profile</a>
+                </div>
+            </div>
+        </div>
+
+    {% endblock %}
+{% endblock %}

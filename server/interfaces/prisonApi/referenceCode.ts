@@ -1,5 +1,5 @@
 export interface ReferenceCode {
-  domain: string
+  domain?: string
   code: string
   description: string
   parentDomain?: string

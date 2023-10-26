@@ -10,6 +10,7 @@ export default class CommonApiRoutes {
 
   public prisonerImage: RequestHandler = (req: Request, res: Response) => {
     const { prisonerNumber } = req.params
+    const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
 
     if (prisonerNumber === 'placeholder') {
       res.sendFile(placeHolderImage)
@@ -17,7 +18,7 @@ export default class CommonApiRoutes {
       res.sendFile(categoryAImage)
     } else {
       this.offenderService
-        .getPrisonerImage(res.locals.user.token, prisonerNumber)
+        .getPrisonerImage(res.locals.user.token, prisonerNumber, fullSizeImage)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')
           res.removeHeader('pragma')

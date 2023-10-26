@@ -1,5 +1,10 @@
+.hmpps-feedback-banner + .hmpps-flash-message {
+  margin-top: 0 !important;
+}
+
 .hmpps-flash-message {
   position: absolute;
+  margin-top: -15px;
   left: 50%;
 
   p {

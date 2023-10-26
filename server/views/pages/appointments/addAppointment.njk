@@ -1,0 +1,189 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% from "components/scheduledEvents/scheduledEvents.njk" import scheduledEvents %}
+{% from "components/timePicker/timePicker.njk" import timePicker %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+
+{% extends "../../partials/layout.njk" %}
+
+{% set recurringHtml %}
+    <div data-qa="recurring-inputs">
+        {{ govukSelect({
+            id: "repeats",
+            name: "repeats",
+            label: {
+                text: "Repeats"
+            },
+            classes: "js-appointment-repeats",
+            items: repeatOptions | addDefaultSelectedValue('Select') | setSelected(formValues.repeats),
+            errorMessage: errors | findError('repeats')
+        }) }}
+
+        {{ govukInput({
+            id: "times",
+            name: "times",
+            value: formValues.times,
+            errorMessage: errors | findError('times'),
+            type: "number",
+            label: {
+                text: "How many appointments do you want to add?"
+            },
+            hint: {
+                text: "This includes the first appointment you have already added above. You can add appointments up to a maximum of 1 year."
+            },
+            classes: "govuk-input--width-3 js-appointment-repeats-times"
+        }) }}
+
+
+        <div class="govuk-form-group js-appointment-last-appointment">
+            <span class="govuk-body">Last appointment on</span>
+            <div id="last-appointment-date" class=" govuk-body govuk-!-font-weight-bold last-appointment">
+                {{ endOfPeriod }}
+            </div>
+        </div>
+    </div>
+{% endset -%}
+
+{% set mainClasses = "govuk-body" %}
+{% block content %}
+    {% block body %}
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })}}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">Add an appointment</h1>
+            </div>
+        </div>
+
+        {{ miniBanner(miniBannerData) }}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <form method="post" novalidate="novalidate" autocomplete="off" class="add-appointment-form">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                    <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
+                    <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
+                    {{ govukSelect({
+                        id: "appointmentType",
+                        name: "appointmentType",
+                        label: {
+                            text: "Type of appointment"
+                        },
+                        errorMessage: errors | findError('appointmentType'),
+                        items: appointmentTypes | addDefaultSelectedValue('Choose appointment type') | setSelected(formValues.appointmentType)
+                    }) }}
+                    {{ govukSelect({
+                        id: "location",
+                        name: "location",
+                        label: {
+                            text: "Location"
+                        },
+                        errorMessage: errors | findError('location'),
+                        items: locations | addDefaultSelectedValue('Choose location') | setSelected(formValues.location)
+                    }) }}
+                    {{ hmppsDatepicker({
+                        id: "date",
+                        name: "date",
+                        label: {
+                            text: "Date"
+                        },
+                        errorMessage: errors | findError('date'),
+                        classes: 'hmpps-datepicker--fixed-width',
+                        value: formValues.date,
+                        minDate: today
+                    }) }}
+
+                    <div id="offender-events">
+                        {# Populated by JavaScript on date changes #}
+                    </div>
+                    <div id="location-events">
+                        {# Populated by JavaScript on date or location changes #}
+                    </div>
+
+                    {{ timePicker({
+                        id: 'startTime',
+                        label: 'Start time',
+                        name: 'startTime',
+                        hour: formValues.startTimeHours,
+                        minute: formValues.startTimeMinutes,
+                        errorMessage: errors | findError('startTime')
+                    }) }}
+
+                    {{ timePicker({
+                        id: 'endTime',
+                        label: 'End time',
+                        name: 'endTime',
+                        hour: formValues.endTimeHours,
+                        minute: formValues.endTimeMinutes,
+                        errorMessage: errors | findError('endTime')
+                    }) }}
+
+                    {{ govukRadios({
+                        idPrefix: "recurring",
+                        name: "recurring",
+                        errorMessage: errors | findError('recurring'),
+                        formGroup : {
+                          classes: "js-recurring-radios"
+                        },
+                        fieldset: {
+                            id: 'recurringFieldset',
+                            legend: {
+                                text: "Is this a recurring appointment?",
+                                classes: "govuk-fieldset__legend--s"
+                            }
+                        },
+                        items: [{
+                            value: "yes",
+                            text: "Yes",
+                            checked: formValues.recurring == 'yes',
+                            conditional: {
+                                html: recurringHtml
+                            }
+                        },
+                            {
+                                value: "no",
+                                text: "No",
+                                checked: formValues.recurring == 'no'
+                            }
+                        ]
+                    }) }}
+
+                    {{ govukTextarea({
+                        name: "comments",
+                        id: "comments",
+                        value: formValues.comments,
+                        errorMessage: errors | findError('comments'),
+                        classes: 'govuk-!-width-one-half',
+                        label: {
+                            text: "Comments (optional)"
+                        }
+                    }) }}
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({ text: "Save and continue", type: "submit", preventDoubleClick: true }) }}
+                        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    {% endblock %}
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/addAppointment.js"></script>
+{% endblock %}

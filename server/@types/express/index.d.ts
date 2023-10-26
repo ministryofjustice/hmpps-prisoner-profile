@@ -10,6 +10,7 @@ declare module 'express-session' {
     nowInMinutes: number
     userDetails: UserDetails
     userBackLink: string
+    movementSlipData: object
   }
 }
 

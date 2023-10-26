@@ -1,0 +1,42 @@
+{% extends "../../partials/layout.njk" %}
+{% macro labelAndValue(label, value, isPre) %}
+    <div class="movement-slip__section__values">
+        <div>
+            <strong>{{label}}</strong>
+        </div>
+        {% if isPre === true %}
+            <pre class="govuk-body">{{ value if value else "--" }}</pre>
+        {% else %}
+            <span>{{ value if value else "--" }}</span>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% set pageTitle = 'Movement authorisation' %}
+{% set htmlClasses = "printed-page" %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+    <div class="movement-slip">
+        <h1 class="govuk-heading-m">Movement authorisation</h1>
+        <div class="movement-slip__section">
+            {{ labelAndValue('Name', prisonerName) }}
+            {{ labelAndValue('Prison number', prisonerNumber) }}
+            {{ labelAndValue('Cell location', cellLocation) }}
+        </div>
+
+        <div class="movement-slip__section">
+            {{ labelAndValue('Date and time', date +' ' + startTime + ' to ' + endTime) }}
+            {{ labelAndValue('Moving to', location) }}
+            {{ labelAndValue('Reason', appointmentType) }}
+            {{ labelAndValue('Comments', comment, true) }}
+        </div>
+
+        <div class="movement-slip__section">
+            {{ labelAndValue('Created by', createdBy) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

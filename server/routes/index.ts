@@ -19,6 +19,7 @@ import PrisonerScheduleController from '../controllers/prisonerScheduleControlle
 import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
+import appointmentRouter from './appointmentRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -142,6 +143,7 @@ export default function routes(services: Services): Router {
   router.use(caseNotesRouter(services))
   router.use(alertsRouter(services))
   router.use(csraRouter(services))
+  router.use(appointmentRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
