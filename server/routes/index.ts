@@ -44,6 +44,7 @@ export default function routes(services: Services): Router {
     services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
+    services.auditService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)

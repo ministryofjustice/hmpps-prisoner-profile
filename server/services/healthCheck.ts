@@ -42,7 +42,7 @@ function addAppInfo(result: HealthCheckResult): HealthCheckResult {
   return { ...result, ...buildInfo }
 }
 
-function getBuild() {
+export function getBuild() {
   try {
     // eslint-disable-next-line import/no-unresolved,global-require
     return require('../../build-info.json')
