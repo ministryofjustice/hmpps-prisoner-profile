@@ -1,19 +1,38 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 
+// The individual pages that contain user information
+// eslint-disable-next-line no-shadow
+export enum PageViewAction {
+  OverviewPage = 'PAGE_VIEW_OVERVIEW',
+}
+
 export interface PageViewAudit {
   userId: string
   prisonerNumber: string
+  pageViewAction: PageViewAction
+  details: { globalView: boolean; releasedPrisonerView: boolean; userRoles: string[] }
+}
 
-  // This should contain things relevant to auditing, ideas:
-  // Page name   - the page that was viewed
-  // Global View - whether or not it was the restricted global view
-  // Users roles - the users roles to determine what they could see
-  details: { pageName: string; isGlobalView: boolean; usersRoles: string[] }
+interface AddAppointmentAudit {
+  userId: string
+  prisonerNumber: string
+  details: object
+}
+
+type SearchActions = 'SEARCH_CASE_NOTES' | 'SEARCH_ALERTS'
+
+interface SearchAudit {
+  userId: string
+  prisonerNumber: string
+  searchAction: SearchActions
+  details: object
 }
 
 export interface AuditService {
-  sendPageView: ({ userId, prisonerNumber, details }: PageViewAudit) => Promise<void>
+  sendPageView: (object: PageViewAudit) => Promise<void>
+  sendAddAppointment: (object: AddAppointmentAudit) => Promise<void>
+  sendSearch: (object: SearchAudit) => Promise<void>
 }
 
 /*
@@ -30,18 +49,8 @@ export const auditService = ({
   build: string
   serviceName: string
 }): AuditService => {
-  const sendPageView = async ({ userId, prisonerNumber, details }: PageViewAudit) => {
+  const sendMessage = async (message: string) => {
     try {
-      const message = JSON.stringify({
-        action: 'PAGE_VIEW',
-        when: new Date(),
-        who: userId,
-        subjectId: prisonerNumber,
-        subjectType: 'PRISONER_ID',
-        service: serviceName,
-        details: { ...details, build },
-      })
-
       const messageResponse = await sqsClient.send(new SendMessageCommand({ MessageBody: message, QueueUrl: queueUrl }))
       logger.info(`Page view sent to audit (${messageResponse.MessageId})`)
     } catch (error) {
@@ -49,7 +58,51 @@ export const auditService = ({
     }
   }
 
+  const sendPageView = async ({ userId, prisonerNumber, details, pageViewAction }: PageViewAudit) => {
+    const message = JSON.stringify({
+      action: pageViewAction.toString(),
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: 'PRISONER_ID',
+      service: serviceName,
+      details: { ...details, build },
+    })
+
+    await sendMessage(message)
+  }
+
+  const sendAddAppointment = async ({ userId, prisonerNumber, details }: AddAppointmentAudit) => {
+    const message = JSON.stringify({
+      action: 'ADD_APPOINTMENT',
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: 'PRISONER_ID',
+      service: serviceName,
+      details: { ...details, build },
+    })
+
+    await sendMessage(message)
+  }
+
+  const sendSearch = async ({ userId, prisonerNumber, searchAction, details }: SearchAudit) => {
+    const message = JSON.stringify({
+      action: searchAction,
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: 'PRISONER_ID',
+      service: serviceName,
+      details: { ...details, build },
+    })
+
+    await sendMessage(message)
+  }
+
   return {
     sendPageView,
+    sendAddAppointment,
+    sendSearch,
   }
 }

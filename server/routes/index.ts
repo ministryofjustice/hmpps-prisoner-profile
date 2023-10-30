@@ -1,6 +1,7 @@
 import { type RequestHandler, Router } from 'express'
 import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import auditPageView from '../middleware/auditPageView'
 import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
 import { formatName, sortArrayOfObjectsByDate, SortType } from '../utils/utils'
@@ -21,6 +22,7 @@ import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
 import professionalContactsRouter from './professionalContactsRouter'
+import { PageViewAction } from '../services/auditService'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -44,7 +46,6 @@ export default function routes(services: Services): Router {
     services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
-    services.auditService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
@@ -61,11 +62,17 @@ export default function routes(services: Services): Router {
 
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
-  get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
-    const prisonerData = req.middleware?.prisonerData
-    const inmateDetail = req.middleware?.inmateDetail
-    return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
-  })
+  get(
+    '/prisoner/:prisonerNumber',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    auditPageView({ services, pageViewAction: PageViewAction.OverviewPage, details: {} }),
+    async (req, res, next) => {
+      const prisonerData = req.middleware?.prisonerData
+      const inmateDetail = req.middleware?.inmateDetail
+      return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
+    },
+  )
 
   get(
     '/prisoner/:prisonerNumber/image',
