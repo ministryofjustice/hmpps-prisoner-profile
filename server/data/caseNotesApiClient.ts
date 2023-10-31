@@ -4,9 +4,14 @@ import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedLi
 import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import { CaseNoteType } from '../interfaces/caseNoteType'
 import { CaseNote } from '../interfaces/caseNotesApi/caseNote'
+import config from '../config'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
-  constructor(private readonly restClient: RestClient) {}
+  private readonly restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Case Notes API', config.apis.caseNotesApi, token)
+  }
 
   private async get<T>(args: object): Promise<T> {
     try {

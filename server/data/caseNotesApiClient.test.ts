@@ -4,7 +4,6 @@ import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import { pagedCaseNotesMock } from './localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
-import restClientBuilder from '.'
 import { CaseNote } from '../interfaces/caseNotesApi/caseNote'
 
 jest.mock('./tokenStore')
@@ -17,11 +16,7 @@ describe('caseNotesApiClient', () => {
 
   beforeEach(() => {
     fakeCaseNotesApi = nock(config.apis.caseNotesApi.url)
-    caseNotesApiClient = restClientBuilder(
-      'Case Notes API',
-      config.apis.caseNotesApi,
-      CaseNotesApiRestClient,
-    )(token.access_token)
+    caseNotesApiClient = new CaseNotesApiRestClient(token.access_token)
   })
 
   afterEach(() => {

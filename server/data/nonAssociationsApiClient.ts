@@ -5,7 +5,11 @@ import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import RestClient from './restClient'
 
 export default class NonAssociationsApiRestClient implements NonAssociationsApiClient {
-  constructor(private restClient: RestClient) {}
+  private restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Non associations API', config.apis.nonAssociationsApi, token)
+  }
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {
