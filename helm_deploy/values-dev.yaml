@@ -9,6 +9,7 @@ generic-service:
     contextColour: green
     v1_2_enabled: true
     v0_47_enabled: false
+    modsecurity_enabled: true
 
   env:
     INGRESS_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk"
