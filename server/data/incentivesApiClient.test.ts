@@ -2,7 +2,6 @@ import nock from 'nock'
 import config from '../config'
 import IncentivesApiRestClient from './incentivesApiClient'
 import { incentiveReviewsMock } from './localMockData/incentiveReviewsMock'
-import restClientBuilder from '.'
 
 jest.mock('./tokenStore')
 
@@ -14,11 +13,7 @@ describe('caseNotesApiClient', () => {
 
   beforeEach(() => {
     incentivesApi = nock(config.apis.incentivesApi.url)
-    incentivesApiClient = restClientBuilder(
-      'Incentives API',
-      config.apis.incentivesApi,
-      IncentivesApiRestClient,
-    )(token.access_token)
+    incentivesApiClient = new IncentivesApiRestClient(token.access_token)
   })
 
   afterEach(() => {

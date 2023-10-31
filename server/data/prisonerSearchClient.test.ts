@@ -2,7 +2,6 @@ import nock from 'nock'
 import config from '../config'
 import { PrisonerMockDataA, PrisonerMockDataB } from './localMockData/prisoner'
 import PrisonerSearchClient from './prisonerSearchClient'
-import restClientBuilder from '.'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -12,11 +11,7 @@ describe('prisonerSearchClient', () => {
 
   beforeEach(() => {
     fakePrisonerSearchApi = nock(config.apis.prisonerSearchApi.url)
-    prisonerSearchClient = restClientBuilder(
-      'Prisoner Search Client',
-      config.apis.prisonerSearchApi,
-      PrisonerSearchClient,
-    )(token.access_token)
+    prisonerSearchClient = new PrisonerSearchClient(token.access_token)
   })
 
   afterEach(() => {

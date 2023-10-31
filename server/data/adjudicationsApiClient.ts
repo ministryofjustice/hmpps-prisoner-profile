@@ -4,7 +4,11 @@ import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import config from '../config'
 
 export default class AdjudicationsApiRestClient implements AdjudicationsApiClient {
-  constructor(private readonly restClient: RestClient) {}
+  private readonly restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Adjudications API', config.apis.adjudicationsApi, token)
+  }
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {

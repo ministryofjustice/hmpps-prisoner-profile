@@ -29,7 +29,6 @@ import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
 import { mockStaffRoles } from './localMockData/staffRoles'
-import restClientBuilder from '.'
 import AgenciesMock from './localMockData/agenciesDetails'
 import OffenderCellHistoryMock from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
@@ -57,7 +56,7 @@ describe('prisonApiClient', () => {
 
   beforeEach(() => {
     fakePrisonApi = nock(config.apis.prisonApi.url)
-    prisonApiClient = restClientBuilder('Prison API', config.apis.prisonApi, PrisonApiClient)(token.access_token)
+    prisonApiClient = new PrisonApiClient(token.access_token)
   })
 
   afterEach(() => {

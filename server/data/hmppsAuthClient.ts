@@ -44,7 +44,11 @@ export interface UserRole {
 }
 
 export default class HmppsAuthClient {
-  constructor(private readonly restClient: RestClient) {}
+  private readonly restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('HMPPS AuthClient', config.apis.hmppsAuth, token)
+  }
 
   private static restClient(token: string): RestClient {
     return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)

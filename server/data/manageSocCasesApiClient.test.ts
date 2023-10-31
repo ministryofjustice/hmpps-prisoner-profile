@@ -1,6 +1,5 @@
 import nock from 'nock'
 import config from '../config'
-import restClientBuilder from '.'
 import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApiClient'
 import ManageSocCasesApiRestClient from './manageSocCasesApiClient'
 
@@ -14,11 +13,7 @@ describe('manageSocCasesApiClient', () => {
 
   beforeEach(() => {
     fakeManageSocCasesApi = nock(config.apis.caseNotesApi.url)
-    manageSocCasesApiClient = restClientBuilder(
-      'Manage SOC Cases',
-      config.apis.manageSocCasesApi,
-      ManageSocCasesApiRestClient,
-    )(token.access_token)
+    manageSocCasesApiClient = new ManageSocCasesApiRestClient(token.access_token)
   })
 
   afterEach(() => {

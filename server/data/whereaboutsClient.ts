@@ -3,9 +3,14 @@ import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
 import { AppointmentDefaults } from '../interfaces/whereaboutsApi/appointment'
 import { CourtLocation } from '../interfaces/whereaboutsApi/courtLocation'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
+import config from '../config'
 
 export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
-  constructor(private readonly restClient: RestClient) {}
+  private readonly restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApi, token)
+  }
 
   private async get<T>(args: object): Promise<T> {
     return this.restClient.get<T>(args)

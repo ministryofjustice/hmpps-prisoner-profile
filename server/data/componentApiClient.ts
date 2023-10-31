@@ -2,9 +2,14 @@ import RestClient from './restClient'
 import Component from './interfaces/component'
 import { ComponentApiClient } from './interfaces/componentApiClient'
 import AvailableComponent from './interfaces/AvailableComponent'
+import config from '../config'
 
 export default class ComponentApiRestClient implements ComponentApiClient {
-  constructor(private restClient: RestClient) {}
+  private restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Component API', config.apis.frontendComponents, token)
+  }
 
   getComponents<T extends AvailableComponent[]>(
     components: T,

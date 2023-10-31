@@ -1,6 +1,5 @@
 import nock from 'nock'
 import config from '../config'
-import restClientBuilder from '.'
 import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
@@ -15,11 +14,7 @@ describe('nonAssociationsApiClient', () => {
 
   beforeEach(() => {
     fakeNonAssociationsApi = nock(config.apis.nonAssociationsApi.url)
-    nonAssociationsApiClient = restClientBuilder(
-      'Prison API',
-      config.apis.nonAssociationsApi,
-      NonAssociationsApiRestClient,
-    )(token.access_token)
+    nonAssociationsApiClient = new NonAssociationsApiRestClient(token.access_token)
   })
 
   afterEach(() => {

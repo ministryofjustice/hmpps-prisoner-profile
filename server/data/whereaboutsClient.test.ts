@@ -1,6 +1,5 @@
 import nock from 'nock'
 import config from '../config'
-import restClientBuilder from '.'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
 import { courtLocationsMock } from './localMockData/courtLocationsMock'
@@ -17,11 +16,7 @@ describe('whereaboutsClient', () => {
 
   beforeEach(() => {
     fakeWhereaboutsApi = nock(config.apis.whereaboutsApi.url)
-    whereaboutsApiClient = restClientBuilder(
-      'Whereabouts API',
-      config.apis.whereaboutsApi,
-      WhereaboutsRestApiClient,
-    )(token.access_token)
+    whereaboutsApiClient = new WhereaboutsRestApiClient(token.access_token)
   })
 
   afterEach(() => {

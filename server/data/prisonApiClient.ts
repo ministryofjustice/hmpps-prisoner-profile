@@ -53,7 +53,11 @@ import { PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSche
 import { Location } from '../interfaces/prisonApi/location'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
-  constructor(private restClient: RestClient) {}
+  private readonly restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Prison API', config.apis.prisonApi, token)
+  }
 
   private async get<T>(args: object, localMockData?: T): Promise<T> {
     try {

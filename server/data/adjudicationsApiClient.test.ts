@@ -1,7 +1,6 @@
 import nock from 'nock'
 import config from '../config'
 import { adjudicationSummaryWithActiveMock } from './localMockData/miniSummaryMock'
-import restClientBuilder from '.'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 
 jest.mock('./tokenStore')
@@ -14,11 +13,7 @@ describe('adjudicationsApiClient', () => {
 
   beforeEach(() => {
     adjudicationsApi = nock(config.apis.adjudicationsApi.url)
-    adjudicationsApiClient = restClientBuilder(
-      'Adjudications API',
-      config.apis.adjudicationsApi,
-      AdjudicationsApiRestClient,
-    )(token.access_token)
+    adjudicationsApiClient = new AdjudicationsApiRestClient(token.access_token)
   })
 
   afterEach(() => {

@@ -1,6 +1,5 @@
 import nock from 'nock'
 import config from '../config'
-import restClientBuilder from '.'
 import PathfinderApiRestClient from './pathfinderApiClient'
 import { PathfinderApiClient } from './interfaces/pathfinderApiClient'
 
@@ -14,11 +13,7 @@ describe('pathfinderApiClient', () => {
 
   beforeEach(() => {
     fakePathfinderApi = nock(config.apis.caseNotesApi.url)
-    pathfinderApiClient = restClientBuilder(
-      'Pathfinder API',
-      config.apis.pathfinderApi,
-      PathfinderApiRestClient,
-    )(token.access_token)
+    pathfinderApiClient = new PathfinderApiRestClient(token.access_token)
   })
 
   afterEach(() => {
