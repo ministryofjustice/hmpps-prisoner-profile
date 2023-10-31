@@ -6,9 +6,8 @@ generic-service:
 
   ingress:
     host: prisoner-dev.digital.prison.service.justice.gov.uk
-    contextColour: green
-    v1_2_enabled: true
-    v0_47_enabled: false
+    modsecurity_enabled: true
+    modsecurity_github_team: "connect-dps"
 
   env:
     INGRESS_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk"
