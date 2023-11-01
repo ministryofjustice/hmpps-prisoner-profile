@@ -914,7 +914,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/agencies/${agencyId}\\?activeOnly=false`,
+        urlPattern: `/prison/api/agencies/${agencyId}\\?.*`,
       },
       response: {
         status: 200,
@@ -1129,6 +1129,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: OffenderAttendanceHistoryMock(),
+      },
+    })
+  },
+
+  stubIdentifiers: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: identifiersMock,
       },
     })
   },
