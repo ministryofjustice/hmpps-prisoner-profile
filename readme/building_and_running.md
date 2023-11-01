@@ -15,7 +15,7 @@ therefore has a number of dependencies:
 * [redis](https://redis.io/) - session store and token caching
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - for authentication
 * [prison-api](https://github.com/ministryofjustice/prison-api) - the main API for retrieving data from NOMIS 
-* [prisoner-offender-search](https://github.com/ministryofjustice/prisoner-offender-search) - an Elastic Search backed API for quickly retrieving commonly requested prisoner details
+* [hmpps-prisoner-search](https://github.com/ministryofjustice/hmpps-prisoner-search) - an OpenSearch backed API for quickly retrieving commonly requested prisoner details
 * [offender-management-allocation-manager](https://github.com/ministryofjustice/offender-management-allocation-manager) - allocation service for associating Prison Offender Managers with Offenders
 * [keyworker-api](https://github.com/ministryofjustice/keyworker-api) - an API providing backend functionality for keyworkers
 * [whereabouts-api](https://github.com/ministryofjustice/whereabouts-api) - an API providing backend functionality for the location of prisoners
