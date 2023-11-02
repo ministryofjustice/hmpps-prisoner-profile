@@ -10,19 +10,8 @@ export default class IncentivesApiRestClient implements IncentivesApiClient {
     this.restClient = new RestClient('Incentives API', config.apis.incentivesApi, token)
   }
 
-  private async get<T>(args: object, localMockData?: T): Promise<T> {
-    try {
-      return await this.restClient.get<T>(args)
-    } catch (error) {
-      if (config.localMockData === 'true' && localMockData) {
-        return localMockData
-      }
-      return error
-    }
-  }
-
   async getReviews(bookingId: number): Promise<IncentiveReviews> {
-    return this.get<IncentiveReviews>({
+    return this.restClient.get<IncentiveReviews>({
       path: `/iep/reviews/booking/${bookingId}`,
       ignore404: true,
     })
