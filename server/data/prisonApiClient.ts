@@ -102,6 +102,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getVisitBalances(prisonerNumber: string): Promise<VisitBalances> {
     return this.get<VisitBalances>({
       path: `/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
+      ignore404: true,
     })
   }
 
