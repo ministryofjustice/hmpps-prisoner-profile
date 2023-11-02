@@ -15,54 +15,43 @@ export default class CuriousRestApiClient implements CuriousApiClient {
     this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token)
   }
 
-  private async get<T>(args: object, localMockData?: T): Promise<T> {
-    try {
-      return await this.restClient.get<T>(args)
-    } catch (error) {
-      if (config.localMockData === 'true' && localMockData) {
-        return localMockData
-      }
-      return error
-    }
-  }
-
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills> {
-    return this.get<LearnerEmployabilitySkills>({
+    return this.restClient.get<LearnerEmployabilitySkills>({
       path: `/learnerEmployabilitySkills/${offenderNumber}`,
       ignore404: true,
     })
   }
 
   async getLearnerProfile(offenderNumber: string): Promise<LearnerProfile[]> {
-    return this.get<LearnerProfile[]>({
+    return this.restClient.get<LearnerProfile[]>({
       path: `/learnerProfile/${offenderNumber}`,
       ignore404: true,
     })
   }
 
   async getLearnerEducation(offenderNumber: string): Promise<LearnerEducation> {
-    return this.get<LearnerEducation>({
+    return this.restClient.get<LearnerEducation>({
       path: `/learnerEducation/${offenderNumber}`,
       ignore404: true,
     })
   }
 
   async getLearnerLatestAssessments(offenderNumber: string): Promise<LearnerLatestAssessment[]> {
-    return this.get<LearnerLatestAssessment[]>({
+    return this.restClient.get<LearnerLatestAssessment[]>({
       path: `/latestLearnerAssessments/${offenderNumber}`,
       ignore404: true,
     })
   }
 
   async getLearnerGoals(offenderNumber: string): Promise<LearnerGoals> {
-    return this.get<LearnerGoals>({
+    return this.restClient.get<LearnerGoals>({
       path: `/learnerGoals/${offenderNumber}`,
       ignore404: true,
     })
   }
 
   async getLearnerNeurodivergence(offenderNumber: string): Promise<LearnerNeurodivergence[]> {
-    return this.get<LearnerNeurodivergence[]>({
+    return this.restClient.get<LearnerNeurodivergence[]>({
       path: `/learnerNeurodivergence/${offenderNumber}`,
       ignore404: true,
     })

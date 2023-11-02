@@ -49,7 +49,7 @@ export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
   getAccountBalances(bookingId: number): Promise<AccountBalances>
   getVisitSummary(bookingId: number): Promise<VisitSummary>
-  getVisitBalances(prisonerNumber: string): Promise<VisitBalances>
+  getVisitBalances(prisonerNumber: string): Promise<VisitBalances | null>
   getAssessments(bookingId: number): Promise<Assessment[]>
   getBookingContacts(bookingId: number): Promise<ContactDetail>
   getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]>

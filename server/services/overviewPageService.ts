@@ -367,9 +367,9 @@ export default class OverviewPageService {
     ])
 
     let privilegedVisitsDescription = ''
-    if (visitBalances.remainingPvo) {
+    if (visitBalances?.remainingPvo) {
       privilegedVisitsDescription = formatPrivilegedVisitsSummary(visitBalances.remainingPvo)
-    } else if (visitBalances.remainingVo) {
+    } else if (visitBalances?.remainingVo) {
       privilegedVisitsDescription = 'No privileged visits'
     }
 
@@ -408,9 +408,9 @@ export default class OverviewPageService {
       topContent: visitSummary.startDateTime ? formatDate(visitSummary.startDateTime, 'short') : 'None scheduled',
       topClass: visitSummary.startDateTime ? 'big' : 'small',
       bottomLabel: 'Remaining visits',
-      bottomContentLine1: visitBalances.remainingVo ? visitBalances.remainingVo : '0',
+      bottomContentLine1: visitBalances?.remainingVo ? visitBalances.remainingVo : '0',
       bottomContentLine3: privilegedVisitsDescription,
-      bottomClass: visitBalances.remainingVo ? 'small' : 'big',
+      bottomClass: visitBalances?.remainingVo ? 'small' : 'big',
       linkLabel: 'Visits details',
       linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/visits-details`,
     }

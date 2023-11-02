@@ -13,6 +13,7 @@ const visitAlertsPage = (): AlertsPage => {
 context('Add Alert Page', () => {
   beforeEach(() => {
     cy.task('reset')
+    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.UpdateAlert] })
   })
 
@@ -21,6 +22,7 @@ context('Add Alert Page', () => {
     let addAlertPage: AddAlertPage
 
     beforeEach(() => {
+      cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       cy.task('stubGetAlertTypes')
       cy.task('stubCreateAlert')

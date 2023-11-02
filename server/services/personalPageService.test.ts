@@ -270,6 +270,13 @@ describe('PersonalPageService', () => {
   })
 
   describe('Addresses', () => {
+    it('Handles the API returning 404 for addresses', async () => {
+      prisonApiClient.getAddresses = jest.fn(async () => null)
+      const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
+      expect(addresses).toBe(undefined)
+      expect(addressSummary).toEqual([])
+    })
+
     it('Maps the data from the API for the primary address', async () => {
       const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
       const expectedAddress = mockAddresses[0]

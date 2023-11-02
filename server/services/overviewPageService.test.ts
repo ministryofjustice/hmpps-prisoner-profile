@@ -182,6 +182,28 @@ describe('OverviewPageService', () => {
   })
 
   describe('getMiniSummaryGroupA', () => {
+    describe('When visit balances returns 404', () => {
+      it('Displays no visit information', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        prisonApiClient.getVisitBalances = jest.fn(async () => null)
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get(
+          'token',
+          { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+          1,
+          CaseLoadsDummyDataA,
+        )
+
+        expect(res.miniSummaryGroupA.length).toEqual(3)
+        const visitSummary = res.miniSummaryGroupA[2]
+        expect(visitSummary.data.bottomClass).toEqual('big')
+        expect(visitSummary.data.bottomContentLine1).toEqual('0')
+        expect(visitSummary.data.bottomContentLine3).toEqual('')
+      })
+    })
+
     it('should get the account, adjudication and visit summaries for the prisoner', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
