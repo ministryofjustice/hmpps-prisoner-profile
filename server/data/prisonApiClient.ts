@@ -206,8 +206,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     }
   }
 
+  // NB: This can return 404 for released prisoners
   async getAddresses(prisonerNumber: string): Promise<Address[]> {
-    return this.restClient.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses` })
+    return this.restClient.get<Address[]>({ path: `/api/offenders/${prisonerNumber}/addresses`, ignore404: true })
   }
 
   async getAddressesForPerson(personId: number): Promise<Address[]> {
