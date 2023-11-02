@@ -99,8 +99,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.get<VisitSummary>({ path: `/api/bookings/${bookingId}/visits/summary` })
   }
 
-  async getVisitBalances(prisonerNumber: string): Promise<VisitBalances> {
-    return this.get<VisitBalances>({
+  async getVisitBalances(prisonerNumber: string): Promise<VisitBalances | null> {
+    return this.get<VisitBalances | null>({
       path: `/api/bookings/offenderNo/${prisonerNumber}/visit/balances`,
       ignore404: true,
     })
