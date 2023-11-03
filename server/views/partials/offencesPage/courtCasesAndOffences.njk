@@ -2,6 +2,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "./courtCaseContent.njk" import courtCaseContent %}
+{% set courtCasesSentenceDetailsId = "court-cases-sentence-details" if releaseDates | length else "court-cases-upcoming-appearances" %}
 
 {%- call summaryCard({title: "Court cases, offences and sentences", id: courtCasesSentenceDetailsId }) -%}
 

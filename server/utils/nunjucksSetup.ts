@@ -22,6 +22,7 @@ import {
 import { pluralise } from './pluralise'
 import { formatDate, formatDateTime, timeFormat } from './dateHelpers'
 import config from '../config'
+import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -133,4 +134,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       ...items,
     ]
   })
+  njkEnv.addFilter('releaseDatesToSummaryRows', releaseDatesToSummaryRows)
 }
