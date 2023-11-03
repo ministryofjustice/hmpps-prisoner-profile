@@ -47,18 +47,21 @@ export default function routes(services: Services): Router {
 
   commonRoutes()
 
+  const overviewController = new OverviewController(
+    services.prisonerSearchService,
+    services.overviewPageService,
+    services.dataAccess.pathfinderApiClientBuilder,
+    services.dataAccess.manageSocCasesApiClientBuilder,
+  )
+
+  const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
+  const prisonerCellHistoryController = new PrisonerCellHistoryController(services.dataAccess.prisonApiClientBuilder)
+
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
   get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
     const prisonerData = req.middleware?.prisonerData
     const inmateDetail = req.middleware?.inmateDetail
-
-    const overviewController = new OverviewController(
-      services.prisonerSearchService,
-      services.overviewPageService,
-      services.dataAccess.pathfinderApiClientBuilder,
-      services.dataAccess.manageSocCasesApiClientBuilder,
-    )
     return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
   })
 
@@ -173,7 +176,6 @@ export default function routes(services: Services): Router {
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
-      const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
     },
   )
@@ -209,9 +211,6 @@ export default function routes(services: Services): Router {
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
-      const prisonerCellHistoryController = new PrisonerCellHistoryController(
-        services.dataAccess.prisonApiClientBuilder,
-      )
       return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData)
     },
   )
