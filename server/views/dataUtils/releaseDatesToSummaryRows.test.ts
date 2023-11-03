@@ -24,6 +24,9 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
     tariffDate: '2016-01-29',
     tariffEarlyRemovalSchemeEligibilityDate: '2016-01-28',
     topupSupervisionExpiryDate: '2016-01-31',
+    sentenceExpiryDate: '2016-02-01',
+    licenceExpiryDate: '2016-02-02',
+    sentenceLicenceExpiryDate: '2016-02-03',
   }
 
   it('should return release dates object as summary rows', () => {
@@ -118,6 +121,14 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
       },
       {
         key: {
+          text: 'License expiry date (LED)',
+        },
+        value: {
+          text: '2 February 2016',
+        },
+      },
+      {
+        key: {
           text: 'Mid-term date (MTD)',
         },
         value: {
@@ -170,6 +181,22 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
         },
         value: {
           text: '27 January 2016',
+        },
+      },
+      {
+        key: {
+          text: 'Sentence and license expiry date (SLED)',
+        },
+        value: {
+          text: '3 February 2016',
+        },
+      },
+      {
+        key: {
+          text: 'Sentence expiry date (SED)',
+        },
+        value: {
+          text: '1 February 2016',
         },
       },
       {
