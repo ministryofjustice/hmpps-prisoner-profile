@@ -191,25 +191,16 @@ context('Offences Page Sentenced', () => {
       offencesPage.conditionalReleaseValue().should('exist')
       offencesPage.conditionalReleaseValue().contains('29 January 2076')
     })
-    it('Detention post-recall release date (DPRRD) key should display', () => {
+
+    it('Parole eligibility key should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.detentionPostRecallReleaseDateKey().should('exist')
-      offencesPage.detentionPostRecallReleaseDateKey().contains('Detention post-recall release date (DPRRD)')
+      offencesPage.paroleEligibilityKey().should('exist')
+      offencesPage.paroleEligibilityKey().contains('Parole eligibility')
     })
-    it('Detention post-recall release date (DPRRD) value should display', () => {
+    it('Parole eligibility value should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.detentionPostRecallReleaseDateValue().should('exist')
-      offencesPage.detentionPostRecallReleaseDateValue().contains('29 January 2076')
-    })
-    it('Effective sentence end date (ESED) key should display', () => {
-      const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.effectiveSentenceEndDateKey().should('exist')
-      offencesPage.effectiveSentenceEndDateKey().contains('Effective sentence end date (ESED)')
-    })
-    it('Effective sentence end date (ESED) value should display', () => {
-      const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.effectiveSentenceEndDateValue().should('exist')
-      offencesPage.effectiveSentenceEndDateValue().contains('12 March 2132')
+      offencesPage.paroleEligibilityValue().should('exist')
+      offencesPage.paroleEligibilityValue().contains('12 December 2021')
     })
 
     it('Post-recall release date (PRRD) key should display', () => {
@@ -223,16 +214,18 @@ context('Offences Page Sentenced', () => {
       offencesPage.postRecallValue().should('exist')
       offencesPage.postRecallValue().contains('12 December 2021')
     })
-    it('Parole eligibility key should display', () => {
+
+    it('Non-dto release date key should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.paroleEligibilityKey().should('exist')
-      offencesPage.paroleEligibilityKey().contains('Parole eligibility')
+      offencesPage.nonDtoSentenceReleaseDateKey().should('exist')
+      offencesPage.nonDtoSentenceReleaseDateKey().contains('Release date for non-DTO sentence')
     })
-    it('Parole eligibility value should display', () => {
+    it('Non-dto release date value should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.paroleEligibilityValue().should('exist')
-      offencesPage.paroleEligibilityValue().contains('12 December 2021')
+      offencesPage.nonDtoSentenceReleaseDateValue().should('exist')
+      offencesPage.nonDtoSentenceReleaseDateValue().contains('29 January 2076')
     })
+
     it('Offences page should go to 404 not found page', () => {
       cy.visit(`/prisoner/asudhsdudhid/offences`, { failOnStatusCode: false })
       Page.verifyOnPage(NotFoundPage)

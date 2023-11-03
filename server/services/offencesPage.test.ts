@@ -202,4 +202,157 @@ describe('OffencesPageService', () => {
       expect(res).toEqual(UniqueCourtDateResultsUnsentencedMockA)
     })
   })
+
+  describe('Release dates', () => {
+    const sentenceDetail = {
+      actualParoleDate: '2016-01-01',
+      automaticReleaseOverrideDate: '2016-01-02',
+      automaticReleaseDate: '2016-01-03',
+      conditionalReleaseOverrideDate: '2016-01-04',
+      conditionalReleaseDate: '2016-01-05',
+      confirmedReleaseDate: '2016-01-06',
+      dtoPostRecallReleaseDateOverride: '2016-01-07',
+      dtoPostRecallReleaseDate: '2016-01-08',
+      detentionPostRecallReleaseDate: 'unused',
+      earlyTermDate: '2016-01-09',
+      earlyRemovalSchemeEligibilityDate: '2016-01-10',
+      etdCalculatedDate: '2016-01-11',
+      etdOverrideDate: '2016-01-12',
+      effectiveSentenceEndDate: 'unused',
+      homeDetentionCurfewActualDate: '2016-01-13',
+      homeDetentionCurfewEligibilityDate: '2016-01-14',
+      licenceExpiryCalculatedDate: 'unused',
+      licenceExpiryDate: 'unused',
+      lateTermDate: '2016-01-15',
+      ltdOverrideDate: '2016-01-16',
+      ltdCalculatedDate: '2016-01-17',
+      mtdCalculatedDate: '2016-01-18',
+      mtdOverrideDate: '2016-01-19',
+      midTermDate: '2016-01-20',
+      nonDtoReleaseDateType: 'unused',
+      nonDtoReleaseDate: '2016-01-21',
+      nonParoleOverrideDate: '2016-01-22',
+      nonParoleDate: '2016-01-23',
+      paroleEligibilityCalculatedDate: '2016-01-24',
+      paroleEligibilityDate: 'unused',
+      paroleEligibilityOverrideDate: '2016-01-24',
+      postRecallReleaseDate: '2016-01-25',
+      postRecallReleaseOverrideDate: '2016-01-26',
+      releaseDate: 'unused',
+      releaseOnTemporaryLicenceDate: '2016-01-27',
+      sentenceExpiryCalculatedDate: 'unused',
+      sentenceExpiryDate: 'unused',
+      sentenceStartDate: 'unused',
+      tariffEarlyRemovalSchemeEligibilityDate: '2016-01-28',
+      tariffDate: '2016-01-29',
+      topupSupervisionExpiryDate: '2016-01-30',
+      topupSupervisionExpiryOverrideDate: '2016-01-31',
+    }
+
+    beforeEach(() => {
+      prisonApiClient = prisonApiClientMock()
+      prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
+      prisonApiClient.getOffenceHistory = jest.fn(async () => OffenceHistoryMock)
+      prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
+      prisonApiClient.getSentenceSummary = jest.fn(async () => SentenceSummaryWithSentenceMock)
+    })
+
+    it('should return all dates if returned', async () => {
+      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        ...prisonerSentenceDetailsMock,
+        sentenceDetail,
+      }))
+      const offencesPageService = offencesPageServiceConstruct()
+      const res = await offencesPageService.getReleaseDates('token', '12345')
+      expect(res).toEqual({
+        actualParoleDate: '2016-01-01',
+        automaticReleaseDate: '2016-01-02',
+        conditionalRelease: '2016-01-04',
+        detentionTrainingOrderPostRecallDate: '2016-01-07',
+        earlyRemovalSchemeEligibilityDate: '2016-01-10',
+        earlyTermDate: '2016-01-09',
+        earlyTransferDate: '2016-01-12',
+        homeDetentionCurfewActualDate: '2016-01-13',
+        homeDetentionCurfewEligibilityDate: '2016-01-14',
+        lateTermDate: '2016-01-15',
+        lateTransferDate: '2016-01-16',
+        midTermDate: '2016-01-20',
+        midTransferDate: '2016-01-19',
+        nonDtoReleaseDate: '2016-01-21',
+        nonParoleDate: '2016-01-22',
+        paroleEligibilityCalculatedDate: '2016-01-24',
+        postRecallDate: '2016-01-26',
+        releaseOnTemporaryLicenceDate: '2016-01-27',
+        tariffDate: '2016-01-29',
+        tariffEarlyRemovalSchemeEligibilityDate: '2016-01-28',
+        topupSupervisionExpiryDate: '2016-01-31',
+      })
+    })
+
+    it('should use override dates where available', async () => {
+      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        ...prisonerSentenceDetailsMock,
+        sentenceDetail,
+      }))
+      const offencesPageService = offencesPageServiceConstruct()
+      const res = await offencesPageService.getReleaseDates('token', '12345')
+      expect(res).toMatchObject({
+        automaticReleaseDate: sentenceDetail.automaticReleaseOverrideDate,
+        conditionalRelease: sentenceDetail.conditionalReleaseOverrideDate,
+        detentionTrainingOrderPostRecallDate: sentenceDetail.dtoPostRecallReleaseDateOverride,
+        earlyTransferDate: sentenceDetail.etdOverrideDate,
+        lateTransferDate: sentenceDetail.ltdOverrideDate,
+        midTransferDate: sentenceDetail.mtdOverrideDate,
+        nonParoleDate: sentenceDetail.nonParoleOverrideDate,
+        paroleEligibilityCalculatedDate: sentenceDetail.paroleEligibilityOverrideDate,
+        postRecallDate: sentenceDetail.postRecallReleaseOverrideDate,
+        topupSupervisionExpiryDate: sentenceDetail.topupSupervisionExpiryOverrideDate,
+      })
+    })
+
+    it('should return calculated dates where overrides dont exist', async () => {
+      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        ...prisonerSentenceDetailsMock,
+        sentenceDetail: {
+          ...sentenceDetail,
+          automaticReleaseOverrideDate: undefined,
+          conditionalReleaseOverrideDate: undefined,
+          dtoPostRecallReleaseDateOverride: undefined,
+          etdOverrideDate: undefined,
+          ltdOverrideDate: undefined,
+          mtdOverrideDate: undefined,
+          nonParoleOverrideDate: undefined,
+          paroleEligibilityOverrideDate: undefined,
+          postRecallReleaseOverrideDate: undefined,
+          topupSupervisionExpiryOverrideDate: undefined,
+        },
+      }))
+      const offencesPageService = offencesPageServiceConstruct()
+      const res = await offencesPageService.getReleaseDates('token', '12345')
+      expect(res).toMatchObject({
+        automaticReleaseDate: sentenceDetail.automaticReleaseDate,
+        conditionalRelease: sentenceDetail.conditionalReleaseDate,
+        detentionTrainingOrderPostRecallDate: sentenceDetail.dtoPostRecallReleaseDate,
+        earlyTransferDate: sentenceDetail.etdCalculatedDate,
+        lateTransferDate: sentenceDetail.ltdCalculatedDate,
+        midTransferDate: sentenceDetail.mtdCalculatedDate,
+        nonParoleDate: sentenceDetail.nonParoleDate,
+        paroleEligibilityCalculatedDate: sentenceDetail.paroleEligibilityCalculatedDate,
+        postRecallDate: sentenceDetail.postRecallReleaseDate,
+        topupSupervisionExpiryDate: sentenceDetail.topupSupervisionExpiryDate,
+      })
+    })
+
+    it('should trim empty values', async () => {
+      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+        ...prisonerSentenceDetailsMock,
+        sentenceDetail: { automaticReleaseOverrideDate: 'date' },
+      }))
+      const offencesPageService = offencesPageServiceConstruct()
+      const res = await offencesPageService.getReleaseDates('token', '12345')
+      expect(res).toEqual({
+        automaticReleaseDate: 'date',
+      })
+    })
+  })
 })

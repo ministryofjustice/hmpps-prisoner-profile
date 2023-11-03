@@ -1,4 +1,5 @@
 import { SummaryListRow } from '../../utils/utils'
+import { ReleaseDates } from '../../interfaces/releaseDates'
 
 export const OffencesPageMockSentences = {
   courtCaseData: [
@@ -463,50 +464,11 @@ export const OffencesPageMockSentences = {
       ],
     },
   ],
-  courtCasesSentenceDetailsId: 'court-cases-sentence-details',
   releaseDates: {
-    dates: [
-      {
-        key: {
-          text: 'Conditional release date (CRD)',
-        },
-        value: {
-          text: '29 January 2076',
-        },
-      },
-      {
-        key: {
-          text: 'Detention post-recall release date (DPRRD)',
-        },
-        value: {
-          text: '29 January 2076',
-        },
-      },
-      {
-        key: {
-          text: 'Effective sentence end date (ESED)',
-        },
-        value: {
-          text: '12 March 2132',
-        },
-      },
-      {
-        key: {
-          text: 'Parole eligibility date (PED)',
-        },
-        value: {
-          text: '12 December 2021',
-        },
-      },
-      {
-        key: {
-          text: 'Post-recall release date (PRRD)',
-        },
-        value: {
-          text: '12 December 2021',
-        },
-      },
-    ],
+    conditionalRelease: '2076-01-29',
+    nonDtoReleaseDate: '2076-01-29',
+    paroleEligibilityCalculatedDate: '2021-12-12',
+    postRecallDate: '2021-12-12',
   },
 }
 
@@ -1027,47 +989,9 @@ export const GetCourtCaseData = [
   },
 ]
 
-export const GetReleaseDates = {
-  dates: [
-    {
-      key: {
-        text: 'Conditional release date (CRD)',
-      },
-      value: {
-        text: '29 January 2076',
-      },
-    },
-    {
-      key: {
-        text: 'Detention post-recall release date (DPRRD)',
-      },
-      value: {
-        text: '29 January 2076',
-      },
-    },
-    {
-      key: {
-        text: 'Effective sentence end date (ESED)',
-      },
-      value: {
-        text: '12 March 2132',
-      },
-    },
-    {
-      key: {
-        text: 'Parole eligibility date (PED)',
-      },
-      value: {
-        text: '12 December 2021',
-      },
-    },
-    {
-      key: {
-        text: 'Post-recall release date (PRRD)',
-      },
-      value: {
-        text: '12 December 2021',
-      },
-    },
-  ],
+export const GetReleaseDates: Partial<ReleaseDates> = {
+  conditionalRelease: '2076-01-29',
+  nonDtoReleaseDate: '2076-01-29',
+  paroleEligibilityCalculatedDate: '2021-12-12',
+  postRecallDate: '2021-12-12',
 }

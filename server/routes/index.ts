@@ -132,12 +132,13 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const { offencesPageService } = services
-      const offencesPageData = await offencesPageService.get(res.locals.clientToken, prisonerData)
+      const { courtCaseData, releaseDates } = await offencesPageService.get(res.locals.clientToken, prisonerData)
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
         ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'offences'),
-        ...offencesPageData,
+        courtCaseData,
+        releaseDates,
         activeTab: true,
       })
     },
