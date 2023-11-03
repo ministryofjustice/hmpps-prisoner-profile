@@ -57,20 +57,6 @@ import { CaseNote } from '../interfaces/caseNote'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 
 export default class OverviewPageService {
-  private prisonApiClient: PrisonApiClient
-
-  private allocationManagerClient: AllocationManagerClient
-
-  private keyWorkerClient: KeyWorkerClient
-
-  private incentivesApiClient: IncentivesApiClient
-
-  private adjudicationsApiClient: AdjudicationsApiClient
-
-  private curiousApiClient: CuriousApiClient
-
-  private nonAssociationsApiClient: NonAssociationsApiClient
-
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
@@ -92,13 +78,13 @@ export default class OverviewPageService {
     const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
       prisonerData
 
-    this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
-    this.allocationManagerClient = this.allocationManagerApiClientBuilder(clientToken)
-    this.keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
-    this.incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
-    this.adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
-    this.curiousApiClient = this.curiousApiClientBuilder(clientToken)
-    this.nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
+    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    const allocationManagerClient = this.allocationManagerApiClientBuilder(clientToken)
+    const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
+    const incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
+    const adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
+    const curiousApiClient = this.curiousApiClientBuilder(clientToken)
+    const nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
 
     const [
       inmateDetail,
@@ -114,25 +100,32 @@ export default class OverviewPageService {
       courtCaseData,
       fullStatus,
     ] = await Promise.all([
-      this.prisonApiClient.getInmateDetail(prisonerData.bookingId),
-      this.prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
-      this.curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
-      this.prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
-      this.nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber),
-      this.prisonApiClient.getBookingContacts(prisonerData.bookingId),
-      this.allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      this.keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
-      this.prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
-      this.prisonApiClient.getMainOffence(bookingId),
-      this.prisonApiClient.getCourtCases(bookingId),
-      this.prisonApiClient.getFullStatus(prisonerNumber),
+      prisonApiClient.getInmateDetail(prisonerData.bookingId),
+      prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
+      curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
+      prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
+      nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber),
+      prisonApiClient.getBookingContacts(prisonerData.bookingId),
+      allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
+      keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
+      prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+      prisonApiClient.getMainOffence(bookingId),
+      prisonApiClient.getCourtCases(bookingId),
+      prisonApiClient.getFullStatus(prisonerNumber),
     ])
 
     const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
-      this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles),
-      this.getMiniSummaryGroupB(prisonerData, inmateDetail, userCaseLoads, userRoles),
+      this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles, prisonApiClient, adjudicationsApiClient),
+      this.getMiniSummaryGroupB(
+        prisonerData,
+        inmateDetail,
+        userCaseLoads,
+        userRoles,
+        incentivesApiClient,
+        prisonApiClient,
+      ),
       this.getPersonalDetails(prisonerData, inmateDetail),
-      this.getSchedule(prisonerData),
+      this.getSchedule(prisonerData, prisonApiClient),
       this.getOffencesOverview(
         imprisonmentStatusDescription,
         conditionalReleaseDate,
@@ -357,13 +350,15 @@ export default class OverviewPageService {
     prisonerData: Prisoner,
     userCaseLoads: CaseLoad[],
     userRoles: string[],
+    prisonApiClient: PrisonApiClient,
+    adjudicationsApiClient: AdjudicationsApiClient,
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
     const [accountBalances, adjudicationSummary, visitSummary, visitBalances] = await Promise.all([
-      this.prisonApiClient.getAccountBalances(bookingId),
-      this.adjudicationsApiClient.getAdjudications(bookingId),
-      this.prisonApiClient.getVisitSummary(bookingId),
-      this.prisonApiClient.getVisitBalances(prisonerNumber),
+      prisonApiClient.getAccountBalances(bookingId),
+      adjudicationsApiClient.getAdjudications(bookingId),
+      prisonApiClient.getVisitSummary(bookingId),
+      prisonApiClient.getVisitBalances(prisonerNumber),
     ])
 
     let privilegedVisitsDescription = ''
@@ -438,20 +433,22 @@ export default class OverviewPageService {
     inmateDetail: InmateDetail,
     userCaseLoads: CaseLoad[],
     userRoles: string[],
+    incentivesApiClient: IncentivesApiClient,
+    prisonApiClient: PrisonApiClient,
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
 
-    const incentiveReviews = await this.incentivesApiClient.getReviews(bookingId)
+    const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
 
     const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
-      this.prisonApiClient.getCaseNoteCount(
+      prisonApiClient.getCaseNoteCount(
         bookingId,
         CaseNoteType.PositiveBehaviour,
         CaseNoteSubType.IncentiveEncouragement,
         incentiveReviews?.iepDate,
         formatDateISO(new Date()),
       ),
-      this.prisonApiClient.getCaseNoteCount(
+      prisonApiClient.getCaseNoteCount(
         bookingId,
         CaseNoteType.NegativeBehaviour,
         CaseNoteSubType.IncentiveWarning,
@@ -548,7 +545,7 @@ export default class OverviewPageService {
     return { activeAlertCount, nonAssociationsCount, showNonAssociationsLink, nonAssociationsUrl }
   }
 
-  private async getSchedule(prisonerData: Prisoner): Promise<OverviewSchedule> {
+  private async getSchedule(prisonerData: Prisoner, prisonApiClient: PrisonApiClient): Promise<OverviewSchedule> {
     const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
       const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
       const { startTime, endTime } = formatScheduledEventTime(event)
@@ -560,7 +557,7 @@ export default class OverviewPageService {
       }
     }
 
-    const scheduledEvents = await this.prisonApiClient.getEventsScheduledForToday(prisonerData.bookingId)
+    const scheduledEvents = await prisonApiClient.getEventsScheduledForToday(prisonerData.bookingId)
     const groupedEvents = groupEventsByPeriod(scheduledEvents)
 
     return {

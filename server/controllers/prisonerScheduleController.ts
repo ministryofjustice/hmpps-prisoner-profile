@@ -14,8 +14,6 @@ import { ScheduledEvent, SelectedWeekDates } from '../interfaces/scheduledEvent'
  */
 
 export default class PrisonerScheduleController {
-  private prisonApiClient: PrisonApiClient
-
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   public async displayPrisonerSchedule(req: Request, res: Response, prisonerData: Prisoner) {
@@ -23,7 +21,7 @@ export default class PrisonerScheduleController {
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
     const { clientToken } = res.locals
-    this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]
 
@@ -32,9 +30,9 @@ export default class PrisonerScheduleController {
     const { bookingId } = prisonerData
 
     if (when === 'nextWeek') {
-      schedule = await this.prisonApiClient.getScheduledEventsForNextWeek(bookingId)
+      schedule = await prisonApiClient.getScheduledEventsForNextWeek(bookingId)
     } else {
-      schedule = await this.prisonApiClient.getScheduledEventsForThisWeek(bookingId)
+      schedule = await prisonApiClient.getScheduledEventsForThisWeek(bookingId)
     }
 
     const groupedByDate = groupBy(schedule, 'eventDate')

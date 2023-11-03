@@ -19,10 +19,6 @@ import buildOverviewActions from './utils/buildOverviewActions'
  * Parse request for overview page and orchestrate response
  */
 export default class OverviewController {
-  private pathfinderApiClient: PathfinderApiClient
-
-  private manageSocCasesApiClient: ManageSocCasesApiClient
-
   constructor(
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly overviewPageService: OverviewPageService,
@@ -32,8 +28,8 @@ export default class OverviewController {
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = res.locals
-    this.pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
-    this.manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
+    const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
+    const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
       this.overviewPageService.get(
@@ -43,8 +39,8 @@ export default class OverviewController {
         res.locals.user.caseLoads,
         res.locals.user.userRoles,
       ),
-      this.pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
-      this.manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
+      pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
+      manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
     ])
 
     const overviewActions = buildOverviewActions(

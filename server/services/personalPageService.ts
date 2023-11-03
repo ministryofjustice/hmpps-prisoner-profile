@@ -36,18 +36,14 @@ import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 
 export default class PersonalPageService {
-  private prisonApiClient: PrisonApiClient
-
-  private curiousApiClient: CuriousApiClient
-
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
   ) {}
 
   public async get(token: string, prisonerData: Prisoner): Promise<PersonalPage> {
-    this.prisonApiClient = this.prisonApiClientBuilder(token)
-    this.curiousApiClient = this.curiousApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const curiousApiClient = this.curiousApiClientBuilder(token)
 
     const { bookingId, prisonerNumber } = prisonerData
     const [
@@ -61,23 +57,23 @@ export default class PersonalPageService {
       healthTreatmentReferenceCodes,
       identifiers,
     ] = await Promise.all([
-      this.prisonApiClient.getInmateDetail(bookingId),
-      this.prisonApiClient.getPrisoner(prisonerNumber),
-      this.prisonApiClient.getSecondaryLanguages(bookingId),
-      this.prisonApiClient.getProperty(bookingId),
-      this.prisonApiClient.getAddresses(prisonerNumber),
-      this.prisonApiClient.getOffenderContacts(prisonerNumber),
-      this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
-      this.prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
-      this.prisonApiClient.getIdentifiers(bookingId),
+      prisonApiClient.getInmateDetail(bookingId),
+      prisonApiClient.getPrisoner(prisonerNumber),
+      prisonApiClient.getSecondaryLanguages(bookingId),
+      prisonApiClient.getProperty(bookingId),
+      prisonApiClient.getAddresses(prisonerNumber),
+      prisonApiClient.getOffenderContacts(prisonerNumber),
+      prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
+      prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
+      prisonApiClient.getIdentifiers(bookingId),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
     const healthCodes = healthReferenceCodes.map(code => code.code)
     const treatmentCodes = healthTreatmentReferenceCodes.map(code => code.code)
     const [{ personalCareNeeds }, { reasonableAdjustments }] = await Promise.all([
-      this.prisonApiClient.getPersonalCareNeeds(inmateDetail.bookingId, healthCodes),
-      this.prisonApiClient.getReasonableAdjustments(inmateDetail.bookingId, treatmentCodes),
+      prisonApiClient.getPersonalCareNeeds(inmateDetail.bookingId, healthCodes),
+      prisonApiClient.getReasonableAdjustments(inmateDetail.bookingId, treatmentCodes),
     ])
 
     return {
@@ -86,7 +82,7 @@ export default class PersonalPageService {
       property: this.property(property),
       addresses,
       addressSummary: this.addressSummary(addresses),
-      nextOfKin: await this.nextOfKin(contacts),
+      nextOfKin: await this.nextOfKin(contacts, prisonApiClient),
       physicalCharacteristics: this.physicalCharacteristics(prisonerData, inmateDetail),
       security: {
         interestToImmigration: getProfileInformationValue(
@@ -100,7 +96,7 @@ export default class PersonalPageService {
         xrays: this.xrays(personalCareNeeds),
       },
       careNeeds: await this.careNeeds(healthReferenceCodes, personalCareNeeds, reasonableAdjustments),
-      learnerNeurodivergence: await this.getLearnerNeurodivergence(prisonerNumber),
+      learnerNeurodivergence: await this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
     }
   }
 
@@ -255,12 +251,12 @@ export default class PersonalPageService {
     }
   }
 
-  private async nextOfKin(contacts: OffenderContacts): Promise<NextOfKin[]> {
+  private async nextOfKin(contacts: OffenderContacts, prisonApiClient: PrisonApiClient): Promise<NextOfKin[]> {
     const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
     let contactAddresses: { personId: number; addresses: Address[] }[] = []
     if (activeNextOfKinContacts) {
       contactAddresses = await Promise.all(
-        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId)),
+        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId, prisonApiClient)),
       )
     }
 
@@ -280,8 +276,11 @@ export default class PersonalPageService {
       })
   }
 
-  private async addressForPerson(personId: number): Promise<{ personId: number; addresses: Address[] }> {
-    const addresses = await this.prisonApiClient.getAddressesForPerson(personId)
+  private async addressForPerson(
+    personId: number,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<{ personId: number; addresses: Address[] }> {
+    const addresses = await prisonApiClient.getAddressesForPerson(personId)
     return { personId, addresses }
   }
 
@@ -374,9 +373,9 @@ export default class PersonalPageService {
     }
   }
 
-  private async getLearnerNeurodivergence(prisonerNumber: string) {
+  private async getLearnerNeurodivergence(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
     const learnerNeurodivergence: LearnerNeurodivergence[] =
-      await this.curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
+      await curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
     return learnerNeurodivergence
   }
 }

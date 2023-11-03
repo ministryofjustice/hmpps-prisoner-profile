@@ -22,12 +22,9 @@ import { ReleaseDates } from '../interfaces/releaseDates'
 import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
 
 export default class OffencesPageService {
-  private prisonApiClient: PrisonApiClient
-
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   public async get(token: string, prisonerData: Prisoner) {
-    this.prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, bookingId } = prisonerData
     const [courtCaseData, releaseDates] = await Promise.all([
       this.getCourtCasesData(token, bookingId, prisonerNumber),
@@ -123,13 +120,13 @@ export default class OffencesPageService {
   }
 
   async getCourtCasesData(token: string, bookingId: number, prisonerNumber: string) {
-    this.prisonApiClient = this.prisonApiClient ? this.prisonApiClient : this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
     const [courtCaseData, offenceHistory, sentenceTermsData, courtDateResults, sentenceSummary] = await Promise.all([
-      this.prisonApiClient.getCourtCases(bookingId),
-      this.prisonApiClient.getOffenceHistory(prisonerNumber),
-      this.prisonApiClient.getSentenceTerms(bookingId),
-      this.prisonApiClient.getCourtDateResults(prisonerNumber),
-      this.prisonApiClient.getSentenceSummary(prisonerNumber),
+      prisonApiClient.getCourtCases(bookingId),
+      prisonApiClient.getOffenceHistory(prisonerNumber),
+      prisonApiClient.getSentenceTerms(bookingId),
+      prisonApiClient.getCourtDateResults(prisonerNumber),
+      prisonApiClient.getSentenceSummary(prisonerNumber),
     ])
 
     const caseIds = [...new Set(this.chargeCodesFilter(offenceHistory))]
@@ -379,8 +376,8 @@ export default class OffencesPageService {
   }
 
   async getReleaseDates(token: string, prisonerNumber: string): Promise<Partial<ReleaseDates>> {
-    this.prisonApiClient = this.prisonApiClient ? this.prisonApiClient : this.prisonApiClientBuilder(token)
-    const releaseDates = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const releaseDates = await prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
 
     const sentenceDetails = releaseDates.sentenceDetail
     const dates = {
