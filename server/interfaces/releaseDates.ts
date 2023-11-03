@@ -10,6 +10,7 @@ export interface ReleaseDates {
   homeDetentionCurfewEligibilityDate: string
   lateTermDate: string
   lateTransferDate: string
+  licenceExpiryDate?: string
   midTermDate: string
   midTransferDate: string
   nonDtoReleaseDate: string
@@ -17,6 +18,8 @@ export interface ReleaseDates {
   paroleEligibilityCalculatedDate: string
   postRecallDate: string
   releaseOnTemporaryLicenceDate: string
+  sentenceExpiryDate?: string
+  sentenceLicenceExpiryDate?: string
   tariffDate: string
   tariffEarlyRemovalSchemeEligibilityDate: string
   topupSupervisionExpiryDate: string

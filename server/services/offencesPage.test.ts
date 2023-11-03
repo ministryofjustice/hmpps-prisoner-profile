@@ -222,7 +222,7 @@ describe('OffencesPageService', () => {
       homeDetentionCurfewActualDate: '2016-01-13',
       homeDetentionCurfewEligibilityDate: '2016-01-14',
       licenceExpiryCalculatedDate: 'unused',
-      licenceExpiryDate: 'unused',
+      licenceExpiryDate: '2016-02-02',
       lateTermDate: '2016-01-15',
       ltdOverrideDate: '2016-01-16',
       ltdCalculatedDate: '2016-01-17',
@@ -241,7 +241,7 @@ describe('OffencesPageService', () => {
       releaseDate: 'unused',
       releaseOnTemporaryLicenceDate: '2016-01-27',
       sentenceExpiryCalculatedDate: 'unused',
-      sentenceExpiryDate: 'unused',
+      sentenceExpiryDate: '2016-02-01',
       sentenceStartDate: 'unused',
       tariffEarlyRemovalSchemeEligibilityDate: '2016-01-28',
       tariffDate: '2016-01-29',
@@ -283,6 +283,7 @@ describe('OffencesPageService', () => {
         paroleEligibilityCalculatedDate: '2016-01-24',
         postRecallDate: '2016-01-26',
         releaseOnTemporaryLicenceDate: '2016-01-27',
+        sentenceExpiryDate: '2016-02-01',
         tariffDate: '2016-01-29',
         tariffEarlyRemovalSchemeEligibilityDate: '2016-01-28',
         topupSupervisionExpiryDate: '2016-01-31',
@@ -352,6 +353,71 @@ describe('OffencesPageService', () => {
       const res = await offencesPageService.getReleaseDates('token', '12345')
       expect(res).toEqual({
         automaticReleaseDate: 'date',
+      })
+    })
+    describe('sed, led, sled', () => {
+      it('should use sed if present', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            sentenceExpiryDate: '2016-02-01',
+            licenceExpiryDate: '2016-02-02',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.sentenceExpiryDate).toEqual(sentenceDetail.sentenceExpiryDate)
+        expect(res.licenceExpiryDate).toBeUndefined()
+        expect(res.sentenceLicenceExpiryDate).toBeUndefined()
+      })
+
+      it('should use led if sed not present', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            sentenceExpiryDate: undefined,
+            licenceExpiryDate: '2016-02-02',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.sentenceExpiryDate).toBeUndefined()
+        expect(res.licenceExpiryDate).toEqual(sentenceDetail.licenceExpiryDate)
+        expect(res.sentenceLicenceExpiryDate).toBeUndefined()
+      })
+
+      it('should use sled if both present and the same', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            sentenceExpiryDate: '2016-02-02',
+            licenceExpiryDate: '2016-02-02',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.sentenceExpiryDate).toBeUndefined()
+        expect(res.licenceExpiryDate).toBeUndefined()
+        expect(res.sentenceLicenceExpiryDate).toEqual(sentenceDetail.licenceExpiryDate)
+      })
+
+      it('should use none if none present', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            sentenceExpiryDate: undefined,
+            licenceExpiryDate: undefined,
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.sentenceExpiryDate).toBeUndefined()
+        expect(res.licenceExpiryDate).toBeUndefined()
+        expect(res.sentenceLicenceExpiryDate).toBeUndefined()
       })
     })
   })

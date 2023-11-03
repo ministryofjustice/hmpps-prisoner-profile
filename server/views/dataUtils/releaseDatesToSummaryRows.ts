@@ -28,6 +28,9 @@ const labels: Record<keyof ReleaseDates, string> = {
   tariffDate: 'Tariff',
   tariffEarlyRemovalSchemeEligibilityDate: 'Tariff Expired Removal Scheme eligibility date (TERSED)',
   topupSupervisionExpiryDate: 'Top-up supervision expiry date (TUSED)',
+  sentenceExpiryDate: 'Sentence expiry date (SED)',
+  licenceExpiryDate: 'License expiry date (LED)',
+  sentenceLicenceExpiryDate: 'Sentence and license expiry date (SLED)',
 }
 export default (releaseDates: ReleaseDates): SummaryRow[] => {
   return Object.keys(releaseDates)

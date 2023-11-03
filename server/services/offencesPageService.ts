@@ -19,6 +19,7 @@ import {
 } from '../interfaces/prisonApi/sentenceSummary'
 import { RestClientBuilder } from '../data'
 import { ReleaseDates } from '../interfaces/releaseDates'
+import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
 
 export default class OffencesPageService {
   private prisonApiClient: PrisonApiClient
@@ -364,6 +365,19 @@ export default class OffencesPageService {
     })
   }
 
+  private getSedLedSled(sentenceDetails: PrisonerSentenceDetails['sentenceDetail']) {
+    if (
+      sentenceDetails.sentenceExpiryDate &&
+      sentenceDetails.licenceExpiryDate &&
+      sentenceDetails.sentenceExpiryDate === sentenceDetails.licenceExpiryDate
+    )
+      return { sentenceLicenceExpiryDate: sentenceDetails.sentenceExpiryDate }
+
+    if (sentenceDetails.sentenceExpiryDate) return { sentenceExpiryDate: sentenceDetails.sentenceExpiryDate }
+    if (sentenceDetails.licenceExpiryDate) return { licenceExpiryDate: sentenceDetails.licenceExpiryDate }
+    return {}
+  }
+
   async getReleaseDates(token: string, prisonerNumber: string): Promise<Partial<ReleaseDates>> {
     this.prisonApiClient = this.prisonApiClient ? this.prisonApiClient : this.prisonApiClientBuilder(token)
     const releaseDates = await this.prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
@@ -394,6 +408,7 @@ export default class OffencesPageService {
       tariffEarlyRemovalSchemeEligibilityDate: sentenceDetails.tariffEarlyRemovalSchemeEligibilityDate,
       topupSupervisionExpiryDate:
         sentenceDetails.topupSupervisionExpiryOverrideDate || sentenceDetails.topupSupervisionExpiryDate,
+      ...this.getSedLedSled(sentenceDetails),
     }
     return Object.keys(dates).reduce<Partial<ReleaseDates>>((dateObj, dateName) => {
       if (!dates[dateName]) return dateObj
