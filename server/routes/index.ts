@@ -65,7 +65,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber',
-    auditPageAccessAttempt({ services, page: Page.OverviewPage, details: {} }),
+    auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -77,11 +77,22 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/image',
+    auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        requestId: res.locals.requestId,
+        page: Page.Photo,
+      })
 
       res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
@@ -92,6 +103,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/personal',
+    auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -100,6 +112,16 @@ export default function routes(services: Services): Router {
 
       const { personalPageService } = services
       const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        requestId: res.locals.requestId,
+        page: Page.Personal,
+      })
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',

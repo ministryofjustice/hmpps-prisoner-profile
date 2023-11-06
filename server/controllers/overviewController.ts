@@ -63,11 +63,11 @@ export default class OverviewController {
     this.auditService.sendPageView({
       userId: res.locals.user.username,
       userCaseLoads: res.locals.user.caseLoads,
-      userRoles: [],
+      userRoles: res.locals.user.userRoles,
       prisonerNumber: prisonerData.prisonerNumber,
       prisonId: prisonerData.prisonId,
       requestId: res.locals.requestId,
-      page: Page.OverviewPage,
+      page: Page.Overview,
     })
 
     res.render('pages/overviewPage', {

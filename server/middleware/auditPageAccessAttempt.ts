@@ -7,7 +7,6 @@ export default function auditPageAccessAttempt({
   page: pageViewAction,
 }: {
   services: Services
-  details: object
   page: Page
 }): RequestHandler {
   return async (req, res, next) => {
