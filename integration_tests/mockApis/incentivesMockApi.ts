@@ -6,7 +6,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/incentives/iep/reviews/booking/${bookingId}`,
+        urlPattern: `/incentives/incentive-reviews/booking/${bookingId}`,
       },
       response: {
         status: 200,
