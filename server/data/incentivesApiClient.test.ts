@@ -28,7 +28,7 @@ describe('caseNotesApiClient', () => {
   describe('getReviews', () => {
     it('Should return data from the API', async () => {
       const bookingId = 123456
-      mockSuccessfulIncentivesApiCall(`/iep/reviews/booking/${bookingId}`, incentiveReviewsMock)
+      mockSuccessfulIncentivesApiCall(`/incentive-reviews/booking/${bookingId}`, incentiveReviewsMock)
 
       const output = await incentivesApiClient.getReviews(bookingId)
       expect(output).toEqual(incentiveReviewsMock)
