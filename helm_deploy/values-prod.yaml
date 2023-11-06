@@ -10,6 +10,12 @@ generic-service:
     v1_2_enabled: true
     v0_47_enabled: false
 
+  autoscaling:
+    enabled: true
+    minReplicas: 4
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 95
+
   env:
     INGRESS_URL: "https://prisoner.digital.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
