@@ -1,29 +1,27 @@
 import type { RequestHandler } from 'express'
-import { PageViewAction } from '../services/auditService'
+import { Page } from '../services/auditService'
 import { Services } from '../services'
 
-export default function auditPageView({
+export default function auditPageAccessAttempt({
   services,
-  pageViewAction,
+  page: pageViewAction,
 }: {
   services: Services
   details: object
-  pageViewAction: PageViewAction
+  page: Page
 }): RequestHandler {
   return async (req, res, next) => {
+    const { requestId } = res.locals
     const { username, userRoles } = res.locals.user
     const { prisonerNumber } = req.params
     const { auditService } = services
 
-    await auditService.sendPageView({
+    await auditService.sendAccessAttempt({
       userId: username,
+      userRoles,
       prisonerNumber,
-      pageViewAction,
-      details: {
-        globalView: false,
-        releasedPrisonerView: false,
-        userRoles,
-      },
+      page: pageViewAction,
+      requestId,
     })
 
     next()

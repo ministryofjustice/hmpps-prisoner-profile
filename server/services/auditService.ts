@@ -1,22 +1,36 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
+import { CaseLoad } from '../interfaces/caseLoad'
+import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
-export enum PageViewAction {
-  OverviewPage = 'PAGE_VIEW_OVERVIEW',
+export enum Page {
+  OverviewPage = 'OVERVIEW',
+}
+
+export interface AccessAttemptAudit {
+  userId: string
+  userRoles: string
+  prisonerNumber: string
+  page: Page
+  requestId: string
 }
 
 export interface PageViewAudit {
   userId: string
+  userCaseLoads: CaseLoad[]
+  userRoles: string[]
   prisonerNumber: string
-  pageViewAction: PageViewAction
-  details: { globalView: boolean; releasedPrisonerView: boolean; userRoles: string[] }
+  prisonId: string
+  page: Page
+  requestId: string
 }
 
 interface AddAppointmentAudit {
   userId: string
   prisonerNumber: string
+  requestId: string
   details: object
 }
 
@@ -25,11 +39,13 @@ type SearchActions = 'SEARCH_CASE_NOTES' | 'SEARCH_ALERTS'
 interface SearchAudit {
   userId: string
   prisonerNumber: string
+  requestId: string
   searchAction: SearchActions
   details: object
 }
 
 export interface AuditService {
+  sendAccessAttempt: (object: AccessAttemptAudit) => Promise<void>
   sendPageView: (object: PageViewAudit) => Promise<void>
   sendAddAppointment: (object: AddAppointmentAudit) => Promise<void>
   sendSearch: (object: SearchAudit) => Promise<void>
@@ -58,15 +74,46 @@ export const auditService = ({
     }
   }
 
-  const sendPageView = async ({ userId, prisonerNumber, details, pageViewAction }: PageViewAudit) => {
+  const sendAccessAttempt = async ({ userId, userRoles, prisonerNumber, page, requestId }: AccessAttemptAudit) => {
     const message = JSON.stringify({
-      action: pageViewAction.toString(),
+      action: `ACCESS_ATTEMPT_${page.toString()}`,
       when: new Date(),
       who: userId,
       subjectId: prisonerNumber,
       subjectType: 'PRISONER_ID',
       service: serviceName,
-      details: { ...details, build },
+      requestId, // To be renamed when documentation is updated
+      details: { build, userRoles },
+    })
+
+    await sendMessage(message)
+  }
+
+  const sendPageView = async ({
+    userId,
+    userCaseLoads,
+    userRoles,
+    prisonerNumber,
+    prisonId,
+    page,
+    requestId,
+  }: PageViewAudit) => {
+    const details = {
+      globalView: !prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads),
+      releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
+      userRoles,
+      build,
+    }
+
+    const message = JSON.stringify({
+      action: `PAGE_VIEW_${page.toString()}`,
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: 'PRISONER_ID',
+      service: serviceName,
+      requestId, // To be renamed when documentation is updated
+      details,
     })
 
     await sendMessage(message)
@@ -101,6 +148,7 @@ export const auditService = ({
   }
 
   return {
+    sendAccessAttempt,
     sendPageView,
     sendAddAppointment,
     sendSearch,
