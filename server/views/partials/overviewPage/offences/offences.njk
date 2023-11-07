@@ -1,10 +1,11 @@
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
-{%- call summaryCard({title: "Offences"}) -%}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{%- call summaryCard({title: "Offences and release dates"}) -%}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <p data-qa="overview-main-offence" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1">Main offence</p>
-        <p>         
+        <p>
             {{offencesOverview.mainOffenceDescription}}
         </p>
         <hr class="govuk-section-break govuk-section-break--visible" />
@@ -20,6 +21,9 @@
             <hr class="govuk-section-break govuk-section-break--visible" />
             <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Conditional release date (CRD)</p>
             <p data-qa="overview-conditional-release"> {{ offencesOverview.conditionalReleaseDate | formatDate}}</p>
+            {{ govukInsetText({
+                text: "This person may be released earlier if they are approved for release under another scheme, such as Home Detention Curfew. Any ongoing court cases may also change their release date."
+            }) }}
         {% endif %}
         <hr class="govuk-section-break govuk-section-break--visible" />
         <p class="govuk-body govuk-!-margin-top-4">
