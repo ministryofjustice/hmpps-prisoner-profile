@@ -398,7 +398,7 @@ export default class OffencesPageService {
       lateTransferDate: sentenceDetails.ltdOverrideDate || sentenceDetails.ltdCalculatedDate,
       midTermDate: sentenceDetails.midTermDate,
       midTransferDate: sentenceDetails.mtdOverrideDate || sentenceDetails.mtdCalculatedDate,
-      nonDtoReleaseDate: sentenceDetails.nonDtoReleaseDate,
+      // nonDtoReleaseDate: sentenceDetails.nonDtoReleaseDate,
       nonParoleDate: sentenceDetails.nonParoleOverrideDate || sentenceDetails.nonParoleDate,
       paroleEligibilityCalculatedDate:
         sentenceDetails.paroleEligibilityOverrideDate || sentenceDetails.paroleEligibilityCalculatedDate,

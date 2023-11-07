@@ -215,16 +215,16 @@ context('Offences Page Sentenced', () => {
       offencesPage.postRecallValue().contains('12 December 2021')
     })
 
-    it('Non-dto release date key should display', () => {
-      const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.nonDtoSentenceReleaseDateKey().should('exist')
-      offencesPage.nonDtoSentenceReleaseDateKey().contains('Release date for non-DTO sentence')
-    })
-    it('Non-dto release date value should display', () => {
-      const offencesPage = Page.verifyOnPage(OffencesPage)
-      offencesPage.nonDtoSentenceReleaseDateValue().should('exist')
-      offencesPage.nonDtoSentenceReleaseDateValue().contains('29 January 2076')
-    })
+    // it('Non-dto release date key should display', () => {
+    //   const offencesPage = Page.verifyOnPage(OffencesPage)
+    //   offencesPage.nonDtoSentenceReleaseDateKey().should('exist')
+    //   offencesPage.nonDtoSentenceReleaseDateKey().contains('Release date for non-DTO sentence')
+    // })
+    // it('Non-dto release date value should display', () => {
+    //   const offencesPage = Page.verifyOnPage(OffencesPage)
+    //   offencesPage.nonDtoSentenceReleaseDateValue().should('exist')
+    //   offencesPage.nonDtoSentenceReleaseDateValue().contains('29 January 2076')
+    // })
 
     it('Offences page should go to 404 not found page', () => {
       cy.visit(`/prisoner/asudhsdudhid/offences`, { failOnStatusCode: false })
