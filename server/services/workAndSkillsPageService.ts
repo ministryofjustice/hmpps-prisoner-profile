@@ -16,18 +16,14 @@ import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
 
 export default class WorkAndSkillsPageService {
-  private curiousApiClient: CuriousApiClient
-
-  private prisonApiClient: PrisonApiClient
-
   constructor(
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
   ) {}
 
   public async get(token: string, prisonerData: Prisoner) {
-    this.curiousApiClient = this.curiousApiClientBuilder(token)
-    this.prisonApiClient = this.prisonApiClientBuilder(token)
+    const curiousApiClient = this.curiousApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, firstName, lastName } = prisonerData
     const workAndSkillsPrisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`
 
@@ -41,14 +37,14 @@ export default class WorkAndSkillsPageService {
       offenderActivitiesHistory,
       unacceptableAbsences,
     ] = await Promise.all([
-      this.getLearnerEmployabilitySkills(prisonerNumber),
-      this.getLearnerProfiles(prisonerNumber),
-      this.getLearnerEducation(prisonerNumber),
-      this.getLearnerLatestAssessments(prisonerNumber),
-      this.getLearnerGoals(prisonerNumber),
-      this.getLearnerNeurodivergence(prisonerNumber),
-      this.getOffenderActivitiesHistory(prisonerNumber),
-      this.getOffenderAttendanceHistoryStats(prisonerNumber),
+      this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient),
+      this.getLearnerProfiles(prisonerNumber, curiousApiClient),
+      this.getLearnerEducation(prisonerNumber, curiousApiClient),
+      this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient),
+      this.getLearnerGoals(prisonerNumber, curiousApiClient),
+      this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
+      this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
+      this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
     ])
 
     return {
@@ -64,11 +60,11 @@ export default class WorkAndSkillsPageService {
     }
   }
 
-  private async getOffenderAttendanceHistoryStats(prisonerNumber: string) {
+  private async getOffenderAttendanceHistoryStats(prisonerNumber: string, prisonApiClient: PrisonApiClient) {
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
     const oneMonthAgo = format(sub(startOfToday(), { months: 1 }), 'yyyy-MM-dd')
-    const offenderAttendanceHistory = await this.prisonApiClient.getOffenderAttendanceHistory(
+    const offenderAttendanceHistory = await prisonApiClient.getOffenderAttendanceHistory(
       prisonerNumber,
       sixMonthsAgo,
       todaysDate,
@@ -91,11 +87,13 @@ export default class WorkAndSkillsPageService {
     return { unacceptableAbsenceLastSixMonths, unacceptableAbsenceLastMonth }
   }
 
-  private async getOffenderActivitiesHistory(prisonerNumber: string) {
+  private async getOffenderActivitiesHistory(prisonerNumber: string, prisonApiClient: PrisonApiClient) {
     const today = format(startOfToday(), 'yyyy-MM-dd')
     // API returns results that have not ended or have an end date after the given date
-    const offenderActivitiesHistory: OffenderActivitiesHistory =
-      await this.prisonApiClient.getOffenderActivitiesHistory(prisonerNumber, today)
+    const offenderActivitiesHistory: OffenderActivitiesHistory = await prisonApiClient.getOffenderActivitiesHistory(
+      prisonerNumber,
+      today,
+    )
     const activitiesHistory: GovSummaryItem[] = []
     if (offenderActivitiesHistory !== undefined && offenderActivitiesHistory.content?.length) {
       offenderActivitiesHistory.content.forEach(content => {
@@ -109,19 +107,19 @@ export default class WorkAndSkillsPageService {
     return { activitiesHistory }
   }
 
-  private async getLearnerEmployabilitySkills(prisonerNumber: string) {
+  private async getLearnerEmployabilitySkills(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
     const learnerEmployabilitySkills: LearnerEmployabilitySkills =
-      await this.curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber)
+      await curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber)
     return learnerEmployabilitySkills
   }
 
-  private async getLearnerProfiles(prisonerNumber: string) {
-    const learnerProfiles: LearnerProfile[] = await this.curiousApiClient.getLearnerProfile(prisonerNumber)
+  private async getLearnerProfiles(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+    const learnerProfiles: LearnerProfile[] = await curiousApiClient.getLearnerProfile(prisonerNumber)
     return learnerProfiles
   }
 
-  private async getLearnerEducation(prisonerNumber: string) {
-    const learnerEducation: LearnerEducation = await this.curiousApiClient.getLearnerEducation(prisonerNumber)
+  private async getLearnerEducation(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+    const learnerEducation: LearnerEducation = await curiousApiClient.getLearnerEducation(prisonerNumber)
     const coursesAndQualifications: GovSummaryItem[] = []
     learnerEducation?.content?.forEach(content => {
       const item = {
@@ -133,9 +131,9 @@ export default class WorkAndSkillsPageService {
     return coursesAndQualifications
   }
 
-  private async getLearnerLatestAssessments(prisonerNumber: string) {
+  private async getLearnerLatestAssessments(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
     const learnerLatestAssessments: LearnerLatestAssessment[] =
-      await this.curiousApiClient.getLearnerLatestAssessments(prisonerNumber)
+      await curiousApiClient.getLearnerLatestAssessments(prisonerNumber)
 
     const multiListArray: GovSummaryGroup[][] = []
 
@@ -159,8 +157,8 @@ export default class WorkAndSkillsPageService {
     return multiListArray
   }
 
-  async getLearnerGoals(prisonerNumber: string) {
-    const learnerGoals: LearnerGoals = await this.curiousApiClient.getLearnerGoals(prisonerNumber)
+  async getLearnerGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+    const learnerGoals: LearnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
 
     let employmentGoals: GovSummaryItem[] = []
     let personalGoals: GovSummaryItem[] = []
@@ -192,9 +190,9 @@ export default class WorkAndSkillsPageService {
     return govList
   }
 
-  public async getLearnerNeurodivergence(prisonerNumber: string) {
+  public async getLearnerNeurodivergence(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
     const learnerNeurodivergence: LearnerNeurodivergence[] =
-      await this.curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
+      await curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
     return learnerNeurodivergence
   }
 }

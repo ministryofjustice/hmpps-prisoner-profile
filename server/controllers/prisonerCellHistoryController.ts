@@ -14,8 +14,6 @@ import config from '../config'
  * Parse request for alerts page and orchestrate response
  */
 export default class PrisonerCellHistoryController {
-  private prisonApiClient: PrisonApiClient
-
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   public async displayPrisonerCellHistory(req: Request, res: Response, prisonerData: Prisoner) {
@@ -67,18 +65,16 @@ export default class PrisonerCellHistoryController {
       const { bookingId, firstName, middleNames, lastName } = prisonerData
       const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-      this.prisonApiClient = this.prisonApiClientBuilder(clientToken)
+      const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
       const page = 0
-      const cells = await this.prisonApiClient.getOffenderCellHistory(bookingId, { page, size: 10000 })
+      const cells = await prisonApiClient.getOffenderCellHistory(bookingId, { page, size: 10000 })
 
       const uniqueAgencyIds = [...new Set(cells.content.filter(cell => cell.agencyId).map(cell => cell.agencyId))]
-      const prisons = await Promise.all(
-        uniqueAgencyIds.map(agencyId => this.prisonApiClient.getAgencyDetails(agencyId)),
-      )
+      const prisons = await Promise.all(uniqueAgencyIds.map(agencyId => prisonApiClient.getAgencyDetails(agencyId)))
 
       const uniqueStaffIds = [...new Set(cells.content.map(cell => cell.movementMadeBy))]
-      const staff = await Promise.all(uniqueStaffIds.map(staffId => this.prisonApiClient.getStaffDetails(staffId)))
+      const staff = await Promise.all(uniqueStaffIds.map(staffId => prisonApiClient.getStaffDetails(staffId)))
 
       const cellData = cells.content.map(cell => {
         const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
@@ -109,7 +105,7 @@ export default class PrisonerCellHistoryController {
         currentLocation.assignmentEndDateTime = formatDateTimeISO(new Date())
       }
       const occupants =
-        (currentLocation && (await this.prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
+        (currentLocation && (await prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
 
       const previousLocations = cellDataLatestFirst.slice(1)
       const prisonerProfileUrl = `/prisoner/${offenderNo}`
