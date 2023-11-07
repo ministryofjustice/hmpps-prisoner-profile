@@ -278,7 +278,7 @@ describe('OffencesPageService', () => {
         lateTransferDate: '2016-01-16',
         midTermDate: '2016-01-20',
         midTransferDate: '2016-01-19',
-        nonDtoReleaseDate: '2016-01-21',
+        // nonDtoReleaseDate: '2016-01-21',
         nonParoleDate: '2016-01-22',
         paroleEligibilityCalculatedDate: '2016-01-24',
         postRecallDate: '2016-01-26',
