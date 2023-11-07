@@ -133,6 +133,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/work-and-skills',
+    auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -144,6 +145,16 @@ export default function routes(services: Services): Router {
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        requestId: res.locals.requestId,
+        page: Page.WorkAndSkills,
+      })
 
       res.render('pages/workAndSkills', {
         ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'work-and-skills'),
@@ -158,6 +169,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/offences',
+    auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -165,6 +177,16 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(res.locals.clientToken, prisonerData)
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        requestId: res.locals.requestId,
+        page: Page.Offences,
+      })
 
       res.render('pages/offences', {
         pageTitle: 'Offences',

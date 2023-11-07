@@ -6,9 +6,11 @@ import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
 export enum Page {
+  Offences = 'OFFENCES',
   Overview = 'OVERVIEW',
-  Photo = 'PHOTO',
   Personal = 'PERSONAL',
+  Photo = 'PHOTO',
+  WorkAndSkills = 'WORK_AND_SKILLS',
 }
 
 export interface AccessAttemptAudit {
