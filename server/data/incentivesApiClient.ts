@@ -12,7 +12,7 @@ export default class IncentivesApiRestClient implements IncentivesApiClient {
 
   async getReviews(bookingId: number): Promise<IncentiveReviews> {
     return this.restClient.get<IncentiveReviews>({
-      path: `/iep/reviews/booking/${bookingId}`,
+      path: `/incentive-reviews/booking/${bookingId}`,
       ignore404: true,
     })
   }
