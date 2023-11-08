@@ -1,4 +1,3 @@
----
 # Per environment values which override defaults in hmpps-prisoner-profile/values.yaml
 
 generic-service:
@@ -14,7 +13,7 @@ generic-service:
     enabled: true
     minReplicas: 4
     maxReplicas: 8
-    targetCPUUtilizationPercentage: 95
+    targetCPUUtilizationPercentage: 1600
 
   env:
     INGRESS_URL: "https://prisoner.digital.prison.service.justice.gov.uk"
