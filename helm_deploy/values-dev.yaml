@@ -50,4 +50,4 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
 
 generic-prometheus-alerts:
-  alertSeverity: digital-prison-service-dev
+  alertSeverity: hmpps-prisoner-profile-non-prod

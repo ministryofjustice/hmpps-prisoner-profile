@@ -146,4 +146,4 @@ generic-service:
     azure-landing-zone-public-egress-2: "20.26.11.108/32"
 
 generic-prometheus-alerts:
-  alertSeverity: digital-prison-service-dev
+  alertSeverity: hmpps-prisoner-profile-non-prod
