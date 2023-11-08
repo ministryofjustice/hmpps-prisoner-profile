@@ -12,6 +12,7 @@ import {
   convertToTitleCase,
   formatCategoryCodeDescription,
   formatMoney,
+  formatName,
   formatPrivilegedVisitsSummary,
   getNamesFromString,
   nonAssociationsEnabled,
@@ -575,7 +576,7 @@ export default class OverviewPageService {
       const { firstName, lastName, offenderNo, assignedLivingUnitDescription, reasonDescription, agencyId } =
         nonAssociation.offenderNonAssociation
       return {
-        nonAssociationName: `${firstName} ${lastName}`,
+        nonAssociationName: formatName(firstName, null, lastName),
         offenderNo,
         assignedLivingUnitDescription,
         reasonDescription,
