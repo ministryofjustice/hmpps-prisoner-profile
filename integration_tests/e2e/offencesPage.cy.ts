@@ -218,7 +218,7 @@ context('Offences Page Sentenced', () => {
     it('Non-dto release date key should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
       offencesPage.nonDtoSentenceReleaseDateKey().should('exist')
-      offencesPage.nonDtoSentenceReleaseDateKey().contains('Release date for non-DTO sentence')
+      offencesPage.nonDtoSentenceReleaseDateKey().contains('Conditional release date (CRD)')
     })
     it('Non-dto release date value should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)

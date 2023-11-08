@@ -20,7 +20,7 @@ export const prisonerSentenceDetailsMock: PrisonerSentenceDetails = {
     sentenceExpiryCalculatedDate: '2132-03-12',
     licenceExpiryCalculatedDate: '2132-03-12',
     paroleEligibilityOverrideDate: '2021-12-12',
-    nonDtoReleaseDateType: 'CRD',
+    nonDtoReleaseDateType: 'CRD' as PrisonerSentenceDetails['sentenceDetail']['nonDtoReleaseDateType'],
     confirmedReleaseDate: '2076-01-29',
     releaseDate: '2076-01-29',
   },

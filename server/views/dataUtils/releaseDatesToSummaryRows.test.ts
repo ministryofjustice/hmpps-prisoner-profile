@@ -27,6 +27,10 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
     sentenceExpiryDate: '2016-02-01',
     licenceExpiryDate: '2016-02-02',
     sentenceLicenceExpiryDate: '2016-02-03',
+    automaticReleaseDateNonDto: '2016-02-04',
+    conditionalReleaseNonDto: '2016-02-05',
+    nonParoleDateNonDto: '2016-02-06',
+    postRecallDateNonDto: '2016-02-07',
   }
 
   it('should return release dates object as summary rows', () => {
@@ -49,10 +53,26 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
       },
       {
         key: {
+          text: 'Automatic release date (ARD)',
+        },
+        value: {
+          text: '4 February 2016',
+        },
+      },
+      {
+        key: {
           text: 'Conditional release date (CRD)',
         },
         value: {
           text: '4 January 2016',
+        },
+      },
+      {
+        key: {
+          text: 'Conditional release date (CRD)',
+        },
+        value: {
+          text: '5 February 2016',
         },
       },
       {
@@ -153,6 +173,14 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
       },
       {
         key: {
+          text: 'Non-parole date (NPD)',
+        },
+        value: {
+          text: '6 February 2016',
+        },
+      },
+      {
+        key: {
           text: 'Parole eligibility date (PED)',
         },
         value: {
@@ -165,6 +193,14 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
         },
         value: {
           text: '26 January 2016',
+        },
+      },
+      {
+        key: {
+          text: 'Post-recall release date (PRRD)',
+        },
+        value: {
+          text: '7 February 2016',
         },
       },
       {
