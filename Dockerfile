@@ -19,6 +19,7 @@ ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
 
 RUN apt-get update && \
         apt-get upgrade -y && \
+        apt-get install procps htop && \
         apt-get autoremove -y && \
         rm -rf /var/lib/apt/lists/*
 
@@ -29,7 +30,7 @@ ARG BUILD_NUMBER=1_0_0
 ARG GIT_REF=not-available
 
 RUN apt-get update && \
-        apt-get install -y make python g++ procps htop
+        apt-get install -y make python g++ 
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
