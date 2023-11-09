@@ -31,7 +31,7 @@ export interface PrisonerSentenceDetails {
     mtdCalculatedDate?: string
     mtdOverrideDate?: string
     midTermDate?: string
-    nonDtoReleaseDateType?: string
+    nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
     nonDtoReleaseDate?: string
     nonParoleOverrideDate?: string
     nonParoleDate?: string
