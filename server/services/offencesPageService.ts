@@ -375,6 +375,18 @@ export default class OffencesPageService {
     return {}
   }
 
+  private getNonDtoReleaseDate(
+    date: PrisonerSentenceDetails['sentenceDetail']['nonDtoReleaseDate'],
+    dateType: PrisonerSentenceDetails['sentenceDetail']['nonDtoReleaseDateType'],
+  ) {
+    if (!date || !dateType) return {}
+    if (dateType === 'ARD') return { automaticReleaseDateNonDto: date }
+    if (dateType === 'CRD') return { conditionalReleaseNonDto: date }
+    if (dateType === 'NPD') return { nonParoleDateNonDto: date }
+    if (dateType === 'PRRD') return { postRecallDateNonDto: date }
+    return {}
+  }
+
   async getReleaseDates(token: string, prisonerNumber: string): Promise<Partial<ReleaseDates>> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const releaseDates = await prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
@@ -395,7 +407,6 @@ export default class OffencesPageService {
       lateTransferDate: sentenceDetails.ltdOverrideDate || sentenceDetails.ltdCalculatedDate,
       midTermDate: sentenceDetails.midTermDate,
       midTransferDate: sentenceDetails.mtdOverrideDate || sentenceDetails.mtdCalculatedDate,
-      // nonDtoReleaseDate: sentenceDetails.nonDtoReleaseDate,
       nonParoleDate: sentenceDetails.nonParoleOverrideDate || sentenceDetails.nonParoleDate,
       paroleEligibilityCalculatedDate:
         sentenceDetails.paroleEligibilityOverrideDate || sentenceDetails.paroleEligibilityCalculatedDate,
@@ -406,6 +417,7 @@ export default class OffencesPageService {
       topupSupervisionExpiryDate:
         sentenceDetails.topupSupervisionExpiryOverrideDate || sentenceDetails.topupSupervisionExpiryDate,
       ...this.getSedLedSled(sentenceDetails),
+      ...this.getNonDtoReleaseDate(sentenceDetails.nonDtoReleaseDate, sentenceDetails.nonDtoReleaseDateType),
     }
     return Object.keys(dates).reduce<Partial<ReleaseDates>>((dateObj, dateName) => {
       if (!dates[dateName]) return dateObj

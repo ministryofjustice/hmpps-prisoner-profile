@@ -23,4 +23,8 @@ export interface ReleaseDates {
   tariffDate: string
   tariffEarlyRemovalSchemeEligibilityDate: string
   topupSupervisionExpiryDate: string
+  automaticReleaseDateNonDto?: string
+  conditionalReleaseNonDto?: string
+  nonParoleDateNonDto?: string
+  postRecallDateNonDto?: string
 }
