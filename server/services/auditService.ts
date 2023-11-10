@@ -11,6 +11,7 @@ export enum Page {
   Personal = 'PERSONAL',
   Photo = 'PHOTO',
   WorkAndSkills = 'WORK_AND_SKILLS',
+  ActivePunishments = 'ACTIVE_PUNISHMENTS',
 }
 
 export interface AccessAttemptAudit {

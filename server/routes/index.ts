@@ -206,6 +206,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
+    auditPageAccessAttempt({ services, page: Page.ActivePunishments }),
     getPrisonerData(services),
     guardMiddleware(
       GuardOperator.OR,
@@ -216,6 +217,16 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const { activePunishmentsPageService } = services
       const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        requestId: res.locals.requestId,
+        page: Page.ActivePunishments,
+      })
 
       return res.render('pages/activePunishments', {
         pageTitle: 'Active punishments',
