@@ -61,6 +61,8 @@ import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import movementsMock from '../data/localMockData/movementsData'
 import config from '../config'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -92,6 +94,10 @@ describe('OverviewPageService', () => {
     getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
   }
 
+  const prisonerProfileDeliusApiClient: PrisonerProfileDeliusApiClient = {
+    getCommunityManager: jest.fn(async () => communityManagerMock),
+  }
+
   const overviewPageServiceConstruct = jest.fn(() => {
     return new OverviewPageService(
       () => prisonApiClient,
@@ -102,6 +108,7 @@ describe('OverviewPageService', () => {
       new OffencesPageService(null),
       () => curiousApiClient,
       () => nonAssociationsApiClient,
+      () => prisonerProfileDeliusApiClient,
     )
   })
 
