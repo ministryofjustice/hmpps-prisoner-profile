@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
 import config from '../config'
