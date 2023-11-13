@@ -9,6 +9,7 @@
   ]
 %}
 {% set showSecurity  = security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0 %}
+{% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoad.caseLoadId) and learnerNeurodivergence.length %}
 
 {% block body %}
   <div class="govuk-grid-row">
@@ -22,7 +23,7 @@
         <li><a class="govuk-link govuk-link--no-visited-state" href="#personal-details">Personal details</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#identity-numbers">Identity numbers</a></li>
         <li><a class="govuk-link govuk-link--no-visited-state" href="#care-needs">Care needs</a></li>
-        {%- call conditionallyShow({condition: neurodiversityEnabled(user.activeCaseLoad.caseLoadId ), id: 'neurodiversity'}) -%}
+        {%- call conditionallyShow({condition: showNeurodiversity, id: 'neurodiversity'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
         {%- endcall -%}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance-nav'}) -%}
