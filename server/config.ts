@@ -175,10 +175,10 @@ export default {
     prisonerProfileDeliusApi: {
       url: get('PRISONER_PROFILE_DELIUS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_RESPONSE', 20000)),
-        deadline: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 20000)),
+        response: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_RESPONSE', 2000)),
+        deadline: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000)),
       },
-      agent: new AgentConfig(Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 20000))),
+      agent: new AgentConfig(Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000))),
     },
   },
   serviceUrls: {
