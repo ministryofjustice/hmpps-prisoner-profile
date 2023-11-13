@@ -16,6 +16,7 @@ import {
   formatName,
   formatPrivilegedVisitsSummary,
   getNamesFromString,
+  neurodiversityEnabled,
   nonAssociationsEnabled,
   prisonerBelongsToUsersCaseLoad,
   userHasRoles,
@@ -622,7 +623,7 @@ export default class OverviewPageService {
     }
 
     // Neurodiversity support needed
-    if (learnerNeurodivergence?.length) {
+    if (learnerNeurodivergence?.length && neurodiversityEnabled(prisonerData.prisonId)) {
       statusList.push({
         label: 'Support needed',
         subText: 'Has neurodiversity needs',
