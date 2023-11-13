@@ -25,7 +25,7 @@ export default class CommonApiRoutes {
           data.pipe(res)
         })
         .catch(_error => {
-          res.sendFile(placeHolderImage)
+          res.redirect(placeHolderImage)
         })
     }
   }
@@ -45,7 +45,7 @@ export default class CommonApiRoutes {
           data.pipe(res)
         })
         .catch(_error => {
-          res.sendFile(placeHolderImage)
+          res.redirect(placeHolderImage)
         })
     }
   }
