@@ -571,7 +571,8 @@ export const objectToSelectOptions = (array: object[], id: string, description: 
 }
 
 export const formatCommunityManager = (communityManager: CommunityManager): string => {
-  if (!communityManager) return 'Not assigned'
+  if (communityManager === null) return 'Not assigned' // Delius has returned 404 because it cannot find the prisoner
+  if (communityManager === undefined) return 'We cannot show these details right now' // Delius has returned an error, e.g. timeout
   if (communityManager.unallocated) return `${communityManager.team.description} (COM not yet allocated)`
 
   return formatName(communityManager.name.forename, null, communityManager.name.surname)

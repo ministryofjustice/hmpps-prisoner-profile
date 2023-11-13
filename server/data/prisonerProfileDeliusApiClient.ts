@@ -10,10 +10,14 @@ export default class PrisonerProfileDeliusApiRestClient implements PrisonerProfi
     this.restClient = new RestClient('Prisoner Profile Delius API', config.apis.prisonerProfileDeliusApi, token)
   }
 
-  async getCommunityManager(prisonerNumber: string): Promise<CommunityManager | null> {
-    return this.restClient.get<CommunityManager | null>({
-      path: `/probation-cases/${prisonerNumber}/community-manager`,
-      ignore404: true,
-    })
+  async getCommunityManager(prisonerNumber: string): Promise<CommunityManager | null | undefined> {
+    try {
+      return await this.restClient.get<CommunityManager | null>({
+        path: `/probation-cases/${prisonerNumber}/community-manager`,
+        ignore404: true,
+      })
+    } catch (e) {
+      return undefined
+    }
   }
 }
