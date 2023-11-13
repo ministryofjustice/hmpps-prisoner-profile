@@ -8,7 +8,7 @@ export const StaffContactsMock = {
   },
   prisonOffenderManager: 'Andy Marke',
   coworkingPrisonOffenderManager: 'Andy Hudson',
-  communityOffenderManager: 'Not assigned',
+  communityOffenderManager: 'Terry Scott',
 }
 
 export default {
