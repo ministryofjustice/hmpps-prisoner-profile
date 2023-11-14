@@ -57,7 +57,7 @@
           {% include "../partials/personalPage/careNeeds.njk" %}
         </div>
       </div>
-      {%- call conditionallyShow({condition: neurodiversityEnabled(user.activeCaseLoad.caseLoadId ), id: 'neurodiversity'}) -%}
+      {%- call conditionallyShow({condition: showNeurodiversity, id: 'neurodiversity'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% include "../partials/personalPage/neurodiversity.njk" %}
