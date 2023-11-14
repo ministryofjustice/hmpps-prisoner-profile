@@ -8,13 +8,17 @@ import { formatName, groupBy, times } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { ScheduledEvent, SelectedWeekDates } from '../interfaces/scheduledEvent'
+import { AuditService, Page } from '../services/auditService'
 
 /**
  * Parse requests for case notes routes and orchestrate response
  */
 
 export default class PrisonerScheduleController {
-  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+  constructor(
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly auditService: AuditService,
+  ) {}
 
   public async displayPrisonerSchedule(req: Request, res: Response, prisonerData: Prisoner) {
     const { firstName, middleNames, lastName } = prisonerData
@@ -117,6 +121,15 @@ export default class PrisonerScheduleController {
             morningActivities: undefined as ScheduledEvent[],
           },
     }))
+    await this.auditService.sendPageView({
+      userId: res.locals.user.username,
+      userCaseLoads: res.locals.user.caseLoads,
+      userRoles: res.locals.user.userRoles,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      requestId: res.locals.requestId,
+      page: Page.Schedule,
+    })
 
     return res.render('pages/prisonerSchedule', {
       pageTitle: 'Schedule',

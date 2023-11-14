@@ -49,8 +49,14 @@ export default function routes(services: Services): Router {
     services.auditService,
   )
 
-  const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
-  const prisonerCellHistoryController = new PrisonerCellHistoryController(services.dataAccess.prisonApiClientBuilder)
+  const prisonerScheduleController = new PrisonerScheduleController(
+    services.dataAccess.prisonApiClientBuilder,
+    services.auditService,
+  )
+  const prisonerCellHistoryController = new PrisonerCellHistoryController(
+    services.dataAccess.prisonApiClientBuilder,
+    services.auditService,
+  )
 
   get(
     '/api/prisoner/:prisonerNumber/image',
@@ -239,6 +245,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/schedule',
+    auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -253,6 +260,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/x-ray-body-scans',
+    auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -260,6 +268,16 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
       const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        requestId: res.locals.requestId,
+        page: Page.XRayBodyScans,
+      })
 
       res.render('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
@@ -274,6 +292,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/location-details',
+    auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {

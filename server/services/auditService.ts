@@ -6,12 +6,19 @@ import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
 export enum Page {
+  ActivePunishments = 'ACTIVE_PUNISHMENTS',
+  PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
   Offences = 'OFFENCES',
   Overview = 'OVERVIEW',
   Personal = 'PERSONAL',
   Photo = 'PHOTO',
+  Schedule = 'SCHEDULE',
   WorkAndSkills = 'WORK_AND_SKILLS',
-  ActivePunishments = 'ACTIVE_PUNISHMENTS',
+  XRayBodyScans = 'XRAY_BODY_SCANS',
+  MoneySpends = 'MONEY_SPENDS',
+  MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
+  MoneySavings = 'MONEY_SAVINGS',
+  MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
 }
 
 export interface AccessAttemptAudit {
