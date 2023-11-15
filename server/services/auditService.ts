@@ -19,6 +19,18 @@ export enum Page {
   MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
   MoneySavings = 'MONEY_SAVINGS',
   MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
+  CaseNotes = 'CASE_NOTES',
+  AddCaseNote = 'ADD_CASE_NOTE',
+  PostAddCaseNote = 'POST_ADD_CASE_NOTE',
+}
+
+// eslint-disable-next-line no-shadow
+export enum PostAction {}
+
+// eslint-disable-next-line no-shadow
+export enum SearchPage {
+  CaseNotes = 'SEARCH_CASE_NOTES',
+  Alerts = 'SEARCH_ALERTS',
 }
 
 export interface AccessAttemptAudit {
@@ -26,7 +38,7 @@ export interface AccessAttemptAudit {
   userRoles: string
   prisonerNumber: string
   page: Page
-  requestId: string
+  correlationId: string
 }
 
 export interface PageViewAudit {
@@ -36,23 +48,35 @@ export interface PageViewAudit {
   prisonerNumber: string
   prisonId: string
   page: Page
-  requestId: string
+  correlationId: string
 }
 
 interface AddAppointmentAudit {
   userId: string
   prisonerNumber: string
-  requestId: string
+  correlationId: string
   details: object
 }
 
-type SearchActions = 'SEARCH_CASE_NOTES' | 'SEARCH_ALERTS'
-
 interface SearchAudit {
   userId: string
+  userCaseLoads: CaseLoad[]
+  userRoles: string[]
   prisonerNumber: string
-  requestId: string
-  searchAction: SearchActions
+  prisonId: string
+  correlationId: string
+  searchPage: SearchPage
+  details: object
+}
+
+interface PostAudit {
+  userId: string
+  userCaseLoads: CaseLoad[]
+  userRoles: string[]
+  prisonerNumber: string
+  prisonId: string
+  correlationId: string
+  action: PostAction
   details: object
 }
 
@@ -86,7 +110,7 @@ export const auditService = ({
     }
   }
 
-  const sendAccessAttempt = async ({ userId, userRoles, prisonerNumber, page, requestId }: AccessAttemptAudit) => {
+  const sendAccessAttempt = async ({ userId, userRoles, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
     const message = JSON.stringify({
       action: `ACCESS_ATTEMPT_${page.toString()}`,
       when: new Date(),
@@ -94,7 +118,7 @@ export const auditService = ({
       subjectId: prisonerNumber,
       subjectType: 'PRISONER_ID',
       service: serviceName,
-      requestId, // To be renamed when documentation is updated
+      correlationId,
       details: { build, userRoles },
     })
 
@@ -108,7 +132,7 @@ export const auditService = ({
     prisonerNumber,
     prisonId,
     page,
-    requestId,
+    correlationId: requestId,
   }: PageViewAudit) => {
     const details = {
       globalView: !prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads),
@@ -145,9 +169,9 @@ export const auditService = ({
     await sendMessage(message)
   }
 
-  const sendSearch = async ({ userId, prisonerNumber, searchAction, details }: SearchAudit) => {
+  const sendSearch = async ({ userId, prisonerNumber, searchPage, details }: SearchAudit) => {
     const message = JSON.stringify({
-      action: searchAction,
+      action: `SEARCH_${searchPage}`,
       when: new Date(),
       who: userId,
       subjectId: prisonerNumber,

@@ -20,7 +20,7 @@ export default function auditPageAccessAttempt({
       userRoles,
       prisonerNumber,
       page: pageViewAction,
-      requestId,
+      correlationId: requestId,
     })
 
     next()

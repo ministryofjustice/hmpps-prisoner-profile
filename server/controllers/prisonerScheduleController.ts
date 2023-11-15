@@ -127,7 +127,7 @@ export default class PrisonerScheduleController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber: prisonerData.prisonerNumber,
       prisonId: prisonerData.prisonId,
-      requestId: res.locals.requestId,
+      correlationId: res.locals.requestId,
       page: Page.Schedule,
     })
 

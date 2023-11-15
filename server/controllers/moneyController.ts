@@ -65,7 +65,7 @@ export default class MoneyController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber,
       prisonId,
-      requestId: res.locals.requestId,
+      correlationId: res.locals.requestId,
       page: Page.MoneyDamageObligations,
     })
 
@@ -206,7 +206,7 @@ export default class MoneyController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber,
       prisonId,
-      requestId: res.locals.requestId,
+      correlationId: res.locals.requestId,
       page: auditPage,
     })
 

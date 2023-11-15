@@ -96,7 +96,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        requestId: res.locals.requestId,
+        correlationId: res.locals.requestId,
         page: Page.Photo,
       })
 
@@ -125,7 +125,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        requestId: res.locals.requestId,
+        correlationId: res.locals.requestId,
         page: Page.Personal,
       })
 
@@ -158,7 +158,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        requestId: res.locals.requestId,
+        correlationId: res.locals.requestId,
         page: Page.WorkAndSkills,
       })
 
@@ -190,7 +190,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        requestId: res.locals.requestId,
+        correlationId: res.locals.requestId,
         page: Page.Offences,
       })
 
@@ -230,7 +230,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        requestId: res.locals.requestId,
+        correlationId: res.locals.requestId,
         page: Page.ActivePunishments,
       })
 
@@ -275,7 +275,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        requestId: res.locals.requestId,
+        correlationId: res.locals.requestId,
         page: Page.XRayBodyScans,
       })
 
