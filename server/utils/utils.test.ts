@@ -5,6 +5,7 @@ import {
   convertToTitleCase,
   findError,
   formatCategoryCodeDescription,
+  formatCommunityManager,
   formatLocation,
   formatMoney,
   formatName,
@@ -42,6 +43,7 @@ import {
   xrayCareNeedsMock,
 } from '../data/localMockData/personalCareNeedsMock'
 import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
+import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 
 describe('convert to title case', () => {
   it.each([
@@ -556,5 +558,20 @@ describe('objectToSelectOptions', () => {
       { value: 'id1', text: 'desc1' },
       { value: 'id2', text: 'desc2' },
     ])
+  })
+})
+
+describe('format community manager', () => {
+  it.each([
+    ['Staff recorded', { name: { forename: 'JOHN', surname: 'SMITH' } } as CommunityManager, 'John Smith'],
+    [
+      'Staff unallocated',
+      { team: { description: 'Probation Team' }, unallocated: true },
+      'Probation Team (COM not yet allocated)',
+    ],
+    ['404', null, 'Not assigned'],
+    ['Error', undefined, 'We cannot show these details right now'],
+  ])('%s: formatCommunityManager(%s, %s, %s)', (_: string, communityManager: CommunityManager, expected: string) => {
+    expect(formatCommunityManager(communityManager)).toEqual(expected)
   })
 })

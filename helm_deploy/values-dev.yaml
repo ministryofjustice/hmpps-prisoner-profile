@@ -48,6 +48,7 @@ generic-service:
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
     COMPONENT_API_LATEST: "true"
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
+    PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk"
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod

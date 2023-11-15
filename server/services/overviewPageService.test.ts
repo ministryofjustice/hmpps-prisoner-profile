@@ -40,7 +40,7 @@ import { StaffContactsMock } from '../data/localMockData/staffContacts'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { formatDate } from '../utils/dateHelpers'
-import { convertToTitleCase } from '../utils/utils'
+import { convertToTitleCase, neurodiversityEnabled } from '../utils/utils'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
@@ -61,6 +61,14 @@ import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import movementsMock from '../data/localMockData/movementsData'
 import config from '../config'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import { communityManagerMock } from '../data/localMockData/communityManagerMock'
+
+jest.mock('../utils/utils', () => {
+  const original = jest.requireActual('../utils/utils')
+  return { ...original, neurodiversityEnabled: jest.fn() }
+})
+const mockedNeurodiversityEnabled = neurodiversityEnabled as jest.Mock
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -92,6 +100,10 @@ describe('OverviewPageService', () => {
     getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
   }
 
+  const prisonerProfileDeliusApiClient: PrisonerProfileDeliusApiClient = {
+    getCommunityManager: jest.fn(async () => communityManagerMock),
+  }
+
   const overviewPageServiceConstruct = jest.fn(() => {
     return new OverviewPageService(
       () => prisonApiClient,
@@ -102,6 +114,7 @@ describe('OverviewPageService', () => {
       new OffencesPageService(null),
       () => curiousApiClient,
       () => nonAssociationsApiClient,
+      () => prisonerProfileDeliusApiClient,
     )
   })
 
@@ -127,6 +140,10 @@ describe('OverviewPageService', () => {
     adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
 
     nonAssociationsApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   describe('Prison name', () => {
@@ -610,9 +627,10 @@ describe('OverviewPageService', () => {
         },
       )
 
-      it('should have neurodiversity support status if returned from API', async () => {
+      it('should have neurodiversity support status if returned from API and it is enabled', async () => {
         const prisonerNumber = 'A1234BC'
         const bookingId = 123456
+        mockedNeurodiversityEnabled.mockImplementation(() => true)
 
         const overviewPageService = overviewPageServiceConstruct()
         const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
@@ -624,10 +642,26 @@ describe('OverviewPageService', () => {
         ).toBeTruthy()
       })
 
-      it('should not have neurodiversity support status if not returned from API', async () => {
+      it('should not have neurodiversity support status if returned from API and it is not enabled', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+        mockedNeurodiversityEnabled.mockImplementation(() => false)
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
+
+        expect(
+          res.statuses.some(
+            status => status.label === 'Support needed' && status.subText === 'Has neurodiversity needs',
+          ),
+        ).toBeFalsy()
+      })
+
+      it('should not have neurodiversity support status if not returned from API and it is enabled', async () => {
         const prisonerNumber = 'A1234BC'
         const bookingId = 123456
         curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => null)
+        mockedNeurodiversityEnabled.mockImplementation(() => true)
 
         const overviewPageService = overviewPageServiceConstruct()
         const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)

@@ -1,9 +1,8 @@
-import path from 'path'
 import { Request, RequestHandler, Response } from 'express'
 import OffenderService from '../../services/offenderService'
 
-const placeHolderImage = path.join(process.cwd(), '/assets/images/prisoner-profile-image.png')
-const categoryAImage = path.join(process.cwd(), '/assets/images/category-a-prisoner-image.png')
+const placeHolderImage = '/assets/images/prisoner-profile-image.png'
+const categoryAImage = '/assets/images/category-a-prisoner-image.png'
 
 export default class CommonApiRoutes {
   public constructor(private readonly offenderService: OffenderService) {}
@@ -13,9 +12,9 @@ export default class CommonApiRoutes {
     const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
 
     if (prisonerNumber === 'placeholder') {
-      res.sendFile(placeHolderImage)
+      res.redirect(placeHolderImage)
     } else if (prisonerNumber === 'photoWithheld') {
-      res.sendFile(categoryAImage)
+      res.redirect(categoryAImage)
     } else {
       this.offenderService
         .getPrisonerImage(res.locals.user.token, prisonerNumber, fullSizeImage)
@@ -26,7 +25,7 @@ export default class CommonApiRoutes {
           data.pipe(res)
         })
         .catch(_error => {
-          res.sendFile(placeHolderImage)
+          res.redirect(placeHolderImage)
         })
     }
   }
@@ -46,7 +45,7 @@ export default class CommonApiRoutes {
           data.pipe(res)
         })
         .catch(_error => {
-          res.sendFile(placeHolderImage)
+          res.redirect(placeHolderImage)
         })
     }
   }

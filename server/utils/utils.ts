@@ -12,6 +12,7 @@ import config from '../config'
 import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
+import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -567,4 +568,12 @@ export const objectToSelectOptions = (array: object[], id: string, description: 
     text: obj[description],
     value: obj[id],
   }))
+}
+
+export const formatCommunityManager = (communityManager: CommunityManager): string => {
+  if (communityManager === null) return 'Not assigned' // Delius has returned 404 because it cannot find the prisoner
+  if (communityManager === undefined) return 'We cannot show these details right now' // Delius has returned an error, e.g. timeout
+  if (communityManager.unallocated) return `${communityManager.team.description} (COM not yet allocated)`
+
+  return formatName(communityManager.name.forename, null, communityManager.name.surname)
 }

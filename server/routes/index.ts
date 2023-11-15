@@ -38,15 +38,6 @@ export default function routes(services: Services): Router {
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const { commonApiRoutes } = services
-
-  const commonRoutes = () => {
-    get('/api/prisoner/:prisonerNumber/image', commonApiRoutes.prisonerImage)
-    get('/api/image/:imageId', commonApiRoutes.image)
-  }
-
-  commonRoutes()
-
   const overviewController = new OverviewController(
     services.prisonerSearchService,
     services.overviewPageService,
@@ -56,6 +47,15 @@ export default function routes(services: Services): Router {
 
   const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
   const prisonerCellHistoryController = new PrisonerCellHistoryController(services.dataAccess.prisonApiClientBuilder)
+
+  get(
+    '/api/prisoner/:prisonerNumber/image',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    services.commonApiRoutes.prisonerImage,
+  )
+
+  get('/api/image/:imageId', services.commonApiRoutes.image)
 
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 

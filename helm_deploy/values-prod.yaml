@@ -50,6 +50,7 @@ generic-service:
     COMPONENT_API_URL: "https://frontend-components.hmpps.service.justice.gov.uk"
     COMPONENT_API_LATEST: "false"
     PROFILE_ADD_APPOINTMENT_ENABLED: "false"
+    PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius.hmpps.service.justice.gov.uk"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
