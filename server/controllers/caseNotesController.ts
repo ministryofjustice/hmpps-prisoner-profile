@@ -15,7 +15,7 @@ import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-import { AuditService, Page, SearchPage } from '../services/auditService'
+import { AuditService, Page, PostAction, SearchPage } from '../services/auditService'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -211,6 +211,14 @@ export default class CaseNotesController {
       }
 
       req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
+      this.auditService.sendPostSuccess({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        prisonerNumber,
+        correlationId: res.locals.requestId,
+        action: PostAction.CaseNote,
+        details: {},
+      })
       return res.redirect(refererUrl || `/prisoner/${prisonerNumber}/case-notes`)
     }
   }

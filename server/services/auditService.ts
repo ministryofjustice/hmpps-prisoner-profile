@@ -25,7 +25,10 @@ export enum Page {
 }
 
 // eslint-disable-next-line no-shadow
-export enum PostAction {}
+export enum PostAction {
+  CaseNote = 'CASE_NOTE',
+  Appointment = 'APPOINTMENT',
+}
 
 // eslint-disable-next-line no-shadow
 export enum SearchPage {
@@ -72,9 +75,7 @@ interface SearchAudit {
 interface PostAudit {
   userId: string
   userCaseLoads: CaseLoad[]
-  userRoles: string[]
   prisonerNumber: string
-  prisonId: string
   correlationId: string
   action: PostAction
   details: object
@@ -85,6 +86,8 @@ export interface AuditService {
   sendPageView: (object: PageViewAudit) => Promise<void>
   sendAddAppointment: (object: AddAppointmentAudit) => Promise<void>
   sendSearch: (object: SearchAudit) => Promise<void>
+  sendPostAttempt: (object: PostAudit) => Promise<void>
+  sendPostSuccess: (object: PostAudit) => Promise<void>
 }
 
 /*
@@ -125,6 +128,36 @@ export const auditService = ({
     await sendMessage(message)
   }
 
+  const sendPostAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
+    const message = JSON.stringify({
+      action: `POST_${action.toString()}`,
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: 'PRISONER_ID',
+      service: serviceName,
+      correlationId,
+      details: { build, ...details },
+    })
+
+    await sendMessage(message)
+  }
+
+  const sendPostSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
+    const message = JSON.stringify({
+      action: `POST_SUCCESS_${action.toString()}`,
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: 'PRISONER_ID',
+      service: serviceName,
+      correlationId,
+      details: { build, ...details },
+    })
+
+    await sendMessage(message)
+  }
+
   const sendPageView = async ({
     userId,
     userCaseLoads,
@@ -132,7 +165,7 @@ export const auditService = ({
     prisonerNumber,
     prisonId,
     page,
-    correlationId: requestId,
+    correlationId,
   }: PageViewAudit) => {
     const details = {
       globalView: !prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads),
@@ -148,7 +181,7 @@ export const auditService = ({
       subjectId: prisonerNumber,
       subjectType: 'PRISONER_ID',
       service: serviceName,
-      requestId, // To be renamed when documentation is updated
+      correlationId, // To be renamed when documentation is updated
       details,
     })
 
@@ -188,5 +221,7 @@ export const auditService = ({
     sendPageView,
     sendAddAppointment,
     sendSearch,
+    sendPostAttempt,
+    sendPostSuccess,
   }
 }
