@@ -430,24 +430,67 @@ export default class OverviewPageService {
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
 
-    const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+    let incentiveSummaryData: MiniSummaryData
 
-    const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
-      prisonApiClient.getCaseNoteCount(
-        bookingId,
-        CaseNoteType.PositiveBehaviour,
-        CaseNoteSubType.IncentiveEncouragement,
-        incentiveReviews?.iepDate,
-        formatDateISO(new Date()),
-      ),
-      prisonApiClient.getCaseNoteCount(
-        bookingId,
-        CaseNoteType.NegativeBehaviour,
-        CaseNoteSubType.IncentiveWarning,
-        incentiveReviews?.iepDate,
-        formatDateISO(new Date()),
-      ),
-    ])
+    try {
+      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+
+      if (incentiveReviews === null) {
+        // Fallback if incentives API returns 404
+        incentiveSummaryData = {
+          bottomLabel: 'Incentives: since last review',
+          bottomContentLine1: `${formatName(
+            prisonerData.firstName,
+            null,
+            prisonerData.lastName,
+          )} has no incentive level history`,
+          bottomClass: 'small',
+          linkLabel: 'Incentive level details',
+          linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+        }
+      }
+
+      if (incentiveReviews) {
+        const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
+          prisonApiClient.getCaseNoteCount(
+            bookingId,
+            CaseNoteType.PositiveBehaviour,
+            CaseNoteSubType.IncentiveEncouragement,
+            incentiveReviews?.iepDate,
+            formatDateISO(new Date()),
+          ),
+          prisonApiClient.getCaseNoteCount(
+            bookingId,
+            CaseNoteType.NegativeBehaviour,
+            CaseNoteSubType.IncentiveWarning,
+            incentiveReviews?.iepDate,
+            formatDateISO(new Date()),
+          ),
+        ])
+
+        incentiveSummaryData = {
+          bottomLabel: 'Incentives: since last review',
+          bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
+          bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
+          bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
+          bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
+            ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
+            : undefined,
+          bottomClass: 'small',
+          linkLabel: 'Incentive level details',
+          linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+        }
+      }
+    } catch (e) {
+      // Fallback if incentives API returns an error
+      incentiveSummaryData = {
+        bottomLabel: 'Incentives: since last review',
+        bottomContentLine1: 'We cannot show these details right now',
+        bottomClass: 'small',
+        linkLabel: 'Incentive level details',
+        linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+      }
+    }
 
     const category: Assessment =
       prisonerData.assessments?.find(
@@ -482,19 +525,6 @@ export default class OverviewPageService {
         ? 'Manage category'
         : 'View category'
       categorySummaryData.linkHref = `${config.serviceUrls.offenderCategorisation}/${bookingId}`
-    }
-
-    const incentiveSummaryData: MiniSummaryData = {
-      bottomLabel: 'Incentives: since last review',
-      bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
-      bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
-      bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
-      bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
-        ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
-        : undefined,
-      bottomClass: 'small',
-      linkLabel: 'Incentive level details',
-      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
     }
 
     const csraSummaryData: MiniSummaryData = {
