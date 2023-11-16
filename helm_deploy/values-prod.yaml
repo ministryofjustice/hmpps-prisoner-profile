@@ -5,6 +5,9 @@ generic-service:
     host: prisoner.digital.prison.service.justice.gov.uk
     modsecurity_enabled: true
     modsecurity_github_team: "connect-dps"
+    modsecurity_snippet: |
+      SecRuleEngine On
+      SecRuleRemoveById 949110
 
   autoscaling:
     enabled: true
