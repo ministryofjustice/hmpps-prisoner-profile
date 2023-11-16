@@ -12,6 +12,8 @@ import {
   categorySummaryDataMock,
   csraSummaryDataMock,
   incentiveSummaryDataMock,
+  incentiveSummaryErrorMock,
+  incentiveSummaryNoDataMock,
   miniSummaryGroupBMock,
   moneySummaryDataMock,
   visitBalancesMock,
@@ -85,6 +87,16 @@ describe('OverviewPageService', () => {
     getReviews: jest.fn(async () => incentiveReviewsMock),
   }
 
+  const incentivesApiClientReturnsNull: IncentivesApiClient = {
+    getReviews: jest.fn(async () => null),
+  }
+
+  const incentivesApiClientThrowsError: IncentivesApiClient = {
+    getReviews: jest.fn(async () => {
+      throw new Error()
+    }),
+  }
+
   const curiousApiClient: CuriousApiClient = {
     getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
     getLearnerProfile: jest.fn(async () => LearnerProfiles),
@@ -104,12 +116,21 @@ describe('OverviewPageService', () => {
     getCommunityManager: jest.fn(async () => communityManagerMock),
   }
 
-  const overviewPageServiceConstruct = jest.fn(() => {
+  const overviewPageServiceConstruct = jest.fn(({ useNull = false, useError = false } = {}) => {
+    let incentivesApi: IncentivesApiClient
+    if (useNull) {
+      incentivesApi = incentivesApiClientReturnsNull
+    } else if (useError) {
+      incentivesApi = incentivesApiClientThrowsError
+    } else {
+      incentivesApi = incentivesApiClient
+    }
+
     return new OverviewPageService(
       () => prisonApiClient,
       () => allocationManagerApiClient,
       () => keyWorkerApiClient,
-      () => incentivesApiClient,
+      () => incentivesApi,
       () => adjudicationsApiClient,
       new OffencesPageService(null),
       () => curiousApiClient,
@@ -342,6 +363,63 @@ describe('OverviewPageService', () => {
         ]),
       )
     })
+
+    it('should use no incentives text', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct({ useNull: true })
+      const res = await overviewPageService.get(
+        'token',
+        {
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: 'MDI',
+          csra: 'Standard',
+          assessments: assessmentsMock,
+        } as Prisoner,
+        1,
+        CaseLoadsDummyDataA,
+      )
+
+      expect(res.miniSummaryGroupB).toEqual(
+        expect.arrayContaining([
+          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(incentiveSummaryNoDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
+    })
+
+    it('should use incentives API error text', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct({ useError: true })
+      const res = await overviewPageService.get(
+        'token',
+        {
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: 'MDI',
+          csra: 'Standard',
+          assessments: assessmentsMock,
+        } as Prisoner,
+        1,
+        CaseLoadsDummyDataA,
+      )
+
+      expect(res.miniSummaryGroupB).toEqual(
+        expect.arrayContaining([
+          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(incentiveSummaryErrorMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
+    })
+
     describe('When the prisoner is not part of the users case loads', () => {
       it('should not return the incentives data', async () => {
         const prisonerNumber = 'A1234BC'
