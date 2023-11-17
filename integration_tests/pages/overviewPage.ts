@@ -162,5 +162,7 @@ export default class OverviewPage extends Page {
     alertCount: (): PageElement => this.alertsSummary().panel().get('[data-qa=overview-active-alerts]'),
     nonAssociationCount: (): PageElement =>
       this.alertsSummary().panel().get('[data-qa=overview-non-association-count]'),
+    nonAssociationsLink: (): PageElement =>
+      this.alertsSummary().panel().get('[data-qa=overview-non-associations-link] a'),
   })
 }

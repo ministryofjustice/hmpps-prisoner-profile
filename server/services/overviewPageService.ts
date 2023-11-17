@@ -17,7 +17,6 @@ import {
   formatPrivilegedVisitsSummary,
   getNamesFromString,
   neurodiversityEnabled,
-  nonAssociationsEnabled,
   prisonerBelongsToUsersCaseLoad,
   userHasRoles,
 } from '../utils/utils'
@@ -162,7 +161,7 @@ export default class OverviewPageService {
       offencesOverview,
       prisonName: prisonerData.prisonName,
       staffRoles: staffRoles.map(role => role.role),
-      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations, userCaseLoads),
+      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations),
     }
   }
 
@@ -557,14 +556,11 @@ export default class OverviewPageService {
   private getAlertsSummary(
     { activeAlertCount, offenderNo }: InmateDetail,
     nonAssociations: OverviewNonAssociation[],
-    userCaseloads: CaseLoad[],
   ): AlertsSummary {
-    const activeCaseload = userCaseloads.find(caseload => caseload.currentlyActive)
     const nonAssociationsCount = nonAssociations.length
-    const showNonAssociationsLink = nonAssociationsEnabled(activeCaseload?.caseLoadId)
     const nonAssociationsUrl = `${config.serviceUrls.nonAssociations}/prisoner/${offenderNo}/non-associations`
 
-    return { activeAlertCount, nonAssociationsCount, showNonAssociationsLink, nonAssociationsUrl }
+    return { activeAlertCount, nonAssociationsCount, nonAssociationsUrl }
   }
 
   private async getSchedule(prisonerData: Prisoner, prisonApiClient: PrisonApiClient): Promise<OverviewSchedule> {
