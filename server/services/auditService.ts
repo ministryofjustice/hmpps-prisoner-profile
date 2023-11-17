@@ -6,6 +6,8 @@ import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
 export enum Page {
+  CsraHistory = 'CSRA_HISTORY',
+  CsraReview = 'CSRA_REVIEW',
   ActiveAlerts = 'ACTIVE_ALERTS',
   ActivePunishments = 'ACTIVE_PUNISHMENTS',
   AddAlert = 'ADD_ALERT',
