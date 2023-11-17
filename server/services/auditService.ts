@@ -6,34 +6,40 @@ import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
 export enum Page {
+  ActiveAlerts = 'ACTIVE_ALERTS',
   ActivePunishments = 'ACTIVE_PUNISHMENTS',
-  PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
+  AddAlert = 'ADD_ALERT',
+  AddCaseNote = 'ADD_CASE_NOTE',
+  Alerts = 'ALERTS',
+  CaseNotes = 'CASE_NOTES',
+  InactiveAlerts = 'INACTIVE_ALERTS',
+  MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
+  MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
+  MoneySavings = 'MONEY_SAVINGS',
+  MoneySpends = 'MONEY_SPENDS',
   Offences = 'OFFENCES',
   Overview = 'OVERVIEW',
   Personal = 'PERSONAL',
   Photo = 'PHOTO',
+  PostAddAlert = 'POST_ADD_ALERT',
+  PostAddCaseNote = 'POST_ADD_CASE_NOTE',
+  PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
   Schedule = 'SCHEDULE',
   WorkAndSkills = 'WORK_AND_SKILLS',
   XRayBodyScans = 'XRAY_BODY_SCANS',
-  MoneySpends = 'MONEY_SPENDS',
-  MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
-  MoneySavings = 'MONEY_SAVINGS',
-  MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
-  CaseNotes = 'CASE_NOTES',
-  AddCaseNote = 'ADD_CASE_NOTE',
-  PostAddCaseNote = 'POST_ADD_CASE_NOTE',
 }
 
 // eslint-disable-next-line no-shadow
 export enum PostAction {
-  CaseNote = 'CASE_NOTE',
+  Alert = 'ALERT',
   Appointment = 'APPOINTMENT',
+  CaseNote = 'CASE_NOTE',
 }
 
 // eslint-disable-next-line no-shadow
 export enum SearchPage {
-  CaseNotes = 'SEARCH_CASE_NOTES',
   Alerts = 'SEARCH_ALERTS',
+  CaseNotes = 'SEARCH_CASE_NOTES',
 }
 
 export interface AccessAttemptAudit {
