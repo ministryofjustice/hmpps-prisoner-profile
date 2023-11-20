@@ -293,9 +293,9 @@ Datepicker.prototype.updateCalendar = function () {
   const day = this.currentDate
 
   const firstOfMonth = new Date(day.getFullYear(), day.getMonth(), 1)
-  const dayOfWeek = firstOfMonth.getDay()
+  const dayOfWeek = firstOfMonth.getDay() === 0 ? 6 : firstOfMonth.getDay() - 1 // Change logic to make Monday first day of week, i.e. 0
 
-  firstOfMonth.setDate(firstOfMonth.getDate() - dayOfWeek + 1)
+  firstOfMonth.setDate(firstOfMonth.getDate() - dayOfWeek)
 
   const thisDay = new Date(firstOfMonth)
 
