@@ -101,7 +101,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.Photo,
       })
 
@@ -130,7 +130,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.Personal,
       })
 
@@ -163,7 +163,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.WorkAndSkills,
       })
 
@@ -195,7 +195,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.Offences,
       })
 
@@ -235,7 +235,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.ActivePunishments,
       })
 
@@ -280,7 +280,7 @@ export default function routes(services: Services): Router {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.XRayBodyScans,
       })
 

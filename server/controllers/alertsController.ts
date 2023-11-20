@@ -58,7 +58,7 @@ export default class AlertsController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber: prisonerData.prisonerNumber,
       prisonId: prisonerData.prisonId,
-      correlationId: res.locals.requestId,
+      correlationId: req.id,
       searchPage: SearchAction.Alerts,
       details: { queryParams },
     })
@@ -108,7 +108,7 @@ export default class AlertsController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber,
       prisonId,
-      correlationId: res.locals.requestId,
+      correlationId: req.id,
       page: Page.AddAlert,
     })
 
@@ -158,7 +158,7 @@ export default class AlertsController {
         userId: res.locals.user.username,
         userCaseLoads: res.locals.user.caseLoads,
         prisonerNumber,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         action: PostAction.Alert,
         details: {},
       })

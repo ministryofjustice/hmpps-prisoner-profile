@@ -21,7 +21,6 @@ import populateClientToken from './middleware/populateClientToken'
 import setUpPageNotFound from './middleware/setUpPageNotFound'
 import flashMessageMiddleware from './middleware/flashMessageMiddleware'
 import setUpEnvironmentName from './middleware/setUpEnvironmentName'
-import addRequestId from './middleware/addRequestId'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -31,7 +30,6 @@ export default function createApp(services: Services): express.Application {
   app.set('port', process.env.PORT || 3000)
 
   app.use(metricsMiddleware)
-  app.use(addRequestId())
   app.use(setUpHealthChecks())
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())

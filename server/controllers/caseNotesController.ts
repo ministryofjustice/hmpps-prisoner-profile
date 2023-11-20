@@ -90,7 +90,7 @@ export default class CaseNotesController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         searchPage: SearchAction.CaseNotes,
         details: { queryParams },
       })
@@ -155,7 +155,7 @@ export default class CaseNotesController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber,
         prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.AddCaseNote,
       })
 
@@ -215,7 +215,7 @@ export default class CaseNotesController {
         userId: res.locals.user.username,
         userCaseLoads: res.locals.user.caseLoads,
         prisonerNumber,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         action: PostAction.CaseNote,
         details: {},
       })

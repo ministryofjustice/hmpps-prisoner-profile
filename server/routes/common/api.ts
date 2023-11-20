@@ -18,7 +18,7 @@ export default class CommonApiRoutes {
     this.auditService.sendEvent({
       who: res.locals.user.username,
       subjectId: prisonerNumber,
-      correlationId: res.locals.requestId,
+      correlationId: req.id,
       action: `API_${ApiAction.PrisonerImage}`,
       subjectType: SubjectType.PrisonerId,
     })
@@ -48,7 +48,7 @@ export default class CommonApiRoutes {
     this.auditService.sendEvent({
       who: res.locals.user.username,
       subjectId: imageId,
-      correlationId: res.locals.requestId,
+      correlationId: req.id,
       action: `API_${ApiAction.Image}`,
     })
 

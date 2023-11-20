@@ -68,7 +68,7 @@ export default class AppointmentController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber,
         prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.AddAppointment,
       })
 
@@ -174,7 +174,7 @@ export default class AppointmentController {
         userId: res.locals.user.username,
         userCaseLoads: res.locals.user.caseLoads,
         prisonerNumber,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         action: PostAction.Appointment,
         details: {},
       })
@@ -253,7 +253,7 @@ export default class AppointmentController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber,
         prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.AppointmentConfirmation,
       })
 
@@ -318,7 +318,7 @@ export default class AppointmentController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber,
         prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.PrePostAppointments,
       })
 
@@ -424,7 +424,7 @@ export default class AppointmentController {
         userId: res.locals.user.username,
         userCaseLoads: res.locals.user.caseLoads,
         prisonerNumber,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         action: PostAction.Appointment,
         details: {},
       })
@@ -512,7 +512,7 @@ export default class AppointmentController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber,
         prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.PrePostAppointmentConfirmation,
       })
 
@@ -543,7 +543,7 @@ export default class AppointmentController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber,
         prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.PrePostAppointmentConfirmation,
       })
 
@@ -573,7 +573,7 @@ export default class AppointmentController {
       this.auditService.sendEvent({
         who: res.locals.user.username,
         subjectId: prisonerNumber,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         action: `API_${ApiAction.OffenderEvents}`,
         subjectType: SubjectType.PrisonerId,
       })
@@ -605,7 +605,7 @@ export default class AppointmentController {
       this.auditService.sendEvent({
         who: res.locals.user.username,
         subjectId: activeCaseLoadId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         action: `API_${ApiAction.LocationEvents}`,
         details: { locationId },
       })

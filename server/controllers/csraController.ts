@@ -45,7 +45,7 @@ export default class CsraController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber,
       prisonId,
-      correlationId: res.locals.requestId,
+      correlationId: req.id,
       page: Page.CsraHistory,
     })
 
@@ -75,7 +75,7 @@ export default class CsraController {
       userRoles: res.locals.user.userRoles,
       prisonerNumber: prisonerData.prisonerNumber,
       prisonId: prisonerData.prisonId,
-      correlationId: res.locals.requestId,
+      correlationId: req.id,
       page: Page.CsraReview,
     })
 

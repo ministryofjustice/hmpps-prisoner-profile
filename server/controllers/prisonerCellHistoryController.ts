@@ -125,7 +125,7 @@ export default class PrisonerCellHistoryController {
         userRoles: res.locals.user.userRoles,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
-        correlationId: res.locals.requestId,
+        correlationId: req.id,
         page: Page.PrisonerCellHistory,
       })
 
