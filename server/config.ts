@@ -172,6 +172,14 @@ export default {
       agent: new AgentConfig(Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000))),
       latest: get('COMPONENT_API_LATEST', 'false') === 'true',
     },
+    prisonerProfileDeliusApi: {
+      url: get('PRISONER_PROFILE_DELIUS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_RESPONSE', 2000)),
+        deadline: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000)),
+      },
+      agent: new AgentConfig(Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -195,7 +203,6 @@ export default {
   feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
-  nonAssociationsPrisons: process.env.NON_ASSOCIATIONS_PRISONS?.split(',') || [],
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
   useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),

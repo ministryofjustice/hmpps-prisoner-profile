@@ -8,6 +8,9 @@ generic-service:
     host: prisoner-dev.digital.prison.service.justice.gov.uk
     modsecurity_enabled: true
     modsecurity_github_team: "connect-dps"
+    modsecurity_snippet: |
+      SecRuleEngine On
+      SecRuleRemoveById 949110
 
   env:
     INGRESS_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk"
@@ -39,7 +42,6 @@ generic-service:
     FEEDBACK_DISABLED_PRISONS: "AGI,DNI,FNI,HDI,HLI,HMI,LEI,LHI,MDI,NHI,RSI,WDI,WEI,WYI"
     ENVIRONMENT_NAME: "DEV"
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
-    NON_ASSOCIATIONS_PRISONS: "FNI,ISI,LGI,RSI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-dev.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
     ACTIVITIES_ENABLED_PRISONS: "LEI,RSI"
@@ -48,6 +50,7 @@ generic-service:
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
     COMPONENT_API_LATEST: "true"
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
+    PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk"
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod

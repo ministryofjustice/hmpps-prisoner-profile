@@ -12,6 +12,8 @@ import {
   categorySummaryDataMock,
   csraSummaryDataMock,
   incentiveSummaryDataMock,
+  incentiveSummaryErrorMock,
+  incentiveSummaryNoDataMock,
   miniSummaryGroupBMock,
   moneySummaryDataMock,
   visitBalancesMock,
@@ -40,7 +42,7 @@ import { StaffContactsMock } from '../data/localMockData/staffContacts'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { formatDate } from '../utils/dateHelpers'
-import { convertToTitleCase } from '../utils/utils'
+import { convertToTitleCase, neurodiversityEnabled } from '../utils/utils'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
@@ -61,6 +63,14 @@ import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import movementsMock from '../data/localMockData/movementsData'
 import config from '../config'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import { communityManagerMock } from '../data/localMockData/communityManagerMock'
+
+jest.mock('../utils/utils', () => {
+  const original = jest.requireActual('../utils/utils')
+  return { ...original, neurodiversityEnabled: jest.fn() }
+})
+const mockedNeurodiversityEnabled = neurodiversityEnabled as jest.Mock
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -75,6 +85,16 @@ describe('OverviewPageService', () => {
 
   const incentivesApiClient: IncentivesApiClient = {
     getReviews: jest.fn(async () => incentiveReviewsMock),
+  }
+
+  const incentivesApiClientReturnsNull: IncentivesApiClient = {
+    getReviews: jest.fn(async () => null),
+  }
+
+  const incentivesApiClientThrowsError: IncentivesApiClient = {
+    getReviews: jest.fn(async () => {
+      throw new Error()
+    }),
   }
 
   const curiousApiClient: CuriousApiClient = {
@@ -92,16 +112,30 @@ describe('OverviewPageService', () => {
     getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
   }
 
-  const overviewPageServiceConstruct = jest.fn(() => {
+  const prisonerProfileDeliusApiClient: PrisonerProfileDeliusApiClient = {
+    getCommunityManager: jest.fn(async () => communityManagerMock),
+  }
+
+  const overviewPageServiceConstruct = jest.fn(({ useNull = false, useError = false } = {}) => {
+    let incentivesApi: IncentivesApiClient
+    if (useNull) {
+      incentivesApi = incentivesApiClientReturnsNull
+    } else if (useError) {
+      incentivesApi = incentivesApiClientThrowsError
+    } else {
+      incentivesApi = incentivesApiClient
+    }
+
     return new OverviewPageService(
       () => prisonApiClient,
       () => allocationManagerApiClient,
       () => keyWorkerApiClient,
-      () => incentivesApiClient,
+      () => incentivesApi,
       () => adjudicationsApiClient,
       new OffencesPageService(null),
       () => curiousApiClient,
       () => nonAssociationsApiClient,
+      () => prisonerProfileDeliusApiClient,
     )
   })
 
@@ -127,6 +161,10 @@ describe('OverviewPageService', () => {
     adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
 
     nonAssociationsApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   describe('Prison name', () => {
@@ -325,6 +363,63 @@ describe('OverviewPageService', () => {
         ]),
       )
     })
+
+    it('should use no incentives text', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct({ useNull: true })
+      const res = await overviewPageService.get(
+        'token',
+        {
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: 'MDI',
+          csra: 'Standard',
+          assessments: assessmentsMock,
+        } as Prisoner,
+        1,
+        CaseLoadsDummyDataA,
+      )
+
+      expect(res.miniSummaryGroupB).toEqual(
+        expect.arrayContaining([
+          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(incentiveSummaryNoDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
+    })
+
+    it('should use incentives API error text', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct({ useError: true })
+      const res = await overviewPageService.get(
+        'token',
+        {
+          ...PrisonerMockDataA,
+          prisonerNumber,
+          bookingId,
+          prisonId: 'MDI',
+          csra: 'Standard',
+          assessments: assessmentsMock,
+        } as Prisoner,
+        1,
+        CaseLoadsDummyDataA,
+      )
+
+      expect(res.miniSummaryGroupB).toEqual(
+        expect.arrayContaining([
+          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(incentiveSummaryErrorMock), classes: 'govuk-grid-row card-body' },
+          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
+    })
+
     describe('When the prisoner is not part of the users case loads', () => {
       it('should not return the incentives data', async () => {
         const prisonerNumber = 'A1234BC'
@@ -610,9 +705,10 @@ describe('OverviewPageService', () => {
         },
       )
 
-      it('should have neurodiversity support status if returned from API', async () => {
+      it('should have neurodiversity support status if returned from API and it is enabled', async () => {
         const prisonerNumber = 'A1234BC'
         const bookingId = 123456
+        mockedNeurodiversityEnabled.mockImplementation(() => true)
 
         const overviewPageService = overviewPageServiceConstruct()
         const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
@@ -624,10 +720,26 @@ describe('OverviewPageService', () => {
         ).toBeTruthy()
       })
 
-      it('should not have neurodiversity support status if not returned from API', async () => {
+      it('should not have neurodiversity support status if returned from API and it is not enabled', async () => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+        mockedNeurodiversityEnabled.mockImplementation(() => false)
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
+
+        expect(
+          res.statuses.some(
+            status => status.label === 'Support needed' && status.subText === 'Has neurodiversity needs',
+          ),
+        ).toBeFalsy()
+      })
+
+      it('should not have neurodiversity support status if not returned from API and it is enabled', async () => {
         const prisonerNumber = 'A1234BC'
         const bookingId = 123456
         curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => null)
+        mockedNeurodiversityEnabled.mockImplementation(() => true)
 
         const overviewPageService = overviewPageServiceConstruct()
         const res = await overviewPageService.get('token', { prisonerNumber, bookingId } as Prisoner, 1)
@@ -762,7 +874,6 @@ describe('OverviewPageService', () => {
         activeAlertCount: 1,
         nonAssociationsCount: 2,
         nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
-        showNonAssociationsLink: false,
       })
     })
 
@@ -773,43 +884,6 @@ describe('OverviewPageService', () => {
         activeAlertCount: 1,
         nonAssociationsCount: 2,
         nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
-        showNonAssociationsLink: false,
-      })
-    })
-
-    describe('Link to non-associations', () => {
-      describe('When non-associations is enabled for private beta', () => {
-        beforeEach(() => {
-          config.nonAssociationsPrisons = ['BAI', 'MDI']
-        })
-
-        it('should show non-associations link', async () => {
-          const overviewPageService = overviewPageServiceConstruct()
-          const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
-          expect(res.alertsSummary).toEqual({
-            activeAlertCount: 1,
-            nonAssociationsCount: 2,
-            nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
-            showNonAssociationsLink: true,
-          })
-        })
-      })
-
-      describe('When non-associations is disabled for private beta', () => {
-        beforeEach(() => {
-          config.nonAssociationsPrisons = ['MDI']
-        })
-
-        it('should show non-associations link', async () => {
-          const overviewPageService = overviewPageServiceConstruct()
-          const res = await overviewPageService.get('token', PrisonerMockDataA, 1, CaseLoadsDummyDataB, [])
-          expect(res.alertsSummary).toEqual({
-            activeAlertCount: 1,
-            nonAssociationsCount: 2,
-            nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
-            showNonAssociationsLink: false,
-          })
-        })
       })
     })
   })

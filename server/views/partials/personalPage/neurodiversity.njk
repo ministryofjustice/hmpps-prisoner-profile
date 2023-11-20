@@ -4,16 +4,7 @@
 {%- call summaryCard({title: "Neurodiversity", id: "neurodiversity"}) -%}
   <div class="govuk-grid-row" data-qa="neurodiversity">
     <div class="govuk-grid-column-full">
-      {% if not learnerNeurodivergence.length %}
-        <p class="govuk-body">
-          DPS currently includes neurodiversity information recorded for prisoners in HMPs Bristol, Lincoln, New Hall and
-          Swaleside.
-        </p>
-        <p class="govuk-body">
-          To check for neurodiversity information for someone in another prison, contact the education team in that
-          prison.
-        </p>
-      {% elseif learnerNeurodivergence.length %}
+      {% if learnerNeurodivergence.length %}
         <p class="govuk-body" data-qa="neurodivergence-exists">
           Information from the local education team - not a medical diagnosis.
         </p>

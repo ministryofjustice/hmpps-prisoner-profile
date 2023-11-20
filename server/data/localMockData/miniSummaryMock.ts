@@ -120,6 +120,20 @@ export const incentiveSummaryDataMock: MiniSummaryData = {
   linkLabel: 'Incentive level details',
 } as MiniSummaryData
 
+export const incentiveSummaryNoDataMock: MiniSummaryData = {
+  bottomLabel: 'Incentives: since last review',
+  bottomContentLine1: 'John Saunders has no incentive level history',
+  bottomClass: 'small',
+  linkLabel: 'Incentive level details',
+} as MiniSummaryData
+
+export const incentiveSummaryErrorMock: MiniSummaryData = {
+  bottomLabel: 'Incentives: since last review',
+  bottomContentLine1: 'We cannot show these details right now',
+  bottomClass: 'small',
+  linkLabel: 'Incentive level details',
+} as MiniSummaryData
+
 export const csraSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'CSRA',
   bottomContentLine1: 'Standard',

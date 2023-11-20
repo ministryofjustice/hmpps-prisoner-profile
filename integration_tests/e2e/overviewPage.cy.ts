@@ -293,6 +293,11 @@ context('Overview Page', () => {
         overviewPage.alertsSummary().panel().should('exist')
         overviewPage.alertsSummary().alertCount().should('have.text', '80')
         overviewPage.alertsSummary().nonAssociationCount().should('have.text', '2')
+        overviewPage.alertsSummary().nonAssociationsLink().should('have.text', 'Non-associations')
+        overviewPage
+          .alertsSummary()
+          .nonAssociationsLink()
+          .should('have.attr', 'href', 'http://localhost:9091/nonassociationsui/prisoner/G6123VU/non-associations')
       })
     })
   })

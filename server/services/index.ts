@@ -31,6 +31,7 @@ export const services = () => {
     nonAssociationsApiClientBuilder,
     componentApiClientBuilder,
     whereaboutsApiClientBuilder,
+    prisonerProfileDeliusApiClientBuilder,
   } = dataAccess
 
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
@@ -49,6 +50,7 @@ export const services = () => {
     offencesPageService,
     curiousApiClientBuilder,
     nonAssociationsApiClientBuilder,
+    prisonerProfileDeliusApiClientBuilder,
   )
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)

@@ -21,6 +21,7 @@ import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import ComponentApiRestClient from './componentApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
+import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient()
@@ -44,6 +45,7 @@ export const dataAccess = {
   nonAssociationsApiClientBuilder: (token: string) => new NonAssociationsApiRestClient(token),
   componentApiClientBuilder: (token: string) => new ComponentApiRestClient(token),
   whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token),
+  prisonerProfileDeliusApiClientBuilder: (token: string) => new PrisonerProfileDeliusApiRestClient(token),
 }
 
 export type DataAccess = typeof dataAccess

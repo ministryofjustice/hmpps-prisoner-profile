@@ -15,6 +15,7 @@ import pathfinderApi from './integration_tests/mockApis/pathfinderApi'
 import socApi from './integration_tests/mockApis/socApi'
 import adjudicationsApi from './integration_tests/mockApis/adjudications'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
+import prisonerProfileDeliusApi from './integration_tests/mockApis/prisonerProfileDeliusApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -26,7 +27,6 @@ export default defineConfig({
   reporterOptions: {
     configFile: 'reporter-config.json',
   },
-  videoUploadOnPasses: false,
   taskTimeout: 60000,
   e2e: {
     // We've imported your old cypress plugins here.
@@ -49,6 +49,7 @@ export default defineConfig({
         ...socApi,
         ...adjudicationsApi,
         ...nonAssociationsApi,
+        ...prisonerProfileDeliusApi,
       })
     },
     baseUrl: 'http://localhost:3007',

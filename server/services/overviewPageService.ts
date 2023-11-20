@@ -11,11 +11,12 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
   convertToTitleCase,
   formatCategoryCodeDescription,
+  formatCommunityManager,
   formatMoney,
   formatName,
   formatPrivilegedVisitsSummary,
   getNamesFromString,
-  nonAssociationsEnabled,
+  neurodiversityEnabled,
   prisonerBelongsToUsersCaseLoad,
   userHasRoles,
 } from '../utils/utils'
@@ -23,7 +24,7 @@ import { Assessment } from '../interfaces/prisonApi/assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import { Prisoner } from '../interfaces/prisoner'
 import { PersonalDetails } from '../interfaces/personalDetails'
-import { ContactDetail, StaffContacts } from '../interfaces/staffContacts'
+import { StaffContacts } from '../interfaces/staffContacts'
 import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { Pom } from '../interfaces/pom'
@@ -56,6 +57,8 @@ import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import { KeyWorker } from '../interfaces/keyWorker'
 import { CaseNote } from '../interfaces/caseNote'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
+import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 
 export default class OverviewPageService {
   constructor(
@@ -67,6 +70,7 @@ export default class OverviewPageService {
     private readonly offencesPageService: OffencesPageService,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly nonAssociationsApiClientBuilder: RestClientBuilder<NonAssociationsApiClient>,
+    private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
   ) {}
 
   public async get(
@@ -86,6 +90,7 @@ export default class OverviewPageService {
     const adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
     const curiousApiClient = this.curiousApiClientBuilder(clientToken)
     const nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
+    const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
 
     const [
       inmateDetail,
@@ -93,26 +98,26 @@ export default class OverviewPageService {
       learnerNeurodivergence,
       movements,
       nonAssociationDetails,
-      offenderContacts,
       allocationManager,
       offenderKeyWorker,
       keyWorkerSessions,
       mainOffence,
       courtCaseData,
       fullStatus,
+      communityManager,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(prisonerData.bookingId),
       prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
       prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
       nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber),
-      prisonApiClient.getBookingContacts(prisonerData.bookingId),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
       keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
       prisonApiClient.getCourtCases(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
+      prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
     ])
 
     const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
@@ -147,7 +152,7 @@ export default class OverviewPageService {
       personalDetails,
       staffContacts: this.getStaffContacts(
         prisonerData,
-        offenderContacts,
+        communityManager,
         allocationManager,
         offenderKeyWorker,
         keyWorkerSessions,
@@ -156,7 +161,7 @@ export default class OverviewPageService {
       offencesOverview,
       prisonName: prisonerData.prisonName,
       staffRoles: staffRoles.map(role => role.role),
-      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations, userCaseLoads),
+      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations),
     }
   }
 
@@ -211,21 +216,11 @@ export default class OverviewPageService {
 
   public getStaffContacts(
     prisonerData: Prisoner,
-    offenderContacts: ContactDetail,
+    communityManager: CommunityManager,
     allocationManager: Pom,
     offenderKeyWorker: KeyWorker,
     keyWorkerSessions: CaseNote[],
   ): StaffContacts {
-    const communityOffenderManager =
-      offenderContacts && offenderContacts.otherContacts !== undefined
-        ? offenderContacts.otherContacts
-            .filter(contact => contact && contact.contactType === 'COM')
-            .map(contact => ({
-              firstName: contact ? contact?.firstName : undefined,
-              lastName: contact ? contact?.lastName : undefined,
-            }))
-        : []
-
     const prisonOffenderManager =
       allocationManager &&
       (allocationManager as Pom).primary_pom &&
@@ -255,12 +250,7 @@ export default class OverviewPageService {
       coworkingPrisonOffenderManager: coworkingPrisonOffenderManager
         ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
         : 'Not assigned',
-      communityOffenderManager:
-        communityOffenderManager && communityOffenderManager[0] !== undefined
-          ? `${convertToTitleCase(communityOffenderManager[0].firstName)} ${convertToTitleCase(
-              communityOffenderManager[0].lastName,
-            )}`
-          : 'Not assigned',
+      communityOffenderManager: formatCommunityManager(communityManager),
       linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
     }
   }
@@ -439,24 +429,67 @@ export default class OverviewPageService {
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
 
-    const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+    let incentiveSummaryData: MiniSummaryData
 
-    const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
-      prisonApiClient.getCaseNoteCount(
-        bookingId,
-        CaseNoteType.PositiveBehaviour,
-        CaseNoteSubType.IncentiveEncouragement,
-        incentiveReviews?.iepDate,
-        formatDateISO(new Date()),
-      ),
-      prisonApiClient.getCaseNoteCount(
-        bookingId,
-        CaseNoteType.NegativeBehaviour,
-        CaseNoteSubType.IncentiveWarning,
-        incentiveReviews?.iepDate,
-        formatDateISO(new Date()),
-      ),
-    ])
+    try {
+      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+
+      if (incentiveReviews === null) {
+        // Fallback if incentives API returns 404
+        incentiveSummaryData = {
+          bottomLabel: 'Incentives: since last review',
+          bottomContentLine1: `${formatName(
+            prisonerData.firstName,
+            null,
+            prisonerData.lastName,
+          )} has no incentive level history`,
+          bottomClass: 'small',
+          linkLabel: 'Incentive level details',
+          linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+        }
+      }
+
+      if (incentiveReviews) {
+        const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
+          prisonApiClient.getCaseNoteCount(
+            bookingId,
+            CaseNoteType.PositiveBehaviour,
+            CaseNoteSubType.IncentiveEncouragement,
+            incentiveReviews?.iepDate,
+            formatDateISO(new Date()),
+          ),
+          prisonApiClient.getCaseNoteCount(
+            bookingId,
+            CaseNoteType.NegativeBehaviour,
+            CaseNoteSubType.IncentiveWarning,
+            incentiveReviews?.iepDate,
+            formatDateISO(new Date()),
+          ),
+        ])
+
+        incentiveSummaryData = {
+          bottomLabel: 'Incentives: since last review',
+          bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
+          bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
+          bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
+          bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
+            ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
+            : undefined,
+          bottomClass: 'small',
+          linkLabel: 'Incentive level details',
+          linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+        }
+      }
+    } catch (e) {
+      // Fallback if incentives API returns an error
+      incentiveSummaryData = {
+        bottomLabel: 'Incentives: since last review',
+        bottomContentLine1: 'We cannot show these details right now',
+        bottomClass: 'small',
+        linkLabel: 'Incentive level details',
+        linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+      }
+    }
 
     const category: Assessment =
       prisonerData.assessments?.find(
@@ -493,19 +526,6 @@ export default class OverviewPageService {
       categorySummaryData.linkHref = `${config.serviceUrls.offenderCategorisation}/${bookingId}`
     }
 
-    const incentiveSummaryData: MiniSummaryData = {
-      bottomLabel: 'Incentives: since last review',
-      bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
-      bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
-      bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
-      bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
-        ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
-        : undefined,
-      bottomClass: 'small',
-      linkLabel: 'Incentive level details',
-      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
-    }
-
     const csraSummaryData: MiniSummaryData = {
       bottomLabel: 'CSRA',
       bottomContentLine1: csra ? csra.classification : 'Not entered',
@@ -536,14 +556,11 @@ export default class OverviewPageService {
   private getAlertsSummary(
     { activeAlertCount, offenderNo }: InmateDetail,
     nonAssociations: OverviewNonAssociation[],
-    userCaseloads: CaseLoad[],
   ): AlertsSummary {
-    const activeCaseload = userCaseloads.find(caseload => caseload.currentlyActive)
     const nonAssociationsCount = nonAssociations.length
-    const showNonAssociationsLink = nonAssociationsEnabled(activeCaseload?.caseLoadId)
     const nonAssociationsUrl = `${config.serviceUrls.nonAssociations}/prisoner/${offenderNo}/non-associations`
 
-    return { activeAlertCount, nonAssociationsCount, showNonAssociationsLink, nonAssociationsUrl }
+    return { activeAlertCount, nonAssociationsCount, nonAssociationsUrl }
   }
 
   private async getSchedule(prisonerData: Prisoner, prisonApiClient: PrisonApiClient): Promise<OverviewSchedule> {
@@ -632,7 +649,7 @@ export default class OverviewPageService {
     }
 
     // Neurodiversity support needed
-    if (learnerNeurodivergence?.length) {
+    if (learnerNeurodivergence?.length && neurodiversityEnabled(prisonerData.prisonId)) {
       statusList.push({
         label: 'Support needed',
         subText: 'Has neurodiversity needs',

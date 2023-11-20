@@ -29,7 +29,6 @@ export interface OverviewNonAssociation {
 export interface AlertsSummary {
   activeAlertCount: number
   nonAssociationsCount: number
-  showNonAssociationsLink: boolean
   nonAssociationsUrl: string
 }
 
