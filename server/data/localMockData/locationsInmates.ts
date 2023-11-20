@@ -1,6 +1,6 @@
-import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
+import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
 
-const LocationsInmatesMock: LocationsInmate[] = [
+const LocationsInmatesMock: OffenderBooking[] = [
   {
     bookingId: 1234134,
     bookingNo: 'A12121',

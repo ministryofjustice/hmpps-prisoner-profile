@@ -508,8 +508,7 @@ export const extractLocation = (location: string, agencyId: string): string => {
   return formatLocation(withoutAgency)
 }
 
-// eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
-export const groupBy = (array: ScheduledEvent[], key: string) =>
+export const groupBy = <T>(array: T[], key: string): Record<string, T[]> =>
   array &&
   array.length &&
   array.reduce((acc, current) => {
