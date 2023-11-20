@@ -320,7 +320,9 @@ export const addressToLines = ({ flat, premise, street, town, county, postalCode
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
   }
-  return [lineOne, town, county, postalCode, country].filter(s => s)
+  const addressArray = [lineOne, town, county, postalCode, country].filter(s => s)
+  if (addressArray.length !== 1 || !country) return addressArray
+  return []
 }
 
 /**
