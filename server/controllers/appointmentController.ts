@@ -23,6 +23,7 @@ import { pluralise } from '../utils/pluralise'
 import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
+import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../services/auditService'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -33,6 +34,7 @@ export default class AppointmentController {
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly prisonerSearchService: PrisonerSearchService,
+    private readonly auditService: AuditService,
   ) {}
 
   public displayAddAppointment(): RequestHandler {
@@ -42,7 +44,7 @@ export default class AppointmentController {
         user: { activeCaseLoadId },
       } = res.locals
       const { prisonerNumber } = req.params
-      const { firstName, lastName, bookingId, cellLocation } = req.middleware.prisonerData
+      const { firstName, lastName, bookingId, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const { appointmentTypes, locations } = await this.appointmentService.getAddAppointmentRefData(
@@ -59,6 +61,16 @@ export default class AppointmentController {
             date: formatDate(now.toISOString(), 'short'),
           }
       const errors = req.flash('errors')
+
+      await this.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: res.locals.requestId,
+        page: Page.AddAppointment,
+      })
 
       return res.render('pages/appointments/addAppointment', {
         pageTitle: 'Add an appointment',
@@ -158,6 +170,15 @@ export default class AppointmentController {
         return res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
       }
 
+      await this.auditService.sendPostAttempt({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        prisonerNumber,
+        correlationId: res.locals.requestId,
+        action: PostAction.Appointment,
+        details: {},
+      })
+
       return res.redirect(`/prisoner/${prisonerNumber}/appointment-confirmation`)
     }
   }
@@ -181,7 +202,7 @@ export default class AppointmentController {
         activeCaseLoadId,
       )
 
-      const { firstName, lastName, cellLocation } = req.middleware.prisonerData
+      const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
       const appointmentDetails: AppointmentForm = appointmentFlash[0] as never
       const heading = `${apostrophe(prisonerName)} ${pluralise(
@@ -226,6 +247,16 @@ export default class AppointmentController {
         createdBy: res.locals.user.displayName,
       }
 
+      await this.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: res.locals.requestId,
+        page: Page.AppointmentConfirmation,
+      })
+
       return res.render('pages/appointments/appointmentConfirmation', {
         pageTitle: 'Appointment confirmation',
         ...appointmentData,
@@ -255,7 +286,7 @@ export default class AppointmentController {
       )
       courts.push({ id: 'other', name: 'Other' })
 
-      const { firstName, lastName, cellLocation, bookingId } = req.middleware.prisonerData
+      const { firstName, lastName, cellLocation, bookingId, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
       const { appointmentDefaults, appointmentForm, formValues } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
@@ -280,6 +311,16 @@ export default class AppointmentController {
       const errors = req.flash('errors')
 
       req.flash('postVLBDetails', { appointmentDefaults, appointmentForm, formValues })
+
+      await this.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: res.locals.requestId,
+        page: Page.PrePostAppointments,
+      })
 
       return res.render('pages/appointments/prePostAppointments', {
         pageTitle: 'Video link booking details',
@@ -379,6 +420,15 @@ export default class AppointmentController {
         return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
       }
 
+      await this.auditService.sendPostSuccess({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        prisonerNumber,
+        correlationId: res.locals.requestId,
+        action: PostAction.Appointment,
+        details: {},
+      })
+
       return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointment-confirmation`)
     }
   }
@@ -456,6 +506,16 @@ export default class AppointmentController {
         createdBy: res.locals.user.displayName,
       }
 
+      await this.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: res.locals.requestId,
+        page: Page.PrePostAppointmentConfirmation,
+      })
+
       return res.render('pages/appointments/prePostAppointmentConfirmation', {
         pageTitle: 'Video link has been booked',
         ...appointmentData,
@@ -468,6 +528,7 @@ export default class AppointmentController {
   public displayPrisonerMovementSlips(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const data = req.session.movementSlipData
+      const { prisonerNumber, prisonId } = req.middleware.prisonerData
       if (!data) throw new NotFoundError('Movement slip data not found in session')
 
       res.locals = {
@@ -475,6 +536,16 @@ export default class AppointmentController {
         hideBackLink: true,
       }
       delete req.session.movementSlipData
+
+      await this.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: res.locals.requestId,
+        page: Page.PrePostAppointmentConfirmation,
+      })
 
       return res.render('pages/appointments/movementSlips', {
         ...data,
@@ -499,6 +570,14 @@ export default class AppointmentController {
         this.appointmentService.getExistingEventsForOffender(clientToken, activeCaseLoadId, isoDate, prisonerNumber),
       ])
 
+      this.auditService.sendEvent({
+        who: res.locals.user.username,
+        subjectId: prisonerNumber,
+        correlationId: res.locals.requestId,
+        action: `API_${ApiAction.OffenderEvents}`,
+        subjectType: SubjectType.PrisonerId,
+      })
+
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events,
         date: formatDate(isoDate, 'long'),
@@ -522,6 +601,14 @@ export default class AppointmentController {
         this.appointmentService.getLocation(clientToken, locationId),
         this.appointmentService.getExistingEventsForLocation(clientToken, activeCaseLoadId, locationId, isoDate),
       ])
+
+      this.auditService.sendEvent({
+        who: res.locals.user.username,
+        subjectId: activeCaseLoadId,
+        correlationId: res.locals.requestId,
+        action: `API_${ApiAction.LocationEvents}`,
+        details: { locationId },
+      })
 
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events,

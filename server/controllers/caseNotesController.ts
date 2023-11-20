@@ -15,7 +15,7 @@ import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-import { AuditService, Page, PostAction, SearchPage } from '../services/auditService'
+import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -91,7 +91,7 @@ export default class CaseNotesController {
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: res.locals.requestId,
-        searchPage: SearchPage.CaseNotes,
+        searchPage: SearchAction.CaseNotes,
         details: { queryParams },
       })
 

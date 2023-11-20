@@ -21,7 +21,7 @@ import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
 import professionalContactsRouter from './professionalContactsRouter'
-import { Page } from '../services/auditService'
+import { ApiAction, Page } from '../services/auditService'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 
 export default function routes(services: Services): Router {
@@ -60,12 +60,17 @@ export default function routes(services: Services): Router {
 
   get(
     '/api/prisoner/:prisonerNumber/image',
+    auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     services.commonApiRoutes.prisonerImage,
   )
 
-  get('/api/image/:imageId', services.commonApiRoutes.image)
+  get(
+    '/api/image/:imageId',
+    auditPageAccessAttempt({ services, page: ApiAction.Image }),
+    services.commonApiRoutes.image,
+  )
 
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 

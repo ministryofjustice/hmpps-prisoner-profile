@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express'
-import { Page } from '../services/auditService'
+import { ApiAction, Page } from '../services/auditService'
 import { Services } from '../services'
 
 export default function auditPageAccessAttempt({
@@ -7,7 +7,7 @@ export default function auditPageAccessAttempt({
   page: pageViewAction,
 }: {
   services: Services
-  page: Page
+  page: Page | ApiAction
 }): RequestHandler {
   return async (req, res, next) => {
     const { requestId } = res.locals

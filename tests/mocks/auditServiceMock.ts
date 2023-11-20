@@ -8,4 +8,5 @@ export const auditServiceMock = (): AuditService => ({
   sendSearch: jest.fn(),
   sendPostAttempt: jest.fn(),
   sendPostSuccess: jest.fn(),
+  sendEvent: jest.fn(),
 })

@@ -11,7 +11,7 @@ import { AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { Alert } from '../interfaces/prisoner'
-import { AuditService, Page, PostAction, SearchPage } from '../services/auditService'
+import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -59,7 +59,7 @@ export default class AlertsController {
       prisonerNumber: prisonerData.prisonerNumber,
       prisonId: prisonerData.prisonId,
       correlationId: res.locals.requestId,
-      searchPage: SearchPage.Alerts,
+      searchPage: SearchAction.Alerts,
       details: { queryParams },
     })
 
