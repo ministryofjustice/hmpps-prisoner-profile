@@ -33,7 +33,7 @@ export default class ProfessionalContactsService {
       (
         await Promise.all(
           activeOfficialContacts
-            .sort((left, right) => left.firstName.localeCompare(right.firstName))
+            .sort((left, right) => left.lastName.localeCompare(right.lastName))
             .map(async contact => {
               const personContactDetails = await this.getPersonContactDetails(clientToken, contact.personId)
               const { addresses, emails, phones } = personContactDetails
@@ -52,17 +52,15 @@ export default class ProfessionalContactsService {
       ).flat()
 
     const contactsGroupedByRelationship = contactForEachAddress.length
-      ? Object.entries(
-          groupBy<PrisonerContactWithContactDetails>(contactForEachAddress, 'relationshipDescription'),
-        ).map(([key, value]) => ({
-          relationship: key,
-          contacts: value,
-        }))
+      ? Object.entries(groupBy<PrisonerContactWithContactDetails>(contactForEachAddress, 'relationshipDescription'))
+          .map(([key, value]) => ({
+            relationship: key,
+            contacts: value,
+          }))
+          .sort((left, right) => left.relationship.localeCompare(right.relationship))
       : []
 
-    return [...contactsGroupedByRelationship, ...this.getPomContacts(allocationManager)].sort((left, right) =>
-      left.relationship.localeCompare(right.relationship),
-    )
+    return [...this.getPomContacts(allocationManager), ...contactsGroupedByRelationship]
   }
 
   async getPersonContactDetails(token: string, personId: number) {
@@ -97,6 +95,20 @@ export default class ProfessionalContactsService {
           jobTitle: key === 'secondary_pom' && 'Co-worker',
         }))
 
-    return pomStaff?.length ? [{ relationship: 'Prison Offender Manager', contacts: pomStaff }] : []
+    return pomStaff?.length ? [{ relationship: 'Prison Offender Manager', contacts: sortPomsByLastName(pomStaff) }] : []
   }
+}
+
+function sortPomsByLastName(contacts: PomContact[]) {
+  const getLastName = (name: string) => name.split(' ').pop()
+  return contacts.sort((left, right) => {
+    const leftLastName = getLastName(left.name)
+    const rightLastName = getLastName(right.name)
+
+    if (leftLastName && rightLastName) {
+      return leftLastName.localeCompare(rightLastName)
+    }
+
+    return 0
+  })
 }

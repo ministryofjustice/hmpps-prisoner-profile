@@ -101,12 +101,12 @@ describe('professionalContactsService', () => {
           relationship: 'Prison Offender Manager',
           contacts: [
             {
-              jobTitle: false,
-              name: 'John Smith',
-            },
-            {
               jobTitle: 'Co-worker',
               name: 'Jane Jones',
+            },
+            {
+              jobTitle: false,
+              name: 'John Smith',
             },
           ],
         },
@@ -168,9 +168,9 @@ describe('professionalContactsService', () => {
       const response = await service.getContacts('token', 'A1234AA', 1)
 
       expect(response.length).toEqual(3)
-      expect(response[0].relationship).toEqual('Prison Guard')
+      expect(response[0].relationship).toEqual('Prison Offender Manager')
       expect(response[0].contacts.length).toEqual(2)
-      expect(response[1].relationship).toEqual('Prison Offender Manager')
+      expect(response[1].relationship).toEqual('Prison Guard')
       expect(response[1].contacts.length).toEqual(2)
       expect(response[2].relationship).toEqual('Responsible officer')
       expect(response[2].contacts.length).toEqual(1)
@@ -197,12 +197,12 @@ describe('professionalContactsService', () => {
           relationship: 'Prison Offender Manager',
           contacts: [
             {
-              jobTitle: false,
-              name: 'John Smith',
-            },
-            {
               jobTitle: 'Co-worker',
               name: 'Jane Jones',
+            },
+            {
+              jobTitle: false,
+              name: 'John Smith',
             },
           ],
         },
