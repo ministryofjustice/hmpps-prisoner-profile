@@ -270,5 +270,28 @@ describe('professionalContactsService', () => {
       })
       expect(response[2].contacts[1]).toMatchObject({ address: mockAddress() })
     })
+
+    it('should remove com and pom contacts from prison api', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [
+          PrisonerContactBuilder({ relationship: 'COM' }),
+          PrisonerContactBuilder({ relationship: 'POM' }),
+        ],
+      }
+
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+      )
+
+      const response = await service.getContacts('token', 'A1234AA', 1)
+
+      expect(response).toEqual([expectedPomResponse, expectedComResponse])
+    })
   })
 })

@@ -32,8 +32,15 @@ export default class ProfessionalContactsService {
       this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
     ])
 
+    // filter out COM and POM from prison API contacts as they are reliably retrieved from other API calls
     const activePrisonApiContacts = contacts.otherContacts
-      ? contacts.otherContacts.filter(contact => contact.activeFlag && contact.contactType === 'O')
+      ? contacts.otherContacts.filter(
+          contact =>
+            contact.relationship !== 'COM' &&
+            contact.relationship !== 'POM' &&
+            contact.activeFlag &&
+            contact.contactType === 'O',
+        )
       : []
 
     const currentDate = new Date()
