@@ -11,7 +11,7 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
   cy.task('stubPrisonerData', { prisonerNumber, overrides: prisonerDataOverrides })
   cy.task('stubEventsForProfileImage', prisonerNumber)
   cy.task('stubAssessments', bookingId)
-  cy.task('stubInmateDetail', bookingId)
+  cy.task('stubInmateDetail', { bookingId })
 })
 
 Cypress.Commands.add(

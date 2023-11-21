@@ -122,6 +122,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
+      cy.task('stubInmateDetail', { bookingId: 1234567, inmateDetail: { activeAlertCount: 0, inactiveAlertCount: 0 } })
       visitEmptyAlertsPage()
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
