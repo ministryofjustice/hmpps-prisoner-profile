@@ -23,7 +23,7 @@ describe('Prisoner schedule', () => {
       get: jest.fn().mockReturnValue('localhost'),
     }
     res = { locals: {}, render: jest.fn(), status: jest.fn() }
-    controller = new ProfessionalContactsController(new ProfessionalContactsService(null, null))
+    controller = new ProfessionalContactsController(new ProfessionalContactsService(null, null, null))
   })
 
   afterEach(() => {

@@ -64,6 +64,7 @@ export const services = () => {
   const professionalContactsService = new ProfessionalContactsService(
     prisonApiClientBuilder,
     allocationManagerApiClientBuilder,
+    prisonerProfileDeliusApiClientBuilder,
   )
 
   return {

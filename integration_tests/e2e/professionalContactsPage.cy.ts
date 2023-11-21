@@ -17,6 +17,7 @@ context('Professional contacts page', () => {
     cy.task('stubPersonAddresses', 5871791)
     cy.task('stubPersonEmails', 5871791)
     cy.task('stubPersonPhones', 5871791)
+    cy.task('stubGetCommunityManager')
   })
 
   context('Professional contacts list page', () => {
@@ -28,22 +29,35 @@ context('Professional contacts page', () => {
 
     it('should contain a list of contacts', () => {
       professionalContactsPage.h1().contains('John Saunders’ professional contacts')
-      professionalContactsPage.contacts().should('have.length', 8)
+      professionalContactsPage.contacts().should('have.length', 9)
 
-      const firstContact = professionalContactsPage.firstContact()
-      firstContact.get('div [data-qa="summary-header"]').contains('Responsible Officer')
-      firstContact
+      const comContact = professionalContactsPage.comContact()
+      comContact.get('div [data-qa="summary-header"]').contains('Community Offender Manager')
+      comContact
+        .get('.hmpps-summary-card__body > .govuk-summary-list > div[data-qa="contact-name"]')
+        .contains('Terry Scott')
+      comContact
+        .get('.hmpps-summary-card__body > .govuk-summary-list > div[data-qa="contact-details"]')
+        .contains('terry@email.com')
+        .contains('team@email.com')
+      comContact
+        .get('.hmpps-summary-card__body > .govuk-summary-list > div[data-qa="contact-address"]')
+        .contains('Not entered')
+
+      const firstPrisonContact = professionalContactsPage.firstPrisonContact()
+      firstPrisonContact.get('div [data-qa="summary-header"]').contains('Responsible Officer')
+      firstPrisonContact
         .get('.hmpps-summary-card__body > .govuk-summary-list > div[data-qa="contact-name"]')
         .contains('John Smith')
 
-      firstContact
+      firstPrisonContact
         .get('.hmpps-summary-card__body > .govuk-summary-list > div[data-qa="contact-details"]')
         .contains('email1@email.com')
         .contains('email2@email.com')
         .contains('07700000000')
         .contains('4444555566')
 
-      firstContact
+      firstPrisonContact
         .get('.hmpps-summary-card__body > .govuk-summary-list > div[data-qa="contact-address"]')
         .contains('Flat 7, premises address, street field')
     })

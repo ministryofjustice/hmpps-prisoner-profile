@@ -5,5 +5,7 @@ export default class ProfessionalContactsPage extends Page {
 
   contacts = (): PageElement => cy.get('.hmpps-summary-card')
 
-  firstContact = (): PageElement => cy.get('.hmpps-summary-card').first()
+  comContact = (): PageElement => cy.get('.hmpps-summary-card').first()
+
+  firstPrisonContact = (): PageElement => cy.get('.hmpps-summary-card').eq(1)
 }

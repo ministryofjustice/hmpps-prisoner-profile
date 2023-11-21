@@ -63,7 +63,7 @@
                                 Address
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                {% if not contact.address.noFixedAddress %}
+                                {% if contact.address and not contact.address.noFixedAddress %}
                                     {{ arrayToLines(contact.address | addressToLines, "Not entered") }}
                                 {% else %}
                                     Not entered
