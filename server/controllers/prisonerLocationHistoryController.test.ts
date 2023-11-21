@@ -12,6 +12,7 @@ import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import prisonerLocationHistoryService from '../services/prisonerLocationHistoryService'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
 
 describe('Specific Prisoner Location History', () => {
   const offenderNo = 'ABC123'
@@ -46,9 +47,12 @@ describe('Specific Prisoner Location History', () => {
     }
 
     const prisonApiClient = prisonApiClientMock()
-    const whereaboutsApiClient = {
+    const whereaboutsApiClient: WhereaboutsApiClient = {
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
+      addVideoLinkBooking: jest.fn(),
+      createAppointments: jest.fn(),
+      getCourts: jest.fn(),
     }
 
     const caseNotesApiClient = {
