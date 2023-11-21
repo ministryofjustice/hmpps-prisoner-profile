@@ -1,3 +1,4 @@
+import format from 'date-fns/format'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
@@ -13,7 +14,6 @@ import { type OverviewNonAssociation } from '../interfaces/overviewPage'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
 import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
-import moment from 'moment'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -574,11 +574,6 @@ export const formatCommunityManager = (communityManager: CommunityManager): stri
 
   return formatName(communityManager.name.forename, null, communityManager.name.surname)
 }
-
-export const formatTimestampToDateTime = (
-  timestamp: moment.MomentInput,
-  format = 'DD/MM/YYYY - HH:mm',
-): moment.MomentInput => timestamp && moment(timestamp).format(format)
 
 export const putLastNameFirst = (firstName: string, lastName: string): string => {
   if (!firstName && !lastName) return null
