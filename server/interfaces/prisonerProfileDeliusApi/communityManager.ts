@@ -4,6 +4,7 @@ export interface CommunityManager {
     forename: string
     surname: string
     email?: string
+    telephone?: string
   }
   team: {
     code: string

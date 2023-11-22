@@ -44,7 +44,7 @@ context('Professional contacts page', () => {
       const comContact = professionalContactsPage.comContact()
       comContact.header().contains('Community Offender Manager')
       comContact.name().contains('Terry Scott')
-      comContact.contactDetails().contains('terry@email.com').contains('team@email.com')
+      comContact.contactDetails().contains('terry@email.com').contains('team@email.com').contains('07700000000')
       comContact.address().contains('Not entered')
 
       const keyWorkerContact = professionalContactsPage.keyWorkerContact()

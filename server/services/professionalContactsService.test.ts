@@ -44,6 +44,7 @@ const mockCommunityManager: CommunityManager = {
     forename: 'Community',
     surname: 'Manager',
     email: 'com@email.com',
+    telephone: '07700000000',
   },
   team: {
     code: 'team',
@@ -106,7 +107,7 @@ const expectedComResponse = [
     emails: ['com@email.com', 'teamEmail@email.com'],
     firstName: 'Community',
     lastName: 'Manager',
-    phones: [] as string[],
+    phones: ['07700000000'],
     relationshipDescription: 'Community Offender Manager',
   },
 ]
