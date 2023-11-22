@@ -3,13 +3,14 @@ export interface CommunityManager {
   name: {
     forename: string
     surname: string
-    email?: string
-    telephone?: string
   }
   team: {
     code: string
     description: string
     email?: string
+    telephone?: string
   }
+  email?: string
+  telephone?: string
   unallocated: boolean
 }

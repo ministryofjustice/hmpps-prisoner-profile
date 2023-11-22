@@ -7,10 +7,10 @@ import { AgenciesEmail } from '../interfaces/prisonApi/agencies'
 import { Telephone } from '../interfaces/prisonApi/telephone'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Contact, ContactDetail } from '../interfaces/staffContacts'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { keyWorkerMock } from '../data/localMockData/keyWorker'
+import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -36,22 +36,6 @@ function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
     createDateTime: '2020-01-01',
     ...overrides,
   }
-}
-
-const mockCommunityManager: CommunityManager = {
-  code: 'a',
-  name: {
-    forename: 'Community',
-    surname: 'Manager',
-    email: 'com@email.com',
-    telephone: '07700000000',
-  },
-  team: {
-    code: 'team',
-    description: 'team desc',
-    email: 'teamEmail@email.com',
-  },
-  unallocated: false,
 }
 
 const mockAddress = (overrides?: Partial<Address>): Address => ({
@@ -104,10 +88,10 @@ const expectedPomResponse = [
 
 const expectedComResponse = [
   {
-    emails: ['com@email.com', 'teamEmail@email.com'],
-    firstName: 'Community',
-    lastName: 'Manager',
-    phones: ['07700000000'],
+    emails: ['terry@email.com', 'team@email.com'],
+    firstName: 'Terry',
+    lastName: 'Scott',
+    phones: ['07700000000', '07711111111'],
     relationshipDescription: 'Community Offender Manager',
   },
 ]
@@ -138,7 +122,7 @@ describe('professionalContactsService', () => {
     }
 
     professionalContactsClient = {
-      getCommunityManager: jest.fn(async () => mockCommunityManager),
+      getCommunityManager: jest.fn(async () => communityManagerMock),
     }
 
     keyWorkerApiClient = {

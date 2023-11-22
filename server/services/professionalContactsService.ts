@@ -130,14 +130,15 @@ function getPomContacts(allocationManager: Pom): ProfessionalContact[] {
 }
 
 function mapCommunityManagerToProfessionalContact(communityManager: CommunityManager): ProfessionalContact {
-  const { forename, surname, email, telephone } = communityManager.name
-  const { email: teamEmail } = communityManager.team
+  const { email, telephone } = communityManager
+  const { forename, surname } = communityManager.name
+  const { email: teamEmail, telephone: teamTelephone } = communityManager.team
 
   return {
     firstName: forename,
     lastName: surname,
     emails: [email, teamEmail].filter(Boolean),
-    phones: [telephone].filter(Boolean),
+    phones: [telephone, teamTelephone].filter(Boolean),
     address: undefined,
     relationshipDescription: 'Community Offender Manager',
   }
