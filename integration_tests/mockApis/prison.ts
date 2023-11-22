@@ -1,4 +1,4 @@
-import { format, addDays, startOfToday } from 'date-fns'
+import { addDays, format, startOfToday } from 'date-fns'
 import { stubFor } from './wiremock'
 import {
   accountBalancesMock,
@@ -77,6 +77,7 @@ import { damageObligationContainerMock } from '../../server/data/localMockData/d
 import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
+import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1177,6 +1178,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: [{ number: '07700000000', type: 'mobile' }],
+      },
+    })
+  },
+
+  stubScheduledTransfers: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/schedules/${prisonerNumber}/scheduled-transfers`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: scheduledTransfersMock,
       },
     })
   },

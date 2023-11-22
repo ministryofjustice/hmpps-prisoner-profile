@@ -42,7 +42,7 @@ import { DamageObligationContainer } from '../../interfaces/prisonApi/damageObli
 import { Movement } from '../../interfaces/prisonApi/movement'
 import { MovementType } from '../enums/movementType'
 import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
-import { PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerPrisonSchedule, PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
 import { Location } from '../../interfaces/prisonApi/location'
 import { Telephone } from '../../interfaces/prisonApi/telephone'
 
@@ -139,4 +139,5 @@ export interface PrisonApiClient {
   ): Promise<PrisonerSchedule[]>
   getPersonEmails(personId: number): Promise<AgenciesEmail[]>
   getPersonPhones(personId: number): Promise<Telephone[]>
+  getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
 }
