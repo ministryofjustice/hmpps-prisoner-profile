@@ -14,6 +14,7 @@ import { Telephone } from '../interfaces/prisonApi/telephone'
 
 interface ProfessionalContact {
   relationshipDescription: string
+  relationship: string
   firstName: string
   lastName: string
   emails: string[]
@@ -141,6 +142,7 @@ function mapCommunityManagerToProfessionalContact(communityManager: CommunityMan
     phones: [telephone, teamTelephone].filter(Boolean),
     address: undefined,
     relationshipDescription: 'Community Offender Manager',
+    relationship: 'COM',
   }
 }
 
@@ -154,6 +156,7 @@ function mapKeyWorkerToProfessionalContact(keyWorker: KeyWorker): ProfessionalCo
     phones: [],
     address: undefined,
     relationshipDescription: 'Key Worker',
+    relationship: 'KW',
   }
 }
 
@@ -168,6 +171,7 @@ function mapPomToProfessionalContact(jobTitle: 'primary_pom' | 'secondary_pom', 
     address: undefined,
     relationshipDescription:
       jobTitle === 'primary_pom' ? 'Prison Offender Manager' : 'Co-working Prison Offender Manager',
+    relationship: 'POM',
   }
 }
 
@@ -186,5 +190,6 @@ function mapPrisonApiContactToProfessionalContact(
     emails: emails.map(email => email.email),
     phones: [...phones, ...(address.phones ?? [])].map(phone => phone.number),
     relationshipDescription: contact.relationshipDescription,
+    relationship: contact.relationship,
   }
 }

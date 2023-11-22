@@ -76,6 +76,7 @@ const expectedPomResponse = [
     lastName: 'Smith',
     phones: [] as string[],
     relationshipDescription: 'Prison Offender Manager',
+    relationship: 'POM',
   },
   {
     relationshipDescription: 'Co-working Prison Offender Manager',
@@ -83,6 +84,7 @@ const expectedPomResponse = [
     firstName: 'Jane',
     lastName: 'Jones',
     phones: [],
+    relationship: 'POM',
   },
 ]
 
@@ -93,6 +95,7 @@ const expectedComResponse = [
     lastName: 'Scott',
     phones: ['07700000000', '07711111111'],
     relationshipDescription: 'Community Offender Manager',
+    relationship: 'COM',
   },
 ]
 
@@ -103,6 +106,7 @@ const expectedKeyWorkerResponse = [
     lastName: 'Stevens',
     phones: [] as string[],
     relationshipDescription: 'Key Worker',
+    relationship: 'KW',
   },
 ]
 describe('professionalContactsService', () => {
@@ -164,6 +168,7 @@ describe('professionalContactsService', () => {
           lastName: 'Smith',
           phones: ['077111111'],
           relationshipDescription: 'Probation Officer',
+          relationship: 'PROBATION',
         },
       ])
     })
