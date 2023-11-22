@@ -56,18 +56,20 @@
                     </dd>
                 </div>
 
-                <div class="govuk-summary-list__row" data-qa="contact-address">
-                    <dt class="govuk-summary-list__key">
-                        Address
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {% if contact.address and not contact.address.noFixedAddress %}
-                            {{ arrayToLines(contact.address | addressToLines, "Not entered") }}
-                        {% else %}
-                            Not entered
-                        {% endif %}
-                    </dd>
-                </div>
+                {% if contact.relationship !== "POM" %}
+                    <div class="govuk-summary-list__row" data-qa="contact-address">
+                        <dt class="govuk-summary-list__key">
+                            Address
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% if contact.address and not contact.address.noFixedAddress %}
+                                {{ arrayToLines(contact.address | addressToLines, "Not entered") }}
+                            {% else %}
+                                Not entered
+                            {% endif %}
+                        </dd>
+                    </div>
+                {% endif %}
             </dl>
         {%- endcall -%}
     {% endfor %}
