@@ -472,10 +472,6 @@ export default class AppointmentController {
 
       res.locals = {
         ...res.locals,
-        user: {
-          ...res.locals.user,
-          showFeedbackBanner: false,
-        },
         hideBackLink: true,
       }
       delete req.session.movementSlipData
