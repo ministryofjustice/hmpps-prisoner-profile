@@ -15,6 +15,7 @@ import CsraService from './csraService'
 import ComponentService from './componentService'
 import MoneyService from './moneyService'
 import AppointmentService from './appointmentService'
+import ProfessionalContactsService from './professionalContactsService'
 
 export const services = () => {
   const {
@@ -60,6 +61,13 @@ export const services = () => {
   const moneyService = new MoneyService(prisonApiClientBuilder)
   const appointmentService = new AppointmentService(prisonApiClientBuilder, whereaboutsApiClientBuilder)
 
+  const professionalContactsService = new ProfessionalContactsService(
+    prisonApiClientBuilder,
+    allocationManagerApiClientBuilder,
+    prisonerProfileDeliusApiClientBuilder,
+    keyworkerApiClientBuilder,
+  )
+
   return {
     dataAccess,
     commonApiRoutes,
@@ -78,6 +86,7 @@ export const services = () => {
     csraService,
     moneyService,
     appointmentService,
+    professionalContactsService,
   }
 }
 

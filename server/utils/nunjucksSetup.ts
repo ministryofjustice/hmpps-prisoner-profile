@@ -7,6 +7,7 @@ import {
   apostrophe,
   findError,
   formatMoney,
+  formatName,
   formatScheduleItem,
   initialiseName,
   neurodiversityEnabled,
@@ -135,4 +136,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
     ]
   })
   njkEnv.addFilter('releaseDatesToSummaryRows', releaseDatesToSummaryRows)
+  njkEnv.addFilter('formatName', formatName)
 }

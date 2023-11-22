@@ -31,4 +31,7 @@
     margin-bottom: 15px;
   }
 
+  .govuk-summary-list__row:last-of-type {
+    border-bottom: none;
+  }
 }

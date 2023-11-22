@@ -7,9 +7,12 @@ import { formatDate, formatDateTime, formatDateTimeISO } from '../utils/dateHelp
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
 import config from '../config'
+import PreviousLocation from '../interfaces/prisonApi/previousLocation'
 
+interface LocationWithAgencyLeaveDate extends PreviousLocation {
+  establishmentWithAgencyLeaveDate: string
+}
 /**
  * Parse request for alerts page and orchestrate response
  */
@@ -19,30 +22,32 @@ export default class PrisonerCellHistoryController {
   public async displayPrisonerCellHistory(req: Request, res: Response, prisonerData: Prisoner) {
     const offenderNo = prisonerData.prisonerNumber
 
-    const enrichLocationsWithAgencyLeaveDate = (locations: LocationsInmate[]) => {
-      const locationsWithAgencyLeaveDate: object[] = []
-      let previousLocationEstablishmentName = locations[0].establishment
-      let previousLocationEstablishmentNameAndLeaveDate =
-        previousLocationEstablishmentName + locations[0].assignmentEndDateTime
-      locations.forEach(location => {
-        const locationEstablishmentNameAndLeaveDate =
-          previousLocationEstablishmentName !== location.establishment
-            ? (previousLocationEstablishmentNameAndLeaveDate = location.establishment + location.assignmentEndDateTime)
-            : previousLocationEstablishmentNameAndLeaveDate
-        locationsWithAgencyLeaveDate.push({
+    const enrichLocationsWithAgencyLeaveDate = (locations: PreviousLocation[]): LocationWithAgencyLeaveDate[] => {
+      const enrichLocation = (
+        prev: LocationWithAgencyLeaveDate | null,
+        location: PreviousLocation,
+      ): LocationWithAgencyLeaveDate => {
+        const establishmentWithAgencyLeaveDate =
+          prev && prev.establishment === location.establishment
+            ? prev.establishmentWithAgencyLeaveDate
+            : location.establishment + location.assignmentEndDateTime
+
+        return {
           ...location,
-          establishmentWithAgencyLeaveDate: locationEstablishmentNameAndLeaveDate,
-        })
-        previousLocationEstablishmentName = location.establishment
-        previousLocationEstablishmentNameAndLeaveDate = locationEstablishmentNameAndLeaveDate
-      })
-      return locationsWithAgencyLeaveDate
+          establishmentWithAgencyLeaveDate,
+        }
+      }
+
+      return locations.reduce<LocationWithAgencyLeaveDate[]>((result, location) => {
+        const prevLocation = result[result.length - 1] || null
+        const enrichedLocation = enrichLocation(prevLocation, location)
+        return [...result, enrichedLocation]
+      }, [])
     }
 
-    const getCellHistoryGroupedByPeriodAtAgency = (locations: LocationsInmate[]) => {
+    const getCellHistoryGroupedByPeriodAtAgency = (locations: PreviousLocation[]) => {
       const locationsWithAgencyLeaveDate = enrichLocationsWithAgencyLeaveDate(locations)
       return Object.entries(groupBy(locationsWithAgencyLeaveDate, 'establishmentWithAgencyLeaveDate')).map(
-        // eslint-disable-next-line no-unused-vars
         ([key, value]) => {
           const fromDateString = formatDate(value.slice(-1)[0].assignmentDateTime, 'short')
           const toDateString = formatDate(value[0].assignmentEndDateTime, 'short') || 'Unknown'
@@ -76,7 +81,7 @@ export default class PrisonerCellHistoryController {
       const uniqueStaffIds = [...new Set(cells.content.map(cell => cell.movementMadeBy))]
       const staff = await Promise.all(uniqueStaffIds.map(staffId => prisonApiClient.getStaffDetails(staffId)))
 
-      const cellData = cells.content.map(cell => {
+      const cellData = cells.content.map<PreviousLocation>(cell => {
         const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
         const agencyName = cell.agencyId
         const agency = prisons.find(prison => cell.agencyId === prison.agencyId)
