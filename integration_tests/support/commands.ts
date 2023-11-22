@@ -41,6 +41,7 @@ Cypress.Commands.add(
     cy.task('stubInmateDetail', bookingId)
     cy.task('stubMovements', prisonerNumber)
     cy.task('stubGetCommunityManager')
+    cy.task('stubScheduledTransfers', prisonerNumber)
   },
 )
 

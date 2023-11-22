@@ -47,7 +47,7 @@ import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligat
 import { Movement } from '../interfaces/prisonApi/movement'
 import { MovementType } from './enums/movementType'
 import { OffenderSentenceDetail } from '../interfaces/prisonApi/offenderSentenceDetail'
-import { PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerPrisonSchedule, PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSchedule'
 import { Location } from '../interfaces/prisonApi/location'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
@@ -470,6 +470,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<PrisonerSchedule[]>({
       path: `/api/schedules/${agencyId}/locations/${locationId}/usage/${usage}`,
       query: mapToQueryString({ date, timeSlot }),
+    })
+  }
+
+  async getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]> {
+    return this.restClient.get<PrisonerPrisonSchedule[]>({
+      path: `/api/schedules/${prisonerNumber}/scheduled-transfers`,
+      ignore404: true,
     })
   }
 }

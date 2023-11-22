@@ -45,6 +45,7 @@ import { locationsMock } from './localMockData/locationsMock'
 import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
+import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
 
 jest.mock('./tokenStore')
 
@@ -574,6 +575,15 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getActivityList(agencyId, locationId, usage, date, timeSlot)
       expect(output).toEqual(prisonerSchedulesMock)
+    })
+  })
+
+  describe('getScheduledTransfers', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      mockSuccessfulPrisonApiCall(`/api/schedules/${prisonerNumber}/scheduled-transfers`, scheduledTransfersMock)
+      const output = await prisonApiClient.getScheduledTransfers(prisonerNumber)
+      expect(output).toEqual(scheduledTransfersMock)
     })
   })
 })
