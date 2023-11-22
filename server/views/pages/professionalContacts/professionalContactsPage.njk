@@ -26,55 +26,51 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-    {% if contactsGroupedByRelationship.length %}
-        {% for group in contactsGroupedByRelationship %}
-            {% for contact in group.contacts %}
-                {%- call summaryCard({title: group.relationship}) -%}
-                    <dl class="govuk-summary-list" >
-                        <div class="govuk-summary-list__row" data-qa="contact-name">
-                            <dt class="govuk-summary-list__key">
-                                Name
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                {{ contact.firstName | formatName("", contact.lastName) }}
-                            </dd>
-                        </div>
+    {% for contact in professionalContacts %}
+        {%- call summaryCard({title: contact.relationshipDescription}) -%}
+            <dl class="govuk-summary-list" >
+                <div class="govuk-summary-list__row" data-qa="contact-name">
+                    <dt class="govuk-summary-list__key">
+                        Name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ contact.firstName | formatName("", contact.lastName) }}
+                    </dd>
+                </div>
 
-                        <div class="govuk-summary-list__row" data-qa="contact-details">
-                            <dt class="govuk-summary-list__key">
-                                Contact details
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                {% if contact.emails.length or contact.phones.length %}
-                                    {% for email in contact.emails %}
-                                        {{ email }} <br />
-                                    {% endfor %}
-                                    {% for phone in contact.phones %}
-                                        {{ phone }} <br />
-                                    {% endfor %}
-                                {% else %}
-                                    Not entered
-                                {% endif %}
-                            </dd>
-                        </div>
+                <div class="govuk-summary-list__row" data-qa="contact-details">
+                    <dt class="govuk-summary-list__key">
+                        Contact details
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if contact.emails.length or contact.phones.length %}
+                            {% for email in contact.emails %}
+                                {{ email }} <br />
+                            {% endfor %}
+                            {% for phone in contact.phones %}
+                                {{ phone }} <br />
+                            {% endfor %}
+                        {% else %}
+                            Not entered
+                        {% endif %}
+                    </dd>
+                </div>
 
-                        <div class="govuk-summary-list__row" data-qa="contact-address">
-                            <dt class="govuk-summary-list__key">
-                                Address
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                {% if contact.address and not contact.address.noFixedAddress %}
-                                    {{ arrayToLines(contact.address | addressToLines, "Not entered") }}
-                                {% else %}
-                                    Not entered
-                                {% endif %}
-                            </dd>
-                        </div>
-                    </dl>
-                {%- endcall -%}
-            {% endfor %}
-        {% endfor %}
-    {% endif %}
+                <div class="govuk-summary-list__row" data-qa="contact-address">
+                    <dt class="govuk-summary-list__key">
+                        Address
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if contact.address and not contact.address.noFixedAddress %}
+                            {{ arrayToLines(contact.address | addressToLines, "Not entered") }}
+                        {% else %}
+                            Not entered
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+        {%- endcall -%}
+    {% endfor %}
 
     </div>
 </div>

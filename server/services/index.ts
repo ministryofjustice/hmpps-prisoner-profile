@@ -65,6 +65,7 @@ export const services = () => {
     prisonApiClientBuilder,
     allocationManagerApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
+    keyworkerApiClientBuilder,
   )
 
   return {

@@ -23,7 +23,7 @@ describe('Prisoner schedule', () => {
       get: jest.fn().mockReturnValue('localhost'),
     }
     res = { locals: {}, render: jest.fn(), status: jest.fn() }
-    controller = new ProfessionalContactsController(new ProfessionalContactsService(null, null, null))
+    controller = new ProfessionalContactsController(new ProfessionalContactsService(null, null, null, null))
   })
 
   afterEach(() => {
@@ -33,7 +33,7 @@ describe('Prisoner schedule', () => {
 
   describe('displayProfessionalContacts', () => {
     it('should call the service and render the page', async () => {
-      const contacts = [
+      const professionalContacts = [
         {
           relationship: 'Prison Offender Manager',
           contacts: [
@@ -48,11 +48,13 @@ describe('Prisoner schedule', () => {
           ],
         },
       ]
-      jest.spyOn<any, string>(controller['professionalContactsService'], 'getContacts').mockResolvedValue(contacts)
+      jest
+        .spyOn<any, string>(controller['professionalContactsService'], 'getContacts')
+        .mockResolvedValue(professionalContacts)
 
       await controller.displayProfessionalContacts(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/professionalContacts/professionalContactsPage', {
-        contactsGroupedByRelationship: contacts,
+        professionalContacts,
         prisonerName: 'John Saunders',
         prisonerNumber: 'G6123VU',
       })

@@ -9,14 +9,14 @@ export default class ProfessionalContactsController {
     const { firstName, lastName, prisonerNumber, bookingId } = req.middleware.prisonerData
     const { clientToken } = res.locals
 
-    const contactsGroupedByRelationship = await this.professionalContactsService.getContacts(
+    const professionalContacts = await this.professionalContactsService.getContacts(
       clientToken,
       prisonerNumber,
       bookingId,
     )
 
     return res.render('pages/professionalContacts/professionalContactsPage', {
-      contactsGroupedByRelationship,
+      professionalContacts,
       prisonerNumber,
       prisonerName: formatName(firstName, '', lastName),
     })

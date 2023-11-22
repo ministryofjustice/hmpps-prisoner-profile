@@ -1,5 +1,3 @@
-import { Address } from './prisonApi/address'
-
 export interface StaffContacts {
   keyWorker: KeyWorkerUI
   prisonOffenderManager: string
@@ -39,12 +37,6 @@ export interface ContactDetail {
   bookingId: number
   nextOfKin: Contact[]
   otherContacts: Contact[]
-}
-
-export interface PrisonerContactWithContactDetails extends Contact {
-  address: Address & { label: string }
-  emails: string[]
-  phones: string[]
 }
 
 export interface PomContact {

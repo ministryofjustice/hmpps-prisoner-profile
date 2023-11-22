@@ -9,6 +9,8 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Contact, ContactDetail } from '../interfaces/staffContacts'
 import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
+import { keyWorkerMock } from '../data/localMockData/keyWorker'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -81,45 +83,48 @@ const mockPom: Pom = {
     name: 'Jones, Jane',
   },
 }
-const expectedPomResponse = {
-  relationship: 'Prison Offender Manager',
-  contacts: [
-    {
-      jobTitle: 'Co-worker',
-      name: 'Jane Jones',
-    },
-    {
-      jobTitle: false,
-      name: 'John Smith',
-    },
-  ],
-}
 
-const expectedComResponse = {
-  contacts: [
-    {
-      code: 'team',
-      emails: ['com@email.com', 'teamEmail@email.com'],
-      firstName: 'Community',
-      lastName: 'Manager',
-      name: {
-        forename: 'Community',
-        surname: 'Manager',
-      },
-      relationshipDescription: 'Community Offender Manager',
-      team: {
-        code: 'team',
-        description: 'team desc',
-      },
-      unallocated: false,
-    },
-  ],
-  relationship: 'Community Offender Manager',
-}
+const expectedPomResponse = [
+  {
+    emails: [] as string[],
+    firstName: 'John',
+    lastName: 'Smith',
+    phones: [] as string[],
+    relationshipDescription: 'Prison Offender Manager',
+  },
+  {
+    relationshipDescription: 'Co-working Prison Offender Manager',
+    emails: [],
+    firstName: 'Jane',
+    lastName: 'Jones',
+    phones: [],
+  },
+]
+
+const expectedComResponse = [
+  {
+    emails: ['com@email.com', 'teamEmail@email.com'],
+    firstName: 'Community',
+    lastName: 'Manager',
+    phones: [] as string[],
+    relationshipDescription: 'Community Offender Manager',
+  },
+]
+
+const expectedKeyWorkerResponse = [
+  {
+    emails: ['1@1.com'],
+    firstName: 'Dave',
+    lastName: 'Stevens',
+    phones: [] as string[],
+    relationshipDescription: 'Key Worker',
+  },
+]
 describe('professionalContactsService', () => {
   let prisonApiClient: PrisonApiClient
   let allocationManagerApiClient: AllocationManagerClient
   let professionalContactsClient: PrisonerProfileDeliusApiClient
+  let keyWorkerApiClient: KeyWorkerClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -133,6 +138,10 @@ describe('professionalContactsService', () => {
 
     professionalContactsClient = {
       getCommunityManager: jest.fn(async () => mockCommunityManager),
+    }
+
+    keyWorkerApiClient = {
+      getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
     }
   })
 
@@ -149,52 +158,32 @@ describe('professionalContactsService', () => {
         () => prisonApiClient,
         () => allocationManagerApiClient,
         () => professionalContactsClient,
+        () => keyWorkerApiClient,
       )
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
       expect(response).toEqual([
-        expectedPomResponse,
-        expectedComResponse,
+        ...expectedPomResponse,
+        ...expectedComResponse,
+        ...expectedKeyWorkerResponse,
         {
-          relationship: 'Probation Officer',
-          contacts: [
-            {
-              activeFlag: true,
-              address: {
-                label: 'Main address',
-                noFixedAddress: false,
-                premise: 'Address',
-                primary: true,
-              },
-              approvedVisitorFlag: false,
-              awareOfChargesFlag: false,
-              bookingId: 1,
-              canBeContactedFlag: true,
-              commentText: 'Some comment',
-              contactRootOffenderId: 1,
-              contactType: 'O',
-              contactTypeDescription: 'Responsible Officer',
-              createDateTime: '2020-01-01',
-              emails: ['e@mail.com'],
-              emergencyContact: false,
-              expiryDate: '2020-01-01',
-              firstName: 'John',
-              lastName: 'Smith',
-              middleName: 'Paul',
-              nextOfKin: false,
-              personId: 1,
-              phones: ['077111111'],
-              relationship: 'PROBATION',
-              relationshipDescription: 'Probation Officer',
-              relationshipId: 1,
-            },
-          ],
+          address: {
+            label: 'Main address',
+            noFixedAddress: false,
+            premise: 'Address',
+            primary: true,
+          },
+          emails: ['e@mail.com'],
+          firstName: 'John',
+          lastName: 'Smith',
+          phones: ['077111111'],
+          relationshipDescription: 'Probation Officer',
         },
       ])
     })
 
-    it('should group the contacts by relationship', async () => {
+    it('should sort the contacts by relationship', async () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
         nextOfKin: [],
@@ -210,19 +199,19 @@ describe('professionalContactsService', () => {
         () => prisonApiClient,
         () => allocationManagerApiClient,
         () => professionalContactsClient,
+        () => keyWorkerApiClient,
       )
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
-      expect(response.length).toEqual(4)
-      expect(response[0].relationship).toEqual('Prison Offender Manager')
-      expect(response[0].contacts.length).toEqual(2)
-      expect(response[1].relationship).toEqual('Community Offender Manager')
-      expect(response[1].contacts.length).toEqual(1)
-      expect(response[2].relationship).toEqual('Prison Guard')
-      expect(response[2].contacts.length).toEqual(2)
-      expect(response[3].relationship).toEqual('Responsible officer')
-      expect(response[3].contacts.length).toEqual(1)
+      expect(response.length).toEqual(7)
+      expect(response[0].relationshipDescription).toEqual('Prison Offender Manager')
+      expect(response[1].relationshipDescription).toEqual('Co-working Prison Offender Manager')
+      expect(response[2].relationshipDescription).toEqual('Community Offender Manager')
+      expect(response[3].relationshipDescription).toEqual('Key Worker')
+      expect(response[4].relationshipDescription).toEqual('Prison Guard')
+      expect(response[5].relationshipDescription).toEqual('Prison Guard')
+      expect(response[6].relationshipDescription).toEqual('Responsible officer')
     })
 
     it('should remove contacts with address with past the enddate', async () => {
@@ -238,11 +227,12 @@ describe('professionalContactsService', () => {
         () => prisonApiClient,
         () => allocationManagerApiClient,
         () => professionalContactsClient,
+        () => keyWorkerApiClient,
       )
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
-      expect(response).toEqual([expectedPomResponse, expectedComResponse])
+      expect(response).toEqual([...expectedPomResponse, ...expectedComResponse, ...expectedKeyWorkerResponse])
     })
 
     it('should return a contact for each address with valid or no endate', async () => {
@@ -253,7 +243,7 @@ describe('professionalContactsService', () => {
       }
       prisonApiClient.getAddressesForPerson = jest.fn(async () => [
         mockAddress({ endDate: '2050-01-01' }),
-        mockAddress(),
+        mockAddress({ addressId: 999 }),
       ])
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
 
@@ -261,14 +251,13 @@ describe('professionalContactsService', () => {
         () => prisonApiClient,
         () => allocationManagerApiClient,
         () => professionalContactsClient,
+        () => keyWorkerApiClient,
       )
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
-      expect(response[2].contacts[0]).toMatchObject({
-        address: mockAddress({ endDate: '2050-01-01' }),
-      })
-      expect(response[2].contacts[1]).toMatchObject({ address: mockAddress() })
+      expect(response.find(contact => contact.address?.endDate === '2050-01-01')).toBeTruthy()
+      expect(response.find(contact => contact.address?.addressId === 999)).toBeTruthy()
     })
 
     it('should remove com and pom contacts from prison api', async () => {
@@ -287,11 +276,12 @@ describe('professionalContactsService', () => {
         () => prisonApiClient,
         () => allocationManagerApiClient,
         () => professionalContactsClient,
+        () => keyWorkerApiClient,
       )
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
-      expect(response).toEqual([expectedPomResponse, expectedComResponse])
+      expect(response).toEqual([...expectedPomResponse, ...expectedComResponse, ...expectedKeyWorkerResponse])
     })
   })
 })
