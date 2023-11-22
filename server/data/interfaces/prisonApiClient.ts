@@ -31,10 +31,10 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
-import { AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
+import { AgenciesEmail, AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
 import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
-import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
+import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
 import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
 import { CsraAssessment } from '../../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../../interfaces/prisonApi/transaction'
@@ -44,6 +44,7 @@ import { MovementType } from '../enums/movementType'
 import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
 import { PrisonerPrisonSchedule, PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
 import { Location } from '../../interfaces/prisonApi/location'
+import { Telephone } from '../../interfaces/prisonApi/telephone'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -94,7 +95,7 @@ export interface PrisonApiClient {
   getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails>
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
   getStaffDetails(staffId: string): Promise<StaffDetails>
-  getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]>
+  getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
@@ -136,5 +137,7 @@ export interface PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
+  getPersonEmails(personId: number): Promise<AgenciesEmail[]>
+  getPersonPhones(personId: number): Promise<Telephone[]>
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
 }

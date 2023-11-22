@@ -250,7 +250,7 @@ export default class OverviewPageService {
         ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
         : 'Not assigned',
       communityOffenderManager: formatCommunityManager(communityManager),
-      linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
+      linkUrl: `/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
     }
   }
 

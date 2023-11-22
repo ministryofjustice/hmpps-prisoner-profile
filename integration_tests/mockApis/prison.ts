@@ -1150,6 +1150,38 @@ export default {
     })
   },
 
+  stubPersonEmails: (personId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/persons/${personId}/emails`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
+      },
+    })
+  },
+
+  stubPersonPhones: (personId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/persons/${personId}/phones`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [{ number: '07700000000', type: 'mobile' }],
+      },
+    })
+  },
+
   stubScheduledTransfers: (prisonerNumber: string) => {
     return stubFor({
       request: {
