@@ -48,23 +48,17 @@ export default class OffencesPage extends Page {
   conditionalReleaseValue = (): PageElement =>
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value')
 
-  nonDtoSentenceReleaseDateKey = (): PageElement =>
+  paroleEligibilityKey = (): PageElement =>
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__key')
 
-  nonDtoSentenceReleaseDateValue = (): PageElement =>
+  paroleEligibilityValue = (): PageElement =>
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value')
 
-  paroleEligibilityKey = (): PageElement =>
+  postRecallKey = (): PageElement =>
     cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__key')
 
-  paroleEligibilityValue = (): PageElement =>
-    cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value')
-
-  postRecallKey = (): PageElement =>
-    cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__key')
-
   postRecallValue = (): PageElement =>
-    cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value')
+    cy.get('.hmpps-summary-card__body > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value')
 
   countFiveCard = (): PageElement =>
     cy.get('#accordion-with-summary-sections-content-3 > :nth-child(3) > .govuk-grid-column-full')

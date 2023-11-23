@@ -427,13 +427,13 @@ describe('OffencesPageService', () => {
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
-            nonDtoReleaseDate: '2016-02-01',
+            nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'ARD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
         }))
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
-        expect(res.automaticReleaseDateNonDto).toEqual('2016-02-01')
+        expect(res.automaticReleaseDateNonDto).toEqual('2017-02-01')
         expect(res.conditionalReleaseNonDto).toBeUndefined()
         expect(res.nonParoleDateNonDto).toBeUndefined()
         expect(res.postRecallDateNonDto).toBeUndefined()
@@ -444,14 +444,14 @@ describe('OffencesPageService', () => {
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
-            nonDtoReleaseDate: '2016-02-01',
+            nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'CRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
         }))
         const offencesPageService = offencesPageServiceConstruct()
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
-        expect(res.conditionalReleaseNonDto).toEqual('2016-02-01')
+        expect(res.conditionalReleaseNonDto).toEqual('2017-02-01')
         expect(res.nonParoleDateNonDto).toBeUndefined()
         expect(res.postRecallDateNonDto).toBeUndefined()
       })
@@ -461,7 +461,7 @@ describe('OffencesPageService', () => {
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
-            nonDtoReleaseDate: '2016-02-01',
+            nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'NPD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
         }))
@@ -469,7 +469,7 @@ describe('OffencesPageService', () => {
         const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
         expect(res.conditionalReleaseNonDto).toBeUndefined()
-        expect(res.nonParoleDateNonDto).toEqual('2016-02-01')
+        expect(res.nonParoleDateNonDto).toEqual('2017-02-01')
         expect(res.postRecallDateNonDto).toBeUndefined()
       })
 
@@ -478,7 +478,7 @@ describe('OffencesPageService', () => {
           ...prisonerSentenceDetailsMock,
           sentenceDetail: {
             ...sentenceDetail,
-            nonDtoReleaseDate: '2016-02-01',
+            nonDtoReleaseDate: '2017-02-01',
             nonDtoReleaseDateType: 'PRRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
           },
         }))
@@ -487,7 +487,7 @@ describe('OffencesPageService', () => {
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
         expect(res.conditionalReleaseNonDto).toBeUndefined()
         expect(res.nonParoleDateNonDto).toBeUndefined()
-        expect(res.postRecallDateNonDto).toEqual('2016-02-01')
+        expect(res.postRecallDateNonDto).toEqual('2017-02-01')
       })
 
       it('should use none if no type', async () => {
@@ -521,6 +521,66 @@ describe('OffencesPageService', () => {
         expect(res.automaticReleaseDateNonDto).toBeUndefined()
         expect(res.conditionalReleaseNonDto).toBeUndefined()
         expect(res.nonParoleDateNonDto).toBeUndefined()
+        expect(res.postRecallDateNonDto).toBeUndefined()
+      })
+
+      it('should use none if no date if crd type and conditionalReleaseDate is the same', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            conditionalReleaseDate: '2012-01-01',
+            nonDtoReleaseDate: '2012-01-01',
+            nonDtoReleaseDateType: 'CRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.conditionalReleaseNonDto).toBeUndefined()
+      })
+
+      it('should use none if no date if ard type and automaticReleaseDate is the same', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            automaticReleaseDate: '2012-01-01',
+            nonDtoReleaseDate: '2012-01-01',
+            nonDtoReleaseDateType: 'CRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.automaticReleaseDateNonDto).toBeUndefined()
+      })
+
+      it('should use none if NPD type and nonParoleDate is the same', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            nonParoleDate: '2012-01-01',
+            nonDtoReleaseDate: '2012-01-01',
+            nonDtoReleaseDateType: 'NPD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
+        expect(res.nonParoleDateNonDto).toBeUndefined()
+      })
+
+      it('should use none if PRRD type and postRecallReleaseDate is the same', async () => {
+        prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => ({
+          ...prisonerSentenceDetailsMock,
+          sentenceDetail: {
+            ...sentenceDetail,
+            postRecallReleaseDate: '2012-01-01',
+            nonDtoReleaseDate: '2012-01-01',
+            nonDtoReleaseDateType: 'PRD' as 'ARD' | 'CRD' | 'NPD' | 'PRRD',
+          },
+        }))
+        const offencesPageService = offencesPageServiceConstruct()
+        const res = await offencesPageService.getReleaseDates('token', '12345')
         expect(res.postRecallDateNonDto).toBeUndefined()
       })
     })
