@@ -119,6 +119,12 @@ export default class OffencesPageService {
       .map(offence => offence.caseId)
   }
 
+  getSentencedCaseIds(offenceHistory: OffenceHistoryDetail[], sentenceSummary: SentenceSummary) {
+    const caseIdsFromOffenceHistory = this.chargeCodesFilter(offenceHistory)
+    const caseIdsFromSentenceSummary = sentenceSummary.latestPrisonTerm.courtSentences.map(s => s.id)
+    return [...new Set([...caseIdsFromOffenceHistory, ...caseIdsFromSentenceSummary])]
+  }
+
   async getCourtCasesData(token: string, bookingId: number, prisonerNumber: string) {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const [courtCaseData, offenceHistory, sentenceTermsData, courtDateResults, sentenceSummary] = await Promise.all([
@@ -129,7 +135,8 @@ export default class OffencesPageService {
       prisonApiClient.getSentenceSummary(prisonerNumber),
     ])
 
-    const caseIds = [...new Set(this.chargeCodesFilter(offenceHistory))]
+    const caseIds = this.getSentencedCaseIds(offenceHistory, sentenceSummary)
+
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
     const summarySentencedCourtCasesMapped = this.getMapForSentenceSummaryCourtCases(
