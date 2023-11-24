@@ -1,4 +1,3 @@
-import { SQSClient } from '@aws-sdk/client-sqs'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import ActivePunishmentsService from './activePunishmentsService'
@@ -17,9 +16,6 @@ import ComponentService from './componentService'
 import MoneyService from './moneyService'
 import AppointmentService from './appointmentService'
 import ProfessionalContactsService from './professionalContactsService'
-import { auditService as AuditService } from './auditService'
-import config from '../config'
-import { getBuild } from './healthCheck'
 
 export const services = () => {
   const {
@@ -38,17 +34,9 @@ export const services = () => {
     prisonerProfileDeliusApiClientBuilder,
   } = dataAccess
 
-  const auditService = AuditService({
-    sqsClient: new SQSClient({ region: config.apis.audit.region }),
-    queueUrl: config.apis.audit.queueUrl,
-    serviceName: config.apis.audit.serviceName,
-    build: getBuild()?.build?.gitRef,
-    enabled: config.apis.audit.enabled,
-  })
-
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
+  const commonApiRoutes = new CommonApiRoutes(offenderService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
   const alertsPageService = new AlertsPageService(prisonApiClientBuilder)
@@ -99,7 +87,6 @@ export const services = () => {
     moneyService,
     appointmentService,
     professionalContactsService,
-    auditService,
   }
 }
 

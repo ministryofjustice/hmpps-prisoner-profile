@@ -14,8 +14,6 @@ import {
 import { damageObligationsMock } from '../data/localMockData/damageObligationsMock'
 import { AccountCode } from '../data/enums/accountCode'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { Page } from '../services/auditService'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: any
 let res: any
@@ -62,7 +60,7 @@ describe('Money Controller', () => {
     moneyService.getAgencyDetails = jest.fn(async () => AgenciesMock)
     moneyService.getTransactions = jest.fn(async () => transactionsMock)
     moneyService.getDamageObligations = jest.fn(async () => damageObligationsMock)
-    controller = new MoneyController(moneyService, auditServiceMock())
+    controller = new MoneyController(moneyService)
   })
 
   afterEach(() => {
@@ -74,7 +72,7 @@ describe('Money Controller', () => {
 
     await controller.displaySpends()(req, res, next)
 
-    expect(getTransactions).toHaveBeenCalledWith(AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
+    expect(getTransactions).toHaveBeenCalledWith(AccountCode.Spends, 'Spends', req, res)
   })
 
   it('should display private cash', async () => {
@@ -82,13 +80,7 @@ describe('Money Controller', () => {
 
     await controller.displayPrivateCash()(req, res, next)
 
-    expect(getTransactions).toHaveBeenCalledWith(
-      AccountCode.PrivateCash,
-      'Private cash',
-      Page.MoneyPrivateCash,
-      req,
-      res,
-    )
+    expect(getTransactions).toHaveBeenCalledWith(AccountCode.PrivateCash, 'Private cash', req, res)
   })
 
   it('should display savings', async () => {
@@ -96,7 +88,7 @@ describe('Money Controller', () => {
 
     await controller.displaySavings()(req, res, next)
 
-    expect(getTransactions).toHaveBeenCalledWith(AccountCode.Savings, 'Savings', Page.MoneySavings, req, res)
+    expect(getTransactions).toHaveBeenCalledWith(AccountCode.Savings, 'Savings', req, res)
   })
 
   it('should display damage obligations', async () => {
@@ -195,7 +187,7 @@ describe('Money Controller', () => {
       { text: 2020, value: 2020 },
     ])
 
-    await controller['getTransactions'](AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
+    await controller['getTransactions'](AccountCode.Spends, 'Spends', req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
       res.locals.clientToken,

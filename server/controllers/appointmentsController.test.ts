@@ -15,7 +15,6 @@ import { courtLocationsMock, courtLocationsSelectOptionsMock } from '../data/loc
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: any
 let res: any
@@ -127,7 +126,7 @@ describe('Appointments Controller', () => {
       redirect: jest.fn(),
     }
 
-    controller = new AppointmentController(appointmentService, prisonerSearchService, auditServiceMock())
+    controller = new AppointmentController(appointmentService, prisonerSearchService)
 
     appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
       appointmentTypes: appointmentTypesMock,

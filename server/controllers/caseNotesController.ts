@@ -15,7 +15,6 @@ import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -25,7 +24,6 @@ export default class CaseNotesController {
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly caseNotesService: CaseNotesService,
-    private readonly auditService: AuditService,
   ) {}
 
   public displayCaseNotes(): RequestHandler {
@@ -84,17 +82,6 @@ export default class CaseNotesController {
       // Get staffId to use in conditional logic for amend link
       const { staffId } = res.locals.user
 
-      await this.auditService.sendSearch({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        searchPage: SearchAction.CaseNotes,
-        details: { queryParams },
-      })
-
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
@@ -149,16 +136,6 @@ export default class CaseNotesController {
         ? addCaseNoteRefererUrlFlash[0]
         : req.headers.referer || `/prisoner/${prisonerNumber}`
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.AddCaseNote,
-      })
-
       return res.render('pages/caseNotes/addCaseNote', {
         today: formatDate(now.toISOString(), 'short'),
         refererUrl,
@@ -211,14 +188,6 @@ export default class CaseNotesController {
       }
 
       req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
-      this.auditService.sendPostSuccess({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.CaseNote,
-        details: {},
-      })
       return res.redirect(refererUrl || `/prisoner/${prisonerNumber}/case-notes`)
     }
   }
