@@ -48,10 +48,10 @@ generic-service:
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"
     ACTIVITIES_ENABLED_PRISONS: "RSI"
     APPOINTMENTS_URL: "https://activities.prison.service.justice.gov.uk/appointments"
-    APPOINTMENTS_ENABLED_PRISONS: ""
+    APPOINTMENTS_ENABLED_PRISONS: "RSI"
     COMPONENT_API_URL: "https://frontend-components.hmpps.service.justice.gov.uk"
     COMPONENT_API_LATEST: "false"
-    PROFILE_ADD_APPOINTMENT_ENABLED: "false"
+    PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
 
