@@ -5,6 +5,7 @@ import { PrisonerScheduleThisWeekMock } from '../data/localMockData/prisonerSche
 import { getEventsNextWeekMock, getEventsThisWeekMock } from '../data/localMockData/getEventsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 describe('Prisoner schedule', () => {
   const offenderNo = 'ABC123'
@@ -26,12 +27,12 @@ describe('Prisoner schedule', () => {
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
     }
-    res = { locals: {}, render: jest.fn(), status: jest.fn() }
+    res = { locals: { user: {} }, render: jest.fn(), status: jest.fn() }
 
     prisonApi = prisonApiClientMock()
     prisonApi.getScheduledEventsForThisWeek = jest.fn().mockResolvedValue(getEventsThisWeekMock)
     prisonApi.getScheduledEventsForNextWeek = jest.fn().mockResolvedValue(getEventsNextWeekMock)
-    controller = new PrisonerScheduleController(() => prisonApi)
+    controller = new PrisonerScheduleController(() => prisonApi, auditServiceMock())
   })
 
   afterEach(() => {

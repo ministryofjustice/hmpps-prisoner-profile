@@ -10,6 +10,8 @@ import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkUserCanEdit from '../middleware/checkUserCanEditMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { AlertValidator } from '../validators/alertValidator'
+import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
+import { Page } from '../services/auditService'
 
 export default function alertsRouter(services: Services): Router {
   const router = Router()
@@ -25,14 +27,23 @@ export default function alertsRouter(services: Services): Router {
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const alertsController = new AlertsController(services.alertsPageService, services.referenceDataService)
+  const alertsController = new AlertsController(
+    services.alertsPageService,
+    services.referenceDataService,
+    services.auditService,
+  )
 
-  get('/prisoner/:prisonerNumber/alerts', async (req, res, next) => {
-    res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
-  })
+  get(
+    '/prisoner/:prisonerNumber/alerts',
+    auditPageAccessAttempt({ services, page: Page.Alerts }),
+    async (req, res, next) => {
+      res.redirect(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    },
+  )
 
   get(
     '/prisoner/:prisonerNumber/alerts/active',
+    auditPageAccessAttempt({ services, page: Page.ActiveAlerts }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     (req, res, next) => {
@@ -42,6 +53,7 @@ export default function alertsRouter(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/alerts/inactive',
+    auditPageAccessAttempt({ services, page: Page.InactiveAlerts }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     (req, res, next) => {
@@ -51,6 +63,7 @@ export default function alertsRouter(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/add-alert',
+    auditPageAccessAttempt({ services, page: Page.AddAlert }),
     getPrisonerData(services),
     guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
     (req, res, next) => {
@@ -58,7 +71,12 @@ export default function alertsRouter(services: Services): Router {
     },
   )
 
-  post('/prisoner/:prisonerNumber/add-alert', validationMiddleware(AlertValidator), alertsController.post())
+  post(
+    '/prisoner/:prisonerNumber/add-alert',
+    auditPageAccessAttempt({ services, page: Page.PostAddAlert }),
+    validationMiddleware(AlertValidator),
+    alertsController.post(),
+  )
 
   return router
 }

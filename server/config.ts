@@ -44,6 +44,12 @@ export default {
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
   apis: {
+    audit: {
+      queueUrl: get('AUDIT_QUEUE_URL', 'eu-west-2', requiredInProduction),
+      region: get('AUDIT_QUEUE_REGION', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
+      serviceName: get('AUDIT_SERVICE_NAME', 'hmpps-prisoner-profile', requiredInProduction),
+      enabled: get('AUDIT_ENABLED', 'false') === 'true',
+    },
     hmppsAuth: {
       url: get('HMPPS_AUTH_URL', 'http://localhost:9090/auth', requiredInProduction),
       externalUrl: get('HMPPS_AUTH_EXTERNAL_URL', get('HMPPS_AUTH_URL', 'http://localhost:9090/auth')),
