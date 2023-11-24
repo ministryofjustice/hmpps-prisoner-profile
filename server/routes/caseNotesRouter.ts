@@ -4,6 +4,8 @@ import { Services } from '../services'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { CaseNoteValidator } from '../validators/caseNoteValidator'
+import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
+import { Page } from '../services/auditService'
 
 export default function caseNotesRouter(services: Services): Router {
   const router = Router()
@@ -23,11 +25,26 @@ export default function caseNotesRouter(services: Services): Router {
     services.dataAccess.prisonApiClientBuilder,
     services.prisonerSearchService,
     services.caseNotesService,
+    services.auditService,
   )
 
-  get('/prisoner/:prisonerNumber/case-notes', caseNotesController.displayCaseNotes())
-  get('/prisoner/:prisonerNumber/add-case-note', caseNotesController.displayAddCaseNote())
-  post('/prisoner/:prisonerNumber/add-case-note', validationMiddleware(CaseNoteValidator), caseNotesController.post())
+  get(
+    '/prisoner/:prisonerNumber/case-notes',
+    auditPageAccessAttempt({ services, page: Page.CaseNotes }),
+    caseNotesController.displayCaseNotes(),
+  )
+  get(
+    '/prisoner/:prisonerNumber/add-case-note',
+    auditPageAccessAttempt({ services, page: Page.AddCaseNote }),
+    caseNotesController.displayAddCaseNote(),
+  )
+
+  post(
+    '/prisoner/:prisonerNumber/add-case-note',
+    auditPageAccessAttempt({ services, page: Page.PostAddCaseNote }),
+    validationMiddleware(CaseNoteValidator),
+    caseNotesController.post(),
+  )
 
   return router
 }

@@ -8,12 +8,16 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import csraAssessmentsToSummaryListMapper from '../mappers/csraAssessmentsToSummaryListMapper'
 import getFilterValuesFromAssessments from '../utils/getFilterValuesFromAssessments'
 import validateDateRange from '../utils/validateDateRange'
+import { AuditService, Page } from '../services/auditService'
 
 export default class CsraController {
-  constructor(private readonly csraService: CsraService) {}
+  constructor(
+    private readonly csraService: CsraService,
+    private readonly auditService: AuditService,
+  ) {}
 
   public async displayHistory(req: Request, res: Response, next: NextFunction) {
-    const { firstName, lastName, middleNames, prisonerNumber } = req.middleware.prisonerData
+    const { firstName, lastName, middleNames, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = res.locals
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
@@ -35,6 +39,16 @@ export default class CsraController {
 
     const filteredSummaries = this.csraService.filterCsraAssessments(allCsraSummaries, req.query)
 
+    await this.auditService.sendPageView({
+      userId: res.locals.user.username,
+      userCaseLoads: res.locals.user.caseLoads,
+      userRoles: res.locals.user.userRoles,
+      prisonerNumber,
+      prisonId,
+      correlationId: req.id,
+      page: Page.CsraHistory,
+    })
+
     return res.render('pages/csra/prisonerCsraHistoryPage', {
       pageTitle: 'CSRA history',
       name,
@@ -54,6 +68,16 @@ export default class CsraController {
       +bookingId,
       +assessmentSeq,
     )
+
+    await this.auditService.sendPageView({
+      userId: res.locals.user.username,
+      userCaseLoads: res.locals.user.caseLoads,
+      userRoles: res.locals.user.userRoles,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.CsraReview,
+    })
 
     return res.render('pages/csra/csraReviewPage', {
       pageTitle: 'CSRA details',
