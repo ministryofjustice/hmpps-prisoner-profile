@@ -1,7 +1,6 @@
 ---
 generic-service:
   nameOverride: hmpps-prisoner-profile
-  serviceAccountName: hmpps-prisoner-profile
 
   replicaCount: 4
 
