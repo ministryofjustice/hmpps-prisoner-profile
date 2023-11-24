@@ -148,20 +148,24 @@ export const auditService = ({
   queueUrl,
   build,
   serviceName,
+  enabled,
 }: {
   sqsClient: SQSClient
   queueUrl: string
   build: string
   serviceName: string
+  enabled: boolean
 }): AuditService => {
   const sendMessage = async (message: AuditMessage) => {
-    try {
-      const messageResponse = await sqsClient.send(
-        new SendMessageCommand({ MessageBody: JSON.stringify(message), QueueUrl: queueUrl }),
-      )
-      logger.info(`Page view sent to audit (${messageResponse.MessageId})`)
-    } catch (error) {
-      logger.error('Problem sending page view to audit', error)
+    if (enabled) {
+      try {
+        const messageResponse = await sqsClient.send(
+          new SendMessageCommand({ MessageBody: JSON.stringify(message), QueueUrl: queueUrl }),
+        )
+        logger.info(`Page view sent to audit (${messageResponse.MessageId})`)
+      } catch (error) {
+        logger.error('Problem sending page view to audit', error)
+      }
     }
   }
 

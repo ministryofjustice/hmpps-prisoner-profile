@@ -43,6 +43,7 @@ export const services = () => {
     queueUrl: config.apis.audit.queueUrl,
     serviceName: config.apis.audit.serviceName,
     build: getBuild()?.build?.gitRef,
+    enabled: config.apis.audit.enabled,
   })
 
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
