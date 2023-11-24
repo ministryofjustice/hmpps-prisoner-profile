@@ -91,6 +91,24 @@ describe('OffencesPageService', () => {
         1563148, 1563148, 1563201,
       ])
     })
+
+    describe('getCaseIds', () => {
+      it('Gets the correct caseIds including ones from the sentence summary', () => {
+        const offencesPageService = offencesPageServiceConstruct()
+        const sentenceSummary = JSON.parse(JSON.stringify(SentenceSummaryWithSentenceMock))
+        const courtSentences = [...SentenceSummaryWithSentenceMock.latestPrisonTerm.courtSentences]
+        courtSentences.push({
+          ...SentenceSummaryWithSentenceMock.latestPrisonTerm.courtSentences[0],
+          id: 123321,
+        })
+        sentenceSummary.latestPrisonTerm.courtSentences = courtSentences
+        const res = offencesPageService.getSentencedCaseIds(OffenceHistoryMock, sentenceSummary)
+        const expectedIds = [1434365, 1507172, 1563148, 1563198, 1563201, 462833, 666929, 669502, 955236, 123321]
+        expect(res.length).toEqual(expectedIds.length)
+        expect(res.sort()).toEqual(expectedIds.sort())
+      })
+    })
+
     it('Get court case details', async () => {
       const offencesPageService = offencesPageServiceConstruct()
       const res = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')

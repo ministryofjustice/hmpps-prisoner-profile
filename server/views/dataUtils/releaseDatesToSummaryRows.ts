@@ -31,7 +31,7 @@ const labels: Record<keyof ReleaseDates, string> = {
   postRecallDateNonDto: 'Post-recall release date (PRRD)',
   releaseOnTemporaryLicenceDate: 'Release on temporary licence (ROTL)',
   sentenceExpiryDate: 'Sentence expiry date (SED)',
-  sentenceLicenceExpiryDate: 'Sentence and license expiry date (SLED)',
+  sentenceLicenceExpiryDate: 'Sentence and licence expiry date (SLED)',
   tariffDate: 'Tariff',
   tariffEarlyRemovalSchemeEligibilityDate: 'Tariff Expired Removal Scheme eligibility date (TERSED)',
   topupSupervisionExpiryDate: 'Top-up supervision expiry date (TUSED)',
