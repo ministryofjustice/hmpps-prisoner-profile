@@ -45,8 +45,8 @@ export default {
   },
   apis: {
     audit: {
-      queueUrl: get('AUDIT_SQS_QUEUE_URL', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
-      region: get('AUDIT_SQS_REGION', 'eu-west-2', requiredInProduction),
+      queueUrl: get('AUDIT_QUEUE_URL', 'eu-west-2', requiredInProduction),
+      region: get('AUDIT_QUEUE_REGION', 'http://localhost:4566/000000000000/mainQueue', requiredInProduction),
       serviceName: get('AUDIT_SERVICE_NAME', 'hmpps-prisoner-profile', requiredInProduction),
       enabled: get('AUDIT_ENABLED', 'false') === 'true',
     },
