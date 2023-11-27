@@ -48,8 +48,8 @@ const appointmentsToCreate = {
   ),
   comment: formBody.comments,
   repeat: {
-    repeatPeriod: formBody.repeats || 'WEEKLY',
-    count: formBody.times || 1,
+    repeatPeriod: formBody.repeats,
+    count: formBody.times,
   },
 }
 
