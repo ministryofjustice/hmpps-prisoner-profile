@@ -126,10 +126,13 @@ export default class AppointmentController {
           startTime,
           endTime,
           comment: comments,
-          repeat: {
-            repeatPeriod: repeats || 'WEEKLY',
-            count: times || 1,
-          },
+          repeat:
+            recurring === 'yes'
+              ? {
+                  repeatPeriod: repeats,
+                  count: times,
+                }
+              : undefined,
         }
 
         if (appointmentType === 'VLB') {
