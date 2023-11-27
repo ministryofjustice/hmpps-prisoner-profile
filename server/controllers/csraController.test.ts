@@ -7,7 +7,6 @@ import CsraService from '../services/csraService'
 import AgencyMock from '../data/localMockData/agency'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import csraAssessmentMock from '../data/localMockData/csraAssessmentMock'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: any
 let res: any
@@ -39,7 +38,7 @@ describe('CSRA Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new CsraController(new CsraService(null), auditServiceMock())
+      controller = new CsraController(new CsraService(null))
     })
 
     it('should map the csra review details and questions to summary rows', async () => {
@@ -257,7 +256,7 @@ describe('CSRA Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new CsraController(new CsraService(null), auditServiceMock())
+      controller = new CsraController(new CsraService(null))
     })
 
     it('should map the csra assessments to summaries', async () => {
@@ -317,7 +316,7 @@ describe('CSRA Controller', () => {
           render: jest.fn(),
         }
         next = jest.fn()
-        controller = new CsraController(new CsraService(null), auditServiceMock())
+        controller = new CsraController(new CsraService(null))
       })
 
       it('should get values to use for filters and filter out those with no location', async () => {

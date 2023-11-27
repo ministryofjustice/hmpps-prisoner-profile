@@ -13,7 +13,6 @@ import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: any
 let res: any
@@ -66,7 +65,6 @@ describe('Case Notes Controller', () => {
       () => prisonApiClient,
       new PrisonerSearchService(null),
       new CaseNotesService(null),
-      auditServiceMock(),
     )
   })
 

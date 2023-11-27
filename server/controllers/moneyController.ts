@@ -11,32 +11,28 @@ import { TransactionPostingType } from '../data/enums/transactionPostingType'
 import { Agency } from '../interfaces/prisonApi/agency'
 import { TransactionType } from '../data/enums/transactionType'
 import { DamageObligation } from '../interfaces/prisonApi/damageObligation'
-import { AuditService, Page } from '../services/auditService'
 
 /**
  * Parse requests for money routes and orchestrate response
  */
 export default class MoneyController {
-  constructor(
-    private readonly moneyService: MoneyService,
-    private readonly auditService: AuditService,
-  ) {}
+  constructor(private readonly moneyService: MoneyService) {}
 
   public displaySpends(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      return this.getTransactions(AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
+      return this.getTransactions(AccountCode.Spends, 'Spends', req, res)
     }
   }
 
   public displayPrivateCash(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      return this.getTransactions(AccountCode.PrivateCash, 'Private cash', Page.MoneyPrivateCash, req, res)
+      return this.getTransactions(AccountCode.PrivateCash, 'Private cash', req, res)
     }
   }
 
   public displaySavings(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      return this.getTransactions(AccountCode.Savings, 'Savings', Page.MoneySavings, req, res)
+      return this.getTransactions(AccountCode.Savings, 'Savings', req, res)
     }
   }
 
@@ -47,7 +43,7 @@ export default class MoneyController {
   }
 
   private async getDamageObligations(req: Request, res: Response) {
-    const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
+    const { prisonerNumber, bookingId } = req.middleware.prisonerData
     const { clientToken } = res.locals
 
     const [accountBalances, damageObligations] = await Promise.all([
@@ -57,17 +53,9 @@ export default class MoneyController {
     damageObligations.sort((a, b) => parseISO(b.startDateTime).getTime() - parseISO(a.startDateTime).getTime())
 
     const uniquePrisonIds = [...new Set(damageObligations.map(obligation => obligation.prisonId))]
-    const prisons = await Promise.all(uniquePrisonIds.map(id => this.moneyService.getAgencyDetails(clientToken, id)))
-
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber,
-      prisonId,
-      correlationId: req.id,
-      page: Page.MoneyDamageObligations,
-    })
+    const prisons = await Promise.all(
+      uniquePrisonIds.map(prisonId => this.moneyService.getAgencyDetails(clientToken, prisonId)),
+    )
 
     return res.render('pages/money/damageObligations', {
       pageTitle: 'Damage obligations',
@@ -78,17 +66,11 @@ export default class MoneyController {
     })
   }
 
-  private async getTransactions(
-    accountCode: AccountCode,
-    accountDescription: string,
-    auditPage: Page,
-    req: Request,
-    res: Response,
-  ) {
+  private async getTransactions(accountCode: AccountCode, accountDescription: string, req: Request, res: Response) {
     const now = new Date()
     const month: number = +req.query.month || now.getMonth()
     const year: number = +req.query.year || now.getFullYear()
-    const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
+    const { prisonerNumber, bookingId } = req.middleware.prisonerData
     const { clientToken } = res.locals
     const isPrivateCash = accountCode === AccountCode.PrivateCash
 
@@ -199,16 +181,6 @@ export default class MoneyController {
     ]
       .filter(transaction => transaction.penceAmount)
       .sort(this.transactionSort)
-
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber,
-      prisonId,
-      correlationId: req.id,
-      page: auditPage,
-    })
 
     return res.render('pages/money/transactions', {
       pageTitle: `${accountDescription} account`,

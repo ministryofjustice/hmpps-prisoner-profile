@@ -8,8 +8,6 @@ import validationMiddleware from '../middleware/validationMiddleware'
 import { AppointmentValidator } from '../validators/appointmentValidator'
 import { PrePostAppointmentValidator } from '../validators/prePostAppointmentValidator'
 import config from '../config'
-import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { ApiAction, Page } from '../services/auditService'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
@@ -26,11 +24,7 @@ export default function appointmentRouter(services: Services): Router {
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const appointmentController = new AppointmentController(
-    services.appointmentService,
-    services.prisonerSearchService,
-    services.auditService,
-  )
+  const appointmentController = new AppointmentController(services.appointmentService, services.prisonerSearchService)
 
   const isCreateIndividualAppointmentRolledOut = (req: Request, res: Response, next: NextFunction) => {
     const { activeCaseLoadId } = res.locals.user
@@ -44,7 +38,6 @@ export default function appointmentRouter(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/add-appointment',
-    auditPageAccessAttempt({ services, page: Page.AddAppointment }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services),
     checkPrisonerInCaseload({ activeCaseloadOnly: true }),
@@ -52,13 +45,11 @@ export default function appointmentRouter(services: Services): Router {
   )
   post(
     '/prisoner/:prisonerNumber/add-appointment',
-    auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
     validationMiddleware(AppointmentValidator),
     appointmentController.post(),
   )
   get(
     '/prisoner/:prisonerNumber/appointment-confirmation',
-    auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
     getPrisonerData(services),
     checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.displayAppointmentConfirmation(),
@@ -66,20 +57,17 @@ export default function appointmentRouter(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/prepost-appointments',
-    auditPageAccessAttempt({ services, page: Page.PrePostAppointments }),
     getPrisonerData(services),
     checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.displayPrePostAppointments(),
   )
   post(
     '/prisoner/:prisonerNumber/prepost-appointments',
-    auditPageAccessAttempt({ services, page: Page.PostPrePostAppointments }),
     validationMiddleware(PrePostAppointmentValidator),
     appointmentController.postVideoLinkBooking(),
   )
   get(
     '/prisoner/:prisonerNumber/prepost-appointment-confirmation',
-    auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
     getPrisonerData(services),
     checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.displayPrePostAppointmentConfirmation(),
@@ -87,7 +75,6 @@ export default function appointmentRouter(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/movement-slips',
-    auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
     checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.displayPrisonerMovementSlips(),
@@ -96,17 +83,9 @@ export default function appointmentRouter(services: Services): Router {
   /**
    * API Routes - called from JavaScript on page
    */
-  get(
-    '/api/get-offender-events',
-    auditPageAccessAttempt({ services, page: ApiAction.OffenderEvents }),
-    appointmentController.getOffenderEvents(),
-  )
+  get('/api/get-offender-events', appointmentController.getOffenderEvents())
 
-  get(
-    '/api/get-location-events',
-    auditPageAccessAttempt({ services, page: ApiAction.LocationEvents }),
-    appointmentController.getLocationExistingEvents(),
-  )
+  get('/api/get-location-events', appointmentController.getLocationExistingEvents())
 
   get('/api/get-recurring-end-date', appointmentController.getRecurringEndDate())
 

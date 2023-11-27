@@ -9,7 +9,6 @@ import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import config from '../config'
 import PreviousLocation from '../interfaces/prisonApi/previousLocation'
-import { AuditService, Page } from '../services/auditService'
 
 interface LocationWithAgencyLeaveDate extends PreviousLocation {
   establishmentWithAgencyLeaveDate: string
@@ -18,10 +17,7 @@ interface LocationWithAgencyLeaveDate extends PreviousLocation {
  * Parse request for alerts page and orchestrate response
  */
 export default class PrisonerCellHistoryController {
-  constructor(
-    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly auditService: AuditService,
-  ) {}
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   public async displayPrisonerCellHistory(req: Request, res: Response, prisonerData: Prisoner) {
     const offenderNo = prisonerData.prisonerNumber
@@ -118,16 +114,6 @@ export default class PrisonerCellHistoryController {
 
       const previousLocations = cellDataLatestFirst.slice(1)
       const prisonerProfileUrl = `/prisoner/${offenderNo}`
-
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.PrisonerCellHistory,
-      })
 
       // Render page
       return res.render('pages/prisonerCellHistoryPage', {
