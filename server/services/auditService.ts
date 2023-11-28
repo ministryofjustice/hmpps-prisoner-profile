@@ -111,7 +111,7 @@ interface PostAudit {
 }
 
 interface SendEvent {
-  action: string
+  what: string
   who: string
   subjectId: string
   subjectType?: SubjectType
@@ -130,7 +130,7 @@ export interface AuditService {
 }
 
 interface AuditMessage {
-  action: string
+  what: string
   when: Date
   who: string
   subjectId: string
@@ -171,7 +171,7 @@ export const auditService = ({
 
   const sendAccessAttempt = async ({ userId, userRoles, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
     await sendMessage({
-      action: `ACCESS_ATTEMPT_${page.toString()}`,
+      what: `ACCESS_ATTEMPT_${page.toString()}`,
       when: new Date(),
       who: userId,
       subjectId: prisonerNumber,
@@ -184,7 +184,7 @@ export const auditService = ({
 
   const sendPostAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
     await sendMessage({
-      action: `POST_${action.toString()}`,
+      what: `POST_${action.toString()}`,
       when: new Date(),
       who: userId,
       subjectId: prisonerNumber,
@@ -197,7 +197,7 @@ export const auditService = ({
 
   const sendPostSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
     await sendMessage({
-      action: `POST_SUCCESS_${action.toString()}`,
+      what: `POST_SUCCESS_${action.toString()}`,
       when: new Date(),
       who: userId,
       subjectId: prisonerNumber,
@@ -225,7 +225,7 @@ export const auditService = ({
     }
 
     await sendMessage({
-      action: `PAGE_VIEW_${page.toString()}`,
+      what: `PAGE_VIEW_${page.toString()}`,
       when: new Date(),
       who: userId,
       subjectId: prisonerNumber,
@@ -238,7 +238,7 @@ export const auditService = ({
 
   const sendAddAppointment = async ({ userId, prisonerNumber, details, correlationId }: AddAppointmentAudit) => {
     await sendMessage({
-      action: 'ADD_APPOINTMENT',
+      what: 'ADD_APPOINTMENT',
       correlationId,
       details: JSON.stringify({ ...details, build }),
       service: serviceName,
@@ -251,7 +251,7 @@ export const auditService = ({
 
   const sendSearch = async ({ userId, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
     await sendMessage({
-      action: `SEARCH_${searchPage}`,
+      what: `SEARCH_${searchPage}`,
       correlationId,
       details: JSON.stringify({ ...details, build }),
       service: serviceName,

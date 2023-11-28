@@ -577,7 +577,7 @@ export default class AppointmentController {
         who: res.locals.user.username,
         subjectId: prisonerNumber,
         correlationId: req.id,
-        action: `API_${ApiAction.OffenderEvents}`,
+        what: `API_${ApiAction.OffenderEvents}`,
         subjectType: SubjectType.PrisonerId,
       })
 
@@ -609,7 +609,7 @@ export default class AppointmentController {
         who: res.locals.user.username,
         subjectId: activeCaseLoadId,
         correlationId: req.id,
-        action: `API_${ApiAction.LocationEvents}`,
+        what: `API_${ApiAction.LocationEvents}`,
         details: JSON.stringify({ locationId }),
       })
 
