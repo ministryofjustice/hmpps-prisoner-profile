@@ -116,7 +116,7 @@ interface SendEvent {
   subjectId: string
   subjectType?: SubjectType
   correlationId: string
-  details?: object
+  details?: string
 }
 
 export interface AuditService {
@@ -137,7 +137,7 @@ interface AuditMessage {
   subjectType?: SubjectType
   service: string
   correlationId: string
-  details?: object
+  details?: string
 }
 
 /*
@@ -178,7 +178,7 @@ export const auditService = ({
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
       correlationId,
-      details: { build, userRoles },
+      details: JSON.stringify({ build, userRoles }),
     })
   }
 
@@ -191,7 +191,7 @@ export const auditService = ({
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
       correlationId,
-      details: { build, ...details },
+      details: JSON.stringify({ build, ...details }),
     })
   }
 
@@ -204,7 +204,7 @@ export const auditService = ({
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
       correlationId,
-      details: { build, ...details },
+      details: JSON.stringify({ build, ...details }),
     })
   }
 
@@ -232,7 +232,7 @@ export const auditService = ({
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
       correlationId,
-      details,
+      details: JSON.stringify(details),
     })
   }
 
@@ -240,7 +240,7 @@ export const auditService = ({
     await sendMessage({
       action: 'ADD_APPOINTMENT',
       correlationId,
-      details: { ...details, build },
+      details: JSON.stringify({ ...details, build }),
       service: serviceName,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
@@ -253,7 +253,7 @@ export const auditService = ({
     await sendMessage({
       action: `SEARCH_${searchPage}`,
       correlationId,
-      details: { ...details, build },
+      details: JSON.stringify({ ...details, build }),
       service: serviceName,
       subjectId: prisonerNumber,
       subjectType: SubjectType.SearchTerm,

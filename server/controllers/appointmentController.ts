@@ -610,7 +610,7 @@ export default class AppointmentController {
         subjectId: activeCaseLoadId,
         correlationId: req.id,
         action: `API_${ApiAction.LocationEvents}`,
-        details: { locationId },
+        details: JSON.stringify({ locationId }),
       })
 
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
