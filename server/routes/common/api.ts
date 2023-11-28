@@ -19,7 +19,7 @@ export default class CommonApiRoutes {
       who: res.locals.user.username,
       subjectId: prisonerNumber,
       correlationId: req.id,
-      action: `API_${ApiAction.PrisonerImage}`,
+      what: `API_${ApiAction.PrisonerImage}`,
       subjectType: SubjectType.PrisonerId,
     })
 
@@ -49,7 +49,7 @@ export default class CommonApiRoutes {
       who: res.locals.user.username,
       subjectId: imageId,
       correlationId: req.id,
-      action: `API_${ApiAction.Image}`,
+      what: `API_${ApiAction.Image}`,
     })
 
     if (imageId === 'placeholder') {
