@@ -1,0 +1,80 @@
+{% extends "../index.njk" %}
+
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../macros/summaryListRow.njk" import summaryListRow %}
+{% from "../../macros/arrayToLines.njk" import arrayToLines %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: prisonerName,
+        href: "/prisoner/" + prisonerNumber
+    }
+] %}
+
+{% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1>{{ prisonerName | apostrophe }} professional contacts</h1>
+        </div>
+    </div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+    {% for contact in professionalContacts %}
+        {%- call summaryCard({title: contact.relationshipDescription}) -%}
+            <dl class="govuk-summary-list" >
+                <div class="govuk-summary-list__row" data-qa="contact-name">
+                    <dt class="govuk-summary-list__key">
+                        Name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ contact.firstName | formatName("", contact.lastName) }}
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row" data-qa="contact-details">
+                    <dt class="govuk-summary-list__key">
+                        Contact details
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if contact.emails.length or contact.phones.length %}
+                            {% for email in contact.emails %}
+                                {{ email }} <br />
+                            {% endfor %}
+                            {% for phone in contact.phones %}
+                                {{ phone }} <br />
+                            {% endfor %}
+                        {% else %}
+                            Not entered
+                        {% endif %}
+                    </dd>
+                </div>
+
+                {% if contact.relationship !== "POM" %}
+                    <div class="govuk-summary-list__row" data-qa="contact-address">
+                        <dt class="govuk-summary-list__key">
+                            Address
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {% if contact.address and not contact.address.noFixedAddress %}
+                                {{ arrayToLines(contact.address | addressToLines, "Not entered") }}
+                            {% else %}
+                                Not entered
+                            {% endif %}
+                        </dd>
+                    </div>
+                {% endif %}
+            </dl>
+        {%- endcall -%}
+    {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}

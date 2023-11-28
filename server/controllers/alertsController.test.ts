@@ -9,6 +9,7 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import ReferenceDataService from '../services/referenceDataService'
 import { alertTypesMock } from '../data/localMockData/alertTypesMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
+import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: any
 let res: any
@@ -44,7 +45,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null))
+      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null), auditServiceMock())
     })
 
     it('should get active alerts', async () => {
@@ -253,7 +254,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null))
+      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()

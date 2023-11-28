@@ -320,7 +320,9 @@ export const addressToLines = ({ flat, premise, street, town, county, postalCode
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
   }
-  return [lineOne, town, county, postalCode, country].filter(s => s)
+  const addressArray = [lineOne, town, county, postalCode, country].filter(s => s)
+  if (addressArray.length !== 1 || !country) return addressArray
+  return []
 }
 
 /**
@@ -505,8 +507,7 @@ export const extractLocation = (location: string, agencyId: string): string => {
   return formatLocation(withoutAgency)
 }
 
-// eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-explicit-any
-export const groupBy = (array: ScheduledEvent[], key: string) =>
+export const groupBy = <T>(array: T[], key: string): Record<string, T[]> =>
   array &&
   array.length &&
   array.reduce((acc, current) => {

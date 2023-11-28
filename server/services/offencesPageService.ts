@@ -119,6 +119,12 @@ export default class OffencesPageService {
       .map(offence => offence.caseId)
   }
 
+  getSentencedCaseIds(offenceHistory: OffenceHistoryDetail[], sentenceSummary: SentenceSummary) {
+    const caseIdsFromOffenceHistory = this.chargeCodesFilter(offenceHistory)
+    const caseIdsFromSentenceSummary = sentenceSummary.latestPrisonTerm.courtSentences.map(s => s.id)
+    return [...new Set([...caseIdsFromOffenceHistory, ...caseIdsFromSentenceSummary])]
+  }
+
   async getCourtCasesData(token: string, bookingId: number, prisonerNumber: string) {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const [courtCaseData, offenceHistory, sentenceTermsData, courtDateResults, sentenceSummary] = await Promise.all([
@@ -129,7 +135,8 @@ export default class OffencesPageService {
       prisonApiClient.getSentenceSummary(prisonerNumber),
     ])
 
-    const caseIds = [...new Set(this.chargeCodesFilter(offenceHistory))]
+    const caseIds = this.getSentencedCaseIds(offenceHistory, sentenceSummary)
+
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
     const summarySentencedCourtCasesMapped = this.getMapForSentenceSummaryCourtCases(
@@ -375,15 +382,33 @@ export default class OffencesPageService {
     return {}
   }
 
-  private getNonDtoReleaseDate(
-    date: PrisonerSentenceDetails['sentenceDetail']['nonDtoReleaseDate'],
-    dateType: PrisonerSentenceDetails['sentenceDetail']['nonDtoReleaseDateType'],
-  ) {
-    if (!date || !dateType) return {}
-    if (dateType === 'ARD') return { automaticReleaseDateNonDto: date }
-    if (dateType === 'CRD') return { conditionalReleaseNonDto: date }
-    if (dateType === 'NPD') return { nonParoleDateNonDto: date }
-    if (dateType === 'PRRD') return { postRecallDateNonDto: date }
+  private getNonDtoReleaseDate({
+    nonDtoReleaseDate,
+    nonDtoReleaseDateType,
+    conditionalReleaseDate,
+    automaticReleaseDate,
+    nonParoleDate,
+    postRecallReleaseDate,
+  }: PrisonerSentenceDetails['sentenceDetail']) {
+    const nonDtoReleaseDateTypeMap: Record<PrisonerSentenceDetails['sentenceDetail']['nonDtoReleaseDateType'], string> =
+      {
+        ARD: automaticReleaseDate,
+        CRD: conditionalReleaseDate,
+        NPD: nonParoleDate,
+        PRRD: postRecallReleaseDate,
+      }
+
+    if (
+      !nonDtoReleaseDate ||
+      !nonDtoReleaseDateType ||
+      nonDtoReleaseDateTypeMap[nonDtoReleaseDateType] === nonDtoReleaseDate
+    )
+      return {}
+
+    if (nonDtoReleaseDateType === 'ARD') return { automaticReleaseDateNonDto: nonDtoReleaseDate }
+    if (nonDtoReleaseDateType === 'CRD') return { conditionalReleaseNonDto: nonDtoReleaseDate }
+    if (nonDtoReleaseDateType === 'NPD') return { nonParoleDateNonDto: nonDtoReleaseDate }
+    if (nonDtoReleaseDateType === 'PRRD') return { postRecallDateNonDto: nonDtoReleaseDate }
     return {}
   }
 
@@ -417,7 +442,7 @@ export default class OffencesPageService {
       topupSupervisionExpiryDate:
         sentenceDetails.topupSupervisionExpiryOverrideDate || sentenceDetails.topupSupervisionExpiryDate,
       ...this.getSedLedSled(sentenceDetails),
-      ...this.getNonDtoReleaseDate(sentenceDetails.nonDtoReleaseDate, sentenceDetails.nonDtoReleaseDateType),
+      ...this.getNonDtoReleaseDate(sentenceDetails),
     }
     return Object.keys(dates).reduce<Partial<ReleaseDates>>((dateObj, dateName) => {
       if (!dates[dateName]) return dateObj

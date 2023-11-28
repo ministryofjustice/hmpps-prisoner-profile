@@ -11,6 +11,7 @@ import { AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { Alert } from '../interfaces/prisoner'
+import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -19,6 +20,7 @@ export default class AlertsController {
   constructor(
     private readonly alertsPageService: AlertsPageService,
     private readonly referenceDataService: ReferenceDataService,
+    private readonly auditService: AuditService,
   ) {}
 
   public async displayAlerts(req: Request, res: Response, next: NextFunction, isActive: boolean) {
@@ -50,6 +52,17 @@ export default class AlertsController {
     const alertsPageData = await this.alertsPageService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
     const showingAll = queryParams.showAll
 
+    await this.auditService.sendSearch({
+      userId: res.locals.user.username,
+      userCaseLoads: res.locals.user.caseLoads,
+      userRoles: res.locals.user.userRoles,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      searchPage: SearchAction.Alerts,
+      details: { queryParams },
+    })
+
     // Render page
     return res.render('pages/alerts/alertsPage', {
       pageTitle: 'Alerts',
@@ -65,7 +78,7 @@ export default class AlertsController {
     const types = await this.referenceDataService.getAlertTypes(res.locals.clientToken)
 
     // Get data from middleware
-    const { firstName, lastName, prisonerNumber, bookingId, alerts } = req.middleware.prisonerData
+    const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId } = req.middleware.prisonerData
     const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
     const existingAlerts = alerts
@@ -88,6 +101,16 @@ export default class AlertsController {
         }
     const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType)
     const errors = req.flash('errors')
+
+    await this.auditService.sendPageView({
+      userId: res.locals.user.username,
+      userCaseLoads: res.locals.user.caseLoads,
+      userRoles: res.locals.user.userRoles,
+      prisonerNumber,
+      prisonId,
+      correlationId: req.id,
+      page: Page.AddAlert,
+    })
 
     return res.render('pages/alerts/addAlert', {
       today: formatDate(now.toISOString(), 'short'),
@@ -131,6 +154,14 @@ export default class AlertsController {
       }
 
       req.flash('flashMessage', { text: 'Alert added', type: FlashMessageType.success })
+      this.auditService.sendPostSuccess({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.Alert,
+        details: {},
+      })
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
     }
   }

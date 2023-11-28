@@ -221,7 +221,7 @@ describe('releaseDatesToSummaryRows.test.ts', () => {
       },
       {
         key: {
-          text: 'Sentence and license expiry date (SLED)',
+          text: 'Sentence and licence expiry date (SLED)',
         },
         value: {
           text: '3 February 2016',

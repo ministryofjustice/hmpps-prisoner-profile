@@ -36,9 +36,9 @@ import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../interfaces/prisonApi/staffRole'
-import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
+import { AgenciesEmail, AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
-import { LocationsInmate } from '../interfaces/prisonApi/locationsInmates'
+import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
 import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
@@ -47,12 +47,13 @@ import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligat
 import { Movement } from '../interfaces/prisonApi/movement'
 import { MovementType } from './enums/movementType'
 import { OffenderSentenceDetail } from '../interfaces/prisonApi/offenderSentenceDetail'
-import { PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerPrisonSchedule, PrisonerSchedule, TimeSlot } from '../interfaces/prisonApi/prisonerSchedule'
 import { Location } from '../interfaces/prisonApi/location'
 import { Details } from '../interfaces/prisonApi/details'
 import { AttributesForLocation } from '../interfaces/prisonApi/attributesForLocation'
 import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
 import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
+import { Telephone } from '../interfaces/prisonApi/telephone'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -80,13 +81,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
-    try {
-      return await this.restClient.stream({
-        path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
-      })
-    } catch (error) {
-      return error
-    }
+    return this.restClient.stream({
+      path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
+    })
   }
 
   async getAccountBalances(bookingId: number): Promise<AccountBalances> {
@@ -224,13 +221,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
-    try {
-      return await this.restClient.stream({
-        path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
-      })
-    } catch (error) {
-      return error
-    }
+    return this.restClient.stream({
+      path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
+    })
   }
 
   async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {
@@ -314,8 +307,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<StaffDetails>({ path: `/api/users/${staffId}` })
   }
 
-  async getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]> {
-    return this.restClient.get<LocationsInmate[]>({
+  async getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]> {
+    return this.restClient.get<OffenderBooking[]>({
       path: `/api/locations/${locationId}/inmates?${mapToQueryString(params)}`,
     })
   }
@@ -495,5 +488,24 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getCellMoveReasonTypes(): Promise<CellMoveReasonType[]> {
     return this.restClient.get<CellMoveReasonType[]>({ path: '/api/reference-domains/domains/CHG_HOUS_RSN' })
+  }
+
+  async getPersonEmails(personId: number): Promise<AgenciesEmail[]> {
+    return this.restClient.get<AgenciesEmail[]>({
+      path: `/api/persons/${personId}/emails`,
+    })
+  }
+
+  async getPersonPhones(personId: number): Promise<Telephone[]> {
+    return this.restClient.get<Telephone[]>({
+      path: `/api/persons/${personId}/phones`,
+    })
+  }
+
+  async getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]> {
+    return this.restClient.get<PrisonerPrisonSchedule[]>({
+      path: `/api/schedules/${prisonerNumber}/scheduled-transfers`,
+      ignore404: true,
+    })
   }
 }

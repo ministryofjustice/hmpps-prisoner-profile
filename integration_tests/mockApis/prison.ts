@@ -1,4 +1,4 @@
-import { format, addDays, startOfToday } from 'date-fns'
+import { addDays, format, startOfToday } from 'date-fns'
 import { stubFor } from './wiremock'
 import {
   accountBalancesMock,
@@ -77,6 +77,7 @@ import { damageObligationContainerMock } from '../../server/data/localMockData/d
 import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
+import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
 
 import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
 import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
@@ -1144,6 +1145,22 @@ export default {
     })
   },
 
+  stubPersonEmails: (personId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/persons/${personId}/emails`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
+      },
+    })
+  },
+
   stubGetDetails: (prisonerNumber: string) => {
     return stubFor({
       request: {
@@ -1160,6 +1177,22 @@ export default {
     })
   },
 
+  stubPersonPhones: (personId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/persons/${personId}/phones`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [{ number: '07700000000', type: 'mobile' }],
+      },
+    })
+  },
+
   stubGetAttributesForLocation: (locationId: string) => {
     return stubFor({
       request: {
@@ -1172,6 +1205,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: GetAttributesForLocation,
+      },
+    })
+  },
+
+  stubScheduledTransfers: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/schedules/${prisonerNumber}/scheduled-transfers`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: scheduledTransfersMock,
       },
     })
   },

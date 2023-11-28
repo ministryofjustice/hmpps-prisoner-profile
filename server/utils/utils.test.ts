@@ -295,6 +295,24 @@ describe('Address to lines', () => {
     expect(lines[2]).toEqual('LS1 AAA')
     expect(lines[3]).toEqual('England')
   })
+
+  it('does not return a country on its own', () => {
+    const address: Address = {
+      country: 'England',
+    }
+
+    const lines = addressToLines(address)
+    expect(lines).toEqual([])
+  })
+
+  it('does return single lines that are not country', () => {
+    const address: Address = {
+      premise: 'premises address',
+    }
+
+    const lines = addressToLines(address)
+    expect(lines).toEqual(['premises address'])
+  })
 })
 
 describe('findError', () => {

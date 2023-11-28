@@ -31,10 +31,10 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
-import { AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
+import { AgenciesEmail, AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
 import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
-import { LocationsInmate } from '../../interfaces/prisonApi/locationsInmates'
+import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
 import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
 import { CsraAssessment } from '../../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../../interfaces/prisonApi/transaction'
@@ -42,12 +42,13 @@ import { DamageObligationContainer } from '../../interfaces/prisonApi/damageObli
 import { Movement } from '../../interfaces/prisonApi/movement'
 import { MovementType } from '../enums/movementType'
 import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
-import { PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerPrisonSchedule, PrisonerSchedule, TimeSlot } from '../../interfaces/prisonApi/prisonerSchedule'
 import { Location } from '../../interfaces/prisonApi/location'
 import { Details } from '../../interfaces/prisonApi/details'
 import { AttributesForLocation } from '../../interfaces/prisonApi/attributesForLocation'
 import { HistoryForLocationItem } from '../../interfaces/prisonApi/historyForLocation'
 import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTypes'
+import { Telephone } from '../../interfaces/prisonApi/telephone'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -98,7 +99,7 @@ export interface PrisonApiClient {
   getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails>
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
   getStaffDetails(staffId: string): Promise<StaffDetails>
-  getInmatesAtLocation(locationId: number, params: object): Promise<LocationsInmate[]>
+  getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
@@ -144,4 +145,7 @@ export interface PrisonApiClient {
   getAttributesForLocation(locationId: string): Promise<AttributesForLocation>
   getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]>
   getCellMoveReasonTypes(): Promise<CellMoveReasonType[]>
+  getPersonEmails(personId: number): Promise<AgenciesEmail[]>
+  getPersonPhones(personId: number): Promise<Telephone[]>
+  getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
 }

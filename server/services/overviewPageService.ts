@@ -50,15 +50,14 @@ import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClien
 import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
-import { MovementType } from '../data/enums/movementType'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import { Movement } from '../interfaces/prisonApi/movement'
 import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import { KeyWorker } from '../interfaces/keyWorker'
 import { CaseNote } from '../interfaces/caseNote'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/prisonerSchedule'
 
 export default class OverviewPageService {
   constructor(
@@ -96,7 +95,7 @@ export default class OverviewPageService {
       inmateDetail,
       staffRoles,
       learnerNeurodivergence,
-      movements,
+      scheduledTransfers,
       nonAssociationDetails,
       allocationManager,
       offenderKeyWorker,
@@ -109,7 +108,7 @@ export default class OverviewPageService {
       prisonApiClient.getInmateDetail(prisonerData.bookingId),
       prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
-      prisonApiClient.getMovements([prisonerData.prisonerNumber], [MovementType.Transfer]),
+      prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
       keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
@@ -147,7 +146,7 @@ export default class OverviewPageService {
     return {
       miniSummaryGroupA,
       miniSummaryGroupB,
-      statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, movements),
+      statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
       nonAssociations,
       personalDetails,
       staffContacts: this.getStaffContacts(
@@ -251,7 +250,7 @@ export default class OverviewPageService {
         ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
         : 'Not assigned',
       communityOffenderManager: formatCommunityManager(communityManager),
-      linkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
+      linkUrl: `/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
     }
   }
 
@@ -606,7 +605,7 @@ export default class OverviewPageService {
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
     learnerNeurodivergence: LearnerNeurodivergence[],
-    movements: Movement[],
+    scheduledTransfers: PrisonerPrisonSchedule[],
   ): Status[] {
     const statusList: Status[] = []
 
@@ -656,11 +655,9 @@ export default class OverviewPageService {
       })
     }
 
-    if (movements.length > 0) {
-      const movement = movements.find(m => m.offenderNo === prisonerData.prisonerNumber)
-      if (isAfter(new Date(movement.movementDate), startOfToday())) {
-        statusList.push({ label: 'Scheduled transfer', subText: `To ${movement.toAgencyDescription}` })
-      }
+    if (scheduledTransfers?.length > 0) {
+      const transfer = scheduledTransfers[0]
+      statusList.push({ label: 'Scheduled transfer', subText: `To ${transfer.eventLocation}` })
     }
 
     return statusList

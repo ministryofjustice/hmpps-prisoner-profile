@@ -44,6 +44,7 @@ Cypress.Commands.add(
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
     cy.task('stubMovements', prisonerNumber)
     cy.task('stubGetCommunityManager')
+    cy.task('stubScheduledTransfers', prisonerNumber)
   },
 )
 

@@ -1,5 +1,5 @@
 import { stubFor } from './wiremock'
-import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
+import { keyWorkerMock } from '../../server/data/localMockData/keyWorker'
 
 export default {
   stubKeyWorkerData: (prisonerNumber: string) => {
@@ -13,7 +13,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: CaseNotesByTypeA,
+        jsonBody: keyWorkerMock,
       },
     })
   },

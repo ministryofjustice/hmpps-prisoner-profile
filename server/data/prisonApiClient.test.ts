@@ -49,6 +49,7 @@ import { GetDetailsMock } from './localMockData/getDetailsMock'
 import { GetAttributesForLocation } from './localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
+import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
 
 jest.mock('./tokenStore')
 
@@ -625,6 +626,14 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall('/api/reference-domains/domains/CHG_HOUS_RSN', getCellMoveReasonTypesMock)
       const output = await prisonApiClient.getCellMoveReasonTypes()
       expect(output).toEqual(getCellMoveReasonTypesMock)
+    })
+  })
+  describe('getScheduledTransfers', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      mockSuccessfulPrisonApiCall(`/api/schedules/${prisonerNumber}/scheduled-transfers`, scheduledTransfersMock)
+      const output = await prisonApiClient.getScheduledTransfers(prisonerNumber)
+      expect(output).toEqual(scheduledTransfersMock)
     })
   })
 })

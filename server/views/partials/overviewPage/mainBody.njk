@@ -41,10 +41,3 @@
     {% include "./offences/offences.njk" %}
   </div>
 </div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'overview-non-associations'}) -%}
-      {% include "./nonAssociations/nonAssociations.njk" %}
-    {%- endcall -%}
-  </div>
-</div>
