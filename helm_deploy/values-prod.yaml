@@ -8,6 +8,8 @@ generic-service:
     modsecurity_snippet: |
       SecRuleEngine On
       SecRuleRemoveById 949110
+      SecRuleRemoveById 942440
+      SecRuleRemoveById 920300
 
   autoscaling:
     enabled: true
@@ -62,10 +64,10 @@ generic-service:
     sscl-newcastle: 62.172.79.105/32
     sscl-newport: 217.38.237.212/32
     groups:
-      - internal
-      - prisons
-      - private_prisons
-      - police
+    - internal
+    - prisons
+    - private_prisons
+    - police
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-prod
