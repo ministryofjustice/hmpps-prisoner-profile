@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { PrisonerSearchService } from '../services'
 import OverviewPageService from '../services/overviewPageService'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import { Prisoner } from '../interfaces/prisoner'
@@ -21,7 +20,6 @@ import { AuditService, Page } from '../services/auditService'
  */
 export default class OverviewController {
   constructor(
-    private readonly prisonerSearchService: PrisonerSearchService,
     private readonly overviewPageService: OverviewPageService,
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
@@ -38,6 +36,7 @@ export default class OverviewController {
         clientToken,
         prisonerData,
         res.locals.user.staffId,
+        inmateDetail,
         res.locals.user.caseLoads,
         res.locals.user.userRoles,
       ),
