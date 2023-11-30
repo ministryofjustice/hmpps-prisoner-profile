@@ -187,7 +187,7 @@ describe('Appointments Controller', () => {
       await controller.post()(req, res)
 
       expect(controller['appointmentService'].createAppointments).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        res.locals.user.token,
         appointmentsToCreate,
       )
 
@@ -354,7 +354,7 @@ describe('Appointments Controller', () => {
       await controller.postVideoLinkBooking()(req, res)
 
       expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        res.locals.user.token,
         videoLinkBookingForm,
       )
 
