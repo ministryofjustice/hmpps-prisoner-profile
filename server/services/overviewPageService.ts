@@ -58,6 +58,7 @@ import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerDetail } from '../interfaces/prisonerDetail'
 
 export default class OverviewPageService {
   constructor(
@@ -104,6 +105,7 @@ export default class OverviewPageService {
       courtCaseData,
       fullStatus,
       communityManager,
+      prisonerDetail,
     ] = await Promise.all([
       prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
@@ -116,6 +118,7 @@ export default class OverviewPageService {
       prisonApiClient.getCourtCases(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
       prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
+      prisonApiClient.getPrisoner(prisonerNumber),
     ])
 
     const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
@@ -128,7 +131,7 @@ export default class OverviewPageService {
         incentivesApiClient,
         prisonApiClient,
       ),
-      this.getPersonalDetails(prisonerData, inmateDetail),
+      this.getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
       this.getSchedule(prisonerData, prisonApiClient),
       this.getOffencesOverview(
         imprisonmentStatusDescription,
@@ -253,7 +256,11 @@ export default class OverviewPageService {
     }
   }
 
-  public async getPersonalDetails(prisonerData: Prisoner, inmateDetail: InmateDetail): Promise<PersonalDetails> {
+  public async getPersonalDetails(
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+    prisonerDetail: PrisonerDetail,
+  ): Promise<PersonalDetails> {
     const personalDetailsMain = [
       {
         key: {
@@ -297,13 +304,21 @@ export default class OverviewPageService {
       },
     ]
 
+    let ethnicGroup = 'Not entered'
+    if (prisonerDetail?.ethnicity) {
+      ethnicGroup = `${prisonerDetail?.ethnicity}`
+      if (prisonerDetail?.ethnicityCode) {
+        ethnicGroup += ` (${prisonerDetail.ethnicityCode})`
+      }
+    }
+
     const personalDetailsSide = [
       {
         key: {
           text: 'Ethnic group',
         },
         value: {
-          text: prisonerData.ethnicity ? prisonerData.ethnicity : 'Not entered',
+          text: ethnicGroup,
         },
       },
       {
