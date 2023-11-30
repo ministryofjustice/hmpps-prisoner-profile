@@ -43,7 +43,6 @@ export default function routes(services: Services): Router {
     )
 
   const overviewController = new OverviewController(
-    services.prisonerSearchService,
     services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
