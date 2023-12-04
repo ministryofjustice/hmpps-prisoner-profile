@@ -1,18 +1,25 @@
 {% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "../../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
 {%- call summaryCard({title: "Personal"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half">
-      {{ govukSummaryList({
-          classes: 'govuk-summary-list--no-border',
-          rows: personalDetails.personalDetailsMain | summaryListOneHalfWidth
-        }) }}
+      <dl class="govuk-summary-list">
+        {{ summaryListRow("Preferred name", personalDetails.personalDetailsMain.preferredName, "preferred-name") }}
+        {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth, "date-of-birth") }}
+        {{ summaryListRow("Age", personalDetails.personalDetailsMain.age, "age") }}
+        {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality, "nationality") }}
+        {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage, "spoken-language") }}
+      <dl>
     </div>
     <div class="govuk-grid-column-one-half">
-      {{ govukSummaryList({
-          classes: 'govuk-summary-list--no-border',
-          rows: personalDetails.personalDetailsSide | summaryListOneHalfWidth
-        }) }}
+      <dl class="govuk-summary-list">
+        {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup, "ethnic-group") }}
+        {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief, "religion-or-belief") }}
+        {{ summaryListRow("CRO number", personalDetails.personalDetailsSide.croNumber, "cro-number") }}
+        {{ summaryListRow("PNC number", personalDetails.personalDetailsSide.pncNumber, "pnc-number") }}
+      <dl>
     </div>
   </div>
 {%- endcall -%}

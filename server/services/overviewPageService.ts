@@ -261,49 +261,6 @@ export default class OverviewPageService {
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
   ): Promise<PersonalDetails> {
-    const personalDetailsMain = [
-      {
-        key: {
-          text: 'Preferred name',
-        },
-        value: {
-          text: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Date of birth',
-        },
-        value: {
-          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Age',
-        },
-        value: {
-          text: inmateDetail.age ? inmateDetail.age.toString() : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Nationality',
-        },
-        value: {
-          text: prisonerData.nationality ? prisonerData.nationality : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Spoken language',
-        },
-        value: {
-          text: inmateDetail.language ? inmateDetail.language : 'No language entered',
-        },
-      },
-    ]
-
     let ethnicGroup = 'Not entered'
     if (prisonerDetail?.ethnicity) {
       ethnicGroup = `${prisonerDetail?.ethnicity}`
@@ -312,42 +269,21 @@ export default class OverviewPageService {
       }
     }
 
-    const personalDetailsSide = [
-      {
-        key: {
-          text: 'Ethnic group',
-        },
-        value: {
-          text: ethnicGroup,
-        },
+    return {
+      personalDetailsMain: {
+        preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
+        dateOfBirth: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+        age: inmateDetail.age ? inmateDetail.age.toString() : 'None',
+        nationality: prisonerData.nationality ? prisonerData.nationality : 'None',
+        spokenLanguage: inmateDetail.language ? inmateDetail.language : 'No language entered',
       },
-      {
-        key: {
-          text: 'Religion or belief',
-        },
-        value: {
-          text: prisonerData.religion ? prisonerData.religion : 'Not entered',
-        },
+      personalDetailsSide: {
+        ethnicGroup,
+        religionOrBelief: prisonerData.religion ? prisonerData.religion : 'Not entered',
+        croNumber: prisonerData.croNumber ? prisonerData.croNumber : 'None',
+        pncNumber: prisonerData.pncNumber ? prisonerData.pncNumber : 'None',
       },
-      {
-        key: {
-          text: 'CRO number',
-        },
-        value: {
-          text: prisonerData.croNumber ? prisonerData.croNumber : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'PNC number',
-        },
-        value: {
-          text: prisonerData.pncNumber ? prisonerData.pncNumber : 'None',
-        },
-      },
-    ]
-
-    return { personalDetailsMain, personalDetailsSide }
+    }
   }
 
   private async getMiniSummaryGroupA(
