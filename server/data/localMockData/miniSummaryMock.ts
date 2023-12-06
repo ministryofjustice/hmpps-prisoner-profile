@@ -88,7 +88,7 @@ export const adjudicationsSummaryDataMock: MiniSummaryData = {
   bottomLabel: 'Active',
   bottomContentLine1: 'No active punishments',
   bottomClass: 'small',
-  linkLabel: 'Adjudications history',
+  linkLabel: 'Adjudication history',
 } as MiniSummaryData
 
 export const visitsSummaryDataMock: MiniSummaryData = {
@@ -108,7 +108,7 @@ export const categorySummaryDataMock: MiniSummaryData = {
   bottomContentLine1: 'B',
   bottomContentLine3: `Next review: ${formatDate('2023-02-19', 'short')}`,
   bottomClass: 'small',
-  linkLabel: 'View category',
+  linkLabel: 'Category',
 } as MiniSummaryData
 
 export const incentiveSummaryDataMock: MiniSummaryData = {

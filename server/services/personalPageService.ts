@@ -150,6 +150,12 @@ export default class PersonalPageService {
       }
     }
 
+    const formatNumberOfChildren = (count: string) => {
+      if (count === null) return 'Not entered'
+      if (count === '0') return 'None'
+      return count
+    }
+
     return {
       age: (inmateDetail.age || yearsBetweenDateStrings(prisonerData.dateOfBirth, todaysDateString)).toString(),
       aliases,
@@ -168,8 +174,9 @@ export default class PersonalPageService {
       },
       marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
       nationality: prisonerData.nationality || 'Not entered',
-      numberOfChildren:
-        getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation) || 'Not entered',
+      numberOfChildren: formatNumberOfChildren(
+        getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation),
+      ),
       otherLanguages: secondaryLanguages.map(({ description, canRead, canSpeak, canWrite, code }) => ({
         language: description,
         code,
