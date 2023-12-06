@@ -102,7 +102,7 @@ context('Overview Page', () => {
         overviewPage.adjudicationsCard().contains('p', '4')
         overviewPage.adjudicationsCard().contains('p', 'Active')
         overviewPage.adjudicationsCard().contains('p', 'No active punishments')
-        overviewPage.adjudicationsCard().contains('a', 'Adjudications history')
+        overviewPage.adjudicationsCard().contains('a', 'Adjudication history')
       })
 
       it('Mini summary Group A should contain Visits card with correct data', () => {
@@ -133,7 +133,7 @@ context('Overview Page', () => {
         overviewPage.categoryCard().contains('p', 'Category')
         overviewPage.categoryCard().contains('p', 'B')
         overviewPage.categoryCard().contains('p', 'Next review: 19/02/2023')
-        overviewPage.categoryCard().contains('a', 'View category')
+        overviewPage.categoryCard().contains('a', 'Category')
       })
 
       it('Mini summary Group B should contain Incentives card with correct data', () => {
@@ -163,7 +163,19 @@ context('Overview Page', () => {
     context('Personal details', () => {
       it('Displays the prisoner presonal details', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.personalDetails().should('exist')
+        overviewPage.personalDetails().perferredName().should('include.text', 'John')
+        overviewPage.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
+        overviewPage.personalDetails().age().should('include.text', '32')
+        overviewPage.personalDetails().nationality().should('include.text', 'Stateless')
+        overviewPage.personalDetails().spokenLanguage().should('include.text', 'Welsh')
+
+        overviewPage
+          .personalDetails()
+          .ethnicGroup()
+          .should('include.text', 'White: Eng./Welsh/Scot./N.Irish/British (W1)')
+        overviewPage.personalDetails().religionOrBelief().should('include.text', 'Celestial Church of God')
+        overviewPage.personalDetails().croNumber().should('include.text', '400862/08W')
+        overviewPage.personalDetails().pncNumber().should('include.text', '08/359381C')
       })
     })
 

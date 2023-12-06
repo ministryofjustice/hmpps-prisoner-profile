@@ -524,16 +524,18 @@ describe('OverviewPageService', () => {
         inmateDetailMock,
       )
 
-      expect(personalDetailsMain[0].value.text).toEqual(convertToTitleCase(PrisonerMockDataB.firstName))
-      expect(personalDetailsMain[1].value.text).toEqual(formatDate(PrisonerMockDataB.dateOfBirth, 'short'))
-      expect(personalDetailsMain[2].value.text).toEqual(inmateDetailMock.age.toString())
-      expect(personalDetailsMain[3].value.text).toEqual(PrisonerMockDataB.nationality)
-      expect(personalDetailsMain[4].value.text).toEqual(inmateDetailMock.language)
+      expect(personalDetailsMain.preferredName).toEqual(convertToTitleCase(PrisonerMockDataB.firstName))
+      expect(personalDetailsMain.dateOfBirth).toEqual(formatDate(PrisonerMockDataB.dateOfBirth, 'short'))
+      expect(personalDetailsMain.age).toEqual(inmateDetailMock.age.toString())
+      expect(personalDetailsMain.nationality).toEqual(PrisonerMockDataB.nationality)
+      expect(personalDetailsMain.spokenLanguage).toEqual(inmateDetailMock.language)
 
-      expect(personalDetailsSide[0].value.text).toEqual(PrisonerMockDataB.ethnicity)
-      expect(personalDetailsSide[1].value.text).toEqual(PrisonerMockDataB.religion)
-      expect(personalDetailsSide[2].value.text).toEqual(PrisonerMockDataB.croNumber)
-      expect(personalDetailsSide[3].value.text).toEqual(PrisonerMockDataB.pncNumber)
+      expect(personalDetailsSide.ethnicGroup).toEqual(
+        `${prisonerDetailMock.ethnicity} (${prisonerDetailMock.ethnicityCode})`,
+      )
+      expect(personalDetailsSide.religionOrBelief).toEqual(PrisonerMockDataB.religion)
+      expect(personalDetailsSide.croNumber).toEqual(PrisonerMockDataB.croNumber)
+      expect(personalDetailsSide.pncNumber).toEqual(PrisonerMockDataB.pncNumber)
     })
   })
 

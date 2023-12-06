@@ -65,7 +65,20 @@ export default class OverviewPage extends Page {
     },
   })
 
-  personalDetails = (): PageElement => cy.get('[data-qa=personal-details]')
+  personalDetails = () => {
+    const card = (): PageElement => cy.getDataQa('personal-details')
+    return {
+      perferredName: (): PageElement => card().findDataQa('preferred-name'),
+      dateOfBirth: (): PageElement => card().findDataQa('date-of-birth'),
+      age: (): PageElement => card().findDataQa('age'),
+      nationality: (): PageElement => card().findDataQa('nationality'),
+      spokenLanguage: (): PageElement => card().findDataQa('spoken-language'),
+      ethnicGroup: (): PageElement => card().findDataQa('ethnic-group'),
+      religionOrBelief: (): PageElement => card().findDataQa('religion-or-belief'),
+      croNumber: (): PageElement => card().findDataQa('cro-number'),
+      pncNumber: (): PageElement => card().findDataQa('pnc-number'),
+    }
+  }
 
   staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
 

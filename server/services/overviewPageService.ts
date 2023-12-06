@@ -58,6 +58,7 @@ import { FullStatus } from '../interfaces/prisonApi/fullStatus'
 import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerDetail } from '../interfaces/prisonerDetail'
 
 export default class OverviewPageService {
   constructor(
@@ -104,6 +105,7 @@ export default class OverviewPageService {
       courtCaseData,
       fullStatus,
       communityManager,
+      prisonerDetail,
     ] = await Promise.all([
       prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
@@ -116,6 +118,7 @@ export default class OverviewPageService {
       prisonApiClient.getCourtCases(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
       prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
+      prisonApiClient.getPrisoner(prisonerNumber),
     ])
 
     const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
@@ -128,7 +131,7 @@ export default class OverviewPageService {
         incentivesApiClient,
         prisonApiClient,
       ),
-      this.getPersonalDetails(prisonerData, inmateDetail),
+      this.getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
       this.getSchedule(prisonerData, prisonApiClient),
       this.getOffencesOverview(
         imprisonmentStatusDescription,
@@ -253,86 +256,34 @@ export default class OverviewPageService {
     }
   }
 
-  public async getPersonalDetails(prisonerData: Prisoner, inmateDetail: InmateDetail): Promise<PersonalDetails> {
-    const personalDetailsMain = [
-      {
-        key: {
-          text: 'Preferred name',
-        },
-        value: {
-          text: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Date of birth',
-        },
-        value: {
-          text: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Age',
-        },
-        value: {
-          text: inmateDetail.age ? inmateDetail.age.toString() : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Nationality',
-        },
-        value: {
-          text: prisonerData.nationality ? prisonerData.nationality : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'Spoken language',
-        },
-        value: {
-          text: inmateDetail.language ? inmateDetail.language : 'No language entered',
-        },
-      },
-    ]
+  public async getPersonalDetails(
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+    prisonerDetail: PrisonerDetail,
+  ): Promise<PersonalDetails> {
+    let ethnicGroup = 'Not entered'
+    if (prisonerDetail?.ethnicity) {
+      ethnicGroup = `${prisonerDetail?.ethnicity}`
+      if (prisonerDetail?.ethnicityCode) {
+        ethnicGroup += ` (${prisonerDetail.ethnicityCode})`
+      }
+    }
 
-    const personalDetailsSide = [
-      {
-        key: {
-          text: 'Ethnic group',
-        },
-        value: {
-          text: prisonerData.ethnicity ? prisonerData.ethnicity : 'Not entered',
-        },
+    return {
+      personalDetailsMain: {
+        preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
+        dateOfBirth: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
+        age: inmateDetail.age ? inmateDetail.age.toString() : 'None',
+        nationality: prisonerData.nationality ? prisonerData.nationality : 'None',
+        spokenLanguage: inmateDetail.language ? inmateDetail.language : 'No language entered',
       },
-      {
-        key: {
-          text: 'Religion or belief',
-        },
-        value: {
-          text: prisonerData.religion ? prisonerData.religion : 'Not entered',
-        },
+      personalDetailsSide: {
+        ethnicGroup,
+        religionOrBelief: prisonerData.religion ? prisonerData.religion : 'Not entered',
+        croNumber: prisonerData.croNumber ? prisonerData.croNumber : 'None',
+        pncNumber: prisonerData.pncNumber ? prisonerData.pncNumber : 'None',
       },
-      {
-        key: {
-          text: 'CRO number',
-        },
-        value: {
-          text: prisonerData.croNumber ? prisonerData.croNumber : 'None',
-        },
-      },
-      {
-        key: {
-          text: 'PNC number',
-        },
-        value: {
-          text: prisonerData.pncNumber ? prisonerData.pncNumber : 'None',
-        },
-      },
-    ]
-
-    return { personalDetailsMain, personalDetailsSide }
+    }
   }
 
   private async getMiniSummaryGroupA(
@@ -382,7 +333,7 @@ export default class OverviewPageService {
         ? `/prisoner/${prisonerNumber}/active-punishments`
         : undefined,
       bottomClass: 'small',
-      linkLabel: 'Adjudications history',
+      linkLabel: 'Adjudication history',
       linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
     }
 
@@ -520,7 +471,7 @@ export default class OverviewPageService {
         userRoles,
       )
         ? 'Manage category'
-        : 'View category'
+        : 'Category'
       categorySummaryData.linkHref = `${config.serviceUrls.offenderCategorisation}/${bookingId}`
     }
 
