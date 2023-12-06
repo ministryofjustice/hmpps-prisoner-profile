@@ -20,14 +20,17 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
   }
 
   async createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults> {
-    return (await this.restClient.post({ path: `/appointment`, data: appointments })) as AppointmentDefaults
+    return this.restClient.post<AppointmentDefaults>({
+      path: `/appointment`,
+      data: appointments,
+    })
   }
 
   async addVideoLinkBooking(videoLinkBooking: VideoLinkBookingForm): Promise<number> {
-    return (await this.restClient.post({ path: '/court/video-link-bookings', data: videoLinkBooking })) as number
+    return this.restClient.post<number>({ path: '/court/video-link-bookings', data: videoLinkBooking })
   }
 
-  async getUnacceptableAbsences(
+  getUnacceptableAbsences(
     offenderNumber: string,
     fromDate: string,
     toDate: string,
@@ -38,7 +41,7 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     })
   }
 
-  async getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<CellMoveReason> {
+  getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<CellMoveReason> {
     return this.restClient.get<CellMoveReason>({
       path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
     })
