@@ -23,7 +23,6 @@ export default function setUpWebSecurity(): Router {
   ]
   const styleSrc = [
     "'self'",
-    "'sha256-dCFTgAnPDLgZfSZ6J47SbSdR5C8q8CG0qFjXCTQa9mY='", // hash for svg style in modal.js
     '*.google-analytics.com',
     '*.analytics.google.com',
     '*.googletagmanager.com',
