@@ -382,7 +382,7 @@ export default class OverviewPageService {
         ? `/prisoner/${prisonerNumber}/active-punishments`
         : undefined,
       bottomClass: 'small',
-      linkLabel: 'Adjudications history',
+      linkLabel: 'Adjudication history',
       linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
     }
 
@@ -520,7 +520,7 @@ export default class OverviewPageService {
         userRoles,
       )
         ? 'Manage category'
-        : 'View category'
+        : 'Category'
       categorySummaryData.linkHref = `${config.serviceUrls.offenderCategorisation}/${bookingId}`
     }
 

@@ -102,10 +102,10 @@ export default class PersonalPage extends Page {
           relationship: () => contactData().find('[data-qa=contact-relationship]'),
           emergencyContact: () => contactData().find('[data-qa=contact-emergency-contact]'),
           phones: () => contactData().find('[data-qa=contact-numbers]'),
-          emails: () => details().eq(0),
-          address: () => details().eq(1),
+          address: () => details().eq(0),
+          addressTypes: () => details().eq(1),
           addressPhones: () => details().eq(2),
-          addressTypes: () => details().eq(3),
+          emails: () => details().eq(3),
         }
       },
     }

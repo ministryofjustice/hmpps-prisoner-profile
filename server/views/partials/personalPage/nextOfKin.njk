@@ -21,10 +21,10 @@
       <div class="govuk-details__text" data-qa="contact-details">
         {{ govukSummaryList({
         rows: [
-          { key: { text: "Email"}, value: { html: arrayToLines(contactInfo.emails, "Not entered")} },
           { key: { text: "Address"}, value: { html: arrayToLines(contactInfo.address.address | addressToLines, "Not entered")} },
+          { key: { text: "Address type"}, value: { html: arrayToLines(contactInfo.address.addressTypes, "Not entered")} },
           { key: { text: "Address phone"}, value: { html: arrayToLines(contactInfo.address.phones, "Not entered")} },
-          { key: { text: "Address type"}, value: { html: arrayToLines(contactInfo.address.addressTypes, "Not entered")} }
+          { key: { text: "Email"}, value: { html: arrayToLines(contactInfo.emails, "Not entered")} }
         ]
       }) }}
       </div>
