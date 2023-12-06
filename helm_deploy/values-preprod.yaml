@@ -10,6 +10,8 @@ generic-service:
     modsecurity_snippet: |
       SecRuleEngine On
       SecRuleRemoveById 949110
+      SecRuleRemoveById 942440
+      SecRuleRemoveById 920300
 
   env:
     INGRESS_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk"
@@ -43,13 +45,14 @@ generic-service:
     NEURODIVERSITY_ENABLED_PRISONS: "BLI,NHI,LII,SLI"
     HMPPS_NON_ASSOCIATIONS_API_URL: "https://non-associations-api-preprod.hmpps.service.justice.gov.uk"
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
-    ACTIVITIES_ENABLED_PRISONS: "RSI"
+    ACTIVITIES_ENABLED_PRISONS: "RSI,LPI"
     APPOINTMENTS_URL: "https://activities-preprod.prison.service.justice.gov.uk/appointments"
-    APPOINTMENTS_ENABLED_PRISONS: "RSI"
+    APPOINTMENTS_ENABLED_PRISONS: "RSI,LPI"
     COMPONENT_API_URL: "https://frontend-components-preprod.hmpps.service.justice.gov.uk"
     COMPONENT_API_LATEST: "true"
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-preprod.hmpps.service.justice.gov.uk"
+    AUDIT_ENABLED: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
@@ -58,10 +61,10 @@ generic-service:
     sscl-newcastle: 62.172.79.105/32
     sscl-newport: 217.38.237.212/32
     groups:
-      - internal
-      - prisons
-      - private_prisons
-      - police
+    - internal
+    - prisons
+    - private_prisons
+    - police
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod

@@ -15,6 +15,7 @@ import { courtLocationsMock, courtLocationsSelectOptionsMock } from '../data/loc
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
+import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 let req: any
 let res: any
@@ -48,8 +49,8 @@ const appointmentsToCreate = {
   ),
   comment: formBody.comments,
   repeat: {
-    repeatPeriod: formBody.repeats || 'WEEKLY',
-    count: formBody.times || 1,
+    repeatPeriod: formBody.repeats,
+    count: formBody.times,
   },
 }
 
@@ -126,7 +127,7 @@ describe('Appointments Controller', () => {
       redirect: jest.fn(),
     }
 
-    controller = new AppointmentController(appointmentService, prisonerSearchService)
+    controller = new AppointmentController(appointmentService, prisonerSearchService, auditServiceMock())
 
     appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
       appointmentTypes: appointmentTypesMock,
@@ -186,7 +187,7 @@ describe('Appointments Controller', () => {
       await controller.post()(req, res)
 
       expect(controller['appointmentService'].createAppointments).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        res.locals.user.token,
         appointmentsToCreate,
       )
 
@@ -353,7 +354,7 @@ describe('Appointments Controller', () => {
       await controller.postVideoLinkBooking()(req, res)
 
       expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        res.locals.user.token,
         videoLinkBookingForm,
       )
 

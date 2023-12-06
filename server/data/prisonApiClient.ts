@@ -77,13 +77,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable> {
-    try {
-      return await this.restClient.stream({
-        path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
-      })
-    } catch (error) {
-      return error
-    }
+    return this.restClient.stream({
+      path: `/api/bookings/offenderNo/${offenderNumber}/image/data?fullSizeImage=${fullSizeImage}`,
+    })
   }
 
   async getAccountBalances(bookingId: number): Promise<AccountBalances> {
@@ -221,13 +217,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable> {
-    try {
-      return await this.restClient.stream({
-        path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
-      })
-    } catch (error) {
-      return error
-    }
+    return this.restClient.stream({
+      path: `/api/images/${imageId}/data?fullSizeImage=${getFullSizedImage}`,
+    })
   }
 
   async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {

@@ -21,6 +21,8 @@ import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
 import professionalContactsRouter from './professionalContactsRouter'
+import { ApiAction, Page } from '../services/auditService'
+import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -40,39 +42,67 @@ export default function routes(services: Services): Router {
     )
 
   const overviewController = new OverviewController(
-    services.prisonerSearchService,
     services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
+    services.auditService,
   )
 
-  const prisonerScheduleController = new PrisonerScheduleController(services.dataAccess.prisonApiClientBuilder)
-  const prisonerCellHistoryController = new PrisonerCellHistoryController(services.dataAccess.prisonApiClientBuilder)
+  const prisonerScheduleController = new PrisonerScheduleController(
+    services.dataAccess.prisonApiClientBuilder,
+    services.auditService,
+  )
+  const prisonerCellHistoryController = new PrisonerCellHistoryController(
+    services.dataAccess.prisonApiClientBuilder,
+    services.auditService,
+  )
 
   get(
     '/api/prisoner/:prisonerNumber/image',
+    auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     services.commonApiRoutes.prisonerImage,
   )
 
-  get('/api/image/:imageId', services.commonApiRoutes.image)
+  get(
+    '/api/image/:imageId',
+    auditPageAccessAttempt({ services, page: ApiAction.Image }),
+    services.commonApiRoutes.image,
+  )
 
   get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
-  get('/prisoner/:prisonerNumber', getPrisonerData(services), checkPrisonerInCaseload(), async (req, res, next) => {
-    const prisonerData = req.middleware?.prisonerData
-    const inmateDetail = req.middleware?.inmateDetail
-    return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
-  })
-
   get(
-    '/prisoner/:prisonerNumber/image',
+    '/prisoner/:prisonerNumber',
+    auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
+      return overviewController.displayOverview(req, res, prisonerData, inmateDetail)
+    },
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/image',
+    auditPageAccessAttempt({ services, page: Page.Photo }),
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    async (req, res, next) => {
+      const prisonerData = req.middleware?.prisonerData
+      const inmateDetail = req.middleware?.inmateDetail
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.Photo,
+      })
 
       res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
@@ -83,6 +113,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/personal',
+    auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -91,6 +122,16 @@ export default function routes(services: Services): Router {
 
       const { personalPageService } = services
       const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.Personal,
+      })
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
@@ -102,6 +143,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/work-and-skills',
+    auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -113,6 +155,16 @@ export default function routes(services: Services): Router {
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.WorkAndSkills,
+      })
 
       res.render('pages/workAndSkills', {
         ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'work-and-skills'),
@@ -127,6 +179,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/offences',
+    auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -134,6 +187,16 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(res.locals.clientToken, prisonerData)
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.Offences,
+      })
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
@@ -153,6 +216,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
+    auditPageAccessAttempt({ services, page: Page.ActivePunishments }),
     getPrisonerData(services),
     guardMiddleware(
       GuardOperator.OR,
@@ -163,6 +227,16 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const { activePunishmentsPageService } = services
       const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.ActivePunishments,
+      })
 
       return res.render('pages/activePunishments', {
         pageTitle: 'Active punishments',
@@ -175,6 +249,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/schedule',
+    auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -189,6 +264,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/x-ray-body-scans',
+    auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
@@ -196,6 +272,16 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
       const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
+
+      await services.auditService.sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.XRayBodyScans,
+      })
 
       res.render('pages/xrayBodyScans', {
         pageTitle: 'X-ray body scans',
@@ -210,6 +296,7 @@ export default function routes(services: Services): Router {
 
   get(
     '/prisoner/:prisonerNumber/location-details',
+    auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {

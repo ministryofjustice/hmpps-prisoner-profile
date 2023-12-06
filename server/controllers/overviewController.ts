@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { PrisonerSearchService } from '../services'
 import OverviewPageService from '../services/overviewPageService'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import { Prisoner } from '../interfaces/prisoner'
@@ -14,16 +13,17 @@ import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiCli
 import { RestClientBuilder } from '../data'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import buildOverviewActions from './utils/buildOverviewActions'
+import { AuditService, Page } from '../services/auditService'
 
 /**
  * Parse request for overview page and orchestrate response
  */
 export default class OverviewController {
   constructor(
-    private readonly prisonerSearchService: PrisonerSearchService,
     private readonly overviewPageService: OverviewPageService,
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
+    private readonly auditService: AuditService,
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
@@ -36,6 +36,7 @@ export default class OverviewController {
         clientToken,
         prisonerData,
         res.locals.user.staffId,
+        inmateDetail,
         res.locals.user.caseLoads,
         res.locals.user.userRoles,
       ),
@@ -57,6 +58,16 @@ export default class OverviewController {
     // Set role based permissions
     const canView = canViewCaseNotes(res.locals.user, prisonerData)
     const canAdd = canAddCaseNotes(res.locals.user, prisonerData)
+
+    this.auditService.sendPageView({
+      userId: res.locals.user.username,
+      userCaseLoads: res.locals.user.caseLoads,
+      userRoles: res.locals.user.userRoles,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.Overview,
+    })
 
     res.render('pages/overviewPage', {
       pageTitle: 'Overview',

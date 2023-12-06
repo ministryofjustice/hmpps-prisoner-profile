@@ -76,6 +76,7 @@ export default class OverviewPageService {
     clientToken: string,
     prisonerData: Prisoner,
     staffId: number,
+    inmateDetail: InmateDetail,
     userCaseLoads: CaseLoad[] = [],
     userRoles: string[] = [],
   ): Promise<OverviewPage> {
@@ -92,7 +93,6 @@ export default class OverviewPageService {
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
 
     const [
-      inmateDetail,
       staffRoles,
       learnerNeurodivergence,
       scheduledTransfers,
@@ -105,7 +105,6 @@ export default class OverviewPageService {
       fullStatus,
       communityManager,
     ] = await Promise.all([
-      prisonApiClient.getInmateDetail(prisonerData.bookingId),
       prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
