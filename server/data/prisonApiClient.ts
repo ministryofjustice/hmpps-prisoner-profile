@@ -484,4 +484,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       ignore404: true,
     })
   }
+
+  async getAlertDetails(bookingId: number, alertId: number): Promise<Alert> {
+    return this.restClient.get<Alert>({
+      path: `/api/bookings/${bookingId}/alerts/${alertId}`,
+    })
+  }
 }

@@ -24,6 +24,20 @@
   }
 }
 
+@mixin alertType($colour) {
+  border-color: $colour;
+
+  &:hover, &:focus {
+    text-decoration: none;
+    background-color: $colour;
+    color: govuk-colour('white');
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 3px $govuk-focus-colour;
+  }
+}
+
 .alerts-list {
 
   min-height: 50px;
@@ -38,10 +52,10 @@
   flex-wrap: wrap;
   gap: 15px;
 
-  li {
+  li a {
     padding: 0 10px;
     margin-bottom: 0;
-    background-color: govuk-colour('white');
+    border-radius: 5px;
   }
 }
 
@@ -56,160 +70,157 @@
 
   height: 26px;
   color: govuk-colour('black');
+  background-color: govuk-colour('white');
 
   &--care-leaver {
-    border-color: #00703c;
+    @include alertType(#00703c);
   }
 
   &--ex-armed-forces {
-    border-color: #85994b;
+    @include alertType(#85994b);
   }
 
   &--medical {
-    border-color: #5694ca;
+    @include alertType(#5694ca);
   }
 
   &--other {
-    border-color: #d53880;
+    @include alertType(#d53880);
   }
 
   &--MAPPP-case {
-    border-color: #28a197;
+    @include alertType(#28a197);
   }
 
   &--security {
-    border-color: #003078;
+    @include alertType(#003078);
   }
 
   &--risk {
-    border-color: #d4351c;
+    @include alertType(#d4351c);
   }
 
   &--self-harm {
-    border-color: #f47738;
+    @include alertType(#f47738);
   }
 
 
   
   &--acct {
-    border-color: #d34700;
+    @include alertType(#d34700);
   }
 
   &--assault {
-    border-color: #4c2c92;
+    @include alertType(#4c2c92);
   }
 
   &--disability {
-    border-color: #2b88c8;
+    @include alertType(#2b88c8);
   }
 
   &--arsonist {
-    border-color: #df3034;
+    @include alertType(#df3034);
   }
 
   &--elist {
-    border-color: #28a197;
+    @include alertType(#28a197);
   }
 
   &--risk-females {
-    border-color: #6f71af;
+    @include alertType(#6f71af);
   }
 
   &--tact {
-    border-color: #d53880;
+    @include alertType(#d53880);
   }
 
   &--corruptor {
-    border-color: #b10e1e;
+    @include alertType(#b10e1e);
   }
 
   &--chemical-attacker {
-    border-color: #69831e;
+    @include alertType(#69831e);
   }
 
   &--concerted-indiscipline {
-    border-color: #444;
+    @include alertType(#444);
   }
 
   &--racist {
-    border-color: #8f5f11;
+    @include alertType(#8f5f11);
   }
 
   &--risk-lgbt {
-    border-color: #912b88;
+    @include alertType(#912b88);
   }
 
   &--hostage-taker {
-    border-color: #c6545f;
+    @include alertType(#c6545f);
   }
 
   &--controlled-unlock {
-    border-color: #2e358b;
+    @include alertType(#2e358b);
   }
 
   &--gang-member {
-    border-color: #005f9e;
+    @include alertType(#005f9e);
   }
 
   &--csip {
-    border-color: #4c2c92;
+    @include alertType(#4c2c92);
   }
 
   &--veteran {
-    border-color: #006435;
+    @include alertType(#006435);
   }
 
   &--care-experienced {
-    border-color: #3f90ae;
+    @include alertType(#3f90ae);
   }
 
   &--acct-post-closure {
-    border: 3px dashed #f47738;
+    border: 3px dashed;
+    @include alertType(#f47738);
   }
 
   &--conflict {
-    border-color: #800000;
+    @include alertType(#800000);
   }
 
   &--no-one-to-one {
-    border-color: #903;
+    @include alertType(#903);
   }
 
   &--quarantined {
-    border-color: #330;
-    background-color: #330;
+    @include alertType(#330);
   }
 
   &--reverse-cohorting-unit {
-    border-color: mix(white, #00703c, 20%);
-    background-color: mix(white, #00703c, 20%);
+    @include alertType(mix(white, #00703c, 20%));
   }
 
   &--protective-isolation-unit {
-    border-color: #006637;
-    background-color: #006637;
+    @include alertType(#006637);
   }
 
   &--shielding-unit {
-    border-color: #004424;
-    background-color: #004424;
+    @include alertType(#004424);
   }
 
   &--refusing-to-shield {
-    border-color: #b58840;
-    background-color: #b58840;
+    @include alertType(#b58840);
   }
 
   &--risk-to-known-adults {
-    border-color: #003078;
+    @include alertType(#003078);
   }
 
   &--isolated-prisoner {
-    border-color: #00753f;
+    @include alertType(#00753f);
   }
 
   &--visor {
-    border-color: #003078;
+    @include alertType(#003078);
   }
 }
 
@@ -242,4 +253,19 @@
   border-color: lighten(#d4351c, 40);
   font-weight: bold;
   color: #d4351c;
+}
+
+.alert-details-modal {
+  .modal-content {
+    width: 800px;
+
+    .hmpps-alert-card-list-item:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .hmpps-alert-card-list-item__notes {
+      margin-bottom: 20px;
+    }
+  }
 }

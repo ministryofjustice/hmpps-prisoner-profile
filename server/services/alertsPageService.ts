@@ -149,4 +149,16 @@ export default class AlertsPageService {
 
     return prisonApiClient.createAlert(bookingId, { ...alert, alertDate: formatDateISO(parseDate(alert.alertDate)) })
   }
+
+  public async getAlertDetails(token: string, bookingId: number, alertId: number) {
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+
+    const alert = await prisonApiClient.getAlertDetails(bookingId, alertId)
+
+    return {
+      ...alert,
+      addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
+      expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
+    }
+  }
 }

@@ -93,6 +93,10 @@
     font-size: 19px;
     font-weight: 300;
     color: $govuk-text-colour;
+
+    span {
+      font-weight: 700;
+    }
   }
 
   &__link {

@@ -78,5 +78,22 @@ export default function alertsRouter(services: Services): Router {
     alertsController.post(),
   )
 
+  get(
+    '/prisoner/:prisonerNumber/alerts/detail',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    alertsController.displayAlert(),
+  )
+
+  /**
+   * API Routes - called from JavaScript on page
+   */
+  get(
+    '/api/prisoner/:prisonerNumber/get-alert-details',
+    getPrisonerData(services),
+    checkPrisonerInCaseload(),
+    alertsController.getAlertDetails(),
+  )
+
   return router
 }

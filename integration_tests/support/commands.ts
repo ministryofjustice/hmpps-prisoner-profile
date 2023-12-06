@@ -43,6 +43,7 @@ Cypress.Commands.add(
     cy.task('stubGetCommunityManager')
     cy.task('stubScheduledTransfers', prisonerNumber)
     cy.task('stubPrisonerDetail', prisonerNumber)
+    cy.task('stubAlertDetails')
   },
 )
 

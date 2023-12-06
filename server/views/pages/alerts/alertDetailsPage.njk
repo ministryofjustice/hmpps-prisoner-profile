@@ -1,0 +1,109 @@
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "../../macros/hmppsActionButton.njk" import hmppsActionButton %}
+{% extends "../index.njk" %}
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
+    },
+    {
+        text: miniBannerData.prisonerName,
+        href: "/prisoner/" + miniBannerData.prisonerNumber
+    }
+] %}
+{% block body %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1>Alert details</h1>
+        </div>
+    </div>
+
+    {{ miniBanner(miniBannerData) }}
+
+    {% for alert in alerts %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <div class="govuk-grid-row govuk-!-margin-bottom-4">
+                <div class="govuk-grid-column-full">
+                    <div class="govuk-grid-row govuk-!-font-weight-bold">
+                        <div class="govuk-grid-column-full">
+                            Alert
+                        </div>
+                    </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ alert.alertCodeDescription }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="govuk-grid-row govuk-!-margin-bottom-4">
+                <div class="govuk-grid-column-one-half">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full govuk-!-font-weight-bold">
+                            Added by
+                        </div>
+                    </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ alert.addedByFullName }} on {{ alert.dateCreated | formatDate }}
+                        </div>
+                    </div>
+                </div>
+                {% if alert.modifiedDateTime %}
+                <div class="govuk-grid-column-one-half">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full govuk-!-font-weight-bold">
+                            Last updated by
+                        </div>
+                    </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ alert.expiredByFullName }} on {{ alert.modifiedDateTime | formatDate }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="govuk-grid-row govuk-!-margin-bottom-4">
+                <div class="govuk-grid-column-full">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full govuk-!-font-weight-bold">
+                            Start date
+                        </div>
+                    </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            {{ alert.dateCreated | formatDate }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full govuk-!-font-weight-bold">
+                            Comments
+                        </div>
+                    </div>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            <pre class="govuk-body">{{ alert.comment }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if not loop.last %}
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
+    {% endif %}
+    {% endfor %}
+    <div>
+        <a href="/prisoner/{{ miniBannerData.prisonerNumber }}/alerts/active" class="govuk-link govuk-link--no-visited-state">All alerts</a>
+    </div>
+
+{% endblock %}

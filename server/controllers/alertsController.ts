@@ -4,13 +4,12 @@ import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import AlertsPageService from '../services/alertsPageService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { Role } from '../data/enums/role'
-import { formatName, userCanEdit, userHasRoles } from '../utils/utils'
+import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
-import { AlertForm, AlertType } from '../interfaces/prisonApi/alert'
+import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { Alert } from '../interfaces/prisoner'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 
 /**
@@ -163,6 +162,59 @@ export default class AlertsController {
         details: {},
       })
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
+    }
+  }
+
+  public displayAlert(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const {
+        prisonerData: { bookingId, firstName, lastName, prisonerNumber, cellLocation },
+      } = req.middleware
+      const { clientToken } = res.locals
+      const alertIds = req.query.ids
+
+      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+      const alerts: Alert[] = await Promise.all(
+        [...(Array.isArray(alertIds) ? alertIds : [alertIds])].map(alertId =>
+          this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId),
+        ),
+      )
+      // Sort by created date DESC
+      alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
+
+      return res.render('pages/alerts/alertDetailsPage', {
+        pageTitle: 'Alerts',
+        miniBannerData: {
+          prisonerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+        alerts,
+      })
+    }
+  }
+
+  public getAlertDetails(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const {
+        prisonerData: { bookingId, prisonerNumber },
+      } = req.middleware
+      const { clientToken } = res.locals
+      const alertIds = req.query.ids
+
+      const alerts: Alert[] = await Promise.all(
+        [...(Array.isArray(alertIds) ? alertIds : [alertIds])].map(alertId =>
+          this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId),
+        ),
+      )
+      // Sort by created date DESC
+      alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
+
+      return res.render('partials/alerts/alertDetails', {
+        alerts,
+        allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      })
     }
   }
 

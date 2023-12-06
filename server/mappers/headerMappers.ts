@@ -1,7 +1,5 @@
-import { Alert, Prisoner } from '../interfaces/prisoner'
+import { Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
-import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
-import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 import { formatCategoryCodeDescription, formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
@@ -9,13 +7,15 @@ import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import { User } from '../data/hmppsAuthClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import { Alert } from '../interfaces/prisonApi/alert'
+import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
+import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
   const { userRoles, caseLoads } = user
   const profileBannerTopLinks = []
-
   const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads)
 
   if (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads)) {
@@ -63,18 +63,15 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
   return profileBannerTopLinks
 }
 
-export function mapAlerts(prisonerData: Prisoner, alertFlags: AlertFlagLabel[]) {
-  const alerts: AlertFlagLabel[] = []
-  if (prisonerData.alerts) {
-    prisonerData.alerts.forEach((alert: Alert) => {
-      alertFlags.forEach((alertFlag: AlertFlagLabel) => {
-        if (alertFlag.alertCodes.includes(alert.alertCode)) {
-          alerts.push(alertFlag)
-        }
-      })
+export function mapAlerts(inmateDetail: InmateDetail, alertFlags: AlertFlagLabel[]) {
+  return alertFlags
+    .map(flag => {
+      const alertIds = inmateDetail.alerts
+        .filter((alert: Alert) => alert.active && !alert.expired && flag.alertCodes.includes(alert.alertCode))
+        .map(alert => alert.alertId)
+      return { ...flag, alertIds } as AlertFlagLabel
     })
-  }
-  return [...new Set(alerts)].sort((a, b) => a.label.localeCompare(b.label))
+    .filter(alert => alert.alertIds?.length)
 }
 
 export function mapHeaderData(
@@ -98,7 +95,7 @@ export function mapHeaderData(
     }),
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
-    alerts: mapAlerts(prisonerData, alertFlagLabels),
+    alerts: mapAlerts(inmateDetail, alertFlagLabels),
     tabLinks: tabs,
     photoType,
     prisonId: prisonerData.prisonId,

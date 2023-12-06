@@ -11,6 +11,7 @@ export interface Alert extends PagedListItem {
   alertCodeDescription: string
   comment?: string
   dateCreated: string
+  modifiedDateTime?: string
   dateExpires?: string
   expired: boolean
   active: boolean

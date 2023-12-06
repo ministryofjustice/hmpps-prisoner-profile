@@ -3,10 +3,10 @@
     <div class="hmpps-alert-card-list-item__content">
         <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertTypeDescription }}</div>
         <div class="hmpps-alert-card-list-item__title">{{ alert.alertCodeDescription }}</div>
-        <div class="hmpps-alert-card-list-item__notes">{{ alert.comment }}</div>
-        <div class="hmpps-alert-card-list-item__metadata"><span class='govuk-!-font-weight-bold'>Created:</span> {{ alert.dateCreated | formatDate }} {% if alert.addedByFullName %} by {{ alert.addedByFullName }} {% endif %}</div>
+        <pre class="hmpps-alert-card-list-item__notes govuk-body">{{ alert.comment }}</pre>
+        <div class="hmpps-alert-card-list-item__metadata"><span>Created:</span> {{ alert.dateCreated | formatDate }} {% if alert.addedByFullName %} by {{ alert.addedByFullName }} {% endif %}</div>
         {% if not alert.active %}
-            <div class="hmpps-alert-card-list-item__metadata"><span class='govuk-!-font-weight-bold'>Closed:</span> {{ alert.dateExpires | formatDate }} {% if alert.expiredByFullName %} by {{ alert.expiredByFullName }} {% endif %}</div>
+            <div class="hmpps-alert-card-list-item__metadata"><span>Closed:</span> {{ alert.dateExpires | formatDate }} {% if alert.expiredByFullName %} by {{ alert.expiredByFullName }} {% endif %}</div>
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">

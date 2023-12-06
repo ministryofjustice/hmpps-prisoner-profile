@@ -140,4 +140,5 @@ export interface PrisonApiClient {
   getPersonEmails(personId: number): Promise<AgenciesEmail[]>
   getPersonPhones(personId: number): Promise<Telephone[]>
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
+  getAlertDetails(bookingId: number, alertId: number): Promise<Alert>
 }
