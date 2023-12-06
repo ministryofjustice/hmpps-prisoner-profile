@@ -61,7 +61,7 @@ class Modal {
 
   handleKeyDown(event) {
     if (event.key === 'Escape') this.hide()
-    else if (event.key === 'Tab') trapFocus(event)
+    else if (event.key === 'Tab') trapFocus(this.element, event)
   }
 
   takeFocus() {
@@ -90,8 +90,8 @@ class Modal {
   }
 }
 
-function trapFocus(event) {
-  const focusableChildren = getFocusableChildren(this.element)
+function trapFocus(el, event) {
+  const focusableChildren = getFocusableChildren(el)
   const focusedItemIndex = focusableChildren.indexOf(document.activeElement)
   const lastIndex = focusableChildren.length - 1
 
