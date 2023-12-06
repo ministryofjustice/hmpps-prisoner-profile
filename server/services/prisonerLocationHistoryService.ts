@@ -6,7 +6,6 @@ import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
 import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
 import { CaseLoad } from '../interfaces/caseLoad'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import LocationHistoryPageData from '../interfaces/pages/locationHistoryPageData'
 import { formatName, sortByDateTime, putLastNameFirst, hasLength, extractLocation } from '../utils/utils'
 import { RestClientBuilder } from '../data'
@@ -30,8 +29,10 @@ export default ({
   whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>
   caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>
 }): PrisonerLocationHistoryService => {
-  const fetchStaffName = (staffId: string, prisonApi: PrisonApiClient) =>
-    prisonApi.getStaffDetails(staffId).then((staff: StaffDetails) => formatName(staff.firstName, '', staff.lastName))
+  const fetchStaffName = async (staffId: string, prisonApi: PrisonApiClient) => {
+    const staffDetails = await prisonApi.getStaffDetails(staffId)
+    return formatName(staffDetails.firstName, '', staffDetails.lastName)
+  }
 
   const fetchWhatHappened = async (
     bookingId: number,
@@ -40,14 +41,20 @@ export default ({
     caseNotesApi: CaseNotesApiClient,
     whereaboutsApi: WhereaboutsApiClient,
   ) => {
-    try {
-      const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence)
-      const caseNote = await caseNotesApi.getCaseNote(offenderNo, cellMoveReason.cellMoveReason?.caseNoteId.toString())
-      return caseNote.text
-    } catch (err) {
-      if (err?.status === 404) return null
-      throw err
+    const cellMoveReason = await whereaboutsApi.getCellMoveReason(bookingId, bedAssignmentHistorySequence, true)
+    if (cellMoveReason) {
+      const caseNote = await caseNotesApi.getCaseNote(
+        offenderNo,
+        cellMoveReason.cellMoveReason?.caseNoteId.toString(),
+        true,
+      )
+
+      if (caseNote) {
+        return caseNote.text
+      }
     }
+
+    return null
   }
 
   const mapReasonToCellMoveReasonDescription = (cellMoveReasonTypes: CellMoveReasonType[], assignmentReason: string) =>

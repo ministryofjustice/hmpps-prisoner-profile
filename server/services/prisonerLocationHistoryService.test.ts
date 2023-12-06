@@ -155,9 +155,7 @@ describe('prisonerLocationHistoryService', () => {
 
   describe('Given no cell move reason', () => {
     it('Puts placeholder text in for the what happened', async () => {
-      whereaboutsApiClient.getCellMoveReason = jest.fn(async () => {
-        throw new NotFoundApiError()
-      })
+      whereaboutsApiClient.getCellMoveReason = jest.fn(async () => null)
 
       const pageData = await service(
         'token',

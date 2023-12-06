@@ -41,9 +41,14 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     })
   }
 
-  getCellMoveReason(bookingId: number, bedAssignmentHistorySequence: number): Promise<CellMoveReason> {
+  getCellMoveReason(
+    bookingId: number,
+    bedAssignmentHistorySequence: number,
+    ignore404 = false,
+  ): Promise<CellMoveReason> {
     return this.restClient.get<CellMoveReason>({
       path: `/cell/cell-move-reason/booking/${bookingId}/bed-assignment-sequence/${bedAssignmentHistorySequence}`,
+      ignore404,
     })
   }
 }
