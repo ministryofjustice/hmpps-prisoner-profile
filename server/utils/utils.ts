@@ -574,3 +574,11 @@ export const formatCommunityManager = (communityManager: CommunityManager): stri
 
   return formatName(communityManager.name.forename, null, communityManager.name.surname)
 }
+
+export const putLastNameFirst = (firstName: string, lastName: string): string => {
+  if (!firstName && !lastName) return null
+  if (!firstName && lastName) return properCaseName(lastName)
+  if (firstName && !lastName) return properCaseName(firstName)
+
+  return `${properCaseName(lastName)}, ${properCaseName(firstName)}`
+}

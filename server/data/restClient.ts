@@ -91,14 +91,14 @@ export default class RestClient {
     }
   }
 
-  async post({
+  async post<T>({
     path = null,
     query = '',
     headers = {},
     responseType = '',
     data = {},
     raw = false,
-  }: PostRequest = {}): Promise<unknown> {
+  }: PostRequest = {}): Promise<T> {
     logger.info(`Post using user credentials: calling ${this.name}: ${path}`)
     try {
       const result = await superagent

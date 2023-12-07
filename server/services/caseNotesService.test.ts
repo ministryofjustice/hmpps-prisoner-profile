@@ -20,6 +20,7 @@ describe('Case Notes Page', () => {
       getCaseNoteTypesForUser: jest.fn(async () => caseNoteTypesMock),
       getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
       addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
+      getCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
     }
     caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
   })
