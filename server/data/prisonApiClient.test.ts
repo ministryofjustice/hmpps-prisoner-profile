@@ -45,6 +45,10 @@ import { locationsMock } from './localMockData/locationsMock'
 import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
+import { GetDetailsMock } from './localMockData/getDetailsMock'
+import { GetAttributesForLocation } from './localMockData/getAttributesForLocationMock'
+import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
+import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
 import { alertDetailsMock } from './localMockData/alertDetailsMock'
 
@@ -579,6 +583,52 @@ describe('prisonApiClient', () => {
     })
   })
 
+  describe('getDetails', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234C'
+      const fullInfo = true
+
+      mockSuccessfulPrisonApiCall(
+        `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
+        GetDetailsMock,
+      )
+      const output = await prisonApiClient.getDetails(prisonerNumber, true)
+      expect(output).toEqual(GetDetailsMock)
+    })
+  })
+
+  describe('getAttributesForLocation', () => {
+    it('Should return data from the API', async () => {
+      const locationId = 'AB1234C'
+
+      mockSuccessfulPrisonApiCall(`/api/cell/${locationId}/attributes`, GetAttributesForLocation)
+      const output = await prisonApiClient.getAttributesForLocation(locationId)
+      expect(output).toEqual(GetAttributesForLocation)
+    })
+  })
+
+  describe('getHistoryForLocation', () => {
+    it('Should return data from the API', async () => {
+      const locationId = 'AB1234C'
+      const fromDate = '2020'
+      const toDate = '2023'
+
+      mockSuccessfulPrisonApiCall(
+        `/api/cell/${locationId}/history?fromDate=${fromDate}&toDate=${toDate}`,
+        mockHistoryForLocation(),
+      )
+      const output = await prisonApiClient.getHistoryForLocation(locationId, fromDate, toDate)
+      expect(output).toEqual(mockHistoryForLocation())
+    })
+  })
+
+  describe('getCellMoveReasonTypes', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulPrisonApiCall('/api/reference-domains/domains/CHG_HOUS_RSN', getCellMoveReasonTypesMock)
+      const output = await prisonApiClient.getCellMoveReasonTypes()
+      expect(output).toEqual(getCellMoveReasonTypesMock)
+    })
+  })
   describe('getScheduledTransfers', () => {
     it('Should return data from the API', async () => {
       const prisonerNumber = 'AB1234C'
