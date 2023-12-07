@@ -259,13 +259,64 @@
   .modal-content {
     width: 800px;
 
-    .hmpps-alert-card-list-item:last-of-type {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
+    .alert-details {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      flex-basis: min-content;
+      padding-bottom: 30px;
+      border-bottom: 1px solid govuk-colour('dark-grey');
+      margin-bottom: 30px;
 
-    .hmpps-alert-card-list-item__notes {
-      margin-bottom: 20px;
+      &__content {
+        max-width: 670px;
+
+        @media (max-width: 1152px) {
+          max-width: 570px;
+        }
+      }
+
+      &__sub-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: $govuk-secondary-text-colour;
+        margin-bottom: 15px;
+      }
+
+      &__title {
+        font-size: 24px;
+        font-weight: bold;
+        color: $govuk-text-colour;
+        margin-bottom: 15px;
+      }
+
+      &__notes {
+        font-size: 19px;
+        font-weight: 300;
+        color: $govuk-text-colour;
+        margin-bottom: 20px;
+        word-break: break-word;
+      }
+
+      &__metadata {
+        font-size: 19px;
+        font-weight: 300;
+        color: $govuk-text-colour;
+
+        span {
+          font-weight: 700;
+        }
+      }
+
+      &__link {
+        white-space: nowrap;
+        margin-top: 36px;
+      }
+
+      &:last-of-type {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
     }
   }
 }
