@@ -1,0 +1,131 @@
+:root {
+  --modal-width: 300px;
+}
+
+.modal-container,
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.modal-container {
+  z-index: 2;
+  display: flex;
+}
+
+.modal-container[hidden] {
+  display: none;
+}
+
+.modal-overlay {
+  background-color: rgb(0 0 0 / 0.6);
+}
+
+.modal-content {
+  margin: auto;
+  min-width: 400px;
+  max-width: 800px;
+  min-height: 300px;
+  max-height: 90vh;
+  z-index: 2;
+  position: relative;
+  background-color: govuk-colour('white');
+  border: 3px solid govuk-colour('black');
+
+  header {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: govuk-colour('black');
+    color: govuk-colour('white');
+    margin-top: 0;
+    padding: 0 15px 0 30px;
+    height: 45px;
+
+    h1 {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .modal__close-button {
+      all: unset;
+      width: 37px;
+      height: 37px;
+      text-align: center;
+      padding-top: 2px;
+      cursor: pointer;
+
+      svg {
+        fill: govuk-colour('white');
+      }
+
+      &:hover, &:focus {
+        svg {
+          fill: govuk-colour('yellow');
+        }
+      }
+    }
+  }
+
+  section {
+    padding: 15px 30px 0 30px;
+    max-height: calc(90vh - 70px);
+    min-height: calc(var(--modal-width) - 70px);
+    overflow: auto;
+
+    svg {
+      width: 50px;
+      display: block;
+      margin: calc((var(--modal-width) / 2) - 70px) auto auto;
+
+      .spinner_OSmW {
+        transform-origin: center;
+        animation: spinner_T6mA .75s step-end infinite
+      }
+
+      @keyframes spinner_T6mA {
+        8.3% {
+          transform: rotate(30deg)
+        }
+        16.6% {
+          transform: rotate(60deg)
+        }
+        25% {
+          transform: rotate(90deg)
+        }
+        33.3% {
+          transform: rotate(120deg)
+        }
+        41.6% {
+          transform: rotate(150deg)
+        }
+        50% {
+          transform: rotate(180deg)
+        }
+        58.3% {
+          transform: rotate(210deg)
+        }
+        66.6% {
+          transform: rotate(240deg)
+        }
+        75% {
+          transform: rotate(270deg)
+        }
+        83.3% {
+          transform: rotate(300deg)
+        }
+        91.6% {
+          transform: rotate(330deg)
+        }
+        100% {
+          transform: rotate(360deg)
+        }
+      }
+    }
+  }
+}

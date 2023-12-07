@@ -50,6 +50,7 @@ import { GetAttributesForLocation } from './localMockData/getAttributesForLocati
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
+import { alertDetailsMock } from './localMockData/alertDetailsMock'
 
 jest.mock('./tokenStore')
 
@@ -634,6 +635,16 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/schedules/${prisonerNumber}/scheduled-transfers`, scheduledTransfersMock)
       const output = await prisonApiClient.getScheduledTransfers(prisonerNumber)
       expect(output).toEqual(scheduledTransfersMock)
+    })
+  })
+
+  describe('getAlertDetails', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      const alertId = 1
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/alerts/${alertId}`, alertDetailsMock)
+      const output = await prisonApiClient.getAlertDetails(bookingId, alertId)
+      expect(output).toEqual(alertDetailsMock)
     })
   })
 })

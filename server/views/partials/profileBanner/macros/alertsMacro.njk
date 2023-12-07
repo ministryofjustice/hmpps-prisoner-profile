@@ -1,7 +1,22 @@
-{% macro alertsMacro(alerts) %}
-  <ul class="alerts-list">
-    {% for alert in  alerts %}
-      <li class="{{ alert.classes }}">{{ alert.label }}</li>
-    {% endfor %}
-  </ul>
+{% from 'components/modal/modal.njk' import modal %}
+{% macro alertsMacro(alerts, prisonerNumber) %}
+    <ul class="alerts-list" data-qa="alert-flags">
+        {% for alert in alerts %}
+            <li><a href="/prisoner/{{ prisonerNumber }}/alerts/detail?ids={{ alert.alertIds | join('&ids=') }}" data-prisoner-number="{{ prisonerNumber }}" class="govuk-link govuk-link--no-underline govuk-link--text-colour {{ alert.classes }}">{{ alert.label }}</a></li>
+        {% endfor %}
+    </ul>
+
+    {{ modal({
+        id: "alert-details",
+        title: "Alert details",
+        classes: "alert-details-modal",
+        close: {
+            label: "Close"
+        }
+    }) }}
+
+    {% block pageScripts %}
+        <script src="/assets/js/alertFlags.js" nonce="{{ cspNonce }}"></script>
+    {% endblock %}
+
 {% endmacro %}
