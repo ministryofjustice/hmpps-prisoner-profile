@@ -30,6 +30,7 @@ $govuk-page-width: $moj-page-width;
 @import './components/summary-card';
 @import './components/xrays';
 @import 'server/views/components/miniBanner/miniBanner';
+@import 'server/views/components/modal/modal';
 @import 'server/views/components/timePicker/timePicker';
 @import 'server/views/components/scheduledEvents/scheduledEvents';
 @import './pages/active-punishments-page';

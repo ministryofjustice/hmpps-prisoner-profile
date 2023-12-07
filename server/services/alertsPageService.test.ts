@@ -6,6 +6,7 @@ import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
+import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
 
 jest.mock('../data/prisonApiClient')
 
@@ -75,6 +76,19 @@ describe('Alerts Page', () => {
       const alert = await alertsPageService.createAlert('', 123456, alertFormMock)
 
       expect(alert).toEqual(pagedActiveAlertsMock.content[0])
+    })
+  })
+
+  describe('Get Alert Details', () => {
+    it('should call Prison API tp get alert details', async () => {
+      prisonApiClientSpy.getAlertDetails = jest.fn(async () => alertDetailsMock)
+
+      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
+      const alertDetails = await alertsPageService.getAlertDetails('', 123456, 1)
+
+      expect(prisonApiClientSpy.getAlertDetails).toHaveBeenCalledWith(prisonerData.bookingId, 1)
+
+      expect(alertDetails).toEqual({ ...alertDetailsMock, addedByFullName: '', expiredByFullName: 'James T Kirk' })
     })
   })
 })

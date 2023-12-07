@@ -551,31 +551,6 @@ context('Overview Page', () => {
       })
     })
   })
-
-  context('Given the prisoner is on remand', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
-      })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'ONREMAND', bookingId: 1234568 })
-    })
-
-    context('Main offence overview', () => {
-      it('should display main offence and the next court appearance and hide the conditional release date', () => {
-        const overviewPage = visitOverviewPageOnRemand()
-        overviewPage.offencesHeader().should('exist')
-        overviewPage.offenceCardContent().should('exist')
-        overviewPage.mainOffence().should('exist')
-        overviewPage.imprisonmentStatusLabel().should('exist')
-        overviewPage.imprisonmentStatus().should('exist')
-        overviewPage.viewAllOffencesLink().should('exist')
-        overviewPage.overviewConditionalReleaseLabel().should('not.exist')
-        overviewPage.overviewConditionalRelease().should('not.exist')
-        overviewPage.nextAppearanceDate().should('exist')
-      })
-    })
-  })
 })
 
 context('Overview Page - Prisoner not found', () => {

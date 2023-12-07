@@ -1,0 +1,23 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from '../alertsPage/macros/alertCard.njk' import alertCard %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="hmpps-alert-card-list" role="list">
+            {% for alert in alerts %}
+                {{ alertCard(alert) }}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="govuk-button-group">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" data-modal-hide data-qa="alert-details-close-button">
+                Close
+            </button>
+            <a href="{{ allAlertsUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="alert-details-all-alerts-link">All alerts</a>
+        </div>
+    </div>
+</div>

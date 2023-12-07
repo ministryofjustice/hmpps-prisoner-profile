@@ -119,4 +119,21 @@ context('Profile banner', () => {
       overviewPage.csraWithLink().should('exist')
     })
   })
+
+  context('Given the prisoner has alerts', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: ['ROLE_PRISON'],
+        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    })
+
+    it('Shows alert flags', () => {
+      visitOverviewPage()
+      const overviewPage = new OverviewPage()
+      overviewPage.alertFlags().children().should('have.length', '5')
+    })
+  })
 })

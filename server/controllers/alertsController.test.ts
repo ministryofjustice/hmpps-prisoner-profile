@@ -10,6 +10,9 @@ import ReferenceDataService from '../services/referenceDataService'
 import { alertTypesMock } from '../data/localMockData/alertTypesMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
+import { formatLocation, formatName } from '../utils/utils'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 let req: any
 let res: any
@@ -283,6 +286,140 @@ describe('Alerts Controller', () => {
 
       expect(createAlertsSpy).toHaveBeenCalledWith(res.locals.user.token, 123456, alertFormMock)
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
+  })
+
+  describe('Alert details page', () => {
+    beforeEach(() => {
+      req = {
+        params: { prisonerNumber: '' },
+        query: {},
+        middleware: {
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+        },
+      }
+      res = {
+        locals: {
+          user: {
+            activeCaseLoadId: 'MDI',
+            userRoles: [Role.UpdateAlert],
+            caseLoads: CaseLoadsDummyDataA,
+            token: 'TOKEN',
+          },
+          clientToken: 'CLIENT_TOKEN',
+        },
+        render: jest.fn(),
+      }
+      next = jest.fn()
+      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null), auditServiceMock())
+    })
+
+    it('should get one alert', async () => {
+      req.query = { ids: 1 }
+      const getAlertDetailsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'getAlertDetails')
+        .mockResolvedValue(alertDetailsMock)
+      const { prisonerNumber, cellLocation, firstName, lastName } = PrisonerMockDataA
+      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+      await controller.displayAlert()(req, res, next)
+
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(res.render).toHaveBeenCalledWith('pages/alerts/alertDetailsPage', {
+        pageTitle: 'Alerts',
+        miniBannerData: {
+          prisonerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+        alerts: [alertDetailsMock],
+      })
+    })
+
+    it('should get two alerts', async () => {
+      req.query = { ids: [1, 2] }
+      const getAlertDetailsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'getAlertDetails')
+        .mockResolvedValue(alertDetailsMock)
+
+      const { prisonerNumber, cellLocation, firstName, lastName } = PrisonerMockDataA
+      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+      await controller.displayAlert()(req, res, next)
+
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 2)
+
+      expect(res.render).toHaveBeenCalledWith('pages/alerts/alertDetailsPage', {
+        pageTitle: 'Alerts',
+        miniBannerData: {
+          prisonerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+        alerts: [alertDetailsMock, alertDetailsMock],
+      })
+    })
+  })
+
+  describe('Get alert details (modal)', () => {
+    beforeEach(() => {
+      req = {
+        params: { prisonerNumber: '' },
+        query: {},
+        middleware: {
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+        },
+      }
+      res = {
+        locals: {
+          user: {
+            activeCaseLoadId: 'MDI',
+            userRoles: [Role.UpdateAlert],
+            caseLoads: CaseLoadsDummyDataA,
+            token: 'TOKEN',
+          },
+          clientToken: 'CLIENT_TOKEN',
+        },
+        render: jest.fn(),
+      }
+      next = jest.fn()
+      controller = new AlertsController(new AlertsPageService(null), new ReferenceDataService(null), auditServiceMock())
+    })
+
+    it('should get one alert', async () => {
+      req.query = { ids: 1 }
+      const getAlertDetailsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'getAlertDetails')
+        .mockResolvedValue(alertDetailsMock)
+      const { prisonerNumber } = PrisonerMockDataA
+
+      await controller.getAlertDetails()(req, res, next)
+
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(res.render).toHaveBeenCalledWith('partials/alerts/alertDetails', {
+        alerts: [alertDetailsMock],
+        allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      })
+    })
+
+    it('should get two alerts', async () => {
+      req.query = { ids: [1, 2] }
+      const getAlertDetailsSpy = jest
+        .spyOn<any, string>(controller['alertsPageService'], 'getAlertDetails')
+        .mockResolvedValue(alertDetailsMock)
+      const { prisonerNumber } = PrisonerMockDataA
+
+      await controller.getAlertDetails()(req, res, next)
+
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 2)
+      expect(res.render).toHaveBeenCalledWith('partials/alerts/alertDetails', {
+        alerts: [alertDetailsMock, alertDetailsMock],
+        allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      })
     })
   })
 })

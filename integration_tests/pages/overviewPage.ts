@@ -169,6 +169,9 @@ export default class OverviewPage extends Page {
 
   csraWithLink = (): PageElement => cy.get(':nth-child(3) > [data-qa="prisoner-csra-info-with-link"]')
 
+  // Alert Flags
+  alertFlags = (): PageElement => cy.get('[data-qa="alert-flags"]')
+
   // Alerts summary
   alertsSummary = () => ({
     panel: (): PageElement => cy.get('[data-qa=overview-alerts-summary]'),
