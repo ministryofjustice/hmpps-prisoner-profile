@@ -40,7 +40,10 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
 
           res.locals.user.caseLoads = availableCaseLoads
           res.locals.user.activeCaseLoad = activeCaseLoad
-          res.locals.user.activeCaseLoadId = activeCaseLoad.caseLoadId
+
+          if (activeCaseLoad) {
+            res.locals.user.activeCaseLoadId = activeCaseLoad.caseLoadId
+          }
         } else {
           logger.info('No user case loads available')
         }
