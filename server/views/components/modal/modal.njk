@@ -1,7 +1,7 @@
 {% macro modal(params) %}
-<div id="{{ params.id }}" class="modal-container {{ params.classes }}" hidden data-module="modal" aria-labelledby="{{ params.id }}-modal-title" role="dialog">
+<div id="{{ params.id }}" class="modal-container {{ params.classes }}" hidden data-module="modal">
     <div class="modal-overlay" data-modal-hide></div>
-    <div class="modal-content" role="document">
+    <dialog class="modal-content" tabindex="0">
         <header>
             <h1 id="{{ params.id }}-modal-title">{{ params.title }}</h1>
             <button class="modal__close-button" data-modal-hide>
@@ -16,8 +16,9 @@
                 {{ caller() }}
             {% endif %}
         </section>
-    </div>
+    </dialog>
 </div>
+
 
 {% block pageScripts %}
     <script src="/assets/js/modal.js" nonce="{{ cspNonce }}"></script>

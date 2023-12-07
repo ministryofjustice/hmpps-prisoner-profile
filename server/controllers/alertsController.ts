@@ -176,9 +176,7 @@ export default class AlertsController {
       const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const alerts: Alert[] = await Promise.all(
-        [...(Array.isArray(alertIds) ? alertIds : [alertIds])].map(alertId =>
-          this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId),
-        ),
+        [alertIds].flat().map(alertId => this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId)),
       )
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
@@ -204,9 +202,7 @@ export default class AlertsController {
       const alertIds = req.query.ids
 
       const alerts: Alert[] = await Promise.all(
-        [...(Array.isArray(alertIds) ? alertIds : [alertIds])].map(alertId =>
-          this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId),
-        ),
+        [alertIds].flat().map(alertId => this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId)),
       )
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
