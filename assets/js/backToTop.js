@@ -15,7 +15,7 @@ BackToTop.prototype.init = function () {
   }
 
   var $h1 = document.querySelector('h1')
-  var $footer = document.querySelector('.govuk-footer')
+  var $footer = document.querySelector('.connect-dps-common-footer') ?? document.querySelector('.govuk-footer')
   var $sidebar = document.querySelector('.app-sidebar')
 
   // Check if there is anything to observe
