@@ -14,7 +14,7 @@ export const alertFlagLabels: AlertFlagLabel[] = [
     label: 'ACCT post closure',
   },
   {
-    alertCodes: ['XSA'],
+    alertCodes: ['XSA', 'SA'],
     classes: 'alert-status alert-status--security',
     label: 'Staff assaulter',
   },
