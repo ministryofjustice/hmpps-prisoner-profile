@@ -1,16 +1,12 @@
 import { formatDate } from '../utils/dateHelpers'
 
 import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
-import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
 import { formatName } from '../utils/utils'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import getCsraClassificationName from './getCsraClassificationName'
+import { Agency } from '../interfaces/prisonApi/agency'
 
-export default (
-  csraAssessment: CsraAssessment,
-  agencyDetails: AgencyLocationDetails | null,
-  staffDetails: StaffDetails | null,
-) => {
+export default (csraAssessment: CsraAssessment, agencyDetails: Agency | null, staffDetails: StaffDetails | null) => {
   const assessorAuthority = csraAssessment.assessmentCommitteeName || 'Not entered'
   const assessorName = formatName(staffDetails?.firstName, '', staffDetails?.lastName)
   return [

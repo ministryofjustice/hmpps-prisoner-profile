@@ -2,6 +2,7 @@ import Page from '../pages/page'
 import CaseNotesPage from '../pages/caseNotesPage'
 import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
+import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -25,7 +26,7 @@ context('Case Notes Page', () => {
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
@@ -78,7 +79,15 @@ context('Case Notes Page', () => {
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'A1234BC' })
-      cy.task('stubInmateDetail', 1234567)
+      cy.task('stubInmateDetail', {
+        bookingId: 1234567,
+        inmateDetail: {
+          prisonerNumber: 'A1234BC',
+          bookingId: 1234567,
+          activeAlertCount: 0,
+          inactiveAlertCount: 0,
+        } as Partial<InmateDetail>,
+      })
       cy.task('stubPrisonerDetail', 'A1234BC')
       cy.task('stubGetCaseNotesUsage', 'A1234BC')
       cy.task('stubGetCaseNotes', 'A1234BC')
@@ -105,7 +114,7 @@ context('Case Notes Page', () => {
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
@@ -130,7 +139,7 @@ context('Case Notes Page', () => {
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
@@ -154,7 +163,7 @@ context('Case Notes Page', () => {
 
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
@@ -185,7 +194,7 @@ context('Sensitive Case Notes', () => {
       })
       cy.task('stubGetCaseNoteTypes')
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
@@ -213,7 +222,7 @@ context('Sensitive Case Notes', () => {
       })
       cy.task('stubGetCaseNoteTypes')
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')
@@ -239,7 +248,7 @@ context('Incentive slips', () => {
     cy.setupUserAuth()
     cy.task('stubGetCaseNoteTypes')
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-    cy.task('stubInmateDetail', 1102484)
+    cy.task('stubInmateDetail', { bookingId: 1102484 })
     cy.task('stubPrisonerDetail', 'G6123VU')
     cy.task('stubGetCaseNotesUsage', 'G6123VU')
     cy.task('stubGetCaseNotes', 'G6123VU')
@@ -286,7 +295,7 @@ context('Case Notes Page Not Found', () => {
   context('Page Not Found', () => {
     beforeEach(() => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
       cy.task('stubGetCaseNotes', 'G6123VU')

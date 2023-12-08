@@ -3,8 +3,8 @@ class Modal {
   constructor(element) {
     this.element = element
     this.element.setAttribute('hidden', true)
-    this.element.setAttribute('role', 'dialog')
-    this.element.setAttribute('aria-modal', true)
+
+    this.dialog = this.element.querySelector('.modal-content')
 
     this.closeHandlers = []
     this.attachCloseHandlers()
@@ -36,6 +36,7 @@ class Modal {
 
   show() {
     this.element.removeAttribute('hidden')
+    this.dialog.setAttribute('aria-modal', true)
 
     this.takeFocus()
 
@@ -47,6 +48,7 @@ class Modal {
 
   hide() {
     this.element.setAttribute('hidden', true)
+    this.dialog.removeAttribute('aria-modal')
 
     document.removeEventListener('keydown', this._handleKeyDown)
     document.body.removeEventListener('focus', this._maintainFocus, true)
@@ -67,9 +69,7 @@ class Modal {
   takeFocus() {
     this.previouslyFocused = document.activeElement
 
-    const target = this.element.querySelector('[autofocus]') || getFocusableChildren(this.element)[0]
-
-    if (target) target.focus()
+    this.dialog.focus()
   }
 
   maintainFocus(event) {

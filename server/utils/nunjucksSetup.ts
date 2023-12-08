@@ -24,6 +24,8 @@ import { pluralise } from './pluralise'
 import { formatDate, formatDateTime, timeFormat } from './dateHelpers'
 import config from '../config'
 import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
+import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
+import mapCsraQuestionsToSummaryList from '../mappers/csraQuestionsToSummaryListMapper'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -137,4 +139,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   })
   njkEnv.addFilter('releaseDatesToSummaryRows', releaseDatesToSummaryRows)
   njkEnv.addFilter('formatName', formatName)
+  njkEnv.addFilter('toCsraAssessmentSummaryList', mapCsraReviewToSummaryList)
+  njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
 }

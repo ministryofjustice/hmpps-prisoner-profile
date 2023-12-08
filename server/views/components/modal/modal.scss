@@ -25,6 +25,8 @@
 }
 
 .modal-content {
+  display: block;
+  padding: 0;
   margin: auto;
   min-width: 400px;
   max-width: 800px;
@@ -35,6 +37,11 @@
   background-color: govuk-colour('white');
   border: 3px solid govuk-colour('black');
 
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px $govuk-focus-colour;
+  }
+
   header {
     display: flex;
     gap: 20px;
@@ -43,7 +50,7 @@
     background-color: govuk-colour('black');
     color: govuk-colour('white');
     margin-top: 0;
-    padding: 0 15px 0 30px;
+    padding: 0 0 0 30px;
     height: 45px;
 
     h1 {
@@ -54,10 +61,11 @@
 
     .modal__close-button {
       all: unset;
-      width: 37px;
-      height: 37px;
+      width: 40px;
+      height: 40px;
       text-align: center;
-      padding-top: 2px;
+      padding-top: 3px;
+      margin-top: -3px;
       cursor: pointer;
 
       svg {
@@ -65,8 +73,9 @@
       }
 
       &:hover, &:focus {
+        background-color: govuk-colour('yellow');
         svg {
-          fill: govuk-colour('yellow');
+          fill: govuk-colour('black');
         }
       }
     }

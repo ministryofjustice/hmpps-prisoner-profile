@@ -1,9 +1,10 @@
-import { addDays } from 'date-fns'
+import { addDays, addYears, subDays } from 'date-fns'
 import { AppointmentValidator } from './appointmentValidator'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
 
 const todayStr = formatDate(formatDateISO(new Date()), 'short')
 const futureDate = formatDateISO(addDays(new Date(), 7))
+const futureDateYear = formatDateISO(addYears(new Date(), 1))
 
 describe('Validation middleware', () => {
   it('should pass validation with good data', async () => {
@@ -108,6 +109,53 @@ describe('Validation middleware', () => {
     ])
   })
 
+  it('should fail validation with date beyond a year in the future', async () => {
+    const appointmentForm = {
+      appointmentType: 'TYPE',
+      location: '27000',
+      date: formatDate(futureDateYear, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'DAILY',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    const dayBefore = formatDate(formatDateISO(subDays(new Date(futureDateYear), 1)), 'short')
+    expect(result).toEqual([
+      {
+        text: `Enter a date which is on or before ${dayBefore}`,
+        href: '#date',
+      },
+    ])
+  })
+
+  it('should pass validation with date befpre a year in the future', async () => {
+    const dayBeforeFutureDateYear = formatDateISO(subDays(new Date(futureDateYear), 1))
+    const appointmentForm = {
+      appointmentType: 'TYPE',
+      location: '27000',
+      date: formatDate(dayBeforeFutureDateYear, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'DAILY',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    expect(result).toEqual([])
+  })
+
   it('should fail validation with a time in past', async () => {
     const appointmentForm = {
       appointmentType: 'X',
@@ -183,6 +231,32 @@ describe('Validation middleware', () => {
       {
         text: `Select fewer number of appointments - you can only add them for a maximum of 1 year`,
         href: '#times',
+      },
+    ])
+  })
+
+  it('should fail validation with WEEKDAY repeats starting on a weekend', async () => {
+    const nextWeekendDate = formatDateISO(addDays(new Date(), 6 - new Date().getDay()))
+    const appointmentForm = {
+      appointmentType: 'TYPE',
+      location: '27000',
+      date: formatDate(nextWeekendDate, 'short'),
+      startTimeHours: '10',
+      startTimeMinutes: '30',
+      endTimeHours: '11',
+      endTimeMinutes: '30',
+      recurring: 'yes',
+      repeats: 'WEEKDAYS',
+      times: '1',
+      comments: 'Comments',
+    }
+
+    const result = AppointmentValidator(appointmentForm)
+
+    expect(result).toEqual([
+      {
+        href: '#repeats',
+        text: 'This weekend appointment cannot be repeated on a weekday (Monday to Friday). Select to repeat it daily, weekly, fortnightly or monthly',
       },
     ])
   })
