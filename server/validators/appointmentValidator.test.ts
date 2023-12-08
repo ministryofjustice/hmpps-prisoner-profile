@@ -126,9 +126,10 @@ describe('Validation middleware', () => {
 
     const result = AppointmentValidator(appointmentForm)
 
+    const dayBefore = formatDate(formatDateISO(subDays(new Date(futureDateYear), 1)), 'short')
     expect(result).toEqual([
       {
-        text: `Enter a date which is less than a year in the future in the format DD/MM/YYYY - for example, 07/12/2023`,
+        text: `Enter a date which is on or before ${dayBefore}`,
         href: '#date',
       },
     ])

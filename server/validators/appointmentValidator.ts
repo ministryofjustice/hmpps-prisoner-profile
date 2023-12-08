@@ -44,7 +44,10 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
   const nightBeforeYearFromNow = subDays(addYears(new Date(), 1), 1).setHours(23, 59, 59, 999)
   if (body.date && isRealDate(body.date) && isAfter(date, nightBeforeYearFromNow)) {
     errors.push({
-      text: `Enter a date which is less than a year in the future in the format DD/MM/YYYY - for example, ${todayStr}`,
+      text: `Enter a date which is on or before ${formatDate(
+        formatDateISO(new Date(nightBeforeYearFromNow)),
+        'short',
+      )}`,
       href: '#date',
     })
   }
