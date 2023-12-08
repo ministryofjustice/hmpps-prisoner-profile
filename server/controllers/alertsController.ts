@@ -221,12 +221,18 @@ export default class AlertsController {
    * @param type - preselected alert type to determine list of codes
    */
   private mapAlertTypes(types: AlertType[], type?: string) {
-    const alertTypes = types?.filter(t => t.activeFlag).map(t => ({ value: t.code, text: t.description }))
+    const alertTypes = types
+      ?.filter(t => t.activeFlag === 'Y')
+      .map(t => ({ value: t.code, text: t.description }))
+      .sort((a, b) => a.text.localeCompare(b.text))
 
     const typeCodeMap: { [key: string]: { value: string; text: string }[] } = types.reduce(
       (ts, t) => ({
         ...ts,
-        [t.code]: t.subCodes?.map(s => ({ value: s.code, text: s.description })),
+        [t.code]: t.subCodes
+          ?.filter(sc => sc.activeFlag === 'Y')
+          .map(s => ({ value: s.code, text: s.description }))
+          .sort((a, b) => a.text.localeCompare(b.text)),
       }),
       {},
     )
@@ -236,14 +242,14 @@ export default class AlertsController {
       const selectedType = types.find(t => t.code === type)
       if (selectedType) {
         alertCodes = selectedType.subCodes
-          ?.filter(t => t.activeFlag)
+          ?.filter(sc => sc.activeFlag === 'Y')
           .map(subType => ({
             value: subType.code,
             text: subType.description,
           }))
+          .sort((a, b) => a.text.localeCompare(b.text))
       }
     }
-
     return { alertTypes, alertCodes, typeCodeMap }
   }
 }
