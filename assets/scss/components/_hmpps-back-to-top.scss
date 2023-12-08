@@ -10,7 +10,7 @@ body {
 @include govuk-media-query($from: tablet) {
   .hmpps-back-to-top {
     position: absolute;
-    bottom: 200px;
+    bottom: 430px;
     margin-top: auto;
     margin-bottom: govuk-spacing(8);
   }
