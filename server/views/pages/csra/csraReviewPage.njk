@@ -7,25 +7,25 @@
         href:  "/" | prependBaseUrl
     },
     {
-        text: prisonerName,
-        href: "/prisoner/" + prisonerNumber
+        text: prisoner.firstName | formatName('', prisoner.lastName),
+        href: "/prisoner/" + prisoner.prisonerNumber
     },
     {
         text: 'CSRA history',
-        href: "/prisoner/" + prisonerNumber + "/csra-history"
+        href: "/prisoner/" + prisoner.prisonerNumber + "/csra-history"
     }
 ] %}
 
 {% block body %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-            <h1>CSRA review on {{ reviewDate }}</h1>
+            <h1>CSRA review on {{ csraAssessment.assessmentDate | formatDate('long') }}</h1>
         </div>
     </div>
 
     {{ govukSummaryList({
         classes: 'govuk-summary-list--no-border',
-        rows: details,
+        rows: csraAssessment | toCsraAssessmentSummaryList(agencyDetails, staffDetails),
         attributes: { "data-test": 'review-summary' }
     }) }}
 
@@ -33,10 +33,10 @@
 
 
 
-    {% if reviewQuestions.length %}
+    {% if csraAssessment.questions.length %}
         {{ govukSummaryList({
             classes: 'govuk-summary-list--no-border',
-            rows: reviewQuestions,
+            rows: csraAssessment.questions | toCsraQuestionsSummaryList,
             attributes: { "data-test": 'review-questions' }
         }) }}
     {% endif %}
