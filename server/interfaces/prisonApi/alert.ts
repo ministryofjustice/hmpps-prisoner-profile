@@ -38,13 +38,13 @@ export interface AlertForm {
 export interface AlertType {
   code: string
   description: string
-  activeFlag: boolean
+  activeFlag: 'Y' | 'N'
   subCodes: AlertCode[]
 }
 
 export interface AlertCode {
   code: string
   description: string
-  activeFlag: boolean
+  activeFlag: 'Y' | 'N'
   parentCode: string
 }

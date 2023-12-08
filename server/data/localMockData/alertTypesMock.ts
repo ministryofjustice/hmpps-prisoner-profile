@@ -5,12 +5,12 @@ export const alertTypesMock: AlertType[] = [
   {
     code: 'A',
     description: 'AAA',
-    activeFlag: true,
+    activeFlag: 'Y',
     subCodes: [
       {
         code: 'A1',
         description: 'AAA111',
-        activeFlag: true,
+        activeFlag: 'Y',
         parentCode: 'A',
       },
     ],
@@ -18,12 +18,12 @@ export const alertTypesMock: AlertType[] = [
   {
     code: 'B',
     description: 'BBB',
-    activeFlag: true,
+    activeFlag: 'Y',
     subCodes: [
       {
         code: 'B1',
         description: 'BBB111',
-        activeFlag: true,
+        activeFlag: 'Y',
         parentCode: 'B',
       },
     ],
@@ -31,12 +31,12 @@ export const alertTypesMock: AlertType[] = [
   {
     code: 'C',
     description: 'CCC',
-    activeFlag: true,
+    activeFlag: 'Y',
     subCodes: [
       {
         code: 'C1',
         description: 'CCC111',
-        activeFlag: true,
+        activeFlag: 'Y',
         parentCode: 'C',
       },
     ],
