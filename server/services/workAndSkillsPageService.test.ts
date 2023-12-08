@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import moment from 'moment'
-
+import { format, startOfDay, subMonths } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 import { Prisoner } from '../interfaces/prisoner'
@@ -70,8 +68,8 @@ describe('WorkAndSkillsService', () => {
 
       it.each(['ABC123', 'DEF321'])('Gets the attendance history for the prisoner', async (prisonerNumber: string) => {
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        const todaysDate = moment().startOf('day').format('YYYY-MM-DD')
-        const sixMonthsAgo = moment().startOf('day').subtract(6, 'month').format('YYYY-MM-DD')
+        const todaysDate = format(startOfDay(new Date()), 'yyyy-MM-dd')
+        const sixMonthsAgo = format(subMonths(startOfDay(new Date()), 6), 'yyyy-MM-dd')
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
         expect(prisonApiClient.getOffenderAttendanceHistory).toHaveBeenCalledWith(
           prisonerNumber,

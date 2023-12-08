@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import { addYears, isBefore, isPast } from 'date-fns'
+import { addYears, isAfter, isBefore, isPast, isWeekend, subDays } from 'date-fns'
 import { Validator } from '../middleware/validationMiddleware'
 import { HmppsError } from '../interfaces/hmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
@@ -11,6 +11,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
   let invalidStartTime = false
   let invalidEndTime = false
   let pastDate = false
+  const date = parseDate(body.date)
 
   if (!body.appointmentType) {
     errors.push({
@@ -40,7 +41,18 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
-  if (body.date && isRealDate(body.date) && isPast(parseDate(body.date).setHours(23, 59, 59))) {
+  const nightBeforeYearFromNow = subDays(addYears(new Date(), 1), 1).setHours(23, 59, 59, 999)
+  if (body.date && isRealDate(body.date) && isAfter(date, nightBeforeYearFromNow)) {
+    errors.push({
+      text: `Enter a date which is on or before ${formatDate(
+        formatDateISO(new Date(nightBeforeYearFromNow)),
+        'short',
+      )}`,
+      href: '#date',
+    })
+  }
+
+  if (body.date && isRealDate(body.date) && isPast(date.setHours(23, 59, 59))) {
     pastDate = true
     errors.push({
       text: `Enter a date which is not in the past in the format DD/MM/YYYY - for example, ${todayStr}`,
@@ -87,7 +99,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     }
 
     if (!pastDate && !invalidStartTime && body.startTimeHours && body.startTimeMinutes) {
-      const dateTime = body.date && parseDate(body.date).setHours(+body.startTimeHours, +body.startTimeMinutes, 0)
+      const dateTime = body.date && date.setHours(+body.startTimeHours, +body.startTimeMinutes, 0)
       if (dateTime && dateTime < new Date().getTime()) {
         invalidStartTime = true
         errors.push({
@@ -137,7 +149,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     }
 
     if (!pastDate && !invalidEndTime && body.endTimeHours && body.endTimeMinutes) {
-      const dateTime = body.date && parseDate(body.date).setHours(+body.endTimeHours, +body.endTimeMinutes, 0)
+      const dateTime = body.date && date.setHours(+body.endTimeHours, +body.endTimeMinutes, 0)
       if (dateTime && dateTime < new Date().getTime()) {
         invalidEndTime = true
         errors.push({
@@ -152,8 +164,8 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     !invalidStartTime &&
     !invalidEndTime &&
     isBefore(
-      parseDate(body.date).setHours(+body.endTimeHours, +body.endTimeMinutes, 0),
-      parseDate(body.date).setHours(+body.startTimeHours, +body.startTimeMinutes, 0),
+      date.setHours(+body.endTimeHours, +body.endTimeMinutes, 0),
+      date.setHours(+body.startTimeHours, +body.startTimeMinutes, 0),
     )
   ) {
     errors.push({
@@ -185,8 +197,8 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     }
 
     if (body.date && body.repeats && body.times && !isNaN(parseInt(body.times, 10))) {
-      const lastAppointmentDate = calculateEndDate(parseDate(body.date), body.repeats, +body.times)
-      const startDate = parseDate(body.date)
+      const lastAppointmentDate = calculateEndDate(date, body.repeats, +body.times)
+      const startDate = date
 
       if (!isBefore(lastAppointmentDate, addYears(startDate, 1).setHours(0, 0, 0))) {
         errors.push({
@@ -194,6 +206,13 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
           text: 'Select fewer number of appointments - you can only add them for a maximum of 1 year',
         })
       }
+    }
+
+    if (body.repeats === 'WEEKDAYS' && body.date && isWeekend(date)) {
+      errors.push({
+        href: '#repeats',
+        text: 'This weekend appointment cannot be repeated on a weekday (Monday to Friday). Select to repeat it daily, weekly, fortnightly or monthly',
+      })
     }
   }
 
