@@ -33,7 +33,7 @@ context('When signed in', () => {
         caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-      cy.task('stubInmateDetail', 1102484)
+      cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubSecondaryLanguages', 1102484)
       cy.task('stubProperty', 1102484)

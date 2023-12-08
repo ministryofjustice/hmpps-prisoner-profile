@@ -39,6 +39,8 @@ describe('Appointment Service', () => {
       getCourts: jest.fn(async () => courtLocationsMock),
       createAppointments: jest.fn(async () => appointmentMock),
       addVideoLinkBooking: jest.fn(async () => 12345),
+      getCellMoveReason: jest.fn(),
+      getUnacceptableAbsences: jest.fn(),
     }
     appointmentService = new AppointmentService(
       () => prisonApiClient,
