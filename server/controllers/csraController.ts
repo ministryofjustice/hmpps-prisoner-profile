@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { formatName } from '../utils/utils'
 import CsraService from '../services/csraService'
-import { formatDate } from '../utils/dateHelpers'
-import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
-import mapCsraQuestionsToSummaryList from '../mappers/csraQuestionsToSummaryListMapper'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import csraAssessmentsToSummaryListMapper from '../mappers/csraAssessmentsToSummaryListMapper'
 import getFilterValuesFromAssessments from '../utils/getFilterValuesFromAssessments'
@@ -81,11 +78,10 @@ export default class CsraController {
 
     return res.render('pages/csra/csraReviewPage', {
       pageTitle: 'CSRA details',
-      details: mapCsraReviewToSummaryList(csraAssessment, agencyDetails, staffDetails),
-      reviewDate: formatDate(new Date(csraAssessment.assessmentDate).toISOString(), 'long'),
-      reviewQuestions: mapCsraQuestionsToSummaryList(csraAssessment.questions),
-      prisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName),
-      prisonerNumber: prisonerData.prisonerNumber,
+      csraAssessment,
+      agencyDetails,
+      staffDetails,
+      prisoner: prisonerData,
     })
   }
 }
