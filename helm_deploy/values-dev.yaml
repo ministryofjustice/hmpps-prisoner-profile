@@ -53,6 +53,7 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "true"
+    ADJUDICATIONS_UI_URL: "https://manage-adjudications-dev.hmpps.service.justice.gov.uk"
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod

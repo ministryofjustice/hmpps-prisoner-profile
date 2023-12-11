@@ -102,7 +102,12 @@ context('Overview Page', () => {
         overviewPage.adjudicationsCard().contains('p', '4')
         overviewPage.adjudicationsCard().contains('p', 'Active')
         overviewPage.adjudicationsCard().contains('p', 'No active punishments')
-        overviewPage.adjudicationsCard().contains('a', 'Adjudication history')
+        overviewPage
+          .adjudicationsCard()
+          .contains(
+            'a[href="http://localhost:3000/adjudications/adjudications-history/G6123VU"]',
+            'Adjudication history',
+          )
       })
 
       it('Mini summary Group A should contain Visits card with correct data', () => {
