@@ -200,6 +200,7 @@ export default {
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
     nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
+    adjudications: get('ADJUDICATIONS_UI_URL', ''),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
