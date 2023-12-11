@@ -184,6 +184,15 @@ export const formatName = (
 }
 
 /**
+ * Format part of a person's name - i.e. firstname, or surname, etc
+ *
+ * @param name
+ */
+export const formatNamePart = (name: string): string => {
+  return name.toLowerCase().replace(/(^\w)|([\s'-]+\w)/g, letter => letter.toUpperCase())
+}
+
+/**
  * Convert name in 'Last, First' format to 'First Last'
  *
  * @param name

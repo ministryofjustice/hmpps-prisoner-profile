@@ -28,6 +28,7 @@ generic-service:
     INCENTIVES_API_URL: "https://incentives-api-dev.hmpps.service.justice.gov.uk"
     PATHFINDER_API_URL: "https://dev-api.pathfinder.service.justice.gov.uk"
     MANAGE_SOC_CASES_API_URL: "https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk"
+    MANAGE_USERS_API_URL: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
 
     OFFENDER_CATEGORISATION_UI_URL: "https://dev.offender-categorisation.service.justice.gov.uk"
     USE_OF_FORCE_UI_URL: "https://dev.use-of-force.service.justice.gov.uk"

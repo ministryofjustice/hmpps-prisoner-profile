@@ -9,6 +9,7 @@ import {
   formatLocation,
   formatMoney,
   formatName,
+  formatNamePart,
   formatScheduleItem,
   getNamesFromString,
   initialiseName,
@@ -256,6 +257,20 @@ describe('format name', () => {
       expect(formatName(firstName, middleNames, lastName, options)).toEqual(expected)
     },
   )
+})
+
+describe('format name part', () => {
+  it.each([
+    ['Proper', 'John', 'John'],
+    ['Lower', 'john', 'John'],
+    ['Upper', 'JOHN', 'John'],
+    ['Random', 'ChRiStOPheR', 'Christopher'],
+    ['Hyphen', 'SMITH-JONES', 'Smith-Jones'],
+    ['Apostrophe', "o'reilly", "O'Reilly"],
+    ['Mixed', "o'reilly-SMITH", "O'Reilly-Smith"],
+  ])('%s: formatNamePart(%s)', (_: string, name: string, expected: string) => {
+    expect(formatNamePart(name)).toEqual(expected)
+  })
 })
 
 describe('Address to lines', () => {
