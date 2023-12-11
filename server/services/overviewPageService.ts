@@ -334,7 +334,9 @@ export default class OverviewPageService {
         : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudication history',
-      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
+      linkHref: config.serviceUrls.adjudications
+        ? `${config.serviceUrls.adjudications}/adjudications-history/${prisonerNumber}`
+        : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
     }
 
     const visitsSummaryData: MiniSummaryData = {
