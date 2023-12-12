@@ -16,6 +16,8 @@ import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBook
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import { notifyClient } from '../utils/notifyClient'
+import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 
 let req: any
 let res: any
@@ -90,7 +92,11 @@ jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/appointmentService.ts')
 
 describe('Appointments Controller', () => {
-  const appointmentService: AppointmentService = new AppointmentService(null, null) as jest.Mocked<AppointmentService>
+  const appointmentService: AppointmentService = new AppointmentService(
+    null,
+    null,
+    null,
+  ) as jest.Mocked<AppointmentService>
   const prisonerSearchService: PrisonerSearchService = new PrisonerSearchService(
     null,
   ) as jest.Mocked<PrisonerSearchService>
@@ -127,7 +133,15 @@ describe('Appointments Controller', () => {
       redirect: jest.fn(),
     }
 
-    controller = new AppointmentController(appointmentService, prisonerSearchService, auditServiceMock())
+    const notifyClientMock = notifyClient
+    notifyClientMock.sendEmail = jest.fn()
+
+    controller = new AppointmentController(
+      appointmentService,
+      prisonerSearchService,
+      auditServiceMock(),
+      notifyClientMock,
+    )
 
     appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
       appointmentTypes: appointmentTypesMock,
@@ -141,6 +155,7 @@ describe('Appointments Controller', () => {
     appointmentService.getLocation = jest.fn(async () => locationsMock[0])
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
+    appointmentService.getUserEmail = jest.fn(async () => userEmailDataMock)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
   })
 
@@ -436,6 +451,8 @@ describe('Appointments Controller', () => {
       res.locals.user.activeCaseLoadId,
     )
     expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
+    expect(controller['appointmentService'].getUserEmail).toHaveBeenCalled()
+    expect(controller['notifyClient'].sendEmail).toHaveBeenCalled()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
       pageTitle: 'Video link has been booked',
       ...appointmentData,

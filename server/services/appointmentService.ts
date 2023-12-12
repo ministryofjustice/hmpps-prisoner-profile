@@ -9,6 +9,8 @@ import { Location } from '../interfaces/prisonApi/location'
 import { CourtLocation } from '../interfaces/whereaboutsApi/courtLocation'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
+import { ManageUsersApiClient } from '../data/interfaces/manageUsersApiClient'
+import { UserEmailData } from '../interfaces/manageUsersApi/userEmailData'
 
 export interface AddAppointmentRefData {
   appointmentTypes: ReferenceCode[]
@@ -60,6 +62,7 @@ export default class AppointmentService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>,
+    private readonly manageUsersApiCLientBuilder: RestClientBuilder<ManageUsersApiClient>,
   ) {}
 
   /**
@@ -96,6 +99,10 @@ export default class AppointmentService {
       courts,
       locations,
     }
+  }
+
+  public async getUserEmail(token: string, username: string): Promise<UserEmailData> {
+    return this.manageUsersApiCLientBuilder(token).getUserEmail(username)
   }
 
   public async createAppointments(token: string, appointments: AppointmentDefaults): Promise<unknown> {

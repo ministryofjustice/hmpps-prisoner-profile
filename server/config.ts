@@ -186,6 +186,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000))),
     },
+    manageUsersApi: {
+      url: get('MANAGE_USERS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 2000)),
+        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 2000)),
+      },
+      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 2000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -214,4 +222,53 @@ export default {
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
   useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
   profileAddAppointmentEnabled: get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false') === 'true',
+  notifications: {
+    enabled: process.env.NOTIFY_ENABLED ? process.env.NOTIFY_ENABLED === 'true' : true,
+    notifyKey: process.env.NOTIFY_API_KEY || '',
+    confirmBookingPrisonTemplateId: '391bb0e0-89b3-4aef-b11e-c6550b71fee8',
+    emails: {
+      WWI: {
+        omu: process.env.WANDSWORTH_OMU_EMAIL,
+      },
+      TSI: {
+        omu: process.env.THAMESIDE_OMU_EMAIL,
+      },
+      HEI: {
+        omu: process.env.HEWELL_OMU_EMAIL,
+      },
+      BWI: {
+        omu: process.env.BERWYN_OMU_EMAIL,
+      },
+      NMI: {
+        omu: process.env.NOTTINGHAM_OMU_EMAIL,
+      },
+      EYI: {
+        omu: process.env.ELMLEY_OMU_EMAIL,
+      },
+      BNI: {
+        omu: process.env.BULLINGDON_OMU_EMAIL,
+      },
+      PBI: {
+        omu: process.env.PETERBOROUGH_OMU_EMAIL,
+      },
+      BMI: {
+        omu: process.env.BIRMINGHAM_OMU_EMAIL,
+      },
+      NWI: {
+        omu: process.env.NORWICH_OMU_EMAIL,
+      },
+      PNI: {
+        omu: process.env.PRESTON_OMU_EMAIL,
+      },
+      BZI: {
+        omu: process.env.BRONZEFIELD_OMU_EMAIL,
+      },
+      PVI: {
+        omu: process.env.PENTONVILLE_OMU_EMAIL,
+      },
+      EXI: {
+        omu: process.env.EXETER_OMU_EMAIL,
+      },
+    },
+  },
 }

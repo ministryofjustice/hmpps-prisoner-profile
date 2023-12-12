@@ -10,6 +10,8 @@ import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock
 import { offenderSentenceDetailsMock } from '../data/localMockData/offenderSentenceDetailsMock'
 import { courtEventPrisonerSchedulesMock, prisonerSchedulesMock } from '../data/localMockData/prisonerSchedulesMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
+import { ManageUsersApiClient } from '../data/interfaces/manageUsersApiClient'
+import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
@@ -18,6 +20,7 @@ describe('Appointment Service', () => {
   let appointmentService: AppointmentService
   let prisonApiClient: PrisonApiClient
   let whereaboutsApiClient: WhereaboutsApiClient
+  let manageUsersApiClient: ManageUsersApiClient
 
   beforeEach(() => {
     prisonApiClient = {
@@ -42,9 +45,13 @@ describe('Appointment Service', () => {
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
     }
+    manageUsersApiClient = {
+      getUserEmail: jest.fn(async () => userEmailDataMock),
+    }
     appointmentService = new AppointmentService(
       () => prisonApiClient,
       () => whereaboutsApiClient,
+      () => manageUsersApiClient,
     )
   })
 
@@ -344,6 +351,15 @@ describe('Appointment Service', () => {
 
       expect(prisonApiClient.getAgencyDetails).toHaveBeenCalledWith('MDI')
       expect(response).toEqual(AgenciesMock)
+    })
+  })
+
+  describe('getUserEmail', () => {
+    it('should call API to get user email', async () => {
+      const response = await manageUsersApiClient.getUserEmail('username')
+
+      expect(manageUsersApiClient.getUserEmail).toHaveBeenCalledWith('username')
+      expect(response).toEqual(userEmailDataMock)
     })
   })
 })

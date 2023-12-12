@@ -1,7 +1,15 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addMinutes, set, subMinutes } from 'date-fns'
+import { NotifyClient } from 'notifications-node-client'
 import AppointmentService from '../services/appointmentService'
-import { apostrophe, formatLocation, formatName, objectToSelectOptions, refDataToSelectOptions } from '../utils/utils'
+import {
+  apostrophe,
+  formatLocation,
+  formatName,
+  formatNamePart,
+  objectToSelectOptions,
+  refDataToSelectOptions,
+} from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import {
   AppointmentDefaults,
@@ -24,8 +32,11 @@ import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
 import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../services/auditService'
+import config from '../config'
+import logger from '../../logger'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
+const { confirmBookingPrisonTemplateId, emails } = config.notifications
 
 /**
  * Parse requests for appointments routes and orchestrate response
@@ -35,6 +46,7 @@ export default class AppointmentController {
     private readonly appointmentService: AppointmentService,
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly auditService: AuditService,
+    private readonly notifyClient: NotifyClient | { sendEmail(): void },
   ) {}
 
   public displayAddAppointment(): RequestHandler {
@@ -441,7 +453,7 @@ export default class AppointmentController {
       const { prisonerNumber } = req.params
       const {
         clientToken,
-        user: { activeCaseLoadId },
+        user: { activeCaseLoadId, username },
       } = res.locals
 
       const appointmentFlash = req.flash('prePostAppointmentDetails')
@@ -453,11 +465,11 @@ export default class AppointmentController {
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
-      const { courts, locations } = await this.appointmentService.getPrePostAppointmentRefData(
-        clientToken,
-        activeCaseLoadId,
-      )
-      const prison = await this.appointmentService.getAgencyDetails(clientToken, prisonId)
+      const [{ courts, locations }, prison, userEmailData] = await Promise.all([
+        this.appointmentService.getPrePostAppointmentRefData(clientToken, activeCaseLoadId),
+        this.appointmentService.getAgencyDetails(clientToken, prisonId),
+        this.appointmentService.getUserEmail(clientToken, username),
+      ])
 
       const location = locations.find(loc => loc.locationId === Number(appointmentDefaults.locationId))?.userDescription
       const preLocation = locations.find(loc => loc.locationId === Number(formValues.preAppointmentLocation))
@@ -507,6 +519,39 @@ export default class AppointmentController {
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
         createdBy: res.locals.user.displayName,
+      }
+
+      // Send confirmation email
+      if (userEmailData && userEmailData.email) {
+        const personalisation = {
+          startTime: appointmentData.startTime,
+          endTime: appointmentData.endTime,
+          comments: appointmentData.comments || 'None entered.',
+          firstName: formatNamePart(firstName),
+          lastName: formatNamePart(lastName),
+          offenderNo: appointmentData.prisonerNumber,
+          prison: appointmentData.prisonName,
+          date: appointmentData.date,
+          location: appointmentData.location,
+          preAppointmentInfo: appointmentData.pre || 'None requested',
+          postAppointmentInfo: appointmentData.post || 'None requested',
+        }
+
+        try {
+          await this.notifyClient.sendEmail(confirmBookingPrisonTemplateId, userEmailData.email, {
+            personalisation,
+            reference: null,
+          })
+
+          if (emails[activeCaseLoadId] && emails[activeCaseLoadId].omu) {
+            await this.notifyClient.sendEmail(confirmBookingPrisonTemplateId, emails[activeCaseLoadId].omu, {
+              personalisation,
+              reference: null,
+            })
+          }
+        } catch (error) {
+          logger.error(`Failed to send email via Notify: ${error.response.status} - ${error.response.statusText}`)
+        }
       }
 
       await this.auditService.sendPageView({

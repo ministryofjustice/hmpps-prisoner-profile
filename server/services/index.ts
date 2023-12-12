@@ -37,6 +37,7 @@ export const services = () => {
     componentApiClientBuilder,
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
+    manageUsersApiClientBuilder,
   } = dataAccess
 
   const auditService = AuditService({
@@ -72,7 +73,11 @@ export const services = () => {
   const componentService = new ComponentService(componentApiClientBuilder)
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
-  const appointmentService = new AppointmentService(prisonApiClientBuilder, whereaboutsApiClientBuilder)
+  const appointmentService = new AppointmentService(
+    prisonApiClientBuilder,
+    whereaboutsApiClientBuilder,
+    manageUsersApiClientBuilder,
+  )
 
   const professionalContactsService = new ProfessionalContactsService(
     prisonApiClientBuilder,
