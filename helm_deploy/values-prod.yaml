@@ -7,9 +7,9 @@ generic-service:
     modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
       SecRuleEngine On
-      SecRuleRemoveById 949110
-      SecRuleRemoveById 942440
-      SecRuleRemoveById 920300
+      SecRuleUpdateActionById 949110 "pass,log"
+      SecRuleUpdateActionById 942440 "pass,log"
+      SecRuleUpdateActionById 920300 "pass,log"
 
   autoscaling:
     enabled: true
