@@ -105,7 +105,7 @@ context('Overview Page', () => {
         overviewPage
           .adjudicationsCard()
           .contains(
-            'a[href="http://localhost:3000/adjudications/adjudications-history/G6123VU"]',
+            'a[href="http://localhost:3000/adjudications/adjudication-history/G6123VU"]',
             'Adjudication history',
           )
       })

@@ -335,7 +335,7 @@ export default class OverviewPageService {
       bottomClass: 'small',
       linkLabel: 'Adjudication history',
       linkHref: config.serviceUrls.adjudications
-        ? `${config.serviceUrls.adjudications}/adjudications-history/${prisonerNumber}`
+        ? `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`
         : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
     }
 
