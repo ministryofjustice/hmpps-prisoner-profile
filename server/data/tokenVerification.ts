@@ -5,13 +5,14 @@ import config from '../config'
 import logger from '../../logger'
 
 function getApiClientToken(token: string) {
+  const endpoint = `${config.apis.tokenVerification.url}/token/verify`
   return superagent
-    .post(`${config.apis.tokenVerification.url}/token/verify`)
+    .post(endpoint)
     .auth(token, { type: 'bearer' })
     .timeout(config.apis.tokenVerification.timeout)
     .then(response => Boolean(response.body && response.body.active))
     .catch(error => {
-      logger.error(getSanitisedError(error), 'Error calling tokenVerificationApi')
+      logger.error(getSanitisedError(error, endpoint), 'Error calling tokenVerificationApi')
     })
 }
 
