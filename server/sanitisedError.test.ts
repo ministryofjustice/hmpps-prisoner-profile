@@ -25,7 +25,8 @@ describe('sanitised error', () => {
       stack: 'stack description',
     } as unknown as UnsanitisedError
 
-    expect(sanitisedError(error)).toEqual({
+    expect(sanitisedError(error, 'endpoint')).toEqual({
+      endpoint: 'endpoint',
       headers: { date: 'Tue, 19 May 2020 15:16:20 GMT' },
       message: 'Not Found',
       stack: 'stack description',
@@ -39,15 +40,16 @@ describe('sanitised error', () => {
     const error = {
       message: 'error description',
     } as unknown as UnsanitisedError
-    expect(sanitisedError(error)).toEqual({
+    expect(sanitisedError(error, 'endpoint')).toEqual({
+      endpoint: 'endpoint',
       message: 'error description',
     })
   })
 
-  it('it should return an empty object for an unknown error structure', () => {
+  it('it should return just the endpoint for an unknown error structure', () => {
     const error = {
       property: 'unknown',
     } as unknown as UnsanitisedError
-    expect(sanitisedError(error)).toEqual({})
+    expect(sanitisedError(error, 'endpoint')).toEqual({ endpoint: 'endpoint' })
   })
 })

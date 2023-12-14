@@ -64,9 +64,10 @@ export default class RestClient {
     ignore404 = false,
   }: GetRequest): Promise<T> {
     logger.info(`Get using user credentials: calling ${this.name}: ${path} ${query}`)
+    const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
-        .get(`${this.apiUrl()}${path}`)
+        .get(endpoint)
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, res) => {
@@ -85,7 +86,7 @@ export default class RestClient {
         logger.info(`Returned null for 404 not found when calling ${this.name}: ${path}`)
         return null
       }
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError, query }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
       throw sanitisedError
     }
@@ -100,9 +101,10 @@ export default class RestClient {
     raw = false,
   }: PostRequest = {}): Promise<T> {
     logger.info(`Post using user credentials: calling ${this.name}: ${path}`)
+    const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
-        .post(`${this.apiUrl()}${path}`)
+        .post(endpoint)
         .send(data)
         .agent(this.agent)
         .query(query)
@@ -118,7 +120,7 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
       throw sanitisedError
     }
@@ -126,9 +128,10 @@ export default class RestClient {
 
   async stream({ path = null, headers = {} }: StreamRequest = {}): Promise<Readable> {
     logger.info(`Get using user credentials: calling ${this.name}: ${path}`)
+    const endpoint = `${this.apiUrl()}${path}`
     return new Promise((resolve, reject) => {
       superagent
-        .get(`${this.apiUrl()}${path}`)
+        .get(endpoint)
         .agent(this.agent)
         .auth(this.token, { type: 'bearer' })
         .use(restClientMetricsMiddleware)
@@ -140,7 +143,7 @@ export default class RestClient {
         .set(headers)
         .end((error, response) => {
           if (error) {
-            logger.warn(sanitiseError(error), `Error calling ${this.name}: ${path}`)
+            logger.warn(sanitiseError(error, endpoint), `Error calling ${this.name}: ${path}`)
             reject(error)
           } else if (response) {
             const s = new Readable()
