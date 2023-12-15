@@ -63,7 +63,6 @@ class Modal {
     this.body = this.dialog.querySelector('[data-modal-body]')
 
     this.closeHandlers = []
-    // this.attachCloseHandlers()
 
     this._show = this.show.bind(this)
     this._hide = this.hide.bind(this)
