@@ -146,6 +146,8 @@ context('Profile banner', () => {
       const overviewPage = new OverviewPage()
       overviewPage.alertModal().should('not.be.visible')
       overviewPage.alertFlags().children().eq(1).click()
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(5000)
       overviewPage.alertModal().should('be.visible')
       overviewPage.alertModalBody().contains('h2', 'Arsonist')
       overviewPage.alertModalClose().eq(1).click()
