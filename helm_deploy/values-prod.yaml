@@ -6,10 +6,10 @@ generic-service:
     modsecurity_enabled: true
     modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
-      SecRuleEngine On
-      SecRuleUpdateActionById 949110 "pass,log,auditlog"
-      SecRuleUpdateActionById 942440 "pass,log,auditlog"
-      SecRuleUpdateActionById 920300 "pass,log,auditlog"
+      SecRuleEngine DetectionOnly
+    # SecRuleUpdateActionById 949110 "pass,log,auditlog"
+    # SecRuleUpdateActionById 942440 "pass,log,auditlog"
+    # SecRuleUpdateActionById 920300 "pass,log,auditlog"
 
   autoscaling:
     enabled: true
