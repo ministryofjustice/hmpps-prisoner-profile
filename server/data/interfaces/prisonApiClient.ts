@@ -49,6 +49,7 @@ import { AttributesForLocation } from '../../interfaces/prisonApi/attributesForL
 import { HistoryForLocationItem } from '../../interfaces/prisonApi/historyForLocation'
 import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTypes'
 import { Telephone } from '../../interfaces/prisonApi/telephone'
+import { CsraAssessmentSummary } from '../../interfaces/prisonApi/csraAssessmentSummary'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -105,7 +106,7 @@ export interface PrisonApiClient {
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
   getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]>
   getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment>
-  getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessment[]>
+  getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessmentSummary[]>
   getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]>
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
   getMovements(prisonerNumbers: string[], movementTypes: MovementType[], latestOnly?: boolean): Promise<Movement[]>

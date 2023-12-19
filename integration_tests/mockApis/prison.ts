@@ -65,6 +65,7 @@ import {
   PrisonerScheduleThisWeekMock,
 } from '../../server/data/localMockData/prisonerScheduleMock'
 import csraAssessmentMock from '../../server/data/localMockData/csraAssessmentMock'
+import csraAssessmentSummaryMock from '../../server/data/localMockData/csraAssessmentSummaryMock'
 import staffDetails from '../../server/data/localMockData/staffDetails'
 import {
   cashHOATransactionsMock,
@@ -890,14 +891,14 @@ export default {
         },
         jsonBody: [
           {
-            ...csraAssessmentMock,
+            ...csraAssessmentSummaryMock,
             bookingId: 67891,
             assessmentSeq: 12345,
             assessmentAgencyId: agenciesDetails.agencyId,
             offenderNo: prisonerNumber,
           },
           {
-            ...csraAssessmentMock,
+            ...csraAssessmentSummaryMock,
             classificationCode: 'MED',
             assessmentAgencyId: agenciesDetails.agencyId,
             offenderNo: prisonerNumber,

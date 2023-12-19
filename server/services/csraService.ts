@@ -6,6 +6,7 @@ import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import { sortByDateTime } from '../utils/utils'
 import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
 import { parseDate } from '../utils/dateHelpers'
+import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
 
 interface AssessmentViewModel {
   csraAssessment: CsraAssessment
@@ -15,7 +16,7 @@ interface AssessmentViewModel {
 export default class CsraService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  async getCsraHistory(token: string, prisonerNumber: string): Promise<CsraAssessment[]> {
+  async getCsraHistory(token: string, prisonerNumber: string): Promise<CsraAssessmentSummary[]> {
     const prisonApi = this.prisonApiClientBuilder(token)
 
     const csraAssessments = await prisonApi.getCsraAssessmentsForPrisoner(prisonerNumber)
@@ -28,7 +29,7 @@ export default class CsraService {
   filterCsraAssessments(
     csraAssessments: CsraSummary[],
     filters: {
-      csra?: CsraAssessment['classificationCode'] | CsraAssessment['classificationCode'][]
+      csra?: CsraAssessmentSummary['classificationCode'] | CsraAssessmentSummary['classificationCode'][]
       location?: string | string[]
       from?: string
       to?: string
@@ -51,7 +52,7 @@ export default class CsraService {
 
   async getAgenciesForCsraAssessments(
     token: string,
-    csraAssessments: CsraAssessment[],
+    csraAssessments: CsraAssessmentSummary[],
   ): Promise<AgencyLocationDetails[]> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const agencyIds = [...new Set(csraAssessments.map(assessment => assessment.assessmentAgencyId))]
