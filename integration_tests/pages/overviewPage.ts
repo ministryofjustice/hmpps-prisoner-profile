@@ -173,12 +173,10 @@ export default class OverviewPage extends Page {
   alertFlags = (): PageElement => cy.get('[data-qa="alert-flags"]')
 
   // Alerts summary
-  alertsSummary = () => ({
-    panel: (): PageElement => cy.get('[data-qa=overview-alerts-summary]'),
-    alertCount: (): PageElement => this.alertsSummary().panel().get('[data-qa=overview-active-alerts]'),
-    nonAssociationCount: (): PageElement =>
-      this.alertsSummary().panel().get('[data-qa=overview-non-association-count]'),
-    nonAssociationsLink: (): PageElement =>
-      this.alertsSummary().panel().get('[data-qa=overview-non-associations-link] a'),
+  nonAssociationSummary = () => ({
+    prisonName: (): PageElement => cy.get('[data-qa=overview-na-prison-name]'),
+    prisonCount: (): PageElement => cy.get('[data-qa=overview-na-prison-count]'),
+    otherPrisonsCount: (): PageElement => cy.get('[data-qa=overview-na-other-prisons-count]'),
+    nonAssociationsLink: (): PageElement => cy.get('[data-qa=overview-non-associations-link] a'),
   })
 }

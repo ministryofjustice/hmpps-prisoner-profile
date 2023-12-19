@@ -149,6 +149,10 @@ describe('properCaseName', () => {
 })
 
 describe('mapToQueryParams', () => {
+  it('should handle null/undefined map', () => {
+    expect(mapToQueryString(undefined)).toEqual('')
+  })
+
   it('should handle empty maps', () => {
     expect(mapToQueryString({})).toEqual('')
   })

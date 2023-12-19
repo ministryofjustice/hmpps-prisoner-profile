@@ -1,6 +1,5 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
-import nonAssociationDetailsDummyData from '../data/localMockData/nonAssociations'
 import OverviewPageService from './overviewPageService'
 import { Prisoner } from '../interfaces/prisoner'
 import {
@@ -45,7 +44,7 @@ import { convertToTitleCase, neurodiversityEnabled } from '../utils/utils'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
-import { CaseLoadsDummyDataA, CaseLoadsDummyDataB } from '../data/localMockData/caseLoad'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
 import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
@@ -60,10 +59,11 @@ import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
-import config from '../config'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
+import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
+import config from '../config'
 
 jest.mock('../utils/utils', () => {
   const original = jest.requireActual('../utils/utils')
@@ -108,7 +108,7 @@ describe('OverviewPageService', () => {
   let adjudicationsApiClient: AdjudicationsApiClient
 
   const nonAssociationsApiClient: NonAssociationsApiClient = {
-    getNonAssociationDetails: jest.fn(async () => nonAssociationDetailsDummyData),
+    getPrisonerNonAssociations: jest.fn(async () => prisonerNonAssociationsMock),
   }
 
   const prisonerProfileDeliusApiClient: PrisonerProfileDeliusApiClient = {
@@ -159,7 +159,7 @@ describe('OverviewPageService', () => {
     adjudicationsApiClient = adjudicationsApiClientMock()
     adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
 
-    nonAssociationsApiClient.getNonAssociationDetails = jest.fn(async () => nonAssociationDetailsDummyData)
+    nonAssociationsApiClient.getPrisonerNonAssociations = jest.fn(async () => prisonerNonAssociationsMock)
   })
 
   afterEach(() => {
@@ -171,51 +171,6 @@ describe('OverviewPageService', () => {
       const overviewPageService = overviewPageServiceConstruct()
       const { prisonName } = await overviewPageService.get('token', PrisonerMockDataA, 1, inmateDetailMock)
       expect(prisonName).toEqual(PrisonerMockDataA.prisonName)
-    })
-  })
-
-  describe('Non-associations', () => {
-    it.each(['ABC123', 'DEF321'])('Gets the non-associations for the prisoner', async (prisonerNumber: string) => {
-      const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get('token', { prisonerNumber } as Prisoner, 1, inmateDetailMock)
-      expect(nonAssociationsApiClient.getNonAssociationDetails).toHaveBeenCalledWith(prisonerNumber)
-    })
-
-    it('Maps the non-associations to correct shape', async () => {
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get(
-        'token',
-        { prisonerNumber: 'ABC123' } as Prisoner,
-        1,
-        inmateDetailMock,
-        CaseLoadsDummyDataA,
-        [],
-      )
-      expect(res.nonAssociations.length).toEqual(2)
-      const [associationOne, associationTwo] = res.nonAssociations
-      expect(associationOne).toEqual({
-        agencyId: 'MDI',
-        assignedLivingUnitDescription: 'NMI-RECP',
-        nonAssociationName: 'John Doe',
-        offenderNo: 'ABC123',
-        reasonDescription: 'Victim',
-      })
-      expect(associationTwo).toEqual({
-        agencyId: 'MDI',
-        assignedLivingUnitDescription: 'NMI-RECP',
-        nonAssociationName: 'Guy Incognito',
-        offenderNo: 'DEF321',
-        reasonDescription: 'Rival Gang',
-      })
-    })
-
-    it('Returns an empty list if no non-associations are returned', async () => {
-      const nonAssocations = { ...nonAssociationDetailsDummyData }
-      nonAssocations.nonAssociations = []
-      nonAssociationsApiClient.getNonAssociationDetails = jest.fn(async () => nonAssocations)
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get('token', { prisonerNumber: 'ABC123' } as Prisoner, 1, inmateDetailMock)
-      expect(res.nonAssociations.length).toEqual(0)
     })
   })
 
@@ -890,8 +845,8 @@ describe('OverviewPageService', () => {
     })
   })
 
-  describe('Alerts summary', () => {
-    it('should return active alerts count from inmate detail and non-Associations count from same establishment', async () => {
+  describe('Non-association summary', () => {
+    it('should return non-associations summary data', async () => {
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get(
         'token',
@@ -901,26 +856,10 @@ describe('OverviewPageService', () => {
         CaseLoadsDummyDataA,
         [],
       )
-      expect(res.alertsSummary).toEqual({
-        activeAlertCount: 1,
-        nonAssociationsCount: 2,
-        nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
-      })
-    })
-
-    it('should filter non-associations from different establishment', async () => {
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get(
-        'token',
-        PrisonerMockDataA,
-        1,
-        inmateDetailMock,
-        CaseLoadsDummyDataB,
-        [],
-      )
-      expect(res.alertsSummary).toEqual({
-        activeAlertCount: 1,
-        nonAssociationsCount: 2,
+      expect(res.nonAssociationSummary).toEqual({
+        prisonName: 'Moorland (HMP & YOI)',
+        prisonCount: 1,
+        otherPrisonsCount: 1,
         nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
       })
     })
