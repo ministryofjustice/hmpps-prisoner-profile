@@ -89,6 +89,36 @@ describe('Csra Service', () => {
     })
   })
 
+  describe('getDetailsForAssessments', () => {
+    it('Should get the CSRA Asessments for each summary', async () => {
+      prisonApiClientSpy.getCsraAssessment = jest.fn(async () => csraAssessmentMock)
+      csraService = new CsraService(() => prisonApiClientSpy)
+      const summaries = [
+        {
+          ...csraAssessmentSummaryMock,
+          bookingId: 123,
+          assessmentSeq: 321,
+          classification: 'MED',
+          location: 'Location One',
+        },
+        {
+          ...csraAssessmentSummaryMock,
+          bookingId: 456,
+          assessmentSeq: 654,
+          classification: 'HIGH',
+          location: 'Location Two',
+        },
+      ]
+
+      const output = await csraService.getDetailsForAssessments('', summaries)
+      expect(prisonApiClientSpy.getCsraAssessment).toHaveBeenCalledWith(123, 321)
+      expect(prisonApiClientSpy.getCsraAssessment).toHaveBeenCalledWith(456, 654)
+      expect(output.length).toEqual(2)
+      expect(output[0]).toEqual({ ...csraAssessmentMock, classification: 'MED', location: 'Location One' })
+      expect(output[1]).toEqual({ ...csraAssessmentMock, classification: 'HIGH', location: 'Location Two' })
+    })
+  })
+
   describe('getAgenciesForCsraAssessments', () => {
     it('should get all location details for the csras passed in', async () => {
       prisonApiClientSpy.getAgencyDetails = jest

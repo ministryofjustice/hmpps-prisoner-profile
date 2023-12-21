@@ -13,6 +13,12 @@ interface AssessmentViewModel {
   agencyDetails: AgencyLocationDetails
   staffDetails: StaffDetails
 }
+
+interface AssessmentListViewModel extends CsraAssessment {
+  classification: string
+  location: string
+}
+
 export default class CsraService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
@@ -48,6 +54,17 @@ export default class CsraService {
 
       return true
     })
+  }
+
+  async getDetailsForAssessments(token: string, summaries: CsraSummary[]): Promise<AssessmentListViewModel[]> {
+    const prisonApi = this.prisonApiClientBuilder(token)
+    return Promise.all(
+      summaries.map(async summary => {
+        const { location, classification } = summary
+        const assessment = await prisonApi.getCsraAssessment(summary.bookingId, summary.assessmentSeq)
+        return { ...assessment, location, classification }
+      }),
+    )
   }
 
   async getAgenciesForCsraAssessments(
