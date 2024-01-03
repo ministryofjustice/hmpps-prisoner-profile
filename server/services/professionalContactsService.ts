@@ -17,9 +17,11 @@ interface ProfessionalContact {
   relationship: string
   firstName: string
   lastName: string
+  teamName?: string
   emails: string[]
   phones: string[]
   address?: Address & { label: string }
+  unallocated?: boolean
 }
 export default class ProfessionalContactsService {
   constructor(
@@ -77,7 +79,12 @@ export default class ProfessionalContactsService {
   }
 
   sortProfessionalContacts = (left: ProfessionalContact, right: ProfessionalContact) => {
-    const jobTitleOrder = ['Prison Offender Manager', 'Co-working Prison Offender Manager']
+    const jobTitleOrder = [
+      'Key Worker',
+      'Prison Offender Manager',
+      'Co-working Prison Offender Manager',
+      'Community Offender Manager',
+    ]
     const leftJobTitleIndex = jobTitleOrder.indexOf(left.relationshipDescription)
     const rightJobTitleIndex = jobTitleOrder.indexOf(right.relationshipDescription)
 
@@ -131,18 +138,20 @@ function getPomContacts(allocationManager: Pom): ProfessionalContact[] {
 }
 
 function mapCommunityManagerToProfessionalContact(communityManager: CommunityManager): ProfessionalContact {
-  const { email, telephone } = communityManager
+  const { email, telephone, unallocated } = communityManager
   const { forename, surname } = communityManager.name
   const { email: teamEmail, telephone: teamTelephone } = communityManager.team
 
   return {
     firstName: forename,
     lastName: surname,
+    teamName: communityManager.team.description,
     emails: [email, teamEmail].filter(Boolean),
     phones: [telephone, teamTelephone].filter(Boolean),
     address: undefined,
     relationshipDescription: 'Community Offender Manager',
     relationship: 'COM',
+    unallocated,
   }
 }
 
