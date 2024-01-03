@@ -93,9 +93,11 @@ const expectedComResponse = [
     emails: ['terry@email.com', 'team@email.com'],
     firstName: 'Terry',
     lastName: 'Scott',
+    teamName: 'Probation Team',
     phones: ['07700000000', '07711111111'],
     relationshipDescription: 'Community Offender Manager',
     relationship: 'COM',
+    unallocated: false,
   },
 ]
 
@@ -153,9 +155,9 @@ describe('professionalContactsService', () => {
       const response = await service.getContacts('token', 'A1234AA', 1)
 
       expect(response).toEqual([
+        ...expectedKeyWorkerResponse,
         ...expectedPomResponse,
         ...expectedComResponse,
-        ...expectedKeyWorkerResponse,
         {
           address: {
             label: 'Main address',
@@ -195,10 +197,10 @@ describe('professionalContactsService', () => {
       const response = await service.getContacts('token', 'A1234AA', 1)
 
       expect(response.length).toEqual(7)
-      expect(response[0].relationshipDescription).toEqual('Prison Offender Manager')
-      expect(response[1].relationshipDescription).toEqual('Co-working Prison Offender Manager')
-      expect(response[2].relationshipDescription).toEqual('Community Offender Manager')
-      expect(response[3].relationshipDescription).toEqual('Key Worker')
+      expect(response[0].relationshipDescription).toEqual('Key Worker')
+      expect(response[1].relationshipDescription).toEqual('Prison Offender Manager')
+      expect(response[2].relationshipDescription).toEqual('Co-working Prison Offender Manager')
+      expect(response[3].relationshipDescription).toEqual('Community Offender Manager')
       expect(response[4].relationshipDescription).toEqual('Prison Guard')
       expect(response[5].relationshipDescription).toEqual('Prison Guard')
       expect(response[6].relationshipDescription).toEqual('Responsible officer')
@@ -222,7 +224,7 @@ describe('professionalContactsService', () => {
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
-      expect(response).toEqual([...expectedPomResponse, ...expectedComResponse, ...expectedKeyWorkerResponse])
+      expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
 
     it('should return a contact for each address with valid or no endate', async () => {
@@ -271,7 +273,7 @@ describe('professionalContactsService', () => {
 
       const response = await service.getContacts('token', 'A1234AA', 1)
 
-      expect(response).toEqual([...expectedPomResponse, ...expectedComResponse, ...expectedKeyWorkerResponse])
+      expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
   })
 })
