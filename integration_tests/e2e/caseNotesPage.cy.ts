@@ -149,12 +149,14 @@ context('Case Notes Page', () => {
 
     it('Displays the case notes and sorts results by Created (oldest)', () => {
       caseNotesPage.sort().invoke('attr', 'value').should('eq', '') // Default sort - Created (most recent)
-      caseNotesPage.caseNotesListItem().first().contains('Created: Tuesday, 18 April 2023 at 17:15 by James Grant')
+      caseNotesPage.caseNotesListItem().first().contains('18 April 2023 at 17:15')
+      caseNotesPage.caseNotesListItem().first().contains('Created by: James Grant')
 
       caseNotesPage.sort().select('Created (oldest)')
 
       caseNotesPage.sort().invoke('attr', 'value').should('eq', 'creationDateTime,ASC')
-      caseNotesPage.caseNotesListItem().first().contains('Created: Monday, 9 January 2023 at 11:29 by James T Kirk')
+      caseNotesPage.caseNotesListItem().first().contains('9 January 2023 at 11:29')
+      caseNotesPage.caseNotesListItem().first().contains('Created by: James T Kirk')
     })
   })
 
