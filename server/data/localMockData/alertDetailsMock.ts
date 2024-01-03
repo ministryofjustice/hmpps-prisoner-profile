@@ -12,6 +12,6 @@ export const alertDetailsMock: Alert = {
   modifiedDateTime: '2020-05-14T15:21:12.530864',
   expired: false,
   active: true,
-  expiredByFirstName: 'JAMES T',
-  expiredByLastName: 'KIRK',
+  addedByFirstName: 'JAMES T',
+  addedByLastName: 'KIRK',
 }

@@ -661,6 +661,7 @@ describe('OverviewPageService', () => {
         ['Suitable Yes/Recognised Yes', suitableListenerYes, recognisedListenerYes, false, true],
         ['Suitable Blank/Recognised Yes', suitableListenerBlank, recognisedListenerYes, false, true],
         ['Suitable No/Recognised Yes', suitableListenerNo, recognisedListenerYes, false, false],
+        ['Suitable None/Recognised No', null, recognisedListenerNo, false, false],
       ])(
         'given %s should show correct suitable and/or recognised listener statuses',
         async (
@@ -670,10 +671,14 @@ describe('OverviewPageService', () => {
           displaySuitable: boolean,
           displayRecognised: boolean,
         ) => {
+          const profileInformation = []
+          if (suitableListener) profileInformation.push(suitableListener)
+          if (recognisedListener) profileInformation.push(recognisedListener)
+
           const prisonerNumber = 'A1234BC'
           const bookingId = 123456
           const inmateDetail = {
-            profileInformation: [suitableListener, recognisedListener],
+            profileInformation,
           } as InmateDetail
 
           const overviewPageService = overviewPageServiceConstruct()

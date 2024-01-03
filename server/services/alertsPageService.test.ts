@@ -88,7 +88,7 @@ describe('Alerts Page', () => {
 
       expect(prisonApiClientSpy.getAlertDetails).toHaveBeenCalledWith(prisonerData.bookingId, 1)
 
-      expect(alertDetails).toEqual({ ...alertDetailsMock, addedByFullName: '', expiredByFullName: 'James T Kirk' })
+      expect(alertDetails).toEqual({ ...alertDetailsMock, addedByFullName: 'James T Kirk', expiredByFullName: '' })
     })
   })
 })
