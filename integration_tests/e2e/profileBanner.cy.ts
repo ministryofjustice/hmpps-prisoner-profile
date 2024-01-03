@@ -130,10 +130,29 @@ context('Profile banner', () => {
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
 
-    it('Shows alert flags', () => {
+    it('Shows clickable alert flags', () => {
       visitOverviewPage()
       const overviewPage = new OverviewPage()
       overviewPage.alertFlags().children().should('have.length', '5')
+      overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Arsonist')
+      overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Concerted indiscipline')
+      overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Controlled unlock')
+      overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Gang member')
+      overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Veteran')
+    })
+
+    it('Shows modal when clicking alert flag', () => {
+      visitOverviewPage()
+      const overviewPage = new OverviewPage()
+      overviewPage.alertModal().should('not.be.visible')
+      overviewPage.alertFlags().children().eq(1).click()
+      overviewPage.alertModal().should('not.have.a.property', 'hidden')
+      overviewPage.alertModal().should('not.have.css', 'display', 'none')
+      overviewPage.alertModal().should('be.visible')
+      overviewPage.alertModalBody().contains('h2', 'Arsonist')
+      overviewPage.alertModalClose().eq(1).click()
+      overviewPage.alertModal().should('have.css', 'display', 'none')
+      overviewPage.alertModal().should('not.be.visible')
     })
   })
 })

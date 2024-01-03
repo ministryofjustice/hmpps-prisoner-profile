@@ -172,6 +172,12 @@ export default class OverviewPage extends Page {
   // Alert Flags
   alertFlags = (): PageElement => cy.get('[data-qa="alert-flags"]')
 
+  alertModal = (): PageElement => cy.get('[data-module="modal"]')
+
+  alertModalBody = (): PageElement => this.alertModal().get('[data-modal-body]')
+
+  alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
+
   // Alerts summary
   alertsSummary = () => ({
     panel: (): PageElement => cy.get('[data-qa=overview-alerts-summary]'),
