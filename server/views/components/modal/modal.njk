@@ -1,5 +1,5 @@
 {% macro modal(params) %}
-<div id="{{ params.id }}" class="modal-container {{ params.classes }}" hidden data-module="modal">
+<div id="{{ params.id }}" class="modal-container {{ params.classes }}" hidden data-module="modal" {{ 'data-call=true' if params.call }}>
     <div class="modal-overlay" data-modal-hide></div>
     <dialog class="modal-content" tabindex="0">
         <header>
@@ -18,7 +18,6 @@
         </section>
     </dialog>
 </div>
-
 
 {% block pageScripts %}
     <script src="/assets/js/modal.js" nonce="{{ cspNonce }}"></script>

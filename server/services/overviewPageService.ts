@@ -1,12 +1,6 @@
 import { differenceInDays, format, isAfter, startOfToday } from 'date-fns'
 import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
-import {
-  AlertsSummary,
-  OverviewNonAssociation,
-  OverviewPage,
-  OverviewSchedule,
-  OverviewScheduleItem,
-} from '../interfaces/overviewPage'
+import { OverviewPage, OverviewSchedule, OverviewScheduleItem } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
   convertToTitleCase,
@@ -51,7 +45,6 @@ import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import { NonAssociationDetails } from '../interfaces/nonAssociationDetails'
 import { KeyWorker } from '../interfaces/keyWorker'
 import { CaseNote } from '../interfaces/caseNote'
 import { FullStatus } from '../interfaces/prisonApi/fullStatus'
@@ -59,6 +52,8 @@ import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communi
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/prisonerSchedule'
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
+import { NonAssociationSummary } from '../interfaces/nonAssociationSummary'
+import { PrisonerNonAssociations } from '../interfaces/nonAssociationsApi/prisonerNonAssociations'
 
 export default class OverviewPageService {
   constructor(
@@ -97,7 +92,7 @@ export default class OverviewPageService {
       staffRoles,
       learnerNeurodivergence,
       scheduledTransfers,
-      nonAssociationDetails,
+      prisonerNonAssociations,
       allocationManager,
       offenderKeyWorker,
       keyWorkerSessions,
@@ -110,7 +105,7 @@ export default class OverviewPageService {
       prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
-      nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber),
+      nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
       keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
@@ -143,13 +138,11 @@ export default class OverviewPageService {
       ),
     ])
 
-    const nonAssociations = this.getNonAssociations(nonAssociationDetails)
-
     return {
       miniSummaryGroupA,
       miniSummaryGroupB,
       statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
-      nonAssociations,
+      nonAssociationSummary: this.getNonAssociationSummary(prisonerNonAssociations),
       personalDetails,
       staffContacts: this.getStaffContacts(
         prisonerData,
@@ -162,7 +155,6 @@ export default class OverviewPageService {
       offencesOverview,
       prisonName: prisonerData.prisonName,
       staffRoles: staffRoles.map(role => role.role),
-      alertsSummary: this.getAlertsSummary(inmateDetail, nonAssociations),
     }
   }
 
@@ -504,16 +496,6 @@ export default class OverviewPageService {
     return summaryData
   }
 
-  private getAlertsSummary(
-    { activeAlertCount, offenderNo }: InmateDetail,
-    nonAssociations: OverviewNonAssociation[],
-  ): AlertsSummary {
-    const nonAssociationsCount = nonAssociations.length
-    const nonAssociationsUrl = `${config.serviceUrls.nonAssociations}/prisoner/${offenderNo}/non-associations`
-
-    return { activeAlertCount, nonAssociationsCount, nonAssociationsUrl }
-  }
-
   private async getSchedule(prisonerData: Prisoner, prisonApiClient: PrisonApiClient): Promise<OverviewSchedule> {
     const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
       const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
@@ -535,22 +517,6 @@ export default class OverviewPageService {
       evening: groupedEvents.eveningEvents.map(formatEventForOverview),
       linkUrl: `/prisoner/${prisonerData.prisonerNumber}/schedule`,
     }
-  }
-
-  private getNonAssociations(nonAssociations: NonAssociationDetails): OverviewNonAssociation[] {
-    if (!nonAssociations?.nonAssociations) return []
-
-    return nonAssociations.nonAssociations.map(nonAssociation => {
-      const { firstName, lastName, offenderNo, assignedLivingUnitDescription, reasonDescription, agencyId } =
-        nonAssociation.offenderNonAssociation
-      return {
-        nonAssociationName: formatName(firstName, null, lastName),
-        offenderNo,
-        assignedLivingUnitDescription,
-        reasonDescription,
-        agencyId,
-      }
-    })
   }
 
   private getStatuses(
@@ -593,7 +559,14 @@ export default class OverviewPageService {
       })
     }
 
-    if ((recognised === BooleanString.Yes || recognised === BooleanString.No) && suitable !== BooleanString.No) {
+    if (!suitable && recognised === BooleanString.Yes) {
+      statusList.push({
+        label: 'Recognised Listener',
+      })
+    } else if (
+      (recognised === BooleanString.Yes || recognised === BooleanString.No) &&
+      suitable === BooleanString.Yes
+    ) {
       statusList.push({
         label: 'Recognised Listener',
       })
@@ -613,5 +586,22 @@ export default class OverviewPageService {
     }
 
     return statusList
+  }
+
+  private getNonAssociationSummary(prisonerNonAssociations: PrisonerNonAssociations): NonAssociationSummary {
+    const prisonCount = prisonerNonAssociations.nonAssociations.filter(
+      na => na.otherPrisonerDetails.prisonId === prisonerNonAssociations.prisonId,
+    ).length
+    const otherPrisonsCount = prisonerNonAssociations.nonAssociations.filter(
+      na =>
+        na.otherPrisonerDetails.prisonId !== prisonerNonAssociations.prisonId &&
+        !['TRN', 'OUT'].includes(na.otherPrisonerDetails.prisonId),
+    ).length
+    return {
+      prisonName: prisonerNonAssociations.prisonName,
+      prisonCount,
+      otherPrisonsCount,
+      nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/${prisonerNonAssociations.prisonerNumber}/non-associations`,
+    }
   }
 }

@@ -1,5 +1,12 @@
-import { NonAssociationDetails } from '../../interfaces/nonAssociationDetails'
+import { PrisonerNonAssociations } from '../../interfaces/nonAssociationsApi/prisonerNonAssociations'
 
 export interface NonAssociationsApiClient {
-  getNonAssociationDetails(prisonerNumber: string): Promise<NonAssociationDetails>
+  getPrisonerNonAssociations(
+    prisonerNumber: string,
+    params?: {
+      includeOpen?: 'true' | 'false'
+      includeClosed?: 'true' | 'false'
+      includeOtherPrisons?: 'true' | 'false'
+    },
+  ): Promise<PrisonerNonAssociations>
 }
