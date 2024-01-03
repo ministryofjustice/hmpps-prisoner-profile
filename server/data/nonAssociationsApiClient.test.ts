@@ -1,8 +1,8 @@
 import nock from 'nock'
 import config from '../config'
-import nonAssociationDetailsDummyData from './localMockData/nonAssociations'
 import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
+import { prisonerNonAssociationsMock } from './localMockData/prisonerNonAssociationsMock'
 
 jest.mock('./tokenStore')
 
@@ -29,12 +29,14 @@ describe('nonAssociationsApiClient', () => {
   describe('getNonAssociations', () => {
     it.each(['ABC12', 'DEF456'])('Should return data from the API', async prisonerNumber => {
       mockSuccessfulPrisonApiCall(
-        `/legacy/api/offenders/${prisonerNumber}/non-association-details?currentPrisonOnly=true&excludeInactive=true`,
-        nonAssociationDetailsDummyData,
+        `/prisoner/${prisonerNumber}/non-associations?includeOtherPrisons=true`,
+        prisonerNonAssociationsMock,
       )
 
-      const output = await nonAssociationsApiClient.getNonAssociationDetails(prisonerNumber)
-      expect(output).toEqual(nonAssociationDetailsDummyData)
+      const output = await nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, {
+        includeOtherPrisons: 'true',
+      })
+      expect(output).toEqual(prisonerNonAssociationsMock)
     })
   })
 })

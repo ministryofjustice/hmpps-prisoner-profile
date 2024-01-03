@@ -1,19 +1,19 @@
-import nonAssociationDetailsDummyData from '../../server/data/localMockData/nonAssociations'
 import { stubFor } from './wiremock'
+import { prisonerNonAssociationsMock } from '../../server/data/localMockData/prisonerNonAssociationsMock'
 
 export default {
   stubNonAssociations: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/nonassociations/legacy/api/offenders/${prisonerNumber}/non-association-details.*`,
+        urlPattern: `/nonassociations/prisoner/${prisonerNumber}/non-associations.*`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: nonAssociationDetailsDummyData,
+        jsonBody: prisonerNonAssociationsMock,
       },
     })
   },

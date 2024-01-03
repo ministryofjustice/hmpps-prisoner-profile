@@ -4,6 +4,7 @@ import { CourtCase } from './prisonApi/courtCase'
 import { CourtHearing } from './prisonApi/courtHearing'
 import { FullStatus } from './prisonApi/fullStatus'
 import { Status } from './status'
+import { NonAssociationSummary } from './nonAssociationSummary'
 
 export interface OverviewScheduleItem {
   name: string
@@ -36,7 +37,7 @@ export interface OverviewPage {
   miniSummaryGroupA: MiniSummary[]
   miniSummaryGroupB: MiniSummary[]
   statuses: Status[]
-  nonAssociations: OverviewNonAssociation[]
+  nonAssociationSummary: NonAssociationSummary
   personalDetails: PersonalDetails
   staffContacts: object
   schedule: OverviewSchedule
@@ -51,5 +52,4 @@ export interface OverviewPage {
   }
   prisonName: string
   staffRoles: string[]
-  alertsSummary: AlertsSummary
 }

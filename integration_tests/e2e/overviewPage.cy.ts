@@ -281,15 +281,15 @@ context('Overview Page', () => {
       })
     })
 
-    context('Alerts summary', () => {
-      it('Displays alerts summary', () => {
+    context('Non-association summary', () => {
+      it('Displays non-association summary', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.alertsSummary().panel().should('exist')
-        overviewPage.alertsSummary().alertCount().should('have.text', '80')
-        overviewPage.alertsSummary().nonAssociationCount().should('have.text', '2')
-        overviewPage.alertsSummary().nonAssociationsLink().should('have.text', 'Non-associations')
+        overviewPage.nonAssociationSummary().prisonName().should('have.text', 'In Moorland (HMP & YOI)')
+        overviewPage.nonAssociationSummary().prisonCount().should('have.text', '1')
+        overviewPage.nonAssociationSummary().otherPrisonsCount().should('have.text', '1')
+        overviewPage.nonAssociationSummary().nonAssociationsLink().should('have.text', 'Non-associations')
         overviewPage
-          .alertsSummary()
+          .nonAssociationSummary()
           .nonAssociationsLink()
           .should('have.attr', 'href', 'http://localhost:9091/nonassociationsui/prisoner/G6123VU/non-associations')
       })
