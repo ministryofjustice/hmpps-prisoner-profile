@@ -593,7 +593,14 @@ export default class OverviewPageService {
       })
     }
 
-    if ((recognised === BooleanString.Yes || recognised === BooleanString.No) && suitable !== BooleanString.No) {
+    if (!suitable && recognised === BooleanString.Yes) {
+      statusList.push({
+        label: 'Recognised Listener',
+      })
+    } else if (
+      (recognised === BooleanString.Yes || recognised === BooleanString.No) &&
+      suitable === BooleanString.Yes
+    ) {
       statusList.push({
         label: 'Recognised Listener',
       })
