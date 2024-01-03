@@ -34,9 +34,20 @@
                         Name
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        {{ contact.firstName | formatName("", contact.lastName) }}
+                        {{ contact.firstName | formatName("", contact.lastName) if not contact.unallocated else 'COM not yet allocated' }}
                     </dd>
                 </div>
+
+                {% if contact.relationship === 'COM' %}
+                <div class="govuk-summary-list__row" data-qa="contact-team">
+                    <dt class="govuk-summary-list__key">
+                        Team
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ contact.teamName }}
+                    </dd>
+                </div>
+                {% endif %}
 
                 <div class="govuk-summary-list__row" data-qa="contact-details">
                     <dt class="govuk-summary-list__key">
