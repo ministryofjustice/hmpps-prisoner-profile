@@ -194,6 +194,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 2000))),
     },
+    complexityApi: {
+      url: get('COMPLEXITY_OF_NEED_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('COMPLEXITY_OF_NEED_API_TIMEOUT_RESPONSE', 5000)),
+        deadline: Number(get('COMPLEXITY_OF_NEED_API_TIMEOUT_DEADLINE', 5000)),
+      },
+      agent: new AgentConfig(Number(get('COMPLEXITY_OF_NEED_API_TIMEOUT_DEADLINE', 5000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -220,6 +228,7 @@ export default {
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
   activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
   appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
+  complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
   useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
   profileAddAppointmentEnabled: get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false') === 'true',
   notifications: {

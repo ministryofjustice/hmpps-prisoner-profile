@@ -17,6 +17,7 @@ import adjudicationsApi from './integration_tests/mockApis/adjudications'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerProfileDeliusApi from './integration_tests/mockApis/prisonerProfileDeliusApi'
 import whereAboutsApi from './integration_tests/mockApis/whereAboutsApi'
+import complexityApi from './integration_tests/mockApis/complexityApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -52,6 +53,7 @@ export default defineConfig({
         ...nonAssociationsApi,
         ...prisonerProfileDeliusApi,
         ...whereAboutsApi,
+        ...complexityApi,
       })
     },
     baseUrl: 'http://localhost:3007',

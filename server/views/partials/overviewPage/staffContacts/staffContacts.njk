@@ -4,7 +4,7 @@
   <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
     <div class="govuk-grid-column-full">
       {% set keyWorkerHtml %}
-        <p class="govuk-body">
+        <p class="govuk-body" data-qa="keyworker-name">
           {{ staffContacts.keyWorker.name }}
           {% if(staffContacts.keyWorker.lastSession) %}
             - last session: {{ staffContacts.keyWorker.lastSession  }}

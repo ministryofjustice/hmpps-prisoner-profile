@@ -3,6 +3,7 @@ import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
+import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -195,13 +196,6 @@ context('Overview Page', () => {
         overviewPage.schedule().afternoon().item(0).should('include.text', 'Joinery PM')
         overviewPage.schedule().evening().item(0).should('include.text', 'Gym - Football')
         overviewPage.schedule().evening().item(1).should('include.text', 'VLB - Test')
-      })
-    })
-
-    context('Staff contacts', () => {
-      it('Displays the offender staff contact details', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.staffContacts().should('exist')
       })
     })
 
@@ -553,6 +547,51 @@ context('Overview Page', () => {
         overviewPage.overviewConditionalReleaseLabel().should('not.exist')
         overviewPage.overviewConditionalRelease().should('not.exist')
         overviewPage.nextAppearanceDate().should('exist')
+      })
+    })
+  })
+
+  context('Given the prisoner has high complexity of needs', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        complexityLevel: ComplexityLevel.High,
+      })
+      visitOverviewPage()
+    })
+
+    context('Staff contacts', () => {
+      it('Displays the offender staff contact details', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.staffContacts().should('exist')
+        overviewPage
+          .staffContacts()
+          .find('[data-qa=keyworker-name]')
+          .should('contain.text', 'None - high complexity of need')
+      })
+    })
+  })
+
+  context('Given the prisoner has low complexity of needs', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        complexityLevel: ComplexityLevel.Low,
+      })
+      visitOverviewPage()
+    })
+
+    context('Staff contacts', () => {
+      it('Displays the offender staff contact details', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.staffContacts().should('exist')
+        overviewPage.staffContacts().find('[data-qa=keyworker-name]').should('contain.text', 'Dave Stevens')
       })
     })
   })
