@@ -36,7 +36,7 @@ import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
 import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
 import { pomMock } from '../data/localMockData/pom'
 import { keyWorkerMock } from '../data/localMockData/keyWorker'
-import { StaffContactsMock } from '../data/localMockData/staffContacts'
+import { StaffContactsHighComplexityMock, StaffContactsMock } from '../data/localMockData/staffContacts'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { formatDate } from '../utils/dateHelpers'
@@ -64,12 +64,15 @@ import { communityManagerMock } from '../data/localMockData/communityManagerMock
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
 import config from '../config'
+import { ComplexityApiClient } from '../data/interfaces/complexityApiClient'
+import { complexityOfNeedHighMock, complexityOfNeedLowMock } from '../data/localMockData/complexityOfNeedMock'
 
 jest.mock('../utils/utils', () => {
   const original = jest.requireActual('../utils/utils')
   return { ...original, neurodiversityEnabled: jest.fn() }
 })
 const mockedNeurodiversityEnabled = neurodiversityEnabled as jest.Mock
+config.complexityEnabledPrisons = ['MDI']
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -115,7 +118,15 @@ describe('OverviewPageService', () => {
     getCommunityManager: jest.fn(async () => communityManagerMock),
   }
 
-  const overviewPageServiceConstruct = jest.fn(({ useNull = false, useError = false } = {}) => {
+  const complexityApiClient: ComplexityApiClient = {
+    getComplexityOfNeed: jest.fn(async () => complexityOfNeedLowMock),
+  }
+
+  const complexityApiClientComplex: ComplexityApiClient = {
+    getComplexityOfNeed: jest.fn(async () => complexityOfNeedHighMock),
+  }
+
+  const overviewPageServiceConstruct = jest.fn(({ useNull = false, useError = false, useComplex = false } = {}) => {
     let incentivesApi: IncentivesApiClient
     if (useNull) {
       incentivesApi = incentivesApiClientReturnsNull
@@ -135,6 +146,7 @@ describe('OverviewPageService', () => {
       () => curiousApiClient,
       () => nonAssociationsApiClient,
       () => prisonerProfileDeliusApiClient,
+      () => (useComplex ? complexityApiClientComplex : complexityApiClient),
     )
   })
 
@@ -507,6 +519,12 @@ describe('OverviewPageService', () => {
         inmateDetailMock,
       )
       expect(res.staffContacts).toEqual(expect.objectContaining(StaffContactsMock))
+    })
+
+    it('should get the staff contact details for a prisoner with complex needs', async () => {
+      const overviewPageService = overviewPageServiceConstruct({ useComplex: true })
+      const res = await overviewPageService.get('token', PrisonerMockDataA, 1, inmateDetailMock)
+      expect(res.staffContacts).toEqual(expect.objectContaining(StaffContactsHighComplexityMock))
     })
   })
 

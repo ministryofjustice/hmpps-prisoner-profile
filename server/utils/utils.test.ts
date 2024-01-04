@@ -2,6 +2,7 @@ import {
   addressToLines,
   apostrophe,
   arrayToQueryString,
+  convertNameCommaToHuman,
   convertToTitleCase,
   findError,
   formatCategoryCodeDescription,
@@ -222,7 +223,7 @@ describe('format name', () => {
       'John James Gordon William Smith',
     ],
     ['Hyphen (no options)', 'John', undefined, 'SMITH-JONES', undefined, 'John Smith-Jones'],
-    ['Apostrophe (no options)', 'JOHN', 'JAMES', "o'reilly", undefined, "John James O'Reilly"],
+    ['Apostrophe (no options)', 'JOHN', 'JAMES', "O'sullivan", undefined, "John James O'Sullivan"],
     [
       'All names (LastCommaFirstMiddle)',
       'John',
@@ -274,6 +275,16 @@ describe('format name part', () => {
     ['Mixed', "o'reilly-SMITH", "O'Reilly-Smith"],
   ])('%s: formatNamePart(%s)', (_: string, name: string, expected: string) => {
     expect(formatNamePart(name)).toEqual(expected)
+  })
+})
+
+describe('convert name comma to human', () => {
+  it.each([
+    ['Normal', 'Smith, John', 'John Smith'],
+    ['Apostrophe', "o'reilly, baba", "Baba O'Reilly"],
+    ['Mixed Case', "o'reilly-SMITH, JoHn", "John O'Reilly-Smith"],
+  ])('%s: convertNameCommaToHuman(%s)', (_: string, name: string, expected: string) => {
+    expect(convertNameCommaToHuman(name)).toEqual(expected)
   })
 })
 

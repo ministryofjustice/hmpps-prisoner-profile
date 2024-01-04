@@ -11,6 +11,16 @@ export const StaffContactsMock = {
   communityOffenderManager: 'Terry Scott',
 }
 
+export const StaffContactsHighComplexityMock = {
+  keyWorker: {
+    name: 'None - high complexity of need',
+    lastSession: '',
+  },
+  prisonOffenderManager: 'Andy Marke',
+  coworkingPrisonOffenderManager: 'Andy Hudson',
+  communityOffenderManager: 'Terry Scott',
+}
+
 export default {
   StaffContactsMock,
 }

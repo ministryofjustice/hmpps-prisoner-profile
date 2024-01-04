@@ -1,5 +1,6 @@
 import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/historyForLocation'
 import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
+import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -16,7 +17,14 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
 
 Cypress.Commands.add(
   'setupOverviewPageStubs',
-  ({ bookingId, prisonerNumber, restrictedPatient = false, prisonerDataOverrides = {}, staffRoles = [] }) => {
+  ({
+    bookingId,
+    prisonerNumber,
+    restrictedPatient = false,
+    prisonerDataOverrides = {},
+    staffRoles = [],
+    complexityLevel = ComplexityLevel.Low,
+  }) => {
     cy.task('stubNonAssociations', prisonerNumber)
     cy.task('stubPrisonerData', { prisonerNumber, restrictedPatient, overrides: prisonerDataOverrides })
     cy.task('stubAccountBalances', bookingId)
@@ -47,6 +55,7 @@ Cypress.Commands.add(
     cy.task('stubScheduledTransfers', prisonerNumber)
     cy.task('stubPrisonerDetail', prisonerNumber)
     cy.task('stubAlertDetails')
+    cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
   },
 )
 
