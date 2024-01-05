@@ -202,7 +202,11 @@ export const formatNamePart = (name: string): string => {
 export const convertNameCommaToHuman = (name: string): string => {
   if (!name) return ''
 
-  return name.split(', ').reverse().join(' ')
+  return name
+    .split(', ')
+    .reverse()
+    .map(namePart => formatNamePart(namePart))
+    .join(' ')
 }
 
 /**

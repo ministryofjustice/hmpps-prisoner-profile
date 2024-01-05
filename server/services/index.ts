@@ -38,6 +38,7 @@ export const services = () => {
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     manageUsersApiClientBuilder,
+    complexityApiClientBuilder,
   } = dataAccess
 
   const auditService = AuditService({
@@ -65,6 +66,7 @@ export const services = () => {
     curiousApiClientBuilder,
     nonAssociationsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
+    complexityApiClientBuilder,
   )
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)

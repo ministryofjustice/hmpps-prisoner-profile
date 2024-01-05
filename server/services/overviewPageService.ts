@@ -54,6 +54,8 @@ import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/prisonerSchedule
 import { PrisonerDetail } from '../interfaces/prisonerDetail'
 import { NonAssociationSummary } from '../interfaces/nonAssociationSummary'
 import { PrisonerNonAssociations } from '../interfaces/nonAssociationsApi/prisonerNonAssociations'
+import { ComplexityApiClient } from '../data/interfaces/complexityApiClient'
+import { ComplexityLevel } from '../interfaces/complexityApi/complexityOfNeed'
 
 export default class OverviewPageService {
   constructor(
@@ -66,6 +68,7 @@ export default class OverviewPageService {
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly nonAssociationsApiClientBuilder: RestClientBuilder<NonAssociationsApiClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
+    private readonly complexityApiClientBuilder: RestClientBuilder<ComplexityApiClient>,
   ) {}
 
   public async get(
@@ -76,8 +79,14 @@ export default class OverviewPageService {
     userCaseLoads: CaseLoad[] = [],
     userRoles: string[] = [],
   ): Promise<OverviewPage> {
-    const { bookingId, prisonerNumber, imprisonmentStatusDescription, conditionalReleaseDate, confirmedReleaseDate } =
-      prisonerData
+    const {
+      bookingId,
+      prisonerNumber,
+      imprisonmentStatusDescription,
+      conditionalReleaseDate,
+      confirmedReleaseDate,
+      prisonId,
+    } = prisonerData
 
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
     const allocationManagerClient = this.allocationManagerApiClientBuilder(clientToken)
@@ -87,6 +96,11 @@ export default class OverviewPageService {
     const curiousApiClient = this.curiousApiClientBuilder(clientToken)
     const nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
+    const complexityApiClient = this.complexityApiClientBuilder(clientToken)
+
+    const complexityLevel =
+      config.complexityEnabledPrisons.includes(prisonId) &&
+      (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
 
     const [
       staffRoles,
@@ -150,6 +164,7 @@ export default class OverviewPageService {
         allocationManager,
         offenderKeyWorker,
         keyWorkerSessions,
+        complexityLevel,
       ),
       schedule,
       offencesOverview,
@@ -213,6 +228,7 @@ export default class OverviewPageService {
     allocationManager: Pom,
     offenderKeyWorker: KeyWorker,
     keyWorkerSessions: CaseNote[],
+    complexityLevel: ComplexityLevel,
   ): StaffContacts {
     const prisonOffenderManager =
       allocationManager &&
@@ -226,12 +242,17 @@ export default class OverviewPageService {
       (allocationManager as Pom).secondary_pom.name &&
       getNamesFromString((allocationManager as Pom).secondary_pom.name)
 
+    const keyworkerName =
+      // eslint-disable-next-line no-nested-ternary
+      complexityLevel === ComplexityLevel.High
+        ? 'None - high complexity of need'
+        : offenderKeyWorker && offenderKeyWorker.firstName
+          ? `${convertToTitleCase(offenderKeyWorker.firstName)} ${convertToTitleCase(offenderKeyWorker.lastName)}`
+          : 'Not allocated'
+
     return {
       keyWorker: {
-        name:
-          offenderKeyWorker && offenderKeyWorker.firstName
-            ? `${convertToTitleCase(offenderKeyWorker.firstName)} ${convertToTitleCase(offenderKeyWorker.lastName)}`
-            : 'Not allocated',
+        name: keyworkerName,
         lastSession:
           keyWorkerSessions !== undefined && keyWorkerSessions[0] !== undefined
             ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
