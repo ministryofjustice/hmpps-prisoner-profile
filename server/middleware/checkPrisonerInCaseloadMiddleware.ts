@@ -3,7 +3,6 @@ import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
-import { addMiddlewareError } from './middlewareHelpers'
 
 export default function checkPrisonerInCaseload({
   allowGlobal = true,
@@ -25,24 +24,14 @@ export default function checkPrisonerInCaseload({
     if (inactiveBooking) {
       if (!(allowInactive && canViewInactiveBookings) && !(allowGlobal && globalSearchUser)) {
         return next(
-          addMiddlewareError(
-            req,
-            next,
-            new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
-          ),
+          new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
         )
       }
       return next()
     }
 
     if (activeCaseloadOnly && activeCaseLoadId !== prisonerData.prisonId) {
-      return next(
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload'),
-        ),
-      )
+      return next(new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload'))
     }
 
     if (
@@ -50,13 +39,7 @@ export default function checkPrisonerInCaseload({
       !prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads) &&
       !(allowGlobal && globalSearchUser)
     ) {
-      return next(
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'),
-        ),
-      )
+      return next(new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'))
     }
 
     return next()

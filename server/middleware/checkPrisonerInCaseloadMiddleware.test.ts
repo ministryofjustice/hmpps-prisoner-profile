@@ -59,18 +59,20 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'OUT'
 
       await checkPrisonerInCaseload()(req, res, next)
-      expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith('route')
+      expect(next).toHaveBeenCalledWith(
+        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [OUT]'),
+      )
     })
 
     it('should add middleware error if inactive booking and allowInactive is false', async () => {
       req.middleware.prisonerData.prisonId = 'OUT'
 
       await checkPrisonerInCaseload({ allowInactive: false })(req, res, next)
-      expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith('route')
+      expect(next).toHaveBeenCalledWith(
+        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [OUT]'),
+      )
     })
 
     it('should return next() if inactive booking and user does have role', async () => {
@@ -97,18 +99,20 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
 
       await checkPrisonerInCaseload()(req, res, next)
-      expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith('route')
+      expect(next).toHaveBeenCalledWith(
+        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'),
+      )
     })
 
     it('should add middleware error if prisoner not in caseload and allowGlobal is false', async () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
 
       await checkPrisonerInCaseload({ allowGlobal: false })(req, res, next)
-      expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
-      expect(next).toHaveBeenCalledWith('route')
+      expect(next).toHaveBeenCalledWith(
+        new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'),
+      )
     })
 
     it('should return next() if prisoner not in caseload and allowGlobal is true and user has role', async () => {
