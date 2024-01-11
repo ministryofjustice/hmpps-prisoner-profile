@@ -9,6 +9,7 @@ generic-service:
     modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
       SecRuleEngine DetectionOnly
+      SecDefaultAction "phase:2,pass,log,tag:github_team=connect-dps,tag:namespace=hmpps-prisoner-profile-dev"
     # SecRuleRemoveById 949110
     # SecRuleRemoveById 942440
     # SecRuleRemoveById 920300
