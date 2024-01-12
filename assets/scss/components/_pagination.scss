@@ -6,3 +6,44 @@
 .moj-pagination__results {
   padding: 5px 0;
 }
+
+.hmpps-paged-list-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 30px;
+  border-bottom: 1px solid govuk-colour('dark-grey');
+  margin-bottom: 30px;
+
+  .moj-pagination {
+    margin-top: 30px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p.moj-pagination__results {
+    margin-left: -5px;
+  }
+}
+
+.hmpps-paged-list-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  &__no-pagination {
+    justify-content: flex-end;
+  }
+
+  .moj-pagination {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  p.moj-pagination__results {
+    margin-left: -5px;
+  }
+}
