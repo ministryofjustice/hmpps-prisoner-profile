@@ -35,6 +35,7 @@ export default class CsraController {
       })
 
     const filteredSummaries = this.csraService.filterCsraAssessments(allCsraSummaries, req.query)
+    const filteredAsessments = await this.csraService.getDetailsForAssessments(clientToken, filteredSummaries)
 
     await this.auditService.sendPageView({
       userId: res.locals.user.username,
@@ -50,7 +51,7 @@ export default class CsraController {
       pageTitle: 'CSRA history',
       name,
       prisonerNumber,
-      csraAssessments: filteredSummaries,
+      csraAssessments: filteredAsessments,
       filterValues,
     })
   }

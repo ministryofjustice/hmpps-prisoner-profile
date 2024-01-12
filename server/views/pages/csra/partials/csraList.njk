@@ -1,34 +1,64 @@
 {% from '../../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
 {% from '../../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro csraTag(approvalDate, originalClassificationCode, classificationCode) %}
+  {% if approvalDate and originalClassificationCode and originalClassificationCode != classificationCode %}
+    {{ govukTag({text: "Level changed at approval", classes: "govuk-tag--blue"}) }}
+  {% elif approvalDate %}
+    {{ govukTag({text: "Approved", classes: "govuk-tag--green"}) }}
+  {% else %}
+    {{ govukTag({text: "Waiting for approval", classes: "govuk-tag--orange"}) }}
+  {% endif %}
+{% endmacro %}
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        <div role="list">
-            {% for csra in csraAssessments %}
-                <div class='govuk-grid-row'>
-                    <div class='govuk-grid-column-three-quarters'>
-                        <p class='govuk-!-font-size-24 govuk-!-font-weight-bold'>{{ csra.classification }}</p>
-                        <p class='hmpps-dark-grey-font'>{{ csra.assessmentDate | formatDateTime('short', ' at ') }}</p>
-                        <p>{{ csra.assessmentComment or 'Not entered' }}</p>
-                        <p class='hmpps-dark-grey-font govuk-!-margin-bottom-0'>Recorded at {{ csra.location }}</p>
-                    </div>
-                    <div class='govuk-grid-column-one-quarter govuk-!-text-align-right'>
-                        <a href="/prisoner/{{ csra.offenderNo }}/csra-review?assessmentSeq={{ csra.assessmentSeq }}&bookingId={{ csra.bookingId }}" class="govuk-link govuk-link--no-visited-state">View details</a>
-                    </div>
-                </div>
-                <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m" />
-            {% endfor %}
+  <div class="govuk-grid-column-full">
+    <div role="list" data-qa="csra-list">
+      {% for csra in csraAssessments %}
+        <div class="govuk-grid-row" data-qa="csra-list-item">
+          <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-!-font-size-24 govuk-!-font-weight-bold">
+              {{ csra.classification }}
+              {{ csraTag(csra.approvalDate, csra.originalClassificationCode, csra.classificationCode) }}
+            </p>
+            {% if csra.approvalDate %}
+              <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Approval comment</p>
+              <p class="govuk-!-margin-bottom-2">{{ csra.classificationReviewReason or 'No approval comment entered' }}</p>
+              <p class="hmpps-dark-grey-font govuk-!-margin-bottom-1">Recorded at {{ csra.location }}</p>
+              <p class="hmpps-dark-grey-font govuk-!-margin-bottom-3">
+                {{ csra.approvalDate | formatDate('short') }}
+              </p>
+            {% endif %}
+            <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Assessment comment</p>
+            <p class="govuk-!-margin-bottom-2">{{ csra.assessmentComment or 'No assesment comment entered' }}</p>
+            <p class="hmpps-dark-grey-font govuk-!-margin-bottom-1">Recorded at {{ csra.location }}</p>
+            <p class="hmpps-dark-grey-font govuk-!-margin-bottom-0">
+              {{ csra.assessmentDate | formatDate('short') }}
+            </p>
+          </div>
+          <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+            <a
+              href="/prisoner/{{ csra.offenderNo }}/csra-review?assessmentSeq={{ csra.assessmentSeq }}&bookingId={{ csra.bookingId }}"
+              class="govuk-link govuk-link--no-visited-state"
+              >View details</a
+            >
+          </div>
         </div>
-        {% if not csraAssessments.length %}
-            <div>
-                <p>No CSRA assessments have been found for the selected filters.</p>
-                <p>You can:</p>
-                <ul>
-                    <li>select different incentive levels and/or establishments</li>
-                    <li>choose different dates</li>
-                    <li>clear filters to view all CSRA assessments</li>
-                </ul>
-            </div>
-        {% endif %}
+        <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m" />
+      {% endfor %}
     </div>
+    {% if not csraAssessments.length %}
+      <div>
+        <p>No CSRA assessments have been found for the selected filters.</p>
+        <p>You can:</p>
+
+        <ul>
+          <li>select different incentive levels and/or establishments</li>
+          <li>choose different dates</li>
+          <li>clear filters to view all CSRA assessments</li>
+        </ul>
+      </div>
+    {% endif %}
+  </div>
 </div>

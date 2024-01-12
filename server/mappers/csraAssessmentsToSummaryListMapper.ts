@@ -1,12 +1,12 @@
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
 import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
 import getCsraClassificationName from './getCsraClassificationName'
+import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
 
-export interface CsraSummary extends CsraAssessment {
+export interface CsraSummary extends CsraAssessmentSummary {
   classification: string
   location: string
 }
-export default (csraAssessments: CsraAssessment[], agencies: AgencyLocationDetails[]): CsraSummary[] =>
+export default (csraAssessments: CsraAssessmentSummary[], agencies: AgencyLocationDetails[]): CsraSummary[] =>
   csraAssessments.map(csra => ({
     ...csra,
     assessmentComment: csra.assessmentComment || 'Not entered',

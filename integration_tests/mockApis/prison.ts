@@ -65,6 +65,7 @@ import {
   PrisonerScheduleThisWeekMock,
 } from '../../server/data/localMockData/prisonerScheduleMock'
 import csraAssessmentMock from '../../server/data/localMockData/csraAssessmentMock'
+import csraAssessmentSummaryMock from '../../server/data/localMockData/csraAssessmentSummaryMock'
 import staffDetails from '../../server/data/localMockData/staffDetails'
 import {
   cashHOATransactionsMock,
@@ -86,6 +87,8 @@ import { mockHistoryForLocation } from '../../server/data/localMockData/getHisto
 import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
 import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/historyForLocation'
 import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
+import { CsraAssessmentSummary } from '../../server/interfaces/prisonApi/csraAssessmentSummary'
+import { CsraAssessment } from '../../server/interfaces/prisonApi/csraAssessment'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -861,7 +864,15 @@ export default {
     })
   },
 
-  stubCsraReview: ({ bookingId, assessmentSeq }) => {
+  stubCsraReview: ({
+    bookingId,
+    assessmentSeq,
+    overrides = {},
+  }: {
+    bookingId: number
+    assessmentSeq: number
+    overrides: Partial<CsraAssessment>
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -872,12 +883,18 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: csraAssessmentMock,
+        jsonBody: { ...csraAssessmentMock, bookingId, assessmentSeq, ...overrides },
       },
     })
   },
 
-  stubCsraHistory: ({ prisonerNumber }) => {
+  stubCsraHistory: ({
+    prisonerNumber,
+    overrides = [csraAssessmentSummaryMock],
+  }: {
+    prisonerNumber: string
+    overrides: Partial<CsraAssessmentSummary>[]
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -888,21 +905,11 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: [
-          {
-            ...csraAssessmentMock,
-            bookingId: 67891,
-            assessmentSeq: 12345,
-            assessmentAgencyId: agenciesDetails.agencyId,
-            offenderNo: prisonerNumber,
-          },
-          {
-            ...csraAssessmentMock,
-            classificationCode: 'MED',
-            assessmentAgencyId: agenciesDetails.agencyId,
-            offenderNo: prisonerNumber,
-          },
-        ],
+        jsonBody: overrides.map(override => ({
+          ...csraAssessmentSummaryMock,
+          offenderNo: prisonerNumber,
+          ...override,
+        })),
       },
     })
   },
