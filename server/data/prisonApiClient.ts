@@ -54,6 +54,7 @@ import { AttributesForLocation } from '../interfaces/prisonApi/attributesForLoca
 import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
 import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
 import { Telephone } from '../interfaces/prisonApi/telephone'
+import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -333,7 +334,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessment[]> {
+  async getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessmentSummary[]> {
     return this.restClient.get<CsraAssessment[]>({
       path: `/api/offender-assessments/csra/${prisonerNumber}`,
     })
