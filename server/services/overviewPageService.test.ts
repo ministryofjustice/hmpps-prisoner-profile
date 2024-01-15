@@ -854,8 +854,14 @@ describe('OverviewPageService', () => {
   describe('Staff roles', () => {
     it('Returns the staff role codes from the prison API', async () => {
       prisonApiClient.getStaffRoles = jest.fn(async () => [{ role: 'A' }, { role: 'B' }])
-      const { staffRoles } = await overviewPageServiceConstruct().get('', PrisonerMockDataA, 1, inmateDetailMock)
-      expect(prisonApiClient.getStaffRoles).toHaveBeenCalledWith(1, PrisonerMockDataA.prisonId)
+      const { staffRoles } = await overviewPageServiceConstruct().get(
+        '',
+        PrisonerMockDataA,
+        1,
+        inmateDetailMock,
+        CaseLoadsDummyDataA,
+      )
+      expect(prisonApiClient.getStaffRoles).toHaveBeenCalledWith(1, 'MDI')
       expect(staffRoles).toEqual(['A', 'B'])
     })
   })
