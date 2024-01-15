@@ -7,7 +7,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/v1/complexity/complexity-of-need/offender-no/${params.prisonerNumber}`,
+        urlPattern: `/complexity/v1/complexity-of-need/offender-no/${params.prisonerNumber}`,
       },
       response: {
         status: 200,
