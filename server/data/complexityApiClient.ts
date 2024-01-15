@@ -12,7 +12,7 @@ export default class ComplexityApiRestClient implements ComplexityApiClient {
 
   async getComplexityOfNeed(prisonerNumber: string): Promise<ComplexityOfNeed> {
     return this.restClient.get<ComplexityOfNeed>({
-      path: `/complexity-of-need/offender-no/${prisonerNumber}`,
+      path: `/v1/complexity-of-need/offender-no/${prisonerNumber}`,
       ignore404: true,
     })
   }

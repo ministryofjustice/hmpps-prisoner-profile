@@ -28,7 +28,7 @@ describe('complexityApiClient', () => {
   describe('getComplexityOfNeed', () => {
     it('Should return data from the API', async () => {
       const prisonerNumber = 'A1234BC'
-      mockSuccessfulComplexityApiCall(`/complexity-of-need/offender-no/${prisonerNumber}`, complexityOfNeedHighMock)
+      mockSuccessfulComplexityApiCall(`/v1/complexity-of-need/offender-no/${prisonerNumber}`, complexityOfNeedHighMock)
 
       const output = await complexityApiClient.getComplexityOfNeed(prisonerNumber)
       expect(output).toEqual(complexityOfNeedHighMock)
