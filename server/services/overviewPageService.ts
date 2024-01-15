@@ -116,7 +116,7 @@ export default class OverviewPageService {
       communityManager,
       prisonerDetail,
     ] = await Promise.all([
-      prisonApiClient.getStaffRoles(staffId, prisonerData.prisonId),
+      prisonApiClient.getStaffRoles(staffId, userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId),
       curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
@@ -169,7 +169,7 @@ export default class OverviewPageService {
       schedule,
       offencesOverview,
       prisonName: prisonerData.prisonName,
-      staffRoles: staffRoles.map(role => role.role),
+      staffRoles: staffRoles?.map(role => role.role),
     }
   }
 
