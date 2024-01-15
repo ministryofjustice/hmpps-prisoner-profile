@@ -1,23 +1,23 @@
 export interface CsraAssessment {
-  bookingId: number
-  assessmentSeq: number
-  offenderNo: string
-  classificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
-  assessmentCode?: string
-  cellSharingAlertFlag: boolean
-  assessmentDate: string
-  assessmentAgencyId?: string
-  assessmentComment?: string
-  assessorUser?: string
-  nextReviewDate?: string
-  assessmentCommitteeCode?: string
-  assessmentCommitteeName?: string
-  approvalDate?: string
   approvalCommitteeCode?: string
   approvalCommitteeName?: string
-  originalClassificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
+  approvalDate?: string
+  assessmentAgencyId?: string
+  assessmentCode: string
+  assessmentComment?: string
+  assessmentCommitteeCode?: string
+  assessmentCommitteeName?: string
+  assessmentDate: string
+  assessmentSeq: number
+  assessorUser?: string
+  bookingId: number
+  cellSharingAlertFlag: boolean
+  classificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
   classificationReviewReason?: string
-  questions?: [
+  nextReviewDate?: string
+  offenderNo: string
+  originalClassificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
+  questions: [
     {
       question: string
       answer?: string

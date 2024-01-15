@@ -2,6 +2,7 @@ import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import CsraService from './csraService'
 import csraAssessmentMock from '../data/localMockData/csraAssessmentMock'
+import csraAssessmentSummaryMock from '../data/localMockData/csraAssessmentSummaryMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
@@ -67,24 +68,54 @@ describe('Csra Service', () => {
 
   describe('getCsraHistory', () => {
     it('should call Prison API to get csra history for prisoner', async () => {
-      prisonApiClientSpy.getCsraAssessmentsForPrisoner = jest.fn(async () => [csraAssessmentMock])
+      prisonApiClientSpy.getCsraAssessmentsForPrisoner = jest.fn(async () => [csraAssessmentSummaryMock])
       csraService = new CsraService(() => prisonApiClientSpy)
 
       const output = await csraService.getCsraHistory('', '123456')
 
-      expect(output).toEqual([csraAssessmentMock])
+      expect(output).toEqual([csraAssessmentSummaryMock])
     })
 
     it('should filter out if no classification code', async () => {
       prisonApiClientSpy.getCsraAssessmentsForPrisoner = jest.fn(async () => [
-        csraAssessmentMock,
-        { ...csraAssessmentMock, classificationCode: undefined },
+        csraAssessmentSummaryMock,
+        { ...csraAssessmentSummaryMock, classificationCode: undefined },
       ])
       csraService = new CsraService(() => prisonApiClientSpy)
 
       const output = await csraService.getCsraHistory('', '123456')
 
-      expect(output).toEqual([csraAssessmentMock])
+      expect(output).toEqual([csraAssessmentSummaryMock])
+    })
+  })
+
+  describe('getDetailsForAssessments', () => {
+    it('Should get the CSRA Asessments for each summary', async () => {
+      prisonApiClientSpy.getCsraAssessment = jest.fn(async () => csraAssessmentMock)
+      csraService = new CsraService(() => prisonApiClientSpy)
+      const summaries = [
+        {
+          ...csraAssessmentSummaryMock,
+          bookingId: 123,
+          assessmentSeq: 321,
+          classification: 'MED',
+          location: 'Location One',
+        },
+        {
+          ...csraAssessmentSummaryMock,
+          bookingId: 456,
+          assessmentSeq: 654,
+          classification: 'HIGH',
+          location: 'Location Two',
+        },
+      ]
+
+      const output = await csraService.getDetailsForAssessments('', summaries)
+      expect(prisonApiClientSpy.getCsraAssessment).toHaveBeenCalledWith(123, 321)
+      expect(prisonApiClientSpy.getCsraAssessment).toHaveBeenCalledWith(456, 654)
+      expect(output.length).toEqual(2)
+      expect(output[0]).toEqual({ ...csraAssessmentMock, classification: 'MED', location: 'Location One' })
+      expect(output[1]).toEqual({ ...csraAssessmentMock, classification: 'HIGH', location: 'Location Two' })
     })
   })
 
