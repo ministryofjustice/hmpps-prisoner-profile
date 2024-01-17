@@ -333,6 +333,15 @@ export default class OverviewPageService {
       linkHref: `/prisoner/${prisonerNumber}/money/spends`,
     }
 
+    // these can be removed once the adjudications service is deployed to all environments
+    const activePunishmentsHref = config.serviceUrls.adjudications
+      ? `${config.serviceUrls.adjudications}/active-punishments/${prisonerNumber}`
+      : `/prisoner/${prisonerNumber}/active-punishments`
+
+    const adjudicationHistoryHref = config.serviceUrls.adjudications
+      ? `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`
+      : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`
+
     const adjudicationsSummaryData: MiniSummaryData = {
       heading: 'Adjudications',
       topLabel: 'Proven in last 3 months',
@@ -342,14 +351,10 @@ export default class OverviewPageService {
       bottomContentLine1: pluralise(adjudicationSummary.awards?.length, 'active punishment', {
         emptyMessage: 'No active punishments',
       }),
-      bottomContentLine1Href: adjudicationSummary.awards?.length
-        ? `/prisoner/${prisonerNumber}/active-punishments`
-        : undefined,
+      bottomContentLine1Href: adjudicationSummary.awards?.length ? activePunishmentsHref : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudication history',
-      linkHref: config.serviceUrls.adjudications
-        ? `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`
-        : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
+      linkHref: adjudicationHistoryHref,
     }
 
     const visitsSummaryData: MiniSummaryData = {
