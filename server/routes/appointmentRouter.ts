@@ -11,6 +11,7 @@ import config from '../config'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
 import { notifyClient } from '../utils/notifyClient'
+import isServiceEnabled from '../utils/isServiceEnabled'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
@@ -35,8 +36,7 @@ export default function appointmentRouter(services: Services): Router {
   )
 
   const isCreateIndividualAppointmentRolledOut = (req: Request, res: Response, next: NextFunction) => {
-    const { activeCaseLoadId } = res.locals.user
-    if (config.appointmentsEnabledPrisons.includes(activeCaseLoadId)) {
+    if (isServiceEnabled('activities', res.locals.feComponentsMeta)) {
       const { prisonerNumber } = req.params
       res.redirect(`${config.serviceUrls.appointments}/create/start-prisoner/${prisonerNumber}`)
     } else {

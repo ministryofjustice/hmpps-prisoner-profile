@@ -1,6 +1,5 @@
 import { RestClientBuilder } from '../data'
-import { ComponentApiClient } from '../data/interfaces/componentApiClient'
-import Component from '../data/interfaces/component'
+import { ComponentApiClient, ComponentsApiResponse } from '../data/interfaces/componentApiClient'
 import AvailableComponent from '../data/interfaces/AvailableComponent'
 
 export default class ComponentService {
@@ -10,7 +9,7 @@ export default class ComponentService {
     components: T,
     userToken: string,
     useLatest = false,
-  ): Promise<Record<T[number], Component>> {
+  ): Promise<ComponentsApiResponse<T>> {
     return this.componentApiClientBuilder(userToken).getComponents(components, userToken, useLatest)
   }
 }

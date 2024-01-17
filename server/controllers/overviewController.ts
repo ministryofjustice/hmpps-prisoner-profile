@@ -51,6 +51,7 @@ export default class OverviewController {
       res.locals.user,
       overviewPageData.staffRoles ?? [],
       config,
+      res.locals.feComponentsMeta,
     )
 
     const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
