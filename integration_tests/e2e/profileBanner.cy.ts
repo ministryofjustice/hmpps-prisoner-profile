@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
+import { Role } from '../../server/data/enums/role'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -52,7 +53,7 @@ context('Profile banner', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
+        roles: [Role.GlobalSearch, Role.InactiveBookings],
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'OUT', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupOverviewPageStubs({
@@ -85,7 +86,7 @@ context('Profile banner', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
+        roles: [Role.GlobalSearch, Role.InactiveBookings],
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'TRN', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupOverviewPageStubs({
