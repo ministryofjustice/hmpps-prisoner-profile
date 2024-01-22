@@ -1,0 +1,31 @@
+.belief-card {
+
+  padding-bottom: 30px;
+  border-top: 1px solid $govuk-border-colour;
+
+  &:last-of-type {
+    border-bottom: 1px solid $govuk-border-colour;
+    margin-bottom: 30px;
+  }
+
+  header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    h2 {
+      font-size: 24px;
+    }
+
+    .govuk-tag {
+      margin-left: 17px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  &__comments {
+    margin-bottom: 15px;
+  }
+}

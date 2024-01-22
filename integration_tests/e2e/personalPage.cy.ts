@@ -115,7 +115,14 @@ context('When signed in', () => {
         page.personalDetails().nationality().should('have.text', 'Stateless')
         page.personalDetails().otherNationalities().should('have.text', 'multiple nationalities field')
         page.personalDetails().ethnicGroup().should('have.text', 'White: Eng./Welsh/Scot./N.Irish/British (W1)')
-        page.personalDetails().religionOrBelief().should('have.text', 'Celestial Church of God')
+        page.personalDetails().religionOrBelief().should('contain', 'Celestial Church of God')
+        page
+          .personalDetails()
+          .religionOrBelief()
+          .should(
+            'contain.html',
+            '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/G6123VU/religion-belief-history">Religion or belief history</a>',
+          )
         page.personalDetails().sex().should('have.text', 'Male')
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual / Straight')
         page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
