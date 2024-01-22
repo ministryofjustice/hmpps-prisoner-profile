@@ -8,10 +8,13 @@ generic-service:
     modsecurity_enabled: true
     modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
-      SecRuleEngine On
-      SecRuleRemoveById 949110
-      SecRuleRemoveById 942440
-      SecRuleRemoveById 920300
+      SecRuleEngine DetectionOnly
+      {{ if .Values.ingress.modsecurity_audit_enabled -}}
+      SecAuditEngine On
+      {{ end -}}
+      {{if .Values.ingress.modsecurity_github_team -}}
+      SecDefaultAction "phase:2,pass,log,tag:github_team={{ .Values.ingress.modsecurity_github_team }},tag:namespace={{  .Release.Namespace  }}"
+      {{ end -}}
 
   env:
     ENVIRONMENT_NAME: "PRE-PRODUCTION"

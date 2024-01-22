@@ -7,6 +7,12 @@ generic-service:
     modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
       SecRuleEngine DetectionOnly
+      {{ if .Values.ingress.modsecurity_audit_enabled -}}
+      SecAuditEngine On
+      {{ end -}}
+      {{if .Values.ingress.modsecurity_github_team -}}
+      SecDefaultAction "phase:2,pass,log,tag:github_team={{ .Values.ingress.modsecurity_github_team }},tag:namespace={{  .Release.Namespace  }}"
+      {{ end -}}
     # SecRuleUpdateActionById 949110 "pass,log,auditlog"
     # SecRuleUpdateActionById 942440 "pass,log,auditlog"
     # SecRuleUpdateActionById 920300 "pass,log,auditlog"
