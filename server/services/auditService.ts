@@ -36,6 +36,7 @@ export enum Page {
   Schedule = 'SCHEDULE',
   WorkAndSkills = 'WORK_AND_SKILLS',
   XRayBodyScans = 'XRAY_BODY_SCANS',
+  ReligionBeliefHistory = 'RELIGION_BELIEF_HISTORY',
 }
 
 // eslint-disable-next-line no-shadow

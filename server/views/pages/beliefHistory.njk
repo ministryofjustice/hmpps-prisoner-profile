@@ -1,0 +1,54 @@
+{% extends "./index.njk" %}
+
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: breadcrumbPrisonerName,
+        href: "/prisoner/" + prisonerNumber
+    }
+] %}
+
+{% block body %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ prisonerName | apostrophe }} religion or belief history</h1>
+        </div>
+    </div>
+
+    <div class="belief-history-list" role="list">
+        {% for belief in beliefs %}
+        <div class="belief-card">
+            <header>
+                <h2>
+                    {{ belief.beliefDescription }}
+                </h2>
+                {% if not belief.endDate %}
+                    {{ govukTag({
+                        text: 'ACTIVE',
+                        classes: 'govuk-tag--green'
+                    }) }}
+                {% endif %}
+            </header>
+            {% if belief.changeReason %}
+            <div class="belief-card__comments">{{ belief.comments }}</div>
+            {% endif %}
+            <div data-qa="belief-start-date"><span class="govuk-!-font-weight-bold">Start date:</span> {{ belief.startDate | formatDate('long') }}</div>
+            {% if belief.endDate %}
+            <div data-qa="belief-end-date"><span class="govuk-!-font-weight-bold">End date:</span> {{ belief.endDate | formatDate('long') }}</div>
+            {% endif %}
+            <div data-qa="belief-added-by"><span class="govuk-!-font-weight-bold">Added by:</span> {{ belief.addedByFirstName | formatName('', belief.addedByLastName) }}</div>
+            {% if belief.updatedByFirstName %}
+            <div data-qa="belief-updated-by"><span class="govuk-!-font-weight-bold">Modified by:</span> {{ belief.updatedByFirstName | formatName('', belief.updatedByLastName) }} on {{ belief.updatedDate | formatDate('long') }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/personal" data-qa="belief-history-back-link">Return to prisoner's profile</a>
+{% endblock %}
