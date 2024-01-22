@@ -55,6 +55,7 @@ import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocati
 import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
 import { Telephone } from '../interfaces/prisonApi/telephone'
 import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
+import { Belief } from '../interfaces/prisonApi/belief'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -513,6 +514,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getAlertDetails(bookingId: number, alertId: number): Promise<Alert> {
     return this.restClient.get<Alert>({
       path: `/api/bookings/${bookingId}/alerts/${alertId}`,
+    })
+  }
+
+  async getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]> {
+    return this.restClient.get<Belief[]>({
+      path: `/api/offenders/${prisonerNumber}/belief-history`,
+      query: bookingId ? `bookingId=${bookingId}` : undefined,
     })
   }
 }

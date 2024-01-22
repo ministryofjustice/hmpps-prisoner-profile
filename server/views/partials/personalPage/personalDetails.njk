@@ -1,6 +1,7 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "./languages.njk" import languagesHtml %}
+{% from "./religionHistory.njk" import religionHistoryHtml %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set aliases = [] %}
@@ -42,7 +43,7 @@
         {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
         {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'religion-or-belief', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
-          {{ summaryListRow("Religion or belief", personalDetails.religionOrBelief, "religion-or-belief") }}
+          {{ summaryListRow("Religion or belief", religionHistoryHtml(personalDetails.religionOrBelief, identityNumbers.prisonNumber), "religion-or-belief", { html: true }) }}
         {%- endcall -%}
         {{ summaryListRow("Sex", personalDetails.sex, "sex") }}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
