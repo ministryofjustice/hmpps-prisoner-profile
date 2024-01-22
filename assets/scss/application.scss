@@ -28,6 +28,7 @@ $govuk-page-width: $moj-page-width;
 @import './components/sidebar';
 @import './components/status';
 @import './components/summary-card';
+@import './components/tags';
 @import './components/xrays';
 @import 'server/views/components/miniBanner/miniBanner';
 @import 'server/views/components/modal/modal';
