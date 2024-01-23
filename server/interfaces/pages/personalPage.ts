@@ -3,7 +3,7 @@ import { GovSummaryItem } from '../govSummaryItem'
 import { LearnerNeurodivergence } from '../learnerNeurodivergence'
 
 export interface PersonalDetails {
-  age: string
+  age: { years: number; months: number }
   aliases: {
     alias: string
     dateOfBirth: string

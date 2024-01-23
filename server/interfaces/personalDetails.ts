@@ -11,7 +11,7 @@ export type PersonalDetails = {
   personalDetailsMain: {
     preferredName: string
     dateOfBirth: string
-    age: string
+    age: { years: number; months: number } | null
     nationality: string
     spokenLanguage: string
   }

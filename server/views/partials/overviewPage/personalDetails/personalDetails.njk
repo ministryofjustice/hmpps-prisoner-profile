@@ -2,16 +2,18 @@
 {% from "../../../macros/summaryListRow.njk" import summaryListRow %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
+{% set age = personalDetails.personalDetailsMain.age.years + " years, " + personalDetails.personalDetailsMain.age.months | pluralise('month') if personalDetails.personalDetailsMain.age else "None" %}
+
 {%- call summaryCard({title: "Personal"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half">
       <dl class="govuk-summary-list">
         {{ summaryListRow("Preferred name", personalDetails.personalDetailsMain.preferredName, "preferred-name") }}
         {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth, "date-of-birth") }}
-        {{ summaryListRow("Age", personalDetails.personalDetailsMain.age, "age") }}
+        {{ summaryListRow("Age", age, "age") }}
         {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality, "nationality") }}
         {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage, "spoken-language") }}
-      <dl>
+      </dl>
     </div>
     <div class="govuk-grid-column-one-half">
       <dl class="govuk-summary-list">
@@ -19,7 +21,7 @@
         {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief, "religion-or-belief") }}
         {{ summaryListRow("CRO number", personalDetails.personalDetailsSide.croNumber, "cro-number") }}
         {{ summaryListRow("PNC number", personalDetails.personalDetailsSide.pncNumber, "pnc-number") }}
-      <dl>
+      </dl>
     </div>
   </div>
 {%- endcall -%}
