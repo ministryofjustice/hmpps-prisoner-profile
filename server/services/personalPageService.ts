@@ -56,6 +56,7 @@ export default class PersonalPageService {
       healthReferenceCodes,
       healthTreatmentReferenceCodes,
       identifiers,
+      beliefs,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -66,6 +67,7 @@ export default class PersonalPageService {
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
       prisonApiClient.getIdentifiers(bookingId),
+      prisonApiClient.getBeliefHistory(prisonerNumber),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -97,6 +99,7 @@ export default class PersonalPageService {
       },
       careNeeds: await this.careNeeds(healthReferenceCodes, personalCareNeeds, reasonableAdjustments),
       learnerNeurodivergence: await this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
+      hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
     }
   }
 
