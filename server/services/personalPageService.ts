@@ -12,7 +12,7 @@ import {
   ReasonableAdjustment as PersonalPageReasonableAdjustment,
 } from '../interfaces/pages/personalPage'
 import { Prisoner } from '../interfaces/prisoner'
-import { addressToLines, formatName, yearsBetweenDateStrings } from '../utils/utils'
+import { addressToLines, formatName, calculateAge } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
 import {
   getOffenderIdentifierValue,
@@ -140,8 +140,6 @@ export default class PersonalPageService {
       dateOfBirth: formatDate(dateOfBirth, 'short'),
     }))
 
-    const todaysDateString = new Date().toISOString()
-
     let ethnicGroup = 'Not entered'
     if (prisonerDetail?.ethnicity) {
       ethnicGroup = `${prisonerDetail.ethnicity}`
@@ -157,7 +155,7 @@ export default class PersonalPageService {
     }
 
     return {
-      age: (inmateDetail.age || yearsBetweenDateStrings(prisonerData.dateOfBirth, todaysDateString)).toString(),
+      age: calculateAge(prisonerData.dateOfBirth),
       aliases,
       dateOfBirth: formatDate(prisonerData.dateOfBirth, 'short'),
       domesticAbusePerpetrator: getProfileInformationValue(

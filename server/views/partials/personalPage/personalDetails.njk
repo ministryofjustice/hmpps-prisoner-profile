@@ -10,7 +10,7 @@
 {% endfor %}
 {% set dateOfBirthText %}
   {{ personalDetails.dateOfBirth }}
-  ({{ personalDetails.age }} years old)
+  ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month')}} old)
 {% endset %}
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">

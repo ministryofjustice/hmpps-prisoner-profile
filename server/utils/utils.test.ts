@@ -2,6 +2,7 @@ import {
   addressToLines,
   apostrophe,
   arrayToQueryString,
+  calculateAge,
   convertNameCommaToHuman,
   convertToTitleCase,
   findError,
@@ -31,7 +32,6 @@ import {
   SummaryListRow,
   toNonAssociationRows,
   userHasRoles,
-  yearsBetweenDateStrings,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { Address } from '../interfaces/address'
@@ -198,13 +198,16 @@ describe('arrayToQueryString()', () => {
 
 describe('dateStringToAge', () => {
   it.each([
-    ['2020-01-10', '2023-10-31', 3],
-    ['2020-01-10', '2020-01-01', 0],
-    ['2020-01-10', '2023-01-11', 3],
-    ['2020-01-10', '2023-01-10', 3],
-    ['2020-01-10', '2023-01-09', 2],
-  ])('Number of years between %s and %s - %s', (startDate: string, endDate: string, expectedYears: number) => {
-    expect(yearsBetweenDateStrings(startDate, endDate)).toEqual(expectedYears)
+    ['2020-01-01', { years: 0, months: 0 }],
+    ['2019-10-01', { years: 0, months: 3 }],
+    ['2018-10-01', { years: 1, months: 3 }],
+    ['1919-10-01', { years: 100, months: 3 }],
+    ['1920-01-01', { years: 100, months: 0 }],
+    ['1920-01-05', { years: 100, months: 0 }],
+  ])('Number of years and months since %s', (dob: string, expectedAge: { years: number; months: number }) => {
+    jest.useFakeTimers().setSystemTime(new Date('2020-01-10'))
+    expect(calculateAge(dob)).toEqual(expectedAge)
+    jest.useRealTimers()
   })
 })
 
