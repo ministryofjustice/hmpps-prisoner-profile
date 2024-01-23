@@ -7,7 +7,7 @@ generic-service:
     host: prisoner-dev.digital.prison.service.justice.gov.uk
     modsecurity_enabled: true
     modsecurity_audit_enabled: true
-    modsecurity_github_team: ""
+    modsecurity_github_team: "connect-dps"
     modsecurity_snippet: |
       SecRuleEngine DetectionOnly
       SecAuditEngine On
