@@ -134,4 +134,5 @@ export interface PersonalPage {
   security: Security
   careNeeds: CareNeeds
   learnerNeurodivergence: LearnerNeurodivergence[]
+  hasCurrentBelief: boolean
 }

@@ -13,7 +13,7 @@ context('Belief history page', () => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
-    cy.task('stubBeliefHistory')
+    cy.task('stubBeliefHistory', 1102484)
 
     beliefHistoryPage = visitBeliefHistoryPage()
   })

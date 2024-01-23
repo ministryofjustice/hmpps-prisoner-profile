@@ -46,6 +46,7 @@ context('When signed in', () => {
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
       cy.task('stubIdentifiers', 1102484)
+      cy.task('stubBeliefHistory')
       visitPersonalDetailsPage()
     })
 
