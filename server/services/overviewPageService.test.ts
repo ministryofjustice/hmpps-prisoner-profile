@@ -478,6 +478,8 @@ describe('OverviewPageService', () => {
 
   describe('getPersonalDetails', () => {
     it('should get the personal details for a prisoner', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2024-01-23'))
+
       const prisonerNumber = '123123'
       const bookingId = 567567
 
@@ -493,7 +495,7 @@ describe('OverviewPageService', () => {
 
       expect(personalDetailsMain.preferredName).toEqual(convertToTitleCase(PrisonerMockDataB.firstName))
       expect(personalDetailsMain.dateOfBirth).toEqual(formatDate(PrisonerMockDataB.dateOfBirth, 'short'))
-      expect(personalDetailsMain.age).toEqual(inmateDetailMock.age.toString())
+      expect(personalDetailsMain.age).toEqual({ months: 1, years: 30 })
       expect(personalDetailsMain.nationality).toEqual(PrisonerMockDataB.nationality)
       expect(personalDetailsMain.spokenLanguage).toEqual(inmateDetailMock.language)
 
@@ -503,6 +505,8 @@ describe('OverviewPageService', () => {
       expect(personalDetailsSide.religionOrBelief).toEqual(PrisonerMockDataB.religion)
       expect(personalDetailsSide.croNumber).toEqual(PrisonerMockDataB.croNumber)
       expect(personalDetailsSide.pncNumber).toEqual(PrisonerMockDataB.pncNumber)
+
+      jest.useRealTimers()
     })
   })
 

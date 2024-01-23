@@ -1,12 +1,12 @@
 import { startOfYear } from 'date-fns'
 import { Role } from '../../server/data/enums/role'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
-import { yearsBetweenDateStrings } from '../../server/utils/utils'
 import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
 import { permissionsTests } from './permissionsTests'
 import { formatDate } from '../../server/utils/dateHelpers'
 import NotFoundPage from '../pages/notFoundPage'
+import { calculateAge } from '../../server/utils/utils'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -107,11 +107,11 @@ context('When signed in', () => {
         page.personalDetails().aliases().row(2).dateOfBirth().should('have.text', '17/06/1983')
         page.personalDetails().preferredName().should('have.text', 'Working Name')
         page.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
-        const expectedAge = yearsBetweenDateStrings(
-          new Date('1990-10-12').toISOString(),
-          new Date('2023-01-01').toISOString(),
-        )
-        page.personalDetails().dateOfBirth().should('include.text', `${expectedAge} years old`)
+        const expectedAge = calculateAge('1990-10-12')
+        page
+          .personalDetails()
+          .dateOfBirth()
+          .should('include.text', `${expectedAge.years} years, ${expectedAge.months} month`)
         page.personalDetails().nationality().should('have.text', 'Stateless')
         page.personalDetails().otherNationalities().should('have.text', 'multiple nationalities field')
         page.personalDetails().ethnicGroup().should('have.text', 'White: Eng./Welsh/Scot./N.Irish/British (W1)')
