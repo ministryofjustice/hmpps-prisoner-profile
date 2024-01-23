@@ -55,6 +55,7 @@ describe('Prisoner belief history', () => {
 
       await controller.displayBeliefHistory(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/beliefHistory', {
+        pageTitle: 'Religion or belief history',
         beliefs: beliefHistoryMock,
         prisonerNumber,
         breadcrumbPrisonerName: formatName('John', '', 'Saunders', { style: NameFormatStyle.lastCommaFirst }),

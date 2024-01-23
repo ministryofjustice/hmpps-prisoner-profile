@@ -43,7 +43,7 @@
         {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
         {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'religion-or-belief', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
-          {{ summaryListRow("Religion or belief", religionHistoryHtml(personalDetails.religionOrBelief, identityNumbers.prisonNumber), "religion-or-belief", { html: true }) }}
+          {{ summaryListRow("Religion or belief", religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), "religion-or-belief", { html: true }) }}
         {%- endcall -%}
         {{ summaryListRow("Sex", personalDetails.sex, "sex") }}
         {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}

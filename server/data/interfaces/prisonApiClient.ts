@@ -151,5 +151,5 @@ export interface PrisonApiClient {
   getPersonPhones(personId: number): Promise<Telephone[]>
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
   getAlertDetails(bookingId: number, alertId: number): Promise<Alert>
-  getBeliefHistory(prisonerNumber: string, bookingId: number): Promise<Belief[]>
+  getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
 }
