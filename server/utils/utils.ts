@@ -450,6 +450,24 @@ export const formatCategoryCodeDescription = (code: string, categoryText: string
   }
 }
 
+/**
+ * Returns a label for use in the cat a prisoner tag.
+ *
+ * @param code
+ */
+export const formatCategoryALabel = (code: string): string => {
+  switch (code) {
+    case 'A':
+      return 'Cat A'
+    case 'P':
+      return 'Cat A Provisional'
+    case 'H':
+      return 'Cat A High'
+    default:
+      return undefined
+  }
+}
+
 // eslint-disable-next-line no-shadow
 export enum SortType {
   ASC = 'ASC',
