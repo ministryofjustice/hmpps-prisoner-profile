@@ -4,6 +4,7 @@ import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
 import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
+import { calculateAge } from '../../server/utils/utils'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -171,7 +172,11 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.personalDetails().perferredName().should('include.text', 'John')
         overviewPage.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
-        overviewPage.personalDetails().age().should('include.text', '32')
+        const expectedAge = calculateAge('1990-10-12')
+        overviewPage
+          .personalDetails()
+          .age()
+          .should('include.text', `${expectedAge.years} years, ${expectedAge.months} month`)
         overviewPage.personalDetails().nationality().should('include.text', 'Stateless')
         overviewPage.personalDetails().spokenLanguage().should('include.text', 'Welsh')
 

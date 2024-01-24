@@ -3,7 +3,7 @@ import { GovSummaryItem } from '../govSummaryItem'
 import { LearnerNeurodivergence } from '../learnerNeurodivergence'
 
 export interface PersonalDetails {
-  age: string
+  age: { years: number; months: number }
   aliases: {
     alias: string
     dateOfBirth: string
@@ -134,4 +134,5 @@ export interface PersonalPage {
   security: Security
   careNeeds: CareNeeds
   learnerNeurodivergence: LearnerNeurodivergence[]
+  hasCurrentBelief: boolean
 }
