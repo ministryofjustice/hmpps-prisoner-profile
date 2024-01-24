@@ -21,6 +21,7 @@ import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
 import { getBuild } from './healthCheck'
+import BeliefService from './beliefService'
 
 export const services = () => {
   const {
@@ -80,13 +81,13 @@ export const services = () => {
     whereaboutsApiClientBuilder,
     manageUsersApiClientBuilder,
   )
-
   const professionalContactsService = new ProfessionalContactsService(
     prisonApiClientBuilder,
     allocationManagerApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     keyworkerApiClientBuilder,
   )
+  const beliefService = new BeliefService(prisonApiClientBuilder)
 
   return {
     dataAccess,
@@ -112,6 +113,7 @@ export const services = () => {
       caseNotesApiClientBuilder,
     }),
     professionalContactsService,
+    beliefService,
     auditService,
   }
 }

@@ -89,6 +89,7 @@ import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/histor
 import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
 import { CsraAssessmentSummary } from '../../server/interfaces/prisonApi/csraAssessmentSummary'
 import { CsraAssessment } from '../../server/interfaces/prisonApi/csraAssessment'
+import { beliefHistoryAllBookingsMock, beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1283,6 +1284,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: alertDetailsMock,
+      },
+    })
+  },
+
+  stubBeliefHistory: (bookingId?: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/offenders/.*/belief-history(\\?bookingId=.*)?`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: bookingId ? beliefHistoryMock : beliefHistoryAllBookingsMock,
       },
     })
   },

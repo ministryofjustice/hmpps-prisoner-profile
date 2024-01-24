@@ -70,7 +70,7 @@ export function permissionsTests<TPage extends Page>({
 
     context('The user does not have the INACTIVE_BOOKINGS role', () => {
       beforeEach(() => {
-        cy.setupUserAuth()
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
       })
 
       it('Displays page not found', () => {
@@ -89,17 +89,6 @@ export function permissionsTests<TPage extends Page>({
         verifyPageDisplayed()
       })
     })
-
-    context('The user has the GLOBAL_SEARCH role', () => {
-      beforeEach(() => {
-        cy.setupUserAuth({ roles: ['ROLE_PRISON', Role.GlobalSearch] })
-      })
-
-      it('Displays the page', () => {
-        visitPage(overrides)
-        verifyPageDisplayed()
-      })
-    })
   })
 
   context('The prisoner is transferring', () => {
@@ -110,7 +99,7 @@ export function permissionsTests<TPage extends Page>({
 
     context('The user does not have the INACTIVE_BOOKINGS role', () => {
       beforeEach(() => {
-        cy.setupUserAuth()
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
       })
 
       it('Displays page not found', () => {

@@ -50,6 +50,7 @@ import { HistoryForLocationItem } from '../../interfaces/prisonApi/historyForLoc
 import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTypes'
 import { Telephone } from '../../interfaces/prisonApi/telephone'
 import { CsraAssessmentSummary } from '../../interfaces/prisonApi/csraAssessmentSummary'
+import { Belief } from '../../interfaces/prisonApi/belief'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -150,4 +151,5 @@ export interface PrisonApiClient {
   getPersonPhones(personId: number): Promise<Telephone[]>
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
   getAlertDetails(bookingId: number, alertId: number): Promise<Alert>
+  getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
 }

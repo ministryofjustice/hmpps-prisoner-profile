@@ -51,6 +51,7 @@ import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMoc
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
 import { alertDetailsMock } from './localMockData/alertDetailsMock'
+import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 
 jest.mock('./tokenStore')
 
@@ -645,6 +646,27 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/alerts/${alertId}`, alertDetailsMock)
       const output = await prisonApiClient.getAlertDetails(bookingId, alertId)
       expect(output).toEqual(alertDetailsMock)
+    })
+  })
+
+  describe('getBeliefHistory', () => {
+    it('Should return data from the API for a specific booking', async () => {
+      const prisonerNumber = 'AB1234C'
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(
+        `/api/offenders/${prisonerNumber}/belief-history?bookingId=${bookingId}`,
+        beliefHistoryMock,
+      )
+      const output = await prisonApiClient.getBeliefHistory(prisonerNumber, bookingId)
+      expect(output).toEqual(beliefHistoryMock)
+    })
+
+    it('Should return data from the API across all bookings', async () => {
+      const prisonerNumber = 'AB1234C'
+      const bookingId: number = null
+      mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/belief-history`, beliefHistoryMock)
+      const output = await prisonApiClient.getBeliefHistory(prisonerNumber, bookingId)
+      expect(output).toEqual(beliefHistoryMock)
     })
   })
 })

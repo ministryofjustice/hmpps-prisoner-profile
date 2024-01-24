@@ -3,6 +3,7 @@ import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import { OverviewPage, OverviewSchedule, OverviewScheduleItem } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
+  calculateAge,
   convertToTitleCase,
   formatCategoryCodeDescription,
   formatCommunityManager,
@@ -286,7 +287,7 @@ export default class OverviewPageService {
       personalDetailsMain: {
         preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
         dateOfBirth: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
-        age: inmateDetail.age ? inmateDetail.age.toString() : 'None',
+        age: prisonerData.dateOfBirth ? calculateAge(prisonerData.dateOfBirth) : null,
         nationality: prisonerData.nationality ? prisonerData.nationality : 'None',
         spokenLanguage: inmateDetail.language ? inmateDetail.language : 'No language entered',
       },
