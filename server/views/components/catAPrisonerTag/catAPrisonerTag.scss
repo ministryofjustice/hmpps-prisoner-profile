@@ -1,0 +1,16 @@
+.dps-cat-a-tag {
+  @include govuk-font($size: 16);
+
+  display: inline-block;
+  height: 26px;
+  padding: 6px 20px 0 20px;
+  color: govuk-colour("white");
+  background-color: govuk-colour("bright-purple");
+  text-decoration: none;
+  font-weight: 700;
+  overflow-wrap: break-word;
+
+  @media screen and (forced-colors: active) {
+    font-weight: bold;
+  }
+}

@@ -1,6 +1,12 @@
 import { Prisoner } from '../interfaces/prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
-import { formatCategoryCodeDescription, formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import {
+  formatCategoryALabel,
+  formatCategoryCodeDescription,
+  formatName,
+  prisonerBelongsToUsersCaseLoad,
+  userHasRoles,
+} from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { Role } from '../data/enums/role'
@@ -96,6 +102,7 @@ export function mapHeaderData(
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
     alerts: mapAlerts(inmateDetail, alertFlagLabels),
+    categoryLabel: formatCategoryALabel(prisonerData.category),
     tabLinks: tabs,
     photoType,
     prisonId: prisonerData.prisonId,

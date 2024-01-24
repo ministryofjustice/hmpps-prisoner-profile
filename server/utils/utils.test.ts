@@ -6,6 +6,7 @@ import {
   convertNameCommaToHuman,
   convertToTitleCase,
   findError,
+  formatCategoryALabel,
   formatCategoryCodeDescription,
   formatCommunityManager,
   formatLocation,
@@ -421,6 +422,18 @@ describe('findError', () => {
       { code: 'H', categoryText: 'other text', result: 'A – high' },
     ])('Should return the correct description', ({ code, categoryText, result }) => {
       expect(formatCategoryCodeDescription(code, categoryText)).toEqual(result)
+    })
+  })
+
+  describe('formatCategoryALabel', () => {
+    it.each([
+      { code: undefined, result: undefined },
+      { code: 'A', result: 'Cat A' },
+      { code: 'P', result: 'Cat A Provisional' },
+      { code: 'H', result: 'Cat A High' },
+      { code: 'I', result: undefined },
+    ])('Should return the correct label', ({ code, result }) => {
+      expect(formatCategoryALabel(code)).toEqual(result)
     })
   })
 
