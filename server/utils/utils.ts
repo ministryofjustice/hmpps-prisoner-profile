@@ -1,3 +1,4 @@
+import { differenceInMonths, parse } from 'date-fns'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
@@ -127,26 +128,17 @@ export const getNamesFromString = (string: string): string[] =>
     .split(' ')
     .map(name => properCaseName(name))
 
-export const yearsBetweenDateStrings = (start: string, end: string): number => {
-  const endDate = new Date(end)
-  const startDate = new Date(start)
-  const endMonth = endDate.getMonth()
-  const startMonth = startDate.getMonth()
-  let years: number = endDate.getFullYear() - startDate.getFullYear()
+export const calculateAge = (dob: string): { years: number; months: number } => {
+  const currentDate = new Date()
 
-  if (years === 0) {
-    return years
-  }
+  const birthDate = parse(dob, 'yyyy-MM-dd', new Date())
 
-  if (startMonth > endMonth) {
-    years -= 1
-  } else if (startMonth === endMonth) {
-    if (startDate.getDate() > endDate.getDate()) {
-      years -= 1
-    }
-  }
+  const totalMonths = differenceInMonths(currentDate, birthDate)
 
-  return years
+  const years = Math.floor(totalMonths / 12)
+  const months = totalMonths % 12
+
+  return { years, months }
 }
 
 /**
@@ -455,6 +447,24 @@ export const formatCategoryCodeDescription = (code: string, categoryText: string
       return 'A – high'
     default:
       return categoryText
+  }
+}
+
+/**
+ * Returns a label for use in the cat a prisoner tag.
+ *
+ * @param code
+ */
+export const formatCategoryALabel = (code: string): string => {
+  switch (code) {
+    case 'A':
+      return 'Cat A'
+    case 'P':
+      return 'Cat A Provisional'
+    case 'H':
+      return 'Cat A High'
+    default:
+      return undefined
   }
 }
 

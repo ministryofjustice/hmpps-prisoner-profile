@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
+import { Role } from '../../server/data/enums/role'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -52,7 +53,7 @@ context('Profile banner', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
+        roles: [Role.GlobalSearch, Role.InactiveBookings],
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'OUT', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupOverviewPageStubs({
@@ -85,7 +86,7 @@ context('Profile banner', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
+        roles: [Role.GlobalSearch, Role.InactiveBookings],
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'TRN', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupOverviewPageStubs({
@@ -133,12 +134,13 @@ context('Profile banner', () => {
     it('Shows clickable alert flags', () => {
       visitOverviewPage()
       const overviewPage = new OverviewPage()
-      overviewPage.alertFlags().children().should('have.length', '5')
-      overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Arsonist')
-      overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Concerted indiscipline')
-      overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Controlled unlock')
-      overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Gang member')
-      overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Veteran')
+      overviewPage.alertFlags().children().should('have.length', '6')
+      overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
+      overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
+      overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
+      overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Controlled unlock')
+      overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
+      overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Veteran')
     })
 
     it('Shows modal when clicking alert flag', () => {

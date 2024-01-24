@@ -24,6 +24,7 @@ import PrisonerLocationHistoryController from '../controllers/prisonerLocationHi
 import professionalContactsRouter from './professionalContactsRouter'
 import { ApiAction, Page } from '../services/auditService'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
+import BeliefHistoryController from '../controllers/beliefHistoryController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -57,6 +58,7 @@ export default function routes(services: Services): Router {
     services.dataAccess.prisonApiClientBuilder,
     services.auditService,
   )
+  const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
 
   get(
     '/api/prisoner/:prisonerNumber/image',
@@ -324,6 +326,16 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
     moneyRouter(services),
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/religion-belief-history',
+    auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
+    getPrisonerData(services, { minimal: true }),
+    checkPrisonerInCaseload(),
+    async (req, res, next) => {
+      return beliefHistoryController.displayBeliefHistory(req, res)
+    },
   )
 
   get('/', (req, res, next) => {

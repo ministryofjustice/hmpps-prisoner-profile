@@ -23,16 +23,22 @@ export default function checkPrisonerInCaseload({
     const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
 
     if (inactiveBooking) {
-      if (!(allowInactive && canViewInactiveBookings) && !(allowGlobal && globalSearchUser)) {
-        return next(
-          addMiddlewareError(
-            req,
-            next,
-            new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
-          ),
-        )
-      }
-      return next()
+      const inactiveAllowed = allowInactive && canViewInactiveBookings
+      const globalSearchAllowed = allowInactive && globalSearchUser
+
+      // transferring prisoners can be viewed by global search users
+      const canAccessInactiveProfile =
+        prisonerData.prisonId === 'OUT' ? inactiveAllowed : inactiveAllowed || globalSearchAllowed
+
+      if (canAccessInactiveProfile) return next()
+
+      return next(
+        addMiddlewareError(
+          req,
+          next,
+          new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
+        ),
+      )
     }
 
     if (activeCaseloadOnly && activeCaseLoadId !== prisonerData.prisonId) {

@@ -1,12 +1,12 @@
 import { startOfYear } from 'date-fns'
 import { Role } from '../../server/data/enums/role'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
-import { yearsBetweenDateStrings } from '../../server/utils/utils'
 import Page from '../pages/page'
 import PersonalPage from '../pages/personalPage'
 import { permissionsTests } from './permissionsTests'
 import { formatDate } from '../../server/utils/dateHelpers'
 import NotFoundPage from '../pages/notFoundPage'
+import { calculateAge } from '../../server/utils/utils'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -46,6 +46,7 @@ context('When signed in', () => {
       cy.task('stubReasonableAdjustments', 1102484)
       cy.task('stubPersonalCareNeeds', 1102484)
       cy.task('stubIdentifiers', 1102484)
+      cy.task('stubBeliefHistory')
       visitPersonalDetailsPage()
     })
 
@@ -107,15 +108,22 @@ context('When signed in', () => {
         page.personalDetails().aliases().row(2).dateOfBirth().should('have.text', '17/06/1983')
         page.personalDetails().preferredName().should('have.text', 'Working Name')
         page.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
-        const expectedAge = yearsBetweenDateStrings(
-          new Date('1990-10-12').toISOString(),
-          new Date('2023-01-01').toISOString(),
-        )
-        page.personalDetails().dateOfBirth().should('include.text', `${expectedAge} years old`)
+        const expectedAge = calculateAge('1990-10-12')
+        page
+          .personalDetails()
+          .dateOfBirth()
+          .should('include.text', `${expectedAge.years} years, ${expectedAge.months} month`)
         page.personalDetails().nationality().should('have.text', 'Stateless')
         page.personalDetails().otherNationalities().should('have.text', 'multiple nationalities field')
         page.personalDetails().ethnicGroup().should('have.text', 'White: Eng./Welsh/Scot./N.Irish/British (W1)')
-        page.personalDetails().religionOrBelief().should('have.text', 'Celestial Church of God')
+        page.personalDetails().religionOrBelief().should('contain', 'Celestial Church of God')
+        page
+          .personalDetails()
+          .religionOrBelief()
+          .should(
+            'contain.html',
+            '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/G6123VU/religion-belief-history">Religion or belief history</a>',
+          )
         page.personalDetails().sex().should('have.text', 'Male')
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual / Straight')
         page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
