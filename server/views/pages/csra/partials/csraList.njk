@@ -1,16 +1,4 @@
-{% from '../../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
-{% from '../../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
-{% from "govuk/components/tag/macro.njk" import govukTag %}
-
-{% macro csraTag(approvalDate, originalClassificationCode, classificationCode) %}
-  {% if approvalDate and originalClassificationCode and originalClassificationCode != classificationCode %}
-    {{ govukTag({text: "Level changed at approval", classes: "govuk-tag--blue hmpps-tag govuk-!-margin-left-2"}) }}
-  {% elif approvalDate %}
-    {{ govukTag({text: "Approved", classes: "govuk-tag--green hmpps-tag govuk-!-margin-left-2"}) }}
-  {% else %}
-    {{ govukTag({text: "Waiting for approval", classes: "govuk-tag--orange hmpps-tag govuk-!-margin-left-2"}) }}
-  {% endif %}
-{% endmacro %}
+{% from '../../../macros/csraTag.njk' import csraTag %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
