@@ -2,10 +2,10 @@
 
 {% macro csraTag(approvalDate, originalClassificationCode, classificationCode) %}
   {% if approvalDate and originalClassificationCode and originalClassificationCode != classificationCode %}
-    {{ govukTag({text: "Level changed at approval", classes: "govuk-tag--blue hmpps-tag govuk-!-margin-left-2"}) }}
+    {{ govukTag({text: "Level changed at approval", classes: "govuk-tag--blue hmpps-tag"}) }}
   {% elif approvalDate %}
-    {{ govukTag({text: "Approved", classes: "govuk-tag--green hmpps-tag govuk-!-margin-left-2"}) }}
+    {{ govukTag({text: "Approved", classes: "govuk-tag--green hmpps-tag"}) }}
   {% else %}
-    {{ govukTag({text: "Waiting for approval", classes: "govuk-tag--orange hmpps-tag govuk-!-margin-left-2"}) }}
+    {{ govukTag({text: "Waiting for approval", classes: "govuk-tag--orange hmpps-tag"}) }}
   {% endif %}
 {% endmacro %}

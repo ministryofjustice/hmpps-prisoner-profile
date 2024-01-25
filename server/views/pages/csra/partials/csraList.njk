@@ -7,7 +7,7 @@
         <div class="govuk-grid-row" data-qa="csra-list-item">
           <div class="govuk-grid-column-three-quarters">
             <p class="govuk-!-font-size-24 govuk-!-font-weight-bold">
-              {{ csra.classification }}
+              <span class="govuk-!-margin-right-2">{{ csra.classification }}</span>
               {{ csraTag(csra.approvalDate, csra.originalClassificationCode, csra.classificationCode) }}
             </p>
             {% if csra.approvalDate %}
