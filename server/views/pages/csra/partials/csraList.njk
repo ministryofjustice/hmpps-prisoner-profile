@@ -4,11 +4,11 @@
 
 {% macro csraTag(approvalDate, originalClassificationCode, classificationCode) %}
   {% if approvalDate and originalClassificationCode and originalClassificationCode != classificationCode %}
-    {{ govukTag({text: "Level changed at approval", classes: "govuk-tag--blue"}) }}
+    {{ govukTag({text: "Level changed at approval", classes: "govuk-tag--blue hmpps-tag govuk-!-margin-left-2"}) }}
   {% elif approvalDate %}
-    {{ govukTag({text: "Approved", classes: "govuk-tag--green"}) }}
+    {{ govukTag({text: "Approved", classes: "govuk-tag--green hmpps-tag govuk-!-margin-left-2"}) }}
   {% else %}
-    {{ govukTag({text: "Waiting for approval", classes: "govuk-tag--orange"}) }}
+    {{ govukTag({text: "Waiting for approval", classes: "govuk-tag--orange hmpps-tag govuk-!-margin-left-2"}) }}
   {% endif %}
 {% endmacro %}
 
@@ -24,18 +24,16 @@
             </p>
             {% if csra.approvalDate %}
               <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Approval comment</p>
-              <p class="govuk-!-margin-bottom-2">{{ csra.classificationReviewReason or 'No approval comment entered' }}</p>
-              <p class="hmpps-dark-grey-font govuk-!-margin-bottom-1">Recorded at {{ csra.location }}</p>
-              <p class="hmpps-dark-grey-font govuk-!-margin-bottom-3">
-                {{ csra.approvalDate | formatDate('short') }}
+              <p class="govuk-!-margin-bottom-2">
+                {{ csra.classificationReviewReason or 'No approval comment entered' }}
               </p>
+              <p class="hmpps-dark-grey-font govuk-!-margin-bottom-1">Recorded at {{ csra.location }}</p>
+              <p class="hmpps-dark-grey-font govuk-!-margin-bottom-3">{{ csra.approvalDate | formatDate('short') }}</p>
             {% endif %}
             <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Assessment comment</p>
             <p class="govuk-!-margin-bottom-2">{{ csra.assessmentComment or 'No assesment comment entered' }}</p>
             <p class="hmpps-dark-grey-font govuk-!-margin-bottom-1">Recorded at {{ csra.location }}</p>
-            <p class="hmpps-dark-grey-font govuk-!-margin-bottom-0">
-              {{ csra.assessmentDate | formatDate('short') }}
-            </p>
+            <p class="hmpps-dark-grey-font govuk-!-margin-bottom-0">{{ csra.assessmentDate | formatDate('short') }}</p>
           </div>
           <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
             <a
