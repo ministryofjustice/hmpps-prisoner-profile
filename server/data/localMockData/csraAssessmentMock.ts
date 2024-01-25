@@ -18,6 +18,9 @@ const csraAssessmentMock: CsraAssessment = {
   approvalCommitteeCode: 'REVIEW',
   approvalCommitteeName: 'Review Board',
   classificationReviewReason: 'Reason',
+  approvedClassificationCode: 'STANDARD',
+  approvalComment: 'Approved',
+  calculatedClassificationCode: 'STANDARD',
   questions: [
     {
       question: 'Select Risk Rating',

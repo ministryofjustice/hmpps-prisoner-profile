@@ -1,7 +1,10 @@
+export type ClassificationCode = 'LOW' | 'MED' | 'STANDARD' | 'HI'
 export interface CsraAssessment {
+  approvalComment?: string
   approvalCommitteeCode?: string
   approvalCommitteeName?: string
   approvalDate?: string
+  approvedClassificationCode?: ClassificationCode
   assessmentAgencyId?: string
   assessmentCode: string
   assessmentComment?: string
@@ -11,12 +14,15 @@ export interface CsraAssessment {
   assessmentSeq: number
   assessorUser?: string
   bookingId: number
+  calculatedClassificationCode?: ClassificationCode
   cellSharingAlertFlag: boolean
-  classificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
+  classificationCode?: ClassificationCode
   classificationReviewReason?: string
   nextReviewDate?: string
   offenderNo: string
-  originalClassificationCode?: 'LOW' | 'MED' | 'STANDARD' | 'HI'
+  originalClassificationCode?: ClassificationCode
+  overrideReason?: string
+  overridingClassificationCode?: ClassificationCode
   questions: [
     {
       question: string

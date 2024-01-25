@@ -1,58 +1,88 @@
 import { formatDate } from '../utils/dateHelpers'
 
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import { CsraAssessment, ClassificationCode } from '../interfaces/prisonApi/csraAssessment'
 import { formatName } from '../utils/utils'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import getCsraClassificationName from './getCsraClassificationName'
 import { Agency } from '../interfaces/prisonApi/agency'
 
+function approvedResultText(
+  originalClassificationCode: ClassificationCode,
+  approvedClassificationCode: ClassificationCode,
+) {
+  if (originalClassificationCode && originalClassificationCode !== approvedClassificationCode) {
+    return `${getCsraClassificationName(
+      approvedClassificationCode,
+    )} - this is an override from ${getCsraClassificationName(originalClassificationCode)}`
+  }
+  return getCsraClassificationName(approvedClassificationCode)
+}
+
+function summaryRow(key: string, value: string, keyClasses = '') {
+  if (keyClasses) {
+    return { key: { text: key, classes: keyClasses }, value: { text: value } }
+  }
+
+  return { key: { text: key }, value: { text: value } }
+}
+
+function approvalRows(csraAssessment: CsraAssessment) {
+  if (csraAssessment.approvedClassificationCode) {
+    return [
+      summaryRow(
+        'Approved result',
+        approvedResultText(csraAssessment.originalClassificationCode, csraAssessment.approvedClassificationCode),
+      ),
+      summaryRow('Approval comments', csraAssessment.approvalComment || 'No approval comments entered'),
+      summaryRow('Approved by', csraAssessment.approvalCommitteeName || 'Not entered'),
+      summaryRow(
+        'Approval date',
+        csraAssessment.approvalDate ? formatDate(csraAssessment.approvalDate, 'long') : 'Not entered',
+      ),
+    ]
+  }
+  return []
+}
+
+function overrideRows(csraAssessment: CsraAssessment) {
+  if (csraAssessment.overridingClassificationCode) {
+    return [
+      summaryRow('Override result', getCsraClassificationName(csraAssessment.overridingClassificationCode)),
+      summaryRow('Override reason', csraAssessment.overrideReason || 'Not entered'),
+    ]
+  }
+  return []
+}
+
 export default (csraAssessment: CsraAssessment, agencyDetails: Agency | null, staffDetails: StaffDetails | null) => {
   const assessorAuthority = csraAssessment.assessmentCommitteeName || 'Not entered'
   const assessorName = formatName(staffDetails?.firstName, '', staffDetails?.lastName)
   return [
+    ...approvalRows(csraAssessment),
+    summaryRow(
+      'Assessment comments',
+      csraAssessment.assessmentComment || 'No assessment comment entered',
+      csraAssessment.approvalDate ? 'govuk-!-padding-top-6' : '',
+    ),
+    summaryRow(
+      'Calculated result',
+      csraAssessment.calculatedClassificationCode
+        ? getCsraClassificationName(csraAssessment.calculatedClassificationCode)
+        : 'Not entered',
+    ),
+    ...overrideRows(csraAssessment),
     {
-      key: { text: 'CSRA' },
-      value: {
-        text: csraAssessment.originalClassificationCode
-          ? `${getCsraClassificationName(
-              csraAssessment.classificationCode,
-            )} - this is an override from ${getCsraClassificationName(csraAssessment.originalClassificationCode)}`
-          : getCsraClassificationName(csraAssessment.classificationCode),
-      },
-    },
-    ...(csraAssessment.originalClassificationCode
-      ? [
-          {
-            key: { text: 'Override reason' },
-            value: { text: csraAssessment.classificationReviewReason || 'Not entered' },
-          },
-        ]
-      : []),
-    ...(csraAssessment.approvalCommitteeName
-      ? [
-          {
-            key: { text: 'Authorised by' },
-            value: { text: csraAssessment.approvalCommitteeName },
-          },
-        ]
-      : []),
-    {
-      key: { text: 'Location', classes: 'govuk-!-padding-top-6' },
+      key: { text: 'Location' },
       value: { text: agencyDetails?.description || 'Not entered' },
     },
     {
-      key: { text: 'Comments' },
-      value: { text: csraAssessment.assessmentComment || 'Not entered' },
-    },
-    {
-      key: { text: 'Reviewed by' },
+      key: { text: 'Assessed by' },
       value: { text: `${assessorAuthority} - ${assessorName || 'Not entered'}` },
     },
-    {
-      key: { text: 'Next review date' },
-      value: {
-        text: csraAssessment.nextReviewDate ? formatDate(csraAssessment.nextReviewDate, 'long') : 'Not entered',
-      },
-    },
+    summaryRow(
+      'Next review date',
+      csraAssessment.nextReviewDate ? formatDate(csraAssessment.nextReviewDate, 'long') : 'Not entered',
+      'govuk-!-padding-top-6',
+    ),
   ]
 }
