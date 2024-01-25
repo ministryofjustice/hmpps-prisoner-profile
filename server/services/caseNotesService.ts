@@ -42,6 +42,7 @@ export default class CaseNotesService {
    * @param prisonerData
    * @param queryParams
    * @param canDeleteSensitiveCaseNotes
+   * @param currentUserDetails
    */
   public async get(
     token: string,
