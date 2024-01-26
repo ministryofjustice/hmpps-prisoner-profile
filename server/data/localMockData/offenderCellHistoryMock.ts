@@ -23,4 +23,4 @@ const OffenderCellHistoryReceptionMock: OffenderCellHistory = {
   content: [{ ...OffenderCellHistoryItemMock, description: 'MDI-RECP' }],
 }
 
-export { OffenderCellHistoryMock, OffenderCellHistoryReceptionMock }
+export { OffenderCellHistoryMock, OffenderCellHistoryItemMock, OffenderCellHistoryReceptionMock }

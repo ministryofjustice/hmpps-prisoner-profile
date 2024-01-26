@@ -90,6 +90,9 @@ import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
 import { CsraAssessmentSummary } from '../../server/interfaces/prisonApi/csraAssessmentSummary'
 import { CsraAssessment } from '../../server/interfaces/prisonApi/csraAssessment'
 import { beliefHistoryAllBookingsMock, beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
+import receptionsWithCapacityMock from '../../server/data/localMockData/receptionsWithCapacityMock'
+import { OffenderCellHistoryMock } from '../../server/data/localMockData/offenderCellHistoryMock'
+import LocationsInmatesMock from '../../server/data/localMockData/locationsInmates'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1300,6 +1303,54 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: bookingId ? beliefHistoryMock : beliefHistoryAllBookingsMock,
+      },
+    })
+  },
+
+  stubReceptionsWithCapacity: (agencyId: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/agencies/${agencyId}/receptionsWithCapacity`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: receptionsWithCapacityMock,
+      },
+    })
+  },
+
+  stubCellHistory: (bookingId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/cell-history\\?size=10000`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: OffenderCellHistoryMock,
+      },
+    })
+  },
+
+  stubInmatesAtLocation: (locationId: number) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/locations/${locationId}/inmates`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: LocationsInmatesMock,
       },
     })
   },

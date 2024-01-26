@@ -1,5 +1,5 @@
 {% macro hmppsActionButton(options) %}
-    <div class="hmpps-action-button" id="{{options.id | default('')}}">
+    <div class="hmpps-action-button" id="{{options.id | default('')}}" data-qa="{{options.id | default('')}}">
         <img src="/assets/images/{{ options.iconName }}.svg" role="presentation" alt="" width="40px" height="40px" />
         <a href="{{ options.url }}" class="govuk-link govuk-link--no-visited-state" referrerpolicy="no-referrer-when-downgrade">{{ options.text }}</a>
     </div>
