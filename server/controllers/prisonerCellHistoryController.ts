@@ -68,16 +68,15 @@ export default class PrisonerCellHistoryController {
     }
 
     try {
-      // Parse query params for paging, sorting and filtering data
-      const { clientToken } = res.locals
-
-      const { bookingId, firstName, middleNames, lastName } = prisonerData
+      const { bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
       const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-      const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+      const prisonApiClient = this.prisonApiClientBuilder(res.locals.clientToken)
 
-      const page = 0
-      const cells = await prisonApiClient.getOffenderCellHistory(bookingId, { page, size: 10000 })
+      const [cells, receptions] = await Promise.all([
+        prisonApiClient.getOffenderCellHistory(bookingId, { page: 0, size: 10000 }),
+        prisonApiClient.getReceptionsWithCapacity(prisonId),
+      ])
 
       const uniqueAgencyIds = [...new Set(cells.content.filter(cell => cell.agencyId).map(cell => cell.agencyId))]
       const prisons = await Promise.all(uniqueAgencyIds.map(agencyId => prisonApiClient.getAgencyDetails(agencyId)))
@@ -110,6 +109,11 @@ export default class PrisonerCellHistoryController {
       )
 
       const currentLocation = cellDataLatestFirst[0]
+      const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
+      const canViewMoveToReceptionButton =
+        config.moveToReceptionLinkEnabled && canViewCellMoveButton && currentLocation?.location !== 'Reception'
+      const receptionIsFull = !receptions.length
+
       if (!currentLocation.assignmentEndDateTime) {
         currentLocation.assignmentEndDateTime = formatDateTimeISO(new Date())
       }
@@ -138,6 +142,8 @@ export default class PrisonerCellHistoryController {
           ? getCellHistoryGroupedByPeriodAtAgency(previousLocations)
           : [],
         currentLocation,
+        canViewCellMoveButton,
+        canViewMoveToReceptionButton,
         occupants: occupants
           .filter(occupant => occupant.offenderNo !== offenderNo)
           .map(occupant => ({
@@ -148,7 +154,9 @@ export default class PrisonerCellHistoryController {
         profileUrl: `/prisoner/${offenderNo}`,
         breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
         changeCellLink: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}/cell-move/search-for-cell?returnUrl=${prisonerProfileUrl}`,
-        canViewCellMoveButton: userHasRoles(['CELL_MOVE'], res.locals.user.userRoles),
+        moveToReceptionLink: receptionIsFull
+          ? `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}/reception-move/reception-full`
+          : `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}/reception-move/consider-risks-reception`,
         prisonerNumber: offenderNo,
         dpsBaseUrl: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}`,
       })
