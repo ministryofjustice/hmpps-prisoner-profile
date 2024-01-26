@@ -1,5 +1,9 @@
 const production = process.env.NODE_ENV === 'production'
 
+const toBoolean = (value: unknown): boolean => {
+  return value === 'true'
+}
+
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name] !== undefined) {
     return process.env[name]
@@ -279,5 +283,8 @@ export default {
         omu: process.env.EXETER_OMU_EMAIL,
       },
     },
+  },
+  featureToggles: {
+    newWorkAndSkillsTabEnabled: toBoolean(get('NEW_WORK_AND_SKILLS_TAB_ENABLED', false, requiredInProduction)),
   },
 }

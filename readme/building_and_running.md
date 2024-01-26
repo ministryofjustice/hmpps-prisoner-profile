@@ -129,3 +129,10 @@ After making code changes eslint can be used to ensure code style is maintained
 npm run lint
 ```
 
+## Feature Toggles
+Features can be toggled by setting the relevant environment variable.
+
+| Name                            | Default Value | Type    | Description                                                                                             |
+|---------------------------------|---------------|---------|---------------------------------------------------------------------------------------------------------|
+| SOME_TOGGLE_ENABLED             | false         | Boolean | Example feature toggle, for demonstration purposes.                                                     |
+| NEW_WORK_AND_SKILLS_TAB_ENABLED | false         | Boolean | Set to true to use the new Work & Skills tab, containing updated Goals and Function Skills information. |
