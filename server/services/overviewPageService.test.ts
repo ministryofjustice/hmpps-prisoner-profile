@@ -66,6 +66,7 @@ import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAs
 import config from '../config'
 import { ComplexityApiClient } from '../data/interfaces/complexityApiClient'
 import { complexityOfNeedHighMock, complexityOfNeedLowMock } from '../data/localMockData/complexityOfNeedMock'
+import { AdjudicationSummaryAward } from '../interfaces/adjudicationSummary'
 
 jest.mock('../utils/utils', () => {
   const original = jest.requireActual('../utils/utils')
@@ -245,6 +246,48 @@ describe('OverviewPageService', () => {
           { data: expect.objectContaining(moneySummaryDataMock), classes: 'govuk-grid-row card-body' },
           { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
           { data: expect.objectContaining(visitsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        ]),
+      )
+    })
+
+    it('should add a link to active punishments if awards list length > 0', async () => {
+      adjudicationsApiClient.getAdjudications = jest.fn(async () => ({
+        ...adjudicationSummaryMock,
+        awards: [
+          {
+            sanctionCode: 'MESS',
+            status: 'IMMEDIATE',
+            sanctionDescription: 'loss of privileges',
+            days: 1,
+            bookingId: 'bod',
+            sanctionCodeDescription: 'loss of privileges',
+            comment: 'comment',
+            effectiveDate: '2021-01-01',
+          } as undefined as AdjudicationSummaryAward,
+        ],
+      }))
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get(
+        'token',
+        { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        1,
+        inmateDetailMock,
+        CaseLoadsDummyDataA,
+      )
+
+      expect(res.miniSummaryGroupA).toEqual(
+        expect.arrayContaining([
+          {
+            data: expect.objectContaining({
+              ...adjudicationsSummaryDataMock,
+              bottomContentLine1: '1 active punishment',
+              bottomContentLine1Href: '/prisoner/A1234BC/active-punishments',
+            }),
+            classes: 'govuk-grid-row card-body',
+          },
         ]),
       )
     })

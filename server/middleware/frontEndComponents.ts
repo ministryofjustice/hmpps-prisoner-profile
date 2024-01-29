@@ -6,7 +6,7 @@ import { Services } from '../services'
 export default function getFrontendComponents({ componentService }: Services, useLatest: boolean): RequestHandler {
   return async (req, res, next) => {
     try {
-      const { header, footer } = await componentService.getComponents(
+      const { header, footer, meta } = await componentService.getComponents(
         ['header', 'footer'],
         res.locals.user.token,
         useLatest,
@@ -18,6 +18,9 @@ export default function getFrontendComponents({ componentService }: Services, us
         cssIncludes: [...header.css, ...footer.css],
         jsIncludes: [...header.javascript, ...footer.javascript],
       }
+
+      res.locals.feComponentsMeta = meta
+
       next()
     } catch (error) {
       logger.error(error, 'Failed to retrieve front end components')

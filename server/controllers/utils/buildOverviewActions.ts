@@ -7,6 +7,8 @@ import { Icon } from '../../data/enums/icon'
 import { userCanEdit, userHasRoles } from '../../utils/utils'
 import { Role } from '../../data/enums/role'
 import conf from '../../config'
+import { HeaderFooterMeta } from '../../data/interfaces/component'
+import isServiceEnabled from '../../utils/isServiceEnabled'
 
 export default (
   prisonerData: Prisoner,
@@ -15,6 +17,7 @@ export default (
   user: User,
   staffRoles: string[],
   config: typeof conf,
+  feComponentsMeta: HeaderFooterMeta | undefined,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
   const addAppointmentUrl = config.profileAddAppointmentEnabled
@@ -67,7 +70,7 @@ export default (
   }
   if (
     userHasRoles([Role.ActivityHub], user.userRoles) &&
-    config.activitiesEnabledPrisons.includes(user.activeCaseLoadId) &&
+    isServiceEnabled('activities', feComponentsMeta) &&
     user.activeCaseLoadId === prisonerData.prisonId &&
     prisonerData.status !== 'ACTIVE OUT'
   ) {

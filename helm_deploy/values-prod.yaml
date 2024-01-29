@@ -43,6 +43,7 @@ generic-service:
 
     # API Service urls
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"
+    ADJUDICATIONS_UI_URL: "https://manage-adjudications.hmpps.service.justice.gov.uk"
     ALLOCATION_MANAGER_ENDPOINT_URL: "https://moic.service.justice.gov.uk"
     APPOINTMENTS_URL: "https://activities.prison.service.justice.gov.uk/appointments"
     CASE_NOTES_API_URL: "https://offender-case-notes.service.justice.gov.uk"
@@ -62,8 +63,6 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
 
     # Feature flags
-    ACTIVITIES_ENABLED_PRISONS: "RSI,LPI"
-    APPOINTMENTS_ENABLED_PRISONS: "RSI,LPI"
     AUDIT_ENABLED: "true"
     COMPONENT_API_LATEST: "false"
     FEEDBACK_DISABLED_PRISONS: "AGI,DNI,FNI,HDI,HLI,HMI,LEI,LHI,MDI,NHI,RSI,WDI,WEI,WYI"
