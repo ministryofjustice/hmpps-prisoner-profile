@@ -109,6 +109,7 @@ describe('Specific Prisoner Location History', () => {
           },
           locationName: undefined,
           locationSharingHistory: [],
+          prisonerBreadcrumbName: 'Saunders, John',
           prisonerName: 'John Saunders',
           prisonerNumber: 'G6123VU',
         })

@@ -40,36 +40,51 @@ docker-compose pull && docker-compose up
 <details>
 <summary>Click here for an example of the .env file</summary>
 <br>
-Note, personal client credentials need to be requested from the Auth team
-to provide the missing client id and secret variables.
+Note, client credentials need to be retrieved from the dev kubernetes secrets to provide the missing client id and secret variables.
 
 ```
 PORT=3000
 NODE_ENV=development
+ENVIRONMENT_NAME=DEV
+SYSTEM_PHASE=DEV
+TOKEN_VERIFICATION_ENABLED=false
 API_CLIENT_ID=
 API_CLIENT_SECRET=
 SYSTEM_CLIENT_ID=
 SYSTEM_CLIENT_SECRET=
-TOKEN_VERIFICATION_ENABLED=true
-HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
-PRISON_API_URL=https://prison-api-dev.prison.service.justice.gov.uk
-PRISONER_SEARCH_API_URL=https://prisoner-search-dev.prison.service.justice.gov.uk
-DPS_HOME_PAGE_URL=https://digital-dev.prison.service.justice.gov.uk
+ACTIVITIES_URL=https://activities-dev.prison.service.justice.gov.uk/activities
+ADJUDICATIONS_UI_URL=https://manage-adjudications-dev.hmpps.service.justice.gov.uk
 ALLOCATION_MANAGER_ENDPOINT_URL=https://dev.moic.service.justice.gov.uk
-KEYWORKER_API_URL=https://keyworker-api-dev.prison.service.justice.gov.uk
-WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
+APPOINTMENTS_URL=https://activities-dev.prison.service.justice.gov.uk/appointments
+CALCULATE_RELEASE_DATES_UI_URL=https://calculate-release-dates-dev.hmpps.service.justice.gov.uk
 CASE_NOTES_API_URL=https://dev.offender-case-notes.service.justice.gov.uk
-INCENTIVES_API_URL=https://incentives-api-dev.hmpps.service.justice.gov.uk
+COMPONENT_API_LATEST=true
+COMPONENT_API_URL=https://frontend-components-dev.hmpps.service.justice.gov.uk
+DEV__COMPONENT_API_URL=https://frontend-components-dev.hmpps.service.justice.gov.uk
+LOCAL__COMPONENT_API_URL=http://localhost:3123
+CREATE_AND_VARY_A_LICENCE_UI_URL=https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk
 CURIOUS_API_URL=https://testservices.sequation.net/sequation-virtual-campus2-api
-PATHFINDER_API_URL=https://dev-api.pathfinder.service.justice.gov.uk
-MANAGE_SOC_CASES_API_URL=https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk
-TOKEN_VERIFICATION_API_URL=https://token-verification-api-dev.prison.service.justice.gov.uk
-OFFENDER_CATEGORISATION_UI_URL=https://dev.offender-categorisation.service.justice.gov.uk
-USE_OF_FORCE_UI_URL=https://dev.use-of-force.service.justice.gov.uk
+DPS_HOME_PAGE_URL=https://digital-dev.prison.service.justice.gov.uk
+HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+HMPPS_NON_ASSOCIATIONS_API_URL=https://non-associations-api-dev.hmpps.service.justice.gov.uk
+INCENTIVES_API_URL=https://incentives-api-dev.hmpps.service.justice.gov.uk
+INGRESS_URL=http://localhost:3000
+KEYWORKER_API_URL=https://keyworker-api-dev.prison.service.justice.gov.uk
+MANAGE_ADJUDICATIONS_API_URL=https://manage-adjudications-api-dev.hmpps.service.justice.gov.uk
 MANAGE_A_WARRANT_FOLDER_UI_URL=https://manage-a-warrant-folder-dev.hmpps.service.justice.gov.uk
-PATHFINDER_UI_URL=https://dev.pathfinder.service.justice.gov.uk
+MANAGE_SOC_CASES_API_URL=https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk
 MANAGE_SOC_CASES_UI_URL=https://manage-soc-cases-dev.hmpps.service.justice.gov.uk
-NON_ASSOCIATIONS_UI_URL: "https://non-associations-dev.hmpps.service.justice.gov.uk"
+MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
+NON_ASSOCIATIONS_UI_URL=https://non-associations-dev.hmpps.service.justice.gov.uk
+OFFENDER_CATEGORISATION_UI_URL=https://dev.offender-categorisation.service.justice.gov.uk
+PATHFINDER_API_URL=https://dev-api.pathfinder.service.justice.gov.uk
+PATHFINDER_UI_URL=https://dev.pathfinder.service.justice.gov.uk
+PRISONER_PROFILE_DELIUS_API_URL=https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk
+PRISONER_SEARCH_API_URL=https://prisoner-search-dev.prison.service.justice.gov.uk
+PRISON_API_URL=https://prison-api-dev.prison.service.justice.gov.uk
+USE_OF_FORCE_UI_URL=https://dev.use-of-force.service.justice.gov.uk
+WELCOME_PEOPLE_INTO_PRISON_UI_URL=https://welcome-dev.prison.service.justice.gov.uk
+WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
 ```
 </details>
 
@@ -114,3 +129,10 @@ After making code changes eslint can be used to ensure code style is maintained
 npm run lint
 ```
 
+## Feature Toggles
+Features can be toggled by setting the relevant environment variable.
+
+| Name                            | Default Value | Type    | Description                                                                                             |
+|---------------------------------|---------------|---------|---------------------------------------------------------------------------------------------------------|
+| SOME_TOGGLE_ENABLED             | false         | Boolean | Example feature toggle, for demonstration purposes.                                                     |
+| NEW_WORK_AND_SKILLS_TAB_ENABLED | false         | Boolean | Set to true to use the new Work & Skills tab, containing updated Goals and Function Skills information. |

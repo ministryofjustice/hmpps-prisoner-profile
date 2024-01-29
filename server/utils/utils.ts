@@ -301,6 +301,7 @@ export const generateListMetadata = (
       sort: queryParams.sort,
       queryParams: {
         ...queryParams,
+        sort: undefined,
       },
     },
     pagination: {
@@ -415,13 +416,11 @@ export const apostrophe = (word: string): string => {
 }
 
 export const prependBaseUrl = (url: string): string => {
-  const urlWithBaseUrl = `${config.serviceUrls.digitalPrison}${url}`
-  return urlWithBaseUrl
+  return `${config.serviceUrls.digitalPrison}${url}`
 }
 
 export const prependHmppsAuthBaseUrl = (url: string): string => {
-  const urlWithHmppsAuthBaseUrl = `${config.apis.hmppsAuth.url}${url}`
-  return urlWithHmppsAuthBaseUrl
+  return `${config.apis.hmppsAuth.url}${url}`
 }
 
 /**
@@ -430,6 +429,7 @@ export const prependHmppsAuthBaseUrl = (url: string): string => {
  * Returns 'Not entered' of the code is undefined
  *
  * @param code
+ * @param categoryText
  */
 export const formatCategoryCodeDescription = (code: string, categoryText: string): string => {
   if (['A', 'B', 'C', 'D'].includes(code)) {
@@ -475,8 +475,7 @@ export enum SortType {
 }
 
 export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: string, sortType: SortType): object[] => {
-  // eslint-disable-next-line
-  let array = arrayOfObjects.sort(function (a, b) {
+  return arrayOfObjects.sort((a, b) => {
     const dateA = new Date(a[dateKey]).getTime()
     const dateB = new Date(b[dateKey]).getTime()
     if (sortType === SortType.DESC) {
@@ -487,14 +486,12 @@ export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: stri
     }
     return 0
   })
-  return array
 }
 
 export const { neurodiversityEnabledPrisons } = config
 
 export const neurodiversityEnabled = (agencyId: string): boolean => {
-  const isEnabled = neurodiversityEnabledPrisons?.includes(agencyId)
-  return isEnabled
+  return neurodiversityEnabledPrisons?.includes(agencyId)
 }
 
 export const stripAgencyPrefix = (location: string, agency: string): string => {
@@ -519,11 +516,12 @@ export const formatLocation = (locationName: string): string => {
 
 export const isTemporaryLocation = (locationName: string): boolean => {
   if (!locationName) return false
-  if (locationName.endsWith('RECP')) return true
-  if (locationName.endsWith('CSWAP')) return true
-  if (locationName.endsWith('COURT')) return true
-  if (locationName.endsWith('TAP')) return true
-  return false
+  return (
+    locationName.endsWith('RECP') ||
+    locationName.endsWith('CSWAP') ||
+    locationName.endsWith('COURT') ||
+    locationName.endsWith('TAP')
+  )
 }
 
 export const extractLocation = (location: string, agencyId: string): string => {

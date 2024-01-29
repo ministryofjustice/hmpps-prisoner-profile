@@ -1,5 +1,9 @@
 const production = process.env.NODE_ENV === 'production'
 
+const toBoolean = (value: unknown): boolean => {
+  return value === 'true'
+}
+
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name] !== undefined) {
     return process.env[name]
@@ -216,7 +220,7 @@ export default {
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
     nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
-    adjudications: get('ADJUDICATIONS_UI_URL', ''),
+    adjudications: get('ADJUDICATIONS_UI_URL', '', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -279,5 +283,8 @@ export default {
         omu: process.env.EXETER_OMU_EMAIL,
       },
     },
+  },
+  featureToggles: {
+    newWorkAndSkillsTabEnabled: toBoolean(get('NEW_WORK_AND_SKILLS_TAB_ENABLED', false, requiredInProduction)),
   },
 }

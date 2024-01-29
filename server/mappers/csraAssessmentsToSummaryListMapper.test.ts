@@ -10,24 +10,36 @@ describe('mapCsraReviewToSummaryList', () => {
 
     const expectedDetails = [
       {
-        key: { text: 'CSRA' },
+        key: { text: 'Approved result' },
         value: { text: 'Standard' },
       },
       {
-        key: { text: 'Authorised by' },
+        key: { text: 'Approval comments' },
+        value: { text: 'Approved' },
+      },
+      {
+        key: { text: 'Approved by' },
         value: { text: 'Review Board' },
       },
       {
-        key: { text: 'Location', classes: 'govuk-!-padding-top-6' },
-        value: { text: 'Sheffield Crown Court' },
+        key: { text: 'Approval date' },
+        value: { text: '13 January 2017' },
       },
       {
-        key: { text: 'Comments' },
+        key: { text: 'Assessment comments', classes: 'govuk-!-padding-top-6' },
         value: { text: 'HiMEIesRHiMEIesR' },
       },
-      { key: { text: 'Reviewed by' }, value: { text: 'Reception - John Smith' } },
       {
-        key: { text: 'Next review date' },
+        key: { text: 'Calculated result' },
+        value: { text: 'Standard' },
+      },
+      {
+        key: { text: 'Location' },
+        value: { text: 'Sheffield Crown Court' },
+      },
+      { key: { text: 'Assessed by' }, value: { text: 'Reception - John Smith' } },
+      {
+        key: { text: 'Next review date', classes: 'govuk-!-padding-top-6' },
         value: { text: '13 January 2018' },
       },
     ]
@@ -39,24 +51,36 @@ describe('mapCsraReviewToSummaryList', () => {
     const result = mapCsraReviewToSummaryList(csraAssessmentMock, null, null)
     const expectedDetails = [
       {
-        key: { text: 'CSRA' },
+        key: { text: 'Approved result' },
         value: { text: 'Standard' },
       },
       {
-        key: { text: 'Authorised by' },
+        key: { text: 'Approval comments' },
+        value: { text: 'Approved' },
+      },
+      {
+        key: { text: 'Approved by' },
         value: { text: 'Review Board' },
       },
       {
-        key: { text: 'Location', classes: 'govuk-!-padding-top-6' },
-        value: { text: 'Not entered' },
+        key: { text: 'Approval date' },
+        value: { text: '13 January 2017' },
       },
       {
-        key: { text: 'Comments' },
+        key: { text: 'Assessment comments', classes: 'govuk-!-padding-top-6' },
         value: { text: 'HiMEIesRHiMEIesR' },
       },
-      { key: { text: 'Reviewed by' }, value: { text: 'Reception - Not entered' } },
       {
-        key: { text: 'Next review date' },
+        key: { text: 'Calculated result' },
+        value: { text: 'Standard' },
+      },
+      {
+        key: { text: 'Location' },
+        value: { text: 'Not entered' },
+      },
+      { key: { text: 'Assessed by' }, value: { text: 'Reception - Not entered' } },
+      {
+        key: { text: 'Next review date', classes: 'govuk-!-padding-top-6' },
         value: { text: '13 January 2018' },
       },
     ]
@@ -67,36 +91,54 @@ describe('mapCsraReviewToSummaryList', () => {
   it('should display override information if present', async () => {
     const csraAssessment = {
       ...csraAssessmentMock,
-      originalClassificationCode: 'HI' as CsraAssessment['originalClassificationCode'],
+      originalClassificationCode: 'HI',
       classificationReviewReason: 'A reason',
-    }
+      overrideReason: 'A reason',
+      overridingClassificationCode: 'HI',
+    } as CsraAssessment
 
     const result = mapCsraReviewToSummaryList(csraAssessment, AgencyMock, StaffDetailsMock)
 
     const expectedDetails = [
       {
-        key: { text: 'CSRA' },
+        key: { text: 'Approved result' },
         value: { text: 'Standard - this is an override from High' },
+      },
+      {
+        key: { text: 'Approval comments' },
+        value: { text: 'Approved' },
+      },
+      {
+        key: { text: 'Approved by' },
+        value: { text: 'Review Board' },
+      },
+      {
+        key: { text: 'Approval date' },
+        value: { text: '13 January 2017' },
+      },
+      {
+        key: { text: 'Assessment comments', classes: 'govuk-!-padding-top-6' },
+        value: { text: 'HiMEIesRHiMEIesR' },
+      },
+      {
+        key: { text: 'Calculated result' },
+        value: { text: 'Standard' },
+      },
+      {
+        key: { text: 'Override result' },
+        value: { text: 'High' },
       },
       {
         key: { text: 'Override reason' },
         value: { text: 'A reason' },
       },
       {
-        key: { text: 'Authorised by' },
-        value: { text: 'Review Board' },
-      },
-      {
-        key: { text: 'Location', classes: 'govuk-!-padding-top-6' },
+        key: { text: 'Location' },
         value: { text: 'Sheffield Crown Court' },
       },
+      { key: { text: 'Assessed by' }, value: { text: 'Reception - John Smith' } },
       {
-        key: { text: 'Comments' },
-        value: { text: 'HiMEIesRHiMEIesR' },
-      },
-      { key: { text: 'Reviewed by' }, value: { text: 'Reception - John Smith' } },
-      {
-        key: { text: 'Next review date' },
+        key: { text: 'Next review date', classes: 'govuk-!-padding-top-6' },
         value: { text: '13 January 2018' },
       },
     ]
@@ -105,10 +147,15 @@ describe('mapCsraReviewToSummaryList', () => {
   })
 
   it('should handle details not being present', async () => {
-    const csraAssessment = {
+    const csraAssessment: CsraAssessment = {
       ...csraAssessmentMock,
       assessmentComment: '',
-      nextReviewDate: undefined as CsraAssessment['nextReviewDate'],
+      approvalComment: undefined,
+      approvalDate: undefined,
+      approvedClassificationCode: undefined,
+      approvalCommitteeCode: undefined,
+      approvalCommitteeName: undefined,
+      nextReviewDate: undefined,
     }
     const agencyDetails = { ...AgencyMock, description: '' }
 
@@ -116,24 +163,20 @@ describe('mapCsraReviewToSummaryList', () => {
 
     const expectedDetails = [
       {
-        key: { text: 'CSRA' },
+        key: { text: 'Assessment comments' },
+        value: { text: 'No assessment comment entered' },
+      },
+      {
+        key: { text: 'Calculated result' },
         value: { text: 'Standard' },
       },
       {
-        key: { text: 'Authorised by' },
-        value: { text: 'Review Board' },
-      },
-      {
-        key: { text: 'Location', classes: 'govuk-!-padding-top-6' },
+        key: { text: 'Location' },
         value: { text: 'Not entered' },
       },
+      { key: { text: 'Assessed by' }, value: { text: 'Reception - John Smith' } },
       {
-        key: { text: 'Comments' },
-        value: { text: 'Not entered' },
-      },
-      { key: { text: 'Reviewed by' }, value: { text: 'Reception - John Smith' } },
-      {
-        key: { text: 'Next review date' },
+        key: { text: 'Next review date', classes: 'govuk-!-padding-top-6' },
         value: { text: 'Not entered' },
       },
     ]
