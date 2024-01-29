@@ -1,6 +1,5 @@
 import RestClient from './restClient'
-import Component from './interfaces/component'
-import { ComponentApiClient } from './interfaces/componentApiClient'
+import { ComponentApiClient, ComponentsApiResponse } from './interfaces/componentApiClient'
 import AvailableComponent from './interfaces/AvailableComponent'
 import config from '../config'
 
@@ -15,9 +14,9 @@ export default class ComponentApiRestClient implements ComponentApiClient {
     components: T,
     userToken: string,
     useLatest: boolean,
-  ): Promise<Record<T[number], Component>> {
+  ): Promise<ComponentsApiResponse<T>> {
     const useLatestHeader = useLatest ? { 'x-use-latest-features': 'true' } : {}
-    return this.restClient.get<Record<T[number], Component>>({
+    return this.restClient.get<ComponentsApiResponse<T>>({
       path: `/components`,
       query: `component=${components.join('&component=')}`,
       headers: { 'x-user-token': userToken, ...useLatestHeader },

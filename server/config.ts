@@ -230,8 +230,6 @@ export default {
   feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
-  activitiesEnabledPrisons: get('ACTIVITIES_ENABLED_PRISONS', [], requiredInProduction),
-  appointmentsEnabledPrisons: get('APPOINTMENTS_ENABLED_PRISONS', [], requiredInProduction),
   complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
   useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
   profileAddAppointmentEnabled: get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false') === 'true',

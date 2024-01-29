@@ -56,8 +56,6 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
 
     # Feature flags
-    ACTIVITIES_ENABLED_PRISONS: "RSI,LPI"
-    APPOINTMENTS_ENABLED_PRISONS: "RSI,LPI"
     AUDIT_ENABLED: "true"
     COMPONENT_API_LATEST: "true"
     FEEDBACK_DISABLED_PRISONS: "AGI,DNI,FNI,HDI,HLI,HMI,LEI,LHI,MDI,NHI,RSI,WDI,WEI,WYI"

@@ -3,6 +3,7 @@ import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
 import { userMock } from '../../data/localMockData/user'
 import config from '../../config'
+import { HeaderFooterMeta } from '../../data/interfaces/component'
 
 const pathfinderNominal = { id: 1 }
 const socNominal = { id: 2 }
@@ -15,7 +16,15 @@ describe('buildOverviewActions', () => {
       ${[Role.GlobalSearch]}           | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, visible }) => {
       const user = { ...userMock, userRoles: roles }
-      const resp = buildOverviewActions(PrisonerMockDataA, pathfinderNominal, socNominal, user, staffRoles, config)
+      const resp = buildOverviewActions(
+        PrisonerMockDataA,
+        pathfinderNominal,
+        socNominal,
+        user,
+        staffRoles,
+        config,
+        undefined,
+      )
       expect(
         !!resp.find(
           action =>
@@ -42,7 +51,7 @@ describe('buildOverviewActions', () => {
       const user = { ...userMock, userRoles: roles, caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })) }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
-      const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config)
+      const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config, undefined)
       expect(
         !!resp.find(action => action.url === `/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note`),
       ).toEqual(visible)
@@ -63,6 +72,7 @@ describe('buildOverviewActions', () => {
         userMock,
         staffRolesToUse,
         config,
+        undefined,
       )
       expect(
         !!resp.find(
@@ -74,30 +84,26 @@ describe('buildOverviewActions', () => {
 
   describe('Log an activity application', () => {
     test.each`
-      roles                 | activeCaseLoadId | prisonId | activitiesEnabledPrisons | prisonerStatus  | visible
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${true}
-      ${[Role.ActivityHub]} | ${'LEI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'LEI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['LEI']}               | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'ACTIVE OUT'} | ${false}
-      ${[]}                 | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
-    `(
-      'user can see: $visible',
-      ({ roles, activeCaseLoadId, prisonId, activitiesEnabledPrisons, prisonerStatus, visible }) => {
-        const user = { ...userMock, userRoles: roles, activeCaseLoadId }
-        const prisoner = { ...PrisonerMockDataA, status: prisonerStatus, prisonId }
+      roles                 | activeCaseLoadId | prisonId | availableServices         | prisonerStatus  | visible
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${true}
+      ${[Role.ActivityHub]} | ${'LEI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'LEI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'something' }]}  | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'ACTIVE OUT'} | ${false}
+      ${[]}                 | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
+    `('user can see: $visible', ({ roles, activeCaseLoadId, prisonId, availableServices, prisonerStatus, visible }) => {
+      const user = { ...userMock, userRoles: roles, activeCaseLoadId }
+      const prisoner = { ...PrisonerMockDataA, status: prisonerStatus, prisonId }
 
-        const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, {
-          ...config,
-          activitiesEnabledPrisons,
-        })
-        expect(
-          !!resp.find(
-            action => action.url === `${config.serviceUrls.activities}/waitlist/${prisoner.prisonerNumber}/apply`,
-          ),
-        ).toEqual(visible)
-      },
-    )
+      const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config, {
+        services: availableServices,
+      } as HeaderFooterMeta)
+      expect(
+        !!resp.find(
+          action => action.url === `${config.serviceUrls.activities}/waitlist/${prisoner.prisonerNumber}/apply`,
+        ),
+      ).toEqual(visible)
+    })
   })
 
   describe('Add appointment', () => {
@@ -110,7 +116,7 @@ describe('buildOverviewActions', () => {
       const user = { ...userMock, activeCaseLoadId }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
-      const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config)
+      const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config, undefined)
       expect(!!resp.find(action => action.dataQA === 'add-appointment-action-link')).toEqual(visible)
     })
   })
@@ -130,44 +136,24 @@ describe('buildOverviewActions', () => {
       const user = { ...userMock, userRoles: roles, caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })) }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
-      const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, {
-        ...config,
-        useOfForceDisabledPrisons: disabledPrisons,
-      })
+      const resp = buildOverviewActions(
+        prisoner,
+        pathfinderNominal,
+        socNominal,
+        user,
+        staffRoles,
+        {
+          ...config,
+          useOfForceDisabledPrisons: disabledPrisons,
+        },
+        undefined,
+      )
       expect(
         !!resp.find(
           action => action.url === `${config.serviceUrls.useOfForce}/report/${prisoner.bookingId}/report-use-of-force`,
         ),
       ).toEqual(visible)
     })
-  })
-
-  describe('Log an activity application', () => {
-    test.each`
-      roles                 | activeCaseLoadId | prisonId | activitiesEnabledPrisons | prisonerStatus  | visible
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${true}
-      ${[Role.ActivityHub]} | ${'LEI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'LEI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['LEI']}               | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'ACTIVE OUT'} | ${false}
-      ${[]}                 | ${'MDI'}         | ${'MDI'} | ${['MDI']}               | ${'SOMETHING'}  | ${false}
-    `(
-      'user can see: $visible',
-      ({ roles, activeCaseLoadId, prisonId, activitiesEnabledPrisons, prisonerStatus, visible }) => {
-        const user = { ...userMock, userRoles: roles, activeCaseLoadId }
-        const prisoner = { ...PrisonerMockDataA, status: prisonerStatus, prisonId }
-
-        const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, {
-          ...config,
-          activitiesEnabledPrisons,
-        })
-        expect(
-          !!resp.find(
-            action => action.url === `${config.serviceUrls.activities}/waitlist/${prisoner.prisonerNumber}/apply`,
-          ),
-        ).toEqual(visible)
-      },
-    )
   })
 
   describe('Refer to Pathfinder', () => {
@@ -181,7 +167,15 @@ describe('buildOverviewActions', () => {
       ${[Role.PathfinderHQ]}           | ${pathfinderNominal}   | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, pathfinderNominalToUse, visible }) => {
       const user = { ...userMock, userRoles: roles }
-      const resp = buildOverviewActions(PrisonerMockDataA, pathfinderNominalToUse, socNominal, user, staffRoles, config)
+      const resp = buildOverviewActions(
+        PrisonerMockDataA,
+        pathfinderNominalToUse,
+        socNominal,
+        user,
+        staffRoles,
+        config,
+        undefined,
+      )
       expect(
         !!resp.find(
           action =>
@@ -200,7 +194,15 @@ describe('buildOverviewActions', () => {
       ${[]}                  | ${undefined}    | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, socNominalToUse, visible }) => {
       const user = { ...userMock, userRoles: roles }
-      const resp = buildOverviewActions(PrisonerMockDataA, pathfinderNominal, socNominalToUse, user, staffRoles, config)
+      const resp = buildOverviewActions(
+        PrisonerMockDataA,
+        pathfinderNominal,
+        socNominalToUse,
+        user,
+        staffRoles,
+        config,
+        undefined,
+      )
       expect(
         !!resp.find(
           action =>
@@ -220,7 +222,15 @@ describe('buildOverviewActions', () => {
       ${[]}                            | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, visible }) => {
       const user = { ...userMock, userRoles: roles }
-      const resp = buildOverviewActions(PrisonerMockDataA, pathfinderNominal, socNominal, user, staffRoles, config)
+      const resp = buildOverviewActions(
+        PrisonerMockDataA,
+        pathfinderNominal,
+        socNominal,
+        user,
+        staffRoles,
+        config,
+        undefined,
+      )
       expect(
         !!resp.find(
           action => action.url === `${config.serviceUrls.offenderCategorisation}/${PrisonerMockDataA.bookingId}`,
