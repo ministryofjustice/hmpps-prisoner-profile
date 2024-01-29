@@ -13,7 +13,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
-import PrisonerCellHistoryController from '../controllers/prisonerCellHistoryController'
+import PrisonerLocationDetailsController from '../controllers/prisonerLocationDetailsController'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import getFrontendComponents from '../middleware/frontEndComponents'
@@ -54,7 +54,7 @@ export default function routes(services: Services): Router {
     services.dataAccess.prisonApiClientBuilder,
     services.auditService,
   )
-  const prisonerCellHistoryController = new PrisonerCellHistoryController(
+  const prisonerLocationDetailsController = new PrisonerLocationDetailsController(
     services.dataAccess.prisonApiClientBuilder,
     services.auditService,
   )
@@ -304,7 +304,7 @@ export default function routes(services: Services): Router {
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
-      return prisonerCellHistoryController.displayPrisonerCellHistory(req, res, prisonerData)
+      return prisonerLocationDetailsController.displayPrisonerLocationDetails(req, res, prisonerData)
     },
   )
 
