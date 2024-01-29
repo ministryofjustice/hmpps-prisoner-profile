@@ -3,6 +3,7 @@ import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
 import { OverviewPage, OverviewSchedule, OverviewScheduleItem } from '../interfaces/overviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import {
+  calculateAge,
   convertToTitleCase,
   formatCategoryCodeDescription,
   formatCommunityManager,
@@ -286,7 +287,7 @@ export default class OverviewPageService {
       personalDetailsMain: {
         preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
         dateOfBirth: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : 'None',
-        age: inmateDetail.age ? inmateDetail.age.toString() : 'None',
+        age: prisonerData.dateOfBirth ? calculateAge(prisonerData.dateOfBirth) : null,
         nationality: prisonerData.nationality ? prisonerData.nationality : 'None',
         spokenLanguage: inmateDetail.language ? inmateDetail.language : 'No language entered',
       },
@@ -333,6 +334,15 @@ export default class OverviewPageService {
       linkHref: `/prisoner/${prisonerNumber}/money/spends`,
     }
 
+    // these can be removed once the adjudications service is deployed to all environments
+    const activePunishmentsHref = config.serviceUrls.adjudications
+      ? `${config.serviceUrls.adjudications}/active-punishments/${prisonerNumber}`
+      : `/prisoner/${prisonerNumber}/active-punishments`
+
+    const adjudicationHistoryHref = config.serviceUrls.adjudications
+      ? `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`
+      : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`
+
     const adjudicationsSummaryData: MiniSummaryData = {
       heading: 'Adjudications',
       topLabel: 'Proven in last 3 months',
@@ -342,14 +352,10 @@ export default class OverviewPageService {
       bottomContentLine1: pluralise(adjudicationSummary.awards?.length, 'active punishment', {
         emptyMessage: 'No active punishments',
       }),
-      bottomContentLine1Href: adjudicationSummary.awards?.length
-        ? `/prisoner/${prisonerNumber}/active-punishments`
-        : undefined,
+      bottomContentLine1Href: adjudicationSummary.awards?.length ? activePunishmentsHref : undefined,
       bottomClass: 'small',
       linkLabel: 'Adjudication history',
-      linkHref: config.serviceUrls.adjudications
-        ? `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`
-        : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/adjudications`,
+      linkHref: adjudicationHistoryHref,
     }
 
     const visitsSummaryData: MiniSummaryData = {

@@ -134,12 +134,13 @@ context('Profile banner', () => {
     it('Shows clickable alert flags', () => {
       visitOverviewPage()
       const overviewPage = new OverviewPage()
-      overviewPage.alertFlags().children().should('have.length', '5')
-      overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Arsonist')
-      overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Concerted indiscipline')
-      overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Controlled unlock')
-      overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Gang member')
-      overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Veteran')
+      overviewPage.alertFlags().children().should('have.length', '6')
+      overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
+      overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
+      overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
+      overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Controlled unlock')
+      overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
+      overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Veteran')
     })
 
     it('Shows modal when clicking alert flag', () => {

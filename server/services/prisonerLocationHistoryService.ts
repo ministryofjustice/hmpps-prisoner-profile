@@ -9,6 +9,7 @@ import { CaseLoad } from '../interfaces/caseLoad'
 import LocationHistoryPageData from '../interfaces/pages/locationHistoryPageData'
 import { formatName, sortByDateTime, putLastNameFirst, hasLength, extractLocation } from '../utils/utils'
 import { RestClientBuilder } from '../data'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 export type PrisonerLocationHistoryService = (
   token: string,
@@ -123,6 +124,7 @@ export default ({
 
     return {
       prisonerName,
+      prisonerBreadcrumbName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
       prisonerNumber,
       locationName: extractLocation(locationAttributes.description, agencyId.toString()),
 

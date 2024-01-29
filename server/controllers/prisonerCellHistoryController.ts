@@ -144,7 +144,7 @@ export default class PrisonerCellHistoryController {
             name: formatName(occupant.firstName, '', occupant.lastName, { style: NameFormatStyle.firstLast }),
             profileUrl: `/prisoner/${occupant.offenderNo}`,
           })),
-        prisonerName: formatName(firstName, '', lastName),
+        prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
         profileUrl: `/prisoner/${offenderNo}`,
         breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
         changeCellLink: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}/cell-move/search-for-cell?returnUrl=${prisonerProfileUrl}`,

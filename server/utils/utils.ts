@@ -1,3 +1,4 @@
+import { differenceInMonths, parse } from 'date-fns'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
@@ -127,26 +128,17 @@ export const getNamesFromString = (string: string): string[] =>
     .split(' ')
     .map(name => properCaseName(name))
 
-export const yearsBetweenDateStrings = (start: string, end: string): number => {
-  const endDate = new Date(end)
-  const startDate = new Date(start)
-  const endMonth = endDate.getMonth()
-  const startMonth = startDate.getMonth()
-  let years: number = endDate.getFullYear() - startDate.getFullYear()
+export const calculateAge = (dob: string): { years: number; months: number } => {
+  const currentDate = new Date()
 
-  if (years === 0) {
-    return years
-  }
+  const birthDate = parse(dob, 'yyyy-MM-dd', new Date())
 
-  if (startMonth > endMonth) {
-    years -= 1
-  } else if (startMonth === endMonth) {
-    if (startDate.getDate() > endDate.getDate()) {
-      years -= 1
-    }
-  }
+  const totalMonths = differenceInMonths(currentDate, birthDate)
 
-  return years
+  const years = Math.floor(totalMonths / 12)
+  const months = totalMonths % 12
+
+  return { years, months }
 }
 
 /**
@@ -309,6 +301,7 @@ export const generateListMetadata = (
       sort: queryParams.sort,
       queryParams: {
         ...queryParams,
+        sort: undefined,
       },
     },
     pagination: {
@@ -423,13 +416,11 @@ export const apostrophe = (word: string): string => {
 }
 
 export const prependBaseUrl = (url: string): string => {
-  const urlWithBaseUrl = `${config.serviceUrls.digitalPrison}${url}`
-  return urlWithBaseUrl
+  return `${config.serviceUrls.digitalPrison}${url}`
 }
 
 export const prependHmppsAuthBaseUrl = (url: string): string => {
-  const urlWithHmppsAuthBaseUrl = `${config.apis.hmppsAuth.url}${url}`
-  return urlWithHmppsAuthBaseUrl
+  return `${config.apis.hmppsAuth.url}${url}`
 }
 
 /**
@@ -438,6 +429,7 @@ export const prependHmppsAuthBaseUrl = (url: string): string => {
  * Returns 'Not entered' of the code is undefined
  *
  * @param code
+ * @param categoryText
  */
 export const formatCategoryCodeDescription = (code: string, categoryText: string): string => {
   if (['A', 'B', 'C', 'D'].includes(code)) {
@@ -458,6 +450,24 @@ export const formatCategoryCodeDescription = (code: string, categoryText: string
   }
 }
 
+/**
+ * Returns a label for use in the cat a prisoner tag.
+ *
+ * @param code
+ */
+export const formatCategoryALabel = (code: string): string => {
+  switch (code) {
+    case 'A':
+      return 'Cat A'
+    case 'P':
+      return 'Cat A Provisional'
+    case 'H':
+      return 'Cat A High'
+    default:
+      return undefined
+  }
+}
+
 // eslint-disable-next-line no-shadow
 export enum SortType {
   ASC = 'ASC',
@@ -465,8 +475,7 @@ export enum SortType {
 }
 
 export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: string, sortType: SortType): object[] => {
-  // eslint-disable-next-line
-  let array = arrayOfObjects.sort(function (a, b) {
+  return arrayOfObjects.sort((a, b) => {
     const dateA = new Date(a[dateKey]).getTime()
     const dateB = new Date(b[dateKey]).getTime()
     if (sortType === SortType.DESC) {
@@ -477,14 +486,12 @@ export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: stri
     }
     return 0
   })
-  return array
 }
 
 export const { neurodiversityEnabledPrisons } = config
 
 export const neurodiversityEnabled = (agencyId: string): boolean => {
-  const isEnabled = neurodiversityEnabledPrisons?.includes(agencyId)
-  return isEnabled
+  return neurodiversityEnabledPrisons?.includes(agencyId)
 }
 
 export const stripAgencyPrefix = (location: string, agency: string): string => {
@@ -509,11 +516,12 @@ export const formatLocation = (locationName: string): string => {
 
 export const isTemporaryLocation = (locationName: string): boolean => {
   if (!locationName) return false
-  if (locationName.endsWith('RECP')) return true
-  if (locationName.endsWith('CSWAP')) return true
-  if (locationName.endsWith('COURT')) return true
-  if (locationName.endsWith('TAP')) return true
-  return false
+  return (
+    locationName.endsWith('RECP') ||
+    locationName.endsWith('CSWAP') ||
+    locationName.endsWith('COURT') ||
+    locationName.endsWith('TAP')
+  )
 }
 
 export const extractLocation = (location: string, agencyId: string): string => {

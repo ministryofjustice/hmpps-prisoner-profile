@@ -27,6 +27,7 @@ export default class BeliefHistoryController {
     })
 
     return res.render('pages/beliefHistory', {
+      pageTitle: 'Religion or belief history',
       beliefs,
       prisonerNumber,
       breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),

@@ -5,7 +5,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { Alias } from '../interfaces/prisoner'
-import { formatName, yearsBetweenDateStrings } from '../utils/utils'
+import { formatName } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
 import { mockAddresses } from '../data/localMockData/addresses'
@@ -95,22 +95,14 @@ describe('PersonalPageService', () => {
 
   describe('Personal details', () => {
     describe('Age', () => {
-      it('Uses the age from the inmate detail when provided', async () => {
-        const service = constructService()
-        const response = await service.get('token', PrisonerMockDataA)
-        expect(response.personalDetails.age).toEqual(inmateDetailMock.age.toString())
-      })
+      it('calculates the age from the date of birth', async () => {
+        jest.useFakeTimers().setSystemTime(new Date('2024-01-23'))
 
-      it('Uses calculates the age from the date of birth when no age is given', async () => {
-        const inmateDetail = { ...inmateDetailMock }
-        inmateDetail.age = undefined
-        const expectedAge = yearsBetweenDateStrings(
-          PrisonerMockDataA.dateOfBirth,
-          new Date('2023-01-01').toISOString(),
-        ).toString()
         const service = constructService()
         const response = await service.get('token', PrisonerMockDataA)
-        expect(response.personalDetails.age).toEqual(expectedAge)
+        expect(response.personalDetails.age).toEqual({ months: 3, years: 33 })
+
+        jest.useRealTimers()
       })
     })
 
