@@ -31,7 +31,6 @@ buildAppInsightsClient()
 type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = {
-  // hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
   allocationManagerApiClientBuilder: (token: string) => new AllocationManagerApiClient(token),
   caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token),
   curiousApiClientBuilder: (token: string) => new CuriousRestApiClient(token),

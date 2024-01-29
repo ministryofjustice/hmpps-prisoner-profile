@@ -51,6 +51,7 @@ import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTyp
 import { Telephone } from '../../interfaces/prisonApi/telephone'
 import { CsraAssessmentSummary } from '../../interfaces/prisonApi/csraAssessmentSummary'
 import { Belief } from '../../interfaces/prisonApi/belief'
+import { Reception } from '../../interfaces/prisonApi/reception'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -100,6 +101,7 @@ export interface PrisonApiClient {
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
   getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails>
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
+  getReceptionsWithCapacity(agencyId: string, attribute?: string): Promise<Reception[]>
   getStaffDetails(staffId: string): Promise<StaffDetails>
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
   getAlertTypes(): Promise<AlertType[]>

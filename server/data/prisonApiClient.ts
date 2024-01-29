@@ -56,6 +56,7 @@ import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
 import { Telephone } from '../interfaces/prisonApi/telephone'
 import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
 import { Belief } from '../interfaces/prisonApi/belief'
+import { Reception } from '../interfaces/prisonApi/reception'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -514,6 +515,12 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getAlertDetails(bookingId: number, alertId: number): Promise<Alert> {
     return this.restClient.get<Alert>({
       path: `/api/bookings/${bookingId}/alerts/${alertId}`,
+    })
+  }
+
+  async getReceptionsWithCapacity(agencyId: string, attribute: string): Promise<Reception[]> {
+    return this.restClient.get<Reception[]>({
+      path: `/api/agencies/${agencyId}/receptionsWithCapacity${attribute ? `?attribute=${attribute}` : ''}`,
     })
   }
 

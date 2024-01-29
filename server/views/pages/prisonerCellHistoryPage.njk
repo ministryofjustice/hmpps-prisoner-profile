@@ -11,7 +11,7 @@
   {
     text: 'Digital Prison Services',
     href:  "/" | prependBaseUrl
-  },  
+  },
   {
     text: prisonerName,
     href: "/prisoner/" + prisonerNumber
@@ -36,16 +36,22 @@
     </div>
   </div>
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter"><h2 class="govuk-!-font-size-36">Current location</h2></div>
-        <div class="govuk-grid-column-three-quarters">
-        {% if canViewCellMoveButton %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter"><h2 class="govuk-!-font-size-36">Current location</h2></div>
+    <div class="location-actions govuk-grid-column-three-quarters">
+      {% if canViewMoveToReceptionButton %}
             <div class="hmpps-action-header">
-                {{ hmppsActionButton({ text: 'Change cell', iconName: 'change-cell', id: 'change-cell-action-button', url:  changeCellLink }) }}
+              {{ hmppsActionButton({ text: 'Move to reception', iconName: 'move-to-reception', id: 'move-to-reception-action-button', url: moveToReceptionLink }) }}
             </div>
-        {% endif %}
+      {% endif %}
+      {% if canViewCellMoveButton %}
+        <div class="govuk-!-margin-left-4 hmpps-action-header">
+          {{ hmppsActionButton({ text: 'Change cell', iconName: 'change-cell', id: 'change-cell-action-button', url: changeCellLink }) }}
         </div>
+      {% endif %}
     </div>
+  </div>
+
   <div class="horizontal-information horizontal-information--with-border govuk-!-margin-bottom-6">
     <div class="horizontal-information__item">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Establishment</h3>
@@ -89,7 +95,7 @@
       {% set rows = [] %}
 
       {% for cell in agency.cellHistory %}
-        {% set rows = (rows.push([  
+        {% set rows = (rows.push([
           { text: cell.location },
           { text: cell.movedIn },
           { text: cell.movedInBy },
