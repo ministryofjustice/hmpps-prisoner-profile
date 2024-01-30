@@ -14,16 +14,14 @@ import { AuditService, Page } from '../services/auditService'
 interface LocationWithAgencyLeaveDate extends PreviousLocation {
   establishmentWithAgencyLeaveDate: string
 }
-/**
- * Parse request for alerts page and orchestrate response
- */
-export default class PrisonerCellHistoryController {
+
+export default class PrisonerLocationDetailsController {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly auditService: AuditService,
   ) {}
 
-  public async displayPrisonerCellHistory(req: Request, res: Response, prisonerData: Prisoner) {
+  public async displayPrisonerLocationDetails(req: Request, res: Response, prisonerData: Prisoner) {
     const offenderNo = prisonerData.prisonerNumber
 
     const enrichLocationsWithAgencyLeaveDate = (locations: PreviousLocation[]): LocationWithAgencyLeaveDate[] => {
@@ -134,7 +132,7 @@ export default class PrisonerCellHistoryController {
       })
 
       // Render page
-      return res.render('pages/prisonerCellHistoryPage', {
+      return res.render('pages/prisonerLocationDetails', {
         pageTitle: 'Location details',
         ...mapHeaderNoBannerData(prisonerData),
         name,

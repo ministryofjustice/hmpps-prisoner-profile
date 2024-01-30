@@ -2,7 +2,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import PrisonerCellHistoryController from './prisonerCellHistoryController'
+import PrisonerLocationDetailsController from './prisonerLocationDetailsController'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { AuditService } from '../services/auditService'
@@ -46,11 +46,11 @@ const prisonerCellHistoryPageData: Record<string, unknown> = {
   prisonId: 'MDI',
 }
 
-describe('Prisoner Cell History', () => {
+describe('Prisoner Location Details', () => {
   const offenderNo = 'ABC123'
   let req: any
   let res: any
-  let controller: PrisonerCellHistoryController
+  let controller: PrisonerLocationDetailsController
   let prisonApiClient: PrisonApiClient
   let auditServiceClient: AuditService
 
@@ -82,7 +82,7 @@ describe('Prisoner Cell History', () => {
     prisonApiClient = prisonApiClientMock()
     auditServiceClient = auditServiceMock()
 
-    controller = new PrisonerCellHistoryController(() => prisonApiClient, auditServiceClient)
+    controller = new PrisonerLocationDetailsController(() => prisonApiClient, auditServiceClient)
   })
 
   afterEach(() => {
@@ -90,7 +90,7 @@ describe('Prisoner Cell History', () => {
     spy.mockRestore()
   })
 
-  describe('displayPrisonerCellHistory', () => {
+  describe('displayPrisonerLocationDetails', () => {
     describe('should render the page', () => {
       it('should not display the "Move to reception" button when user does not have the CELL_MOVE role', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [] } } }
@@ -98,9 +98,9 @@ describe('Prisoner Cell History', () => {
         prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
         prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue(ReceptionsWithCapacityMock)
         prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
-        await controller.displayPrisonerCellHistory(req, res, PrisonerMockDataA)
+        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerCellHistoryPage', {
+        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
           ...prisonerCellHistoryPageData,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
@@ -112,9 +112,9 @@ describe('Prisoner Cell History', () => {
         prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
         prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue(ReceptionsWithCapacityMock)
         prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
-        await controller.displayPrisonerCellHistory(req, res, PrisonerMockDataA)
+        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerCellHistoryPage', {
+        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
           ...prisonerCellHistoryPageData,
           currentLocation: {
             ...currentLocation,
@@ -130,9 +130,9 @@ describe('Prisoner Cell History', () => {
         prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
         prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue(ReceptionsWithCapacityMock)
         prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
-        await controller.displayPrisonerCellHistory(req, res, PrisonerMockDataA)
+        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerCellHistoryPage', {
+        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
           ...prisonerCellHistoryPageData,
           canViewMoveToReceptionButton: true,
           moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
@@ -144,9 +144,9 @@ describe('Prisoner Cell History', () => {
         prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
         prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue([])
         prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
-        await controller.displayPrisonerCellHistory(req, res, PrisonerMockDataA)
+        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerCellHistoryPage', {
+        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
           ...prisonerCellHistoryPageData,
           canViewMoveToReceptionButton: true,
           moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/reception-full`,
