@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { formatName } from '../utils/utils'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 
-export default class ProfessionalContactsController {
+export default class GoalsController {
   constructor(private readonly workAndSkillsPageService: WorkAndSkillsPageService) {}
 
   public async displayGoals(req: Request, res: Response) {

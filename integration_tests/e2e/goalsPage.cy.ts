@@ -2,7 +2,7 @@ import Page from '../pages/page'
 import GoalsPage from '../pages/goalsPage'
 
 const visitGoalsPage = (): GoalsPage => {
-  cy.signIn({ redirectPath: '/prisoner/A1143DZ/goals' })
+  cy.signIn({ redirectPath: '/prisoner/G6123VU/goals' })
   return Page.verifyOnPageWithTitle(GoalsPage, 'Michael Willis’ goals in Virtual Campus (VC2)')
 }
 
@@ -10,7 +10,7 @@ context('Prisoners goals page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.task('stubPrisonerData', { prisonerNumber: 'A1143DZ' })
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
   })
 
   context('Goals page', () => {
