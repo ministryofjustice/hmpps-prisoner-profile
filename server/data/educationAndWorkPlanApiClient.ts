@@ -1,0 +1,21 @@
+import { EducationAndWorkPlanApiClient } from './interfaces/educationAndWorkPlanApiClient'
+import RestClient from './restClient'
+import config from '../config'
+import { ActionPlanResponse } from '../interfaces/educationAndWorkPlanApi/actionPlanResponse'
+
+/**
+ * REST API client implementation of [EducationAndWorkPlanApiClient] (aka. the PLP API Client)
+ */
+export default class EducationAndWorkPlanApiRestClient implements EducationAndWorkPlanApiClient {
+  private readonly restClient: RestClient
+
+  constructor(token: string) {
+    this.restClient = new RestClient('Education And Work Plan API', config.apis.educationAndWorkPlanApi, token)
+  }
+
+  getPrisonerActionPlan(prisonerNumber: string): Promise<ActionPlanResponse> {
+    return this.restClient.get<ActionPlanResponse>({
+      path: `/action-plans/${prisonerNumber}`,
+    })
+  }
+}
