@@ -1,12 +1,13 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
-import { services } from './services'
+
+jest.mock('./services')
 
 let app: Express
 
 beforeEach(() => {
-  app = appWithAllRoutes({ services: services() })
+  app = appWithAllRoutes({ services: { dataAccess: {} as any, commonApiRoutes: {} as any } })
 })
 
 afterEach(() => {

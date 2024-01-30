@@ -24,13 +24,16 @@ import WhereaboutsRestApiClient from './whereaboutsClient'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
 import ManageUsersApiRestClient from './manageUsersApiClient'
 import ComplexityApiRestClient from './complexityApiClient'
+import applicationInfo from '../applicationInfo'
 
 initialiseAppInsights()
-buildAppInsightsClient()
+buildAppInsightsClient(applicationInfo())
 
 type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = {
+  // hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
+  applicationInfo: applicationInfo(),
   allocationManagerApiClientBuilder: (token: string) => new AllocationManagerApiClient(token),
   caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token),
   curiousApiClientBuilder: (token: string) => new CuriousRestApiClient(token),
