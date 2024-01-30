@@ -15,13 +15,41 @@ import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
 
+interface WorkAndSkillsData {
+  learnerEmployabilitySkills: LearnerEmployabilitySkills
+  learnerProfiles: Array<LearnerProfile>
+  learnerEducation: Array<GovSummaryItem>
+  learnerLatestAssessments: Array<Array<GovSummaryGroup>>
+  learnerGoals: LearnerGoalsData
+  learnerNeurodivergence: Array<LearnerNeurodivergence>
+  workAndSkillsPrisonerName: string
+  offenderActivitiesHistory: ActivitiesHistoryData
+  unacceptableAbsences: UnacceptableAttendanceData
+}
+
+interface LearnerGoalsData {
+  employmentGoals: Array<GovSummaryItem>
+  personalGoals: Array<GovSummaryItem>
+  longTermGoals: Array<GovSummaryItem>
+  shortTermGoals: Array<GovSummaryItem>
+}
+
+interface ActivitiesHistoryData {
+  activitiesHistory: Array<GovSummaryItem>
+}
+
+interface UnacceptableAttendanceData {
+  unacceptableAbsenceLastSixMonths: number
+  unacceptableAbsenceLastMonth: number
+}
+
 export default class WorkAndSkillsPageService {
   constructor(
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
   ) {}
 
-  public async get(token: string, prisonerData: Prisoner) {
+  public async get(token: string, prisonerData: Prisoner): Promise<WorkAndSkillsData> {
     const curiousApiClient = this.curiousApiClientBuilder(token)
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, firstName, lastName } = prisonerData
@@ -60,7 +88,10 @@ export default class WorkAndSkillsPageService {
     }
   }
 
-  private async getOffenderAttendanceHistoryStats(prisonerNumber: string, prisonApiClient: PrisonApiClient) {
+  private async getOffenderAttendanceHistoryStats(
+    prisonerNumber: string,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<UnacceptableAttendanceData> {
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
     const oneMonthAgo = format(sub(startOfToday(), { months: 1 }), 'yyyy-MM-dd')
@@ -87,7 +118,10 @@ export default class WorkAndSkillsPageService {
     return { unacceptableAbsenceLastSixMonths, unacceptableAbsenceLastMonth }
   }
 
-  private async getOffenderActivitiesHistory(prisonerNumber: string, prisonApiClient: PrisonApiClient) {
+  private async getOffenderActivitiesHistory(
+    prisonerNumber: string,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<ActivitiesHistoryData> {
     const today = format(startOfToday(), 'yyyy-MM-dd')
     // API returns results that have not ended or have an end date after the given date
     const offenderActivitiesHistory: OffenderActivitiesHistory = await prisonApiClient.getOffenderActivitiesHistory(
@@ -107,18 +141,27 @@ export default class WorkAndSkillsPageService {
     return { activitiesHistory }
   }
 
-  private async getLearnerEmployabilitySkills(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+  private async getLearnerEmployabilitySkills(
+    prisonerNumber: string,
+    curiousApiClient: CuriousApiClient,
+  ): Promise<LearnerEmployabilitySkills> {
     const learnerEmployabilitySkills: LearnerEmployabilitySkills =
       await curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber)
     return learnerEmployabilitySkills
   }
 
-  private async getLearnerProfiles(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+  private async getLearnerProfiles(
+    prisonerNumber: string,
+    curiousApiClient: CuriousApiClient,
+  ): Promise<LearnerProfile[]> {
     const learnerProfiles: LearnerProfile[] = await curiousApiClient.getLearnerProfile(prisonerNumber)
     return learnerProfiles
   }
 
-  private async getLearnerEducation(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+  private async getLearnerEducation(
+    prisonerNumber: string,
+    curiousApiClient: CuriousApiClient,
+  ): Promise<GovSummaryItem[]> {
     const learnerEducation: LearnerEducation = await curiousApiClient.getLearnerEducation(prisonerNumber)
     const coursesAndQualifications: GovSummaryItem[] = []
     learnerEducation?.content?.forEach(content => {
@@ -131,7 +174,10 @@ export default class WorkAndSkillsPageService {
     return coursesAndQualifications
   }
 
-  private async getLearnerLatestAssessments(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+  private async getLearnerLatestAssessments(
+    prisonerNumber: string,
+    curiousApiClient: CuriousApiClient,
+  ): Promise<GovSummaryGroup[][]> {
     const learnerLatestAssessments: LearnerLatestAssessment[] =
       await curiousApiClient.getLearnerLatestAssessments(prisonerNumber)
 
@@ -157,7 +203,7 @@ export default class WorkAndSkillsPageService {
     return multiListArray
   }
 
-  async getLearnerGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+  private async getLearnerGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<LearnerGoalsData> {
     const learnerGoals: LearnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
 
     let employmentGoals: GovSummaryItem[] = []
@@ -181,7 +227,7 @@ export default class WorkAndSkillsPageService {
     return { employmentGoals, personalGoals, longTermGoals, shortTermGoals }
   }
 
-  private strArrayToGovList(goals: string[]) {
+  private strArrayToGovList(goals: string[]): GovSummaryItem[] {
     const govList: GovSummaryItem[] = []
     goals.forEach(content => {
       const item: GovSummaryItem = { key: { text: content }, value: { text: '' } }
@@ -190,7 +236,10 @@ export default class WorkAndSkillsPageService {
     return govList
   }
 
-  public async getLearnerNeurodivergence(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
+  private async getLearnerNeurodivergence(
+    prisonerNumber: string,
+    curiousApiClient: CuriousApiClient,
+  ): Promise<LearnerNeurodivergence[]> {
     const learnerNeurodivergence: LearnerNeurodivergence[] =
       await curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
     return learnerNeurodivergence
