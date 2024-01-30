@@ -1,0 +1,58 @@
+{# New Work & Skills page introduced in epic RR-575
+   This view is only rendered if the NEW_WORK_AND_SKILLS_TAB_ENABLED feature toggle is enabled
+
+   TODO - The feature toggle, the "new_" prefix, and this comment will be removed in RR-607
+#}
+{% extends "./index.njk" %}
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
+  }
+] %}
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h1>Work and skills</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter app-sidebar">
+      <ul class="govuk-list hmpps-sidebar">
+        <li><a class="govuk-link" href="#courses-and-qualifications">Courses and qualifications</a></li>
+        <li><a class="govuk-link" href="#work-and-activities">Work and activities</a></li>
+        <li><a class="govuk-link" href="#employability-skills">Employability skills</a></li>
+        <li><a class="govuk-link" href="#goals">Goals</a></li>
+        <li><a class="govuk-link" href="#functional-skills-level">Functional skills level</a></li>
+      </ul>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+      <div class="govuk-grid-row" data-qa="courses-and-qualifications">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/new_workAndSkillsPage/coursesAndQualifications.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/new_workAndSkillsPage/workAndActivities.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/new_workAndSkillsPage/employabilitySkills.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/new_workAndSkillsPage/goals.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/new_workAndSkillsPage/functionalSkillsLevel.njk" %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include "../partials/backToTop.njk" %}
+{% endblock %}
