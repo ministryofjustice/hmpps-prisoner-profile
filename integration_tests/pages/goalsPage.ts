@@ -12,4 +12,12 @@ export default class GoalsPage extends Page {
   shortTermGoalsList = (): PageElement => cy.get('[data-qa="short-term-goals-list"]')
 
   longTermGoalsList = (): PageElement => cy.get('[data-qa="long-term-goals-list"]')
+
+  noEmploymentGoalsMessage = (): PageElement => cy.get('[data-qa="no-employment-goals-message"]')
+
+  noPersonalGoalsMessage = (): PageElement => cy.get('[data-qa="no-personal-goals-message"]')
+
+  noShortTermGoalsMessage = (): PageElement => cy.get('[data-qa="no-short-term-goals-message"]')
+
+  noLongTermGoalsMessage = (): PageElement => cy.get('[data-qa="no-long-term-goals-message"]')
 }
