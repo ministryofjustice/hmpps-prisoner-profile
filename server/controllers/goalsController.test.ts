@@ -1,132 +1,68 @@
+import { Role } from '../data/enums/role'
+import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
+
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import GoalsController from './goalsController'
 
-describe('Prisoner goals', () => {
-  const offenderNo = 'A1143DZ'
+let req: any
+let res: any
+let controller: GoalsController
 
-  let req: any
-  let res: any
-  let controller: GoalsController
+jest.mock('../services/workAndSkillsPageService.ts')
+
+describe('Prisoner goals controller', () => {
+  let workAndSkillsPageService: WorkAndSkillsPageService
 
   beforeEach(() => {
     req = {
+      params: { prisonerNumber: 'A9999AA' },
+      query: {},
       middleware: {
         prisonerData: PrisonerMockDataA,
-        inmateDetail: inmateDetailMock,
       },
-      originalUrl: 'http://localhost',
-      params: { offenderNo },
-      query: {},
-      protocol: 'http',
-      get: jest.fn().mockReturnValue('localhost'),
+      headers: {
+        referer: 'http://referer',
+      },
+      path: 'goals',
+      session: {
+        userDetails: { displayName: 'A Name' },
+      },
+      flash: jest.fn(),
     }
-    res = { locals: {}, render: jest.fn(), status: jest.fn() }
-    controller = new GoalsController(new WorkAndSkillsPageService(null, null))
+    res = {
+      locals: {
+        clientToken: 'CLIENT_TOKEN',
+        user: {
+          userRoles: [Role.PrisonUser],
+          staffId: 487023,
+          caseLoads: CaseLoadsDummyDataA,
+          token: 'USER_TOKEN',
+        },
+      },
+      render: jest.fn(),
+      redirect: jest.fn(),
+    }
+
+    workAndSkillsPageService = new WorkAndSkillsPageService(null, null)
+    workAndSkillsPageService.get = jest.fn().mockResolvedValue(LearnerGoalsMock)
+    controller = new GoalsController(workAndSkillsPageService)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   describe('displayGoals', () => {
     it('should render the page with the prisoners goals', async () => {
       // Given
-      const getGoalsForPrisonerSpy = jest.spyOn<any, string>(controller['workAndSkillsPageService'], 'get')
-      const expectedGoals = [
-        {
-          employmentGoals: [
-            {
-              key: {
-                text: 'Example 1 for employment goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-            {
-              key: {
-                text: 'Example 2 for employment goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-            {
-              key: {
-                text: 'Example 3 for employment goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-          ],
-          personalGoals: [
-            {
-              key: {
-                text: 'Example 1 for personal goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-            {
-              key: {
-                text: 'Example 2 for personal goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-            {
-              key: {
-                text: 'Example 3 for personal goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-          ],
-          longTermGoals: [
-            {
-              key: {
-                text: 'Example 1 for long term goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-            {
-              key: {
-                text: 'Example 2 for long term goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-          ],
-          shortTermGoals: [
-            {
-              key: {
-                text: 'Example 1 for short term goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-            {
-              key: {
-                text: 'Example 2 for short term goal',
-              },
-              value: {
-                text: '',
-              },
-            },
-          ],
-        },
-      ]
-
+      const getGoals = jest.spyOn<any, string>(controller['workAndSkillsPageService'], 'get')
+      const expectedGoals = LearnerGoalsMock
       const expectedView = {
-        prisonerName: 'Michael Willis',
-        prisonerNumber: 'A1143DZ',
-        expectedGoals,
+        prisonerName: 'John Saunders',
+        prisonerNumber: 'G6123VU',
+        ...expectedGoals,
       }
 
       // When
@@ -134,8 +70,7 @@ describe('Prisoner goals', () => {
 
       // Then
       expect(res.render).toHaveBeenCalledWith('pages/goals/goalsPage', expectedView)
-      expect(controller.displayGoals).toHaveBeenCalled()
-      expect(getGoalsForPrisonerSpy).toHaveBeenCalledWith(res.locals.clientToken, req.middleware.prisonerData)
+      expect(getGoals).toHaveBeenCalledWith(res.locals.clientToken, req.middleware.prisonerData)
     })
   })
 })
