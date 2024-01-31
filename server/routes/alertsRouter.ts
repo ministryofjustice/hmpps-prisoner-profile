@@ -1,6 +1,5 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { Services } from '../services'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import AlertsController from '../controllers/alertsController'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
@@ -12,20 +11,12 @@ import validationMiddleware from '../middleware/validationMiddleware'
 import { AlertValidator } from '../validators/alertValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
+import { getRequest, postRequest } from './routerUtils'
 
 export default function alertsRouter(services: Services): Router {
   const router = Router()
-
-  const get = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.get(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.post(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
+  const get = getRequest(router)
+  const post = postRequest(router)
 
   const alertsController = new AlertsController(
     services.alertsPageService,
