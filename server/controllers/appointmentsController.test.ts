@@ -1,7 +1,7 @@
 import { addDays, addMinutes, set, subMinutes } from 'date-fns'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
-import { PrisonerSearchService } from '../services'
+import PrisonerSearchService from '../services/prisonerSearch'
 import AppointmentService from '../services/appointmentService'
 import AppointmentController from './appointmentController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
