@@ -14,9 +14,11 @@ import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapa
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import AgencyMock from '../data/localMockData/agency'
 import config from '../config'
+import { LocationDetailsCurrentLocation, LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
 
 const profileUrl = `/prisoner/${PrisonerMockDataA.prisonerNumber}`
-const currentLocation: Record<string, unknown> = {
+
+const currentLocation: LocationDetailsCurrentLocation = {
   agencyId: 'MDI',
   assignmentDateTime: '2021-07-05T10:35:17',
   assignmentEndDateTime: '2021-07-05T10:35:17',
@@ -28,7 +30,8 @@ const currentLocation: Record<string, unknown> = {
   movedInBy: 'John Smith',
   movedOut: '05/07/2021 - 10:35',
 }
-const prisonerCellHistoryPageData: Record<string, unknown> = {
+
+const prisonerCellHistoryPageData: LocationDetailsPageData = {
   pageTitle: 'Location details',
   breadcrumbPrisonerName: 'John Saunders',
   name: 'John Saunders',
