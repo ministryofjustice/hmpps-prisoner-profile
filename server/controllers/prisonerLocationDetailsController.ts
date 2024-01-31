@@ -10,10 +10,11 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import config from '../config'
 import PreviousLocation from '../interfaces/prisonApi/previousLocation'
 import { AuditService, Page } from '../services/auditService'
-
-interface LocationWithAgencyLeaveDate extends PreviousLocation {
-  establishmentWithAgencyLeaveDate: string
-}
+import {
+  CellHistoryGroupedByPeriodAtAgency,
+  LocationDetailsPageData,
+  LocationWithAgencyLeaveDate,
+} from '../interfaces/pages/locationDetailsPageData'
 
 export default class PrisonerLocationDetailsController {
   constructor(
@@ -47,7 +48,9 @@ export default class PrisonerLocationDetailsController {
       }, [])
     }
 
-    const getCellHistoryGroupedByPeriodAtAgency = (locations: PreviousLocation[]) => {
+    const getCellHistoryGroupedByPeriodAtAgency = (
+      locations: PreviousLocation[],
+    ): CellHistoryGroupedByPeriodAtAgency[] => {
       const locationsWithAgencyLeaveDate = enrichLocationsWithAgencyLeaveDate(locations)
       return Object.entries(groupBy(locationsWithAgencyLeaveDate, 'establishmentWithAgencyLeaveDate')).map(
         ([key, value]) => {
@@ -131,8 +134,8 @@ export default class PrisonerLocationDetailsController {
         page: Page.PrisonerCellHistory,
       })
 
-      // Render page
-      return res.render('pages/prisonerLocationDetails', {
+      // TODO CDPS-373: Move into PrisonerLocationDetailsService
+      const pageData: LocationDetailsPageData = {
         pageTitle: 'Location details',
         ...mapHeaderNoBannerData(prisonerData),
         name,
@@ -157,7 +160,10 @@ export default class PrisonerLocationDetailsController {
           : `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}/reception-move/consider-risks-reception`,
         prisonerNumber: offenderNo,
         dpsBaseUrl: `${config.serviceUrls.digitalPrison}/prisoner/${offenderNo}`,
-      })
+      }
+
+      // Render page
+      return res.render('pages/prisonerLocationDetails', pageData)
     } catch (error) {
       res.locals.redirectUrl = `/prisoner/${offenderNo}`
       throw error

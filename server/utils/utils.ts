@@ -533,10 +533,11 @@ export const extractLocation = (location: string, agencyId: string): string => {
 export const groupBy = <T>(array: T[], key: string): Record<string, T[]> =>
   array &&
   array.length &&
-  array.reduce((acc, current) => {
-    const group = current[key]
+  array.reduce((acc, currentItem) => {
+    const groupKey = currentItem[key]
+    const existingGroupedItems = acc[groupKey] || []
 
-    return { ...acc, [group]: [...(acc[group] || []), current] }
+    return { ...acc, [groupKey]: [...existingGroupedItems, currentItem] }
   }, {})
 
 export const times =
