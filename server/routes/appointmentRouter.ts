@@ -1,6 +1,5 @@
-import { NextFunction, Request, RequestHandler, Response, Router } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 import { Services } from '../services'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import AppointmentController from '../controllers/appointmentController'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
@@ -12,21 +11,12 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
 import { notifyClient } from '../utils/notifyClient'
 import isServiceEnabled from '../utils/isServiceEnabled'
+import { getRequest, postRequest } from './routerUtils'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
-
-  const get = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.get(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-
-  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.post(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
+  const get = getRequest(router)
+  const post = postRequest(router)
 
   const appointmentController = new AppointmentController(
     services.appointmentService,

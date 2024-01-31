@@ -1,25 +1,16 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import CaseNotesController from '../controllers/caseNotesController'
 import { Services } from '../services'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { CaseNoteValidator } from '../validators/caseNoteValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
+import { getRequest, postRequest } from './routerUtils'
 
 export default function caseNotesRouter(services: Services): Router {
   const router = Router()
-
-  const get = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.get(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.post(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
+  const get = getRequest(router)
+  const post = postRequest(router)
 
   const caseNotesController = new CaseNotesController(
     services.dataAccess.prisonApiClientBuilder,

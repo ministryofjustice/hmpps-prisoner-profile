@@ -1,6 +1,5 @@
-import { type RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import config from '../config'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
 import { formatName, sortArrayOfObjectsByDate, SortType } from '../utils/utils'
@@ -13,7 +12,6 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
-import PrisonerLocationDetailsController from '../controllers/prisonerLocationDetailsController'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import getFrontendComponents from '../middleware/frontEndComponents'
@@ -26,9 +24,12 @@ import goalsRouter from './goalsRouter'
 import { ApiAction, Page } from '../services/auditService'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import BeliefHistoryController from '../controllers/beliefHistoryController'
+import locationDetailsRouter from './locationDetailsRouter'
+import { getRequest } from './routerUtils'
 
 export default function routes(services: Services): Router {
   const router = Router()
+  const get = getRequest(router)
 
   router.use(async (req, res, next) => {
     res.locals = {
@@ -38,12 +39,6 @@ export default function routes(services: Services): Router {
     next()
   })
 
-  const get = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.get(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-
   const overviewController = new OverviewController(
     services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
@@ -52,10 +47,6 @@ export default function routes(services: Services): Router {
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(
-    services.dataAccess.prisonApiClientBuilder,
-    services.auditService,
-  )
-  const prisonerLocationDetailsController = new PrisonerLocationDetailsController(
     services.dataAccess.prisonApiClientBuilder,
     services.auditService,
   )
@@ -226,6 +217,7 @@ export default function routes(services: Services): Router {
   router.use(appointmentRouter(services))
   router.use(professionalContactsRouter(services))
   router.use(goalsRouter(services))
+  router.use(locationDetailsRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
@@ -304,17 +296,6 @@ export default function routes(services: Services): Router {
         }),
         bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
       })
-    },
-  )
-
-  get(
-    '/prisoner/:prisonerNumber/location-details',
-    auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      return prisonerLocationDetailsController.displayPrisonerLocationDetails(req, res, prisonerData)
     },
   )
 
