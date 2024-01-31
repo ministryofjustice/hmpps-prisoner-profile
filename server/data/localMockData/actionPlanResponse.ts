@@ -2,26 +2,40 @@ import { ActionPlanResponse } from '../../interfaces/educationAndWorkPlanApi/act
 import { GoalResponse } from '../../interfaces/educationAndWorkPlanApi/goalResponse'
 import { StepResponse } from '../../interfaces/educationAndWorkPlanApi/stepResponse'
 
-const aValidActionPlanResponseWithOneGoal = (): ActionPlanResponse => {
+const aValidActionPlanResponse = (options?: {
+  reference?: string
+  prisonNumber?: string
+  goals?: Array<GoalResponse>
+}): ActionPlanResponse => {
   return {
-    reference: 'a20912ab-4dae-4aa4-8bc5-32319da8fceb',
-    prisonNumber: 'A1234BC',
-    goals: [aValidGoalResponse()],
+    reference: options?.reference || 'a20912ab-4dae-4aa4-8bc5-32319da8fceb',
+    prisonNumber: options?.prisonNumber || 'A1234BC',
+    goals: options?.goals || [aValidGoalResponse()],
   }
 }
-const aValidGoalResponse = (): GoalResponse => {
+
+const aValidActionPlanResponseWithOneGoal = (): ActionPlanResponse => {
+  return aValidActionPlanResponse({ goals: [aValidGoalResponse()] })
+}
+
+const aValidGoalResponse = (options?: {
+  reference?: string
+  title?: string
+  createdAt?: string
+  updatedAt?: string
+}): GoalResponse => {
   return {
-    goalReference: 'd38a6c41-13d1-1d05-13c2-24619966119b',
-    title: 'Learn Spanish',
+    goalReference: options?.reference || 'd38a6c41-13d1-1d05-13c2-24619966119b',
+    title: options?.title || 'Learn Spanish',
     status: 'ACTIVE',
     steps: [aValidFirstStepResponse(), aValidSecondStepResponse()],
     createdBy: 'asmith_gen',
     createdByDisplayName: 'Alex Smith',
-    createdAt: '2023-01-16',
+    createdAt: options?.createdAt || '2023-01-16T09:14:43.158Z',
     createdAtPrison: 'MDI',
     updatedBy: 'asmith_gen',
     updatedByDisplayName: 'Alex Smith',
-    updatedAt: '2023-09-23',
+    updatedAt: options?.updatedAt || '2023-09-23T14:43:02.094Z',
     updatedAtPrison: 'MDI',
     targetCompletionDate: '2024-02-29',
     notes: 'Prisoner is not good at listening',
@@ -46,4 +60,4 @@ const aValidSecondStepResponse = (): StepResponse => {
   }
 }
 
-export { aValidActionPlanResponseWithOneGoal, aValidGoalResponse }
+export { aValidActionPlanResponse, aValidActionPlanResponseWithOneGoal, aValidGoalResponse }
