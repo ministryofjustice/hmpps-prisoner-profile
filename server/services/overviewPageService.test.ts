@@ -73,7 +73,7 @@ jest.mock('../utils/utils', () => {
   return { ...original, neurodiversityEnabled: jest.fn() }
 })
 const mockedNeurodiversityEnabled = neurodiversityEnabled as jest.Mock
-config.complexityEnabledPrisons = ['MDI']
+config.featureToggles.complexityEnabledPrisons = ['MDI']
 
 describe('OverviewPageService', () => {
   let prisonApiClient: PrisonApiClient

@@ -144,7 +144,7 @@ describe('buildOverviewActions', () => {
         staffRoles,
         {
           ...config,
-          useOfForceDisabledPrisons: disabledPrisons,
+          featureToggles: { ...config.featureToggles, useOfForceDisabledPrisons: disabledPrisons },
         },
         undefined,
       )
