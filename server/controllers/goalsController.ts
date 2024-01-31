@@ -25,7 +25,7 @@ export default class GoalsController {
       page: Page.Goals,
     })
 
-    return res.render('pages/goals/goalsPage', {
+    return res.render('pages/goals/vc2GoalsPage', {
       prisonerNumber,
       prisonerName: formatName(firstName, '', lastName),
       ...workAndSkillsPageData,

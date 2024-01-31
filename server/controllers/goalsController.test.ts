@@ -55,7 +55,7 @@ describe('Prisoner goals controller', () => {
   })
 
   describe('displayGoals', () => {
-    it('should render the page with the prisoners goals', async () => {
+    it('should render the page with the prisoners goals from VC2', async () => {
       // Given
       const getGoals = jest.spyOn<any, string>(controller['workAndSkillsPageService'], 'get')
       const expectedGoals = LearnerGoalsMock
@@ -69,7 +69,7 @@ describe('Prisoner goals controller', () => {
       await controller.displayGoals(req, res)
 
       // Then
-      expect(res.render).toHaveBeenCalledWith('pages/goals/goalsPage', expectedView)
+      expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', expectedView)
       expect(getGoals).toHaveBeenCalledWith(res.locals.clientToken, req.middleware.prisonerData)
     })
   })

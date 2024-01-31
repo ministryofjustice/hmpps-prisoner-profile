@@ -19,7 +19,7 @@ export default function goalsRouter(services: Services): Router {
   const goalsController = new GoalsController(services.workAndSkillsPageService, services.auditService)
 
   get(
-    '/prisoner/:prisonerNumber/goals',
+    '/prisoner/:prisonerNumber/vc2-goals',
     auditPageAccessAttempt({ services, page: Page.Goals }),
     getPrisonerData(services, { minimal: true }),
     checkPrisonerInCaseload(),

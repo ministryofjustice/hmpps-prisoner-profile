@@ -1,11 +1,11 @@
 import Page from '../pages/page'
-import GoalsPage from '../pages/goalsPage'
+import Vc2GoalsPage from '../pages/vc2GoalsPage'
 
 const visitGoalsPage = () => {
-  cy.signIn({ redirectPath: '/prisoner/G6123VU/goals' })
+  cy.signIn({ redirectPath: '/prisoner/G6123VU/vc2-goals' })
 }
 
-context('Prisoners goals page', () => {
+context('Prisoners VC2 goals page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
@@ -18,19 +18,19 @@ context('Prisoners goals page', () => {
     visitGoalsPage()
 
     // When
-    const goalsPage = Page.verifyOnPageWithTitle(GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
+    const goalsPage = Page.verifyOnPageWithTitle(Vc2GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
 
     // Check
     goalsPage.banner().contains('The learning and work progress service in DPS is replacing VC2')
   })
 
-  it('should display goals', () => {
+  it('should display goals from VC2', () => {
     // Given
     cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU', emptyStates: false })
     visitGoalsPage()
 
     // When
-    const goalsPage = Page.verifyOnPageWithTitle(GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
+    const goalsPage = Page.verifyOnPageWithTitle(Vc2GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
 
     // Check
     goalsPage.employmentGoalsList().should('exist')
@@ -39,13 +39,13 @@ context('Prisoners goals page', () => {
     goalsPage.longTermGoalsList().should('exist')
   })
 
-  it('should display no goals message given there are no goals', () => {
+  it('should display no goals message given there are no goals in VC2', () => {
     // Given
     cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU', emptyStates: true })
     visitGoalsPage()
 
     // When
-    const goalsPage = Page.verifyOnPageWithTitle(GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
+    const goalsPage = Page.verifyOnPageWithTitle(Vc2GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
 
     // Check
     goalsPage.noEmploymentGoalsMessage().should('exist')

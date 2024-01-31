@@ -1,6 +1,6 @@
 import Page, { PageElement } from './page'
 
-export default class GoalsPage extends Page {
+export default class Vc2GoalsPage extends Page {
   h1 = (): PageElement => cy.get('h1')
 
   banner = (): PageElement => cy.get('.moj-banner')
