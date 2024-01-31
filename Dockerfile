@@ -1,8 +1,9 @@
 # Stage: base image
 FROM node:20.9-bullseye-slim as base
 
-ARG BUILD_NUMBER=1_0_0
-ARG GIT_REF=not-available
+ARG BUILD_NUMBER
+ARG GIT_REF
+ARG GIT_BRANCH
 
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
@@ -14,8 +15,15 @@ RUN addgroup --gid 2000 --system appgroup && \
 
 WORKDIR /app
 
-# Cache breaking
-ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
+# Cache breaking and ensure required build / git args defined
+RUN test -n "$BUILD_NUMBER" || (echo "BUILD_NUMBER not set" && false)
+RUN test -n "$GIT_REF" || (echo "GIT_REF not set" && false)
+RUN test -n "$GIT_BRANCH" || (echo "GIT_BRANCH not set" && false)
+
+# Define env variables for runtime health / info
+ENV BUILD_NUMBER=${BUILD_NUMBER}
+ENV GIT_REF=${GIT_REF}
+ENV GIT_BRANCH=${GIT_BRANCH}
 
 RUN apt-get update && \
         apt-get upgrade -y && \
@@ -25,11 +33,12 @@ RUN apt-get update && \
 # Stage: build assets
 FROM base as build
 
-ARG BUILD_NUMBER=1_0_0
-ARG GIT_REF=not-available
+ARG BUILD_NUMBER
+ARG GIT_REF
+ARG GIT_BRANCH
 
 RUN apt-get update && \
-        apt-get install -y make python g++ 
+        apt-get install -y make python g++
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
