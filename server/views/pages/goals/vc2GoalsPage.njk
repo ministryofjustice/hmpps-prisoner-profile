@@ -1,0 +1,101 @@
+{% extends "../index.njk" %}
+
+{%- from "govuk/components/summary-list/macro.njk" import govukSummaryList -%}
+{%- from "moj/components/banner/macro.njk" import mojBanner -%}
+
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href:  "/" | prependBaseUrl
+  },
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
+
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h1>{{ prisonerName | apostrophe }} goals in Virtual Campus (VC2)</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% set bannerHtml %}
+        <h2 class="govuk-heading-m">The learning and work progress service in DPS is replacing VC2</h2>
+      {% endset %}
+
+      {{ mojBanner({
+        type: 'information',
+        html: bannerHtml
+      }) }}
+
+      <p class="govuk-body hmpps-secondary-text">The careers information, advice and guidance (CIAG) team has previously recorded goals for this person in VC2. They do not include sentence plan targets.</p>
+      
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Employment goals</h3>
+      <div class="hmpps-goal-container">
+      {% if (learnerGoals.employmentGoals.length > 0) %}
+        {{ govukSummaryList({
+          classes: "hmpps-font-weight-normal",
+          rows: learnerGoals.employmentGoals, 
+          attributes: {
+            'data-qa': 'employment-goals-list'
+          }
+        }) }}
+      {% else %}
+        <p class="govuk-body" data-qa="no-employment-goals-message">The prisoner does not have any employment goals.</p>
+      {% endif %}
+      </div>
+
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Personal goals</h3>
+      <div class="hmpps-goal-container">
+      {% if (learnerGoals.personalGoals.length > 0) %}
+        {{ govukSummaryList({
+          classes: "hmpps-font-weight-normal",
+          rows: learnerGoals.personalGoals,
+          attributes: {
+            'data-qa': 'personal-goals-list'
+          }
+        }) }}
+      {% else %}
+        <p class="govuk-body" data-qa="no-personal-goals-message">The prisoner does not have any personal goals.</p>
+      {% endif %}
+      </div>
+
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Short-term goals</h3>
+      <div class="hmpps-goal-container">
+        {% if (learnerGoals.shortTermGoals.length > 0) %}
+          {{ govukSummaryList({
+            classes: "hmpps-font-weight-normal",
+            rows: learnerGoals.shortTermGoals,
+            attributes: {
+              'data-qa': 'short-term-goals-list'
+            }
+          }) }}
+        {% else %}
+          <p class="govuk-body" data-qa="no-short-term-goals-message">The prisoner does not have any short-term goals.</p>
+        {% endif %}
+      </div>
+
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Long-term goals</h3>
+      <div class="hmpps-goal-container hmpps-goal-container--no-border">
+      {% if (learnerGoals.longTermGoals.length > 0) %}
+        {{ govukSummaryList({
+          classes: "hmpps-font-weight-normal",
+          rows: learnerGoals.longTermGoals,
+          attributes: {
+            'data-qa': 'long-term-goals-list'
+          }
+        }) }}
+      {% else %}
+        <p class="govuk-body" data-qa="no-long-term-goals-message">The prisoner does not have any long term goals.</p>
+      {% endif %}
+      </div>
+
+      <p class="govuk-body">
+        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/work-and-skills">Return to the prisoner's profile</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
