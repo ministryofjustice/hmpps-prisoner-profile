@@ -2,7 +2,7 @@ import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
-
+import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import GoalsController from './goalsController'
 
@@ -47,7 +47,7 @@ describe('Prisoner goals controller', () => {
 
     workAndSkillsPageService = new WorkAndSkillsPageService(null, null)
     workAndSkillsPageService.get = jest.fn().mockResolvedValue(LearnerGoalsMock)
-    controller = new GoalsController(workAndSkillsPageService)
+    controller = new GoalsController(workAndSkillsPageService, auditServiceMock())
   })
 
   afterEach(() => {
