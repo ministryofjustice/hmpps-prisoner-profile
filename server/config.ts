@@ -238,14 +238,8 @@ export default {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
-  localMockData: get('LOCAL_MOCK_DATA', false),
-  feedbackDisabledPrisons: get('FEEDBACK_DISABLED_PRISONS', [], requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
-  neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
-  complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
-  useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
-  profileAddAppointmentEnabled: get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false') === 'true',
-  moveToReceptionLinkEnabled: get('MOVE_TO_RECEPTION_LINK_ENABLED', 'true') === 'true',
+
   notifications: {
     enabled: process.env.NOTIFY_ENABLED ? process.env.NOTIFY_ENABLED === 'true' : true,
     notifyKey: process.env.NOTIFY_API_KEY || '',
@@ -297,5 +291,10 @@ export default {
   },
   featureToggles: {
     newWorkAndSkillsTabEnabled: toBoolean(get('NEW_WORK_AND_SKILLS_TAB_ENABLED', false, requiredInProduction)),
+    neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
+    complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
+    useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
+    profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
+    moveToReceptionLinkEnabled: toBoolean(get('MOVE_TO_RECEPTION_LINK_ENABLED', 'true')),
   },
 }

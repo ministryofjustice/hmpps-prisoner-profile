@@ -20,7 +20,7 @@ export default (
   feComponentsMeta: HeaderFooterMeta | undefined,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
-  const addAppointmentUrl = config.profileAddAppointmentEnabled
+  const addAppointmentUrl = config.featureToggles.profileAddAppointmentEnabled
     ? `/prisoner/${prisonerData.prisonerNumber}/add-appointment`
     : `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`
 
@@ -59,7 +59,7 @@ export default (
   if (
     userCanEdit(user, prisonerData) &&
     !prisonerData.restrictedPatient &&
-    !config.useOfForceDisabledPrisons.includes(user.activeCaseLoadId)
+    !config.featureToggles.useOfForceDisabledPrisons.includes(user.activeCaseLoadId)
   ) {
     actions.push({
       text: 'Report use of force',

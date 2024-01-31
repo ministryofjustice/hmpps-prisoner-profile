@@ -100,7 +100,7 @@ export default class OverviewPageService {
     const complexityApiClient = this.complexityApiClientBuilder(clientToken)
 
     const complexityLevel =
-      config.complexityEnabledPrisons.includes(prisonId) &&
+      config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
       (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
 
     const [

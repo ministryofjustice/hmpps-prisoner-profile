@@ -112,7 +112,9 @@ export default class PrisonerLocationDetailsController {
       const currentLocation = cellDataLatestFirst[0]
       const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
       const canViewMoveToReceptionButton =
-        config.moveToReceptionLinkEnabled && canViewCellMoveButton && currentLocation?.location !== 'Reception'
+        config.featureToggles.moveToReceptionLinkEnabled &&
+        canViewCellMoveButton &&
+        currentLocation?.location !== 'Reception'
       const receptionIsFull = !receptions.length
 
       if (!currentLocation.assignmentEndDateTime) {

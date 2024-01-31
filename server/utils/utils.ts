@@ -488,7 +488,7 @@ export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: stri
   })
 }
 
-export const { neurodiversityEnabledPrisons } = config
+export const { neurodiversityEnabledPrisons } = config.featureToggles
 
 export const neurodiversityEnabled = (agencyId: string): boolean => {
   return neurodiversityEnabledPrisons?.includes(agencyId)
