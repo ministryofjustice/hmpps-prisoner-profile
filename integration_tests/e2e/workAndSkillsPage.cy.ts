@@ -3,6 +3,7 @@ import WorkAndSkillsPage from '../pages/workAndSkillsPage'
 import Page from '../pages/page'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
+import config from '../../server/config'
 
 const visitWorkAndSkillsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/work-and-skills' })
@@ -180,7 +181,7 @@ context('Work and skills page', () => {
           workAndSkillsPage
             .GoalsInfo()
             .contains(
-              'The prisoner education team set these goals using Virtual Campus. They do not include sentence plan targets. Contact the local education team to find out more.',
+              'The careers, information, advice and guidance (CIAG) team set these goals using Virtual Campus (VC2). They do not include sentence plan targets.',
             )
 
           workAndSkillsPage.GoalsEmploymentLabel().should('exist')
@@ -299,7 +300,7 @@ context('Work and skills page', () => {
           workAndSkillsPage
             .GoalsInfo()
             .contains(
-              'The prisoner education team set these goals using Virtual Campus. They do not include sentence plan targets. Contact the local education team to find out more.',
+              'The careers, information, advice and guidance (CIAG) team set these goals using Virtual Campus (VC2). They do not include sentence plan targets.',
             )
 
           workAndSkillsPage.GoalsEmploymentLabel().should('exist')
