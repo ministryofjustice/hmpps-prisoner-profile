@@ -22,7 +22,7 @@ export default class GoalsController {
       prisonerNumber,
       prisonId,
       correlationId: req.id,
-      page: Page.Goals,
+      page: Page.VirtualCampusGoals,
     })
 
     return res.render('pages/goals/vc2GoalsPage', {

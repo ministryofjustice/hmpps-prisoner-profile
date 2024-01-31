@@ -17,7 +17,7 @@ export enum Page {
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
-  Goals = 'GOALS',
+  VirtualCampusGoals = 'VC2_GOALS',
   InactiveAlerts = 'INACTIVE_ALERTS',
   MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
   MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
