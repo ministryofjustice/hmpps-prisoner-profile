@@ -54,6 +54,7 @@ generic-service:
     PRISONER_SEARCH_API_URL: "https://prisoner-search-preprod.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api-preprod.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
+    EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-preprod.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
