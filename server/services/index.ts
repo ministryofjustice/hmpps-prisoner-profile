@@ -20,7 +20,6 @@ import prisonerLocationHistoryService from './prisonerLocationHistoryService'
 import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
-import { getBuild } from './healthCheck'
 import BeliefService from './beliefService'
 
 export const services = () => {
@@ -46,7 +45,7 @@ export const services = () => {
     sqsClient: new SQSClient({ region: config.apis.audit.region }),
     queueUrl: config.apis.audit.queueUrl,
     serviceName: config.apis.audit.serviceName,
-    build: getBuild()?.build?.gitRef,
+    build: config.gitRef,
     enabled: config.apis.audit.enabled,
   })
 
