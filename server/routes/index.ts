@@ -22,6 +22,7 @@ import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
 import PrisonerLocationHistoryController from '../controllers/prisonerLocationHistoryController'
 import professionalContactsRouter from './professionalContactsRouter'
+import goalsRouter from './goalsRouter'
 import { ApiAction, Page } from '../services/auditService'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import BeliefHistoryController from '../controllers/beliefHistoryController'
@@ -224,6 +225,7 @@ export default function routes(services: Services): Router {
   router.use(csraRouter(services))
   router.use(appointmentRouter(services))
   router.use(professionalContactsRouter(services))
+  router.use(goalsRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/active-punishments',
