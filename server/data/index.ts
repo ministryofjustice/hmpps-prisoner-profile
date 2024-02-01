@@ -25,6 +25,7 @@ import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient
 import ManageUsersApiRestClient from './manageUsersApiClient'
 import ComplexityApiRestClient from './complexityApiClient'
 import applicationInfo from '../applicationInfo'
+import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo())
@@ -52,6 +53,7 @@ export const dataAccess = {
   prisonerProfileDeliusApiClientBuilder: (token: string) => new PrisonerProfileDeliusApiRestClient(token),
   manageUsersApiClientBuilder: (token: string) => new ManageUsersApiRestClient(token),
   complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token),
+  educationAndWorkPlanApiClientBuilder: (token: string) => new EducationAndWorkPlanApiRestClient(token),
 }
 
 export type DataAccess = typeof dataAccess
