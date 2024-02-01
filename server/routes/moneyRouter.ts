@@ -1,18 +1,13 @@
-import { RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { Services } from '../services'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import MoneyController from '../controllers/moneyController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
+import { getRequest } from './routerUtils'
 
 export default function moneyRouter(services: Services): Router {
   const router = Router()
-
-  const get = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.get(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
+  const get = getRequest(router)
 
   const moneyController = new MoneyController(services.moneyService, services.auditService)
 
