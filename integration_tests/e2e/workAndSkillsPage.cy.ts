@@ -161,6 +161,7 @@ context('Work and skills page', () => {
           workAndSkillsPage.ES_header().should('exist')
           workAndSkillsPage.ES_header().contains('Employability skills')
           workAndSkillsPage.ES_heading().contains('Most recent levels')
+          workAndSkillsPage.ES_info().should('exist')
           workAndSkillsPage.ES_skillOne().contains('string')
           workAndSkillsPage.ES_skillLevelOne().contains('string')
         })

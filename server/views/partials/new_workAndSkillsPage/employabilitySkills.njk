@@ -1,5 +1,6 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {%- call summaryCard({title: "Employability skills", id: "employability-skills", classes: "hmpps-employability-card"}) -%}
+    <p>The local education team record these employability skills in Curious.</p>
     <h3 class="govuk-heading-s">Most recent levels</h3>
     {% if learnerEmployabilitySkills.content.length > 0 %}
         {% for item in learnerEmployabilitySkills.content %}
