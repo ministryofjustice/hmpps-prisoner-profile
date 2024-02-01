@@ -75,6 +75,8 @@ export default class WorkAndSkillsPage extends Page {
 
   ES_heading = (): PageElement => cy.get('#employability-skills > .hmpps-summary-card__body > .govuk-heading-s')
 
+  ES_info = (): PageElement => cy.get('#employability-skills > .hmpps-summary-card__body > p')
+
   ES_skillOne = (): PageElement => cy.get('.govuk-grid-column-one-third > .govuk-body')
 
   ES_skillLevelOne = (): PageElement => cy.get('.govuk-grid-column-two-thirds > p')
