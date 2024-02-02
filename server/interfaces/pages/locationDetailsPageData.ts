@@ -1,16 +1,14 @@
-import PreviousLocation from '../prisonApi/previousLocation'
-
-export interface LocationDetailsCurrentLocation {
-  agencyId: string
+export interface LocationDetails {
+  establishment: string
+  location: string
+  isTemporaryLocation: boolean
+  movedIn: string
+  movedOut: string
   assignmentDateTime: string
   assignmentEndDateTime: string
-  establishment: string
-  isTemporaryLocation: boolean
   livingUnitId: number
-  location: string
-  movedIn: string
+  agencyId: string
   movedInBy: string
-  movedOut: string
 }
 
 export interface LocationDetailsOccupant {
@@ -18,16 +16,12 @@ export interface LocationDetailsOccupant {
   profileUrl: string
 }
 
-export interface LocationWithAgencyLeaveDate extends PreviousLocation {
-  establishmentWithAgencyLeaveDate: string
-}
-
-export interface CellHistoryGroupedByPeriodAtAgency {
-  isValidAgency: boolean
+export interface LocationDetailsGroupedByPeriodAtAgency {
   name: string
-  datePeriod: string
-  cellHistory: LocationWithAgencyLeaveDate[]
-  key: string
+  fromDateString: string
+  toDateString: string
+  locationDetails: LocationDetails[]
+  isValidAgency: boolean
 }
 
 export interface LocationDetailsPageData {
@@ -37,9 +31,9 @@ export interface LocationDetailsPageData {
   breadcrumbPrisonerName: string
   prisonerNumber: string
   prisonId: string
-  currentLocation: LocationDetailsCurrentLocation
+  currentLocation: LocationDetails
   occupants: LocationDetailsOccupant[]
-  cellHistoryGroupedByAgency: CellHistoryGroupedByPeriodAtAgency[]
+  locationDetailsGroupedByAgency: LocationDetailsGroupedByPeriodAtAgency[]
   profileUrl: string
   dpsBaseUrl: string
   changeCellLink: string

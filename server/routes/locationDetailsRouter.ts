@@ -13,6 +13,7 @@ export default function locationDetailsRouter(services: Services): Router {
 
   const prisonerLocationDetailsController = new PrisonerLocationDetailsController(
     services.dataAccess.prisonApiClientBuilder,
+    services.prisonerLocationDetailsPageService,
     services.auditService,
   )
 

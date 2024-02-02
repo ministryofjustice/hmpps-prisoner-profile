@@ -2,71 +2,25 @@ import { Request, Response } from 'express'
 
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { Prisoner } from '../interfaces/prisoner'
-import { extractLocation, formatName, groupBy, hasLength, isTemporaryLocation, userHasRoles } from '../utils/utils'
-import { formatDate, formatDateTime, formatDateTimeISO } from '../utils/dateHelpers'
+import { extractLocation, formatName, hasLength, isTemporaryLocation, userHasRoles } from '../utils/utils'
+import { formatDateTime, formatDateTimeISO } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import config from '../config'
-import PreviousLocation from '../interfaces/prisonApi/previousLocation'
 import { AuditService, Page } from '../services/auditService'
-import {
-  CellHistoryGroupedByPeriodAtAgency,
-  LocationDetailsPageData,
-  LocationWithAgencyLeaveDate,
-} from '../interfaces/pages/locationDetailsPageData'
+import { LocationDetails, LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
+import PrisonerLocationDetailsPageService from '../services/prisonerLocationDetailsPageService'
 
 export default class PrisonerLocationDetailsController {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly prisonerLocationDetailsPageService: PrisonerLocationDetailsPageService,
     private readonly auditService: AuditService,
   ) {}
 
   public async displayPrisonerLocationDetails(req: Request, res: Response, prisonerData: Prisoner) {
     const offenderNo = prisonerData.prisonerNumber
-
-    const enrichLocationsWithAgencyLeaveDate = (locations: PreviousLocation[]): LocationWithAgencyLeaveDate[] => {
-      const enrichLocation = (
-        prev: LocationWithAgencyLeaveDate | null,
-        location: PreviousLocation,
-      ): LocationWithAgencyLeaveDate => {
-        const establishmentWithAgencyLeaveDate =
-          prev && prev.establishment === location.establishment
-            ? prev.establishmentWithAgencyLeaveDate
-            : location.establishment + location.assignmentEndDateTime
-
-        return {
-          ...location,
-          establishmentWithAgencyLeaveDate,
-        }
-      }
-
-      return locations.reduce<LocationWithAgencyLeaveDate[]>((result, location) => {
-        const prevLocation = result[result.length - 1] || null
-        const enrichedLocation = enrichLocation(prevLocation, location)
-        return [...result, enrichedLocation]
-      }, [])
-    }
-
-    const getCellHistoryGroupedByPeriodAtAgency = (
-      locations: PreviousLocation[],
-    ): CellHistoryGroupedByPeriodAtAgency[] => {
-      const locationsWithAgencyLeaveDate = enrichLocationsWithAgencyLeaveDate(locations)
-      return Object.entries(groupBy(locationsWithAgencyLeaveDate, 'establishmentWithAgencyLeaveDate')).map(
-        ([key, value]) => {
-          const fromDateString = formatDate(value.slice(-1)[0].assignmentDateTime, 'short')
-          const toDateString = formatDate(value[0].assignmentEndDateTime, 'short') || 'Unknown'
-
-          return {
-            isValidAgency: !!value[0].establishment,
-            name: value[0].establishment,
-            datePeriod: `from ${fromDateString} to ${toDateString}`,
-            cellHistory: value,
-            key,
-          }
-        },
-      )
-    }
 
     try {
       const { bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
@@ -85,31 +39,31 @@ export default class PrisonerLocationDetailsController {
       const uniqueStaffIds = [...new Set(cells.content.map(cell => cell.movementMadeBy))]
       const staff = await Promise.all(uniqueStaffIds.map(staffId => prisonApiClient.getStaffDetails(staffId)))
 
-      const cellData = cells.content.map<PreviousLocation>(cell => {
+      const cellData = cells.content.map<LocationDetails>(cell => {
         const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
-        const agencyName = cell.agencyId
+        const { agencyId } = cell
         const agency = prisons.find(prison => cell.agencyId === prison.agencyId)
         const agencyDescription = agency ? agency.description : null
 
         return {
+          agencyId,
           establishment: agencyDescription,
-          location: extractLocation(cell.description, agencyName),
+          location: extractLocation(cell.description, agencyId),
           isTemporaryLocation: isTemporaryLocation(cell.description),
           movedIn: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short', ' - '),
           movedOut: cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short', ' - '),
           assignmentDateTime: cell.assignmentDateTime,
           assignmentEndDateTime: cell.assignmentEndDateTime,
           livingUnitId: cell.livingUnitId,
-          agencyId: agencyName,
           movedInBy: formatName(staffDetails.firstName, '', staffDetails.lastName),
         }
       })
 
-      const cellDataLatestFirst = cellData.sort(
+      const locationDetailsLatestFirst = cellData.sort(
         (a, b) => new Date(b.assignmentDateTime).getTime() - new Date(a.assignmentDateTime).getTime(),
       )
 
-      const currentLocation = cellDataLatestFirst[0]
+      const currentLocation = locationDetailsLatestFirst[0]
       const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
       const canViewMoveToReceptionButton =
         config.featureToggles.moveToReceptionLinkEnabled &&
@@ -123,7 +77,7 @@ export default class PrisonerLocationDetailsController {
       const occupants =
         (currentLocation && (await prisonApiClient.getInmatesAtLocation(currentLocation.livingUnitId, {}))) || []
 
-      const previousLocations = cellDataLatestFirst.slice(1)
+      const previousLocations = locationDetailsLatestFirst.slice(1)
       const prisonerProfileUrl = `/prisoner/${offenderNo}`
 
       await this.auditService.sendPageView({
@@ -141,8 +95,8 @@ export default class PrisonerLocationDetailsController {
         pageTitle: 'Location details',
         ...mapHeaderNoBannerData(prisonerData),
         name,
-        cellHistoryGroupedByAgency: hasLength(previousLocations)
-          ? getCellHistoryGroupedByPeriodAtAgency(previousLocations)
+        locationDetailsGroupedByAgency: hasLength(previousLocations)
+          ? this.prisonerLocationDetailsPageService.getLocationDetailsGroupedByPeriodAtAgency(previousLocations)
           : [],
         currentLocation,
         canViewCellMoveButton,
