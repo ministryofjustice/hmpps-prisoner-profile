@@ -14,6 +14,8 @@ import { Prisoner } from '../interfaces/prisoner'
 import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
+import PersonalLearningPlanService from './personalLearningPlanService'
+import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPlanGoals'
 
 interface WorkAndSkillsData {
   learnerEmployabilitySkills: LearnerEmployabilitySkills
@@ -25,6 +27,7 @@ interface WorkAndSkillsData {
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
   unacceptableAbsences: UnacceptableAttendanceData
+  personalLearningPlanActionPlan: PersonalLearningPlanActionPlan
 }
 
 interface LearnerGoalsData {
@@ -47,6 +50,7 @@ export default class WorkAndSkillsPageService {
   constructor(
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly personalLearningPlanService: PersonalLearningPlanService,
   ) {}
 
   public async get(token: string, prisonerData: Prisoner): Promise<WorkAndSkillsData> {
@@ -60,19 +64,21 @@ export default class WorkAndSkillsPageService {
       learnerProfiles,
       learnerEducation,
       learnerLatestAssessments,
-      learnerGoals,
+      curiousGoals,
       learnerNeurodivergence,
       offenderActivitiesHistory,
       unacceptableAbsences,
+      personalLearningPlanActionPlan,
     ] = await Promise.all([
       this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient),
       this.getLearnerProfiles(prisonerNumber, curiousApiClient),
       this.getLearnerEducation(prisonerNumber, curiousApiClient),
       this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient),
-      this.getLearnerGoals(prisonerNumber, curiousApiClient),
+      this.getCuriousGoals(prisonerNumber, curiousApiClient),
       this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
       this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
       this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
+      this.getPersonalLearningPlanActionPlan(prisonerNumber, token),
     ])
 
     return {
@@ -80,11 +86,12 @@ export default class WorkAndSkillsPageService {
       learnerProfiles,
       learnerEducation,
       learnerLatestAssessments,
-      learnerGoals,
+      learnerGoals: curiousGoals, // TODO - rename `learnerGoals` to `curiousGoals` in WorkAndSkillsData and downstream view dependencies.
       learnerNeurodivergence,
       workAndSkillsPrisonerName,
       offenderActivitiesHistory,
       unacceptableAbsences,
+      personalLearningPlanActionPlan,
     }
   }
 
@@ -203,7 +210,7 @@ export default class WorkAndSkillsPageService {
     return multiListArray
   }
 
-  private async getLearnerGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<LearnerGoalsData> {
+  private async getCuriousGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<LearnerGoalsData> {
     const learnerGoals: LearnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
 
     let employmentGoals: GovSummaryItem[] = []
@@ -225,6 +232,13 @@ export default class WorkAndSkillsPageService {
     }
 
     return { employmentGoals, personalGoals, longTermGoals, shortTermGoals }
+  }
+
+  private async getPersonalLearningPlanActionPlan(
+    prisonerNumber: string,
+    token: string,
+  ): Promise<PersonalLearningPlanActionPlan> {
+    return this.personalLearningPlanService.getPrisonerActionPlan(prisonerNumber, token)
   }
 
   private strArrayToGovList(goals: string[]): GovSummaryItem[] {

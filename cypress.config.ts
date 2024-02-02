@@ -7,6 +7,7 @@ import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearch'
 import pomApi from './integration_tests/mockApis/pom'
 import keyWorkerApi from './integration_tests/mockApis/keyWorker'
+import educationAndWorkPlanApi from './integration_tests/mockApis/educationAndWorkPlanApi'
 import curiousApi from './integration_tests/mockApis/curiousApi'
 import caseNotesApi from './integration_tests/mockApis/caseNotesApi'
 import incentivesMockApi from './integration_tests/mockApis/incentivesMockApi'
@@ -42,6 +43,7 @@ export default defineConfig({
         ...prisonerSearchApi,
         ...pomApi,
         ...keyWorkerApi,
+        ...educationAndWorkPlanApi,
         ...curiousApi,
         ...caseNotesApi,
         ...incentivesMockApi,
