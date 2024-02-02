@@ -21,7 +21,7 @@ import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
 import BeliefService from './beliefService'
-import PersonalLearningPlanService from './personalLearningPlanService'
+import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
 
 export const services = () => {
   const {
@@ -50,7 +50,7 @@ export const services = () => {
     enabled: config.apis.audit.enabled,
   })
 
-  const personalLearningPlansService = PersonalLearningPlanService.getInstance(dataAccess)
+  const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)

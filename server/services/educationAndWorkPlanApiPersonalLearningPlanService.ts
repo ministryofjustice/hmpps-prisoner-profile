@@ -3,7 +3,6 @@ import { EducationAndWorkPlanApiClient } from '../data/interfaces/educationAndWo
 import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPlanGoals'
 import toPersonalLearningPlanActionPlan from '../interfaces/mappers/personalLearningPlanActionPlanMapper'
 import logger from '../../logger'
-// eslint-disable-next-line import/no-cycle
 import PersonalLearningPlanService from './personalLearningPlanService'
 
 /**
