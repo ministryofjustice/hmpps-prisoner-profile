@@ -181,6 +181,33 @@ describe('Money Controller', () => {
     })
   })
 
+  it('Should get transactions for January (month 0)', async () => {
+    jest.spyOn<any, string>(controller, 'mapToTableRows')
+    jest.spyOn<any, string>(controller, 'getRefData')
+    jest.spyOn<any, string>(controller, 'getLast4Years').mockReturnValue([
+      { text: 2023, value: 2023 },
+      { text: 2022, value: 2022 },
+      { text: 2021, value: 2021 },
+      { text: 2020, value: 2020 },
+    ])
+
+    await controller['getTransactions'](
+      AccountCode.Spends,
+      'Spends',
+      Page.MoneySpends,
+      { ...req, query: { month: '0', year: '2023' } } as any,
+      res,
+    )
+
+    expect(moneyService.getTransactions).toHaveBeenCalledWith(
+      res.locals.clientToken,
+      req.middleware.prisonerData.prisonerNumber,
+      AccountCode.Spends,
+      0,
+      2023,
+    )
+  })
+
   it('should get transactions', async () => {
     const now = new Date()
     const month = now.getMonth()
