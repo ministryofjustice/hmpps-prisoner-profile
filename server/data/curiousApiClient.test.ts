@@ -3,7 +3,7 @@ import config from '../config'
 import CuriousApiClient from './curiousApiClient'
 import { learnerEducation } from './localMockData/learnerEducation'
 import { learnerEmployabilitySkills } from './localMockData/learnerEmployabilitySkills'
-import { LearnerGoalsMock } from './localMockData/learnerGoalsMock'
+import aValidLearnerGoals from './localMockData/learnerGoalsMock'
 import { LearnerLatestAssessmentsMock } from './localMockData/learnerLatestAssessmentsMock'
 import { LearnerNeurodivergenceMock } from './localMockData/learnerNeurodivergenceMock'
 import { LearnerProfiles } from './localMockData/learnerProfiles'
@@ -74,13 +74,14 @@ describe('curiousApiClient', () => {
 
   describe('getLearnerGoals', () => {
     it('should return data from api', async () => {
+      const expectedLearnerGoals = aValidLearnerGoals()
       fakeCuriousApi
         .get('/learnerGoals/G6123VU')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
-        .reply(200, LearnerGoalsMock)
+        .reply(200, expectedLearnerGoals)
 
       const output = await curiousApiClient.getLearnerGoals('G6123VU')
-      expect(output).toEqual(LearnerGoalsMock)
+      expect(output).toEqual(expectedLearnerGoals)
     })
   })
 
