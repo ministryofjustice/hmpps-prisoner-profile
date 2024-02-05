@@ -6,13 +6,6 @@ import PrisonerLocationDetailsController from './prisonerLocationDetailsControll
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { AuditService } from '../services/auditService'
-import {
-  OffenderCellHistoryMock,
-  OffenderCellHistoryReceptionMock,
-} from '../data/localMockData/offenderCellHistoryMock'
-import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapacityMock'
-import StaffDetailsMock from '../data/localMockData/staffDetails'
-import AgencyMock from '../data/localMockData/agency'
 import config from '../config'
 import { locationDetailsMock, locationDetailsPageData } from '../data/localMockData/locationDetailsPageMock'
 import { prisonerLocationDetailsPageServiceMock } from '../../tests/mocks/prisonerLocationDetailsPageServiceMock'
@@ -74,12 +67,13 @@ describe('Prisoner Location Details', () => {
     describe('should render the page', () => {
       it('should not display the "Move to reception" button when user does not have the CELL_MOVE role', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [] } } }
-        prisonApiClient.getOffenderCellHistory = jest.fn().mockResolvedValue(OffenderCellHistoryMock)
-        prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-        prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue(ReceptionsWithCapacityMock)
-        prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
+        prisonerLocationDetailsPageService.getLocationDetailsByLatestFirst = jest
+          .fn()
+          .mockResolvedValue([locationDetailsMock])
+
         await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
+        expect(prisonerLocationDetailsPageService.isReceptionFull).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
           ...locationDetailsPageData,
           canViewCellMoveButton: false,
@@ -88,12 +82,13 @@ describe('Prisoner Location Details', () => {
       })
 
       it('should not display the "Move to reception" button when prisoner is already in reception', async () => {
-        prisonApiClient.getOffenderCellHistory = jest.fn().mockResolvedValue(OffenderCellHistoryReceptionMock)
-        prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-        prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue(ReceptionsWithCapacityMock)
-        prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
+        prisonerLocationDetailsPageService.getLocationDetailsByLatestFirst = jest
+          .fn()
+          .mockResolvedValue([{ ...locationDetailsMock, location: 'Reception', isTemporaryLocation: true }])
+
         await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
+        expect(prisonerLocationDetailsPageService.isReceptionFull).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
           ...locationDetailsPageData,
           currentLocation: {
@@ -106,10 +101,11 @@ describe('Prisoner Location Details', () => {
       })
 
       it('should display the "Move to reception" button with "consider risks" link when there is capacity', async () => {
-        prisonApiClient.getOffenderCellHistory = jest.fn().mockResolvedValue(OffenderCellHistoryMock)
-        prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-        prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue(ReceptionsWithCapacityMock)
-        prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
+        prisonerLocationDetailsPageService.isReceptionFull = jest.fn().mockResolvedValue(false)
+        prisonerLocationDetailsPageService.getLocationDetailsByLatestFirst = jest
+          .fn()
+          .mockResolvedValue([locationDetailsMock])
+
         await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
         expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
@@ -119,11 +115,12 @@ describe('Prisoner Location Details', () => {
         })
       })
 
-      it('should display the "Move to reception" button with "reception full" link when there is no capacity', async () => {
-        prisonApiClient.getOffenderCellHistory = jest.fn().mockResolvedValue(OffenderCellHistoryMock)
-        prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-        prisonApiClient.getReceptionsWithCapacity = jest.fn().mockResolvedValue([])
-        prisonApiClient.getAgencyDetails = jest.fn().mockResolvedValue(AgencyMock)
+      it('should display the "Move to reception" button with "reception full" link when reception is full', async () => {
+        prisonerLocationDetailsPageService.isReceptionFull = jest.fn().mockResolvedValue(true)
+        prisonerLocationDetailsPageService.getLocationDetailsByLatestFirst = jest
+          .fn()
+          .mockResolvedValue([locationDetailsMock])
+
         await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
 
         expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {

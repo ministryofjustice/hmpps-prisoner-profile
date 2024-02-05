@@ -1,6 +1,6 @@
 import { OffenderCellHistory, OffenderCellHistoryItem } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
 
-const OffenderCellHistoryItemMock: OffenderCellHistoryItem = {
+export const OffenderCellHistoryItemMock: OffenderCellHistoryItem = {
   bookingId: 1234134,
   livingUnitId: 123123,
   assignmentDate: '2020-10-12',
@@ -15,12 +15,10 @@ const OffenderCellHistoryItemMock: OffenderCellHistoryItem = {
   offenderNo: 'A1234AA',
 }
 
-const OffenderCellHistoryMock: OffenderCellHistory = {
+export const OffenderCellHistoryMock: OffenderCellHistory = {
   content: [OffenderCellHistoryItemMock],
 }
 
-const OffenderCellHistoryReceptionMock: OffenderCellHistory = {
-  content: [{ ...OffenderCellHistoryItemMock, description: 'MDI-RECP' }],
+export const mockOffenderCellHistory = (overrides: Partial<OffenderCellHistoryItem>[] = []): OffenderCellHistory => {
+  return { content: overrides.map(override => ({ ...OffenderCellHistoryItemMock, ...override })) }
 }
-
-export { OffenderCellHistoryMock, OffenderCellHistoryItemMock, OffenderCellHistoryReceptionMock }
