@@ -22,19 +22,23 @@ const aValidGoalResponse = (options?: {
   reference?: string
   title?: string
   createdAt?: string
+  createdBy?: string
+  createdByDisplayName?: string
   updatedAt?: string
+  updatedBy?: string
+  updatedByDisplayName?: string
 }): GoalResponse => {
   return {
     goalReference: options?.reference || 'd38a6c41-13d1-1d05-13c2-24619966119b',
     title: options?.title || 'Learn Spanish',
     status: 'ACTIVE',
     steps: [aValidFirstStepResponse(), aValidSecondStepResponse()],
-    createdBy: 'asmith_gen',
-    createdByDisplayName: 'Alex Smith',
+    createdBy: options?.createdBy || 'asmith_gen',
+    createdByDisplayName: options?.createdByDisplayName || 'Alex Smith',
     createdAt: options?.createdAt || '2023-01-16T09:14:43.158Z',
     createdAtPrison: 'MDI',
-    updatedBy: 'asmith_gen',
-    updatedByDisplayName: 'Alex Smith',
+    updatedBy: options?.updatedBy || 'asmith_gen',
+    updatedByDisplayName: options?.updatedByDisplayName || 'Alex Smith',
     updatedAt: options?.updatedAt || '2023-09-23T14:43:02.094Z',
     updatedAtPrison: 'MDI',
     targetCompletionDate: '2024-02-29',
