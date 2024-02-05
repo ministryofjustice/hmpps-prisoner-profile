@@ -1,5 +1,4 @@
 import { format, startOfDay, subMonths } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 import { Prisoner } from '../interfaces/prisoner'
 import {
@@ -12,7 +11,6 @@ import {
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
-import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
 import { OffenderActivitiesMock } from '../data/localMockData/offenderActivitiesMock'
 import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'
@@ -26,38 +24,43 @@ import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 
 describe('WorkAndSkillsService', () => {
+  const prisonApiClient = prisonApiClientMock()
+  prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
+  prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+  prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
+  prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
+  prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+  prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
+  prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock())
+  prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
+  prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
+  prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
+  prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
+
+  const curiousApiClient = {
+    getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
+    getLearnerProfile: jest.fn(async () => LearnerProfiles),
+    getLearnerEducation: jest.fn(async () => learnerEducation),
+    getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
+    getLearnerGoals: jest.fn(),
+    getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
+  }
+
+  const personalLearningPlanService = {
+    getPrisonerActionPlan: jest.fn(),
+  }
+
+  const workAndSkillsPageServiceConstruct = jest.fn(() => {
+    return new WorkAndSkillsPageService(
+      () => curiousApiClient,
+      () => prisonApiClient,
+      personalLearningPlanService,
+    )
+  })
+
   describe('Scenario A', () => {
-    let prisonApiClient: PrisonApiClient
-
-    const curiousApiClient: CuriousApiClient = {
-      getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
-      getLearnerProfile: jest.fn(async () => LearnerProfiles),
-      getLearnerEducation: jest.fn(async () => learnerEducation),
-      getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
-      getLearnerGoals: jest.fn(async () => LearnerGoalsMock),
-      getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
-    }
-
-    const workAndSkillsPageServiceConstruct = jest.fn(() => {
-      return new WorkAndSkillsPageService(
-        () => curiousApiClient,
-        () => prisonApiClient,
-      )
-    })
-
     beforeEach(() => {
-      prisonApiClient = prisonApiClientMock()
-      prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
-      prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
-      prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
-      prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
-      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
-      prisonApiClient.getOffenderActivitiesHistory = jest.fn(async () => OffenderActivitiesMock)
-      prisonApiClient.getOffenderAttendanceHistory = jest.fn(async () => OffenderAttendanceHistoryMock())
-      prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-      prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
-      prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
-      prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
+      curiousApiClient.getLearnerGoals.mockReturnValue(LearnerGoalsMock)
     })
 
     describe('Work and skills', () => {
@@ -180,25 +183,8 @@ describe('WorkAndSkillsService', () => {
   })
 
   describe('Scenario B', () => {
-    let prisonApiClient: PrisonApiClient
-    const curiousApiClient: CuriousApiClient = {
-      getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
-      getLearnerProfile: jest.fn(async () => LearnerProfiles),
-      getLearnerEducation: jest.fn(async () => learnerEducation),
-      getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
-      getLearnerGoals: jest.fn(async () => LearnerGoalsMockB),
-      getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
-    }
-
-    const workAndSkillsPageServiceConstruct = jest.fn(() => {
-      return new WorkAndSkillsPageService(
-        () => curiousApiClient,
-        () => prisonApiClient,
-      )
-    })
-
     beforeEach(() => {
-      prisonApiClient = prisonApiClientMock()
+      curiousApiClient.getLearnerGoals.mockReturnValue(LearnerGoalsMockB)
     })
 
     describe('Work and skills', () => {

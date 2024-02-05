@@ -74,7 +74,7 @@ export default {
       },
     })
   },
-  stubGetLearnerGoals: (params: LearnerGoalsTestParams) => {
+  stubGetCuriousGoals: (params: LearnerGoalsTestParams) => {
     let jsonResp
     if (params.emptyStates === false) {
       jsonResp = LearnerGoalsMock

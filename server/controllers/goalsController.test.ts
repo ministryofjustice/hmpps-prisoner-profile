@@ -1,3 +1,5 @@
+import { SessionData } from 'express-session'
+import { Request, Response } from 'express'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -6,59 +8,65 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import GoalsController from './goalsController'
 
-let req: any
-let res: any
-let controller: GoalsController
-
-jest.mock('../services/workAndSkillsPageService.ts')
-
 describe('Prisoner goals controller', () => {
-  let workAndSkillsPageService: WorkAndSkillsPageService
+  const workAndSkillsPageService = {
+    get: jest.fn(),
+  }
+
+  const controller = new GoalsController(
+    workAndSkillsPageService as unknown as WorkAndSkillsPageService,
+    auditServiceMock(),
+  )
+
+  const req = {
+    params: {} as Record<string, string>,
+    query: {} as Record<string, string>,
+    headers: {} as Record<string, string>,
+    session: {} as SessionData,
+    middleware: { prisonerData: {} },
+    path: '',
+    flash: jest.fn(),
+  }
+  const res = {
+    locals: {} as Record<string, any>,
+    render: jest.fn(),
+    redirect: jest.fn(),
+  }
 
   beforeEach(() => {
-    req = {
-      params: { prisonerNumber: 'A9999AA' },
-      query: {},
-      middleware: {
-        prisonerData: PrisonerMockDataA,
-      },
-      headers: {
-        referer: 'http://referer',
-      },
-      path: 'goals',
-      session: {
-        userDetails: { displayName: 'A Name' },
-      },
-      flash: jest.fn(),
+    jest.resetAllMocks()
+    req.params = { prisonerNumber: 'A9999AA' }
+    req.query = {}
+    req.middleware = {
+      prisonerData: PrisonerMockDataA,
     }
-    res = {
-      locals: {
-        clientToken: 'CLIENT_TOKEN',
-        user: {
-          userRoles: [Role.PrisonUser],
-          staffId: 487023,
-          caseLoads: CaseLoadsDummyDataA,
-          token: 'USER_TOKEN',
-        },
-      },
-      render: jest.fn(),
-      redirect: jest.fn(),
+    req.headers = {
+      referer: 'http://referer',
     }
+    req.path = 'goals'
+    req.session = {
+      userDetails: { displayName: 'A Name' },
+    } as SessionData
 
-    workAndSkillsPageService = new WorkAndSkillsPageService(null, null)
-    workAndSkillsPageService.get = jest.fn().mockResolvedValue(LearnerGoalsMock)
-    controller = new GoalsController(workAndSkillsPageService, auditServiceMock())
-  })
-
-  afterEach(() => {
-    jest.restoreAllMocks()
+    res.locals = {
+      clientToken: 'CLIENT_TOKEN',
+      user: {
+        userRoles: [Role.PrisonUser],
+        staffId: 487023,
+        caseLoads: CaseLoadsDummyDataA,
+        token: 'USER_TOKEN',
+      },
+    }
   })
 
   describe('displayGoals', () => {
     it('should render the page with the prisoners goals from VC2', async () => {
       // Given
       const getGoals = jest.spyOn<any, string>(controller['workAndSkillsPageService'], 'get')
+
       const expectedGoals = LearnerGoalsMock
+      workAndSkillsPageService.get.mockResolvedValue(expectedGoals)
+
       const expectedView = {
         prisonerName: 'John Saunders',
         prisonerNumber: 'G6123VU',
@@ -66,7 +74,7 @@ describe('Prisoner goals controller', () => {
       }
 
       // When
-      await controller.displayGoals(req, res)
+      await controller.displayGoals(req as unknown as Request, res as unknown as Response)
 
       // Then
       expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', expectedView)

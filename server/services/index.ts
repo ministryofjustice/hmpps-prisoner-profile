@@ -21,6 +21,7 @@ import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
 import BeliefService from './beliefService'
+import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
 
 export const services = () => {
   const {
@@ -49,6 +50,7 @@ export const services = () => {
     enabled: config.apis.audit.enabled,
   })
 
+  const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
@@ -69,7 +71,11 @@ export const services = () => {
     complexityApiClientBuilder,
   )
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
-  const workAndSkillsPageService = new WorkAndSkillsPageService(curiousApiClientBuilder, prisonApiClientBuilder)
+  const workAndSkillsPageService = new WorkAndSkillsPageService(
+    curiousApiClientBuilder,
+    prisonApiClientBuilder,
+    personalLearningPlansService,
+  )
   const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
   const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
   const componentService = new ComponentService(componentApiClientBuilder)
@@ -99,6 +105,7 @@ export const services = () => {
     overviewPageService,
     personalPageService,
     workAndSkillsPageService,
+    personalLearningPlansService,
     activePunishmentsPageService,
     offencesPageService,
     referenceDataService,
