@@ -1,0 +1,50 @@
+{# Goals summary card content for when the prisoner only has VC2 goals #}
+
+<p>The prisoner education team set these goals using Virtual Campus. They do not include sentence plan targets. Contact the local education team to find out more.</p>
+<h3 class="govuk-heading-s  govuk-!-margin-bottom-1">Employment goals</h3>
+<div class="hmpps-goal-container">
+{% if (learnerGoals.employmentGoals.length > 0) %}
+    {{ govukSummaryList({
+        classes: "hmpps-font-weight-normal",
+        rows: learnerGoals.employmentGoals
+    }) }}
+{% else %}
+    <p>The prisoner does not have any employment goals.</p>
+{% endif %}
+</div>
+
+<h3 class="govuk-heading-s govuk-!-margin-bottom-1">Personal goals</h3>
+<div class="hmpps-goal-container">
+{% if (learnerGoals.personalGoals.length > 0) %}
+    {{ govukSummaryList({
+        classes: "hmpps-font-weight-normal",
+        rows: learnerGoals.personalGoals
+    }) }}
+{% else %}
+    <p>The prisoner does not have any personal goals.</p>
+{% endif %}
+</div>
+
+<h3 class="govuk-heading-s  govuk-!-margin-bottom-1">Short-term goals</h3>
+<div class="hmpps-goal-container">
+    {% if (learnerGoals.shortTermGoals.length > 0) %}
+        {{ govukSummaryList({
+            classes: "hmpps-font-weight-normal",
+            rows: learnerGoals.shortTermGoals
+        }) }}
+    {% else %}
+        <p>The prisoner does not have any short-term goals.</p>
+    {% endif %}
+</div>
+
+<h3 class="govuk-heading-s  govuk-!-margin-bottom-1">Long-term goals</h3>
+<div class="hmpps-goal-container hmpps-goal-container--no-border">
+{% if (learnerGoals.longTermGoals.length > 0) %}
+    {{ govukSummaryList({
+        classes: "hmpps-font-weight-normal",
+        rows: learnerGoals.longTermGoals
+    }) }}
+{% else %}
+    <p>The prisoner does not have any long term goals.</p>
+{% endif %}
+</div>

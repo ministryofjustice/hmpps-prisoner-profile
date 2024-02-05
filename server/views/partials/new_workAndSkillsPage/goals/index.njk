@@ -1,0 +1,9 @@
+{# Summary card for Goals, pulling in the relevant include #}
+
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Goals", id: "goals"}) -%}
+
+    {% include './vc2GoalsOnly.njk' %}
+
+{%- endcall -%}
