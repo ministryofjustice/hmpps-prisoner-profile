@@ -236,7 +236,7 @@ describe('Validation middleware', () => {
   })
 
   it('should fail validation with WEEKDAY repeats starting on a weekend', async () => {
-    const nextWeekendDate = formatDateISO(addDays(new Date(), 6 - new Date().getDay()))
+    const nextWeekendDate = formatDateISO(addDays(new Date(), 6 - new Date().getDay() || 7))
     const appointmentForm = {
       appointmentType: 'TYPE',
       location: '27000',
