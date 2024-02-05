@@ -86,7 +86,7 @@ export default class MoneyController {
     res: Response,
   ) {
     const now = new Date()
-    const month: number = +req.query.month || now.getMonth()
+    const month: number = req.query.month === undefined ? now.getMonth() : +req.query.month
     const year: number = +req.query.year || now.getFullYear()
     const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
     const { clientToken } = res.locals
