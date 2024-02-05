@@ -35,10 +35,10 @@
       
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Employment goals</h3>
       <div class="hmpps-goal-container">
-      {% if (learnerGoals.employmentGoals.length > 0) %}
+      {% if (curiousGoals.employmentGoals.length > 0) %}
         {{ govukSummaryList({
           classes: "hmpps-font-weight-normal",
-          rows: learnerGoals.employmentGoals, 
+          rows: curiousGoals.employmentGoals,
           attributes: {
             'data-qa': 'employment-goals-list'
           }
@@ -50,10 +50,10 @@
 
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Personal goals</h3>
       <div class="hmpps-goal-container">
-      {% if (learnerGoals.personalGoals.length > 0) %}
+      {% if (curiousGoals.personalGoals.length > 0) %}
         {{ govukSummaryList({
           classes: "hmpps-font-weight-normal",
-          rows: learnerGoals.personalGoals,
+          rows: curiousGoals.personalGoals,
           attributes: {
             'data-qa': 'personal-goals-list'
           }
@@ -65,10 +65,10 @@
 
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Short-term goals</h3>
       <div class="hmpps-goal-container">
-        {% if (learnerGoals.shortTermGoals.length > 0) %}
+        {% if (curiousGoals.shortTermGoals.length > 0) %}
           {{ govukSummaryList({
             classes: "hmpps-font-weight-normal",
-            rows: learnerGoals.shortTermGoals,
+            rows: curiousGoals.shortTermGoals,
             attributes: {
               'data-qa': 'short-term-goals-list'
             }
@@ -80,10 +80,10 @@
 
       <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Long-term goals</h3>
       <div class="hmpps-goal-container hmpps-goal-container--no-border">
-      {% if (learnerGoals.longTermGoals.length > 0) %}
+      {% if (curiousGoals.longTermGoals.length > 0) %}
         {{ govukSummaryList({
           classes: "hmpps-font-weight-normal",
-          rows: learnerGoals.longTermGoals,
+          rows: curiousGoals.longTermGoals,
           attributes: {
             'data-qa': 'long-term-goals-list'
           }

@@ -188,25 +188,25 @@ context('Work and skills page', () => {
           workAndSkillsPage.GoalsEmploymentLabel().contains('Employment goals')
 
           workAndSkillsPage.GoalsEmploymentText().should('exist')
-          workAndSkillsPage.GoalsEmploymentText().contains('string')
+          workAndSkillsPage.GoalsEmploymentText().contains('An employment goal')
 
           workAndSkillsPage.GoalsPersonalLabel().should('exist')
           workAndSkillsPage.GoalsPersonalLabel().contains('Personal goals')
 
           workAndSkillsPage.GoalsPersonalText().should('exist')
-          workAndSkillsPage.GoalsPersonalText().contains('string')
+          workAndSkillsPage.GoalsPersonalText().contains('A personal goal')
 
           workAndSkillsPage.GoalsShortTermLabel().should('exist')
           workAndSkillsPage.GoalsShortTermLabel().contains('Short-term goals')
 
           workAndSkillsPage.GoalsShortTermText().should('exist')
-          workAndSkillsPage.GoalsShortTermText().contains('string')
+          workAndSkillsPage.GoalsShortTermText().contains('A short term goal')
 
           workAndSkillsPage.GoalsLongTermLabel().should('exist')
           workAndSkillsPage.GoalsLongTermLabel().contains('Long-term goals')
 
           workAndSkillsPage.GoalsLongTermText().should('exist')
-          workAndSkillsPage.GoalsLongTermText().contains('string')
+          workAndSkillsPage.GoalsLongTermText().contains('A long term goal')
         })
       })
 

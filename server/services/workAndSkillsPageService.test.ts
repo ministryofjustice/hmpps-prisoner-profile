@@ -18,12 +18,18 @@ import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmploya
 import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
 import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
-import { LearnerGoalsMock, LearnerGoalsMockB } from '../data/localMockData/learnerGoalsMock'
+import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
+import { CuriousGoals } from '../interfaces/curiousGoals'
+import toCuriousGoals from '../interfaces/mappers/curiousGoalsMapper'
+
+jest.mock('../interfaces/mappers/curiousGoalsMapper')
 
 describe('WorkAndSkillsService', () => {
+  const curiousGoalsMapperMock = toCuriousGoals as jest.MockedFunction<typeof toCuriousGoals>
+
   const prisonApiClient = prisonApiClientMock()
   prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
   prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
@@ -58,9 +64,13 @@ describe('WorkAndSkillsService', () => {
     )
   })
 
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('Scenario A', () => {
     beforeEach(() => {
-      curiousApiClient.getLearnerGoals.mockReturnValue(LearnerGoalsMock)
+      curiousApiClient.getLearnerGoals.mockReturnValue(aValidLearnerGoals())
     })
 
     describe('Work and skills', () => {
@@ -182,17 +192,97 @@ describe('WorkAndSkillsService', () => {
     })
   })
 
-  describe('Scenario B', () => {
-    beforeEach(() => {
-      curiousApiClient.getLearnerGoals.mockReturnValue(LearnerGoalsMockB)
-    })
-
+  describe('Curious Goals', () => {
     describe('Work and skills', () => {
-      it('Prisoner without learner goals', async () => {
+      it('should return CuriousGoals for a prisoner with learner goals in Curious', async () => {
+        // Given
         const prisonerNumber = '123123'
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+        const learnerGoals = aValidLearnerGoals({
+          prn: prisonerNumber,
+          employmentGoals: ['An employment goal'],
+          personalGoals: ['A personal goal'],
+          shortTermGoals: ['A short term goal'],
+          longTermGoals: ['A long term goal'],
+        })
+        curiousApiClient.getLearnerGoals.mockReturnValue(learnerGoals)
+
+        const expectedCuriousGoals: CuriousGoals = {
+          prisonerNumber,
+          employmentGoals: [{ key: { text: 'An employment goal' }, value: { text: '' } }],
+          personalGoals: [{ key: { text: 'A personal goal' }, value: { text: '' } }],
+          shortTermGoals: [{ key: { text: 'A short term goal' }, value: { text: '' } }],
+          longTermGoals: [{ key: { text: 'A long term goal' }, value: { text: '' } }],
+          problemRetrievingData: false,
+        }
+        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
+
+        // When
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-        expect(res.learnerGoals).toEqual(LearnerGoalsMockB)
+
+        // Then
+        expect(res.curiousGoals).toEqual(expectedCuriousGoals)
+        expect(curiousGoalsMapperMock).toHaveBeenCalledWith(learnerGoals)
+      })
+
+      it('should return empty CuriousGoals for a prisoner without learner goals in Curious', async () => {
+        // Given
+        const prisonerNumber = '123123'
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+        const learnerGoals = aValidLearnerGoals({
+          prn: prisonerNumber,
+          employmentGoals: [],
+          personalGoals: [],
+          shortTermGoals: [],
+          longTermGoals: [],
+        })
+        curiousApiClient.getLearnerGoals.mockReturnValue(learnerGoals)
+
+        const expectedCuriousGoals: CuriousGoals = {
+          prisonerNumber,
+          employmentGoals: [],
+          personalGoals: [],
+          shortTermGoals: [],
+          longTermGoals: [],
+          problemRetrievingData: false,
+        }
+        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
+
+        // When
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+        // Then
+        expect(res.curiousGoals).toEqual(expectedCuriousGoals)
+        expect(curiousGoalsMapperMock).toHaveBeenCalledWith(learnerGoals)
+      })
+
+      it('should return CuriousGoals Curious API throws an error', async () => {
+        // Given
+        const prisonerNumber = '123123'
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+        const curiousApiError = {
+          status: 501,
+          data: {
+            status: 501,
+            userMessage: 'An unexpected error occurred',
+            developerMessage: 'An unexpected error occurred',
+          },
+        }
+        curiousApiClient.getLearnerGoals.mockRejectedValue(curiousApiError)
+
+        const expectedCuriousGoals = {
+          problemRetrievingData: true,
+        } as CuriousGoals
+
+        // When
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+        // Then
+        expect(res.curiousGoals).toEqual(expectedCuriousGoals)
+        expect(curiousGoalsMapperMock).not.toHaveBeenCalled()
       })
     })
   })
