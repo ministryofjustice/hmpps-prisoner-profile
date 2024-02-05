@@ -3,7 +3,7 @@
 <p class="govuk-body">The prisoner education team set these goals using Virtual Campus. They do not include sentence plan targets. Contact the local education team to find out more.</p>
 <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Employment goals</h3>
 <div class="hmpps-goal-container">
-{% if (learnerGoals.employmentGoals.length > 0) %}
+{% if (curiousGoals.employmentGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
         rows: learnerGoals.employmentGoals
@@ -15,7 +15,7 @@
 
 <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Personal goals</h3>
 <div class="hmpps-goal-container">
-{% if (learnerGoals.personalGoals.length > 0) %}
+{% if (curiousGoals.personalGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
         rows: learnerGoals.personalGoals
@@ -27,7 +27,7 @@
 
 <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Short-term goals</h3>
 <div class="hmpps-goal-container">
-{% if (learnerGoals.shortTermGoals.length > 0) %}
+{% if (curiousGoals.shortTermGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
         rows: learnerGoals.shortTermGoals
