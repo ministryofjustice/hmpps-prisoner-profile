@@ -12,6 +12,9 @@
 export interface PersonalLearningPlanActionPlan {
   prisonerNumber: string
   goals: Array<PersonalLearningPlanGoal>
+  updatedBy?: string
+  updatedByDisplayName?: string
+  updatedAt?: Date
   problemRetrievingData: boolean
 }
 
@@ -19,5 +22,9 @@ export interface PersonalLearningPlanGoal {
   reference: string
   title: string
   createdAt: Date
+  createdBy: string
+  createdByDisplayName: string
   updatedAt: Date
+  updatedBy: string
+  updatedByDisplayName: string
 }
