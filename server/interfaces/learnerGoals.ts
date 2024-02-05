@@ -5,8 +5,3 @@ export interface LearnerGoals {
   longTermGoals: string[]
   shortTermGoals: string[]
 }
-
-export interface LearnerGoalsTestParams {
-  prisonerNumber: string
-  emptyStates: boolean
-}
