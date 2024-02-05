@@ -1,6 +1,6 @@
-import { AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
+import { AgencyDetails } from '../../interfaces/prisonApi/agencies'
 
-const AgenciesMock: AgencyLocationDetails = {
+const AgenciesMock: AgencyDetails = {
   agencyId: 'MDI',
   description: 'Moorland (HMP & YOI)',
   longDescription: 'Moorland (HMP & YOI)',
