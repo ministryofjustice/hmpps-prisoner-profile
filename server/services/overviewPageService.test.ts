@@ -57,7 +57,7 @@ import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmploya
 import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
 import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
-import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
+import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
@@ -105,7 +105,7 @@ describe('OverviewPageService', () => {
     getLearnerProfile: jest.fn(async () => LearnerProfiles),
     getLearnerEducation: jest.fn(async () => learnerEducation),
     getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
-    getLearnerGoals: jest.fn(async () => LearnerGoalsMock),
+    getLearnerGoals: jest.fn(async () => aValidLearnerGoals()),
     getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
   }
 

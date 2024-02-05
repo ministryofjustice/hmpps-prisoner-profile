@@ -4,14 +4,13 @@ import { learnerEmployabilitySkills } from '../../server/data/localMockData/lear
 import { learnerEducation } from '../../server/data/localMockData/learnerEducation'
 import { LearnerProfiles } from '../../server/data/localMockData/learnerProfiles'
 import { LearnerLatestAssessmentsMock } from '../../server/data/localMockData/learnerLatestAssessmentsMock'
-import { LearnerGoalsMock, LearnerGoalsMockB } from '../../server/data/localMockData/learnerGoalsMock'
+import aValidLearnerGoals from '../../server/data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../../server/data/localMockData/learnerNeurodivergenceMock'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import {
   OffenderActivitiesEmptyMock,
   OffenderActivitiesMock,
 } from '../../server/data/localMockData/offenderActivitiesMock'
-import { LearnerGoalsTestParams } from '../../server/interfaces/learnerGoals'
 
 export default {
   stubGetLearnerEmployabilitySkills: (prisonerNumber: string) => {
@@ -74,24 +73,30 @@ export default {
       },
     })
   },
-  stubGetCuriousGoals: (params: LearnerGoalsTestParams) => {
-    let jsonResp
-    if (params.emptyStates === false) {
-      jsonResp = LearnerGoalsMock
-    } else if (params.emptyStates === true) {
-      jsonResp = LearnerGoalsMockB
-    }
+  stubGetCuriousGoals: (options?: { prisonerNumber?: string; emptyStates?: boolean }) => {
+    const prisonerNumber = options?.prisonerNumber || 'G6123VU'
+    const responseBody =
+      !options || options.emptyStates === null || options.emptyStates === undefined || options.emptyStates === false
+        ? aValidLearnerGoals({ prn: prisonerNumber })
+        : aValidLearnerGoals({
+            prn: prisonerNumber,
+            employmentGoals: [],
+            personalGoals: [],
+            longTermGoals: [],
+            shortTermGoals: [],
+          })
+
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/curiousApi/learnerGoals/${params.prisonerNumber}`,
+        urlPattern: `/curiousApi/learnerGoals/${prisonerNumber}`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: responseBody,
       },
     })
   },

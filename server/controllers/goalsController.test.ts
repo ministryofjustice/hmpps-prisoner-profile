@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { LearnerGoalsMock } from '../data/localMockData/learnerGoalsMock'
+import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import WorkAndSkillsPageService from '../services/workAndSkillsPageService'
 import GoalsController from './goalsController'
@@ -64,7 +64,7 @@ describe('Prisoner goals controller', () => {
       // Given
       const getGoals = jest.spyOn<any, string>(controller['workAndSkillsPageService'], 'get')
 
-      const expectedGoals = LearnerGoalsMock
+      const expectedGoals = aValidLearnerGoals()
       workAndSkillsPageService.get.mockResolvedValue(expectedGoals)
 
       const expectedView = {

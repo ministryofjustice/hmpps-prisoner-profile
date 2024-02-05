@@ -5,7 +5,6 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { GovSummaryGroup, GovSummaryItem } from '../interfaces/govSummaryItem'
 import { LearnerEducation } from '../interfaces/learnerEducation'
 import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
-import { LearnerGoals } from '../interfaces/learnerGoals'
 import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
 import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
 import { LearnerProfile } from '../interfaces/learnerProfile'
@@ -16,25 +15,21 @@ import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
 import PersonalLearningPlanService from './personalLearningPlanService'
 import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPlanGoals'
+import logger from '../../logger'
+import { CuriousGoals } from '../interfaces/curiousGoals'
+import toCuriousGoals from '../interfaces/mappers/curiousGoalsMapper'
 
 interface WorkAndSkillsData {
   learnerEmployabilitySkills: LearnerEmployabilitySkills
   learnerProfiles: Array<LearnerProfile>
   learnerEducation: Array<GovSummaryItem>
   learnerLatestAssessments: Array<Array<GovSummaryGroup>>
-  learnerGoals: LearnerGoalsData
+  curiousGoals: CuriousGoals
   learnerNeurodivergence: Array<LearnerNeurodivergence>
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
   unacceptableAbsences: UnacceptableAttendanceData
   personalLearningPlanActionPlan: PersonalLearningPlanActionPlan
-}
-
-interface LearnerGoalsData {
-  employmentGoals: Array<GovSummaryItem>
-  personalGoals: Array<GovSummaryItem>
-  longTermGoals: Array<GovSummaryItem>
-  shortTermGoals: Array<GovSummaryItem>
 }
 
 interface ActivitiesHistoryData {
@@ -86,7 +81,7 @@ export default class WorkAndSkillsPageService {
       learnerProfiles,
       learnerEducation,
       learnerLatestAssessments,
-      learnerGoals: curiousGoals, // TODO - rename `learnerGoals` to `curiousGoals` in WorkAndSkillsData and downstream view dependencies.
+      curiousGoals,
       learnerNeurodivergence,
       workAndSkillsPrisonerName,
       offenderActivitiesHistory,
@@ -210,28 +205,14 @@ export default class WorkAndSkillsPageService {
     return multiListArray
   }
 
-  private async getCuriousGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<LearnerGoalsData> {
-    const learnerGoals: LearnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
-
-    let employmentGoals: GovSummaryItem[] = []
-    let personalGoals: GovSummaryItem[] = []
-    let longTermGoals: GovSummaryItem[] = []
-    let shortTermGoals: GovSummaryItem[] = []
-
-    if (learnerGoals?.employmentGoals) {
-      employmentGoals = this.strArrayToGovList(learnerGoals.employmentGoals)
+  private async getCuriousGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<CuriousGoals> {
+    try {
+      const learnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
+      return toCuriousGoals(learnerGoals)
+    } catch (error) {
+      logger.error(`Error calling the Curious API to get the prisoner's goals`, error)
+      return { problemRetrievingData: true } as CuriousGoals
     }
-    if (learnerGoals?.personalGoals) {
-      personalGoals = this.strArrayToGovList(learnerGoals.personalGoals)
-    }
-    if (learnerGoals?.longTermGoals) {
-      longTermGoals = this.strArrayToGovList(learnerGoals.longTermGoals)
-    }
-    if (learnerGoals?.shortTermGoals) {
-      shortTermGoals = this.strArrayToGovList(learnerGoals.shortTermGoals)
-    }
-
-    return { employmentGoals, personalGoals, longTermGoals, shortTermGoals }
   }
 
   private async getPersonalLearningPlanActionPlan(
@@ -239,15 +220,6 @@ export default class WorkAndSkillsPageService {
     token: string,
   ): Promise<PersonalLearningPlanActionPlan> {
     return this.personalLearningPlanService.getPrisonerActionPlan(prisonerNumber, token)
-  }
-
-  private strArrayToGovList(goals: string[]): GovSummaryItem[] {
-    const govList: GovSummaryItem[] = []
-    goals.forEach(content => {
-      const item: GovSummaryItem = { key: { text: content }, value: { text: '' } }
-      govList.push(item)
-    })
-    return govList
   }
 
   private async getLearnerNeurodivergence(
