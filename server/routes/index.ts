@@ -150,6 +150,7 @@ export default function routes(services: Services): Router {
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
+      const vc2goalsUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
 
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
@@ -176,6 +177,7 @@ export default function routes(services: Services): Router {
         fullCourseHistoryLinkUrl,
         workAndActivities12MonthLinkUrl,
         workAndActivities7DayLinkUrl,
+        vc2goalsUrl,
       })
     },
   )
