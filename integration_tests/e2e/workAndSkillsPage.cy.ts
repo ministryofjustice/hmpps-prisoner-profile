@@ -181,7 +181,7 @@ context('Work and skills page', () => {
           workAndSkillsPage
             .GoalsInfo()
             .contains(
-              'The careers, information, advice and guidance (CIAG) team set these goals using Virtual Campus (VC2). They do not include sentence plan targets.',
+              'The prisoner education team set these goals using Virtual Campus. They do not include sentence plan targets. Contact the local education team to find out more.',
             )
 
           workAndSkillsPage.GoalsEmploymentLabel().should('exist')
@@ -300,7 +300,7 @@ context('Work and skills page', () => {
           workAndSkillsPage
             .GoalsInfo()
             .contains(
-              'The careers, information, advice and guidance (CIAG) team set these goals using Virtual Campus (VC2). They do not include sentence plan targets.',
+              'The prisoner education team set these goals using Virtual Campus. They do not include sentence plan targets. Contact the local education team to find out more.',
             )
 
           workAndSkillsPage.GoalsEmploymentLabel().should('exist')

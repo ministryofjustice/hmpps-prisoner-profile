@@ -1,13 +1,15 @@
 {# Goals summary card content for when the prisoner only has PLP goals #}
 
-<p class="govuk-body">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
-{% for goal in personalLearningPlanActionPlan.goals %}
-  {% set goalLoop = loop %} 
-  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Goal {{ goalLoop.index }}</h3>
-  <div class="hmpps-goal-container">
-    <p class="govuk-body">{{ goal.title }}</p>
-  </div>
-{% endfor %}
-<p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">View goals in the Learning and work progress service</a></p>
-<p class="govuk-body hmpps-secondary-text govuk-!-margin-bottom-7">Last updated: {{ personalLearningPlanActionPlan.updatedAt | formatDate }} by {{ personalLearningPlanActionPlan.updatedByDisplayName }}</p>
-<p class="govuk-body">{{ workAndSkillsPrisonerName }} has no previous goals recorded in Virtual Campus (VC2)</p>
+<div data-qa="plp-goals">
+  <p class="govuk-body">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
+  {% for goal in personalLearningPlanActionPlan.goals %}
+    {% set goalLoop = loop %} 
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Goal {{ goalLoop.index }}</h3>
+    <div class="hmpps-goal-container">
+      <p class="govuk-body">{{ goal.title }}</p>
+    </div>
+  {% endfor %}
+  <p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">View goals in the Learning and work progress service</a></p>
+  <p class="govuk-body hmpps-secondary-text govuk-!-margin-bottom-7">Last updated: {{ personalLearningPlanActionPlan.updatedAt | formatDate }} by {{ personalLearningPlanActionPlan.updatedByDisplayName }}</p>
+  <p class="govuk-body">{{ workAndSkillsPrisonerName }} has no previous goals recorded in Virtual Campus (VC2)</p>
+</div>

@@ -85,7 +85,7 @@ PRISON_API_URL=https://prison-api-dev.prison.service.justice.gov.uk
 USE_OF_FORCE_UI_URL=https://dev.use-of-force.service.justice.gov.uk
 WELCOME_PEOPLE_INTO_PRISON_UI_URL=https://welcome-dev.prison.service.justice.gov.uk
 WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
-LEARNING_AND_WORK_PROGRESS_URL=https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk
+LEARNING_AND_WORK_PROGRESS_UI_URL=https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk
 EDUCATION_AND_WORK_PLAN_API_URL=https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk
 ```
 </details>
