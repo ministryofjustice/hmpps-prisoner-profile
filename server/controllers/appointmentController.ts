@@ -237,8 +237,9 @@ export default class AppointmentController {
         calculateEndDate(parseDate(appointmentDetails.date), appointmentDetails.repeats, appointmentDetails.times),
       )
       const lastAppointmentDate = formatDate(lastAppointmentISODate, 'long')
-      const appointmentType = appointmentTypes.find(type => type.code === appointmentDetails.appointmentType)
-        ?.description
+      const appointmentType = appointmentTypes.find(
+        type => type.code === appointmentDetails.appointmentType,
+      )?.description
       const location = locations.find(loc => loc.locationId === Number(appointmentDetails.location))?.userDescription
       const repeats = repeatOptions.find(type => type.value === appointmentDetails.repeats)?.text
 
@@ -482,10 +483,12 @@ export default class AppointmentController {
       ])
 
       const location = locations.find(loc => loc.locationId === Number(appointmentDefaults.locationId))?.userDescription
-      const preLocation = locations.find(loc => loc.locationId === Number(formValues.preAppointmentLocation))
-        ?.userDescription
-      const postLocation = locations.find(loc => loc.locationId === Number(formValues.postAppointmentLocation))
-        ?.userDescription
+      const preLocation = locations.find(
+        loc => loc.locationId === Number(formValues.preAppointmentLocation),
+      )?.userDescription
+      const postLocation = locations.find(
+        loc => loc.locationId === Number(formValues.postAppointmentLocation),
+      )?.userDescription
       const courtDescription = courts.find(court => court.id === formValues.court)?.name
 
       const preAppointmentStartTime = subMinutes(
