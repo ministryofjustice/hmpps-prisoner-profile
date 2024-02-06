@@ -6,7 +6,7 @@
 {% if (curiousGoals.employmentGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
-        rows: learnerGoals.employmentGoals
+        rows: curiousGoals.employmentGoals
     }) }}
 {% else %}
     <p>The prisoner does not have any employment goals.</p>
@@ -18,7 +18,7 @@
 {% if (curiousGoals.personalGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
-        rows: learnerGoals.personalGoals
+        rows: curiousGoals.personalGoals
     }) }}
 {% else %}
     <p class="govuk-body">The prisoner does not have any personal goals.</p>
@@ -30,7 +30,7 @@
 {% if (curiousGoals.shortTermGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
-        rows: learnerGoals.shortTermGoals
+        rows: curiousGoals.shortTermGoals
     }) }}
 {% else %}
     <p class="govuk-body">The prisoner does not have any short-term goals.</p>
@@ -42,7 +42,7 @@
 {% if (learnerGoals.longTermGoals.length > 0) %}
     {{ govukSummaryList({
         classes: "hmpps-font-weight-normal",
-        rows: learnerGoals.longTermGoals
+        rows: curiousGoals.longTermGoals
     }) }}
 {% else %}
     <p class="govuk-body">The prisoner does not have any long term goals.</p>
