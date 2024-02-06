@@ -195,11 +195,43 @@ export default {
     })
   },
 
-  stubGetCaseNote: ({ prisonerNumber, caseNoteId }: { prisonerNumber: string; caseNoteId: string }) => {
+  stubGetCaseNote: ({
+    prisonerNumber,
+    caseNoteId,
+    isOmic,
+    longText,
+  }: {
+    prisonerNumber: string
+    caseNoteId: string
+    isOmic?: boolean
+    longText?: boolean
+  }) => {
+    // eslint-disable-next-line no-nested-ternary
+    const jsonBody = longText
+      ? pagedCaseNotesMock.content[3]
+      : isOmic
+        ? pomCaseNotesMock.content[0]
+        : pagedCaseNotesMock.content[0]
     return stubFor({
       request: {
         method: 'GET',
         urlPattern: `/casenotes/case-notes/${prisonerNumber}/${caseNoteId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody,
+      },
+    })
+  },
+
+  stubUpdateCaseNote: () => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/casenotes/case-notes/G6123VU/123456`,
       },
       response: {
         status: 200,

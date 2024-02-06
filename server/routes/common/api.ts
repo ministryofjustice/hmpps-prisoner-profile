@@ -1,6 +1,7 @@
 import { Request, RequestHandler, Response } from 'express'
 import OffenderService from '../../services/offenderService'
 import { ApiAction, AuditService, SubjectType } from '../../services/auditService'
+import logger from '../../../logger'
 
 const placeHolderImage = '/assets/images/prisoner-profile-image.png'
 const categoryAImage = '/assets/images/category-a-prisoner-image.png'
@@ -15,13 +16,15 @@ export default class CommonApiRoutes {
     const { prisonerNumber } = req.params
     const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
 
-    this.auditService.sendEvent({
-      who: res.locals.user.username,
-      subjectId: prisonerNumber,
-      correlationId: req.id,
-      what: `API_${ApiAction.PrisonerImage}`,
-      subjectType: SubjectType.PrisonerId,
-    })
+    this.auditService
+      .sendEvent({
+        who: res.locals.user.username,
+        subjectId: prisonerNumber,
+        correlationId: req.id,
+        what: `API_${ApiAction.PrisonerImage}`,
+        subjectType: SubjectType.PrisonerId,
+      })
+      .catch(error => logger.error(error))
 
     if (prisonerNumber === 'placeholder') {
       res.redirect(placeHolderImage)
@@ -45,12 +48,14 @@ export default class CommonApiRoutes {
   public image: RequestHandler = (req: Request, res: Response) => {
     const { imageId } = req.params
 
-    this.auditService.sendEvent({
-      who: res.locals.user.username,
-      subjectId: imageId,
-      correlationId: req.id,
-      what: `API_${ApiAction.Image}`,
-    })
+    this.auditService
+      .sendEvent({
+        who: res.locals.user.username,
+        subjectId: imageId,
+        correlationId: req.id,
+        what: `API_${ApiAction.Image}`,
+      })
+      .catch(error => logger.error(error))
 
     if (imageId === 'placeholder') {
       res.sendFile(placeHolderImage)

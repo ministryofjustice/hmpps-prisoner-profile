@@ -4,7 +4,7 @@ import { PagedList } from '../../interfaces/prisonApi/pagedList'
 export const pagedCaseNotesMock: PagedList<CaseNote> = {
   content: [
     {
-      caseNoteId: '47023806',
+      caseNoteId: '123456',
       offenderIdentifier: 'G6123VU',
       type: 'ACP',
       typeDescription: 'Accredited Programme',
@@ -13,17 +13,18 @@ export const pagedCaseNotesMock: PagedList<CaseNote> = {
       source: 'INST',
       creationDateTime: '2023-04-18T17:15:16.410402327',
       occurrenceDateTime: '2023-04-18T17:15:00',
-      authorName: 'Grant, James',
-      authorUserId: '487023',
-      text: 'Test tes',
+      authorName: 'Smith, John',
+      authorUserId: '231232',
+      text: 'Initial text for case note.',
       locationId: 'MDI',
       eventId: 47023806,
       sensitive: false,
       amendments: [
         {
           creationDateTime: '2023-04-18T17:15:52',
-          authorName: 'Grant, James',
-          additionalNoteText: 'Test case note.',
+          authorName: 'Smith, John',
+          authorUserName: 'AB123456',
+          additionalNoteText: 'Additional case note text, part one.',
         },
       ],
     },
@@ -75,7 +76,7 @@ export const pagedCaseNotesMock: PagedList<CaseNote> = {
       occurrenceDateTime: '2023-02-21T12:24:00',
       authorName: 'Heath, Harry',
       authorUserId: '485802',
-      text: 'John was nice today.',
+      text: 'John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today. John was nice today.',
       locationId: 'MDI',
       eventId: 47020236,
       sensitive: false,
@@ -83,6 +84,7 @@ export const pagedCaseNotesMock: PagedList<CaseNote> = {
         {
           creationDateTime: '2023-02-21T12:25:47',
           authorName: 'Heath, Harry',
+          authorUserName: 'AB123456',
           additionalNoteText: 'I lied.',
         },
       ],
@@ -479,6 +481,7 @@ export const pagedCaseNotesMockPage2: PagedList<CaseNote> = {
         {
           creationDateTime: '2023-02-21T12:25:47',
           authorName: 'Heath, Harry',
+          authorUserName: 'AB123456',
           additionalNoteText: 'I lied.',
         },
       ],
@@ -875,6 +878,7 @@ export const pagedCaseNotesMockSorted: PagedList<CaseNote> = {
         {
           creationDateTime: '2023-02-21T12:25:47',
           authorName: 'Heath, Harry',
+          authorUserName: 'AB123456',
           additionalNoteText: 'I lied.',
         },
       ],
@@ -1330,8 +1334,8 @@ export const pomCaseNotesMock: PagedList<CaseNote> = {
       offenderIdentifier: 'G6123VU',
       type: 'OMIC',
       typeDescription: 'OMiC',
-      subType: 'POM2POM_HO',
-      subTypeDescription: 'POM to POM Handover',
+      subType: 'OPEN_COMM',
+      subTypeDescription: 'OMiC Open',
       source: 'OCNS',
       creationDateTime: '2023-04-18T17:15:16.410402327',
       occurrenceDateTime: '2023-04-18T17:15:00',

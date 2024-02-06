@@ -1,0 +1,105 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% extends "../index.njk" %}
+{% set pageTitle = 'Add more details to a case note' %}
+{% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })}}
+    {% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 id="updateCaseNoteHeader">Add more details to {{ prisonerDisplayName | apostrophe }} case note</h1>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body govuk-!-margin-bottom-6" data-qa="prison-number"><span class="govuk-!-font-weight-bold">Prison number:</span> {{ prisonerNumber }}</p>
+
+        {% if maxLength < 1 %}
+            {{ govukWarningText({
+                text: "You cannot add more details to this case note because it has reached the character limit. You’ll need to add a new case note to add more details.",
+                iconFallbackText: "Warning",
+                classes: 'govuk-grid-column-full',
+                attributes: { 'data-test': 'max-limit-reached-warning'}
+            }) }}
+        {% endif %}
+
+        <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold" data-qa="current-type">{{ currentCaseNote.typeDescription }}: {{ currentCaseNote.subTypeDescription }}</p>
+        <pre class="govuk-body govuk-!-margin-bottom-6" data-qa="current-text">{{ currentCaseNote.text }}</pre>
+        {% if currentCaseNote.amendments.length %}
+            {% for amendment in currentCaseNote.amendments %}
+                <div class="govuk-body govuk-!-margin-bottom-2">More details added:</div>
+                <pre class="govuk-body govuk-!-margin-bottom-6" data-qa="more-details-text">{{ amendment.additionalNoteText }}</pre>
+            {% endfor %}
+        {% endif %}
+        <form method="post" novalidate="novalidate" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="isExternal" value="{{ isExternal }}" />
+            <input type="hidden" name="currentLength" value="{{ currentLength }}" />
+            <input type="hidden" name="username" value="{{ user.username }}" />
+
+            {% if isOMICOpen %}
+                {{ govukWarningText({
+                    text: "This case note could be read by anyone with access to Digital Prison Services.  Check all information recorded here is appropriate and necessary to share across the prison.",
+                    iconFallbackText: "Warning",
+                    classes: 'govuk-grid-column-full',
+                    attributes: { 'data-qa': 'omic-open-warning'}
+                }) }}
+
+                {% set hint = {
+                    text: 'Do not save any sensitive information as an OMiC open case note.',
+                    attributes: { 'data-qa': 'omic-open-hint'}
+                } %}
+            {% endif %}
+
+            {% if maxLength > 0 %}
+                {{ govukCharacterCount({
+                    name: "text",
+                    id: "text",
+                    maxlength: maxLength,
+                    rows: 10,
+                    value: caseNoteText,
+                    errorMessage: errors | findError('text'),
+                    label: {
+                        text: 'Additional details',
+                        classes: 'govuk-visually-hidden'
+                    },
+                    hint: hint
+                }) }}
+
+                <div class="govuk-button-group">
+                    {{ govukButton({
+                        text: "Save",
+                        type: "submit",
+                        preventDoubleClick: true,
+                        attributes: { "data-qa": "update-case-note-submit-button" }
+                    }) }}
+                    {{ govukButton({
+                        text: "Cancel",
+                        href: refererUrl,
+                        classes: "govuk-button--secondary",
+                        attributes: { "data-qa": "update-case-note-cancel-button" }
+                    }) }}
+                </div>
+            {% else %}
+                <div class="govuk-button-group">
+                    <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Return to prisoner's case notes</a>
+                </div>
+            {% endif %}
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

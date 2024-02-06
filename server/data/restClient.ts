@@ -3,9 +3,9 @@ import superagent from 'superagent'
 import Agent, { HttpsAgent } from 'agentkeepalive'
 
 import logger from '../../logger'
+import type { UnsanitisedError } from '../sanitisedError'
 import sanitiseError from '../sanitisedError'
 import { ApiConfig } from '../config'
-import type { UnsanitisedError } from '../sanitisedError'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 
 interface GetRequest {
@@ -18,6 +18,15 @@ interface GetRequest {
 }
 
 interface PostRequest {
+  path?: string
+  headers?: Record<string, string>
+  responseType?: string
+  data?: object | string[]
+  raw?: boolean
+  query?: string
+}
+
+interface PutRequest {
   path?: string
   headers?: Record<string, string>
   responseType?: string
@@ -122,6 +131,40 @@ export default class RestClient {
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
+      throw sanitisedError
+    }
+  }
+
+  async put<T>({
+    path = null,
+    query = '',
+    headers = {},
+    responseType = '',
+    data = {},
+    raw = false,
+  }: PutRequest = {}): Promise<T> {
+    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
+    const endpoint = `${this.apiUrl()}${path}`
+    try {
+      const result = await superagent
+        .put(endpoint)
+        .send(data)
+        .agent(this.agent)
+        .query(query)
+        .use(restClientMetricsMiddleware)
+        .retry(2, (err, res) => {
+          if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+          return undefined // retry handler only for logging retries, not to influence retry logic
+        })
+        .auth(this.token, { type: 'bearer' })
+        .set(headers)
+        .responseType(responseType)
+        .timeout(this.timeoutConfig())
+
+      return raw ? result : result.body
+    } catch (error) {
+      const sanitisedError = sanitiseError(error, endpoint)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'PUT'`)
       throw sanitisedError
     }
   }

@@ -11,6 +11,7 @@ import config from '../config'
 import { AuditService, Page } from '../services/auditService'
 import { LocationDetails, LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
 import PrisonerLocationDetailsPageService from '../services/prisonerLocationDetailsPageService'
+import logger from '../../logger'
 
 export default class PrisonerLocationDetailsController {
   constructor(
@@ -80,15 +81,17 @@ export default class PrisonerLocationDetailsController {
       const previousLocations = locationDetailsLatestFirst.slice(1)
       const prisonerProfileUrl = `/prisoner/${offenderNo}`
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.PrisonerCellHistory,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: Page.PrisonerCellHistory,
+        })
+        .catch(error => logger.error(error))
 
       // TODO CDPS-373: Move into PrisonerLocationDetailsService
       const pageData: LocationDetailsPageData = {
