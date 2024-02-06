@@ -198,7 +198,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     it('Displays the active alerts tab and filters results', () => {
       alertsPage.alertsList().children().should('have.length', 20)
 
-      alertsPage.filterCheckbox().click()
+      alertsPage.filterCheckbox().click({ force: true })
       alertsPage.filterApplyButton().click()
 
       alertsPage.alertsList().children().should('have.length', 1)
