@@ -13,11 +13,13 @@ context('Work and skills page - Goals card', () => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.setupBannerStubs({ prisonerNumber })
+    cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
   })
 
-  it('should display the Goals card with populated goals given prisoner has goals', () => {
+  it('should display the Goals card with populated goals given prisoner has VC2 goals only', () => {
     // Given
-    cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+    cy.task('stubGetCuriousGoals', prisonerNumber)
+    cy.task('stubGetPlpActionPlanForPrisonerWithNoGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -62,7 +64,8 @@ context('Work and skills page - Goals card', () => {
 
   it('should display the Goals card with no populated goals given prisoner has no goals', () => {
     // Given
-    cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: true })
+    cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals', prisonerNumber)
+    cy.task('stubGetPlpActionPlanForPrisonerWithNoGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -102,5 +105,57 @@ context('Work and skills page - Goals card', () => {
 
     workAndSkillsPage.GoalsLongTermText().should('exist')
     workAndSkillsPage.GoalsLongTermText().contains('The prisoner does not have any long term goals.')
+  })
+
+  it.skip('should display the Goals card with populated goals given prisoner has PLP goals only', () => {
+    // Given
+    cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals', prisonerNumber)
+    cy.task('stubGetPlpActionPlan', prisonerNumber)
+
+    // When
+    visitWorkAndSkillsPage()
+
+    // Then
+    const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    // TODO - add relevant page assertions once the implementation has been completed
+  })
+
+  it.skip('should display the Goals card with populated goals given prisoner has both PLP and VC2 goals', () => {
+    // Given
+    cy.task('stubGetCuriousGoals', prisonerNumber)
+    cy.task('stubGetPlpActionPlan', prisonerNumber)
+
+    // When
+    visitWorkAndSkillsPage()
+
+    // Then
+    const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    // TODO - add relevant page assertions once the implementation has been completed
+  })
+
+  it.skip('should display the Goals card informing the user the Goals could not be retrieved given there was a problem getting the VC2 goals', () => {
+    // Given
+    cy.task('stubGetCuriousGoals500Error', prisonerNumber)
+    cy.task('stubGetPlpActionPlan', prisonerNumber)
+
+    // When
+    visitWorkAndSkillsPage()
+
+    // Then
+    const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    // TODO - add relevant page assertions once the implementation has been completed
+  })
+
+  it.skip('should display the Goals card informing the user the Goals could not be retrieved given there was a problem getting the PLP goals', () => {
+    // Given
+    cy.task('stubGetCuriousGoals', prisonerNumber)
+    cy.task('stubGetPlpActionPlan500Error', prisonerNumber)
+
+    // When
+    visitWorkAndSkillsPage()
+
+    // Then
+    const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    // TODO - add relevant page assertions once the implementation has been completed
   })
 })
