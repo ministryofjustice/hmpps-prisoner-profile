@@ -117,6 +117,7 @@ context('Work and skills page - Goals card', () => {
 
     // Then
     const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    workAndSkillsPage.GoalsInfo().should('exist')
     // TODO - add relevant page assertions once the implementation has been completed
   })
 
@@ -130,6 +131,7 @@ context('Work and skills page - Goals card', () => {
 
     // Then
     const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    workAndSkillsPage.GoalsInfo().should('exist')
     // TODO - add relevant page assertions once the implementation has been completed
   })
 
@@ -143,6 +145,7 @@ context('Work and skills page - Goals card', () => {
 
     // Then
     const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    workAndSkillsPage.GoalsInfo().should('exist')
     // TODO - add relevant page assertions once the implementation has been completed
   })
 
@@ -156,6 +159,7 @@ context('Work and skills page - Goals card', () => {
 
     // Then
     const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    workAndSkillsPage.GoalsInfo().should('exist')
     // TODO - add relevant page assertions once the implementation has been completed
   })
 })
