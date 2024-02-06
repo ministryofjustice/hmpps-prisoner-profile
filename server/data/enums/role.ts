@@ -25,4 +25,5 @@ export enum Role {
   ReceptionUser = 'ROLE_PRISON_RECEPTION',
   ReleaseDatesCalculator = 'ROLE_RELEASE_DATES_CALCULATOR',
   ActivityHub = 'ROLE_ACTIVITY_HUB',
+  EditEducationWorkPlan = 'ROLE_EDUCATION_WORK_PLAN_EDITOR',
 }

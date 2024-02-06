@@ -9,7 +9,9 @@
       <p class="govuk-body">{{ goal.title }}</p>
     </div>
   {% endfor %}
-  <p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">View goals in the Learning and work progress service</a></p>
+  {% if canEditEducationWorkPlan %}
+    <p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">View goals in the Learning and work progress service</a></p>
+  {% endif %}
   <p class="govuk-body hmpps-secondary-text govuk-!-margin-bottom-7">Last updated: {{ personalLearningPlanActionPlan.updatedAt | formatDate }} by {{ personalLearningPlanActionPlan.updatedByDisplayName }}</p>
   <p class="govuk-body"><a href="{{ vc2goalsUrl }}">View previous goals from Virtual Campus</a></p>
 </div>
