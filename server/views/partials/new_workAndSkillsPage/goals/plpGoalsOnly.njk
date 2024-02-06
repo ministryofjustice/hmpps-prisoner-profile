@@ -8,6 +8,6 @@
     <p class="govuk-body">{{ goal.title }}</p>
   </div>
 {% endfor %}
-<p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}">View goals in the Learning and work progress service</a></p>
-<p class="govuk-body hmpps-secondary-text govuk-!-margin-bottom-2">Last updated: {{ personalLearningPlanActionPlan.updatedAt | formatDate }} by {{ personalLearningPlanActionPlan.updatedByDisplayName }}</p>
+<p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">View goals in the Learning and work progress service</a></p>
+<p class="govuk-body hmpps-secondary-text govuk-!-margin-bottom-7">Last updated: {{ personalLearningPlanActionPlan.updatedAt | formatDate }} by {{ personalLearningPlanActionPlan.updatedByDisplayName }}</p>
 <p class="govuk-body">{{ workAndSkillsPrisonerName }} has no previous goals recorded in Virtual Campus (VC2)</p>
