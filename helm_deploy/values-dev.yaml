@@ -67,6 +67,7 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
     MOVE_TO_RECEPTION_LINK_ENABLED: "true"
+    NEW_WORK_AND_SKILLS_TAB_ENABLED: "true"
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
