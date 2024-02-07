@@ -14,7 +14,7 @@ context('Prisoners VC2 goals page', () => {
 
   it('should contain a banner about learning and work progress service replacing VC2', () => {
     // Given
-    cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU', emptyStates: false })
+    cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU' })
     visitGoalsPage()
 
     // When
@@ -26,7 +26,7 @@ context('Prisoners VC2 goals page', () => {
 
   it('should display goals from VC2', () => {
     // Given
-    cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU', emptyStates: false })
+    cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU' })
     visitGoalsPage()
 
     // When
@@ -41,7 +41,8 @@ context('Prisoners VC2 goals page', () => {
 
   it('should display no goals message given there are no goals in VC2', () => {
     // Given
-    cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU', emptyStates: true })
+    cy.setupWorkAndSkillsPageStubs({ prisonerNumber: 'G6123VU' })
+    cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals')
     visitGoalsPage()
 
     // When

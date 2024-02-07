@@ -17,7 +17,7 @@ context('Work and skills page - Employability Skills Card', () => {
       const prisonerNumber = 'G6123VU'
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber })
-        cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+        cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
         visitWorkAndSkillsPage()
       })
 

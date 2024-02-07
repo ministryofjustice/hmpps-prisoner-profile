@@ -73,18 +73,9 @@ export default {
       },
     })
   },
-  stubGetCuriousGoals: (options?: { prisonerNumber?: string; emptyStates?: boolean }) => {
-    const prisonerNumber = options?.prisonerNumber || 'G6123VU'
-    const responseBody =
-      !options || options.emptyStates === null || options.emptyStates === undefined || options.emptyStates === false
-        ? aValidLearnerGoals({ prn: prisonerNumber })
-        : aValidLearnerGoals({
-            prn: prisonerNumber,
-            employmentGoals: [],
-            personalGoals: [],
-            longTermGoals: [],
-            shortTermGoals: [],
-          })
+
+  stubGetCuriousGoals: (prisonerNumber = 'G6123VU') => {
+    const responseBodyForPrisonerWithGoals = aValidLearnerGoals({ prn: prisonerNumber })
 
     return stubFor({
       request: {
@@ -96,10 +87,53 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: responseBody,
+        jsonBody: responseBodyForPrisonerWithGoals,
       },
     })
   },
+
+  stubGetCuriousGoalsForPrisonerWithNoGoals: (prisonerNumber = 'G6123VU') => {
+    const responseBodyForPrisonerWithNoGoals = aValidLearnerGoals({
+      prn: prisonerNumber,
+      employmentGoals: [],
+      personalGoals: [],
+      longTermGoals: [],
+      shortTermGoals: [],
+    })
+
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/curiousApi/learnerGoals/${prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: responseBodyForPrisonerWithNoGoals,
+      },
+    })
+  },
+
+  stubGetCuriousGoals500Error: (prisonerNumber = 'G6123VU') => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/curiousApi/learnerGoals/${prisonerNumber}`,
+      },
+      response: {
+        status: 500,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          errorCode: 'VC5001',
+          errorMessage: 'Service unavailable',
+          httpStatusCode: 500,
+        },
+      },
+    })
+  },
+
   stubGetLearnerNeurodivergence: (prisonerNumber: string) => {
     return stubFor({
       request: {
