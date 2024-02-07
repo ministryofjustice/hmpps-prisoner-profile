@@ -13,7 +13,7 @@ context('Work and skills page', () => {
     const prisonerNumber = 'G6123VU'
     const visitPage = prisonerDataOverrides => {
       cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
-      cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+      cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
       visitWorkAndSkillsPage({ failOnStatusCode: false })
     }
 
@@ -29,7 +29,7 @@ context('Work and skills page', () => {
         caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupBannerStubs({ prisonerNumber })
-      cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+      cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
     })
 
     it('Doesnt dislpay the link to the 7 day schedule', () => {
@@ -48,7 +48,7 @@ context('Work and skills page', () => {
       const prisonerNumber = 'G6123VU'
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber })
-        cy.setupWorkAndSkillsPageStubs({ prisonerNumber, emptyStates: false })
+        cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
         visitWorkAndSkillsPage()
       })
 
