@@ -3,6 +3,7 @@ import { formatName } from '../utils/utils'
 import { AuditService, Page } from '../services/auditService'
 import BeliefService from '../services/beliefService'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import logger from '../../logger'
 
 export default class BeliefHistoryController {
   constructor(
@@ -16,15 +17,17 @@ export default class BeliefHistoryController {
 
     const beliefs = await this.beliefService.getBeliefHistory(clientToken, prisonerNumber, bookingId)
 
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber,
-      prisonId,
-      correlationId: req.id,
-      page: Page.ReligionBeliefHistory,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.ReligionBeliefHistory,
+      })
+      .catch(error => logger.error(error))
 
     return res.render('pages/beliefHistory', {
       pageTitle: 'Religion or belief history',

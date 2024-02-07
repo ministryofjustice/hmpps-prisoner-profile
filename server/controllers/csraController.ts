@@ -6,6 +6,7 @@ import csraAssessmentsToSummaryListMapper from '../mappers/csraAssessmentsToSumm
 import getFilterValuesFromAssessments from '../utils/getFilterValuesFromAssessments'
 import validateDateRange from '../utils/validateDateRange'
 import { AuditService, Page } from '../services/auditService'
+import logger from '../../logger'
 
 export default class CsraController {
   constructor(
@@ -37,15 +38,17 @@ export default class CsraController {
     const filteredSummaries = this.csraService.filterCsraAssessments(allCsraSummaries, req.query)
     const filteredAsessments = await this.csraService.getDetailsForAssessments(clientToken, filteredSummaries)
 
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber,
-      prisonId,
-      correlationId: req.id,
-      page: Page.CsraHistory,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.CsraHistory,
+      })
+      .catch(error => logger.error(error))
 
     return res.render('pages/csra/prisonerCsraHistoryPage', {
       pageTitle: 'CSRA history',
@@ -67,15 +70,17 @@ export default class CsraController {
       +assessmentSeq,
     )
 
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
-      correlationId: req.id,
-      page: Page.CsraReview,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.CsraReview,
+      })
+      .catch(error => logger.error(error))
 
     return res.render('pages/csra/csraReviewPage', {
       pageTitle: 'CSRA details',

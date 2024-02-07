@@ -2,11 +2,13 @@ import { AuditService } from '../../server/services/auditService'
 
 // eslint-disable-next-line import/prefer-default-export
 export const auditServiceMock = (): AuditService => ({
-  sendAccessAttempt: jest.fn(),
-  sendAddAppointment: jest.fn(),
-  sendPageView: jest.fn(),
-  sendSearch: jest.fn(),
-  sendPostAttempt: jest.fn(),
-  sendPostSuccess: jest.fn(),
-  sendEvent: jest.fn(),
+  sendAccessAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendAddAppointment: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendPageView: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendSearch: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendPostAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendPostSuccess: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendPutAttempt: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendPutSuccess: jest.fn().mockImplementation(() => Promise.resolve()),
+  sendEvent: jest.fn().mockImplementation(() => Promise.resolve()),
 })

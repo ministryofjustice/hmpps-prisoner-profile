@@ -31,13 +31,15 @@ export enum Page {
   PostAddAppointment = 'POST_ADD_APPOINTMENT',
   PostAddCaseNote = 'POST_ADD_CASE_NOTE',
   PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
+  PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
   PrePostAppointmentConfirmation = 'PRE_POST_APPOINTMENT_CONFIRMATION',
   PrePostAppointments = 'PRE_POST_APPOINTMENTS',
   PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
+  ReligionBeliefHistory = 'RELIGION_BELIEF_HISTORY',
   Schedule = 'SCHEDULE',
+  UpdateCaseNote = 'UPDATE_CASE_NOTE',
   WorkAndSkills = 'WORK_AND_SKILLS',
   XRayBodyScans = 'XRAY_BODY_SCANS',
-  ReligionBeliefHistory = 'RELIGION_BELIEF_HISTORY',
 }
 
 // eslint-disable-next-line no-shadow
@@ -50,9 +52,14 @@ export enum ApiAction {
 
 // eslint-disable-next-line no-shadow
 export enum PostAction {
-  Alert = 'ALERT',
-  Appointment = 'APPOINTMENT',
-  CaseNote = 'CASE_NOTE',
+  Alert = 'ADD_ALERT',
+  Appointment = 'ADD_APPOINTMENT',
+  CaseNote = 'ADD_CASE_NOTE',
+}
+
+// eslint-disable-next-line no-shadow
+export enum PutAction {
+  CaseNote = 'UPDATE_CASE_NOTE',
 }
 
 // eslint-disable-next-line no-shadow
@@ -112,6 +119,15 @@ interface PostAudit {
   details: object
 }
 
+interface PutAudit {
+  userId: string
+  userCaseLoads: CaseLoad[]
+  prisonerNumber: string
+  correlationId: string
+  action: PutAction
+  details: object
+}
+
 interface SendEvent {
   what: string
   who: string
@@ -128,6 +144,8 @@ export interface AuditService {
   sendSearch: (object: SearchAudit) => Promise<void>
   sendPostAttempt: (object: PostAudit) => Promise<void>
   sendPostSuccess: (object: PostAudit) => Promise<void>
+  sendPutAttempt: (object: PutAudit) => Promise<void>
+  sendPutSuccess: (object: PutAudit) => Promise<void>
   sendEvent: (object: SendEvent) => Promise<void>
 }
 
@@ -210,6 +228,32 @@ export const auditService = ({
     })
   }
 
+  const sendPutAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PutAudit) => {
+    await sendMessage({
+      what: `PUT_${action.toString()}`,
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: SubjectType.PrisonerId,
+      service: serviceName,
+      correlationId,
+      details: JSON.stringify({ build, ...details }),
+    })
+  }
+
+  const sendPutSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PutAudit) => {
+    await sendMessage({
+      what: `PUT_SUCCESS_${action.toString()}`,
+      when: new Date(),
+      who: userId,
+      subjectId: prisonerNumber,
+      subjectType: SubjectType.PrisonerId,
+      service: serviceName,
+      correlationId,
+      details: JSON.stringify({ build, ...details }),
+    })
+  }
+
   const sendPageView = async ({
     userId,
     userCaseLoads,
@@ -279,6 +323,8 @@ export const auditService = ({
     sendSearch,
     sendPostAttempt,
     sendPostSuccess,
+    sendPutAttempt,
+    sendPutSuccess,
     sendEvent,
   }
 }

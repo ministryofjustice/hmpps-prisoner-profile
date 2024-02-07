@@ -1,7 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { PrisonerSearchService } from '../services'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Role } from '../data/enums/role'
@@ -14,8 +13,10 @@ import config from '../config'
 import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
+import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import { AuditService, Page, PostAction, PutAction, SearchAction } from '../services/auditService'
+import logger from '../../logger'
+import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -23,7 +24,6 @@ import { AuditService, Page, PostAction, SearchAction } from '../services/auditS
 export default class CaseNotesController {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly prisonerSearchService: PrisonerSearchService,
     private readonly caseNotesService: CaseNotesService,
     private readonly auditService: AuditService,
   ) {}
@@ -44,7 +44,7 @@ export default class CaseNotesController {
       if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
       // Get prisoner data for banner and for use in alerts generation
-      const prisonerData = await this.prisonerSearchService.getPrisonerDetails(clientToken, req.params.prisonerNumber)
+      const { prisonerData } = req.middleware
 
       // Set role based permissions
       const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
@@ -84,16 +84,18 @@ export default class CaseNotesController {
       // Get staffId to use in conditional logic for amend link
       const { staffId } = res.locals.user
 
-      await this.auditService.sendSearch({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        searchPage: SearchAction.CaseNotes,
-        details: { queryParams },
-      })
+      this.auditService
+        .sendSearch({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          searchPage: SearchAction.CaseNotes,
+          details: { queryParams },
+        })
+        .catch(error => logger.error(error))
 
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
@@ -113,10 +115,8 @@ export default class CaseNotesController {
 
   public displayAddCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { clientToken } = res.locals
       const userToken = res.locals.user.token
-      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient } =
-        await this.prisonerSearchService.getPrisonerDetails(clientToken, req.params.prisonerNumber)
+      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
       // If user cannot view this prisoner's case notes, redirect to 404 page
@@ -149,15 +149,17 @@ export default class CaseNotesController {
         ? addCaseNoteRefererUrlFlash[0]
         : req.headers.referer || `/prisoner/${prisonerNumber}`
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.AddCaseNote,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.AddCaseNote,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('pages/caseNotes/addCaseNote', {
         today: formatDate(now.toISOString(), 'short'),
@@ -211,15 +213,113 @@ export default class CaseNotesController {
       }
 
       req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
-      this.auditService.sendPostSuccess({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.CaseNote,
-        details: {},
-      })
+      this.auditService
+        .sendPostSuccess({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.CaseNote,
+          details: {},
+        })
+        .catch(error => logger.error(error))
       return res.redirect(refererUrl || `/prisoner/${prisonerNumber}/case-notes`)
+    }
+  }
+
+  public displayUpdateCaseNote(): RequestHandler {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const userToken = res.locals.user.token
+      const { caseNoteId } = req.params
+      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient } = req.middleware.prisonerData
+      const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+
+      // If user cannot view this prisoner's case notes, redirect to 404 page
+      if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient })) {
+        return next()
+      }
+
+      const currentCaseNote = await this.caseNotesService.getCaseNote(userToken, prisonerNumber, caseNoteId)
+      const currentLength = this.calculateCaseNoteTotalLength(currentCaseNote)
+      const isOMICOpen = currentCaseNote.subType === 'OPEN_COMM'
+      const isExternal = Number.isNaN(+currentCaseNote.caseNoteId) // External case notes have non-numeric IDs
+
+      // Prison API adds " ...[%s updated the case notes on yyyy/MM/dd HH:mm:ss] " to the text (%s is variable length username)
+      const maxLength = isExternal
+        ? 4000
+        : 4000 - currentLength - prisonApiAdditionalCaseNoteTextLength - res.locals.user.username.length
+      const caseNoteFlash = req.flash('caseNoteText')
+      const caseNoteText: string = caseNoteFlash?.length ? (caseNoteFlash[0] as string) : ''
+      const errors = req.flash('errors')
+
+      const refererUrl = `/prisoner/${prisonerNumber}/case-notes`
+
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.UpdateCaseNote,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/caseNotes/updateCaseNote', {
+        refererUrl,
+        prisonerDisplayName,
+        prisonerNumber,
+        caseNoteText,
+        currentCaseNote,
+        currentLength,
+        maxLength,
+        isOMICOpen,
+        isExternal,
+        errors,
+      })
+    }
+  }
+
+  public postUpdate(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, caseNoteId } = req.params
+      const { text, isExternal, currentLength, username } = req.body
+
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.caseNotesService.updateCaseNote(res.locals.user.token, prisonerNumber, caseNoteId, {
+            text,
+            isExternal,
+            currentLength: +currentLength,
+            username,
+          })
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('caseNoteText', text)
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/update-case-note/${caseNoteId}`)
+      }
+
+      req.flash('flashMessage', { text: 'Case note updated', type: FlashMessageType.success })
+      this.auditService
+        .sendPutSuccess({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PutAction.CaseNote,
+          details: { caseNoteId },
+        })
+        .catch(error => logger.error(error))
+      return res.redirect(`/prisoner/${prisonerNumber}/case-notes`)
     }
   }
 
@@ -268,6 +368,17 @@ export default class CaseNotesController {
         const index = Math.floor(Math.random() * prompts.length)
         return [type, prompts[index]]
       }),
+    )
+  }
+
+  private calculateCaseNoteTotalLength(caseNote: CaseNote): number {
+    return (
+      caseNote.text.length +
+      (caseNote.amendments?.reduce(
+        (totalLength: number, amendment) =>
+          totalLength + amendment.additionalNoteText.length + prisonApiAdditionalCaseNoteTextLength + 8, // TODO + amendment.authorUserName.length - needs Offender Case Note API & PrisonAPI change
+        0,
+      ) || 0)
     )
   }
 }

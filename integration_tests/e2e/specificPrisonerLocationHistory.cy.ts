@@ -56,7 +56,7 @@ context('Specific Prisoner Location History', () => {
       page.cellType().should('contain', 'Listener Cell')
       page.movedBy().should('contain', 'John Smith')
       page.reasonForMove().should('contain', 'Some description')
-      page.whatHappened().should('contain', 'Test tes')
+      page.whatHappened().should('contain', 'Initial text for case note.')
     })
 
     it('Displays information about the prisoners shared with', () => {

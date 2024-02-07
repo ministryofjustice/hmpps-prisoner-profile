@@ -6,7 +6,7 @@ import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
 import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
-import { CaseNote, CaseNoteAmendment, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNote, CaseNoteAmendment, CaseNoteForm, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
@@ -79,7 +79,7 @@ export default class CaseNotesService {
             ...amendment,
             authorName: convertNameCommaToHuman(amendment.authorName),
           })),
-          addMoreLinkUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/case-notes/amend-case-note/${caseNote.caseNoteId}`,
+          addMoreLinkUrl: `/prisoner/${prisonerData.prisonerNumber}/update-case-note/${caseNote.caseNoteId}`,
           deleteLinkUrl:
             caseNote.source === CaseNoteSource.SecureCaseNoteSource &&
             canDeleteSensitiveCaseNotes &&
@@ -124,6 +124,10 @@ export default class CaseNotesService {
     return caseNotesApiClient.getCaseNoteTypesForUser()
   }
 
+  public async getCaseNote(token: string, prisonerNumber: string, caseNoteId: string): Promise<CaseNote> {
+    return this.caseNotesApiClientBuilder(token).getCaseNote(prisonerNumber, caseNoteId)
+  }
+
   public async addCaseNote(token: string, prisonerNumber: string, caseNote: CaseNoteForm) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const dateTime = parseDate(caseNote.date).setHours(+caseNote.hours, +caseNote.minutes, 0)
@@ -135,5 +139,16 @@ export default class CaseNotesService {
       text: caseNote.text,
       occurrenceDateTime,
     })
+  }
+
+  public async updateCaseNote(
+    token: string,
+    prisonerNumber: string,
+    caseNoteId: string,
+    updatedCaseNoteForm: UpdateCaseNoteForm,
+  ) {
+    const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
+
+    return caseNotesApiClient.updateCaseNote(prisonerNumber, caseNoteId, updatedCaseNoteForm)
   }
 }

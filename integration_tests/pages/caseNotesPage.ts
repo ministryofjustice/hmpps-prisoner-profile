@@ -41,6 +41,8 @@ export default class CaseNotesPage extends Page {
 
   addCaseNoteButton = (): PageElement => cy.get('#add-case-note-action-button a')
 
+  addMoreDetailsButton = (): PageElement => cy.get('[data-qa=case-notes-add-more-details-link]')
+
   viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
 
   filterDateFromLabel = (): PageElement => cy.get(':nth-child(3) > .govuk-label')

@@ -74,15 +74,17 @@ export default class AppointmentController {
           }
       const errors = req.flash('errors')
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.AddAppointment,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.AddAppointment,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('pages/appointments/addAppointment', {
         pageTitle: 'Add an appointment',
@@ -185,14 +187,16 @@ export default class AppointmentController {
         return res.redirect(`/prisoner/${prisonerNumber}/add-appointment`)
       }
 
-      await this.auditService.sendPostAttempt({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.Appointment,
-        details: {},
-      })
+      this.auditService
+        .sendPostAttempt({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.Appointment,
+          details: {},
+        })
+        .catch(error => logger.error(error))
 
       return res.redirect(`/prisoner/${prisonerNumber}/appointment-confirmation`)
     }
@@ -263,15 +267,17 @@ export default class AppointmentController {
         createdBy: res.locals.user.displayName,
       }
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.AppointmentConfirmation,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.AppointmentConfirmation,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('pages/appointments/appointmentConfirmation', {
         pageTitle: 'Appointment confirmation',
@@ -328,15 +334,17 @@ export default class AppointmentController {
 
       req.flash('postVLBDetails', { appointmentDefaults, appointmentForm, formValues })
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.PrePostAppointments,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.PrePostAppointments,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('pages/appointments/prePostAppointments', {
         pageTitle: 'Video link booking details',
@@ -436,14 +444,16 @@ export default class AppointmentController {
         return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
       }
 
-      await this.auditService.sendPostSuccess({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        prisonerNumber,
-        correlationId: req.id,
-        action: PostAction.Appointment,
-        details: {},
-      })
+      this.auditService
+        .sendPostSuccess({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.Appointment,
+          details: {},
+        })
+        .catch(error => logger.error(error))
 
       return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointment-confirmation`)
     }
@@ -557,15 +567,17 @@ export default class AppointmentController {
         }
       }
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.PrePostAppointmentConfirmation,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.PrePostAppointmentConfirmation,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('pages/appointments/prePostAppointmentConfirmation', {
         pageTitle: 'Video link has been booked',
@@ -588,15 +600,17 @@ export default class AppointmentController {
       }
       delete req.session.movementSlipData
 
-      await this.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber,
-        prisonId,
-        correlationId: req.id,
-        page: Page.PrePostAppointmentConfirmation,
-      })
+      this.auditService
+        .sendPageView({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.PrePostAppointmentConfirmation,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('pages/appointments/movementSlips', {
         ...data,
@@ -621,13 +635,15 @@ export default class AppointmentController {
         this.appointmentService.getExistingEventsForOffender(clientToken, activeCaseLoadId, isoDate, prisonerNumber),
       ])
 
-      this.auditService.sendEvent({
-        who: res.locals.user.username,
-        subjectId: prisonerNumber,
-        correlationId: req.id,
-        what: `API_${ApiAction.OffenderEvents}`,
-        subjectType: SubjectType.PrisonerId,
-      })
+      this.auditService
+        .sendEvent({
+          who: res.locals.user.username,
+          subjectId: prisonerNumber,
+          correlationId: req.id,
+          what: `API_${ApiAction.OffenderEvents}`,
+          subjectType: SubjectType.PrisonerId,
+        })
+        .catch(error => logger.error(error))
 
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events,
@@ -653,13 +669,15 @@ export default class AppointmentController {
         this.appointmentService.getExistingEventsForLocation(clientToken, activeCaseLoadId, locationId, isoDate),
       ])
 
-      this.auditService.sendEvent({
-        who: res.locals.user.username,
-        subjectId: activeCaseLoadId,
-        correlationId: req.id,
-        what: `API_${ApiAction.LocationEvents}`,
-        details: JSON.stringify({ locationId }),
-      })
+      this.auditService
+        .sendEvent({
+          who: res.locals.user.username,
+          subjectId: activeCaseLoadId,
+          correlationId: req.id,
+          what: `API_${ApiAction.LocationEvents}`,
+          details: JSON.stringify({ locationId }),
+        })
+        .catch(error => logger.error(error))
 
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events,

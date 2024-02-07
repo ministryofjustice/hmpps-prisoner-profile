@@ -60,6 +60,7 @@ describe('Specific Prisoner Location History', () => {
       getCaseNoteTypesForUser: jest.fn(),
       getCaseNotes: jest.fn(),
       addCaseNote: jest.fn(),
+      updateCaseNote: jest.fn(),
       getCaseNote: jest.fn(),
     }
 
@@ -105,7 +106,7 @@ describe('Specific Prisoner Location History', () => {
             movedIn: undefined,
             movedOut: 'Current cell',
             reasonForMove: 'Not entered',
-            whatHappened: 'Test tes',
+            whatHappened: 'Initial text for case note.',
           },
           locationName: undefined,
           locationSharingHistory: [],
