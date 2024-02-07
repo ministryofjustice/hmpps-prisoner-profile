@@ -249,7 +249,7 @@ export default class CaseNotesController {
         ? 4000
         : 4000 - currentLength - prisonApiAdditionalCaseNoteTextLength - res.locals.user.username.length
       const caseNoteFlash = req.flash('caseNoteText')
-      const caseNoteText: string = caseNoteFlash?.length ? (caseNoteFlash[0] as never) : ''
+      const caseNoteText: string = caseNoteFlash?.length ? (caseNoteFlash[0] as string) : ''
       const errors = req.flash('errors')
 
       const refererUrl = `/prisoner/${prisonerNumber}/case-notes`
