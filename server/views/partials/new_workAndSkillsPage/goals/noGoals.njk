@@ -1,7 +1,7 @@
 {# Goals summary card content for when the prisoner has no goals #}
 
 <div data-qa="no-goals">
-  <p class="govuk-!-margin-bottom-7">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
+  <p class="govuk-!-margin-bottom-7" data-qa="goals-info-text">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
   <p class="govuk-body">{{ workAndSkillsPrisonerName }} has no goals recorded yet.</p>
   {% if canEditEducationWorkPlan %}
     <p class="govuk-body"><a href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">Add goals in the Learning and work progress service</a></p>

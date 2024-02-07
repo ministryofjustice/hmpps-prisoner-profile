@@ -86,7 +86,7 @@ export default class WorkAndSkillsPage extends Page {
 
   GoalsHeader = (): PageElement => cy.get('#goals > [data-qa="summary-header"] > h2')
 
-  GoalsInfo = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > p')
+  GoalsInfo = (): PageElement => cy.get('[data-qa="goals-info-text"]')
 
   GoalsEmploymentLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(2)')
 
