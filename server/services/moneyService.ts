@@ -5,7 +5,7 @@ import { AccountCode } from '../data/enums/accountCode'
 import { Transaction } from '../interfaces/prisonApi/transaction'
 import { formatDateISO } from '../utils/dateHelpers'
 import { AccountBalances } from '../interfaces/accountBalances'
-import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
+import { AgencyDetails } from '../interfaces/prisonApi/agencies'
 import { TransactionType } from '../data/enums/transactionType'
 import { DamageObligation } from '../interfaces/prisonApi/damageObligation'
 
@@ -73,7 +73,7 @@ export default class MoneyService {
    * @param token
    * @param agencyId
    */
-  public async getAgencyDetails(token: string, agencyId: string): Promise<AgencyLocationDetails> {
+  public async getAgencyDetails(token: string, agencyId: string): Promise<AgencyDetails> {
     return this.prisonApiClientBuilder(token).getAgencyDetails(agencyId)
   }
 
