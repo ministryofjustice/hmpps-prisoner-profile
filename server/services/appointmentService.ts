@@ -8,7 +8,7 @@ import { sortByDateTime } from '../utils/utils'
 import { Location } from '../interfaces/prisonApi/location'
 import { CourtLocation } from '../interfaces/whereaboutsApi/courtLocation'
 import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
-import { AgencyLocationDetails } from '../interfaces/prisonApi/agencies'
+import { AgencyDetails } from '../interfaces/prisonApi/agencies'
 import { ManageUsersApiClient } from '../data/interfaces/manageUsersApiClient'
 import { UserEmailData } from '../interfaces/manageUsersApi/userEmailData'
 
@@ -161,7 +161,7 @@ export default class AppointmentService {
     return eventsAtLocationByUsage.sort((left, right) => sortByDateTime(left.startTime, right.startTime)).map(toEvent)
   }
 
-  public async getAgencyDetails(token: string, agencyId: string): Promise<AgencyLocationDetails> {
+  public async getAgencyDetails(token: string, agencyId: string): Promise<AgencyDetails> {
     return this.prisonApiClientBuilder(token).getAgencyDetails(agencyId)
   }
 }

@@ -31,7 +31,7 @@ import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
 import { SentenceSummary } from '../../interfaces/prisonApi/sentenceSummary'
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 import { StaffRole } from '../../interfaces/prisonApi/staffRole'
-import { AgenciesEmail, AgencyLocationDetails } from '../../interfaces/prisonApi/agencies'
+import { AgenciesEmail, AgencyDetails } from '../../interfaces/prisonApi/agencies'
 import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
 import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
@@ -99,7 +99,7 @@ export interface PrisonApiClient {
   getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
   getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]>
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
-  getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails>
+  getAgencyDetails(agencyId: string): Promise<AgencyDetails>
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
   getReceptionsWithCapacity(agencyId: string, attribute?: string): Promise<Reception[]>
   getStaffDetails(username: string): Promise<StaffDetails>

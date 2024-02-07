@@ -3,13 +3,18 @@ import { extractLocation, formatName, groupBy, isTemporaryLocation } from '../ut
 import { formatDate, formatDateTime } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
 
 interface LocationDetailsWithAgencyOrder extends LocationDetails {
   agencyPeriodId: number
 }
 
-export default class PrisonerLocationDetailsPageService {
+export default class PrisonerLocationDetailsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+
+  getInmatesAtLocation(clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> {
+    return this.prisonApiClientBuilder(clientToken).getInmatesAtLocation(livingUnitId, {})
+  }
 
   isReceptionFull = async (clientToken: string, prisonId: string): Promise<boolean> => {
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)

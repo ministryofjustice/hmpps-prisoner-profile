@@ -1,5 +1,4 @@
-import PrisonerLocationDetailsPageService from './prisonerLocationDetailsPageService'
-import { locationDetailsMock } from '../data/localMockData/locationDetailsPageMock'
+import PrisonerLocationDetailsService from './prisonerLocationDetailsService'
 import { LocationDetails } from '../interfaces/pages/locationDetailsPageData'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
@@ -8,21 +7,31 @@ import AgenciesMock from '../data/localMockData/agenciesDetails'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import { OffenderCellHistoryItem } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapacityMock'
+import LocationsInmatesMock from '../data/localMockData/locationsInmates'
+import { AgencyDetails } from '../interfaces/prisonApi/agencies'
+import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 
 describe('prisonerLocationDetailsService', () => {
-  let service: PrisonerLocationDetailsPageService
+  let service: PrisonerLocationDetailsService
   let prisonApiClient: PrisonApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    service = new PrisonerLocationDetailsPageService(() => prisonApiClient)
+    service = new PrisonerLocationDetailsService(() => prisonApiClient)
 
     prisonApiClient.getStaffDetails = jest.fn(async (username: string) => generateStaffDetails(username))
-    prisonApiClient.getAgencyDetails = jest.fn(async (agencyId: string) => generateAgencyLocationDetails(agencyId))
+    prisonApiClient.getAgencyDetails = jest.fn(async (agencyId: string) => generateAgencyDetails(agencyId))
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
+  })
+
+  describe('getInmatesAtLocation', () => {
+    it('returns data about inmates sharing a location', async () => {
+      prisonApiClient.getInmatesAtLocation = jest.fn(async () => LocationsInmatesMock)
+      await expect(service.getInmatesAtLocation('', 123)).resolves.toEqual(LocationsInmatesMock)
+    })
   })
 
   describe('isReceptionFull', () => {
@@ -236,13 +245,13 @@ describe('prisonerLocationDetailsService', () => {
   })
 })
 
-const generateAgencyLocationDetails = (agencyId: string) => ({
+const generateAgencyDetails = (agencyId: string): AgencyDetails => ({
   ...AgenciesMock,
   agencyId,
   description: agencyId.replace('AGY', 'Agency '),
 })
 
-const generateStaffDetails = (username: string) => ({
+const generateStaffDetails = (username: string): StaffDetails => ({
   ...StaffDetailsMock,
   username,
   firstName: username.split('_')[0],
@@ -280,7 +289,6 @@ const generateLocation = ({
   order: number
   movedInBy?: string
 }): LocationDetails => ({
-  ...locationDetailsMock,
   agencyId: `AGY${agency}`,
   establishment: `Agency ${agency}`,
   livingUnitId,
@@ -290,6 +298,7 @@ const generateLocation = ({
   movedIn: `${order.toString().padStart(2, '0')}/01/2024 - 01:02`,
   movedOut: `${(order + 1).toString().padStart(2, '0')}/01/2024 - 01:02`,
   movedInBy,
+  isTemporaryLocation: false,
 })
 
 const generateTestDateTime = (dayOfMonth: number) => `2024-01-${dayOfMonth.toString().padStart(2, '0')}T01:02:03`
