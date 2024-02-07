@@ -226,36 +226,67 @@ describe('WorkAndSkillsService', () => {
         expect(curiousGoalsMapperMock).toHaveBeenCalledWith(learnerGoals)
       })
 
-      it('should return empty CuriousGoals for a prisoner without learner goals in Curious', async () => {
-        // Given
-        const prisonerNumber = '123123'
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+      describe('should return empty CuriousGoals for a prisoner without learner goals in Curious', () => {
+        // The Curious API appears inconsistent in it's handling of prisoners without Goals
+        // Some prisoners have a 200 response body returned containing empty arrays
+        // Whilst others get a 404 response (which the API client class ignores and returns a null to the service)
 
-        const learnerGoals = aValidLearnerGoals({
-          prn: prisonerNumber,
-          employmentGoals: [],
-          personalGoals: [],
-          shortTermGoals: [],
-          longTermGoals: [],
+        it('should return empty CuriousGoals given Curious returns an object of empty arrays', async () => {
+          // Given
+          const prisonerNumber = '123123'
+          const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+          const learnerGoals = aValidLearnerGoals({
+            prn: prisonerNumber,
+            employmentGoals: [],
+            personalGoals: [],
+            shortTermGoals: [],
+            longTermGoals: [],
+          })
+          curiousApiClient.getLearnerGoals.mockReturnValue(learnerGoals)
+
+          const expectedCuriousGoals: CuriousGoals = {
+            prisonerNumber,
+            employmentGoals: [],
+            personalGoals: [],
+            shortTermGoals: [],
+            longTermGoals: [],
+            problemRetrievingData: false,
+          }
+          curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
+
+          // When
+          const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+          // Then
+          expect(res.curiousGoals).toEqual(expectedCuriousGoals)
+          expect(curiousGoalsMapperMock).toHaveBeenCalledWith(learnerGoals)
         })
-        curiousApiClient.getLearnerGoals.mockReturnValue(learnerGoals)
 
-        const expectedCuriousGoals: CuriousGoals = {
-          prisonerNumber,
-          employmentGoals: [],
-          personalGoals: [],
-          shortTermGoals: [],
-          longTermGoals: [],
-          problemRetrievingData: false,
-        }
-        curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
+        it('should return empty CuriousGoals given Curious returns a 404 which is returned to the service as a null', async () => {
+          // Given
+          const prisonerNumber = '123123'
+          const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
 
-        // When
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+          curiousApiClient.getLearnerGoals.mockReturnValue(null)
 
-        // Then
-        expect(res.curiousGoals).toEqual(expectedCuriousGoals)
-        expect(curiousGoalsMapperMock).toHaveBeenCalledWith(learnerGoals)
+          const expectedCuriousGoals: CuriousGoals = {
+            prisonerNumber,
+            employmentGoals: [],
+            personalGoals: [],
+            shortTermGoals: [],
+            longTermGoals: [],
+            problemRetrievingData: false,
+          }
+          curiousGoalsMapperMock.mockReturnValue(expectedCuriousGoals)
+
+          // When
+          const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+          // Then
+          expect(res.curiousGoals).toEqual(expectedCuriousGoals)
+          expect(curiousGoalsMapperMock).not.toHaveBeenCalled()
+        })
       })
 
       it('should return CuriousGoals Curious API throws an error', async () => {

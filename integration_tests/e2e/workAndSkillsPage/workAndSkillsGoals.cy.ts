@@ -30,7 +30,7 @@ context('Work and skills page - Goals card', () => {
     workAndSkillsPage.Vc2GoalsSummary().should('exist')
   })
 
-  it('should display the Goals card with no populated goals given prisoner has no goals', () => {
+  it('should display the Goals card with no populated goals given prisoner has no goals (empty goals from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals', prisonerNumber)
     cy.task('stubGetPlpActionPlanForPrisonerWithNoGoals', prisonerNumber)
@@ -44,9 +44,37 @@ context('Work and skills page - Goals card', () => {
     workAndSkillsPage.NoGoalsSummary().should('exist')
   })
 
-  it('should display the Goals card with populated goals given prisoner has PLP goals only', () => {
+  it('should display the Goals card with no populated goals given prisoner has no goals (404 from Curious)', () => {
+    // Given
+    cy.task('stubGetCuriousGoals404Error', prisonerNumber)
+    cy.task('stubGetPlpActionPlanForPrisonerWithNoGoals', prisonerNumber)
+
+    // When
+    visitWorkAndSkillsPage()
+
+    // Then
+    const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    workAndSkillsPage.GoalsInfo().should('exist')
+    workAndSkillsPage.NoGoalsSummary().should('exist')
+  })
+
+  it('should display the Goals card with populated goals given prisoner has PLP goals only (empty goals from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals', prisonerNumber)
+    cy.task('stubGetPlpActionPlan', prisonerNumber)
+
+    // When
+    visitWorkAndSkillsPage()
+
+    // Then
+    const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
+    workAndSkillsPage.GoalsInfo().should('exist')
+    workAndSkillsPage.PlpGoalsSummary().should('exist')
+  })
+
+  it('should display the Goals card with populated goals given prisoner has PLP goals only (404 from Curious)', () => {
+    // Given
+    cy.task('stubGetCuriousGoals404Error', prisonerNumber)
     cy.task('stubGetPlpActionPlan', prisonerNumber)
 
     // When
