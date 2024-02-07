@@ -440,6 +440,8 @@ describe('utils', () => {
         { code: 'A', result: 'Cat A' },
         { code: 'P', result: 'Cat A Provisional' },
         { code: 'H', result: 'Cat A High' },
+        { code: 'Q', result: 'Female Restricted' },
+        { code: 'V', result: 'YOI Restricted' },
         { code: 'I', result: undefined },
       ])('Should return the correct label', ({ code, result }) => {
         expect(formatCategoryALabel(code)).toEqual(result)
