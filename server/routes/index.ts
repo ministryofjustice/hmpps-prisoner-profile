@@ -161,8 +161,6 @@ export default function routes(services: Services): Router {
 
       const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals.length > 0
 
-      const hasVC2GoalsAndPlpGoals = hasVc2Goals && hasPlpGoals
-
       const problemRetrievingPrisonerGoalData =
         workAndSkillsPageData.curiousGoals.problemRetrievingData ||
         workAndSkillsPageData.personalLearningPlanActionPlan.problemRetrievingData
@@ -196,7 +194,6 @@ export default function routes(services: Services): Router {
         canEditEducationWorkPlan,
         hasVc2Goals,
         hasPlpGoals,
-        hasVC2GoalsAndPlpGoals,
         problemRetrievingPrisonerGoalData,
       })
     },
