@@ -463,6 +463,10 @@ export const formatCategoryALabel = (code: string): string => {
       return 'Cat A Provisional'
     case 'H':
       return 'Cat A High'
+    case 'Q':
+      return 'Female Restricted'
+    case 'V':
+      return 'YOI Restricted'
     default:
       return undefined
   }
