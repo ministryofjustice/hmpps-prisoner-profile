@@ -12,6 +12,7 @@ import { Agency } from '../interfaces/prisonApi/agency'
 import { TransactionType } from '../data/enums/transactionType'
 import { DamageObligation } from '../interfaces/prisonApi/damageObligation'
 import { AuditService, Page } from '../services/auditService'
+import logger from '../../logger'
 
 /**
  * Parse requests for money routes and orchestrate response
@@ -59,15 +60,17 @@ export default class MoneyController {
     const uniquePrisonIds = [...new Set(damageObligations.map(obligation => obligation.prisonId))]
     const prisons = await Promise.all(uniquePrisonIds.map(id => this.moneyService.getAgencyDetails(clientToken, id)))
 
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber,
-      prisonId,
-      correlationId: req.id,
-      page: Page.MoneyDamageObligations,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.MoneyDamageObligations,
+      })
+      .catch(error => logger.error(error))
 
     return res.render('pages/money/damageObligations', {
       pageTitle: 'Damage obligations',
@@ -200,15 +203,17 @@ export default class MoneyController {
       .filter(transaction => transaction.penceAmount)
       .sort(this.transactionSort)
 
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber,
-      prisonId,
-      correlationId: req.id,
-      page: auditPage,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: auditPage,
+      })
+      .catch(error => logger.error(error))
 
     return res.render('pages/money/transactions', {
       pageTitle: `${accountDescription} account`,

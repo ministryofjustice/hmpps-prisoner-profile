@@ -36,6 +36,7 @@ describe('prisonerLocationHistoryService', () => {
       getCaseNoteTypesForUser: jest.fn(),
       getCaseNotes: jest.fn(),
       addCaseNote: jest.fn(),
+      updateCaseNote: jest.fn(),
       getCaseNote: jest.fn(),
     }
 
@@ -107,7 +108,7 @@ describe('prisonerLocationHistoryService', () => {
       expect(locationDetails.movedOut).toEqual('05/07/2021 - 10:35')
       expect(locationDetails.movedBy).toEqual('John Smith')
       expect(locationDetails.reasonForMove).toEqual('Some description')
-      expect(locationDetails.whatHappened).toEqual('Test tes')
+      expect(locationDetails.whatHappened).toEqual('Initial text for case note.')
       expect(locationDetails.attributes).toEqual(GetAttributesForLocation.attributes)
     })
   })

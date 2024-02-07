@@ -3,7 +3,7 @@ import CaseNotesService from './caseNotesService'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNote, CaseNoteForm, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { PagedList } from '../interfaces/prisonApi/pagedList'
 
 jest.mock('../data/caseNotesApiClient')
@@ -20,6 +20,7 @@ describe('Case Notes Page', () => {
       getCaseNoteTypesForUser: jest.fn(async () => caseNoteTypesMock),
       getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
       addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
+      updateCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
       getCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
     }
     caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
@@ -53,7 +54,7 @@ describe('Case Notes Page', () => {
   describe('Add Case Note', () => {
     it('should call Case Notes API tp add case notes', async () => {
       const prisonerNumber = 'A9999AA'
-      const caseNoteForm = {
+      const updateCaseNoteForm = {
         type: 'TYPE',
         subType: 'SUBTYPE',
         text: 'Text',
@@ -62,13 +63,34 @@ describe('Case Notes Page', () => {
         minutes: '30',
       } as CaseNoteForm
       const occurrenceDateTime = '2023-01-01T12:30:00'
-      await caseNotesService.addCaseNote('', prisonerNumber, caseNoteForm)
+      await caseNotesService.addCaseNote('', prisonerNumber, updateCaseNoteForm)
 
       expect(caseNotesApiClientSpy.addCaseNote).toHaveBeenCalledWith(prisonerNumber, {
         type: 'TYPE',
         subType: 'SUBTYPE',
         text: 'Text',
         occurrenceDateTime,
+      })
+    })
+  })
+
+  describe('Update Case Note', () => {
+    it('should call Case Notes API tp update case notes', async () => {
+      const prisonerNumber = 'A9999AA'
+      const caseNoteId = 'abc123'
+      const updateCaseNoteForm: UpdateCaseNoteForm = {
+        text: 'Text',
+        isExternal: false,
+        currentLength: 1,
+        username: 'AB123456',
+      }
+      await caseNotesService.updateCaseNote('', prisonerNumber, caseNoteId, updateCaseNoteForm)
+
+      expect(caseNotesApiClientSpy.updateCaseNote).toHaveBeenCalledWith(prisonerNumber, 'abc123', {
+        text: 'Text',
+        isExternal: false,
+        currentLength: 1,
+        username: 'AB123456',
       })
     })
   })

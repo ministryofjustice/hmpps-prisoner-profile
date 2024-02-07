@@ -14,6 +14,7 @@ import { RestClientBuilder } from '../data'
 import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
 import buildOverviewActions from './utils/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
+import logger from '../../logger'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -60,15 +61,17 @@ export default class OverviewController {
     const canView = canViewCaseNotes(res.locals.user, prisonerData)
     const canAdd = canAddCaseNotes(res.locals.user, prisonerData)
 
-    this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
-      correlationId: req.id,
-      page: Page.Overview,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.Overview,
+      })
+      .catch(error => logger.error(error))
 
     res.render('pages/overviewPage', {
       pageTitle: 'Overview',

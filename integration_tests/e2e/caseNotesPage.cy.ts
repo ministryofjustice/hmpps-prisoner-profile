@@ -78,7 +78,7 @@ context('Case Notes Page', () => {
     let caseNotesPage
 
     beforeEach(() => {
-      cy.setupBannerStubs({ prisonerNumber: 'A1234BC' })
+      cy.setupBannerStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
       cy.task('stubInmateDetail', {
         bookingId: 1234567,
         inmateDetail: {
@@ -150,7 +150,7 @@ context('Case Notes Page', () => {
     it('Displays the case notes and sorts results by Created (oldest)', () => {
       caseNotesPage.sort().invoke('attr', 'value').should('eq', '') // Default sort - Created (most recent)
       caseNotesPage.caseNotesListItem().first().contains('18 April 2023 at 17:15')
-      caseNotesPage.caseNotesListItem().first().contains('Created by: James Grant')
+      caseNotesPage.caseNotesListItem().first().contains('Created by: John Smith')
 
       caseNotesPage.sort().select('Created (oldest)')
 

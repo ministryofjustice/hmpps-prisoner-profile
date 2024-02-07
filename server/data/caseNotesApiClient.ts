@@ -3,7 +3,7 @@ import { mapToQueryString } from '../utils/utils'
 import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import { CaseNoteType } from '../interfaces/caseNoteType'
-import { CaseNote } from '../interfaces/caseNotesApi/caseNote'
+import { CaseNote, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import config from '../config'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
@@ -25,6 +25,10 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.restClient.post(args)
   }
 
+  private async put(args: object): Promise<unknown> {
+    return this.restClient.put(args)
+  }
+
   async getCaseNotes(offenderNumber: string, queryParams?: PagedListQueryParams): Promise<PagedList<CaseNote>> {
     // Set defaults then apply queryParams
     const params: PagedListQueryParams = {
@@ -44,6 +48,17 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
 
   async addCaseNote(prisonerNumber: string, caseNote: CaseNote): Promise<CaseNote> {
     return (await this.post({ path: `/case-notes/${prisonerNumber}`, data: caseNote })) as Promise<CaseNote>
+  }
+
+  async updateCaseNote(
+    prisonerNumber: string,
+    caseNoteId: string,
+    updateCaseNoteForm: UpdateCaseNoteForm,
+  ): Promise<CaseNote> {
+    return (await this.put({
+      path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
+      data: { text: updateCaseNoteForm.text },
+    })) as Promise<CaseNote>
   }
 
   async getCaseNote(prisonerNumber: string, caseNoteId: string, ignore404 = false): Promise<CaseNote> {

@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName, userHasRoles } from '../utils/utils'
@@ -10,6 +9,7 @@ import { AuditService, Page } from '../services/auditService'
 import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
 import PrisonerLocationDetailsService from '../services/prisonerLocationDetailsService'
 import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
+import logger from '../../logger'
 
 export default class PrisonerLocationDetailsController {
   constructor(
@@ -47,15 +47,17 @@ export default class PrisonerLocationDetailsController {
     const previousLocations = locationDetailsLatestFirst.slice(1)
     const prisonerProfileUrl = `/prisoner/${prisonerNumber}`
 
-    await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
-      prisonerNumber: prisonerData.prisonerNumber,
-      prisonId: prisonerData.prisonId,
-      correlationId: req.id,
-      page: Page.PrisonerCellHistory,
-    })
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: Page.PrisonerCellHistory,
+      })
+      .catch(error => logger.error(error))
 
     const pageData: LocationDetailsPageData = {
       pageTitle: 'Location details',

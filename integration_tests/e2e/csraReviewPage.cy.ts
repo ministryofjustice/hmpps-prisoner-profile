@@ -103,7 +103,7 @@ context('CSRA page', () => {
       csraHistoryPage.filters().get('#startDate').should('exist')
       csraHistoryPage.filters().get('#endDate').should('exist')
 
-      csraFilters.first().click()
+      csraFilters.first().click({ force: true })
       csraHistoryPage.applyFiltersBtn().click()
       Page.verifyOnPageWithTitle(CsraHistoryPage, 'John Saunders’ CSRA history')
       csraHistoryPage.csraList().children('.govuk-grid-row').should('have.length', 1)

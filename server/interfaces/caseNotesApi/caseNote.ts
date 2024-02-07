@@ -2,6 +2,7 @@ import { PagedListItem } from '../prisonApi/pagedList'
 
 export interface CaseNoteAmendment {
   creationDateTime: string
+  authorUserName: string
   authorName: string
   additionalNoteText: string
 }
@@ -32,4 +33,11 @@ export interface CaseNoteForm {
   date: string
   hours: string
   minutes: string
+}
+
+export interface UpdateCaseNoteForm {
+  text: string
+  isExternal: boolean
+  currentLength: number
+  username: string
 }

@@ -6,7 +6,6 @@ import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import PrisonerSearchService from '../services/prisonerSearch'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import CaseNotesService from '../services/caseNotesService'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
@@ -14,12 +13,13 @@ import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
+import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
+import { UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 
 let req: any
 let res: any
 let controller: any
 
-jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/caseNotesService.ts')
 jest.mock('../data/prisonApiClient.ts')
 
@@ -28,7 +28,7 @@ describe('Case Notes Controller', () => {
 
   beforeEach(() => {
     req = {
-      params: { prisonerNumber: 'A9999AA' },
+      params: { prisonerNumber: 'G6123VU' },
       query: {
         page: '0',
         sort: 'dateCreated,ASC',
@@ -40,6 +40,9 @@ describe('Case Notes Controller', () => {
       headers: {
         referer: 'http://referer',
       },
+      middleware: {
+        prisonerData: PrisonerMockDataA,
+      },
       path: 'case-notes',
       session: {
         userDetails: { displayName: 'A Name' },
@@ -50,6 +53,7 @@ describe('Case Notes Controller', () => {
       locals: {
         clientToken: 'CLIENT_TOKEN',
         user: {
+          username: 'AB123456',
           userRoles: [Role.DeleteSensitiveCaseNotes],
           staffId: 487023,
           caseLoads: CaseLoadsDummyDataA,
@@ -62,18 +66,10 @@ describe('Case Notes Controller', () => {
 
     prisonApiClient = prisonApiClientMock()
     prisonApiClient.getCaseNotesUsage = jest.fn(async () => caseNoteUsageMock)
-    controller = new CaseNotesController(
-      () => prisonApiClient,
-      new PrisonerSearchService(null),
-      new CaseNotesService(null),
-      auditServiceMock(),
-    )
+    controller = new CaseNotesController(() => prisonApiClient, new CaseNotesService(null), auditServiceMock())
   })
 
   it('should get case notes', async () => {
-    const getPrisonerDetailsSpy = jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(PrisonerMockDataA)
     const getCaseNotesSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockResolvedValue({
       pagedCaseNotes: pagedCaseNotesMock,
       listMetadata: null,
@@ -85,7 +81,6 @@ describe('Case Notes Controller', () => {
 
     await controller.displayCaseNotes()(req, res)
 
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, req.params.prisonerNumber)
     expect(prisonApiClient.getCaseNotesUsage).toHaveBeenCalledWith(req.params.prisonerNumber)
     expect(getCaseNotesSpy).toHaveBeenCalledWith(
       res.locals.user.token,
@@ -105,16 +100,12 @@ describe('Case Notes Controller', () => {
   })
 
   it('should display add case note page', async () => {
-    const getPrisonerDetailsSpy = jest
-      .spyOn<any, string>(controller['prisonerSearchService'], 'getPrisonerDetails')
-      .mockResolvedValue(PrisonerMockDataA)
     const getCaseNoteTypesForUserSpy = jest
       .spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser')
       .mockResolvedValue(caseNoteTypesMock.slice(0, 2))
 
     await controller.displayAddCaseNote()(req, res)
 
-    expect(getPrisonerDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, req.params.prisonerNumber)
     expect(getCaseNoteTypesForUserSpy).toHaveBeenCalledWith(res.locals.user.token)
     expect(res.render).toHaveBeenCalledWith('pages/caseNotes/addCaseNote', {
       today: formatDate(new Date().toISOString(), 'short'),
@@ -194,6 +185,72 @@ describe('Case Notes Controller', () => {
       expect(res.redirect).toHaveBeenCalledWith(
         `${config.serviceUrls.digitalPrison}/prisoner/${PrisonerMockDataA.prisonerNumber}/add-case-note/record-incentive-level`,
       )
+    })
+  })
+
+  it('should display update case note page', async () => {
+    const currentCaseNote = pagedCaseNotesMock.content[0]
+    const currentLength =
+      currentCaseNote.text.length +
+      currentCaseNote.amendments[0].additionalNoteText.length +
+      prisonApiAdditionalCaseNoteTextLength +
+      currentCaseNote.amendments[0].authorUserName.length
+    const getCaseNoteSpy = jest
+      .spyOn<any, string>(controller['caseNotesService'], 'getCaseNote')
+      .mockResolvedValue(currentCaseNote)
+    req.params.caseNoteId = 'abc123'
+
+    await controller.displayUpdateCaseNote()(req, res)
+
+    expect(getCaseNoteSpy).toHaveBeenCalledWith(res.locals.user.token, req.params.prisonerNumber, req.params.caseNoteId)
+    expect(res.render).toHaveBeenCalledWith('pages/caseNotes/updateCaseNote', {
+      refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/case-notes`,
+      caseNoteText: '',
+      currentCaseNote,
+      maxLength: 4000 - currentLength - prisonApiAdditionalCaseNoteTextLength - res.locals.user.username.length,
+      isOMICOpen: false,
+      isExternal: false,
+      prisonerDisplayName: 'John Saunders',
+      prisonerNumber: PrisonerMockDataA.prisonerNumber,
+      currentLength,
+      errors: undefined,
+    })
+  })
+
+  describe('Handle update case note POST', () => {
+    it('should update case note', async () => {
+      const updateCaseNoteForm: UpdateCaseNoteForm = {
+        text: 'Note text',
+        isExternal: false,
+        username: 'AB123456',
+        currentLength: 100,
+      }
+      const caseNoteId = 'abc123'
+
+      req = {
+        params: {
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          caseNoteId,
+        },
+        body: {
+          ...updateCaseNoteForm,
+          refererUrl: 'http://referer',
+        },
+        flash: jest.fn(),
+      }
+      const updateCaseNoteSpy = jest
+        .spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
+        .mockResolvedValue(pagedCaseNotesMock.content[0])
+
+      await controller.postUpdate()(req, res)
+
+      expect(updateCaseNoteSpy).toHaveBeenCalledWith(
+        res.locals.user.token,
+        PrisonerMockDataA.prisonerNumber,
+        caseNoteId,
+        updateCaseNoteForm,
+      )
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/case-notes`)
     })
   })
 })
