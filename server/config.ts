@@ -233,6 +233,7 @@ export default {
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
     nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
     adjudications: get('ADJUDICATIONS_UI_URL', '', requiredInProduction),
+    learningAndWorkProgress: get('LEARNING_AND_WORK_PROGRESS_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),

@@ -30,8 +30,8 @@ export default ({
   whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>
   caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>
 }): PrisonerLocationHistoryService => {
-  const fetchStaffName = async (staffId: string, prisonApi: PrisonApiClient) => {
-    const staffDetails = await prisonApi.getStaffDetails(staffId)
+  const fetchStaffName = async (username: string, prisonApi: PrisonApiClient) => {
+    const staffDetails = await prisonApi.getStaffDetails(username)
     return formatName(staffDetails.firstName, '', staffDetails.lastName)
   }
 

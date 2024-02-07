@@ -102,7 +102,7 @@ export interface PrisonApiClient {
   getAgencyDetails(agencyId: string): Promise<AgencyLocationDetails>
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
   getReceptionsWithCapacity(agencyId: string, attribute?: string): Promise<Reception[]>
-  getStaffDetails(staffId: string): Promise<StaffDetails>
+  getStaffDetails(username: string): Promise<StaffDetails>
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>

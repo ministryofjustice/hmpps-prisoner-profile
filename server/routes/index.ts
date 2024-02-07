@@ -2,7 +2,7 @@ import { Router } from 'express'
 import config from '../config'
 import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
-import { formatName, sortArrayOfObjectsByDate, SortType } from '../utils/utils'
+import { formatName, sortArrayOfObjectsByDate, SortType, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
@@ -150,6 +150,20 @@ export default function routes(services: Services): Router {
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/schedule`
+      const vc2goalsUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
+      const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
+
+      const hasVc2Goals =
+        workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
+        workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
+        workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
+        workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
+
+      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals?.length > 0
+
+      const problemRetrievingPrisonerGoalData =
+        workAndSkillsPageData.curiousGoals.problemRetrievingData ||
+        workAndSkillsPageData.personalLearningPlanActionPlan.problemRetrievingData
 
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
@@ -176,6 +190,11 @@ export default function routes(services: Services): Router {
         fullCourseHistoryLinkUrl,
         workAndActivities12MonthLinkUrl,
         workAndActivities7DayLinkUrl,
+        vc2goalsUrl,
+        canEditEducationWorkPlan,
+        hasVc2Goals,
+        hasPlpGoals,
+        problemRetrievingPrisonerGoalData,
       })
     },
   )
