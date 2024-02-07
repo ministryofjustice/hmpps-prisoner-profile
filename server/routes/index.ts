@@ -154,12 +154,12 @@ export default function routes(services: Services): Router {
       const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
 
       const hasVc2Goals =
-        workAndSkillsPageData.curiousGoals.employmentGoals.length > 0 ||
-        workAndSkillsPageData.curiousGoals.personalGoals.length > 0 ||
-        workAndSkillsPageData.curiousGoals.shortTermGoals.length > 0 ||
-        workAndSkillsPageData.curiousGoals.longTermGoals.length > 0
+        workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
+        workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
+        workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
+        workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
 
-      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals.length > 0
+      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
         workAndSkillsPageData.curiousGoals.problemRetrievingData ||

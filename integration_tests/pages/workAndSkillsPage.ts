@@ -82,27 +82,17 @@ export default class WorkAndSkillsPage extends Page {
   ES_skillLevelOne = (): PageElement => cy.get('.govuk-grid-column-two-thirds > p')
 
   // Goals card
-  GoalsCard = (): PageElement => cy.get('#goals')
-
-  GoalsHeader = (): PageElement => cy.get('#goals > [data-qa="summary-header"] > h2')
-
   GoalsInfo = (): PageElement => cy.get('[data-qa="goals-info-text"]')
 
-  GoalsEmploymentLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(2)')
+  PlpGoalsSummary = (): PageElement => cy.getDataQa('plp-goals')
 
-  GoalsEmploymentText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(3)')
+  Vc2GoalsSummary = (): PageElement => cy.getDataQa('vc2-goals')
 
-  GoalsPersonalLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(4)')
+  PlpVc2GoalsSummary = (): PageElement => cy.getDataQa('plp-vc2-goals')
 
-  GoalsPersonalText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(5)')
+  NoGoalsSummary = (): PageElement => cy.getDataQa('no-goals')
 
-  GoalsShortTermLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(6)')
-
-  GoalsShortTermText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(7)')
-
-  GoalsLongTermLabel = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(8)')
-
-  GoalsLongTermText = (): PageElement => cy.get('#goals > .hmpps-summary-card__body > :nth-child(9)')
+  ProblemRetrievingGoals = (): PageElement => cy.getDataQa('problem-retrieving-goals')
 
   // FSL = Functional skills level
   FSL_card = (): PageElement => cy.get('#functional-skills-level')
