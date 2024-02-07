@@ -5,6 +5,7 @@ import {
   calculateAge,
   convertNameCommaToHuman,
   convertToTitleCase,
+  extractLocation,
   findError,
   formatCategoryALabel,
   formatCategoryCodeDescription,
@@ -382,211 +383,248 @@ describe('utils', () => {
       const error = findError(errors, 'myError')
       expect(error).toBeNull()
     })
+  })
 
-    describe('prisonerBelongsToUsersCaseLoad', () => {
-      it('Should return true when the user has a caseload matching the prisoner', () => {
-        const caseLoads: CaseLoad[] = [
-          { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
-          { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
-        ]
+  describe('prisonerBelongsToUsersCaseLoad', () => {
+    it('Should return true when the user has a caseload matching the prisoner', () => {
+      const caseLoads: CaseLoad[] = [
+        { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
+        { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
+      ]
 
-        expect(prisonerBelongsToUsersCaseLoad('DEF', caseLoads)).toEqual(true)
-      })
-
-      it('Should return false when the user has a caseload that doesnt match the prisoner', () => {
-        const caseLoads: CaseLoad[] = [
-          { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
-          { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
-        ]
-
-        expect(prisonerBelongsToUsersCaseLoad('123', caseLoads)).toEqual(false)
-      })
+      expect(prisonerBelongsToUsersCaseLoad('DEF', caseLoads)).toEqual(true)
     })
 
-    describe('userHasRoles', () => {
-      it.each([
-        { roles: ['GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
-        { roles: ['GLOBAL_SEARCH'], userRoles: ['SOME_ROLE', 'GLOBAL_SEARCH'], result: true },
-        { roles: ['GLOBAL_SEARCH'], userRoles: [], result: false },
-        { roles: [], userRoles: ['GLOBAL_SEARCH'], result: false },
-        { roles: ['GLOBAL_SEARCH', 'SOME_ROLE'], userRoles: ['SOME_ROLE'], result: true },
-        { roles: ['GLOBAL_SEARCH'], userRoles: ['ROLE_GLOBAL_SEARCH'], result: true },
-        { roles: ['ROLE_GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
-      ])('Should return the correct result when checking user roles', ({ roles, userRoles, result }) => {
-        expect(userHasRoles(roles, userRoles)).toEqual(result)
-      })
+    it('Should return false when the user has a caseload that doesnt match the prisoner', () => {
+      const caseLoads: CaseLoad[] = [
+        { caseloadFunction: '', caseLoadId: 'ABC', currentlyActive: false, description: '', type: '' },
+        { caseloadFunction: '', caseLoadId: 'DEF', currentlyActive: false, description: '', type: '' },
+      ]
+
+      expect(prisonerBelongsToUsersCaseLoad('123', caseLoads)).toEqual(false)
+    })
+  })
+
+  describe('userHasRoles', () => {
+    it.each([
+      { roles: ['GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
+      { roles: ['GLOBAL_SEARCH'], userRoles: ['SOME_ROLE', 'GLOBAL_SEARCH'], result: true },
+      { roles: ['GLOBAL_SEARCH'], userRoles: [], result: false },
+      { roles: [], userRoles: ['GLOBAL_SEARCH'], result: false },
+      { roles: ['GLOBAL_SEARCH', 'SOME_ROLE'], userRoles: ['SOME_ROLE'], result: true },
+      { roles: ['GLOBAL_SEARCH'], userRoles: ['ROLE_GLOBAL_SEARCH'], result: true },
+      { roles: ['ROLE_GLOBAL_SEARCH'], userRoles: ['GLOBAL_SEARCH'], result: true },
+    ])('Should return the correct result when checking user roles', ({ roles, userRoles, result }) => {
+      expect(userHasRoles(roles, userRoles)).toEqual(result)
+    })
+  })
+
+  describe('formatCategoryCodeDescription', () => {
+    it.each([
+      { code: undefined, categoryText: undefined, result: 'Not entered' },
+      { code: null, categoryText: null, result: 'Not entered' },
+      { code: 'A', categoryText: 'Cat A', result: 'A' },
+      { code: 'B', categoryText: 'Cat B', result: 'B' },
+      { code: 'C', categoryText: 'Cat C', result: 'C' },
+      { code: 'D', categoryText: 'Cat D', result: 'D' },
+      { code: 'I', categoryText: 'Cat I', result: 'Cat I' },
+      { code: 'U', categoryText: 'Some text', result: 'Unsentenced' },
+      { code: 'P', categoryText: 'text', result: 'A – provisional' },
+      { code: 'H', categoryText: 'other text', result: 'A – high' },
+    ])('Should return the correct description', ({ code, categoryText, result }) => {
+      expect(formatCategoryCodeDescription(code, categoryText)).toEqual(result)
+    })
+  })
+
+  describe('formatCategoryALabel', () => {
+    it.each([
+      { code: undefined, result: undefined },
+      { code: 'A', result: 'Cat A' },
+      { code: 'P', result: 'Cat A Provisional' },
+      { code: 'H', result: 'Cat A High' },
+      { code: 'Q', result: 'Female Restricted' },
+      { code: 'V', result: 'YOI Restricted' },
+      { code: 'I', result: undefined },
+    ])('Should return the correct label', ({ code, result }) => {
+      expect(formatCategoryALabel(code)).toEqual(result)
+    })
+  })
+
+  describe('apostrophe', () => {
+    const firstName = 'James'
+    const lastName = 'Grant'
+    expect(apostrophe(firstName)).toEqual('James’')
+    expect(apostrophe(lastName)).toEqual('Grant’s')
+  })
+
+  describe('prependBaseUrl', () => {
+    const route = '/prisoner'
+    expect(prependBaseUrl(route)).toEqual(`${config.serviceUrls.digitalPrison}${route}`)
+  })
+
+  describe('prependHmppsAuthBaseUrl', () => {
+    const route = '/account-details'
+    expect(prependHmppsAuthBaseUrl(route)).toEqual(`${config.apis.hmppsAuth.url}${route}`)
+  })
+
+  describe('prisonerIsOut', () => {
+    expect(prisonerIsTRN('TRN')).toEqual(true)
+    expect(prisonerIsTRN('OUT')).toEqual(false)
+  })
+
+  describe('prisonerIsTRN', () => {
+    expect(prisonerIsOut('TRN')).toEqual(false)
+    expect(prisonerIsOut('OUT')).toEqual(true)
+  })
+
+  describe('sortArrayOfObjectsByDate', () => {
+    it('Should return array of objects sorted in ascending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
+        xrayCareNeedsASCMock.personalCareNeeds,
+      )
+    })
+    it('Should return array of objects sorted in descending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
+        xrayCareNeedsDESCMock.personalCareNeeds,
+      )
+    })
+  })
+
+  describe('sortArrayOfObjectsByDate', () => {
+    it('Should return array of objects sorted in ascending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
+        xrayCareNeedsASCMock.personalCareNeeds,
+      )
+    })
+    it('Should return array of objects sorted in descending order', () => {
+      expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
+        xrayCareNeedsDESCMock.personalCareNeeds,
+      )
+    })
+  })
+
+  describe.skip('neuroDiversityEnabledPrisons', () => {
+    it('Should return true', () => {
+      expect(neurodiversityEnabled('NHI')).toEqual(true)
+    })
+  })
+
+  describe('neuroDiversityDisabledPrisons', () => {
+    it('Should return false', () => {
+      expect(neurodiversityEnabled('MDI')).toEqual(false)
+    })
+  })
+
+  describe('isTemporaryLocation', () => {
+    it('should cope with undefined', () => {
+      expect(isTemporaryLocation(undefined)).toEqual(false)
+    })
+    it('should cope with null', () => {
+      expect(isTemporaryLocation(null)).toEqual(false)
+    })
+    it('should ignore normal locations', () => {
+      expect(isTemporaryLocation('A1234BC')).toEqual(false)
+    })
+    it('should detect temporary locations', () => {
+      expect(isTemporaryLocation('RECP')).toEqual(true)
+      expect(isTemporaryLocation('CSWAP')).toEqual(true)
+      expect(isTemporaryLocation('COURT')).toEqual(true)
+      expect(isTemporaryLocation('TAP')).toEqual(true)
+    })
+    it('should detect temporary locations even with prefix', () => {
+      expect(isTemporaryLocation('MDI-CSWAP')).toEqual(true)
+    })
+    it('should not detect temporary locations with suffix', () => {
+      expect(isTemporaryLocation('CSWAP-')).toEqual(false)
+    })
+  })
+
+  describe('formatLocation', () => {
+    it('should cope with undefined', () => {
+      expect(formatLocation(undefined)).toEqual(undefined)
     })
 
-    describe('formatCategoryCodeDescription', () => {
-      it.each([
-        { code: undefined, categoryText: undefined, result: 'Not entered' },
-        { code: null, categoryText: null, result: 'Not entered' },
-        { code: 'A', categoryText: 'Cat A', result: 'A' },
-        { code: 'B', categoryText: 'Cat B', result: 'B' },
-        { code: 'C', categoryText: 'Cat C', result: 'C' },
-        { code: 'D', categoryText: 'Cat D', result: 'D' },
-        { code: 'I', categoryText: 'Cat I', result: 'Cat I' },
-        { code: 'U', categoryText: 'Some text', result: 'Unsentenced' },
-        { code: 'P', categoryText: 'text', result: 'A – provisional' },
-        { code: 'H', categoryText: 'other text', result: 'A – high' },
-      ])('Should return the correct description', ({ code, categoryText, result }) => {
-        expect(formatCategoryCodeDescription(code, categoryText)).toEqual(result)
-      })
+    it('should cope with null', () => {
+      expect(formatLocation(null)).toEqual(undefined)
     })
 
-    describe('formatCategoryALabel', () => {
-      it.each([
-        { code: undefined, result: undefined },
-        { code: 'A', result: 'Cat A' },
-        { code: 'P', result: 'Cat A Provisional' },
-        { code: 'H', result: 'Cat A High' },
-        { code: 'Q', result: 'Female Restricted' },
-        { code: 'V', result: 'YOI Restricted' },
-        { code: 'I', result: undefined },
-      ])('Should return the correct label', ({ code, result }) => {
-        expect(formatCategoryALabel(code)).toEqual(result)
-      })
+    it('should preserve normal location names', () => {
+      expect(formatLocation('MDI-1-1-1')).toEqual('MDI-1-1-1')
     })
 
-    describe('apostrophe', () => {
-      const firstName = 'James'
-      const lastName = 'Grant'
-      expect(apostrophe(firstName)).toEqual('James’')
-      expect(apostrophe(lastName)).toEqual('Grant’s')
+    it('should convert RECP,CSWAP,COURT', () => {
+      expect(formatLocation('RECP')).toEqual('Reception')
+      expect(formatLocation('CSWAP')).toEqual('No cell allocated')
+      expect(formatLocation('COURT')).toEqual('Court')
+    })
+  })
+
+  describe('extractLocation', () => {
+    it('should cope with undefined location', () => {
+      expect(extractLocation(undefined, 'MDI')).toEqual(undefined)
     })
 
-    describe('prependBaseUrl', () => {
-      const route = '/prisoner'
-      expect(prependBaseUrl(route)).toEqual(`${config.serviceUrls.digitalPrison}${route}`)
+    it('should cope with undefined agencyId', () => {
+      expect(extractLocation('MDI-1-1-1', undefined)).toEqual(undefined)
     })
 
-    describe('prependHmppsAuthBaseUrl', () => {
-      const route = '/account-details'
-      expect(prependHmppsAuthBaseUrl(route)).toEqual(`${config.apis.hmppsAuth.url}${route}`)
+    it('should cope with null location', () => {
+      expect(extractLocation(null, 'MDI')).toEqual(undefined)
     })
 
-    describe('prisonerIsOut', () => {
-      expect(prisonerIsTRN('TRN')).toEqual(true)
-      expect(prisonerIsTRN('OUT')).toEqual(false)
+    it('should cope with null agencyId', () => {
+      expect(extractLocation('MDI-1-1-1', null)).toEqual(undefined)
     })
 
-    describe('prisonerIsTRN', () => {
-      expect(prisonerIsOut('TRN')).toEqual(false)
-      expect(prisonerIsOut('OUT')).toEqual(true)
+    it('returns undefined for locations that do not fit expected pattern', () => {
+      expect(extractLocation('UNEXPECTED', 'MDI')).toEqual(undefined)
+      expect(extractLocation('1-1-1', 'MDI')).toEqual(undefined)
+      expect(extractLocation('LEI-1-1-1', 'MDI')).toEqual(undefined)
     })
 
-    describe('sortArrayOfObjectsByDate', () => {
-      it('Should return array of objects sorted in ascending order', () => {
-        expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
-          xrayCareNeedsASCMock.personalCareNeeds,
-        )
-      })
-      it('Should return array of objects sorted in descending order', () => {
-        expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
-          xrayCareNeedsDESCMock.personalCareNeeds,
-        )
-      })
+    it('extracts locations', () => {
+      expect(extractLocation('MDI-1-1-1', 'MDI')).toEqual('1-1-1')
     })
 
-    describe('sortArrayOfObjectsByDate', () => {
-      it('Should return array of objects sorted in ascending order', () => {
-        expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.ASC)).toEqual(
-          xrayCareNeedsASCMock.personalCareNeeds,
-        )
-      })
-      it('Should return array of objects sorted in descending order', () => {
-        expect(sortArrayOfObjectsByDate(xrayCareNeedsMock.personalCareNeeds, 'startDate', SortType.DESC)).toEqual(
-          xrayCareNeedsDESCMock.personalCareNeeds,
-        )
-      })
+    it('should extract RECP,CSWAP,COURT', () => {
+      expect(extractLocation('MDI-RECP', 'MDI')).toEqual('Reception')
+      expect(extractLocation('MDI-CSWAP', 'MDI')).toEqual('No cell allocated')
+      expect(extractLocation('MDI-COURT', 'MDI')).toEqual('Court')
     })
+  })
 
-    describe.skip('neuroDiversityEnabledPrisons', () => {
-      it('Should return true', () => {
-        expect(neurodiversityEnabled('NHI')).toEqual(true)
-      })
-    })
-
-    describe('neuroDiversityDisabledPrisons', () => {
-      it('Should return false', () => {
-        expect(neurodiversityEnabled('MDI')).toEqual(false)
-      })
-    })
-
-    describe('isTemporaryLocation()', () => {
-      it('should cope with undefined', () => {
-        expect(isTemporaryLocation(undefined)).toEqual(false)
-      })
-      it('should cope with null', () => {
-        expect(isTemporaryLocation(null)).toEqual(false)
-      })
-      it('should ignore normal locations', () => {
-        expect(isTemporaryLocation('A1234BC')).toEqual(false)
-      })
-      it('should detect temporary locations', () => {
-        expect(isTemporaryLocation('RECP')).toEqual(true)
-        expect(isTemporaryLocation('CSWAP')).toEqual(true)
-        expect(isTemporaryLocation('COURT')).toEqual(true)
-        expect(isTemporaryLocation('TAP')).toEqual(true)
-      })
-      it('should detect temporary locations even with prefix', () => {
-        expect(isTemporaryLocation('MDI-CSWAP')).toEqual(true)
-      })
-      it('should not detect temporary locations with suffix', () => {
-        expect(isTemporaryLocation('CSWAP-')).toEqual(false)
-      })
-    })
-
-    describe('formatLocation()', () => {
-      it('should cope with undefined', () => {
-        expect(formatLocation(undefined)).toEqual(undefined)
-      })
-      it('should cope with null', () => {
-        expect(formatLocation(null)).toEqual(undefined)
-      })
-      it('should preserve normal location names', () => {
-        expect(formatLocation('A1234BC')).toEqual('A1234BC')
-      })
-      it('should convert RECP,CSWAP,COURT', () => {
-        expect(formatLocation('RECP')).not.toEqual('RECP')
-        expect(formatLocation('CSWAP')).not.toEqual('CSWAP')
-        expect(formatLocation('COURT')).not.toEqual('COURT')
-      })
-    })
-
-    describe('toNonAssociationRows()', () => {
-      it('map non-associations to rows', () => {
-        const res = toNonAssociationRows([
-          {
-            agencyId: 'MDI',
-            assignedLivingUnitDescription: 'NMI-RECP',
-            nonAssociationName: 'John Doe',
-            offenderNo: 'ABC123',
-            reasonDescription: 'Victim',
-          },
-          {
-            agencyId: 'MDI',
-            assignedLivingUnitDescription: 'NMI-RECP',
-            nonAssociationName: 'Guy Incognito',
-            offenderNo: 'DEF321',
-            reasonDescription: 'Rival Gang',
-          },
-        ])
-        expect(res).toEqual([
-          [
-            { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/ABC123">John Doe</a>' },
-            { text: 'ABC123' },
-            { text: 'NMI-RECP' },
-            { text: 'Victim' },
-          ],
-          [
-            { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/DEF321">Guy Incognito</a>' },
-            { text: 'DEF321' },
-            { text: 'NMI-RECP' },
-            { text: 'Rival Gang' },
-          ],
-        ])
-      })
+  describe('toNonAssociationRows()', () => {
+    it('map non-associations to rows', () => {
+      const res = toNonAssociationRows([
+        {
+          agencyId: 'MDI',
+          assignedLivingUnitDescription: 'NMI-RECP',
+          nonAssociationName: 'John Doe',
+          offenderNo: 'ABC123',
+          reasonDescription: 'Victim',
+        },
+        {
+          agencyId: 'MDI',
+          assignedLivingUnitDescription: 'NMI-RECP',
+          nonAssociationName: 'Guy Incognito',
+          offenderNo: 'DEF321',
+          reasonDescription: 'Rival Gang',
+        },
+      ])
+      expect(res).toEqual([
+        [
+          { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/ABC123">John Doe</a>' },
+          { text: 'ABC123' },
+          { text: 'NMI-RECP' },
+          { text: 'Victim' },
+        ],
+        [
+          { html: '<a class="govuk-link govuk-link--no-visited-state" href="/prisoner/DEF321">Guy Incognito</a>' },
+          { text: 'DEF321' },
+          { text: 'NMI-RECP' },
+          { text: 'Rival Gang' },
+        ],
+      ])
     })
   })
 
