@@ -34,6 +34,7 @@ generic-service:
     PATHFINDER_UI_URL: "https://preprod.pathfinder.service.justice.gov.uk"
     USE_OF_FORCE_UI_URL: "https://preprod.use-of-force.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome-preprod.prison.service.justice.gov.uk"
+    LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress-preprod.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
