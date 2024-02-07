@@ -153,6 +153,20 @@ export default function routes(services: Services): Router {
       const vc2goalsUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
       const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
 
+      const hasVc2Goals =
+        workAndSkillsPageData.curiousGoals.employmentGoals.length > 0 ||
+        workAndSkillsPageData.curiousGoals.personalGoals.length > 0 ||
+        workAndSkillsPageData.curiousGoals.shortTermGoals.length > 0 ||
+        workAndSkillsPageData.curiousGoals.longTermGoals.length > 0
+
+      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals.length > 0
+
+      const hasVC2GoalsAndPlpGoals = hasVc2Goals && hasPlpGoals
+
+      const problemRetrievingPrisonerGoalData =
+        workAndSkillsPageData.curiousGoals.problemRetrievingData ||
+        workAndSkillsPageData.personalLearningPlanActionPlan.problemRetrievingData
+
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
         userCaseLoads: res.locals.user.caseLoads,
@@ -180,6 +194,10 @@ export default function routes(services: Services): Router {
         workAndActivities7DayLinkUrl,
         vc2goalsUrl,
         canEditEducationWorkPlan,
+        hasVc2Goals,
+        hasPlpGoals,
+        hasVC2GoalsAndPlpGoals,
+        problemRetrievingPrisonerGoalData,
       })
     },
   )

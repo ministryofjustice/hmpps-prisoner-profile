@@ -4,10 +4,18 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Goals", id: "goals"}) -%}
 
-    {% include './vc2GoalsOnly.njk' %}
-    {# {% include './plpGoalsOnly.njk' %} #}
-    {# {% include './plpAndVc2Goals.njk' %} #}
-    {# {% include './noGoals.njk' %} #}
-    {# {% include './problemRetrievingGoals.njk' %} #} 
+    {% if problemRetrievingPrisonerGoalData %}
+        {% include './problemRetrievingGoals.njk' %}
+    {% else %}
+        {% if hasVc2Goals and not hasPlpGoals %}
+            {% include './vc2GoalsOnly.njk' %}
+        {% elif hasPlpGoals and not hasVc2Goals %}
+            {% include './plpGoalsOnly.njk' %}
+        {% elif hasPlpGoals and hasVc2Goals %}
+            {% include './plpAndVc2Goals.njk' %}
+        {% else %}
+            {% include './noGoals.njk' %}
+        {% endif %} 
+    {%- endif -%}
 
 {%- endcall -%}
