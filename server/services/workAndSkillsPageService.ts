@@ -208,7 +208,7 @@ export default class WorkAndSkillsPageService {
   private async getCuriousGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<CuriousGoals> {
     try {
       const learnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
-      return toCuriousGoals(learnerGoals)
+      return learnerGoals ? toCuriousGoals(learnerGoals) : emptyCuriousGoals(prisonerNumber)
     } catch (error) {
       logger.error(`Error calling the Curious API to get the prisoner's goals`, error)
       return { problemRetrievingData: true } as CuriousGoals
@@ -229,5 +229,16 @@ export default class WorkAndSkillsPageService {
     const learnerNeurodivergence: LearnerNeurodivergence[] =
       await curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
     return learnerNeurodivergence
+  }
+}
+
+const emptyCuriousGoals = (prisonerNumber: string): CuriousGoals => {
+  return {
+    prisonerNumber,
+    employmentGoals: [],
+    personalGoals: [],
+    longTermGoals: [],
+    shortTermGoals: [],
+    problemRetrievingData: false,
   }
 }

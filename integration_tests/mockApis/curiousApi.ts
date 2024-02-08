@@ -116,6 +116,24 @@ export default {
     })
   },
 
+  stubGetCuriousGoals404Error: (prisonerNumber = 'G6123VU') => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/curiousApi/learnerGoals/${prisonerNumber}`,
+      },
+      response: {
+        status: 404,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          errorCode: 'VC4004',
+          errorMessage: 'Resource not found',
+          httpStatusCode: 404,
+        },
+      },
+    })
+  },
+
   stubGetCuriousGoals500Error: (prisonerNumber = 'G6123VU') => {
     return stubFor({
       request: {
