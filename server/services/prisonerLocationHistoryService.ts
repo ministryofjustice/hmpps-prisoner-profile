@@ -7,7 +7,7 @@ import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocati
 import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
 import { CaseLoad } from '../interfaces/caseLoad'
 import LocationHistoryPageData from '../interfaces/pages/locationHistoryPageData'
-import { formatName, sortByDateTime, putLastNameFirst, hasLength, extractLocation } from '../utils/utils'
+import { extractLocation, formatName, hasLength, putLastNameFirst, sortByDateTime } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
@@ -32,7 +32,7 @@ export default ({
 }): PrisonerLocationHistoryService => {
   const fetchStaffName = async (username: string, prisonApi: PrisonApiClient) => {
     const staffDetails = await prisonApi.getStaffDetails(username)
-    return formatName(staffDetails.firstName, '', staffDetails.lastName)
+    return staffDetails ? formatName(staffDetails.firstName, '', staffDetails.lastName) : username
   }
 
   const fetchWhatHappened = async (

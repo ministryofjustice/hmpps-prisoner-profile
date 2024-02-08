@@ -12,6 +12,7 @@ import {
   LocationDetailsGroupedByPeriodAtAgency,
   LocationDetailsPageData,
 } from '../interfaces/pages/locationDetailsPageData'
+import { Role } from '../data/enums/role'
 
 const profileUrl = `/prisoner/${PrisonerMockDataA.prisonerNumber}`
 
@@ -135,6 +136,36 @@ describe('Prisoner Location Details', () => {
           moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/reception-full`,
         })
       })
+
+      it('should not display the "Current location" section or action buttons for TRN prisoners', async () => {
+        res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
+
+        await controller.displayPrisonerLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
+
+        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+          ...locationDetailsPageData,
+          prisonId: 'TRN',
+          isTransfer: true,
+          canViewCellMoveButton: false,
+          canViewMoveToReceptionButton: false,
+          locationDetailsGroupedByAgency,
+        })
+      })
+
+      it('should not display the "Current location" section or action buttons for OUT prisoners', async () => {
+        res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
+
+        await controller.displayPrisonerLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
+
+        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+          ...locationDetailsPageData,
+          prisonId: 'OUT',
+          isReleased: true,
+          canViewCellMoveButton: false,
+          canViewMoveToReceptionButton: false,
+          locationDetailsGroupedByAgency,
+        })
+      })
     })
   })
 
@@ -225,5 +256,7 @@ describe('Prisoner Location Details', () => {
     moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
     occupants: [{ name: 'Mate 1', profileUrl: `/prisoner/${PrisonerMockDataB.prisonerNumber}` }],
     prisonId: 'MDI',
+    isTransfer: false,
+    isReleased: false,
   }
 })
