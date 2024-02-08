@@ -13,7 +13,7 @@ const toPersonalLearningPlanActionPlan = (
   const goals = apiActionPlanResponse.goals.map(goal => toPersonalLearningPlanGoal(goal))
   return {
     prisonerNumber: apiActionPlanResponse.prisonNumber,
-    goals,
+    goals: [...goals],
     ...getLastUpdatedAuditFields(goals),
     problemRetrievingData: false,
   }
