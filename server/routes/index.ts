@@ -153,17 +153,25 @@ export default function routes(services: Services): Router {
       const vc2goalsUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
       const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
 
-      const hasVc2Goals =
-        workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
+      /* New Work & Skills page data introduced in epic RR-575
+         Render the new view data values if the NEW_WORK_AND_SKILLS_TAB_ENABLED feature toggle is enabled
+         TODO - The feature toggle and this ternary will be removed in RR-607
+      */
+      const hasVc2Goals = config.featureToggles.newWorkAndSkillsTabEnabled
+        ? workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
+          workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
+          workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
+          workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
+        : false
 
-      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals?.length > 0
+      const hasPlpGoals = config.featureToggles.newWorkAndSkillsTabEnabled
+        ? workAndSkillsPageData.personalLearningPlanActionPlan.goals?.length > 0
+        : false
 
-      const problemRetrievingPrisonerGoalData =
-        workAndSkillsPageData.curiousGoals.problemRetrievingData ||
-        workAndSkillsPageData.personalLearningPlanActionPlan.problemRetrievingData
+      const problemRetrievingPrisonerGoalData = config.featureToggles.newWorkAndSkillsTabEnabled
+        ? workAndSkillsPageData.curiousGoals.problemRetrievingData ||
+          workAndSkillsPageData.personalLearningPlanActionPlan.problemRetrievingData
+        : false
 
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
