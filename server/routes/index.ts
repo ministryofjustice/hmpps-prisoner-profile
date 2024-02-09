@@ -159,11 +159,11 @@ export default function routes(services: Services): Router {
         workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
         workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
 
-      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan.goals?.length > 0
+      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.goals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
         workAndSkillsPageData.curiousGoals.problemRetrievingData ||
-        workAndSkillsPageData.personalLearningPlanActionPlan.problemRetrievingData
+        workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
