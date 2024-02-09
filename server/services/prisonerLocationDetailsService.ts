@@ -36,7 +36,7 @@ export default class PrisonerLocationDetailsService {
     ])
 
     const locationDetails = cells.content.map<LocationDetails>(cell => {
-      const staffDetails = staff.find(user => cell.movementMadeBy === user.username)
+      const staffDetails = staff.find(user => cell.movementMadeBy === user?.username)
       const { agencyId } = cell
       const agency = prisons.find(prison => cell.agencyId === prison.agencyId)
       const agencyDescription = agency?.description
@@ -51,7 +51,7 @@ export default class PrisonerLocationDetailsService {
         assignmentDateTime: cell.assignmentDateTime,
         assignmentEndDateTime: cell.assignmentEndDateTime,
         livingUnitId: cell.livingUnitId,
-        movedInBy: formatName(staffDetails.firstName, '', staffDetails.lastName),
+        movedInBy: staffDetails ? formatName(staffDetails.firstName, '', staffDetails.lastName) : cell.movementMadeBy,
       }
     })
 

@@ -32,6 +32,22 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
       classes: '',
       url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
     })
+  } else if (userHasRoles([Role.InactiveBookings], userRoles) && prisonerData.prisonId === 'OUT') {
+    profileBannerTopLinks.push({
+      heading: 'Location',
+      hiddenLabel: 'View location details',
+      info: 'Released',
+      classes: '',
+      url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
+    })
+  } else if (userHasRoles([Role.InactiveBookings], userRoles) && prisonerData.prisonId === 'TRN') {
+    profileBannerTopLinks.push({
+      heading: 'Location',
+      hiddenLabel: 'View location details',
+      info: 'Transfer',
+      classes: '',
+      url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
+    })
   }
 
   profileBannerTopLinks.push({

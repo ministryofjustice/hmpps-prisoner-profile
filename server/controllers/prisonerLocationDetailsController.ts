@@ -22,6 +22,10 @@ export default class PrisonerLocationDetailsController {
     const { clientToken } = res.locals
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
+    const isTransfer = prisonerData.prisonId === 'TRN'
+    const isReleased = prisonerData.prisonId === 'OUT'
+    const isInactiveBooking = isTransfer || isReleased
+
     const locationDetailsLatestFirst = await this.locationDetailsService.getLocationDetailsByLatestFirst(
       clientToken,
       bookingId,
@@ -44,7 +48,7 @@ export default class PrisonerLocationDetailsController {
       ? await this.locationDetailsService.getInmatesAtLocation(clientToken, currentLocation.livingUnitId)
       : []
 
-    const previousLocations = locationDetailsLatestFirst.slice(1)
+    const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
     const prisonerProfileUrl = `/prisoner/${prisonerNumber}`
 
     this.auditService
@@ -83,6 +87,8 @@ export default class PrisonerLocationDetailsController {
         : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception`,
       prisonerNumber,
       dpsBaseUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}`,
+      isTransfer,
+      isReleased,
     }
 
     // Render page

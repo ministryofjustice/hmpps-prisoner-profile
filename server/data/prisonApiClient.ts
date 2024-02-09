@@ -307,7 +307,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async getStaffDetails(username: string): Promise<StaffDetails> {
-    return this.restClient.get<StaffDetails>({ path: `/api/users/${username}` })
+    return this.restClient.get<StaffDetails>({ path: `/api/users/${username}`, ignore404: true })
   }
 
   async getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]> {

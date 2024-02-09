@@ -40,4 +40,6 @@ export interface LocationDetailsPageData {
   moveToReceptionLink: string
   canViewCellMoveButton: boolean
   canViewMoveToReceptionButton: boolean
+  isTransfer: boolean
+  isReleased: boolean
 }
