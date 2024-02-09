@@ -10,8 +10,8 @@ export interface OffenderCellHistoryItem {
   assignmentDate: string
   assignmentDateTime: string
   assignmentReason: string
-  assignmentEndDate: string
-  assignmentEndDateTime: string
+  assignmentEndDate?: string
+  assignmentEndDateTime?: string
   agencyId: string
   description: string
   bedAssignmentHistorySequence: number
