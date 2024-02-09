@@ -2,7 +2,7 @@ import PrisonerLocationDetailsService from './prisonerLocationDetailsService'
 import { LocationDetails } from '../interfaces/pages/locationDetailsPageData'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { mockOffenderCellHistory, OffenderCellHistoryItemMock } from '../data/localMockData/offenderCellHistoryMock'
+import { mockOffenderCellHistory, mockCellHistoryItem1 } from '../data/localMockData/offenderCellHistoryMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import { OffenderCellHistoryItem } from '../interfaces/prisonApi/offenderCellHistoryInterface'
@@ -269,7 +269,7 @@ const generateCellHistory = ({
   order: number
   movedInByUsername?: string
 }): OffenderCellHistoryItem => ({
-  ...OffenderCellHistoryItemMock,
+  ...mockCellHistoryItem1,
   agencyId: `AGY${agency}`,
   livingUnitId,
   description: `AGY${agency}-1-1-${livingUnitId}`,

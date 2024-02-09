@@ -1,7 +1,7 @@
 import LocationDetailsPage from '../pages/locationDetailsPage'
 import Page from '../pages/page'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
-import { OffenderCellHistoryItemMock } from '../../server/data/localMockData/offenderCellHistoryMock'
+import { mockCellHistoryItem1 } from '../../server/data/localMockData/offenderCellHistoryMock'
 
 const visitLocationDetailsPage = (prisonerNumber: string): LocationDetailsPage => {
   cy.signIn({
@@ -12,7 +12,7 @@ const visitLocationDetailsPage = (prisonerNumber: string): LocationDetailsPage =
 
 context('Location details page', () => {
   const { prisonerNumber, bookingId } = PrisonerMockDataA
-  const locationId = OffenderCellHistoryItemMock.livingUnitId
+  const locationId = mockCellHistoryItem1.livingUnitId
 
   let locationDetailsPage: LocationDetailsPage
 
