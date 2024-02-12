@@ -54,7 +54,7 @@ context('CSRA page', () => {
         },
       ],
     })
-    cy.task('stubGetAgency', 'MDI')
+    cy.task('stubGetAgency', { agencyId: 'MDI' })
 
     cy.task('stubCsraReview', { bookingId: 67891, assessmentSeq: 3, overrides: { offenderNo: prisonerNumber } })
     cy.task('stubCsraReview', {
@@ -67,7 +67,7 @@ context('CSRA page', () => {
       assessmentSeq: 5,
       overrides: { classificationCode: 'HI', approvalDate: null },
     })
-    cy.task('stubGetAgency', 'HLI')
+    cy.task('stubGetAgency', { agencyId: 'HLI' })
     cy.task('stubStaffDetails', 'BQN38E')
   })
 
