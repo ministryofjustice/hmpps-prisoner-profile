@@ -1,6 +1,5 @@
 import { CaseNoteUsage } from '../../interfaces/prisonApi/caseNoteUsage'
 
-// eslint-disable-next-line import/prefer-default-export
 export const caseNoteUsageMock: CaseNoteUsage[] = [
   {
     offenderNo: 'ZWE12A',

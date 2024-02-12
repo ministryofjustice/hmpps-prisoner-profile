@@ -3,7 +3,6 @@ import { AccountCode } from '../enums/accountCode'
 import { TransactionPostingType } from '../enums/transactionPostingType'
 import { TransactionPayType } from '../enums/transactionPayType'
 
-// eslint-disable-next-line import/prefer-default-export
 export const transactionsMock: Transaction[] = [
   {
     id: 1,

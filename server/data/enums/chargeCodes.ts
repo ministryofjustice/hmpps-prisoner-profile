@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow,import/prefer-default-export
+// eslint-disable-next-line no-shadow
 export enum Charge {
   Code_1002 = '1002',
   Code_1501 = '1501',

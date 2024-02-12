@@ -1,6 +1,5 @@
 import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
 
-// eslint-disable-next-line import/prefer-default-export
 export const mockInmateAtLocation: OffenderBooking = {
   bookingId: 1234134,
   bookingNo: 'A12121',

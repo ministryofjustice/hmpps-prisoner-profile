@@ -1,6 +1,5 @@
 import { ReasonableAdjustments } from '../../interfaces/prisonApi/reasonableAdjustment'
 
-// eslint-disable-next-line import/prefer-default-export
 export const mockReasonableAdjustments: ReasonableAdjustments = {
   reasonableAdjustments: [
     {

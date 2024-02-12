@@ -1,6 +1,5 @@
 import { PrisonerDetail } from '../../interfaces/prisonerDetail'
 
-// eslint-disable-next-line import/prefer-default-export
 export const prisonerDetailMock: PrisonerDetail = {
   birthCountry: '',
   convictedStatus: 'Convicted',

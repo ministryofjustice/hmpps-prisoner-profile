@@ -7,7 +7,6 @@ const sortAddressesByStartDate = (leftAddress: Address, rightAddress: Address) =
   return compareAsc(left, right)
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const getMostRecentAddress = (addresses: Address[] = []): Address | undefined => {
   const activeAddresses = addresses.filter(
     address => !address.endDate || isBefore(new Date(), new Date(address.endDate)),

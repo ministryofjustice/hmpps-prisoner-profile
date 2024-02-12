@@ -1,6 +1,5 @@
 import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
 
-// eslint-disable-next-line import/prefer-default-export
 export const secondaryLanguagesMock: SecondaryLanguage[] = [
   {
     bookingId: 1102484,

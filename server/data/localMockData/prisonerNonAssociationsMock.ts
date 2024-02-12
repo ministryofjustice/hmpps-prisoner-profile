@@ -1,6 +1,5 @@
 import { PrisonerNonAssociations } from '../../interfaces/nonAssociationsApi/prisonerNonAssociations'
 
-// eslint-disable-next-line import/prefer-default-export
 export const prisonerNonAssociationsMock: PrisonerNonAssociations = {
   prisonerNumber: 'G6123VU',
   firstName: 'John',

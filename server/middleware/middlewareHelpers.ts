@@ -1,7 +1,6 @@
 import { NextFunction, Request } from 'express'
 import logger from '../../logger'
 
-// eslint-disable-next-line import/prefer-default-export
 export function addMiddlewareError(req: Request, next: NextFunction, error: Error) {
   const usingGuard = req.middleware?.usingGuard
 

@@ -1,6 +1,5 @@
 import { AppointmentDefaults } from '../../interfaces/whereaboutsApi/appointment'
 
-// eslint-disable-next-line import/prefer-default-export
 export const appointmentMock: AppointmentDefaults = {
   bookingId: 1,
   locationId: 1,

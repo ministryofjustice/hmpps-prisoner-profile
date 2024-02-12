@@ -97,6 +97,7 @@
   "extends": ["airbnb-base", "plugin:prettier/recommended"],
 
   "rules": {
+    "import/prefer-default-export": "off",
     "no-empty-function": ["error", { "allow": ["constructors"] }],
     "no-unused-vars": [
       1,

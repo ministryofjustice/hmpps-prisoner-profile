@@ -1,6 +1,5 @@
 import { Alert } from '../../interfaces/prisonApi/alert'
 
-// eslint-disable-next-line import/prefer-default-export
 export const alertDetailsMock: Alert = {
   alertId: 7,
   alertType: 'X',

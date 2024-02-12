@@ -1,6 +1,5 @@
 import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
 
-// eslint-disable-next-line import/prefer-default-export
 export const identifiersMock: OffenderIdentifier[] = [
   {
     type: 'CRO',

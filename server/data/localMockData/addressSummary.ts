@@ -1,6 +1,5 @@
 import { GovSummaryItem } from '../../interfaces/govSummaryItem'
 
-// eslint-disable-next-line import/prefer-default-export
 export const addressSummaryMock: GovSummaryItem[] = [
   {
     key: { text: 'Address' },
