@@ -1,6 +1,6 @@
 import LocationDetailsPage from '../pages/locationDetailsPage'
 import Page from '../pages/page'
-import { PrisonerMockDataA, PrisonerMockDataB } from '../../server/data/localMockData/prisoner'
+import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 import { mockCellHistoryItem1 } from '../../server/data/localMockData/offenderCellHistoryMock'
 
 const visitLocationDetailsPage = (prisonerNumber: string): LocationDetailsPage => {
