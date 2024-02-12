@@ -92,7 +92,10 @@ import { CsraAssessment } from '../../server/interfaces/prisonApi/csraAssessment
 import { beliefHistoryAllBookingsMock, beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
 import receptionsWithCapacityMock from '../../server/data/localMockData/receptionsWithCapacityMock'
 import { OffenderCellHistoryMock } from '../../server/data/localMockData/offenderCellHistoryMock'
-import LocationsInmatesMock from '../../server/data/localMockData/locationsInmates'
+import { mockInmateAtLocation } from '../../server/data/localMockData/locationsInmates'
+import { OffenderCellHistory } from '../../server/interfaces/prisonApi/offenderCellHistoryInterface'
+import { AgencyDetails } from '../../server/interfaces/prisonApi/agencies'
+import { OffenderBooking } from '../../server/interfaces/prisonApi/offenderBooking'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -918,7 +921,7 @@ export default {
     })
   },
 
-  stubGetAgency: agencyId => {
+  stubGetAgency: ({ agencyId, override }: { agencyId: string; override: Partial<AgencyDetails> }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -929,7 +932,11 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: agenciesDetails,
+        jsonBody: {
+          ...agenciesDetails,
+          agencyId,
+          ...override,
+        },
       },
     })
   },
@@ -1323,7 +1330,13 @@ export default {
     })
   },
 
-  stubCellHistory: (bookingId: number) => {
+  stubCellHistory: ({
+    bookingId,
+    offenderCellHistory = OffenderCellHistoryMock,
+  }: {
+    bookingId: number
+    offenderCellHistory: OffenderCellHistory
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -1334,12 +1347,18 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: OffenderCellHistoryMock,
+        jsonBody: offenderCellHistory,
       },
     })
   },
 
-  stubInmatesAtLocation: (locationId: number) => {
+  stubInmatesAtLocation: ({
+    locationId,
+    overrides = [mockInmateAtLocation],
+  }: {
+    locationId: number
+    overrides: Partial<OffenderBooking>[]
+  }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -1350,7 +1369,10 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: LocationsInmatesMock,
+        jsonBody: overrides.map(override => ({
+          ...csraAssessmentSummaryMock,
+          ...override,
+        })),
       },
     })
   },

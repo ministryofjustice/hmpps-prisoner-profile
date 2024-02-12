@@ -57,33 +57,35 @@
       <div class="horizontal-information horizontal-information--with-border govuk-!-margin-bottom-6">
         <div class="horizontal-information__item">
           <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Establishment</h3>
-          <p class="govuk-body" data-test="establishment"> {{ currentLocation.establishment }} </p>
+          <p class="govuk-body" data-qa="establishment"> {{ currentLocation.establishment }} </p>
         </div>
         <div class="horizontal-information__item">
           <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Location</h3>
-          <p class="govuk-body" data-test="location"> {{ currentLocation.location }} </p>
+          <p class="govuk-body" data-qa="location"> {{ currentLocation.location }} </p>
         </div>
         <div class="horizontal-information__item">
           <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved in</h3>
-          <p class="govuk-body" data-test="current-location-moved-in-date"> {{ currentLocation.movedIn }} </p>
+          <p class="govuk-body" data-qa="current-location-moved-in-date"> {{ currentLocation.movedIn }} </p>
         </div>
         <div class="horizontal-information__item">
           <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Moved in by</h3>
-          <p class="govuk-body" data-test="current-location-moved-in-by"> {{ currentLocation.movedInBy }} </p>
+          <p class="govuk-body" data-qa="current-location-moved-in-by"> {{ currentLocation.movedInBy }} </p>
         </div>
         {% if occupants.length %}
           <div class="horizontal-information__item">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Currently sharing with</h3>
-            {% for occupant in occupants %}
-              <p class="govuk-body" data-test="occupants">
-                <a class="govuk-link" href={{occupant.profileUrl}}>{{ occupant.name }}</a>
-              </p>
-            {% endfor %}
+            <span data-qa="currently-sharing-with">
+              {% for occupant in occupants %}
+                <p class="govuk-body" data-qa="occupants">
+                  <a class="govuk-link" href={{occupant.profileUrl}}>{{ occupant.name }}</a>
+                </p>
+              {% endfor %}
+            </span>
           </div>
         {% endif %}
         <div class="horizontal-information__item">
           {% if not currentLocation.isTemporaryLocation %}
-            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body" data-test="cell-details-link">
+            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body" data-qa="location-history-link">
             View details<span class="govuk-visually-hidden"> for location {{ currentLocation.location }}</span>
             </a>
           {% endif %}
@@ -108,7 +110,7 @@
           ]), rows) %}
         {% endfor %}
 
-        <h3 class="govuk-heading-m" data-test="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
+        <h3 class="govuk-heading-m" data-qa="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
 
         {{ govukTable({
           head: [
@@ -119,17 +121,17 @@
             { html: '<span class="govuk-visually-hidden">Details link</span>' }
           ],
           rows: rows,
-          attributes: { "data-test": "prisoner-cell-history" }
+          attributes: { "data-qa": "prisoner-cell-history-" }
         }) }}
       {% else %}
-        <h3 class="govuk-heading-m" data-test="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
+        <h3 class="govuk-heading-m" data-qa="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
       {% endif %}
     {% endfor %}
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <p class="govuk-body">
-          <a class="govuk-link" href="{{ profileUrl }}" data-test="back-link">Return to prisoner's profile</a>
+          <a class="govuk-link" href="{{ profileUrl }}" data-qa="back-link">Return to prisoner's profile</a>
         </p>
       </div>
     </div>

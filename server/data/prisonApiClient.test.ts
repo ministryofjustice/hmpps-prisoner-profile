@@ -32,7 +32,6 @@ import { mockStaffRoles } from './localMockData/staffRoles'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
-import LocationsInmatesMock from './localMockData/locationsInmates'
 import { AlertForm } from '../interfaces/prisonApi/alert'
 import { alertTypesMock } from './localMockData/alertTypesMock'
 import CsraAssessmentMock from './localMockData/csraAssessmentMock'
@@ -52,6 +51,7 @@ import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTyp
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
 import { alertDetailsMock } from './localMockData/alertDetailsMock'
 import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
+import { mockInmateAtLocation } from './localMockData/locationsInmates'
 
 jest.mock('./tokenStore')
 
@@ -355,9 +355,11 @@ describe('prisonApiClient', () => {
   describe('getInmatesAtLocation', () => {
     it('Should return data from the API', async () => {
       const locationId = 123456
-      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates?${mapToQueryString({})}`, LocationsInmatesMock)
+      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates?${mapToQueryString({})}`, [
+        mockInmateAtLocation,
+      ])
       const output = await prisonApiClient.getInmatesAtLocation(locationId, {})
-      expect(output).toEqual(LocationsInmatesMock)
+      expect(output).toEqual([mockInmateAtLocation])
     })
   })
 

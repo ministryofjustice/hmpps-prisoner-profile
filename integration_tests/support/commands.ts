@@ -148,7 +148,7 @@ Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId =
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubAssessments', bookingId)
   cy.task('stubAccountBalances', bookingId)
-  cy.task('stubGetAgency', prisonId)
+  cy.task('stubGetAgency', { agencyId: prisonId })
   cy.task('stubSpendsTransactions', prisonerNumber)
   cy.task('stubPrivateCashTransactions', prisonerNumber)
   cy.task('stubSpendsHOATransactions', prisonerNumber)
@@ -187,7 +187,7 @@ Cypress.Commands.add(
     cy.task('stubGetCellMoveReason', bookingId)
     cy.task('stubGetCaseNote', { prisonerNumber, caseNoteId: 2 })
     cy.task('stubGetCaseNote', { prisonerNumber, caseNoteId: 0 })
-    cy.task('stubGetAgency', prisonId)
+    cy.task('stubGetAgency', { agencyId: prisonId })
     cy.task('stubUserCaseLoads', caseLoads)
     cy.task('stubAssessments', bookingId)
     sharingHistory.forEach(i => {
