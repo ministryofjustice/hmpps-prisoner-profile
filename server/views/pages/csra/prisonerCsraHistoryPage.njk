@@ -8,7 +8,7 @@
         href:  "/" | prependBaseUrl
     },
     {
-        text: name,
+        text: breadcrumbPrisonerName,
         href: "/prisoner/" + prisonerNumber
     }
 ] %}
@@ -23,16 +23,16 @@
     {% endif %}
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
+        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
             <h1>{{ name |  apostrophe }} CSRA history</h1>
         </div>
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter app-sidebar">
+        <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
             {% include './partials/csraFilter.njk' %}
         </div>
-        <div class="govuk-grid-column-three-quarters ">
+        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
             {% include './partials/csraList.njk' %}
         </div>
     </div>

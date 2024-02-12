@@ -12,13 +12,13 @@
     </div>
   </div>
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-quarter app-sidebar">
+    <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
       <ul class="govuk-list hmpps-sidebar">
         <li><a class="govuk-link" href="#courtCasesAccordion">Court cases and offences</a></li>
         <li><a class="govuk-link" href="#release-dates">Release dates</a></li>
       </ul>
     </div>
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
       <div class="govuk-grid-row" data-qa="court-cases-and-offences">
         <div class="govuk-grid-column-full" id="courtCasesAccordion">
           {% include "../partials/offencesPage/courtCasesAndOffences.njk" %}

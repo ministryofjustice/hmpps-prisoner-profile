@@ -9,6 +9,11 @@
 }
 
 @include govuk-media-query($media-type: print) {
+  @page {
+    margin-top: 1.4cm;
+    margin-bottom: 1.4cm;
+  }
+
   // govuk-frontend overrides
   .govuk-template {
     background-color: govuk-colour('white');
@@ -48,7 +53,8 @@
     }
   }
 
-  .govuk-link {
+  .govuk-link,
+  .hmpps-clickable-image {
     text-decoration: none;
 
     &:link,
@@ -62,5 +68,31 @@
         content: '';
       }
     }
+  }
+
+  .hmpps-summary-card,
+  .hmpps-case-note-card-list-item,
+  .hmpps-alert-card-list-item,
+  .csra-list-item {
+    break-inside: avoid;
+  }
+
+  .govuk-accordion__controls,
+  .govuk-accordion__section-toggle,
+  .hmpps-datepicker-button {
+    display: none !important;
+  }
+
+  .hmpps-full-width-print {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  details:not([open]) {
+    display: none;
+  }
+
+  textarea {
+    field-sizing: content;
   }
 }

@@ -22,7 +22,7 @@
 {% block body %}
   {% block content %}
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-three-quarters">
+      <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
         <h1 class="govuk-!-font-size-36">{{name |  apostrophe}} location details</h1>
       </div>
     </div>
@@ -39,8 +39,8 @@
       }) }}
     {% else %}
       <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter"><h2 class="govuk-!-font-size-36">Current location</h2></div>
-        <div class="location-actions govuk-grid-column-three-quarters">
+        <div class="govuk-grid-column-one-quarter hmpps-full-width-print"><h2 class="govuk-!-font-size-36">Current location</h2></div>
+        <div class="location-actions govuk-grid-column-three-quarters govuk-!-display-none-print">
           {% if canViewMoveToReceptionButton %}
             <div class="hmpps-action-header">
               {{ hmppsActionButton({ text: 'Move to reception', iconName: 'move-to-reception', id: 'move-to-reception-action-button', url: moveToReceptionLink }) }}
@@ -85,7 +85,7 @@
         {% endif %}
         <div class="horizontal-information__item">
           {% if not currentLocation.isTemporaryLocation %}
-            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body" data-qa="location-history-link">
+            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body govuk-!-display-none-print" data-qa="location-history-link">
             View details<span class="govuk-visually-hidden"> for location {{ currentLocation.location }}</span>
             </a>
           {% endif %}
@@ -106,7 +106,7 @@
             { text: location.movedIn },
             { text: location.movedInBy },
             { text: location.movedOut },
-            { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + location.assignmentDateTime + '&toDate=' + location.assignmentEndDateTime + '&locationId=' + location.livingUnitId + '&agencyId=' + location.agencyId + '" class="govuk-link">View details<span class="govuk-visually-hidden"> for location ' + location.location + '</span></a>' if not location.isTemporaryLocation }
+            { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + location.assignmentDateTime + '&toDate=' + location.assignmentEndDateTime + '&locationId=' + location.livingUnitId + '&agencyId=' + location.agencyId + '" class="govuk-link govuk-!-display-none-print">View details<span class="govuk-visually-hidden"> for location ' + location.location + '</span></a>' if not location.isTemporaryLocation }
           ]), rows) %}
         {% endfor %}
 
@@ -131,7 +131,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <p class="govuk-body">
-          <a class="govuk-link" href="{{ profileUrl }}" data-qa="back-link">Return to prisoner's profile</a>
+          <a class="govuk-link govuk-!-display-none-print" href="{{ profileUrl }}" data-qa="back-link">Return to prisoner's profile</a>
         </p>
       </div>
     </div>

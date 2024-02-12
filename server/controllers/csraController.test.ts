@@ -59,6 +59,7 @@ describe('CSRA Controller', () => {
         agencyDetails: AgencyMock,
         staffDetails: StaffDetailsMock,
         prisoner: PrisonerMockDataA,
+        breadcrumbPrisonerName: 'Saunders, John',
       })
     })
   })

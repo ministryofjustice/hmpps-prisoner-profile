@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row govuk-!-display-none-print">
         <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
         <div class="govuk-grid-column-three-quarters">
             {% if addCaseNoteLinkUrl %}
@@ -36,10 +36,10 @@
 
     {% if (hasCaseNotes) %}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter app-sidebar">
+        <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
             {% include '../../partials/caseNotesPage/caseNotesFilter.njk' %}
         </div>
-        <div class="govuk-grid-column-three-quarters ">
+        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
             {% include '../../partials/caseNotesPage/caseNotesList.njk' %}
         </div>
     </div>

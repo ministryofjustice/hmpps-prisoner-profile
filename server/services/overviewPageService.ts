@@ -507,7 +507,7 @@ export default class OverviewPageService {
 
     if (belongsToCaseLoad) {
       csraSummaryData.linkLabel = 'CSRA history'
-      csraSummaryData.linkHref = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/csra-history`
+      csraSummaryData.linkHref = `/prisoner/${prisonerNumber}/csra-history`
     }
 
     const summaryData = []

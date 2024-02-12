@@ -13,6 +13,9 @@
     @media (max-width: 1152px) {
       max-width: 570px;
     }
+    @media print {
+      max-width: none;
+    }
   }
 
   &__sub-title {

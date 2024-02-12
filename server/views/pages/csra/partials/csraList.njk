@@ -4,8 +4,8 @@
   <div class="govuk-grid-column-full">
     <div role="list" data-qa="csra-list">
       {% for csra in csraAssessments %}
-        <div class="govuk-grid-row" data-qa="csra-list-item">
-          <div class="govuk-grid-column-three-quarters">
+        <div class="govuk-grid-row csra-list-itema" data-qa="csra-list-item">
+          <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
             <p class="govuk-!-font-size-24 govuk-!-font-weight-bold">
               <span class="govuk-!-margin-right-2">{{ csra.classification }}</span>
               {{ csraTag(csra.approvalDate, csra.originalClassificationCode, csra.classificationCode) }}
@@ -23,7 +23,7 @@
             <p class="hmpps-dark-grey-font govuk-!-margin-bottom-1">Recorded at {{ csra.location }}</p>
             <p class="hmpps-dark-grey-font govuk-!-margin-bottom-0">{{ csra.assessmentDate | formatDate('short') }}</p>
           </div>
-          <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+          <div class="govuk-grid-column-one-quarter govuk-!-text-align-right govuk-!-display-none-print">
             <a
               href="/prisoner/{{ csra.offenderNo }}/csra-review?assessmentSeq={{ csra.assessmentSeq }}&bookingId={{ csra.bookingId }}"
               class="govuk-link govuk-link--no-visited-state"
