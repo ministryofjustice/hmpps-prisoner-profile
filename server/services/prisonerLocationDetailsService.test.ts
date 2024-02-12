@@ -7,9 +7,9 @@ import AgenciesMock from '../data/localMockData/agenciesDetails'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import { OffenderCellHistoryItem } from '../interfaces/prisonApi/offenderCellHistoryInterface'
 import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapacityMock'
-import LocationsInmatesMock from '../data/localMockData/locationsInmates'
 import { AgencyDetails } from '../interfaces/prisonApi/agencies'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
 
 describe('prisonerLocationDetailsService', () => {
   let service: PrisonerLocationDetailsService
@@ -29,8 +29,8 @@ describe('prisonerLocationDetailsService', () => {
 
   describe('getInmatesAtLocation', () => {
     it('returns data about inmates sharing a location', async () => {
-      prisonApiClient.getInmatesAtLocation = jest.fn(async () => LocationsInmatesMock)
-      await expect(service.getInmatesAtLocation('', 123)).resolves.toEqual(LocationsInmatesMock)
+      prisonApiClient.getInmatesAtLocation = jest.fn(async () => [mockInmateAtLocation])
+      await expect(service.getInmatesAtLocation('', 123)).resolves.toEqual([mockInmateAtLocation])
     })
   })
 

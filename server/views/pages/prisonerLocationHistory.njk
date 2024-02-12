@@ -19,7 +19,7 @@
     text: 'Location details',
     href: '/prisoner/' + prisonerNumber + '/location-details'
   }
-] 
+]
 %}
 {% from "../macros/conditionallyShow.njk" import conditionallyShow %}
 {% block body %}
@@ -55,7 +55,7 @@
 
   {% set rows = [] %}
   {% for prisoner in locationSharingHistory %}
-    {% set rows = (rows.push([  
+    {% set rows = (rows.push([
       {
         html: '<a href="/prisoner/' + prisoner.number + '" class="govuk-link" target="_blank" rel="noopener noreferrer">' + prisoner.name + ' (opens in a new tab)</a>' if prisoner.shouldLink,
         text: prisoner.name
@@ -104,7 +104,7 @@
         { text: "Moved out" }
       ],
       rows: rows,
-      attributes: { "data-test": "prisoner-location-history" }
+      attributes: { "data-qa": "prisoner-location-history" }
     }) }}
   {% else %}
 
