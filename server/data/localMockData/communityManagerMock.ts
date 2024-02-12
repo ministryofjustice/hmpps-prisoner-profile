@@ -1,6 +1,5 @@
 import { CommunityManager } from '../../interfaces/prisonerProfileDeliusApi/communityManager'
 
-// eslint-disable-next-line import/prefer-default-export
 export const communityManagerMock: CommunityManager = {
   code: 'ABC',
   name: { forename: 'Terry', surname: 'Scott' },

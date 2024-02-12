@@ -1,6 +1,5 @@
 import { Address } from '../../interfaces/prisonApi/address'
 
-// eslint-disable-next-line import/prefer-default-export
 export const mockAddresses: Address[] = [
   {
     addressId: 5622837,

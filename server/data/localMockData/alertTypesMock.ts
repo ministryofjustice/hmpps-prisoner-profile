@@ -1,6 +1,5 @@
 import { AlertType } from '../../interfaces/prisonApi/alert'
 
-// eslint-disable-next-line import/prefer-default-export
 export const alertTypesMock: AlertType[] = [
   {
     code: 'A',

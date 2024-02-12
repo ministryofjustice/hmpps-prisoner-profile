@@ -1,6 +1,5 @@
 import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
 
-// eslint-disable-next-line import/prefer-default-export
 export const offenderSentenceDetailsMock: OffenderSentenceDetail[] = [
   {
     bookingId: 401267,

@@ -3,7 +3,6 @@ import { Validator } from '../middleware/validationMiddleware'
 import { HmppsError } from '../interfaces/hmppsError'
 import { isRealDate, parseDate } from '../utils/dateHelpers'
 
-// eslint-disable-next-line import/prefer-default-export
 export const AlertValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
   const { existingAlerts, alertType, alertCode, alertDate, comment } = body

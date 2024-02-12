@@ -12,7 +12,6 @@ const formatDateToTime = (dateString: string): string => {
   return ''
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const formatScheduledEventTime = (scheduledEvent: ScheduledEvent): { startTime: string; endTime: string } => {
   return { startTime: formatDateToTime(scheduledEvent.startTime), endTime: formatDateToTime(scheduledEvent.endTime) }
 }

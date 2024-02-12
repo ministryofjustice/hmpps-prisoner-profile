@@ -1,6 +1,5 @@
 import { OffenderContacts } from '../../interfaces/prisonApi/offenderContacts'
 
-// eslint-disable-next-line import/prefer-default-export
 export const mockOffenderContacts: OffenderContacts = {
   offenderContacts: [
     {

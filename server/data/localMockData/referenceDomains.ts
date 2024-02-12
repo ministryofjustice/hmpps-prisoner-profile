@@ -1,6 +1,5 @@
 import { ReferenceCode } from '../../interfaces/prisonApi/referenceCode'
 
-// eslint-disable-next-line import/prefer-default-export
 export const mockReferenceDomains: { health: ReferenceCode[]; healthTreatment: ReferenceCode[] } = {
   health: [
     {

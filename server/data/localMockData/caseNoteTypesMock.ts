@@ -1,7 +1,5 @@
-// eslint-disable-next-line import/prefer-default-export
 import { CaseNoteType } from '../../interfaces/caseNoteType'
 
-// eslint-disable-next-line import/prefer-default-export
 export const caseNoteTypesMock: CaseNoteType[] = [
   {
     code: 'ACP',

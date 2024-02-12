@@ -1,6 +1,5 @@
 import { DamageObligation, DamageObligationContainer } from '../../interfaces/prisonApi/damageObligation'
 
-// eslint-disable-next-line import/prefer-default-export
 export const damageObligationsMock: DamageObligation[] = [
   {
     id: 1,

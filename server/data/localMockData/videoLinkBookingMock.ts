@@ -1,6 +1,5 @@
 import { VideoLinkBookingForm } from '../../interfaces/whereaboutsApi/videoLinkBooking'
 
-// eslint-disable-next-line import/prefer-default-export
 export const videoLinkBookingMock: VideoLinkBookingForm = {
   bookingId: 1,
   court: undefined,

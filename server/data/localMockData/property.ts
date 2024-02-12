@@ -1,6 +1,5 @@
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
 
-// eslint-disable-next-line import/prefer-default-export
 export const propertyMock: PropertyContainer[] = [
   {
     location: {

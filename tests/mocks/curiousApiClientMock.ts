@@ -1,6 +1,5 @@
 import { CuriousApiClient } from '../../server/data/interfaces/curiousApiClient'
 
-// eslint-disable-next-line import/prefer-default-export
 export const curiousApiClientMock = (): CuriousApiClient => ({
   getLearnerEmployabilitySkills: jest.fn(),
   getLearnerProfile: jest.fn(),

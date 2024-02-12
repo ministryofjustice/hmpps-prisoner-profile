@@ -4,7 +4,6 @@ import { Validator } from '../middleware/validationMiddleware'
 import { HmppsError } from '../interfaces/hmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 
-// eslint-disable-next-line import/prefer-default-export
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
   const todayStr = formatDate(formatDateISO(new Date()), 'short')

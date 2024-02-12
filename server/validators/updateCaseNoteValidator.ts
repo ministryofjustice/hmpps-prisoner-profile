@@ -4,7 +4,6 @@ import { pluralise } from '../utils/pluralise'
 
 export const prisonApiAdditionalCaseNoteTextLength = 53
 
-// eslint-disable-next-line import/prefer-default-export
 export const UpdateCaseNoteValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
 

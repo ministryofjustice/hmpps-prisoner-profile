@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/prefer-default-export,no-shadow
+// eslint-disable-next-line no-shadow
 export enum Icon {
   AddCaseNote = 'add-case-note',
   AddAppointment = 'add-appointment',
