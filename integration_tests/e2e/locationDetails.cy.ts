@@ -1,7 +1,11 @@
 import LocationDetailsPage from '../pages/locationDetailsPage'
 import Page from '../pages/page'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
-import { mockCellHistoryItem1 } from '../../server/data/localMockData/offenderCellHistoryMock'
+import {
+  mockCellHistoryItem1,
+  mockCellHistoryItem2,
+  mockCellHistoryItem4,
+} from '../../server/data/localMockData/offenderCellHistoryMock'
 
 const visitLocationDetailsPage = (prisonerNumber: string): LocationDetailsPage => {
   cy.signIn({
@@ -70,16 +74,58 @@ context('Location details page', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_CELL_MOVE'] })
     locationDetailsPage = visitLocationDetailsPage(prisonerNumber)
 
-    locationDetailsPage.locationHistoryLink().contains('View details')
+    locationDetailsPage.currentLocationHistoryLink().contains('View details')
     locationDetailsPage
-      .locationHistoryLink()
+      .currentLocationHistoryLink()
       .should('have.attr', 'href')
-      .and('contain', `/prisoner/${prisonerNumber}/location-history`)
       .and(
         'match',
         new RegExp(
           `.*/prisoner/${prisonerNumber}/location-history?.*locationId=${mockCellHistoryItem1.livingUnitId}.*agencyId=MDI`,
         ),
       )
+  })
+
+  it('should provide a details of previous locations', () => {
+    cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_CELL_MOVE'] })
+    locationDetailsPage = visitLocationDetailsPage(prisonerNumber)
+
+    // Moorland
+    locationDetailsPage.previousLocationAgency(1).contains('Moorland (HMP & YOI) from 01/12/2023 to 01/01/2024')
+    locationDetailsPage.previousLocation(1, 1, it => {
+      expect(it.location).to.contain('1-1-2')
+      expect(it.movedIn).to.contain('01/12/2023 - 10:20')
+      expect(it.movedInBy).to.contain('John Smith')
+      expect(it.movedOut).to.contain('01/01/2024 - 01:02')
+      expect(it.linkVisible).to.eq(true)
+      expect(it.link).to.match(
+        new RegExp(
+          `.*/prisoner/${prisonerNumber}/location-history?.*locationId=${mockCellHistoryItem2.livingUnitId}.*agencyId=MDI`,
+        ),
+      )
+    })
+
+    locationDetailsPage.previousLocation(1, 2, it => {
+      expect(it.location).to.contain('Reception')
+      expect(it.movedIn).to.contain('01/12/2023 - 01:02')
+      expect(it.movedInBy).to.contain('John Smith')
+      expect(it.movedOut).to.contain('01/12/2023 - 10:20')
+      expect(it.linkVisible).to.eq(false)
+    })
+
+    // Leeds
+    locationDetailsPage.previousLocationAgency(2).contains('Leeds (HMP) from 01/11/2023 to 01/12/2023')
+    locationDetailsPage.previousLocation(2, 1, it => {
+      expect(it.location).to.contain('1-1-4')
+      expect(it.movedIn).to.contain('01/11/2023 - 01:02')
+      expect(it.movedInBy).to.contain('John Smith')
+      expect(it.movedOut).to.contain('01/12/2023 - 01:02')
+      expect(it.linkVisible).to.eq(true)
+      expect(it.link).to.match(
+        new RegExp(
+          `.*/prisoner/${prisonerNumber}/location-history?.*locationId=${mockCellHistoryItem4.livingUnitId}.*agencyId=LEI`,
+        ),
+      )
+    })
   })
 })
