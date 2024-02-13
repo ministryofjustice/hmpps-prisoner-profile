@@ -70,7 +70,7 @@
     </div>
   {% endif %}
 
-  <div class="prisoner-profile-breadcrumbs">
+  <div class="prisoner-profile-breadcrumbs govuk-!-display-none-print">
 
     {% if refererUrl %}
       <div class="prisoner-profile-breadcrumbs__back">
@@ -86,7 +86,7 @@
       </div>
     {% endif %}
 
-    <div class="prisoner-profile-breadcrumbs__breadcrumbs govuk-!-display-none-print">
+    <div class="prisoner-profile-breadcrumbs__breadcrumbs">
     {{ govukBreadcrumbs({
         items: breadCrumbs | default([])
       }) }}

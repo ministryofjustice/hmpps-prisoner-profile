@@ -2,7 +2,7 @@
 {%- from './hmppsPaginationSummary.njk' import hmppsPaginationSummary -%}
 {% macro hmppsPagedListFooter(listMetadata) %}
   {% if listMetadata.pagination.totalElements %}
-    <div class="hmpps-paged-list-footer {{ 'hmpps-paged-list-footer__no-pagination' if listMetadata.pagination.totalPages === 1 }}">
+    <div class="hmpps-paged-list-footer {{ 'hmpps-paged-list-footer__no-pagination' if listMetadata.pagination.totalPages === 1 }} govuk-!-display-none-print">
       <div>
         {{ hmppsPagination(listMetadata.pagination) }}
       </div>

@@ -48,6 +48,9 @@
     @media (max-width: 1000px) {
       max-width: 380px;
     }
+    @media print {
+      max-width: none;
+    }
   }
 
   &__amendment {

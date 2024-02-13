@@ -30,7 +30,7 @@
     ]
     %}
 
-    <div class="govuk-tabs">
+    <div class="govuk-tabs govuk-!-display-none-print">
         <ul class="govuk-tabs__list">
             {% for tab in tabs %}
                 {% if tab.visible %}
@@ -46,7 +46,7 @@
         </ul>
     </div>
 
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row govuk-!-display-none-print">
         <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
         <div class="govuk-grid-column-three-quarters">
             {% if addAlertLinkUrl %}
@@ -59,10 +59,10 @@
 
     {% if (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter app-sidebar">
+        <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
             {% include '../../partials/alertsPage/alertsFilter.njk' %}
         </div>
-        <div class="govuk-grid-column-three-quarters ">
+        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
             {% include '../../partials/alertsPage/alertsList.njk' %}
         </div>
     </div>

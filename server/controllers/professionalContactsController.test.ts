@@ -56,6 +56,7 @@ describe('Prisoner schedule', () => {
       expect(res.render).toHaveBeenCalledWith('pages/professionalContacts/professionalContactsPage', {
         professionalContacts,
         prisonerName: 'John Saunders',
+        breadcrumbPrisonerName: 'Saunders, John',
         prisonerNumber: 'G6123VU',
       })
     })

@@ -18,6 +18,9 @@ export default class CsraController {
     const { firstName, lastName, middleNames, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = res.locals
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+    const breadcrumbPrisonerName = formatName(firstName, middleNames, lastName, {
+      style: NameFormatStyle.lastCommaFirst,
+    })
 
     const filterErrors = validateDateRange(req.query.from as string, req.query.to as string)
 
@@ -29,6 +32,7 @@ export default class CsraController {
     if (filterErrors.length)
       return res.render('pages/csra/prisonerCsraHistoryPage', {
         name,
+        breadcrumbPrisonerName,
         prisonerNumber,
         csraAssessments: [],
         filterValues,
@@ -53,6 +57,7 @@ export default class CsraController {
     return res.render('pages/csra/prisonerCsraHistoryPage', {
       pageTitle: 'CSRA history',
       name,
+      breadcrumbPrisonerName,
       prisonerNumber,
       csraAssessments: filteredAsessments,
       filterValues,
@@ -60,9 +65,15 @@ export default class CsraController {
   }
 
   public async displayReview(req: Request, res: Response, next: NextFunction) {
-    const { prisonerData } = req.middleware
+    const {
+      prisonerData,
+      prisonerData: { firstName, lastName, middleNames },
+    } = req.middleware
     const { assessmentSeq, bookingId } = req.query
     const { clientToken } = res.locals
+    const breadcrumbPrisonerName = formatName(firstName, middleNames, lastName, {
+      style: NameFormatStyle.lastCommaFirst,
+    })
 
     const { csraAssessment, agencyDetails, staffDetails } = await this.csraService.getCsraAssessment(
       clientToken,
@@ -88,6 +99,7 @@ export default class CsraController {
       agencyDetails,
       staffDetails,
       prisoner: prisonerData,
+      breadcrumbPrisonerName,
     })
   }
 }

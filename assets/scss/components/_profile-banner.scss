@@ -28,6 +28,11 @@
       'photo name name'
       'photo info info';
 
+    @media print {
+      padding: 15px 10px;
+      grid-template-rows: 3em 6em;
+    }
+
     .hmpps-profile-photo {
       grid-area: photo;
     }
@@ -47,6 +52,14 @@
         gap: 12px 60px;
         flex-wrap: wrap;
         min-width: fit-content;
+
+        @media print {
+          gap: 12px 30px;
+
+          & a {
+            color: govuk-colour('white');
+          }
+        }
       }
 
       .hmpps-profile-prisoner-number {
