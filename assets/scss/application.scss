@@ -35,7 +35,6 @@ $govuk-page-width: $moj-page-width;
 @import 'server/views/components/modal/modal';
 @import 'server/views/components/timePicker/timePicker';
 @import 'server/views/components/scheduledEvents/scheduledEvents';
-@import './pages/active-punishments';
 @import './pages/add-appointment';
 @import './pages/add-case-note';
 @import './pages/appointment-confirmation';

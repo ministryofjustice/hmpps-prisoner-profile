@@ -46,7 +46,6 @@ declare global {
       }): Chainable<AUTWindow>
       getDataQa(id: string): Chainable<JQuery<HTMLElement>>
       findDataQa(id: string): Chainable<JQuery<HTMLElement>>
-      setupActivePunishmentsPageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupPrisonerSchedulePageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
       setupMoneyStubs(options: { prisonerNumber: string; bookingId: number; prisonId: string }): Chainable<AUTWindow>
       setupSpecificLocationHistoryPageStubs(options?: {

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import config from '../config'
-import { mapHeaderData, mapHeaderNoBannerData } from '../mappers/headerMappers'
+import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
 import { formatName, sortArrayOfObjectsByDate, SortType, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
@@ -9,9 +9,7 @@ import { Services } from '../services'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import caseNotesRouter from './caseNotesRouter'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
-import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import getFrontendComponents from '../middleware/frontEndComponents'
@@ -239,39 +237,6 @@ export default function routes(services: Services): Router {
   router.use(locationDetailsRouter(services))
 
   get(
-    '/prisoner/:prisonerNumber/active-punishments',
-    auditPageAccessAttempt({ services, page: Page.ActivePunishments }),
-    getPrisonerData(services),
-    guardMiddleware(
-      GuardOperator.OR,
-      checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-      checkHasSomeRoles([Role.ReceptionUser, Role.PomUser]),
-    ),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const { activePunishmentsPageService } = services
-      const activePunishmentsPageData = await activePunishmentsPageService.get(res.locals.clientToken, prisonerData)
-
-      await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.ActivePunishments,
-      })
-
-      return res.render('pages/activePunishments', {
-        pageTitle: 'Active punishments',
-        ...mapHeaderNoBannerData(prisonerData),
-        ...activePunishmentsPageData,
-        activeTab: false,
-      })
-    },
-  )
-
-  get(
     '/prisoner/:prisonerNumber/schedule',
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
@@ -281,10 +246,6 @@ export default function routes(services: Services): Router {
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
     },
   )
-
-  get('/prisoner/:prisonerNumber/adjudications', async (req, res, next) => {
-    res.redirect(`${config.serviceUrls.digitalPrison}/prisoner/${req.params.prisonerNumber}/adjudications`)
-  })
 
   get(
     '/prisoner/:prisonerNumber/x-ray-body-scans',

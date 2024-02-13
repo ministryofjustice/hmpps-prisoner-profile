@@ -284,7 +284,7 @@ describe('OverviewPageService', () => {
             data: expect.objectContaining({
               ...adjudicationsSummaryDataMock,
               bottomContentLine1: '1 active punishment',
-              bottomContentLine1Href: '/prisoner/A1234BC/active-punishments',
+              bottomContentLine1Href: `${config.serviceUrls.adjudications}/active-punishments/A1234BC`,
             }),
             classes: 'govuk-grid-row card-body',
           },
