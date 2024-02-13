@@ -150,7 +150,7 @@ export default function routes(services: Services): Router {
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
-      const vc2goalsUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
+      const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
       const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
 
       const hasVc2Goals =
