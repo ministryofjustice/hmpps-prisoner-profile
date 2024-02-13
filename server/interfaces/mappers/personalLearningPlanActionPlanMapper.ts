@@ -35,7 +35,7 @@ const getLastUpdatedAuditFields = (
   }
 
   const mostRecentlyUpdatedGoal = [...goals].sort((left: GoalResponse, right: GoalResponse) =>
-    dateComparator(parseISO(left.updatedAt), parseISO(right.updatedAt)),
+    dateComparator(parseISO(left.updatedAt), parseISO(right.updatedAt), 'DESC'),
   )[0]
   return {
     updatedBy: mostRecentlyUpdatedGoal.updatedBy,
@@ -61,12 +61,12 @@ const toPersonalLearningPlanGoal = (
   }
 }
 
-const dateComparator = (left: Date, right: Date): number => {
+const dateComparator = (left: Date, right: Date, direction: 'ASC' | 'DESC' = 'DESC'): number => {
   if (left > right) {
-    return -1
+    return direction === 'DESC' ? -1 : 1
   }
   if (left < right) {
-    return 1
+    return direction === 'DESC' ? 1 : -1
   }
   return 0
 }
@@ -77,9 +77,8 @@ const dateComparator = (left: Date, right: Date): number => {
  */
 const goalReferencesSortedByCreationDate = (goals: Array<GoalResponse>): Array<string> => {
   return [...goals]
-    .sort(
-      (left: GoalResponse, right: GoalResponse) =>
-        dateComparator(parseISO(left.createdAt), parseISO(right.createdAt)) * -1,
+    .sort((left: GoalResponse, right: GoalResponse) =>
+      dateComparator(parseISO(left.createdAt), parseISO(right.createdAt), 'ASC'),
     )
     .map(goal => goal.goalReference)
 }
