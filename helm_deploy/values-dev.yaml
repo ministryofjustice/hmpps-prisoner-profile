@@ -11,7 +11,8 @@ generic-service:
     modsecurity_snippet: |
       SecRuleEngine DetectionOnly
       SecAuditEngine On
-      SecDefaultAction "phase:2,pass,log,tag:github_team=connect-dps;tag:namespace=hmpps-prisoner-profile-dev"
+      SecDefaultAction "phase:2,pass,log,tag:github_team=connect-dps,tag:namespace=hmpps-prisoner-profile-dev"
+
   env:
     ENVIRONMENT_NAME: "DEV"
     INGRESS_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk"

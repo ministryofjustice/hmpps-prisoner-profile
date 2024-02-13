@@ -8,7 +8,8 @@ generic-service:
     modsecurity_snippet: |
       SecRuleEngine DetectionOnly
       SecAuditEngine On
-      SecDefaultAction "phase:2,pass,log,tag:github_team=connect-dps;tag:namespace=hmpps-prisoner-profile-prod"
+      SecDefaultAction "phase:2,pass,log,tag:github_team=connect-dps,tag:namespace=hmpps-prisoner-profile-prod"
+
   autoscaling:
     enabled: true
     minReplicas: 8
