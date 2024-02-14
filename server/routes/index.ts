@@ -24,6 +24,7 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import BeliefHistoryController from '../controllers/beliefHistoryController'
 import locationDetailsRouter from './locationDetailsRouter'
 import { getRequest } from './routerUtils'
+import probationDocumentsRouter from './probationDocumentsRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -235,6 +236,7 @@ export default function routes(services: Services): Router {
   router.use(professionalContactsRouter(services))
   router.use(goalsRouter(services))
   router.use(locationDetailsRouter(services))
+  router.use(probationDocumentsRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/schedule',

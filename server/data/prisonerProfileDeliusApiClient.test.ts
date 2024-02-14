@@ -3,6 +3,7 @@ import config from '../config'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
 import { PrisonerProfileDeliusApiClient } from './interfaces/prisonerProfileDeliusApiClient'
 import { communityManagerMock } from './localMockData/communityManagerMock'
+import probationDocuments from './localMockData/deliusApi/probationDocuments'
 
 jest.mock('./tokenStore')
 
@@ -36,6 +37,16 @@ describe('prisonerProfileDeliusApiClient', () => {
 
       const output = await prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber)
       expect(output).toEqual(communityManagerMock)
+    })
+  })
+
+  describe('getProbationDocuments', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'AB1234Y'
+      mockSuccessfulApiCall(`/probation-cases/${prisonerNumber}/documents`, probationDocuments)
+
+      const output = await prisonerProfileDeliusApiClient.getProbationDocuments(prisonerNumber)
+      expect(output).toEqual(probationDocuments)
     })
   })
 })

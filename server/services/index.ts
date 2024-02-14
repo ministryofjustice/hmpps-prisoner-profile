@@ -22,6 +22,7 @@ import config from '../config'
 import BeliefService from './beliefService'
 import LocationDetailsService from './locationDetailsService'
 import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
+import ProbationDocumentsService from './probationDocumentsService'
 
 export const services = () => {
   const {
@@ -93,6 +94,7 @@ export const services = () => {
     keyworkerApiClientBuilder,
   )
   const beliefService = new BeliefService(prisonApiClientBuilder)
+  const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
 
   return {
     dataAccess,
@@ -121,6 +123,7 @@ export const services = () => {
     professionalContactsService,
     beliefService,
     auditService,
+    probationDocumentsService,
   }
 }
 
