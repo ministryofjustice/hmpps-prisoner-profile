@@ -1,15 +1,10 @@
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../interfaces/pages/locationDetailsPageData'
-import { extractLocation, formatName, groupBy, isTemporaryLocation } from '../utils/utils'
-import { formatDate, formatDateTime } from '../utils/dateHelpers'
+import { extractLocation, groupBy, isTemporaryLocation } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
+import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from './interfaces/locationDetails'
 
-interface LocationDetailsWithAgencyOrder extends LocationDetails {
-  agencyPeriodId: number
-}
-
-export default class PrisonerLocationDetailsService {
+export default class LocationDetailsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   getInmatesAtLocation(clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> {
@@ -43,15 +38,14 @@ export default class PrisonerLocationDetailsService {
 
       return {
         agencyId,
-        establishment: agencyDescription,
+        agencyName: agencyDescription,
+        livingUnitId: cell.livingUnitId,
         location: extractLocation(cell.description, agencyId),
         isTemporaryLocation: isTemporaryLocation(cell.description),
-        movedIn: cell.assignmentDateTime && formatDateTime(cell.assignmentDateTime, 'short', ' - '),
-        movedOut: cell.assignmentEndDateTime && formatDateTime(cell.assignmentEndDateTime, 'short', ' - '),
         assignmentDateTime: cell.assignmentDateTime,
         assignmentEndDateTime: cell.assignmentEndDateTime,
-        livingUnitId: cell.livingUnitId,
-        movedInBy: staffDetails ? formatName(staffDetails.firstName, '', staffDetails.lastName) : cell.movementMadeBy,
+        movementMadeByUsername: cell.movementMadeBy,
+        movementMadeByStaffDetails: staffDetails,
       }
     })
 
@@ -66,14 +60,13 @@ export default class PrisonerLocationDetailsService {
     const locationsWithGroups = this.addGroupingIdForPeriodAtAgency(locationDetails)
     return Object.values(groupBy(locationsWithGroups, 'agencyPeriodId')).map(locations => {
       return {
-        name: locations[0].establishment,
-        fromDateString: formatDate(locations.slice(-1)[0].assignmentDateTime, 'short'),
-        toDateString: formatDate(locations[0].assignmentEndDateTime, 'short') || 'Unknown',
+        agencyName: locations[0].agencyName,
+        fromDate: locations.slice(-1)[0].assignmentDateTime,
+        toDate: locations[0].assignmentEndDateTime,
         locationDetails: locations.map(locationWithGroup => {
           const { agencyPeriodId, ...location } = locationWithGroup
           return location
         }),
-        isValidAgency: !!locations[0].establishment,
       }
     })
   }
@@ -99,4 +92,8 @@ export default class PrisonerLocationDetailsService {
       return [...result, addAgencyPeriodId(prevLocation, location)]
     }, [])
   }
+}
+
+interface LocationDetailsWithAgencyOrder extends LocationDetails {
+  agencyPeriodId: number
 }

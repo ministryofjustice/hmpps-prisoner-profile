@@ -1,5 +1,4 @@
-import PrisonerLocationDetailsService from './prisonerLocationDetailsService'
-import { LocationDetails } from '../interfaces/pages/locationDetailsPageData'
+import LocationDetailsService from './locationDetailsService'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { mockOffenderCellHistory, mockCellHistoryItem1 } from '../data/localMockData/offenderCellHistoryMock'
@@ -10,14 +9,15 @@ import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapa
 import { AgencyDetails } from '../interfaces/prisonApi/agencies'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
+import { LocationDetails } from './interfaces/locationDetails'
 
 describe('prisonerLocationDetailsService', () => {
-  let service: PrisonerLocationDetailsService
+  let service: LocationDetailsService
   let prisonApiClient: PrisonApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    service = new PrisonerLocationDetailsService(() => prisonApiClient)
+    service = new LocationDetailsService(() => prisonApiClient)
 
     prisonApiClient.getStaffDetails = jest.fn(async (username: string) => generateStaffDetails(username))
     prisonApiClient.getAgencyDetails = jest.fn(async (agencyId: string) => generateAgencyDetails(agencyId))
@@ -55,17 +55,17 @@ describe('prisonerLocationDetailsService', () => {
     it('returns location details in order of latest first', async () => {
       prisonApiClient.getOffenderCellHistory = jest.fn(async () =>
         mockOffenderCellHistory([
-          generateCellHistory({ order: 1, agency: 1, livingUnitId: 1, movedInByUsername: 'USER_1' }),
-          generateCellHistory({ order: 2, agency: 2, livingUnitId: 1, movedInByUsername: 'USER_2' }),
-          generateCellHistory({ order: 3, agency: 3, livingUnitId: 1, movedInByUsername: 'USER_3' }),
+          generateCellHistory({ order: 1, agency: 1, livingUnitId: 1, movementMadeByUsername: 'USER_1' }),
+          generateCellHistory({ order: 2, agency: 2, livingUnitId: 1, movementMadeByUsername: 'USER_2' }),
+          generateCellHistory({ order: 3, agency: 3, livingUnitId: 1, movementMadeByUsername: 'USER_3' }),
         ]),
       )
 
       // The greater the 'order', the later the date, so we expect the higher 'order' values first:
       await expect(service.getLocationDetailsByLatestFirst('', 123)).resolves.toEqual([
-        generateLocation({ order: 3, agency: 3, livingUnitId: 1, movedInBy: 'User 3' }),
-        generateLocation({ order: 2, agency: 2, livingUnitId: 1, movedInBy: 'User 2' }),
-        generateLocation({ order: 1, agency: 1, livingUnitId: 1, movedInBy: 'User 1' }),
+        generateLocation({ order: 3, agency: 3, livingUnitId: 1, movementMadeByUsername: 'USER_3' }),
+        generateLocation({ order: 2, agency: 2, livingUnitId: 1, movementMadeByUsername: 'USER_2' }),
+        generateLocation({ order: 1, agency: 1, livingUnitId: 1, movementMadeByUsername: 'USER_1' }),
       ])
     })
 
@@ -112,11 +112,10 @@ describe('prisonerLocationDetailsService', () => {
       const location = generateLocation({ agency: 1, livingUnitId: 1, order: 1 })
       expect(service.getLocationDetailsGroupedByPeriodAtAgency([location])).toEqual([
         {
-          name: 'Agency 1',
-          fromDateString: '01/01/2024',
-          toDateString: '02/01/2024',
+          agencyName: 'Agency 1',
+          fromDate: '2024-01-01T01:02:03',
+          toDate: '2024-01-02T01:02:03',
           locationDetails: [location],
-          isValidAgency: true,
         },
       ])
     })
@@ -128,11 +127,10 @@ describe('prisonerLocationDetailsService', () => {
 
       expect(service.getLocationDetailsGroupedByPeriodAtAgency([location3, location2, location1])).toEqual([
         {
-          name: 'Agency 1',
-          fromDateString: '01/01/2024',
-          toDateString: '04/01/2024',
+          agencyName: 'Agency 1',
+          fromDate: '2024-01-01T01:02:03',
+          toDate: '2024-01-04T01:02:03',
           locationDetails: [location3, location2, location1],
-          isValidAgency: true,
         },
       ])
     })
@@ -156,25 +154,22 @@ describe('prisonerLocationDetailsService', () => {
         ]),
       ).toEqual([
         {
-          name: 'Agency 3',
-          fromDateString: '04/01/2024',
-          toDateString: '07/01/2024',
+          agencyName: 'Agency 3',
+          fromDate: '2024-01-04T01:02:03',
+          toDate: '2024-01-07T01:02:03',
           locationDetails: [location6, location5, location4],
-          isValidAgency: true,
         },
         {
-          name: 'Agency 2',
-          fromDateString: '03/01/2024',
-          toDateString: '04/01/2024',
+          agencyName: 'Agency 2',
+          fromDate: '2024-01-03T01:02:03',
+          toDate: '2024-01-04T01:02:03',
           locationDetails: [location3],
-          isValidAgency: true,
         },
         {
-          name: 'Agency 1',
-          fromDateString: '01/01/2024',
-          toDateString: '03/01/2024',
+          agencyName: 'Agency 1',
+          fromDate: '2024-01-01T01:02:03',
+          toDate: '2024-01-03T01:02:03',
           locationDetails: [location2, location1],
-          isValidAgency: true,
         },
       ])
     })
@@ -186,59 +181,37 @@ describe('prisonerLocationDetailsService', () => {
 
       expect(service.getLocationDetailsGroupedByPeriodAtAgency([location3, location2, location1])).toEqual([
         {
-          name: 'Agency 1',
-          fromDateString: '03/01/2024',
-          toDateString: '04/01/2024',
+          agencyName: 'Agency 1',
+          fromDate: '2024-01-03T01:02:03',
+          toDate: '2024-01-04T01:02:03',
           locationDetails: [location3],
-          isValidAgency: true,
         },
         {
-          name: 'Agency 2',
-          fromDateString: '02/01/2024',
-          toDateString: '03/01/2024',
+          agencyName: 'Agency 2',
+          fromDate: '2024-01-02T01:02:03',
+          toDate: '2024-01-03T01:02:03',
           locationDetails: [location2],
-          isValidAgency: true,
         },
         {
-          name: 'Agency 1',
-          fromDateString: '01/01/2024',
-          toDateString: '02/01/2024',
+          agencyName: 'Agency 1',
+          fromDate: '2024-01-01T01:02:03',
+          toDate: '2024-01-02T01:02:03',
           locationDetails: [location1],
-          isValidAgency: true,
         },
       ])
     })
 
-    it('marks agencies without a name/description invalid', () => {
+    it('marks agencies without a name invalid', () => {
       const location: LocationDetails = {
         ...generateLocation({ agency: 1, livingUnitId: 1, order: 1 }),
-        establishment: null,
+        agencyName: null,
       }
       expect(service.getLocationDetailsGroupedByPeriodAtAgency([location])).toEqual([
         {
-          name: null,
-          fromDateString: '01/01/2024',
-          toDateString: '02/01/2024',
+          agencyName: null,
+          fromDate: '2024-01-01T01:02:03',
+          toDate: '2024-01-02T01:02:03',
           locationDetails: [location],
-          isValidAgency: false,
-        },
-      ])
-    })
-
-    it('sets toDateString as "Unknown" when no assignmentEndDateTime for latest location', () => {
-      const location1 = generateLocation({ agency: 1, livingUnitId: 1, order: 1 })
-      const location2 = generateLocation({ agency: 1, livingUnitId: 2, order: 2 })
-      const location3: LocationDetails = {
-        ...generateLocation({ agency: 1, livingUnitId: 3, order: 3 }),
-        assignmentEndDateTime: null,
-      }
-      expect(service.getLocationDetailsGroupedByPeriodAtAgency([location3, location2, location1])).toEqual([
-        {
-          name: 'Agency 1',
-          fromDateString: '01/01/2024',
-          toDateString: 'Unknown',
-          locationDetails: [location3, location2, location1],
-          isValidAgency: true,
         },
       ])
     })
@@ -262,12 +235,12 @@ const generateCellHistory = ({
   agency,
   livingUnitId,
   order,
-  movedInByUsername = 'JOHN_SMITH',
+  movementMadeByUsername = 'JOHN_SMITH',
 }: {
   agency: number
   livingUnitId: number
   order: number
-  movedInByUsername?: string
+  movementMadeByUsername?: string
 }): OffenderCellHistoryItem => ({
   ...mockCellHistoryItem1,
   agencyId: `AGY${agency}`,
@@ -275,30 +248,29 @@ const generateCellHistory = ({
   description: `AGY${agency}-1-1-${livingUnitId}`,
   assignmentDateTime: generateTestDateTime(order),
   assignmentEndDateTime: generateTestDateTime(order + 1),
-  movementMadeBy: movedInByUsername,
+  movementMadeBy: movementMadeByUsername,
 })
 
 const generateLocation = ({
   agency,
   livingUnitId,
   order,
-  movedInBy = 'John Smith',
+  movementMadeByUsername = 'JOHN_SMITH',
 }: {
   agency: number
   livingUnitId: number
   order: number
-  movedInBy?: string
+  movementMadeByUsername?: string
 }): LocationDetails => ({
   agencyId: `AGY${agency}`,
-  establishment: `Agency ${agency}`,
+  agencyName: `Agency ${agency}`,
   livingUnitId,
   location: `1-1-${livingUnitId}`,
+  isTemporaryLocation: false,
   assignmentDateTime: generateTestDateTime(order),
   assignmentEndDateTime: generateTestDateTime(order + 1),
-  movedIn: `${order.toString().padStart(2, '0')}/01/2024 - 01:02`,
-  movedOut: `${(order + 1).toString().padStart(2, '0')}/01/2024 - 01:02`,
-  movedInBy,
-  isTemporaryLocation: false,
+  movementMadeByUsername,
+  movementMadeByStaffDetails: generateStaffDetails(movementMadeByUsername),
 })
 
 const generateTestDateTime = (dayOfMonth: number) => `2024-01-${dayOfMonth.toString().padStart(2, '0')}T01:02:03`

@@ -1,27 +1,24 @@
-export interface LocationDetails {
-  establishment: string
-  location: string
-  isTemporaryLocation: boolean
-  movedIn: string
-  movedOut: string
-  assignmentDateTime: string
-  assignmentEndDateTime: string
-  livingUnitId: number
-  agencyId: string
-  movedInBy: string
-}
-
 export interface LocationDetailsOccupant {
   name: string
   profileUrl: string
 }
 
-export interface LocationDetailsGroupedByPeriodAtAgency {
-  name: string
-  fromDateString: string
-  toDateString: string
-  locationDetails: LocationDetails[]
-  isValidAgency: boolean
+export interface LocationDetailsForDisplay {
+  agencyId: string
+  establishment: string
+  location: string
+  livingUnitId: number
+  isTemporaryLocation: boolean
+  movedIn: string
+  movedInBy: string
+  movedOut: string
+}
+
+export interface GroupedLocationDetailsForDisplay {
+  agencyName: string
+  fromDate: string
+  toDate: string
+  locationDetails: LocationDetailsForDisplay[]
 }
 
 export interface LocationDetailsPageData {
@@ -31,9 +28,9 @@ export interface LocationDetailsPageData {
   breadcrumbPrisonerName: string
   prisonerNumber: string
   prisonId: string
-  currentLocation: LocationDetails
+  currentLocation?: LocationDetailsForDisplay
   occupants: LocationDetailsOccupant[]
-  locationDetailsGroupedByAgency: LocationDetailsGroupedByPeriodAtAgency[]
+  locationDetailsGroupedByAgency: GroupedLocationDetailsForDisplay[]
   profileUrl: string
   dpsBaseUrl: string
   changeCellLink: string

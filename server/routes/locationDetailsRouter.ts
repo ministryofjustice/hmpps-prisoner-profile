@@ -5,13 +5,13 @@ import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddle
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest } from './routerUtils'
-import PrisonerLocationDetailsController from '../controllers/prisonerLocationDetailsController'
+import LocationDetailsController from '../controllers/locationDetailsController'
 
 export default function locationDetailsRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
 
-  const prisonerLocationDetailsController = new PrisonerLocationDetailsController(
+  const prisonerLocationDetailsController = new LocationDetailsController(
     services.prisonerLocationDetailsPageService,
     services.auditService,
   )
@@ -23,7 +23,7 @@ export default function locationDetailsRouter(services: Services): Router {
     checkPrisonerInCaseload({ allowInactive: true }),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
-      return prisonerLocationDetailsController.displayPrisonerLocationDetails(req, res, prisonerData)
+      return prisonerLocationDetailsController.displayLocationDetails(req, res, prisonerData)
     },
   )
 

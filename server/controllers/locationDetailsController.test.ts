@@ -1,18 +1,17 @@
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
-import PrisonerLocationDetailsController from './prisonerLocationDetailsController'
+import LocationDetailsController from './locationDetailsController'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { AuditService } from '../services/auditService'
 import config from '../config'
 import { prisonerLocationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
-import PrisonerLocationDetailsService from '../services/prisonerLocationDetailsService'
-import {
-  LocationDetails,
-  LocationDetailsGroupedByPeriodAtAgency,
-  LocationDetailsPageData,
-} from '../interfaces/pages/locationDetailsPageData'
+import LocationDetailsService from '../services/locationDetailsService'
+import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
 import { Role } from '../data/enums/role'
+import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../services/interfaces/locationDetails'
+import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import { convertGroupedLocationDetails, convertLocationDetails } from './converters/locationDetailsConverter'
 
 const profileUrl = `/prisoner/${PrisonerMockDataA.prisonerNumber}`
 
@@ -20,8 +19,8 @@ describe('Prisoner Location Details', () => {
   const offenderNo = 'ABC123'
   let req: any
   let res: any
-  let controller: PrisonerLocationDetailsController
-  let locationDetailsService: PrisonerLocationDetailsService
+  let controller: LocationDetailsController
+  let locationDetailsService: LocationDetailsService
   let auditServiceClient: AuditService
 
   beforeEach(() => {
@@ -49,7 +48,7 @@ describe('Prisoner Location Details', () => {
       redirect: jest.fn(),
     }
 
-    locationDetailsService = prisonerLocationDetailsServiceMock() as PrisonerLocationDetailsService
+    locationDetailsService = prisonerLocationDetailsServiceMock() as LocationDetailsService
     locationDetailsService.isReceptionFull = jest.fn().mockResolvedValue(false)
     locationDetailsService.getInmatesAtLocation = jest
       .fn()
@@ -62,7 +61,7 @@ describe('Prisoner Location Details', () => {
       .fn()
       .mockReturnValue(locationDetailsGroupedByAgency)
 
-    controller = new PrisonerLocationDetailsController(locationDetailsService, auditServiceClient)
+    controller = new LocationDetailsController(locationDetailsService, auditServiceClient)
   })
 
   afterEach(() => {
@@ -72,9 +71,9 @@ describe('Prisoner Location Details', () => {
 
   describe('displayPrisonerLocationDetails', () => {
     it('should render the page', async () => {
-      await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
+      await controller.displayLocationDetails(req, res, PrisonerMockDataA)
 
-      expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+      expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
         ...locationDetailsPageData,
       })
     })
@@ -82,10 +81,10 @@ describe('Prisoner Location Details', () => {
     describe('should provide "Change cell" and "Move to reception" functionality', () => {
       it('should not display the "Move to reception" or "Change cell" buttons when user does not have the CELL_MOVE role', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [] } } }
-        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
+        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
 
         expect(locationDetailsService.isReceptionFull).not.toHaveBeenCalled()
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
@@ -100,13 +99,13 @@ describe('Prisoner Location Details', () => {
             ...previousLocations,
           ])
 
-        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
+        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
 
         expect(locationDetailsService.isReceptionFull).not.toHaveBeenCalled()
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           currentLocation: {
-            ...currentLocation,
+            ...locationDetailsPageData.currentLocation,
             isTemporaryLocation: true,
             location: 'Reception',
           },
@@ -116,9 +115,9 @@ describe('Prisoner Location Details', () => {
 
       it('should display the "Move to reception" button with "consider risks" link when there is capacity', async () => {
         locationDetailsService.isReceptionFull = jest.fn().mockResolvedValue(false)
-        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
+        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           canViewMoveToReceptionButton: true,
           moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
@@ -128,9 +127,9 @@ describe('Prisoner Location Details', () => {
       it('should display the "Move to reception" button with "reception full" link when reception is full', async () => {
         locationDetailsService.isReceptionFull = jest.fn().mockResolvedValue(true)
 
-        await controller.displayPrisonerLocationDetails(req, res, PrisonerMockDataA)
+        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           canViewMoveToReceptionButton: true,
           moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/reception-full`,
@@ -140,30 +139,32 @@ describe('Prisoner Location Details', () => {
       it('should not display the "Current location" section or action buttons for TRN prisoners', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
 
-        await controller.displayPrisonerLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
+        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           prisonId: 'TRN',
           isTransfer: true,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
-          locationDetailsGroupedByAgency,
+          currentLocation: null,
+          occupants: [],
         })
       })
 
       it('should not display the "Current location" section or action buttons for OUT prisoners', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
 
-        await controller.displayPrisonerLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
+        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
 
-        expect(res.render).toHaveBeenCalledWith('pages/prisonerLocationDetails', {
+        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           prisonId: 'OUT',
           isReleased: true,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
-          locationDetailsGroupedByAgency,
+          currentLocation: null,
+          occupants: [],
         })
       })
     })
@@ -171,72 +172,66 @@ describe('Prisoner Location Details', () => {
 
   const currentLocation: LocationDetails = {
     agencyId: 'MDI',
+    agencyName: 'Moorland (HMP & YOI)',
     assignmentDateTime: '2024-01-01T01:02:03',
     assignmentEndDateTime: null,
-    establishment: 'Moorland (HMP & YOI)',
     isTemporaryLocation: false,
     livingUnitId: 1,
     location: '1-1-1',
-    movedIn: '01/01/2024 - 01:02',
-    movedOut: null,
-    movedInBy: 'User 1',
+    movementMadeByUsername: 'USER_1',
+    movementMadeByStaffDetails: { firstName: 'User', lastName: '1' } as StaffDetails,
   }
 
   const previousLocation1: LocationDetails = {
     agencyId: 'MDI',
+    agencyName: 'Moorland (HMP & YOI)',
     assignmentDateTime: '2023-12-01T10:20:30',
     assignmentEndDateTime: '2024-01-01T01:02:03',
-    establishment: 'Moorland (HMP & YOI)',
     isTemporaryLocation: false,
     livingUnitId: 2,
     location: '1-1-2',
-    movedIn: '01/12/2023 - 10:20',
-    movedOut: '01/01/2024 - 01:02',
-    movedInBy: 'User 2',
+    movementMadeByUsername: 'USER_2',
+    movementMadeByStaffDetails: { firstName: 'User', lastName: '2' } as StaffDetails,
   }
 
   const previousLocation2: LocationDetails = {
     agencyId: 'MDI',
+    agencyName: 'Moorland (HMP & YOI)',
     assignmentDateTime: '2023-12-01T01:02:03',
     assignmentEndDateTime: '2023-12-01T10:20:30',
-    establishment: 'Moorland (HMP & YOI)',
     isTemporaryLocation: true,
     livingUnitId: 0,
     location: 'Reception',
-    movedIn: '01/12/2023 - 01:02',
-    movedOut: '01/12/2023 - 10:20',
-    movedInBy: 'User 3',
+    movementMadeByUsername: 'USER_3',
+    movementMadeByStaffDetails: { firstName: 'User', lastName: '3' } as StaffDetails,
   }
 
   const previousLocation3: LocationDetails = {
     agencyId: 'LEI',
+    agencyName: 'Leeds (HMP)',
     assignmentDateTime: '2023-11-01T01:02:03',
     assignmentEndDateTime: '2023-12-01T01:02:03',
-    establishment: 'Leeds (HMP)',
     isTemporaryLocation: false,
     livingUnitId: 321,
     location: '3-2-1',
-    movedIn: '01/11/2023 - 01:02',
-    movedOut: '01/12/2023 - 01:02',
-    movedInBy: 'User 4',
+    movementMadeByUsername: 'USER_4',
+    movementMadeByStaffDetails: { firstName: 'User', lastName: '4' } as StaffDetails,
   }
 
   const previousLocations: LocationDetails[] = [previousLocation1, previousLocation2, previousLocation3]
 
   const locationDetailsGroupedByAgency: LocationDetailsGroupedByPeriodAtAgency[] = [
     {
-      name: 'Moorland (HMP & YOI)',
-      fromDateString: '01/12/2023',
-      toDateString: '01/01/2024',
+      agencyName: 'Moorland (HMP & YOI)',
+      fromDate: '2023-12-01T01:02:03',
+      toDate: '2024-01-01T01:02:03',
       locationDetails: [previousLocation1, previousLocation2],
-      isValidAgency: true,
     },
     {
-      name: 'Leeds (HMP)',
-      fromDateString: '01/11/2023',
-      toDateString: '01/12/2023',
+      agencyName: 'Leeds (HMP)',
+      fromDate: '2023-11-01T01:02:03',
+      toDate: '2023-12-01T01:02:03',
       locationDetails: [previousLocation3],
-      isValidAgency: true,
     },
   ]
 
@@ -249,8 +244,8 @@ describe('Prisoner Location Details', () => {
     profileUrl,
     canViewCellMoveButton: true,
     canViewMoveToReceptionButton: true,
-    currentLocation,
-    locationDetailsGroupedByAgency,
+    currentLocation: convertLocationDetails(currentLocation),
+    locationDetailsGroupedByAgency: locationDetailsGroupedByAgency.map(convertGroupedLocationDetails),
     dpsBaseUrl: `${config.apis.dpsHomePageUrl}${profileUrl}`,
     changeCellLink: `${config.apis.dpsHomePageUrl}${profileUrl}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
     moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
