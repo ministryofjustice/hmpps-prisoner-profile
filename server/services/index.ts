@@ -20,7 +20,7 @@ import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
 import BeliefService from './beliefService'
-import PrisonerLocationDetailsService from './prisonerLocationDetailsService'
+import LocationDetailsService from './locationDetailsService'
 import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
 
 export const services = () => {
@@ -76,7 +76,7 @@ export const services = () => {
     prisonApiClientBuilder,
     personalLearningPlansService,
   )
-  const prisonerLocationDetailsPageService = new PrisonerLocationDetailsService(prisonApiClientBuilder)
+  const prisonerLocationDetailsPageService = new LocationDetailsService(prisonApiClientBuilder)
   const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
   const componentService = new ComponentService(componentApiClientBuilder)
   const csraService = new CsraService(prisonApiClientBuilder)
