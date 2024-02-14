@@ -11,7 +11,7 @@ import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPage
 import { Role } from '../data/enums/role'
 import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../services/interfaces/locationDetails'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
-import { convertGroupedLocationDetails, convertLocationDetails } from './converters/locationDetailsConverter'
+import { groupedLocationDetailsConverter, locationDetailsConverter } from './converters/locationDetailsConverter'
 
 const profileUrl = `/prisoner/${PrisonerMockDataA.prisonerNumber}`
 
@@ -106,8 +106,8 @@ describe('Prisoner Location Details', () => {
           ...locationDetailsPageData,
           currentLocation: {
             ...locationDetailsPageData.currentLocation,
-            isTemporaryLocation: true,
             location: 'Reception',
+            locationHistoryLink: null,
           },
           canViewMoveToReceptionButton: false,
         })
@@ -244,9 +244,10 @@ describe('Prisoner Location Details', () => {
     profileUrl,
     canViewCellMoveButton: true,
     canViewMoveToReceptionButton: true,
-    currentLocation: convertLocationDetails(currentLocation),
-    locationDetailsGroupedByAgency: locationDetailsGroupedByAgency.map(convertGroupedLocationDetails),
-    dpsBaseUrl: `${config.apis.dpsHomePageUrl}${profileUrl}`,
+    currentLocation: locationDetailsConverter(PrisonerMockDataA.prisonerNumber)(currentLocation),
+    locationDetailsGroupedByAgency: locationDetailsGroupedByAgency.map(
+      groupedLocationDetailsConverter(PrisonerMockDataA.prisonerNumber),
+    ),
     changeCellLink: `${config.apis.dpsHomePageUrl}${profileUrl}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
     moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
     occupants: [{ name: 'Mate 1', profileUrl: `/prisoner/${PrisonerMockDataB.prisonerNumber}` }],

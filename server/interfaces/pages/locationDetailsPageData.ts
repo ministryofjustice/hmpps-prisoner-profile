@@ -4,14 +4,12 @@ export interface LocationDetailsOccupant {
 }
 
 export interface LocationDetailsForDisplay {
-  agencyId: string
   establishment: string
   location: string
-  livingUnitId: number
-  isTemporaryLocation: boolean
   movedIn: string
   movedInBy: string
-  movedOut: string
+  movedOut?: string
+  locationHistoryLink?: string
 }
 
 export interface GroupedLocationDetailsForDisplay {
@@ -32,7 +30,6 @@ export interface LocationDetailsPageData {
   occupants: LocationDetailsOccupant[]
   locationDetailsGroupedByAgency: GroupedLocationDetailsForDisplay[]
   profileUrl: string
-  dpsBaseUrl: string
   changeCellLink: string
   moveToReceptionLink: string
   canViewCellMoveButton: boolean

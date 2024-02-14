@@ -81,7 +81,7 @@ context('Location details page', () => {
       .and(
         'match',
         new RegExp(
-          `.*/prisoner/${prisonerNumber}/location-history?.*locationId=${mockCellHistoryItem1.livingUnitId}.*agencyId=MDI`,
+          `.*/prisoner/${prisonerNumber}/location-history?.*agencyId=MDI&locationId=${mockCellHistoryItem1.livingUnitId}.*`,
         ),
       )
   })
@@ -100,7 +100,7 @@ context('Location details page', () => {
       expect(it.linkVisible).to.eq(true)
       expect(it.link).to.match(
         new RegExp(
-          `.*/prisoner/${prisonerNumber}/location-history?.*locationId=${mockCellHistoryItem2.livingUnitId}.*agencyId=MDI`,
+          `.*/prisoner/${prisonerNumber}/location-history?.*agencyId=MDI&locationId=${mockCellHistoryItem2.livingUnitId}.*`,
         ),
       )
     })
@@ -123,7 +123,7 @@ context('Location details page', () => {
       expect(it.linkVisible).to.eq(true)
       expect(it.link).to.match(
         new RegExp(
-          `.*/prisoner/${prisonerNumber}/location-history?.*locationId=${mockCellHistoryItem4.livingUnitId}.*agencyId=LEI`,
+          `.*/prisoner/${prisonerNumber}/location-history?.*agencyId=LEI&locationId=${mockCellHistoryItem4.livingUnitId}.*`,
         ),
       )
     })
