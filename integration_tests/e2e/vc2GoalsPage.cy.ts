@@ -21,7 +21,7 @@ context('Prisoners VC2 goals page', () => {
     const goalsPage = Page.verifyOnPageWithTitle(Vc2GoalsPage, 'John Saunders’ goals in Virtual Campus (VC2)')
 
     // Check
-    goalsPage.banner().contains('The learning and work progress service in DPS is replacing VC2')
+    goalsPage.banner().contains('The learning and work progress service is replacing VC2 for recording goals')
   })
 
   it('should display goals from VC2', () => {
