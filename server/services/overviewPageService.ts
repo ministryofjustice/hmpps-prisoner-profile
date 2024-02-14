@@ -539,75 +539,6 @@ export default class OverviewPageService {
     }
   }
 
-  private getStatuses(
-    prisonerData: Prisoner,
-    inmateDetail: InmateDetail,
-    learnerNeurodivergence: LearnerNeurodivergence[],
-    scheduledTransfers: PrisonerPrisonSchedule[],
-  ): Status[] {
-    const statusList: Status[] = []
-
-    // Current Location
-    let currentLocation = ''
-    if (prisonerData.inOutStatus === 'IN') {
-      currentLocation = `In ${prisonerData.prisonName}`
-    } else if (prisonerData.status === 'ACTIVE OUT') {
-      currentLocation = `Out from ${prisonerData.prisonName}`
-    } else if (prisonerData.status === 'INACTIVE OUT') {
-      currentLocation = prisonerData.locationDescription
-    } else if (prisonerData.inOutStatus === 'TRN') {
-      currentLocation = 'Being transferred'
-    }
-
-    statusList.push({
-      label: currentLocation,
-    })
-
-    // Listener - Recognised and Suitable
-    const recognised = getProfileInformationValue(
-      ProfileInformationType.RecognisedListener,
-      inmateDetail.profileInformation,
-    )
-    const suitable = getProfileInformationValue(
-      ProfileInformationType.SuitableListener,
-      inmateDetail.profileInformation,
-    )
-
-    if (suitable === BooleanString.Yes && recognised !== BooleanString.Yes) {
-      statusList.push({
-        label: 'Suitable Listener',
-      })
-    }
-
-    if (!suitable && recognised === BooleanString.Yes) {
-      statusList.push({
-        label: 'Recognised Listener',
-      })
-    } else if (
-      (recognised === BooleanString.Yes || recognised === BooleanString.No) &&
-      suitable === BooleanString.Yes
-    ) {
-      statusList.push({
-        label: 'Recognised Listener',
-      })
-    }
-
-    // Neurodiversity support needed
-    if (learnerNeurodivergence?.length && neurodiversityEnabled(prisonerData.prisonId)) {
-      statusList.push({
-        label: 'Support needed',
-        subText: 'Has neurodiversity needs',
-      })
-    }
-
-    if (scheduledTransfers?.length > 0) {
-      const transfer = scheduledTransfers[0]
-      statusList.push({ label: 'Scheduled transfer', subText: `To ${transfer.eventLocation}` })
-    }
-
-    return statusList
-  }
-
   private getNonAssociationSummary(prisonerNonAssociations: PrisonerNonAssociations): NonAssociationSummary {
     const prisonCount = prisonerNonAssociations.nonAssociations.filter(
       na => na.otherPrisonerDetails.prisonId === prisonerNonAssociations.prisonId,
@@ -623,5 +554,84 @@ export default class OverviewPageService {
       otherPrisonsCount,
       nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/${prisonerNonAssociations.prisonerNumber}/non-associations`,
     }
+  }
+
+  private getStatuses(
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+    learnerNeurodivergence: LearnerNeurodivergence[],
+    scheduledTransfers: PrisonerPrisonSchedule[],
+  ): Status[] {
+    return [
+      ...this.getLocationStatus(prisonerData),
+      ...this.getListenerStatus(inmateDetail),
+      ...this.getNeurodiversitySupportStatus(prisonerData, learnerNeurodivergence),
+      ...this.getScheduledTransferStatus(scheduledTransfers),
+    ]
+  }
+
+  private getLocationStatus(prisonerData: Prisoner): Status[] {
+    if (prisonerData.inOutStatus === 'IN') {
+      return [{ label: `In ${prisonerData.prisonName}` }]
+    }
+    if (prisonerData.status === 'ACTIVE OUT') {
+      return [{ label: `Out from ${prisonerData.prisonName}` }]
+    }
+    if (prisonerData.status === 'INACTIVE OUT') {
+      return [{ label: prisonerData.locationDescription }]
+    }
+    if (prisonerData.inOutStatus === 'TRN') {
+      return [{ label: 'Being transferred' }]
+    }
+    return []
+  }
+
+  private getListenerStatus(inmateDetail: InmateDetail): Status[] {
+    const recognised = getProfileInformationValue(
+      ProfileInformationType.RecognisedListener,
+      inmateDetail.profileInformation,
+    )
+    const suitable = getProfileInformationValue(
+      ProfileInformationType.SuitableListener,
+      inmateDetail.profileInformation,
+    )
+
+    if (recognised === BooleanString.Yes) {
+      return [{ label: 'Recognised Listener' }]
+    }
+
+    if (suitable === BooleanString.Yes) {
+      return [{ label: 'Suitable Listener' }]
+    }
+
+    return []
+  }
+
+  private getNeurodiversitySupportStatus(
+    prisonerData: Prisoner,
+    learnerNeurodivergence: LearnerNeurodivergence[],
+  ): Status[] {
+    return (
+      (learnerNeurodivergence?.length &&
+        neurodiversityEnabled(prisonerData.prisonId) && [
+          {
+            label: 'Support needed',
+            subText: 'Has neurodiversity needs',
+          },
+        ]) ||
+      []
+    )
+  }
+
+  private getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[]): Status[] {
+    return (
+      (scheduledTransfers?.length > 0 && [
+        {
+          label: 'Scheduled transfer',
+          subText: `To ${scheduledTransfers[0].eventLocation}`,
+        },
+      ]) ||
+      []
+    )
   }
 }

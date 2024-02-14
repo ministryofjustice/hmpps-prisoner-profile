@@ -722,10 +722,10 @@ describe('OverviewPageService', () => {
         ['Suitable No/Recognised Blank', suitableListenerNo, recognisedListenerBlank, false, false],
         ['Suitable No/Recognised No', suitableListenerNo, recognisedListenerNo, false, false],
         ['Suitable Yes/Recognised Blank', suitableListenerYes, recognisedListenerBlank, true, false],
-        ['Suitable Yes/Recognised No', suitableListenerYes, recognisedListenerNo, true, true],
+        ['Suitable Yes/Recognised No', suitableListenerYes, recognisedListenerNo, true, false],
         ['Suitable Yes/Recognised Yes', suitableListenerYes, recognisedListenerYes, false, true],
         ['Suitable Blank/Recognised Yes', suitableListenerBlank, recognisedListenerYes, false, true],
-        ['Suitable No/Recognised Yes', suitableListenerNo, recognisedListenerYes, false, false],
+        ['Suitable No/Recognised Yes', suitableListenerNo, recognisedListenerYes, false, true],
         ['Suitable None/Recognised No', null, recognisedListenerNo, false, false],
       ])(
         'given %s should show correct suitable and/or recognised listener statuses',
