@@ -7,7 +7,6 @@ import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 // eslint-disable-next-line no-shadow
 export enum Page {
   ActiveAlerts = 'ACTIVE_ALERTS',
-  ActivePunishments = 'ACTIVE_PUNISHMENTS',
   AddAlert = 'ADD_ALERT',
   AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',

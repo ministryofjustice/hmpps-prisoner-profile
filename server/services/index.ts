@@ -1,7 +1,6 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
-import ActivePunishmentsService from './activePunishmentsService'
 import AlertsPageService from './alertsPageService'
 import CaseNotesService from './caseNotesService'
 import OffencesPageService from './offencesPageService'
@@ -77,7 +76,6 @@ export const services = () => {
     prisonApiClientBuilder,
     personalLearningPlansService,
   )
-  const activePunishmentsPageService = new ActivePunishmentsService(adjudicationsApiClientBuilder)
   const prisonerLocationDetailsPageService = new PrisonerLocationDetailsService(prisonApiClientBuilder)
   const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
   const componentService = new ComponentService(componentApiClientBuilder)
@@ -108,7 +106,6 @@ export const services = () => {
     personalPageService,
     workAndSkillsPageService,
     personalLearningPlansService,
-    activePunishmentsPageService,
     offencesPageService,
     referenceDataService,
     componentService,
