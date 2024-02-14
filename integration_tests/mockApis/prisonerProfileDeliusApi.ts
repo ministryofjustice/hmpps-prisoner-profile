@@ -24,7 +24,7 @@ export default {
       return stubFor({
         request: {
           method: 'GET',
-          urlPattern: `/delius/case/G6123VU/documents`,
+          urlPattern: `/delius/probation-cases/G6123VU/documents`,
         },
         response: {
           status: 404,
@@ -38,7 +38,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/delius/case/G6123VU/documents`,
+        urlPattern: `/delius/probation-cases/G6123VU/documents`,
       },
       response: {
         status: 200,

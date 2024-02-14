@@ -53,7 +53,6 @@ describe('Prisoner schedule', () => {
         dpsUrl: config.serviceUrls.digitalPrison,
         prisonerBreadcrumbName: 'Saunders, John',
         probationDocumentsNotFound: probationDocuments.notFound,
-        title: 'Probation documents - Digital Prison Services',
       })
     })
   })
