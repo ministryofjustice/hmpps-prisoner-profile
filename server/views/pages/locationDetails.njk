@@ -96,8 +96,8 @@
     <h2 class="govuk-!-font-size-36">Previous locations</h2>
     <div data-qa="previous-locations">
       {% for agency in locationDetailsGroupedByAgency %}
-        {% set agencyDatePeriod = "from " + agency.fromDateString + " to " + agency.toDateString %}
-        {% if agency.isValidAgency %}
+        {% set agencyDatePeriod = "from " + agency.fromDate + " to " + agency.toDate %}
+        {% if agency.agencyName %}
           {% set rows = [] %}
 
           {% for location in agency.locationDetails %}
@@ -111,7 +111,7 @@
           {% endfor %}
 
           <div data-qa="agency-group">
-            <h3 class="govuk-heading-m" data-qa="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
+            <h3 class="govuk-heading-m" data-qa="agency-heading">{{ agency.agencyName }} <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
 
             {{ govukTable({
               head: [

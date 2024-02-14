@@ -2,28 +2,29 @@ import { Request, Response } from 'express'
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName, userHasRoles } from '../utils/utils'
-import { formatDateTimeISO } from '../utils/dateHelpers'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { AuditService, Page } from '../services/auditService'
 import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
-import PrisonerLocationDetailsService from '../services/prisonerLocationDetailsService'
+import LocationDetailsService from '../services/locationDetailsService'
 import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
 import logger from '../../logger'
+import { convertGroupedLocationDetails, convertLocationDetails } from './converters/locationDetailsConverter'
 
-export default class PrisonerLocationDetailsController {
+export default class LocationDetailsController {
   constructor(
-    private readonly locationDetailsService: PrisonerLocationDetailsService,
+    private readonly locationDetailsService: LocationDetailsService,
     private readonly auditService: AuditService,
   ) {}
 
-  public async displayPrisonerLocationDetails(req: Request, res: Response, prisonerData: Prisoner) {
+  public async displayLocationDetails(req: Request, res: Response, prisonerData: Prisoner) {
     const { prisonerNumber, bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
-    const { clientToken } = res.locals
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+    const profileUrl = `/prisoner/${prisonerNumber}`
+    const { clientToken } = res.locals
 
-    const isTransfer = prisonerData.prisonId === 'TRN'
-    const isReleased = prisonerData.prisonId === 'OUT'
+    const isTransfer = prisonId === 'TRN'
+    const isReleased = prisonId === 'OUT'
     const isInactiveBooking = isTransfer || isReleased
 
     const locationDetailsLatestFirst = await this.locationDetailsService.getLocationDetailsByLatestFirst(
@@ -31,7 +32,9 @@ export default class PrisonerLocationDetailsController {
       bookingId,
     )
 
-    const currentLocation = locationDetailsLatestFirst[0]
+    const currentLocation = !isInactiveBooking && locationDetailsLatestFirst[0]
+    const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
+
     const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
     const canViewMoveToReceptionButton =
       config.featureToggles.moveToReceptionLinkEnabled &&
@@ -39,25 +42,17 @@ export default class PrisonerLocationDetailsController {
       currentLocation?.location !== 'Reception'
     const receptionIsFull =
       canViewMoveToReceptionButton && (await this.locationDetailsService.isReceptionFull(clientToken, prisonId))
-
-    if (!currentLocation.assignmentEndDateTime) {
-      currentLocation.assignmentEndDateTime = formatDateTimeISO(new Date())
-    }
-
     const occupants: OffenderBooking[] = currentLocation
       ? await this.locationDetailsService.getInmatesAtLocation(clientToken, currentLocation.livingUnitId)
       : []
-
-    const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
-    const prisonerProfileUrl = `/prisoner/${prisonerNumber}`
 
     this.auditService
       .sendPageView({
         userId: res.locals.user.username,
         userCaseLoads: res.locals.user.caseLoads,
         userRoles: res.locals.user.userRoles,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
+        prisonerNumber,
+        prisonId,
         correlationId: req.id,
         page: Page.PrisonerCellHistory,
       })
@@ -67,9 +62,10 @@ export default class PrisonerLocationDetailsController {
       pageTitle: 'Location details',
       ...mapHeaderNoBannerData(prisonerData),
       name,
-      locationDetailsGroupedByAgency:
-        this.locationDetailsService.getLocationDetailsGroupedByPeriodAtAgency(previousLocations),
-      currentLocation,
+      locationDetailsGroupedByAgency: this.locationDetailsService
+        .getLocationDetailsGroupedByPeriodAtAgency(previousLocations)
+        .map(convertGroupedLocationDetails),
+      currentLocation: convertLocationDetails(currentLocation),
       canViewCellMoveButton,
       canViewMoveToReceptionButton,
       occupants: occupants
@@ -79,9 +75,9 @@ export default class PrisonerLocationDetailsController {
           profileUrl: `/prisoner/${occupant.offenderNo}`,
         })),
       prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
-      profileUrl: `/prisoner/${prisonerNumber}`,
+      profileUrl,
       breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
-      changeCellLink: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnUrl=${prisonerProfileUrl}`,
+      changeCellLink: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
       moveToReceptionLink: receptionIsFull
         ? `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/reception-full`
         : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception`,
@@ -92,6 +88,6 @@ export default class PrisonerLocationDetailsController {
     }
 
     // Render page
-    return res.render('pages/prisonerLocationDetails', pageData)
+    return res.render('pages/locationDetails', pageData)
   }
 }
