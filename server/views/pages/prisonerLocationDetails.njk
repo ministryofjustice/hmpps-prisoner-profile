@@ -74,18 +74,18 @@
         {% if occupants.length %}
           <div class="horizontal-information__item">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Currently sharing with</h3>
-            <span data-qa="currently-sharing-with">
+            <div data-qa="currently-sharing-with">
               {% for occupant in occupants %}
                 <p class="govuk-body" data-qa="occupants">
                   <a class="govuk-link" href={{occupant.profileUrl}}>{{ occupant.name }}</a>
                 </p>
               {% endfor %}
-            </span>
+            </div>
           </div>
         {% endif %}
         <div class="horizontal-information__item">
           {% if not currentLocation.isTemporaryLocation %}
-            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body govuk-!-display-none-print" data-qa="location-history-link">
+            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body govuk-!-display-none-print" data-qa="current-location-history-link">
             View details<span class="govuk-visually-hidden"> for location {{ currentLocation.location }}</span>
             </a>
           {% endif %}
@@ -94,39 +94,42 @@
     {% endif %}
 
     <h2 class="govuk-!-font-size-36">Previous locations</h2>
+    <div data-qa="previous-locations">
+      {% for agency in locationDetailsGroupedByAgency %}
+        {% set agencyDatePeriod = "from " + agency.fromDateString + " to " + agency.toDateString %}
+        {% if agency.isValidAgency %}
+          {% set rows = [] %}
 
-    {% for agency in locationDetailsGroupedByAgency %}
-      {% set agencyDatePeriod = "from " + agency.fromDateString + " to " + agency.toDateString %}
-      {% if agency.isValidAgency %}
-        {% set rows = [] %}
+          {% for location in agency.locationDetails %}
+            {% set rows = (rows.push([
+              { text: location.location },
+              { text: location.movedIn },
+              { text: location.movedInBy },
+              { text: location.movedOut },
+              { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + location.assignmentDateTime + '&toDate=' + location.assignmentEndDateTime + '&locationId=' + location.livingUnitId + '&agencyId=' + location.agencyId + '" class="govuk-link govuk-!-display-none-print">View details<span class="govuk-visually-hidden"> for location ' + location.location + '</span></a>' if not location.isTemporaryLocation }
+            ]), rows) %}
+          {% endfor %}
 
-        {% for location in agency.locationDetails %}
-          {% set rows = (rows.push([
-            { text: location.location },
-            { text: location.movedIn },
-            { text: location.movedInBy },
-            { text: location.movedOut },
-            { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + location.assignmentDateTime + '&toDate=' + location.assignmentEndDateTime + '&locationId=' + location.livingUnitId + '&agencyId=' + location.agencyId + '" class="govuk-link govuk-!-display-none-print">View details<span class="govuk-visually-hidden"> for location ' + location.location + '</span></a>' if not location.isTemporaryLocation }
-          ]), rows) %}
-        {% endfor %}
+          <div data-qa="agency-group">
+            <h3 class="govuk-heading-m" data-qa="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
 
-        <h3 class="govuk-heading-m" data-qa="agency-heading">{{ agency.name }} <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
-
-        {{ govukTable({
-          head: [
-            { text: "Location" },
-            { text: "Moved in" },
-            { text: "Moved in by" },
-            { text: "Moved out" },
-            { html: '<span class="govuk-visually-hidden">Details link</span>' }
-          ],
-          rows: rows,
-          attributes: { "data-qa": "prisoner-cell-history-" }
-        }) }}
-      {% else %}
-        <h3 class="govuk-heading-m" data-qa="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
-      {% endif %}
-    {% endfor %}
+            {{ govukTable({
+              head: [
+                { text: "Location" },
+                { text: "Moved in" },
+                { text: "Moved in by" },
+                { text: "Moved out" },
+                { html: '<span class="govuk-visually-hidden">Details link</span>' }
+              ],
+              rows: rows,
+              attributes: { "data-qa": "prisoner-cell-history-" }
+            }) }}
+          </div>
+        {% else %}
+          <h3 class="govuk-heading-m" data-qa="invalid-agency-heading">There is no known cell location <span class="govuk-!-font-weight-regular">{{ agencyDatePeriod }}</span></h3>
+        {% endif %}
+      {% endfor %}
+    </div>
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
