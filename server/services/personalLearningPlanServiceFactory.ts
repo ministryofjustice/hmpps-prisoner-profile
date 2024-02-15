@@ -1,7 +1,5 @@
 import { DataAccess } from '../data'
-import config from '../config'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
-import NoOpPersonalLearningPlanService from './noOpPersonalLearningPlanService'
 import PersonalLearningPlanService from './personalLearningPlanService'
 
 export default class PersonalLearningPlanServiceFactory {
@@ -13,10 +11,9 @@ export default class PersonalLearningPlanServiceFactory {
    */
   static getInstance = (dataAccess: DataAccess): PersonalLearningPlanService => {
     if (!PersonalLearningPlanServiceFactory.instance) {
-      // TODO - feature toggle logic to be removed in RR-607
-      PersonalLearningPlanServiceFactory.instance = config.featureToggles.newWorkAndSkillsTabEnabled
-        ? new EducationAndWorkPlanApiPersonalLearningPlanService(dataAccess.educationAndWorkPlanApiClientBuilder)
-        : new NoOpPersonalLearningPlanService()
+      PersonalLearningPlanServiceFactory.instance = new EducationAndWorkPlanApiPersonalLearningPlanService(
+        dataAccess.educationAndWorkPlanApiClientBuilder,
+      )
     }
     return PersonalLearningPlanServiceFactory.instance
   }
