@@ -10,11 +10,14 @@ import { GoalResponse } from '../educationAndWorkPlanApi/goalResponse'
 const toPersonalLearningPlanActionPlan = (
   apiActionPlanResponse: ActionPlanResponse,
 ): PersonalLearningPlanActionPlan => {
-  const goals = apiActionPlanResponse.goals.map(goal => toPersonalLearningPlanGoal(goal))
+  const goalReferencesInCreationDateOrder = goalReferencesSortedByCreationDate(apiActionPlanResponse.goals)
   return {
     prisonerNumber: apiActionPlanResponse.prisonNumber,
-    goals: [...goals],
-    ...getLastUpdatedAuditFields(goals),
+    goals: apiActionPlanResponse.goals.map((goal: GoalResponse) => {
+      const goalSequenceNumber = goalReferencesInCreationDateOrder.indexOf(goal.goalReference) + 1
+      return toPersonalLearningPlanGoal(goal, goalSequenceNumber)
+    }),
+    ...getLastUpdatedAuditFields(apiActionPlanResponse.goals),
     problemRetrievingData: false,
   }
 }
@@ -25,21 +28,26 @@ const toPersonalLearningPlanActionPlan = (
  * If the specified array of [GoalResponse] is empty then the 3 fields will be returned as `undefined`
  */
 const getLastUpdatedAuditFields = (
-  goals: Array<PersonalLearningPlanGoal>,
+  goals: Array<GoalResponse>,
 ): { updatedBy?: string; updatedByDisplayName?: string; updatedAt?: Date } => {
   if (goals.length === 0) {
     return { updatedBy: undefined, updatedByDisplayName: undefined, updatedAt: undefined }
   }
 
-  const mostRecentGoal = goals.sort(goalComparator)[0]
+  const mostRecentlyUpdatedGoal = [...goals].sort((left: GoalResponse, right: GoalResponse) =>
+    dateComparator(parseISO(left.updatedAt), parseISO(right.updatedAt), 'DESC'),
+  )[0]
   return {
-    updatedBy: mostRecentGoal.updatedBy,
-    updatedByDisplayName: mostRecentGoal.updatedByDisplayName,
-    updatedAt: mostRecentGoal.updatedAt,
+    updatedBy: mostRecentlyUpdatedGoal.updatedBy,
+    updatedByDisplayName: mostRecentlyUpdatedGoal.updatedByDisplayName,
+    updatedAt: parseISO(mostRecentlyUpdatedGoal.updatedAt),
   }
 }
 
-const toPersonalLearningPlanGoal = (apiGoalResponse: GoalResponse): PersonalLearningPlanGoal => {
+const toPersonalLearningPlanGoal = (
+  apiGoalResponse: GoalResponse,
+  goalSequenceNumber: number,
+): PersonalLearningPlanGoal => {
   return {
     reference: apiGoalResponse.goalReference,
     title: apiGoalResponse.title,
@@ -49,17 +57,30 @@ const toPersonalLearningPlanGoal = (apiGoalResponse: GoalResponse): PersonalLear
     updatedAt: parseISO(apiGoalResponse.updatedAt),
     updatedBy: apiGoalResponse.updatedBy,
     updatedByDisplayName: apiGoalResponse.updatedByDisplayName,
+    sequenceNumber: goalSequenceNumber,
   }
 }
 
-const goalComparator = (left: PersonalLearningPlanGoal, right: PersonalLearningPlanGoal): number => {
-  if (left.updatedAt > right.updatedAt) {
-    return -1
+const dateComparator = (left: Date, right: Date, direction: 'ASC' | 'DESC' = 'DESC'): number => {
+  if (left > right) {
+    return direction === 'DESC' ? -1 : 1
   }
-  if (left.updatedAt < right.updatedAt) {
-    return 1
+  if (left < right) {
+    return direction === 'DESC' ? 1 : -1
   }
   return 0
+}
+
+/**
+ * Sorts the goals by creation date descending in a non-destructive manner (function arg is pass by reference) and
+ * returns an array of the goal reference numbers.
+ */
+const goalReferencesSortedByCreationDate = (goals: Array<GoalResponse>): Array<string> => {
+  return [...goals]
+    .sort((left: GoalResponse, right: GoalResponse) =>
+      dateComparator(parseISO(left.createdAt), parseISO(right.createdAt), 'ASC'),
+    )
+    .map(goal => goal.goalReference)
 }
 
 export default toPersonalLearningPlanActionPlan
