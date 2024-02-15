@@ -27,4 +27,5 @@ export interface PersonalLearningPlanGoal {
   updatedAt: Date
   updatedBy: string
   updatedByDisplayName: string
+  sequenceNumber: number
 }

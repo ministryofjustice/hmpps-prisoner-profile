@@ -3,8 +3,7 @@
 <div data-qa="plp-goals">
   <p class="govuk-body" data-qa="goals-info-text">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
   {% for goal in personalLearningPlanActionPlan.goals %}
-    {% set goalLoop = loop %} 
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Goal {{ goalLoop.index }}</h3>
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Goal {{ goal.sequenceNumber }}</h3>
     <div class="hmpps-goal-container">
       <p class="govuk-body">{{ goal.title }}</p>
     </div>

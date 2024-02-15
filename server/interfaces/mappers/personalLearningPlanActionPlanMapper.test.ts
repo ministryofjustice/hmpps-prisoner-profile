@@ -44,6 +44,7 @@ describe('personalLearningPlanActionPlanMapper', () => {
           updatedAt: new Date('2023-09-23T14:43:02.094Z'),
           updatedBy: 'user_b',
           updatedByDisplayName: 'User B',
+          sequenceNumber: 1,
         },
         {
           reference: '30b8abe1-736f-426d-87a7-0e1a7f2f63ab',
@@ -54,6 +55,7 @@ describe('personalLearningPlanActionPlanMapper', () => {
           updatedAt: new Date('2023-07-01T11:14:43.017Z'),
           updatedBy: 'user_d',
           updatedByDisplayName: 'User D',
+          sequenceNumber: 2,
         },
       ],
       updatedAt: new Date('2023-09-23T14:43:02.094Z'),
