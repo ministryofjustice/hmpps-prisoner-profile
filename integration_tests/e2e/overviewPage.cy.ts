@@ -484,6 +484,7 @@ context('Overview Page', () => {
         roles: [Role.PrisonUser, Role.PomUser],
       })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, restrictedPatient: true })
+      cy.task('stubGetRestrictedPatient', { prisonerNumber: 'G6123VU', supportingPrisonId: 'MDI' })
       visitOverviewPage()
     })
 
