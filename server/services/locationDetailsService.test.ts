@@ -10,6 +10,7 @@ import { AgencyDetails } from '../interfaces/prisonApi/agencies'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
 import { LocationDetails } from './interfaces/locationDetails'
+import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
 describe('prisonerLocationDetailsService', () => {
   let service: LocationDetailsService
@@ -49,7 +50,7 @@ describe('prisonerLocationDetailsService', () => {
   describe('getLocationDetailsByLatestFirst', () => {
     it('handles empty list of cell history', async () => {
       prisonApiClient.getOffenderCellHistory = jest.fn(async () => ({ content: [] }))
-      await expect(service.getLocationDetailsByLatestFirst('', 123)).resolves.toEqual([])
+      await expect(service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)).resolves.toEqual([])
     })
 
     it('returns location details in order of latest first', async () => {
@@ -62,7 +63,7 @@ describe('prisonerLocationDetailsService', () => {
       )
 
       // The greater the 'order', the later the date, so we expect the higher 'order' values first:
-      await expect(service.getLocationDetailsByLatestFirst('', 123)).resolves.toEqual([
+      await expect(service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)).resolves.toEqual([
         generateLocation({ order: 3, agency: 3, livingUnitId: 1, movementMadeByUsername: 'USER_3' }),
         generateLocation({ order: 2, agency: 2, livingUnitId: 1, movementMadeByUsername: 'USER_2' }),
         generateLocation({ order: 1, agency: 1, livingUnitId: 1, movementMadeByUsername: 'USER_1' }),
@@ -79,7 +80,7 @@ describe('prisonerLocationDetailsService', () => {
         'Given %s (%s) return formatted as "%s"',
         async (_: string, description: string, formattedLocationDescription: string) => {
           prisonApiClient.getOffenderCellHistory = jest.fn(async () => mockOffenderCellHistory([{ description }]))
-          const locationDetails = await service.getLocationDetailsByLatestFirst('', 123)
+          const locationDetails = await service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)
           expect(locationDetails[0].location).toEqual(formattedLocationDescription)
         },
       )
@@ -96,7 +97,7 @@ describe('prisonerLocationDetailsService', () => {
         'Given %s (%s) return isTemporaryLocation "%s"',
         async (_: string, description: string, isTemporaryLocation: boolean) => {
           prisonApiClient.getOffenderCellHistory = jest.fn(async () => mockOffenderCellHistory([{ description }]))
-          const locationDetails = await service.getLocationDetailsByLatestFirst('', 123)
+          const locationDetails = await service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)
           expect(locationDetails[0].isTemporaryLocation).toEqual(isTemporaryLocation)
         },
       )
@@ -218,6 +219,8 @@ describe('prisonerLocationDetailsService', () => {
   })
 })
 
+const { prisonerNumber } = PrisonerMockDataA
+
 const generateAgencyDetails = (agencyId: string): AgencyDetails => ({
   ...AgenciesMock,
   agencyId,
@@ -262,6 +265,7 @@ const generateLocation = ({
   order: number
   movementMadeByUsername?: string
 }): LocationDetails => ({
+  prisonerNumber,
   agencyId: `AGY${agency}`,
   agencyName: `Agency ${agency}`,
   livingUnitId,

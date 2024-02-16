@@ -9,12 +9,15 @@ import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPage
 import LocationDetailsService from '../services/locationDetailsService'
 import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
 import logger from '../../logger'
-import { groupedLocationDetailsConverter, locationDetailsConverter } from './converters/locationDetailsConverter'
+import LocationDetailsConverter from './converters/locationDetailsConverter'
 
 export default class LocationDetailsController {
   constructor(
     private readonly locationDetailsService: LocationDetailsService,
     private readonly auditService: AuditService,
+    private readonly locationDetailsConverter: LocationDetailsConverter = new LocationDetailsConverter(
+      () => new Date(),
+    ),
   ) {}
 
   public async displayLocationDetails(req: Request, res: Response, prisonerData: Prisoner) {
@@ -29,6 +32,7 @@ export default class LocationDetailsController {
 
     const locationDetailsLatestFirst = await this.locationDetailsService.getLocationDetailsByLatestFirst(
       clientToken,
+      prisonerNumber,
       bookingId,
     )
 
@@ -64,8 +68,8 @@ export default class LocationDetailsController {
       name,
       locationDetailsGroupedByAgency: this.locationDetailsService
         .getLocationDetailsGroupedByPeriodAtAgency(previousLocations)
-        .map(groupedLocationDetailsConverter(prisonerNumber)),
-      currentLocation: locationDetailsConverter(prisonerNumber)(currentLocation),
+        .map(this.locationDetailsConverter.convertGroupedLocationDetails.bind(this.locationDetailsConverter)),
+      currentLocation: this.locationDetailsConverter.convertLocationDetails(currentLocation),
       canViewCellMoveButton,
       canViewMoveToReceptionButton,
       occupants: occupants

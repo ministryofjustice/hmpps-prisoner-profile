@@ -11,9 +11,7 @@ import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPage
 import { Role } from '../data/enums/role'
 import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../services/interfaces/locationDetails'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
-import { groupedLocationDetailsConverter, locationDetailsConverter } from './converters/locationDetailsConverter'
-
-const profileUrl = `/prisoner/${PrisonerMockDataA.prisonerNumber}`
+import LocationDetailsConverter from './converters/locationDetailsConverter'
 
 describe('Prisoner Location Details', () => {
   const offenderNo = 'ABC123'
@@ -61,7 +59,7 @@ describe('Prisoner Location Details', () => {
       .fn()
       .mockReturnValue(locationDetailsGroupedByAgency)
 
-    controller = new LocationDetailsController(locationDetailsService, auditServiceClient)
+    controller = new LocationDetailsController(locationDetailsService, auditServiceClient, locationDetailsConverter)
   })
 
   afterEach(() => {
@@ -170,7 +168,13 @@ describe('Prisoner Location Details', () => {
     })
   })
 
+  const { prisonerNumber } = PrisonerMockDataA
+  const profileUrl = `/prisoner/${prisonerNumber}`
+  const now = new Date('2024-02-03T11:22:33')
+  const locationDetailsConverter = new LocationDetailsConverter(() => now)
+
   const currentLocation: LocationDetails = {
+    prisonerNumber,
     agencyId: 'MDI',
     agencyName: 'Moorland (HMP & YOI)',
     assignmentDateTime: '2024-01-01T01:02:03',
@@ -183,6 +187,7 @@ describe('Prisoner Location Details', () => {
   }
 
   const previousLocation1: LocationDetails = {
+    prisonerNumber,
     agencyId: 'MDI',
     agencyName: 'Moorland (HMP & YOI)',
     assignmentDateTime: '2023-12-01T10:20:30',
@@ -195,6 +200,7 @@ describe('Prisoner Location Details', () => {
   }
 
   const previousLocation2: LocationDetails = {
+    prisonerNumber,
     agencyId: 'MDI',
     agencyName: 'Moorland (HMP & YOI)',
     assignmentDateTime: '2023-12-01T01:02:03',
@@ -207,6 +213,7 @@ describe('Prisoner Location Details', () => {
   }
 
   const previousLocation3: LocationDetails = {
+    prisonerNumber,
     agencyId: 'LEI',
     agencyName: 'Leeds (HMP)',
     assignmentDateTime: '2023-11-01T01:02:03',
@@ -244,9 +251,9 @@ describe('Prisoner Location Details', () => {
     profileUrl,
     canViewCellMoveButton: true,
     canViewMoveToReceptionButton: true,
-    currentLocation: locationDetailsConverter(PrisonerMockDataA.prisonerNumber)(currentLocation),
+    currentLocation: locationDetailsConverter.convertLocationDetails(currentLocation),
     locationDetailsGroupedByAgency: locationDetailsGroupedByAgency.map(
-      groupedLocationDetailsConverter(PrisonerMockDataA.prisonerNumber),
+      locationDetailsConverter.convertGroupedLocationDetails.bind(locationDetailsConverter),
     ),
     changeCellLink: `${config.apis.dpsHomePageUrl}${profileUrl}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
     moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
