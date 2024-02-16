@@ -9,7 +9,7 @@ import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPage
 import LocationDetailsService from '../services/locationDetailsService'
 import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
 import logger from '../../logger'
-import { convertGroupedLocationDetails, convertLocationDetails } from './converters/locationDetailsConverter'
+import { groupedLocationDetailsConverter, locationDetailsConverter } from './converters/locationDetailsConverter'
 
 export default class LocationDetailsController {
   constructor(
@@ -64,8 +64,8 @@ export default class LocationDetailsController {
       name,
       locationDetailsGroupedByAgency: this.locationDetailsService
         .getLocationDetailsGroupedByPeriodAtAgency(previousLocations)
-        .map(convertGroupedLocationDetails),
-      currentLocation: convertLocationDetails(currentLocation),
+        .map(groupedLocationDetailsConverter(prisonerNumber)),
+      currentLocation: locationDetailsConverter(prisonerNumber)(currentLocation),
       canViewCellMoveButton,
       canViewMoveToReceptionButton,
       occupants: occupants
@@ -82,7 +82,6 @@ export default class LocationDetailsController {
         ? `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/reception-full`
         : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception`,
       prisonerNumber,
-      dpsBaseUrl: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}`,
       isTransfer,
       isReleased,
     }

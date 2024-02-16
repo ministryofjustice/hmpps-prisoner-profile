@@ -39,6 +39,7 @@ export enum Page {
   UpdateCaseNote = 'UPDATE_CASE_NOTE',
   WorkAndSkills = 'WORK_AND_SKILLS',
   XRayBodyScans = 'XRAY_BODY_SCANS',
+  ProbationDocuments = 'PROBATION_DOCUMENTS',
 }
 
 // eslint-disable-next-line no-shadow

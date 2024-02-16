@@ -117,6 +117,7 @@ describe('OverviewPageService', () => {
 
   const prisonerProfileDeliusApiClient: PrisonerProfileDeliusApiClient = {
     getCommunityManager: jest.fn(async () => communityManagerMock),
+    getProbationDocuments: jest.fn(),
   }
 
   const complexityApiClient: ComplexityApiClient = {

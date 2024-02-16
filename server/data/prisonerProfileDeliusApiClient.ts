@@ -2,6 +2,7 @@ import RestClient from './restClient'
 import config from '../config'
 import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
 import { PrisonerProfileDeliusApiClient } from './interfaces/prisonerProfileDeliusApiClient'
+import { ProbationDocuments } from '../interfaces/deliusApi/probationDocuments'
 
 export default class PrisonerProfileDeliusApiRestClient implements PrisonerProfileDeliusApiClient {
   private readonly restClient: RestClient
@@ -20,4 +21,7 @@ export default class PrisonerProfileDeliusApiRestClient implements PrisonerProfi
       return undefined
     }
   }
+
+  getProbationDocuments = (prisonerNumber: string): Promise<ProbationDocuments> =>
+    this.restClient.get<ProbationDocuments>({ path: `/probation-cases/${prisonerNumber}/documents` })
 }
