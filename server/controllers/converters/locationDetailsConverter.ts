@@ -54,7 +54,7 @@ function generateLocationHistoryLink(
 ): string {
   if (location.isTemporaryLocation || !location.assignmentDateTime) return null
 
-  const locationHistoryLink = new URL(`/prisoner/${prisonerNumber}/location-history`, config.serviceUrls.digitalPrison)
+  const locationHistoryLink = new URL(`/prisoner/${prisonerNumber}/location-history`, config.domain)
   const { searchParams } = locationHistoryLink
 
   searchParams.append('agencyId', location.agencyId)
@@ -62,5 +62,5 @@ function generateLocationHistoryLink(
   searchParams.append('fromDate', location.assignmentDateTime)
   searchParams.append('toDate', location.assignmentEndDateTime || formatDateTimeISO(defaultLocationHistoryToDate))
 
-  return locationHistoryLink.href
+  return locationHistoryLink.pathname + locationHistoryLink.search
 }
