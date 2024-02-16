@@ -1,0 +1,164 @@
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% extends "../index.njk" %}
+{% set title = "Probation documents" %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+  { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+  { text: prisonerBreadcrumbName, href: "/prisoner/" + prisonerNumber }
+  ]
+%}
+
+{% macro summary(conviction) %}
+  <div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">{{ conviction.offence }}</div>
+      <div class="govuk-grid-column-one-third">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">{{ conviction.date | formatDate }}</div>
+          <div class="govuk-grid-column-one-half">
+            {% if conviction.active %}
+              Active
+            {% else %}
+              Terminated
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro summaryTitle(conviction) %}
+  {{ conviction.title }}
+  {% if conviction.institutionName %}at {{ conviction.institutionName }}{% endif %}
+{% endmacro %}
+
+{% macro incorrectDetails(probationDetails) %}
+  <p class="govuk-body">
+    We have retrieved this information from the probation system where the prisoner’s name is recorded as
+    <strong data-qa="probation-details-name">{{ probationDetails.name }}</strong>. If something does not look right you
+    should ask a Community offender manager to check the details in Delius, the case reference number (CRN) is
+    <strong data-qa="probation-details-crn">{{ probationDetails.crn }}</strong>.
+  </p>
+  <p class="govuk-body">
+    The Delius record should have the prison number assigned to the Delius NOMS number and the Throughcare (custody)
+    details may need to be updated using the Search DSS feature.
+  </p>
+{% endmacro %}
+
+{% macro documentDetail(document, prisonerNumber) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <a
+        class="govuk-link"
+        data-test="document-link"
+        href="{{ dpsUrl }}/offenders/{{ prisonerNumber }}/probation-documents/{{ document.id }}/download"
+        >{{ document.name }}</a
+      >
+    </div>
+    <div class="govuk-grid-column-full">{{ document.type }} created by {{ document.author }}</div>
+    {% if document.description %}
+      <div class="govuk-grid-column-full govuk-caption-m">{{ document.description }}</div>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro documentTable(documents, caption, prisonerNumber) %}
+  {% set rows = [] %}
+
+  {% for document in documents %}
+    {%
+      set rows = (rows.push([
+      {
+      html: documentDetail(document, prisonerNumber)
+      },
+      {
+      text: document.createdAt | formatDate
+      }
+      ]), rows)
+    %}
+  {% endfor %}
+
+  {{
+    govukTable({
+    firstCellIsHeader: false,
+    caption: caption,
+    captionClasses: 'govuk-heading-m',
+    head: [
+    { text: "Details" },
+    { text: "Date" }
+    ],
+    rows: rows
+    })
+  }}
+{% endmacro %}
+
+{% macro convictionDocuments(conviction, prisonerNumber) %}
+  {% if conviction.documents.length > 0 %}
+    {{ documentTable(conviction.documents, "Documents for this sentence", prisonerNumber) }}
+  {% else %}
+    <p class="govuk-body">No documents have been upload for this conviction.</p>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">Documents held by probation</h1>
+  {% if probationDetails %}
+    {{
+      govukDetails({
+      summaryText: "These details don't look correct",
+      html: incorrectDetails(probationDetails)
+      })
+    }}
+  {% else %}
+    {{
+      govukDetails({
+      summaryText: "What can I do to find the probation documents",
+      text: "If something does not look right you should ask a Community offender manager to check the details in Delius. It is possible that the offender record does exist in Delius, but the Delius NOMS number has not been set correctly to the prison number. Ask a someone to update the Delius record and try again."
+      })
+    }}
+  {% endif %}
+
+  {% if probationDocumentsNotFound %}
+    {{
+      govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{text: "We are unable to display documents for this prisoner because we cannot find the offender record in the probation system"}],
+      attributes: { 'data-qa-errors': true }
+      })
+    }}
+  {% else %}
+    {% if documents.offenderDocuments.length > 0 %}
+      {{ documentTable(documents.offenderDocuments, "General documents for " + probationDetails.name, prisonerNumber) }}
+    {% endif %}
+    {% set convictionItems = [] %}
+
+    {% for conviction in documents.convictions %}
+      {%
+        set convictionItems = (convictionItems.push(
+        {
+        heading: { text: summaryTitle(conviction) },
+        summary: { html: summary(conviction) },
+        content: { html: convictionDocuments(conviction, prisonerNumber) }
+        }
+        ), convictionItems)
+      %}
+    {% endfor %}
+
+    <h3 class="govuk-heading-m govuk-!-margin-top-9 govuk-!-margin-bottom-0">Documents related to each sentence</h3>
+    {{
+      govukAccordion({
+      id: "accordion-default",
+      items: convictionItems
+      })
+    }}
+  {% endif %}
+{% endblock %}

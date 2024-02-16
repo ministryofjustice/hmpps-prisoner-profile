@@ -99,7 +99,7 @@ export default class OverviewController {
     ) {
       links.push({
         text: 'Probation documents',
-        url: `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/probation-documents`,
+        url: `/prisoner/${prisonerData.prisonerNumber}/probation-documents`,
         dataQA: 'probation-documents-info-link',
       })
     }
