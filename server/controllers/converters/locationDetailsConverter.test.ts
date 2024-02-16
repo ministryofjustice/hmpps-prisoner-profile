@@ -4,7 +4,6 @@ import {
   GroupedLocationDetailsForDisplay,
   LocationDetailsForDisplay,
 } from '../../interfaces/pages/locationDetailsPageData'
-import config from '../../config'
 import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
 import { groupedLocationDetailsConverter, locationDetailsConverter } from './locationDetailsConverter'
 
@@ -73,7 +72,7 @@ describe('locationDetailsConverter', () => {
         ).toEqual({
           ...expectedLocationDetailsForDisplay,
           movedOut: endDate,
-          locationHistoryLink: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/location-history?agencyId=MDI&locationId=111111&fromDate=2023-12-01T10%3A20%3A30&toDate=2024-02-03T11%3A22%3A33`,
+          locationHistoryLink: `/prisoner/${prisonerNumber}/location-history?agencyId=MDI&locationId=111111&fromDate=2023-12-01T10%3A20%3A30&toDate=2024-02-03T11%3A22%3A33`,
         })
       },
     )
@@ -138,5 +137,5 @@ const expectedLocationDetailsForDisplay: LocationDetailsForDisplay = {
   movedOut: '01/01/2024 - 01:02',
   location: '1-1-1',
   movedInBy: 'John Smith',
-  locationHistoryLink: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/location-history?agencyId=MDI&locationId=111111&fromDate=2023-12-01T10%3A20%3A30&toDate=2024-01-01T01%3A02%3A03`,
+  locationHistoryLink: `/prisoner/${prisonerNumber}/location-history?agencyId=MDI&locationId=111111&fromDate=2023-12-01T10%3A20%3A30&toDate=2024-01-01T01%3A02%3A03`,
 }
