@@ -129,6 +129,7 @@ describe('professionalContactsService', () => {
 
     professionalContactsClient = {
       getCommunityManager: jest.fn(async () => communityManagerMock),
+      getProbationDocuments: jest.fn(),
     }
 
     keyWorkerApiClient = {
