@@ -174,15 +174,7 @@ export default function routes(services: Services): Router {
         page: Page.WorkAndSkills,
       })
 
-      /* New Work & Skills page introduced in epic RR-575
-         Render the new view if the NEW_WORK_AND_SKILLS_TAB_ENABLED feature toggle is enabled
-         TODO - The feature toggle and this ternary will be removed in RR-607
-      */
-      const viewTemplate = config.featureToggles.newWorkAndSkillsTabEnabled
-        ? 'pages/new_workAndSkills'
-        : 'pages/workAndSkills'
-
-      res.render(viewTemplate, {
+      res.render('pages/workAndSkills', {
         ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'work-and-skills'),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',

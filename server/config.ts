@@ -291,7 +291,6 @@ export default {
     },
   },
   featureToggles: {
-    newWorkAndSkillsTabEnabled: toBoolean(get('NEW_WORK_AND_SKILLS_TAB_ENABLED', false, requiredInProduction)),
     neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
     complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),

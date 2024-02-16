@@ -14,15 +14,20 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter app-sidebar">
       <ul class="govuk-list hmpps-sidebar">
+        <li><a class="govuk-link" href="#functional-skills-level">Functional skills level</a></li>
         <li><a class="govuk-link" href="#courses-and-qualifications">Courses and qualifications</a></li>
         <li><a class="govuk-link" href="#work-and-activities">Work and activities</a></li>
-        <li><a class="govuk-link" href="#employability-skills">Employability skills</a></li>
         <li><a class="govuk-link" href="#goals">Goals</a></li>
-        <li><a class="govuk-link" href="#functional-skills-level">Functional skills level</a></li>
+        <li><a class="govuk-link" href="#employability-skills">Employability skills</a></li>
       </ul>
     </div>
     <div class="govuk-grid-column-three-quarters">
       <div class="govuk-grid-row" data-qa="courses-and-qualifications">
+        <div class="govuk-grid-column-full">
+          {% include "../partials/workAndSkillsPage/functionalSkillsLevel.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
           {% include "../partials/workAndSkillsPage/coursesAndQualifications.njk" %}
         </div>
@@ -34,17 +39,12 @@
       </div>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
+          {% include "../partials/workAndSkillsPage/goals/index.njk" %}
+        </div>
+      </div>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
           {% include "../partials/workAndSkillsPage/employabilitySkills.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/goals.njk" %}
-        </div>
-      </div>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/functionalSkillsLevel.njk" %}
         </div>
       </div>
     </div>
