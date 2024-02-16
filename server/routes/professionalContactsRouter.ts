@@ -14,7 +14,7 @@ export default function professionalContactsRouter(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/professional-contacts',
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     (req, res, next) => professionalContactsController.displayProfessionalContacts(req, res),
   )
 

@@ -218,6 +218,14 @@ export default {
       },
       agent: new AgentConfig(),
     },
+    restrictedPatientApi: {
+      url: get('RESTRICTED_PATIENT_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('RESTRICTED_PATIENT_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('RESTRICTED_PATIENT_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),

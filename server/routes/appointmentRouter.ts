@@ -39,7 +39,7 @@ export default function appointmentRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.AddAppointment }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    checkPrisonerInCaseload(services, { activeCaseloadOnly: true }),
     appointmentController.displayAddAppointment(),
   )
   post(
@@ -52,7 +52,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/appointment-confirmation',
     auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    checkPrisonerInCaseload(services, { activeCaseloadOnly: true }),
     appointmentController.displayAppointmentConfirmation(),
   )
 
@@ -60,7 +60,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/prepost-appointments',
     auditPageAccessAttempt({ services, page: Page.PrePostAppointments }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    checkPrisonerInCaseload(services, { activeCaseloadOnly: true }),
     appointmentController.displayPrePostAppointments(),
   )
   post(
@@ -73,7 +73,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/prepost-appointment-confirmation',
     auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    checkPrisonerInCaseload(services, { activeCaseloadOnly: true }),
     appointmentController.displayPrePostAppointmentConfirmation(),
   )
 
@@ -81,7 +81,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/movement-slips',
     auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    checkPrisonerInCaseload(services, { activeCaseloadOnly: true }),
     appointmentController.displayPrisonerMovementSlips(),
   )
 

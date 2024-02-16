@@ -17,7 +17,7 @@ export default function goalsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/vc2-goals',
     auditPageAccessAttempt({ services, page: Page.VirtualCampusGoals }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     (req, res, next) => goalsController.displayGoals(req, res),
   )
 

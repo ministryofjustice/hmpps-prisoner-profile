@@ -20,7 +20,7 @@ export default function locationDetailsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/location-details',
     auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ allowInactive: true }),
+    checkPrisonerInCaseload(services, { allowInactive: true }),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerLocationDetailsController.displayLocationDetails(req, res, prisonerData)

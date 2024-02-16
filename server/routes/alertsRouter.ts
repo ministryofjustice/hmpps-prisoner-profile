@@ -36,7 +36,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/active',
     auditPageAccessAttempt({ services, page: Page.ActiveAlerts }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     (req, res, next) => {
       alertsController.displayAlerts(req, res, next, true)
     },
@@ -46,7 +46,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/inactive',
     auditPageAccessAttempt({ services, page: Page.InactiveAlerts }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     (req, res, next) => {
       alertsController.displayAlerts(req, res, next, false)
     },
@@ -72,7 +72,7 @@ export default function alertsRouter(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/alerts/detail',
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     alertsController.displayAlert(),
   )
 
@@ -82,7 +82,7 @@ export default function alertsRouter(services: Services): Router {
   get(
     '/api/prisoner/:prisonerNumber/get-alert-details',
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     alertsController.getAlertDetails(),
   )
 

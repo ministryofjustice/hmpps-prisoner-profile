@@ -55,7 +55,7 @@ export default function routes(services: Services): Router {
     '/api/prisoner/:prisonerNumber/image',
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     services.commonApiRoutes.prisonerImage,
   )
 
@@ -71,7 +71,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber',
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -83,7 +83,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/image',
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -109,7 +109,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/personal',
     auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -139,7 +139,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/work-and-skills',
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -194,7 +194,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/offences',
     auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -234,7 +234,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/schedule',
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
@@ -245,7 +245,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/x-ray-body-scans',
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -276,7 +276,7 @@ export default function routes(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/location-history',
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(
@@ -289,7 +289,7 @@ export default function routes(services: Services): Router {
   router.use(
     '/prisoner/:prisonerNumber/money',
     getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+    checkPrisonerInCaseload(services, { allowGlobal: false, allowInactive: false }),
     moneyRouter(services),
   )
 
@@ -297,7 +297,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/religion-belief-history',
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    checkPrisonerInCaseload(services),
     async (req, res, next) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
     },
