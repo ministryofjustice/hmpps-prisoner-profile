@@ -7,12 +7,11 @@ import { formatDate, formatDateTime, formatDateTimeISO } from '../../utils/dateH
 import { formatName } from '../../utils/utils'
 import config from '../../config'
 
-export function locationDetailsConverter(
-  prisonerNumber: string,
-  defaultLocationHistoryToDate: Date = new Date(),
-): (location: LocationDetails) => LocationDetailsForDisplay {
-  return location => {
-    if (!location || !prisonerNumber) return null
+export default class LocationDetailsConverter {
+  constructor(private readonly getDateTimeNow: () => Date = () => new Date()) {}
+
+  convertLocationDetails = (location: LocationDetails): LocationDetailsForDisplay => {
+    if (!location) return null
 
     const staffDetails = location.movementMadeByStaffDetails
     const fromDateTime = location.assignmentDateTime
@@ -26,41 +25,33 @@ export function locationDetailsConverter(
       movedInBy: location.movementMadeByStaffDetails
         ? formatName(staffDetails.firstName, '', staffDetails.lastName)
         : location.movementMadeByUsername,
-      locationHistoryLink: generateLocationHistoryLink(location, prisonerNumber, defaultLocationHistoryToDate),
+      locationHistoryLink: this.generateLocationHistoryLink(location),
     }
   }
-}
 
-export function groupedLocationDetailsConverter(
-  prisonerNumber: string,
-  defaultLocationHistoryToDate: Date = new Date(),
-): (groupedLocations: LocationDetailsGroupedByPeriodAtAgency) => GroupedLocationDetailsForDisplay {
-  return (groupedLocations: LocationDetailsGroupedByPeriodAtAgency) => {
+  convertGroupedLocationDetails = (
+    groupedLocations: LocationDetailsGroupedByPeriodAtAgency,
+  ): GroupedLocationDetailsForDisplay => {
     if (!groupedLocations) return null
-    const convertLocationDetails = locationDetailsConverter(prisonerNumber, defaultLocationHistoryToDate)
     return {
       agencyName: groupedLocations.agencyName,
       fromDate: formatDate(groupedLocations.fromDate, 'short'),
       toDate: formatDate(groupedLocations.toDate, 'short') || 'Unknown',
-      locationDetails: groupedLocations.locationDetails.map(convertLocationDetails),
+      locationDetails: groupedLocations.locationDetails.map(this.convertLocationDetails),
     }
   }
-}
 
-function generateLocationHistoryLink(
-  location: LocationDetails,
-  prisonerNumber: string,
-  defaultLocationHistoryToDate: Date,
-): string {
-  if (location.isTemporaryLocation || !location.assignmentDateTime) return null
+  private generateLocationHistoryLink = (location: LocationDetails): string => {
+    if (location.isTemporaryLocation || !location.assignmentDateTime) return null
 
-  const locationHistoryLink = new URL(`/prisoner/${prisonerNumber}/location-history`, config.domain)
-  const { searchParams } = locationHistoryLink
+    const locationHistoryLink = new URL(`/prisoner/${location.prisonerNumber}/location-history`, config.domain)
+    const { searchParams } = locationHistoryLink
 
-  searchParams.append('agencyId', location.agencyId)
-  searchParams.append('locationId', String(location.livingUnitId))
-  searchParams.append('fromDate', location.assignmentDateTime)
-  searchParams.append('toDate', location.assignmentEndDateTime || formatDateTimeISO(defaultLocationHistoryToDate))
+    searchParams.append('agencyId', location.agencyId)
+    searchParams.append('locationId', String(location.livingUnitId))
+    searchParams.append('fromDate', location.assignmentDateTime)
+    searchParams.append('toDate', location.assignmentEndDateTime || formatDateTimeISO(this.getDateTimeNow()))
 
-  return locationHistoryLink.pathname + locationHistoryLink.search
+    return locationHistoryLink.pathname + locationHistoryLink.search
+  }
 }

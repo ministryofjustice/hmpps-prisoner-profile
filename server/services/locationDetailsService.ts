@@ -7,7 +7,7 @@ import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from './inter
 export default class LocationDetailsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  getInmatesAtLocation(clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> {
+  getInmatesAtLocation = (clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> => {
     return this.prisonApiClientBuilder(clientToken).getInmatesAtLocation(livingUnitId, {})
   }
 
@@ -17,7 +17,11 @@ export default class LocationDetailsService {
     return !receptionsWithCapacity.length
   }
 
-  getLocationDetailsByLatestFirst = async (clientToken: string, bookingId: number): Promise<LocationDetails[]> => {
+  getLocationDetailsByLatestFirst = async (
+    clientToken: string,
+    prisonerNumber: string,
+    bookingId: number,
+  ): Promise<LocationDetails[]> => {
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     const cells = await prisonApiClient.getOffenderCellHistory(bookingId, { page: 0, size: 10000 })
@@ -37,6 +41,7 @@ export default class LocationDetailsService {
       const agencyDescription = agency?.description
 
       return {
+        prisonerNumber,
         agencyId,
         agencyName: agencyDescription,
         livingUnitId: cell.livingUnitId,

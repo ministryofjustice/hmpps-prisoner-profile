@@ -5,28 +5,33 @@ import {
   LocationDetailsForDisplay,
 } from '../../interfaces/pages/locationDetailsPageData'
 import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
-import { groupedLocationDetailsConverter, locationDetailsConverter } from './locationDetailsConverter'
+import LocationDetailsConverter from './locationDetailsConverter'
 
 describe('locationDetailsConverter', () => {
+  let locationDetailsConverter: LocationDetailsConverter
+
+  beforeEach(() => {
+    locationDetailsConverter = new LocationDetailsConverter(() => now)
+  })
+
   describe('convertLocationDetails', () => {
-    let convertLocationDetails: (locationDetails: LocationDetails) => LocationDetailsForDisplay
+    let convert: (location: LocationDetails) => LocationDetailsForDisplay
 
     beforeEach(() => {
-      convertLocationDetails = locationDetailsConverter(prisonerNumber, nowDate)
+      convert = location => locationDetailsConverter.convertLocationDetails(location)
     })
 
-    it('handles null or undefined location details', () => {
-      expect(convertLocationDetails(null)).toEqual(null)
-      expect(convertLocationDetails(undefined)).toEqual(null)
+    it.each([null, undefined])('handles null or undefined location details', locationDetails => {
+      expect(convert(locationDetails)).toEqual(null)
     })
 
     it('converts location details with staff details', () => {
-      expect(convertLocationDetails(locationDetails)).toEqual(expectedLocationDetailsForDisplay)
+      expect(convert(locationDetails)).toEqual(expectedLocationDetailsForDisplay)
     })
 
     it('converts location details without staff details', () => {
       expect(
-        convertLocationDetails({
+        convert({
           ...locationDetails,
           movementMadeByStaffDetails: undefined,
         }),
@@ -38,7 +43,7 @@ describe('locationDetailsConverter', () => {
 
     it.each([null, undefined])('converts location details and handles missing start date', startDate => {
       expect(
-        convertLocationDetails({
+        convert({
           ...locationDetails,
           assignmentDateTime: startDate,
         }),
@@ -51,7 +56,7 @@ describe('locationDetailsConverter', () => {
 
     it('temporary location details do not include a location history link', () => {
       expect(
-        convertLocationDetails({
+        convert({
           ...locationDetails,
           isTemporaryLocation: true,
         }),
@@ -65,7 +70,7 @@ describe('locationDetailsConverter', () => {
       'location details without end date uses default date (now) in location history link',
       endDate => {
         expect(
-          convertLocationDetails({
+          convert({
             ...locationDetails,
             assignmentEndDateTime: endDate,
           }),
@@ -79,22 +84,19 @@ describe('locationDetailsConverter', () => {
   })
 
   describe('convertGroupedLocationDetails', () => {
-    let convertGroupedLocationDetails: (
-      groupedLocationDetails: LocationDetailsGroupedByPeriodAtAgency,
-    ) => GroupedLocationDetailsForDisplay
+    let convert: (groupedLocation: LocationDetailsGroupedByPeriodAtAgency) => GroupedLocationDetailsForDisplay
 
     beforeEach(() => {
-      convertGroupedLocationDetails = groupedLocationDetailsConverter(prisonerNumber, new Date('2024-02-03T11:22:33'))
+      convert = location => locationDetailsConverter.convertGroupedLocationDetails(location)
     })
 
-    it('handles null or undefined groups', () => {
-      expect(convertGroupedLocationDetails(null)).toEqual(null)
-      expect(convertGroupedLocationDetails(undefined)).toEqual(null)
+    it.each([null, undefined])('handles null or undefined groups', group => {
+      expect(convert(group)).toEqual(null)
     })
 
     it('converts groups', () => {
       expect(
-        convertGroupedLocationDetails({
+        convert({
           agencyName: 'Moorland (HMP & YOI)',
           fromDate: '2023-12-01T10:20:30',
           toDate: '2024-01-01T01:02:03',
@@ -117,9 +119,10 @@ describe('locationDetailsConverter', () => {
 })
 
 const { prisonerNumber } = PrisonerMockDataA
-const nowDate = new Date('2024-02-03T11:22:33')
+const now = new Date('2024-02-03T11:22:33')
 
 const locationDetails: LocationDetails = {
+  prisonerNumber,
   agencyId: 'MDI',
   agencyName: 'Moorland (HMP & YOI)',
   assignmentDateTime: '2023-12-01T10:20:30',
