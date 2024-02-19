@@ -84,8 +84,8 @@
           </div>
         {% endif %}
         <div class="horizontal-information__item">
-          {% if not currentLocation.isTemporaryLocation %}
-            <a href="{{ dpsBaseUrl + '/location-history?fromDate=' + currentLocation.assignmentDateTime + '&toDate=' + currentLocation.assignmentEndDateTime + '&locationId=' + currentLocation.livingUnitId + '&agencyId=' + currentLocation.agencyId }}" class="govuk-link govuk-body govuk-!-display-none-print" data-qa="current-location-history-link">
+          {% if currentLocation.locationHistoryLink %}
+            <a href="{{ currentLocation.locationHistoryLink }}" class="govuk-link govuk-body govuk-!-display-none-print" data-qa="current-location-history-link">
             View details<span class="govuk-visually-hidden"> for location {{ currentLocation.location }}</span>
             </a>
           {% endif %}
@@ -106,7 +106,7 @@
               { text: location.movedIn },
               { text: location.movedInBy },
               { text: location.movedOut },
-              { html: '<a href="' + dpsBaseUrl + '/location-history?fromDate=' + location.assignmentDateTime + '&toDate=' + location.assignmentEndDateTime + '&locationId=' + location.livingUnitId + '&agencyId=' + location.agencyId + '" class="govuk-link govuk-!-display-none-print">View details<span class="govuk-visually-hidden"> for location ' + location.location + '</span></a>' if not location.isTemporaryLocation }
+              { html: '<a href="' + location.locationHistoryLink + '" class="govuk-link govuk-!-display-none-print">View details<span class="govuk-visually-hidden"> for location ' + location.location + '</span></a>' if location.locationHistoryLink }
             ]), rows) %}
           {% endfor %}
 
