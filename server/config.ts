@@ -295,6 +295,5 @@ export default {
     complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    moveToReceptionLinkEnabled: toBoolean(get('MOVE_TO_RECEPTION_LINK_ENABLED', 'true')),
   },
 }
