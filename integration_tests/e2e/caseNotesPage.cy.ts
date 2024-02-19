@@ -108,8 +108,7 @@ context('Case Notes Page', () => {
     })
   })
 
-  // TODO investigate why this fails in pipeline but passes locally
-  context.skip('Paging', () => {
+  context('Paging', () => {
     let caseNotesPage
 
     beforeEach(() => {
