@@ -5,21 +5,13 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import checkPrisonerInCaseload from './checkPrisonerInCaseloadMiddleware'
 import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
-import { Services } from '../services'
-import { DataAccess } from '../data'
-import { restrictedPatientMock } from '../data/localMockData/restrictedPatientApi/restrictedPatient'
-import { RestrictedPatientApiClient } from '../data/interfaces/restrictedPatientApiClient'
 
 let req: any
 let res: any
 let next: NextFunction
 
 describe('CheckPrisonerInCaseloadMiddleware', () => {
-  let services: Services
-
   beforeEach(() => {
-    services = {} as Services
-
     req = {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
@@ -47,7 +39,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
   it('should return ServerError if no prisonerData found in middleware', async () => {
     delete req.middleware
 
-    await checkPrisonerInCaseload(services)(req, res, next)
+    await checkPrisonerInCaseload()(req, res, next)
     expect(req.middleware).not.toBeDefined()
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith(
@@ -66,7 +58,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should add middleware error if inactive booking and user does not have role', async () => {
       req.middleware.prisonerData.prisonId = 'OUT'
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith('route')
@@ -75,7 +67,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should add middleware error if inactive booking and allowInactive is false', async () => {
       req.middleware.prisonerData.prisonId = 'OUT'
 
-      await checkPrisonerInCaseload(services, { allowInactive: false })(req, res, next)
+      await checkPrisonerInCaseload({ allowInactive: false })(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith('route')
@@ -85,7 +77,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'OUT'
       res.locals.user.userRoles = [Role.InactiveBookings]
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware?.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith()
@@ -95,7 +87,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'OUT'
       res.locals.user.userRoles = [Role.InactiveBookings]
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware?.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith()
@@ -104,7 +96,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should add middleware error if prisoner not in caseload and user does not have global search role', async () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith('route')
@@ -113,7 +105,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should add middleware error if prisoner not in caseload and allowGlobal is false', async () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
 
-      await checkPrisonerInCaseload(services, { allowGlobal: false })(req, res, next)
+      await checkPrisonerInCaseload({ allowGlobal: false })(req, res, next)
       expect(req.middleware.errors).toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith('route')
@@ -123,7 +115,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
       res.locals.user.userRoles = [Role.GlobalSearch]
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware?.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith()
@@ -134,7 +126,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should return NotFoundError if inactive booking and user does not have role', async () => {
       req.middleware.prisonerData.prisonId = 'OUT'
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
@@ -145,7 +137,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should return NotFoundError if inactive booking and allowInactive is false', async () => {
       req.middleware.prisonerData.prisonId = 'OUT'
 
-      await checkPrisonerInCaseload(services, { allowInactive: false })(req, res, next)
+      await checkPrisonerInCaseload({ allowInactive: false })(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
@@ -157,7 +149,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'OUT'
       res.locals.user.userRoles = [Role.InactiveBookings]
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware?.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith()
@@ -167,7 +159,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'OUT'
       res.locals.user.userRoles = [Role.InactiveBookings]
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware?.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith()
@@ -176,7 +168,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should return NotFoundError if prisoner not in caseload and user does not have global search role', async () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
@@ -187,7 +179,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     it('should return NotFoundError if prisoner not in caseload and allowGlobal is false', async () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
 
-      await checkPrisonerInCaseload(services, { allowGlobal: false })(req, res, next)
+      await checkPrisonerInCaseload({ allowGlobal: false })(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
@@ -199,7 +191,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
       req.middleware.prisonerData.prisonId = 'ZZZ'
       res.locals.user.userRoles = [Role.GlobalSearch]
 
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware?.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith()
@@ -207,21 +199,13 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
   })
 
   describe('Restricted patients', () => {
-    let restrictedPatientApi: RestrictedPatientApiClient
     beforeEach(() => {
-      restrictedPatientApi = {
-        getRestrictedPatient: jest.fn(async () => restrictedPatientMock),
-      }
-
       req.middleware.prisonerData.restrictedPatient = true
-      services.dataAccess = {
-        restrictedPatientApiClientBuilder: (_: string) => restrictedPatientApi,
-      } as DataAccess
     })
 
     it('Does not let users view a restricted patient without a POM role', async () => {
       res.locals.user.userRoles = [Role.PrisonUser]
-      await checkPrisonerInCaseload(services)(req, res, next)
+      await checkPrisonerInCaseload()(req, res, next)
       expect(req.middleware.errors).not.toBeDefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(
@@ -234,28 +218,9 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
         res.locals.user.userRoles = [Role.PrisonUser, 'POM']
       })
 
-      it('Gets restricted patient information from the API', async () => {
-        await checkPrisonerInCaseload(services)(req, res, next)
-        expect(restrictedPatientApi.getRestrictedPatient).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
-      })
-
       it('Does not let users view a patient without the supporting prison caseload', async () => {
-        await checkPrisonerInCaseload(services)(req, res, next)
-        expect(req.middleware.errors).not.toBeDefined()
-        expect(next).toHaveBeenCalledTimes(1)
-        expect(next).toHaveBeenCalledWith(
-          new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient'),
-        )
-      })
-
-      it('Does not let users view a patient without the supporting prison being active', async () => {
-        res.locals.user.caseLoads[0].caseLoadId = 'LEI'
-        restrictedPatientApi.getRestrictedPatient = jest.fn(async () => ({
-          ...restrictedPatientMock,
-          supportingPrison: { agencyId: 'LEI', active: false },
-        }))
-
-        await checkPrisonerInCaseload(services)(req, res, next)
+        req.middleware.prisonerData.supportingPrisonId = 'XYZ'
+        await checkPrisonerInCaseload()(req, res, next)
         expect(req.middleware.errors).not.toBeDefined()
         expect(next).toHaveBeenCalledTimes(1)
         expect(next).toHaveBeenCalledWith(
@@ -265,12 +230,9 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
       it('Lets users view a patient with the active supporting prison', async () => {
         res.locals.user.caseLoads[0].caseLoadId = 'LEI'
-        restrictedPatientApi.getRestrictedPatient = jest.fn(async () => ({
-          ...restrictedPatientMock,
-          supportingPrison: { agencyId: 'LEI', active: true },
-        }))
+        req.middleware.prisonerData.supportingPrisonId = 'LEI'
 
-        await checkPrisonerInCaseload(services)(req, res, next)
+        await checkPrisonerInCaseload()(req, res, next)
         expect(req.middleware.errors).not.toBeDefined()
         expect(next).toHaveBeenCalledTimes(1)
         expect(next).toHaveBeenCalledWith()

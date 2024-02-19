@@ -17,7 +17,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/csra-history',
     auditPageAccessAttempt({ services, page: Page.CsraHistory }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(services),
+    checkPrisonerInCaseload(),
     (req, res, next) => csraController.displayHistory(req, res, next),
   )
 
@@ -25,7 +25,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/csra-review',
     auditPageAccessAttempt({ services, page: Page.CsraReview }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(services),
+    checkPrisonerInCaseload(),
     (req, res, next) => csraController.displayReview(req, res, next),
   )
 

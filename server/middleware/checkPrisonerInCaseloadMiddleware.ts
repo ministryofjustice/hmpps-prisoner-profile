@@ -5,13 +5,13 @@ import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { addMiddlewareError } from './middlewareHelpers'
 import { Prisoner } from '../interfaces/prisoner'
-import { Services } from '../services'
 import { CaseLoad } from '../interfaces/caseLoad'
 
-export default function checkPrisonerInCaseload(
-  services: Services,
-  { allowGlobal = true, allowInactive = true, activeCaseloadOnly = false } = {},
-): RequestHandler {
+export default function checkPrisonerInCaseload({
+  allowGlobal = true,
+  allowInactive = true,
+  activeCaseloadOnly = false,
+} = {}): RequestHandler {
   return async (req, res, next) => {
     const prisonerData: Prisoner = req.middleware?.prisonerData
     const {
@@ -27,19 +27,11 @@ export default function checkPrisonerInCaseload(
     const globalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
     const canViewInactiveBookings = userHasRoles([Role.InactiveBookings], userRoles)
     const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
-    const pomUser = userRoles.filter(role => role.includes('POM')).length > 0
+    const pomUser = userHasRoles([Role.PomUser], userRoles)
 
     if (prisonerData.restrictedPatient) {
-      // Check for POM user here to avoid unnecessary calls to the restricted patient API
-      if (pomUser) {
-        const restrictedPatientApi = services.dataAccess.restrictedPatientApiClientBuilder(res.locals.clientToken)
-        const restrictedPatient = await restrictedPatientApi.getRestrictedPatient(prisonerData.prisonerNumber)
-
-        if (restrictedPatient && restrictedPatient.supportingPrison) {
-          const { agencyId, active } = restrictedPatient.supportingPrison
-          const canAccessRestrictedPatient = prisonerBelongsToUsersCaseLoad(agencyId, caseLoads) && active
-          if (canAccessRestrictedPatient) return next()
-        }
+      if (pomUser && prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)) {
+        return next()
       }
 
       return next(
