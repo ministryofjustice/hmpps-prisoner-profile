@@ -145,12 +145,12 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     })
   })
 
-  // TODO investigate why this fails in pipeline but passes locally
-  context.skip('Paging', () => {
+  context('Paging', () => {
     let alertsPage
 
     beforeEach(() => {
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitActiveAlertsPage()
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
