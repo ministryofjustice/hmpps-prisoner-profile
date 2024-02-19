@@ -19,71 +19,76 @@ export default function checkPrisonerInCaseload({
       caseLoads,
       userRoles,
     }: { activeCaseLoadId: string; caseLoads: CaseLoad[]; userRoles: string[] } = res.locals.user
-
+    // This function requires prisoner data - so ensure that's present before continuing
     if (!prisonerData) {
       return next(new ServerError('CheckPrisonerInCaseloadMiddleware: No PrisonerData found in middleware'))
     }
 
-    const globalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
-    const canViewInactiveBookings = userHasRoles([Role.InactiveBookings], userRoles)
+    const errors: { message: string }[] = []
+    const { restrictedPatient } = prisonerData
     const inactiveBooking = ['OUT', 'TRN'].some(prisonId => prisonId === prisonerData.prisonId)
+    const globalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
+    const inactiveBookingsUser = userHasRoles([Role.InactiveBookings], userRoles)
     const pomUser = userHasRoles([Role.PomUser], userRoles)
 
-    if (prisonerData.restrictedPatient) {
-      if (pomUser && prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)) {
-        return next()
+    // Restricted patients can only be accessed by POM users who have the supporting prison ID in their case loads
+    function authenticateRestictedPatient() {
+      if (prisonerData.restrictedPatient) {
+        if (!pomUser || !prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)) {
+          errors.push({ message: 'CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient' })
+        }
       }
-
-      return next(
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient`),
-        ),
-      )
     }
 
-    if (inactiveBooking) {
-      const inactiveAllowed = allowInactive && canViewInactiveBookings
-      const globalSearchAllowed = allowInactive && globalSearchUser
-
-      // transferring prisoners can be viewed by global search users
-      const canAccessInactiveProfile =
-        prisonerData.prisonId === 'OUT' ? inactiveAllowed : inactiveAllowed || globalSearchAllowed
-
-      if (canAccessInactiveProfile) return next()
-
-      return next(
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`),
-        ),
-      )
+    // Prisoners with a caseload of OUT can only be accessed by people who have the inactive bookings role
+    function authenticateOut() {
+      if (!allowInactive || !inactiveBookingsUser) {
+        errors.push({ message: `CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]` })
+      }
     }
 
-    if (activeCaseloadOnly && activeCaseLoadId !== prisonerData.prisonId) {
-      return next(
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload'),
-        ),
-      )
+    // Prisoners with a caseload of TRN (transferring) can be accessed by people with global search or inactive bookings
+    function authenticateTransfer() {
+      const allowedToViewTransfers = globalSearchUser || inactiveBookingsUser
+
+      if (!allowInactive || !allowedToViewTransfers) {
+        errors.push({ message: `CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]` })
+      }
     }
 
-    if (
-      !activeCaseloadOnly &&
-      !prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads) &&
-      !(allowGlobal && globalSearchUser)
-    ) {
-      return next(
-        addMiddlewareError(
-          req,
-          next,
-          new NotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads'),
-        ),
-      )
+    /*
+     * Prisoners can only be accessed if they are within your caseload
+     * OR
+     * You are a global search user and the route is able to be accessed globally
+     */
+    function authenticateActiveBooking() {
+      if (!prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads)) {
+        if (!allowGlobal || !globalSearchUser) {
+          errors.push({ message: 'CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads' })
+        }
+      }
+    }
+
+    // Some routes can only be accessed if the prisoner is within your active caseload
+    function ensureActiveCaseloadOnly() {
+      if (activeCaseloadOnly && activeCaseLoadId !== prisonerData.prisonId) {
+        errors.push({ message: 'CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload' })
+      }
+    }
+
+    ensureActiveCaseloadOnly()
+
+    if (restrictedPatient) {
+      authenticateRestictedPatient()
+    } else if (inactiveBooking) {
+      if (prisonerData.prisonId === 'OUT') authenticateOut()
+      if (prisonerData.prisonId === 'TRN') authenticateTransfer()
+    } else {
+      authenticateActiveBooking()
+    }
+
+    if (errors.length > 0) {
+      return next(addMiddlewareError(req, next, new NotFoundError(errors.map(e => e.message).join(', '))))
     }
 
     return next()
