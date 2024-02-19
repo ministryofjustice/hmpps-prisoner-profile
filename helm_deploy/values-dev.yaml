@@ -57,7 +57,7 @@ generic-service:
     PRISON_API_URL: "https://prison-api-dev.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk"
-    RESTRICTED_PATIENT_API_URL: https://restricted-patients-api-dev.hmpps.service.justice.gov.uk/
+    RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api-dev.hmpps.service.justice.gov.uk"
     # Feature flags
     AUDIT_ENABLED: "true"
     COMPONENT_API_LATEST: "true"
