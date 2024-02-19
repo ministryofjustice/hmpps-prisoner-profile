@@ -1,6 +1,7 @@
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
 
 export interface LocationDetails {
+  prisonerNumber: string
   agencyId: string
   agencyName: string
   livingUnitId: number
