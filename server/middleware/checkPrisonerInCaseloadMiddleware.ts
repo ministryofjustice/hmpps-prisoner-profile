@@ -68,10 +68,8 @@ export default function checkPrisonerInCaseload({
       return next(addMiddlewareError(req, next, new NotFoundError(message)))
     }
 
-    if (activeCaseloadOnly) {
-      if (!authenticateActiveCaseloadOnly()) {
-        return authenticationError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload')
-      }
+    if (activeCaseloadOnly && !authenticateActiveCaseloadOnly()) {
+      return authenticationError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload')
     }
 
     if (restrictedPatient) {
@@ -79,19 +77,11 @@ export default function checkPrisonerInCaseload({
         return authenticationError('CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient')
       }
     } else if (inactiveBooking) {
-      if (prisonerData.prisonId === 'OUT') {
-        if (!authenticateOut()) {
-          return authenticationError(
-            `CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`,
-          )
-        }
+      if (prisonerData.prisonId === 'OUT' && !authenticateOut()) {
+        return authenticationError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`)
       }
-      if (prisonerData.prisonId === 'TRN') {
-        if (!authenticateTransfer()) {
-          return authenticationError(
-            `CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`,
-          )
-        }
+      if (prisonerData.prisonId === 'TRN' && !authenticateTransfer()) {
+        return authenticationError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`)
       }
     } else if (!authenticateActiveBooking()) {
       return authenticationError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads')
