@@ -1,5 +1,5 @@
-import { IncentiveReviews } from '../../interfaces/IncentivesApi/incentiveReviews'
+import { IncentiveReviewSummary } from '../../interfaces/IncentivesApi/incentiveReviews'
 
 export interface IncentivesApiClient {
-  getReviews(bookingId: number): Promise<IncentiveReviews>
+  getReviewSummary(bookingId: number, withDetails?: boolean): Promise<IncentiveReviewSummary>
 }

@@ -23,6 +23,7 @@ import BeliefService from './beliefService'
 import LocationDetailsService from './locationDetailsService'
 import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
 import ProbationDocumentsService from './probationDocumentsService'
+import IncentivesService from './incentivesService'
 
 export const services = () => {
   const {
@@ -95,6 +96,7 @@ export const services = () => {
   )
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
+  const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
 
   return {
     dataAccess,
@@ -122,6 +124,7 @@ export const services = () => {
     }),
     professionalContactsService,
     beliefService,
+    incentivesService,
     auditService,
     probationDocumentsService,
   }

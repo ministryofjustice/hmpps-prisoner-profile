@@ -25,6 +25,7 @@ import BeliefHistoryController from '../controllers/beliefHistoryController'
 import locationDetailsRouter from './locationDetailsRouter'
 import { getRequest } from './routerUtils'
 import probationDocumentsRouter from './probationDocumentsRouter'
+import incentivesRouter from './incentivesRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -229,6 +230,7 @@ export default function routes(services: Services): Router {
   router.use(goalsRouter(services))
   router.use(locationDetailsRouter(services))
   router.use(probationDocumentsRouter(services))
+  router.use(incentivesRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/schedule',

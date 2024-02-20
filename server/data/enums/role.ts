@@ -26,4 +26,5 @@ export enum Role {
   ReleaseDatesCalculator = 'ROLE_RELEASE_DATES_CALCULATOR',
   ActivityHub = 'ROLE_ACTIVITY_HUB',
   EditEducationWorkPlan = 'ROLE_EDUCATION_WORK_PLAN_EDITOR',
+  MaintainIEP = 'ROLE_MAINTAIN_IEP',
 }

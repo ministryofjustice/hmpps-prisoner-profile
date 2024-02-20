@@ -30,7 +30,7 @@ Cypress.Commands.add(
     cy.task('stubAccountBalances', bookingId)
     cy.task('stubAdjudications', bookingId)
     cy.task('stubGetCaseNoteCount', bookingId)
-    cy.task('stubGetReviews', bookingId)
+    cy.task('stubGetReviews', { bookingId, withDetails: false })
     cy.task('stubVisitSummary', bookingId)
     cy.task('stubVisitBalances', prisonerNumber)
     cy.task('stubAssessments', bookingId)

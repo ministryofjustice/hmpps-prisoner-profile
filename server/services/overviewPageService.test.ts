@@ -87,15 +87,15 @@ describe('OverviewPageService', () => {
   }
 
   const incentivesApiClient: IncentivesApiClient = {
-    getReviews: jest.fn(async () => incentiveReviewsMock),
+    getReviewSummary: jest.fn(async () => incentiveReviewsMock),
   }
 
   const incentivesApiClientReturnsNull: IncentivesApiClient = {
-    getReviews: jest.fn(async () => null),
+    getReviewSummary: jest.fn(async () => null),
   }
 
   const incentivesApiClientThrowsError: IncentivesApiClient = {
-    getReviews: jest.fn(async () => {
+    getReviewSummary: jest.fn(async () => {
       throw new Error()
     }),
   }
@@ -354,7 +354,7 @@ describe('OverviewPageService', () => {
         1,
         inmateDetailMock,
       )
-      expect(incentivesApiClient.getReviews).toHaveBeenCalledWith(bookingId)
+      expect(incentivesApiClient.getReviewSummary).toHaveBeenCalledWith(bookingId)
     })
 
     it('should map api results into page data', async () => {

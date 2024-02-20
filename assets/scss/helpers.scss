@@ -51,6 +51,10 @@
   background-color:  govuk-colour("light-grey");
 }
 
+.hmpps-grey-block {
+  background-color:  govuk-colour("light-grey");
+}
+
 .hmpps-dark-grey-font {
   color: govuk-colour("dark-grey")
 }
@@ -140,6 +144,10 @@
       flex: 1 1 0;
       padding-right: govuk-spacing(3);
 
+      &--button-container {
+        flex: 0 0 auto;
+      }
+
       &--tenth {
         flex-basis: 10%;
       }
@@ -164,3 +172,53 @@
   }
 }
 @include hmpps-width-x;
+
+.horizontal-form {
+  * {
+    width: 100%;
+  }
+
+  @include govuk-media-query($from: desktop) {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-end;
+
+    * {
+      width: auto;
+      margin-bottom: 0;
+    }
+
+    > div {
+      margin-right: govuk-spacing(3);
+    }
+
+    label {
+      margin-bottom: govuk-spacing(1);
+    }
+
+    .govuk-button-group {
+      margin-bottom: 2px;
+
+      .govuk-button {
+        align-self: flex-end;
+        margin-bottom: 0;
+      }
+
+      a {
+        align-self: flex-end;
+        margin-bottom: 0;
+        line-height: 2;
+      }
+    }
+  }
+
+  .hmpps-datepicker {
+    flex-basis: min-content;
+  }
+
+  .govuk-error-message {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+}

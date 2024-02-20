@@ -395,7 +395,7 @@ export default class OverviewPageService {
     let incentiveSummaryData: MiniSummaryData
 
     try {
-      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+      const incentiveReviews = await incentivesApiClient.getReviewSummary(bookingId)
 
       if (incentiveReviews === null) {
         // Fallback if incentives API returns 404

@@ -18,6 +18,7 @@ export enum Page {
   CsraReview = 'CSRA_REVIEW',
   VirtualCampusGoals = 'VC2_GOALS',
   InactiveAlerts = 'INACTIVE_ALERTS',
+  IncentiveLevelDetails = 'INCENTIVE_LEVEL_DETAILS',
   MoneyDamageObligations = 'MONEY_DAMAGE_OBLIGATIONS',
   MoneyPrivateCash = 'MONEY_PRIVATE_CASH',
   MoneySavings = 'MONEY_SAVINGS',
@@ -66,6 +67,7 @@ export enum PutAction {
 export enum SearchAction {
   Alerts = 'ALERTS',
   CaseNotes = 'CASE_NOTES',
+  IncentiveLevels = 'INCENTIVE_LEVELS',
 }
 
 // eslint-disable-next-line no-shadow

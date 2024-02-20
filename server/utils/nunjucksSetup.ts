@@ -11,6 +11,7 @@ import {
   formatScheduleItem,
   initialiseName,
   neurodiversityEnabled,
+  objectToSelectOptions,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
   prisonerBelongsToUsersCaseLoad,
@@ -85,7 +86,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('pluralise', pluralise)
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('findError', findError)
-  njkEnv.addFilter('addDefaultSelectedValue', (items, text) => {
+  njkEnv.addFilter('addDefaultSelectedValue', (items, text, hidden) => {
     if (!items) return null
 
     return [
@@ -93,9 +94,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
         text,
         value: '',
         selected: true,
-        attributes: {
-          hidden: 'hidden',
-        },
+        attributes: hidden !== false && { hidden: 'hidden' },
       },
       ...items,
     ]
@@ -141,4 +140,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatName', formatName)
   njkEnv.addFilter('toCsraAssessmentSummaryList', mapCsraReviewToSummaryList)
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
+  njkEnv.addFilter('objectToSelectOptions', objectToSelectOptions)
 }
