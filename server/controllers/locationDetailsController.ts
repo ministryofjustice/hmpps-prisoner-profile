@@ -40,10 +40,7 @@ export default class LocationDetailsController {
     const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
 
     const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
-    const canViewMoveToReceptionButton =
-      config.featureToggles.moveToReceptionLinkEnabled &&
-      canViewCellMoveButton &&
-      currentLocation?.location !== 'Reception'
+    const canViewMoveToReceptionButton = canViewCellMoveButton && currentLocation?.location !== 'Reception'
     const receptionIsFull =
       canViewMoveToReceptionButton && (await this.locationDetailsService.isReceptionFull(clientToken, prisonId))
     const occupants: OffenderBooking[] = currentLocation
