@@ -141,4 +141,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCsraAssessmentSummaryList', mapCsraReviewToSummaryList)
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
   njkEnv.addFilter('objectToSelectOptions', objectToSelectOptions)
+  njkEnv.addFilter('formatMultilineText', njkEnv.getFilter('nl2br')) // Use the inbuilt `nl2br` filter, but reference it as `formatMultilineText` in the nunjucks templates because it's a better name
 }
