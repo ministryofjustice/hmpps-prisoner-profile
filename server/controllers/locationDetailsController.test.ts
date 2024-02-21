@@ -118,7 +118,7 @@ describe('Prisoner Location Details', () => {
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           canViewMoveToReceptionButton: true,
-          moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
+          moveToReceptionLink: `${config.serviceUrls.changeSomeonesCell}${profileUrl}/reception-move/consider-risks-reception`,
         })
       })
 
@@ -130,7 +130,7 @@ describe('Prisoner Location Details', () => {
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           canViewMoveToReceptionButton: true,
-          moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/reception-full`,
+          moveToReceptionLink: `${config.serviceUrls.changeSomeonesCell}${profileUrl}/reception-move/reception-full`,
         })
       })
 
@@ -255,8 +255,8 @@ describe('Prisoner Location Details', () => {
     locationDetailsGroupedByAgency: locationDetailsGroupedByAgency.map(
       locationDetailsConverter.convertGroupedLocationDetails,
     ),
-    changeCellLink: `${config.apis.dpsHomePageUrl}${profileUrl}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
-    moveToReceptionLink: `${config.apis.dpsHomePageUrl}${profileUrl}/reception-move/consider-risks-reception`,
+    changeCellLink: `${config.serviceUrls.changeSomeonesCell}${profileUrl}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
+    moveToReceptionLink: `${config.serviceUrls.changeSomeonesCell}${profileUrl}/reception-move/consider-risks-reception`,
     occupants: [{ name: 'Mate 1', profileUrl: `/prisoner/${PrisonerMockDataB.prisonerNumber}` }],
     prisonId: 'MDI',
     isTransfer: false,
