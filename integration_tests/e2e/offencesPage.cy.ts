@@ -181,6 +181,18 @@ context('Offences Page Sentenced', () => {
       offencesPage.releaseDatesSummaryHeader().should('exist')
       offencesPage.releaseDatesSummaryHeader().contains('Release dates')
     })
+
+    it('Confirmed release date key should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.confirmedReleaseDateKey().should('exist')
+      offencesPage.confirmedReleaseDateKey().contains('Confirmed release date')
+    })
+    it('Confirmed release date value should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.confirmedReleaseDateValue().should('exist')
+      offencesPage.confirmedReleaseDateValue().contains('29 January 2076')
+    })
+
     it('Conditional release key should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
       offencesPage.conditionalReleaseKey().should('exist')

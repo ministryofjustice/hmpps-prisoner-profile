@@ -285,6 +285,7 @@ describe('OffencesPageService', () => {
       expect(res).toEqual({
         actualParoleDate: '2016-01-01',
         automaticReleaseDate: '2016-01-02',
+        confirmedReleaseDate: '2016-01-06',
         conditionalRelease: '2016-01-04',
         detentionTrainingOrderPostRecallDate: '2016-01-07',
         earlyRemovalSchemeEligibilityDate: '2016-01-10',
