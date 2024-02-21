@@ -481,9 +481,16 @@ context('Overview Page', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth({
-        roles: [Role.PrisonUser],
+        roles: [Role.PrisonUser, Role.PomUser],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, restrictedPatient: true })
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        restrictedPatient: true,
+        prisonerDataOverrides: {
+          supportingPrisonId: 'MDI',
+        },
+      })
       visitOverviewPage()
     })
 
