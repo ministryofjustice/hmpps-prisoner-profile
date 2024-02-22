@@ -23,7 +23,11 @@ export default function probationDocumentsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/probation-documents',
     auditPageAccessAttempt({ services, page: Page.ProbationDocuments }),
     getPrisonerData(services, { minimal: true }),
-    guardMiddleware(GuardOperator.AND, checkPrisonerInCaseload(), checkHasSomeRoles([Role.ViewProbationDocuments])),
+    guardMiddleware(
+      GuardOperator.AND,
+      checkPrisonerInCaseload(),
+      checkHasSomeRoles([Role.PomUser, Role.ViewProbationDocuments]),
+    ),
     (req, res, next) => probationDocumentsController.displayDocuments(req, res),
   )
 
