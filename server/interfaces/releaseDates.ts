@@ -1,6 +1,7 @@
 export interface ReleaseDates {
   actualParoleDate: string
   automaticReleaseDate: string
+  confirmedReleaseDate?: string
   conditionalRelease: string
   detentionTrainingOrderPostRecallDate: string
   earlyRemovalSchemeEligibilityDate: string
