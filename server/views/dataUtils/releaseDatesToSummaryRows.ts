@@ -10,6 +10,7 @@ const labels: Record<keyof ReleaseDates, string> = {
   actualParoleDate: 'Approved parole date (APD)',
   automaticReleaseDate: 'Automatic release date (ARD)',
   automaticReleaseDateNonDto: 'Automatic release date (ARD)',
+  confirmedReleaseDate: 'Confirmed release date',
   conditionalRelease: 'Conditional release date (CRD)',
   conditionalReleaseNonDto: 'Conditional release date (CRD)',
   detentionTrainingOrderPostRecallDate: 'Detention training order post recall release date (DPRRD)',
@@ -42,5 +43,9 @@ export default (releaseDates: ReleaseDates): SummaryRow[] => {
       key: { text: labels[dateName] },
       value: { text: formatDate(releaseDates[dateName], 'long') },
     }))
-    .sort((a, b) => (a.key.text < b.key.text ? -1 : 1))
+    .sort((a, b) => {
+      if (a.key.text === 'Confirmed release date') return -1
+      if (b.key.text === 'Confirmed release date') return 1
+      return a.key.text < b.key.text ? -1 : 1
+    })
 }

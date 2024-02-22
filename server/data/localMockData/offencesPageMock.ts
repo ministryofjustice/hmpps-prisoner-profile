@@ -465,6 +465,7 @@ export const OffencesPageMockSentences = {
     },
   ],
   releaseDates: {
+    confirmedReleaseDate: '2076-01-29',
     conditionalRelease: '2076-01-29',
     paroleEligibilityCalculatedDate: '2021-12-12',
     postRecallDate: '2021-12-12',
@@ -990,6 +991,7 @@ export const GetCourtCaseData = [
 ]
 
 export const GetReleaseDates: Partial<ReleaseDates> = {
+  confirmedReleaseDate: '2076-01-29',
   conditionalRelease: '2076-01-29',
   paroleEligibilityCalculatedDate: '2021-12-12',
   postRecallDate: '2021-12-12',
