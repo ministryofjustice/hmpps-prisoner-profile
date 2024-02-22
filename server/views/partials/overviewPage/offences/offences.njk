@@ -16,8 +16,14 @@
             <p data-qa="overview-next-court-appearance" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Next court appearance</p>
             <p> {{ offencesOverview.nextCourtAppearance.dateTime | formatDate }}</p>
         {% endif %}
-
-        {% if offencesOverview.fullStatus.legalStatus !== "REMAND" and offencesOverview.conditionalReleaseDate %}
+        {% if offencesOverview.confirmedReleaseDate %}
+            <hr class="govuk-section-break govuk-section-break--visible" />
+            <p data-qa="overview-confirmed-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Confirmed release date</p>
+            <p data-qa="overview-confirmed-release"> {{ offencesOverview.confirmedReleaseDate | formatDate}}</p>
+            {{ govukInsetText({
+                text: "This person is currently due to be released from prison on this date."
+            }) }}
+        {% elseif offencesOverview.fullStatus.legalStatus !== "REMAND" and offencesOverview.conditionalReleaseDate %}
             <hr class="govuk-section-break govuk-section-break--visible" />
             <p data-qa="overview-conditional-release-label" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Conditional release date (CRD)</p>
             <p data-qa="overview-conditional-release"> {{ offencesOverview.conditionalReleaseDate | formatDate}}</p>

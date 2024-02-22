@@ -518,12 +518,16 @@ context('Overview Page', () => {
       cy.setupUserAuth({
         roles: ['ROLE_GLOBAL_SEARCH'],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      visitOverviewPage()
     })
 
     context('Main offence overview', () => {
-      it('should display main offence and conditional release date and hide the next court appearance', () => {
+      it('should display main offence and confirmed release date if there is one and hide the next court appearance', () => {
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          prisonerDataOverrides: { confirmedReleaseDate: '2024-02-20' },
+        })
+        visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.offencesHeader().should('exist')
         overviewPage.offenceCardContent().should('exist')
@@ -531,6 +535,25 @@ context('Overview Page', () => {
         overviewPage.imprisonmentStatusLabel().should('exist')
         overviewPage.imprisonmentStatus().should('exist')
         overviewPage.viewAllOffencesLink().should('exist')
+        overviewPage.overviewConfirmedReleaseLabel().should('exist')
+        overviewPage.overviewConfirmedRelease().should('exist')
+        overviewPage.overviewConditionalReleaseLabel().should('not.exist')
+        overviewPage.overviewConditionalRelease().should('not.exist')
+        overviewPage.nextAppearanceDate().should('not.exist')
+      })
+
+      it('should display main offence and conditional release date if there is no confirmed release date and hide the next court appearance', () => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.offencesHeader().should('exist')
+        overviewPage.offenceCardContent().should('exist')
+        overviewPage.mainOffence().should('exist')
+        overviewPage.imprisonmentStatusLabel().should('exist')
+        overviewPage.imprisonmentStatus().should('exist')
+        overviewPage.viewAllOffencesLink().should('exist')
+        overviewPage.overviewConfirmedReleaseLabel().should('not.exist')
+        overviewPage.overviewConfirmedRelease().should('not.exist')
         overviewPage.overviewConditionalReleaseLabel().should('exist')
         overviewPage.overviewConditionalRelease().should('exist')
         overviewPage.nextAppearanceDate().should('not.exist')

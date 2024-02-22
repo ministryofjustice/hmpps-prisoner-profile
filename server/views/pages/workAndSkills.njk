@@ -7,12 +7,12 @@
 ] %}
 {% block body %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
       <h1>Work and skills</h1>
     </div>
   </div>
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-quarter app-sidebar">
+    <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
       <ul class="govuk-list hmpps-sidebar">
         <li><a class="govuk-link" href="#functional-skills-level">Functional skills level</a></li>
         <li><a class="govuk-link" href="#courses-and-qualifications">Courses and qualifications</a></li>
@@ -21,7 +21,7 @@
         <li><a class="govuk-link" href="#employability-skills">Employability skills</a></li>
       </ul>
     </div>
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
       <div class="govuk-grid-row" data-qa="courses-and-qualifications">
         <div class="govuk-grid-column-full">
           {% include "../partials/workAndSkillsPage/functionalSkillsLevel.njk" %}

@@ -38,6 +38,7 @@ generic-service:
     USE_OF_FORCE_UI_URL: "https://use-of-force.service.justice.gov.uk"
     WELCOME_PEOPLE_INTO_PRISON_UI_URL: "https://welcome.prison.service.justice.gov.uk"
     LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress.hmpps.service.justice.gov.uk"
+    CHANGE_SOMEONES_CELL_UI_URL: "https://digital.prison.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"
