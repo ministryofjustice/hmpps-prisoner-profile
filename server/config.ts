@@ -96,7 +96,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_SEARCH_API_TIMEOUT_DEADLINE', 20000))),
     },
-    dpsHomePageUrl: get('DPS_HOME_PAGE_URL', 'http://localhost:3001', requiredInProduction),
     allocationManager: {
       url: get('ALLOCATION_MANAGER_ENDPOINT_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
@@ -218,6 +217,14 @@ export default {
       },
       agent: new AgentConfig(),
     },
+    restrictedPatientApi: {
+      url: get('RESTRICTED_PATIENT_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('RESTRICTED_PATIENT_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('RESTRICTED_PATIENT_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -234,6 +241,7 @@ export default {
     nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
     adjudications: get('ADJUDICATIONS_UI_URL', '', requiredInProduction),
     learningAndWorkProgress: get('LEARNING_AND_WORK_PROGRESS_UI_URL', 'http://localhost:3001', requiredInProduction),
+    changeSomeonesCell: get('CHANGE_SOMEONES_CELL_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -295,6 +303,5 @@ export default {
     complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    moveToReceptionLinkEnabled: toBoolean(get('MOVE_TO_RECEPTION_LINK_ENABLED', 'true')),
   },
 }

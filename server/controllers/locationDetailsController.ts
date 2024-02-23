@@ -40,10 +40,7 @@ export default class LocationDetailsController {
     const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
 
     const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
-    const canViewMoveToReceptionButton =
-      config.featureToggles.moveToReceptionLinkEnabled &&
-      canViewCellMoveButton &&
-      currentLocation?.location !== 'Reception'
+    const canViewMoveToReceptionButton = canViewCellMoveButton && currentLocation?.location !== 'Reception'
     const receptionIsFull =
       canViewMoveToReceptionButton && (await this.locationDetailsService.isReceptionFull(clientToken, prisonId))
     const occupants: OffenderBooking[] = currentLocation
@@ -81,10 +78,10 @@ export default class LocationDetailsController {
       prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
       profileUrl,
       breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
-      changeCellLink: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
+      changeCellLink: `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
       moveToReceptionLink: receptionIsFull
-        ? `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/reception-full`
-        : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception`,
+        ? `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/reception-full`
+        : `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception`,
       prisonerNumber,
       isTransfer,
       isReleased,

@@ -419,6 +419,7 @@ export default class OffencesPageService {
     const sentenceDetails = releaseDates.sentenceDetail
     const dates = {
       actualParoleDate: sentenceDetails.actualParoleDate,
+      confirmedReleaseDate: sentenceDetails.confirmedReleaseDate,
       automaticReleaseDate: sentenceDetails.automaticReleaseOverrideDate || sentenceDetails.automaticReleaseDate,
       conditionalRelease: sentenceDetails.conditionalReleaseOverrideDate || sentenceDetails.conditionalReleaseDate,
       detentionTrainingOrderPostRecallDate:

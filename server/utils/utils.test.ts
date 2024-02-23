@@ -503,13 +503,19 @@ describe('utils', () => {
     })
   })
 
-  describe.skip('neuroDiversityEnabledPrisons', () => {
+  describe('neuroDiversityEnabledPrisons', () => {
+    beforeAll(() => {
+      config.featureToggles.neurodiversityEnabledPrisons = ['NHI']
+    })
+
+    afterAll(() => {
+      config.featureToggles.neurodiversityEnabledPrisons = []
+    })
+
     it('Should return true', () => {
       expect(neurodiversityEnabled('NHI')).toEqual(true)
     })
-  })
 
-  describe('neuroDiversityDisabledPrisons', () => {
     it('Should return false', () => {
       expect(neurodiversityEnabled('MDI')).toEqual(false)
     })
