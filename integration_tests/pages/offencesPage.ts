@@ -24,6 +24,10 @@ export default class OffencesPage extends Page {
 
   sectionSumaryOffences = (): PageElement => cy.get('#accordion-with-summary-sections-content-1 > :nth-child(1)')
 
+  sectionSummarySentencedNoToggle = (): PageElement => cy.get('.govuk-accordion > :nth-child(7)')
+
+  sectionSummaryUnsentencedNoToggle = (): PageElement => cy.get('.govuk-accordion > :nth-child(4)')
+
   offencesChildOne = (): PageElement =>
     cy.get(':nth-child(1) > .govuk-grid-column-full > .govuk-!-static-margin-bottom-5 > .govuk-!-font-weight-bold')
 

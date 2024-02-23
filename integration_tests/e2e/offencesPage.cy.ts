@@ -141,6 +141,12 @@ context('Offences Page Sentenced', () => {
         offencesPage.countFiveCard().contains('Licence')
         offencesPage.countFiveCard().contains('5 years')
       })
+      it('Should not display accordion toggle if no sentences/offences/terms', () => {
+        const offencesPage = Page.verifyOnPage(OffencesPage)
+        offencesPage.sectionSummarySentencedNoToggle().should('exist')
+        offencesPage.sectionSummarySentencedNoToggle().should('not.have.class', 'govuk-accordion__section')
+        offencesPage.sectionSummarySentencedNoToggle().find('.govuk-accordion__section-toggle').should('not.exist')
+      })
     })
   })
   context('Unsentenced Counts', () => {
@@ -164,6 +170,13 @@ context('Offences Page Sentenced', () => {
       offencesPage.sectionSumaryOffences().contains('Committed on 13 March 2013')
       offencesPage.sectionSumaryOffences().contains('Status')
       offencesPage.sectionSumaryOffences().contains('Recall to Prison')
+    })
+
+    it('Should not display accordion toggle if no sentences/offences/terms', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.sectionSummaryUnsentencedNoToggle().should('exist')
+      offencesPage.sectionSummaryUnsentencedNoToggle().should('not.have.class', 'govuk-accordion__section')
+      offencesPage.sectionSummaryUnsentencedNoToggle().find('.govuk-accordion__section-toggle').should('not.exist')
     })
   })
 

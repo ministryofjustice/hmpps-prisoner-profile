@@ -1,7 +1,11 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro courtCaseContent(courtCase,index) %}
 
-<div class="govuk-accordion__section ">
+{% if (courtCase.sentences.length > 0) or (courtCase.sentenced == false and courtCase.courtDateResults.length > 0) %}
+    {% set accordionClass = 'govuk-accordion__section' %}
+{% endif %}
+
+<div class="{{ accordionClass }}">
     <div class="govuk-accordion__section-header">
       <h3 class="govuk-accordion__section-heading">
         <div class="govuk-accordion__section-button govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-5" id="accordion-with-summary-sections-heading-{{index}}">
@@ -48,6 +52,7 @@
         </div>
       </div>
     </div>
+    {% if (courtCase.sentences.length > 0) or (courtCase.sentenced == false and courtCase.courtDateResults.length > 0) %}
     <div id="accordion-with-summary-sections-content-{{index}}" class="govuk-accordion__section-content govuk-!-static-padding-bottom-0" aria-labelledby="accordion-with-summary-sections-heading-{{index}}">
     {% if courtCase.sentences.length > 0 %}
         {% for sentence in courtCase.sentences %}
@@ -170,5 +175,6 @@
     {% endif %}
 
     </div>
+    {% endif %}
 </div>
 {% endmacro %}
