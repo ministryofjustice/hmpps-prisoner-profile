@@ -103,7 +103,9 @@ describe('OffencesPageService', () => {
         })
         sentenceSummary.latestPrisonTerm.courtSentences = courtSentences
         const res = offencesPageService.getSentencedCaseIds(OffenceHistoryMock, sentenceSummary)
-        const expectedIds = [1434365, 1507172, 1563148, 1563198, 1563201, 462833, 666929, 669502, 955236, 123321]
+        const expectedIds = [
+          1434365, 1507172, 1563148, 1563198, 1563201, 462833, 666929, 669502, 955236, 123321, 1563202,
+        ]
         expect(res.length).toEqual(expectedIds.length)
         expect(res.sort()).toEqual(expectedIds.sort())
       })

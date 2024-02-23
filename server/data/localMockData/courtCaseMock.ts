@@ -211,6 +211,60 @@ export const CourtCasesUnsentencedMockA: CourtCase[] = [
       },
     ],
   },
+  {
+    id: 1564685,
+    caseSeq: 6,
+    beginDate: '2015-07-30',
+    agency: {
+      agencyId: 'SHEFCC',
+      description: 'Sheffield Crown Court',
+      longDescription: 'Sheffield Crown Court',
+      agencyType: 'CRT',
+      active: true,
+      courtType: 'CC',
+    },
+    caseType: 'Adult',
+    caseInfoNumber: 'T20150854',
+    caseStatus: 'ACTIVE',
+    courtHearings: [
+      {
+        id: 512784871,
+        dateTime: '2015-07-30T10:00:00',
+        location: {
+          agencyId: 'BRNSMC',
+          description: 'Barnsley Magistrates Court',
+          longDescription: 'Barnsley Magistrates Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'MC',
+        },
+      },
+      {
+        id: 512784872,
+        dateTime: '2015-08-13T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+      {
+        id: 512784873,
+        dateTime: '2015-09-10T10:00:00',
+        location: {
+          agencyId: 'SHEFCC',
+          description: 'Sheffield Crown Court',
+          longDescription: 'Sheffield Crown Court',
+          agencyType: 'CRT',
+          active: true,
+          courtType: 'CC',
+        },
+      },
+    ],
+  },
 ]
 
 export const CourtCasesUnsentencedMockB: CourtCase[] = [
