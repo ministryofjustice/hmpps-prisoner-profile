@@ -157,6 +157,10 @@ export default class OverviewPage extends Page {
   viewAllOffencesLink = (): PageElement => cy.get('[data-qa="overview-offences-view-all"]')
 
   // Not on remand
+  overviewConfirmedReleaseLabel = (): PageElement => cy.get('[data-qa="overview-confirmed-release-label"]')
+
+  overviewConfirmedRelease = (): PageElement => cy.get('[data-qa="overview-confirmed-release"]')
+
   overviewConditionalReleaseLabel = (): PageElement => cy.get('[data-qa="overview-conditional-release-label"]')
 
   overviewConditionalRelease = (): PageElement => cy.get('[data-qa="overview-conditional-release"]')

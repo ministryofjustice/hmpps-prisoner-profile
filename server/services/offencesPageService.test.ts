@@ -103,7 +103,9 @@ describe('OffencesPageService', () => {
         })
         sentenceSummary.latestPrisonTerm.courtSentences = courtSentences
         const res = offencesPageService.getSentencedCaseIds(OffenceHistoryMock, sentenceSummary)
-        const expectedIds = [1434365, 1507172, 1563148, 1563198, 1563201, 462833, 666929, 669502, 955236, 123321]
+        const expectedIds = [
+          1434365, 1507172, 1563148, 1563198, 1563201, 462833, 666929, 669502, 955236, 123321, 1563202,
+        ]
         expect(res.length).toEqual(expectedIds.length)
         expect(res.sort()).toEqual(expectedIds.sort())
       })
@@ -285,6 +287,7 @@ describe('OffencesPageService', () => {
       expect(res).toEqual({
         actualParoleDate: '2016-01-01',
         automaticReleaseDate: '2016-01-02',
+        confirmedReleaseDate: '2016-01-06',
         conditionalRelease: '2016-01-04',
         detentionTrainingOrderPostRecallDate: '2016-01-07',
         earlyRemovalSchemeEligibilityDate: '2016-01-10',

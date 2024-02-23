@@ -141,6 +141,12 @@ context('Offences Page Sentenced', () => {
         offencesPage.countFiveCard().contains('Licence')
         offencesPage.countFiveCard().contains('5 years')
       })
+      it('Should not display accordion toggle if no sentences/offences/terms', () => {
+        const offencesPage = Page.verifyOnPage(OffencesPage)
+        offencesPage.sectionSummarySentencedNoToggle().should('exist')
+        offencesPage.sectionSummarySentencedNoToggle().should('not.have.class', 'govuk-accordion__section')
+        offencesPage.sectionSummarySentencedNoToggle().find('.govuk-accordion__section-toggle').should('not.exist')
+      })
     })
   })
   context('Unsentenced Counts', () => {
@@ -165,6 +171,13 @@ context('Offences Page Sentenced', () => {
       offencesPage.sectionSumaryOffences().contains('Status')
       offencesPage.sectionSumaryOffences().contains('Recall to Prison')
     })
+
+    it('Should not display accordion toggle if no sentences/offences/terms', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.sectionSummaryUnsentencedNoToggle().should('exist')
+      offencesPage.sectionSummaryUnsentencedNoToggle().should('not.have.class', 'govuk-accordion__section')
+      offencesPage.sectionSummaryUnsentencedNoToggle().find('.govuk-accordion__section-toggle').should('not.exist')
+    })
   })
 
   context('Release dates', () => {
@@ -181,6 +194,18 @@ context('Offences Page Sentenced', () => {
       offencesPage.releaseDatesSummaryHeader().should('exist')
       offencesPage.releaseDatesSummaryHeader().contains('Release dates')
     })
+
+    it('Confirmed release date key should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.confirmedReleaseDateKey().should('exist')
+      offencesPage.confirmedReleaseDateKey().contains('Confirmed release date')
+    })
+    it('Confirmed release date value should display', () => {
+      const offencesPage = Page.verifyOnPage(OffencesPage)
+      offencesPage.confirmedReleaseDateValue().should('exist')
+      offencesPage.confirmedReleaseDateValue().contains('29 January 2076')
+    })
+
     it('Conditional release key should display', () => {
       const offencesPage = Page.verifyOnPage(OffencesPage)
       offencesPage.conditionalReleaseKey().should('exist')
