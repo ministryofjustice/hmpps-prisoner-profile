@@ -78,10 +78,10 @@ export default class LocationDetailsController {
       prisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
       profileUrl,
       breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }),
-      changeCellLink: `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnUrl=${profileUrl}`,
+      changeCellLink: `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/cell-move/search-for-cell?returnToService=prisonerProfile`,
       moveToReceptionLink: receptionIsFull
-        ? `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/reception-full`
-        : `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception`,
+        ? `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/reception-full?returnToService=prisonerProfile`
+        : `${config.serviceUrls.changeSomeonesCell}/prisoner/${prisonerNumber}/reception-move/consider-risks-reception?returnToService=prisonerProfile`,
       prisonerNumber,
       isTransfer,
       isReleased,
