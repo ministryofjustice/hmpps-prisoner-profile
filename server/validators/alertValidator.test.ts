@@ -88,7 +88,7 @@ describe('Validation middleware', () => {
     ])
   })
 
-  fit.each([
+  it.each([
     ['on', '01/01/2000'],
     ['before', '01/01/1999'],
   ])('should fail validation with expiry date %s the start date', async (_, expiryDate) => {
