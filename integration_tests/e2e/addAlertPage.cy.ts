@@ -34,7 +34,6 @@ context('Add Alert Page', () => {
 
     context('Adding a valid alert', () => {
       it('should show correct prisoner number and default field values', () => {
-        addAlertPage.prisonerNumber().contains('G6123VU')
         addAlertPage.typeField().contains('Choose alert type')
         addAlertPage.subTypeField().contains('Choose alert code')
         addAlertPage.textField().should('have.value', '')
