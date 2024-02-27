@@ -5,7 +5,7 @@ import { isRealDate, parseDate } from '../utils/dateHelpers'
 
 export const AlertValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
-  const { existingAlerts, alertType, alertCode, alertDate, comment } = body
+  const { existingAlerts, alertType, alertCode, alertDate, comment, expiryDate } = body
 
   if (!alertType) {
     errors.push({
@@ -67,6 +67,13 @@ export const AlertValidator: Validator = (body: Record<string, string>) => {
     errors.push({
       text: 'Enter a date that is not more than 7 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
       href: '#alertDate',
+    })
+  }
+
+  if (alertDate && expiryDate && parseDate(expiryDate) <= parseDate(alertDate)) {
+    errors.push({
+      text: "'Alert end date' must be later than the start date",
+      href: '#expiryDate',
     })
   }
 

@@ -29,7 +29,7 @@ context('Add Alert Page', () => {
       alertsPage = visitAlertsPage()
       alertsPage.addAlertButton().click()
       cy.location('pathname').should('eq', '/prisoner/G6123VU/add-alert')
-      addAlertPage = new AddAlertPage('Create an alert for John Saunders')
+      addAlertPage = new AddAlertPage('Add an alert')
     })
 
     context('Adding a valid alert', () => {

@@ -80,8 +80,9 @@ export default class AlertsController {
     const types = await this.referenceDataService.getAlertTypes(res.locals.clientToken)
 
     // Get data from middleware
-    const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId } = req.middleware.prisonerData
-    const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+    const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId, cellLocation } =
+      req.middleware.prisonerData
+    const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
     const existingAlerts = alerts
       .filter((alert: Alert) => !alert.expired)
@@ -119,26 +120,30 @@ export default class AlertsController {
     return res.render('pages/alerts/addAlert', {
       today: formatDate(now.toISOString(), 'short'),
       todayMinus8: formatDate(subDays(now, 7).toISOString(), 'short'),
-      prisonerDisplayName,
-      prisonerNumber,
       formValues,
       typeCodeMap,
       alertTypes,
       alertCodes,
       refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
       errors,
+      miniBannerData: {
+        prisonerName: prisonerBannerName,
+        prisonerNumber,
+        cellLocation: formatLocation(cellLocation),
+      },
     })
   }
 
   public post(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const { bookingId, existingAlerts, alertType, alertCode, comment, alertDate } = req.body
+      const { bookingId, existingAlerts, alertType, alertCode, comment, alertDate, expiryDate } = req.body
       const alert = {
         alertType,
         alertCode,
         comment,
         alertDate,
+        expiryDate,
       }
       const errors = req.errors || []
       if (!errors.length) {
