@@ -324,10 +324,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
-    return (await this.restClient.post({
+    return this.restClient.post<Alert>({
       path: `/api/bookings/${bookingId}/alert`,
       data: alert,
-    })) as Alert
+    })
   }
 
   async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {

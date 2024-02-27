@@ -3,6 +3,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% extends "../index.njk" %}
 {% set pageTitle = 'Create an alert' %}
 {% block body %}
@@ -17,13 +18,18 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 id="addCaseNote">Create an alert for {{ prisonerDisplayName }}</h1>
+        <h1 id="addCaseNote">Add an alert</h1>
     </div>
 </div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ miniBanner(miniBannerData) }}
+    </div>
+</div>
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <p class="govuk-body govuk-!-margin-bottom-6" data-qa="prison-number"><span class="govuk-!-font-weight-bold">Prison number:</span> {{ prisonerNumber }}</p>
-
         <form method="post" novalidate="novalidate" autocomplete="off">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
@@ -32,7 +38,8 @@
                 id: "alertType",
                 name: "alertType",
                 label: {
-                    text: "Type of alert"
+                    text: "Type of alert",
+                    classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('alertType'),
                 items: alertTypes | addDefaultSelectedValue('Choose alert type') | setSelected(formValues.alertType)
@@ -42,7 +49,8 @@
                 id: "alertCode",
                 name: "alertCode",
                 label: {
-                    text: "Alert"
+                    text: "Alert",
+                    classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('alertCode'),
                 items: alertCodes | addDefaultSelectedValue('Choose alert code') | setSelected(formValues.alertCode)
@@ -65,13 +73,27 @@
                 id: "alertDate",
                 name: "alertDate",
                 label: {
-                    text: "Alert start date"
+                    text: "Alert start date",
+                    classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('alertDate'),
                 classes: 'hmpps-datepicker--fixed-width',
                 value: formValues.alertDate,
                 minDate: todayMinus8,
                 maxDate: today
+            }) }}
+
+            {{ hmppsDatepicker({
+                id: "expiryDate",
+                name: "expiryDate",
+                label: {
+                    text: "Alert end date (optional)",
+                    classes: "govuk-!-font-weight-bold"
+                },
+                errorMessage: errors | findError('expiryDate'),
+                classes: 'hmpps-datepicker--fixed-width',
+                value: formValues.expiryDate,
+                minDate: todayMinus8
             }) }}
 
             <div class="govuk-button-group govuk-!-display-none-print">

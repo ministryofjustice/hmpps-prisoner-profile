@@ -147,7 +147,11 @@ export default class AlertsPageService {
   public async createAlert(token: string, bookingId: number, alert: AlertForm) {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    return prisonApiClient.createAlert(bookingId, { ...alert, alertDate: formatDateISO(parseDate(alert.alertDate)) })
+    return prisonApiClient.createAlert(bookingId, {
+      ...alert,
+      alertDate: formatDateISO(parseDate(alert.alertDate)),
+      expiryDate: formatDateISO(parseDate(alert.expiryDate)),
+    })
   }
 
   public async getAlertDetails(token: string, bookingId: number, alertId: number) {

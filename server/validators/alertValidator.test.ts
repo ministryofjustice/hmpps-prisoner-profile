@@ -1,3 +1,4 @@
+import { addDays } from 'date-fns'
 import { AlertValidator } from './alertValidator'
 import { formatDate } from '../utils/dateHelpers'
 
@@ -8,6 +9,7 @@ describe('Validation middleware', () => {
       alertCode: 'CODE',
       comment: 'Note text',
       alertDate: formatDate(new Date().toISOString(), 'short'),
+      expiryDate: formatDate(addDays(new Date(), 10).toISOString(), 'short'),
     }
 
     const result = AlertValidator(alertForm)
@@ -84,5 +86,29 @@ describe('Validation middleware', () => {
         href: '#alertDate',
       },
     ])
+  })
+
+  it.each([
+    ['on', '01/01/2000'],
+    ['before', '01/01/1999'],
+  ])('should fail validation with expiry date %s the start date', async (_, expiryDate) => {
+    const alertForm = {
+      alertType: 'X',
+      alertCode: 'X',
+      comment: 'X',
+      alertDate: '01/01/2000',
+      expiryDate,
+    }
+
+    const result = AlertValidator(alertForm)
+
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: "'Alert end date' must be later than the start date",
+          href: '#expiryDate',
+        }),
+      ]),
+    )
   })
 })
