@@ -146,7 +146,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
         req.middleware.prisonerData = { ...req.middleware.prisonerData, restrictedPatient: true, prisonId: 'OUT' }
       })
 
-      it('Does not let users view a restricted patient without a POM role', async () => {
+      it('Does not let users view a restricted patient without a POM or inactive bookings role', async () => {
         res.locals.user.userRoles = [Role.PrisonUser]
         await checkPrisonerInCaseload()(req, res, next)
         expectNotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient')
@@ -181,6 +181,28 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
           await checkPrisonerInCaseload({ activeCaseloadOnly: true })(req, res, next)
           expectNotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload')
+        })
+      })
+
+      describe('Given a user with the inactive bookings role', () => {
+        beforeEach(() => {
+          res.locals.user.userRoles = [Role.PrisonUser, Role.InactiveBookings]
+        })
+
+        it('Respects active caseload only check', async () => {
+          const secondCaseload = { ...CaseLoadsDummyDataA, caseLoadId: 'LEI' }
+          res.locals.user.caseLoads = [...res.locals.user.caseLoads, secondCaseload]
+          setPrisonerData({ supportingPrisonId: 'LEI' })
+
+          res.locals.user.activeCaseLoadId = 'MDI'
+
+          await checkPrisonerInCaseload({ activeCaseloadOnly: true })(req, res, next)
+          expectNotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload')
+        })
+
+        it('should return next()', async () => {
+          await checkPrisonerInCaseload()(req, res, next)
+          expectAccessToBeGranted()
         })
       })
     })
