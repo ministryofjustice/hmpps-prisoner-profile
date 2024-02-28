@@ -35,7 +35,7 @@ import { AgenciesEmail, AgencyDetails } from '../../interfaces/prisonApi/agencie
 import { OffenderCellHistory } from '../../interfaces/prisonApi/offenderCellHistoryInterface'
 import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
 import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
-import { Alert, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
+import { Alert, AlertChanges, AlertForm, AlertType } from '../../interfaces/prisonApi/alert'
 import { CsraAssessment } from '../../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../../interfaces/prisonApi/damageObligation'
@@ -106,6 +106,7 @@ export interface PrisonApiClient {
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
   getAlertTypes(): Promise<AlertType[]>
   createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
+  updateAlert(bookingId: number, alertId: number, alertChanges: AlertChanges): Promise<Alert>
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
   getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]>
   getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment>

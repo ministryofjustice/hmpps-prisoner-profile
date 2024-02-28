@@ -21,7 +21,8 @@ export interface Alert extends PagedListItem {
   expiredByFirstName?: string
   expiredByLastName?: string
   expiredByFullName?: string
-  updateLinkUrl?: string
+  addMoreDetailsLinkUrl?: string
+  closeAlertLinkUrl?: string
 }
 
 export interface AlertForm {
@@ -47,4 +48,9 @@ export interface AlertCode {
   description: string
   activeFlag: 'Y' | 'N'
   parentCode: string
+}
+
+export interface AlertChanges {
+  expiryDate?: string
+  comment?: string
 }
