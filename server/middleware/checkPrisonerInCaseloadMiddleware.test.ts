@@ -189,6 +189,17 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
           res.locals.user.userRoles = [Role.PrisonUser, Role.InactiveBookings]
         })
 
+        it('Respects active caseload only check', async () => {
+          const secondCaseload = { ...CaseLoadsDummyDataA, caseLoadId: 'LEI' }
+          res.locals.user.caseLoads = [...res.locals.user.caseLoads, secondCaseload]
+          setPrisonerData({ supportingPrisonId: 'LEI' })
+
+          res.locals.user.activeCaseLoadId = 'MDI'
+
+          await checkPrisonerInCaseload({ activeCaseloadOnly: true })(req, res, next)
+          expectNotFoundError('CheckPrisonerInCaseloadMiddleware: Prisoner not in active caseload')
+        })
+
         it('should return next()', async () => {
           await checkPrisonerInCaseload()(req, res, next)
           expectAccessToBeGranted()
