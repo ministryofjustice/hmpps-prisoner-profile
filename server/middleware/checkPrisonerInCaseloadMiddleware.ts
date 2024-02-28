@@ -30,9 +30,15 @@ export default function checkPrisonerInCaseload({
     const inactiveBookingsUser = userHasRoles([Role.InactiveBookings], userRoles)
     const pomUser = userHasRoles([Role.PomUser], userRoles)
 
-    // Restricted patients can only be accessed by POM users who have the supporting prison ID in their case loads
+    /*
+     * Restricted patients can be accessed by:
+     * - POM users who have the supporting prison ID in their case loads
+     * - Users with the inactive bookings role
+     */
     function authenticateRestictedPatient() {
-      return pomUser && prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)
+      return (
+        (pomUser && prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)) || inactiveBookingsUser
+      )
     }
 
     // Prisoners with a caseload of OUT can only be accessed by people who have the inactive bookings role
