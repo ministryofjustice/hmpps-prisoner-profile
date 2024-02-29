@@ -5,7 +5,7 @@ import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { Role } from '../data/enums/role'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
-import { formatName, userHasRoles } from '../utils/utils'
+import { formatLocation, formatName, userHasRoles } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
@@ -116,8 +116,9 @@ export default class CaseNotesController {
   public displayAddCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const userToken = res.locals.user.token
-      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient } = req.middleware.prisonerData
-      const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+      const { firstName, lastName, prisonerNumber, prisonId, restrictedPatient, cellLocation } =
+        req.middleware.prisonerData
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       // If user cannot view this prisoner's case notes, redirect to 404 page
       if (!canViewCaseNotes(res.locals.user, { prisonId, restrictedPatient })) {
@@ -164,7 +165,6 @@ export default class CaseNotesController {
       return res.render('pages/caseNotes/addCaseNote', {
         today: formatDate(now.toISOString(), 'short'),
         refererUrl,
-        prisonerDisplayName,
         prisonerNumber,
         formValues,
         types,
@@ -172,6 +172,11 @@ export default class CaseNotesController {
         typeSubTypeMap,
         behaviourPrompts: this.chooseBehaviourPrompts(),
         errors,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
       })
     }
   }
