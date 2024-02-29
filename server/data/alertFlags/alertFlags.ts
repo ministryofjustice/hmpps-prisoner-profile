@@ -107,4 +107,5 @@ export const alertFlagLabels: AlertFlagLabel[] = [
   { alertCodes: ['RKS'], classes: 'alert-status alert-status--risk-to-known-adults', label: 'Risk to known adults' },
   { alertCodes: ['VIP'], classes: 'alert-status alert-status--isolated-prisoner', label: 'Isolated' },
   { alertCodes: ['PVN'], classes: 'alert-status alert-status--multicase alert-status--MAPPP-case', label: 'ViSOR' },
+  { alertCodes: ['HID'], classes: 'alert-status alert-status--medical', label: 'Hidden disability' },
 ].sort((a, b) => a.label.localeCompare(b.label))
