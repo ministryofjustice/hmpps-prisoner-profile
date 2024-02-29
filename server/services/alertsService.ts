@@ -151,7 +151,7 @@ export default class AlertsService {
     return prisonApiClient.createAlert(bookingId, {
       ...alert,
       alertDate: formatDateISO(parseDate(alert.alertDate)),
-      expiryDate: formatDateISO(parseDate(alert.expiryDate)),
+      expiryDate: alert.expiryDate ? formatDateISO(parseDate(alert.expiryDate)) : null,
     })
   }
 
