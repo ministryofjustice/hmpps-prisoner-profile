@@ -51,7 +51,16 @@
   }
 
   &__link {
+    text-align: right;
     white-space: nowrap;
-    margin-top: 36px;
+
+    a {
+      margin-top: 36px;
+      display: block;
+    }
+
+    a + a {
+      margin-top: 10px;
+    }
   }
 }

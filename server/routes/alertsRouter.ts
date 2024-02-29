@@ -8,7 +8,7 @@ import { Role } from '../data/enums/role'
 import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkUserCanEdit from '../middleware/checkUserCanEditMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
-import { AlertValidator } from '../validators/alertValidator'
+import { AlertAddMoreDetailsValidator, AlertCloseValidator, AlertValidator } from '../validators/alertValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
@@ -19,7 +19,7 @@ export default function alertsRouter(services: Services): Router {
   const post = postRequest(router)
 
   const alertsController = new AlertsController(
-    services.alertsPageService,
+    services.alertsService,
     services.referenceDataService,
     services.auditService,
   )
@@ -74,6 +74,40 @@ export default function alertsRouter(services: Services): Router {
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     alertsController.displayAlert(),
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/alerts/:alertId/add-more-details',
+    auditPageAccessAttempt({ services, page: Page.AlertAddMoreDetails }),
+    getPrisonerData(services),
+    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    (req, res, next) => {
+      alertsController.displayAddMoreDetails(req, res, next)
+    },
+  )
+
+  post(
+    '/prisoner/:prisonerNumber/alerts/:alertId/add-more-details',
+    auditPageAccessAttempt({ services, page: Page.PostAlertAddMoreDetails }),
+    validationMiddleware(AlertAddMoreDetailsValidator),
+    alertsController.postAddMoreDetails(),
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/alerts/:alertId/close',
+    auditPageAccessAttempt({ services, page: Page.AlertClose }),
+    getPrisonerData(services),
+    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    (req, res, next) => {
+      alertsController.displayCloseAlert(req, res, next)
+    },
+  )
+
+  post(
+    '/prisoner/:prisonerNumber/alerts/:alertId/close',
+    auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
+    validationMiddleware(AlertCloseValidator),
+    alertsController.postCloseAlert(),
   )
 
   /**
