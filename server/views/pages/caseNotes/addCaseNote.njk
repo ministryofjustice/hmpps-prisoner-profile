@@ -7,6 +7,7 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% extends "../index.njk" %}
 {% set pageTitle = 'Add a case note' %}
 {% block body %}
@@ -21,13 +22,18 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 id="addCaseNote">Add a case note for {{ prisonerDisplayName }}</h1>
+        <h1 id="addCaseNote">Add a case note</h1>
     </div>
 </div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ miniBanner(miniBannerData) }}
+    </div>
+</div>
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
-        <p class="govuk-body govuk-!-margin-bottom-6" data-qa="prison-number"><span class="govuk-!-font-weight-bold">Prison number:</span> {{ prisonerNumber }}</p>
-
         <form method="post" novalidate="novalidate" autocomplete="off">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
@@ -35,7 +41,8 @@
                 id: "type",
                 name: "type",
                 label: {
-                    text: "Type"
+                    text: "Type",
+                    classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('type'),
                 items: types | addDefaultSelectedValue('Choose type') | setSelected(formValues.type)
@@ -53,7 +60,8 @@
                 id: "subType",
                 name: "subType",
                 label: {
-                    text: "Sub-type"
+                    text: "Sub-type",
+                    classes: "govuk-!-font-weight-bold"
                 },
                 errorMessage: errors | findError('subType'),
                 items: subTypes | addDefaultSelectedValue('Choose sub-type') | setSelected(formValues.subType)
@@ -107,7 +115,7 @@
             <div class="govuk-form-group govuk-!-margin-bottom-8 {{ 'govuk-form-group govuk-form-group--error' if hoursErrors or minutesErrors }}">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="case-note-time-hint">
                     <legend class="govuk-fieldset__legend govuk-!-margin-bottom-0">
-                        <p class="govuk-fieldset__heading govuk-!-font-weight-regular">
+                        <p class="govuk-fieldset__heading govuk-!-font-weight-bold">
                             Time
                         </p>
                     </legend>

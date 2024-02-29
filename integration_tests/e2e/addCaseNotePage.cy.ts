@@ -32,12 +32,11 @@ context('Add Case Note Page', () => {
       caseNotesPage = visitCaseNotesPage()
       caseNotesPage.addCaseNoteButton().click()
       cy.location('pathname').should('eq', '/prisoner/G6123VU/add-case-note')
-      addCaseNotePage = new AddCaseNotePage('Add a case note for John Saunders')
+      addCaseNotePage = new AddCaseNotePage('Add a case note')
     })
 
     context('Adding a valid case note', () => {
       it('should show correct prisoner number and default field values', () => {
-        addCaseNotePage.prisonerNumber().contains('G6123VU')
         addCaseNotePage.typeField().contains('Choose type')
         addCaseNotePage.subTypeField().contains('Choose sub-type')
         addCaseNotePage.textField().should('have.value', '')
