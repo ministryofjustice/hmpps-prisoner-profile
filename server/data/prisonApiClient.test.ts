@@ -32,7 +32,7 @@ import { mockStaffRoles } from './localMockData/staffRoles'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
-import { AlertForm } from '../interfaces/prisonApi/alert'
+import { AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
 import { alertTypesMock } from './localMockData/alertTypesMock'
 import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
@@ -76,6 +76,9 @@ describe('prisonApiClient', () => {
   }
   const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
     fakePrisonApi.post(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
+  }
+  const mockSuccessfulPrisonApiPut = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
+    fakePrisonApi.put(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
   describe('getCaseLoads', () => {
@@ -669,6 +672,21 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/belief-history`, beliefHistoryMock)
       const output = await prisonApiClient.getBeliefHistory(prisonerNumber, bookingId)
       expect(output).toEqual(beliefHistoryMock)
+    })
+  })
+
+  describe('updateAlert', () => {
+    it('Should call API with data and return data from the API', async () => {
+      const bookingId = 123456
+      const alert = pagedActiveAlertsMock.content[0]
+      const { alertId } = alert
+      const alertChanges: AlertChanges = {
+        comment: 'Comment',
+      }
+      mockSuccessfulPrisonApiPut(`/api/bookings/${bookingId}/alert/${alertId}`, alertChanges, alert)
+
+      const output = await prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
+      expect(output).toEqual(alert)
     })
   })
 })

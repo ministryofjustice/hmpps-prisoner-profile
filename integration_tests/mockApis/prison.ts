@@ -79,7 +79,7 @@ import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
-import { alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
+import { alertDetailsExpiresMock, alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
 
 import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
 import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
@@ -327,7 +327,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=ACTIVE`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertStatus=ACTIVE(&sort=.*)?`,
       },
       response: {
         status: 200,
@@ -349,7 +349,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&alertStatus=ACTIVE`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&sort=.*&alertStatus=ACTIVE`,
       },
       response: {
         status: 200,
@@ -371,7 +371,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&sort=dateCreated%2CASC&alertStatus=ACTIVE`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&sort=.*&alertStatus=ACTIVE`,
       },
       response: {
         status: 200,
@@ -393,7 +393,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&alertType=.*&alertStatus=ACTIVE`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&sort=.*&alertType=.*&alertStatus=ACTIVE`,
       },
       response: {
         status: 200,
@@ -409,7 +409,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&alertStatus=INACTIVE`,
+        urlPattern: `/prison/api/bookings/${bookingId}/alerts/v2\\?size=20&page=1&alertStatus=INACTIVE.*`,
       },
       response: {
         status: 200,
@@ -1298,6 +1298,22 @@ export default {
     })
   },
 
+  stubAlertDetailsExpires: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/.*/alerts/\\d*`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: alertDetailsExpiresMock,
+      },
+    })
+  },
+
   stubBeliefHistory: (bookingId?: number) => {
     return stubFor({
       request: {
@@ -1373,6 +1389,22 @@ export default {
           ...csraAssessmentSummaryMock,
           ...override,
         })),
+      },
+    })
+  },
+
+  stubUpdateAlert: () => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/prison/api/bookings/1102484/alert/2113`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedActiveAlertsMock.content[0],
       },
     })
   },

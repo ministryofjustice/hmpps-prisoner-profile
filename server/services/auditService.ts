@@ -10,6 +10,8 @@ export enum Page {
   AddAlert = 'ADD_ALERT',
   AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
+  AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertClose = 'ALERT_CLOSE',
   Alerts = 'ALERTS',
   AppointmentConfirmation = 'APPOINTMENT_CONFIRMATION',
   AppointmentMovementSlips = 'APPOINTMENT_MOVEMENT_SLIPS',
@@ -31,6 +33,8 @@ export enum Page {
   PostAddCaseNote = 'POST_ADD_CASE_NOTE',
   PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
   PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
+  PostAlertAddMoreDetails = 'POST_ALERT_ADD_MORE_DETAILS',
+  PostAlertClose = 'POST_ALERT_CLOSE',
   PrePostAppointmentConfirmation = 'PRE_POST_APPOINTMENT_CONFIRMATION',
   PrePostAppointments = 'PRE_POST_APPOINTMENTS',
   PrisonerCellHistory = 'PRISONER_CELL_HISTORY',
@@ -53,6 +57,8 @@ export enum ApiAction {
 // eslint-disable-next-line no-shadow
 export enum PostAction {
   Alert = 'ADD_ALERT',
+  AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertClose = 'ALERT_CLOSE',
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
 }

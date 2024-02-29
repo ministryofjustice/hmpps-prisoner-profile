@@ -1,7 +1,7 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
-import AlertsPageService from './alertsPageService'
+import AlertsService from './alertsService'
 import CaseNotesService from './caseNotesService'
 import OffencesPageService from './offencesPageService'
 import OffenderService from './offenderService'
@@ -57,7 +57,7 @@ export const services = () => {
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
-  const alertsPageService = new AlertsPageService(prisonApiClientBuilder)
+  const alertsService = new AlertsService(prisonApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const overviewPageService = new OverviewPageService(
     prisonApiClientBuilder,
@@ -103,7 +103,7 @@ export const services = () => {
     userService,
     caseNotesService,
     prisonerSearchService,
-    alertsPageService,
+    alertsService,
     overviewPageService,
     personalPageService,
     workAndSkillsPageService,

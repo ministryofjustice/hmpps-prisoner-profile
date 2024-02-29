@@ -10,8 +10,9 @@
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">
-        {% if alert.updateLinkUrl %}
-        <a href="{{ alert.updateLinkUrl }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Update or close</a>
+        {% if alert.addMoreDetailsLinkUrl %}
+        <a href="{{ alert.addMoreDetailsLinkUrl }}" data-qa="add-more-details-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Add more details</a>
+        <a href="{{ alert.closeAlertLinkUrl }}" data-qa="close-alert-link" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Close alert</a>
         {% endif %}
     </div>
 </div>
