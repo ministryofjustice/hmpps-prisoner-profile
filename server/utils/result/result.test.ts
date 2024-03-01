@@ -1,29 +1,36 @@
-import { rejected, fulfilled, toResult, resultsOf, resultOf } from './result'
+import { Result } from './result'
 
 const error = new Error('Some error!')
 
 describe('result', () => {
   describe('isFulfilled', () => {
     it('reports fulfilled', () => {
-      expect(fulfilled(1).isFulfilled()).toBeTruthy()
+      expect(Result.fulfilled(1).isFulfilled()).toBeTruthy()
     })
 
     it('reports rejected', () => {
-      expect(rejected(error).isFulfilled()).toBeFalsy()
+      expect(Result.rejected(error).isFulfilled()).toBeFalsy()
     })
   })
 
   describe('handle', () => {
     it('can handle a fulfilled result', () => {
-      expect(fulfilled(1).handle({ fulfilled: i => i + 1, rejected: _e => null })).toEqual(2)
-      expect(fulfilled('hello').handle({ fulfilled: s => `${s} there`, rejected: _e => null })).toEqual('hello there')
+      expect(Result.fulfilled(1).handle({ fulfilled: i => i + 1, rejected: _e => null })).toEqual(2)
+      expect(Result.fulfilled('hello').handle({ fulfilled: s => `${s} there`, rejected: _e => null })).toEqual(
+        'hello there',
+      )
       expect(
-        fulfilled({ some: 'object' }).handle({ fulfilled: o => ({ ...o, another: 'field' }), rejected: _e => null }),
+        Result.fulfilled({ some: 'object' }).handle({
+          fulfilled: o => ({ ...o, another: 'field' }),
+          rejected: _e => null,
+        }),
       ).toEqual({ some: 'object', another: 'field' })
     })
 
     it('can handle a rejected result', () => {
-      expect(rejected(error).handle({ fulfilled: value => value, rejected: e => ({ handled: e.message }) })).toEqual({
+      expect(
+        Result.rejected(error).handle({ fulfilled: value => value, rejected: e => ({ handled: e.message }) }),
+      ).toEqual({
         handled: error.message,
       })
     })
@@ -31,49 +38,49 @@ describe('result', () => {
 
   describe('getOrThrow', () => {
     it.each([1, 'hello', { some: 'object' }])('can retrieve the value from a fulfilled result', value => {
-      expect(fulfilled(value).getOrThrow()).toEqual(value)
+      expect(Result.fulfilled(value).getOrThrow()).toEqual(value)
     })
 
     it('can throw an error from a rejected result', () => {
-      expect(rejected(error).getOrThrow).toThrow(error)
+      expect(Result.rejected(error).getOrThrow).toThrow(error)
     })
   })
 
   describe('getOrHandle', () => {
     it.each([1, 'hello', { some: 'object' }])('can retrieve the value from a fulfilled result', value => {
-      expect(fulfilled(value).getOrHandle(e => e.message)).toEqual(value)
+      expect(Result.fulfilled(value).getOrHandle(e => e.message)).toEqual(value)
     })
 
     it('can handle an error from a rejected result', () => {
-      expect(rejected(error).getOrHandle(e => e.message)).toEqual(error.message)
+      expect(Result.rejected(error).getOrHandle(e => e.message)).toEqual(error.message)
     })
   })
 
   describe('getOrNull', () => {
     it.each([1, 'hello', { some: 'object' }])('can retrieve the value from a fulfilled result', value => {
-      expect(fulfilled(value).getOrNull()).toEqual(value)
+      expect(Result.fulfilled(value).getOrNull()).toEqual(value)
     })
 
     it('returns null from a rejected result', () => {
-      expect(rejected(error).getOrNull()).toBeNull()
+      expect(Result.rejected(error).getOrNull()).toBeNull()
     })
   })
 
-  describe('toResult', () => {
+  describe('Result.from', () => {
     it('converts a PromiseFulfilledResult', async () => {
       const [promiseResult] = await Promise.allSettled([Promise.resolve(1)])
-      expect(toResult(promiseResult).getOrThrow()).toEqual(1)
+      expect(Result.from(promiseResult).getOrThrow()).toEqual(1)
     })
 
     it('converts a PromiseRejectedResult', async () => {
       const [promiseResult] = await Promise.allSettled([Promise.reject(error)])
-      expect(toResult(promiseResult).getOrThrow).toThrow(error)
+      expect(Result.from(promiseResult).getOrThrow).toThrow(error)
     })
   })
 
-  describe('resultsOf', () => {
+  describe('Result.all', () => {
     it('returns results for an array of Promises', async () => {
-      const [a, b, c, d] = await resultsOf([
+      const [a, b, c, d] = await Result.all([
         Promise.resolve(1),
         Promise.resolve('hello'),
         Promise.resolve({ some: 'object' }),
@@ -87,7 +94,7 @@ describe('result', () => {
     })
   })
 
-  describe('resultOf', () => {
+  describe('Result.of', () => {
     const functionReturnsAString = () => Promise.resolve('hello')
     const functionReturnsAnObject = (i: number, s: string) => Promise.resolve({ number: i, string: s })
 
@@ -96,8 +103,8 @@ describe('result', () => {
 
       const [a, b, c, d] = await Promise.all([
         Promise.resolve(1),
-        resultOf(functionReturnsAString)(),
-        resultOf(functionReturnsAnObject)(123, 'abc'),
+        Result.of(functionReturnsAString)(),
+        Result.of(functionReturnsAnObject)(123, 'abc'),
         Promise.resolve(1.23),
       ])
 
@@ -110,8 +117,8 @@ describe('result', () => {
     it('wraps individual functions in a try catch to safely return rejected results', async () => {
       const [a, b, c, d] = await Promise.all([
         Promise.resolve(1),
-        resultOf(() => Promise.reject(error))(),
-        resultOf((_i: number, _s: string) => Promise.reject(error))(123, 'abc'),
+        Result.of(() => Promise.reject(error))(),
+        Result.of((_i: number, _s: string) => Promise.reject(error))(123, 'abc'),
         Promise.resolve(1.23),
       ])
 
