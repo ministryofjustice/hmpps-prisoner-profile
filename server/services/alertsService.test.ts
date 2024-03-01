@@ -77,6 +77,15 @@ describe('Alerts Service', () => {
 
       expect(alert).toEqual(pagedActiveAlertsMock.content[0])
     })
+
+    it('should call Prison API to create the alert without expiry date', async () => {
+      prisonApiClientSpy.createAlert = jest.fn(async () => pagedActiveAlertsMock.content[0])
+
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alert = await alertsService.createAlert('', 123456, { ...alertFormMock, expiryDate: null })
+
+      expect(alert).toEqual(pagedActiveAlertsMock.content[0])
+    })
   })
 
   describe('Get Alert Details', () => {
