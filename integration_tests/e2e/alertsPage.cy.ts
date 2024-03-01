@@ -178,14 +178,14 @@ context('Alerts Page - User does not have Update Alerts role', () => {
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
     })
 
-    it('Displays the active alerts tab and sorts results by Created (oldest)', () => {
-      alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,DESC') // Default sort - Created (most recent)
-      alertsPage.alertsListItem().first().contains('Created: 24 October 2022 by James T Kirk')
+    it('Displays the active alerts tab and sorts results by Start date (oldest)', () => {
+      alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,DESC') // Default sort - Start date (most recent)
+      alertsPage.alertsListItem().first().contains('Start date: 24 October 2022 by James T Kirk')
 
-      alertsPage.sort().select('Created (oldest)')
+      alertsPage.sort().select('Start date (oldest)')
 
       alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,ASC')
-      alertsPage.alertsListItem().first().contains('Created: 10 June 2020 by Dom Bull')
+      alertsPage.alertsListItem().first().contains('Start date: 10 June 2020 by Dom Bull')
     })
   })
 

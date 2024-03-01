@@ -1397,7 +1397,7 @@ export default {
     return stubFor({
       request: {
         method: 'PUT',
-        urlPattern: `/prison/api/bookings/1102484/alert/2113`,
+        urlPattern: `/prison/api/bookings/1102484/alert/\\d*`,
       },
       response: {
         status: 200,

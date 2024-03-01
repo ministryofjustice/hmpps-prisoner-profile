@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { addDays, subDays } from 'date-fns'
+import { addDays, isToday, subDays } from 'date-fns'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
@@ -422,6 +422,112 @@ export default class AlertsController {
           correlationId: req.id,
           action: PostAction.AlertClose,
           details: { comment, expiryDate },
+        })
+        .catch(error => logger.error(error))
+      return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
+    }
+  }
+
+  public async displayChangeEndDate(req: Request, res: Response, next: NextFunction) {
+    const { clientToken } = res.locals
+    const { alertId } = req.params
+
+    // Get data from middleware
+    const { firstName, middleNames, lastName, prisonerNumber, prisonId, cellLocation, bookingId } =
+      req.middleware.prisonerData
+    const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+
+    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)
+
+    // If alert already closed, redirect
+    if (alert.expired) {
+      return res.render('pages/alerts/alreadyClosed', {
+        pageTitle: 'Alert already closed',
+        refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      })
+    }
+
+    // Initialise form
+    const alertFlash = req.flash('alert')
+    const { comment, expiryDate, removeEndDate } = alertFlash?.length
+      ? (alertFlash[0] as never)
+      : {
+          comment: alert.comment,
+          expiryDate: formatDate(alert.dateExpires, 'short'),
+          removeEndDate: '',
+        }
+    const formValues = {
+      bookingId,
+      comment,
+      expiryDate,
+      removeEndDate,
+    }
+
+    const errors = req.flash('errors') || []
+
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.AlertChangeEndDate,
+      })
+      .catch(error => logger.error(error))
+
+    return res.render('pages/alerts/changeEndDate', {
+      pageTitle: 'Change or remove alert end date',
+      miniBannerData: {
+        prisonerName,
+        prisonerNumber,
+        cellLocation: formatLocation(cellLocation),
+      },
+      alert,
+      formValues,
+      today: formatDate(formatDateISO(new Date()), 'short'),
+      refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      errors,
+    })
+  }
+
+  public postChangeEndDate(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, alertId } = req.params
+      const { bookingId, comment, expiryDate, removeEndDate } = req.body
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, {
+            comment,
+            expiryDate: removeEndDate === 'yes' ? null : formatDateISO(parseDate(expiryDate)),
+          })
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('alert', { comment, expiryDate, removeEndDate })
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/change-end-date`)
+      }
+
+      req.flash('flashMessage', {
+        text: removeEndDate === 'no' && isToday(parseDate(expiryDate)) ? 'Alert closed' : 'Alert updated',
+        type: FlashMessageType.success,
+      })
+      this.auditService
+        .sendPostSuccess({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AlertChangeEndDate,
+          details: { comment, expiryDate, removeEndDate },
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
