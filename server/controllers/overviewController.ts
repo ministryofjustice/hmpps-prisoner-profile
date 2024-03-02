@@ -33,14 +33,15 @@ export default class OverviewController {
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
-      this.overviewPageService.get(
+      this.overviewPageService.get({
         clientToken,
         prisonerData,
-        res.locals.user.staffId,
+        staffId: res.locals.user.staffId,
         inmateDetail,
-        res.locals.user.caseLoads,
-        res.locals.user.userRoles,
-      ),
+        pageErrorCallback: res.locals.pageErrorCallback,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+      }),
       pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
     ])

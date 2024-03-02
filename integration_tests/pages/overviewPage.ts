@@ -5,6 +5,8 @@ export default class OverviewPage extends Page {
     super('Overview')
   }
 
+  pageErrorBanner = (): PageElement => cy.get('.hmpps-page-error-banner')
+
   activeTab = (): PageElement => cy.get('[data-qa=active-tab]')
 
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')

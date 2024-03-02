@@ -94,7 +94,7 @@ describe('result', () => {
     })
   })
 
-  describe('Result.of', () => {
+  describe('Result.wrap', () => {
     const functionReturnsAString = () => Promise.resolve('hello')
     const functionReturnsAnObject = (i: number, s: string) => Promise.resolve({ number: i, string: s })
 
@@ -103,8 +103,8 @@ describe('result', () => {
 
       const [a, b, c, d] = await Promise.all([
         Promise.resolve(1),
-        Result.of(functionReturnsAString)(),
-        Result.of(functionReturnsAnObject)(123, 'abc'),
+        Result.wrap(functionReturnsAString)(),
+        Result.wrap(functionReturnsAnObject)(123, 'abc'),
         Promise.resolve(1.23),
       ])
 
@@ -117,8 +117,8 @@ describe('result', () => {
     it('wraps individual functions in a try catch to safely return rejected results', async () => {
       const [a, b, c, d] = await Promise.all([
         Promise.resolve(1),
-        Result.of(() => Promise.reject(error))(),
-        Result.of((_i: number, _s: string) => Promise.reject(error))(123, 'abc'),
+        Result.wrap(() => Promise.reject(error))(),
+        Result.wrap((_i: number, _s: string) => Promise.reject(error))(123, 'abc'),
         Promise.resolve(1.23),
       ])
 
@@ -126,6 +126,20 @@ describe('result', () => {
       expect(b.getOrThrow).toThrow(error)
       expect(c.getOrThrow).toThrow(error)
       expect(d).toEqual(1.23)
+    })
+  })
+
+  describe('Result.map', () => {
+    it('maps a fulfilled result', () => {
+      expect(
+        Result.fulfilled(1)
+          .map(value => value + 1)
+          .getOrThrow(),
+      ).toEqual(2)
+    })
+
+    it('maps a rejected result to itself', () => {
+      expect(Result.rejected(error).getOrThrow).toThrowError(error)
     })
   })
 })

@@ -5,9 +5,10 @@
  */
 export type Result<T, E extends Error = Error> = PromiseSettledResult<T> & {
   isFulfilled: () => boolean
+  map: <R>(map: (value: T) => R) => Result<R, E>
   handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => R1 | R2
   getOrThrow: () => T
-  getOrHandle: <R1>(handler: (e: E) => R1) => T | R1
+  getOrHandle: <R>(handler: (e: E) => R) => T | R
   getOrNull: () => T
 }
 
@@ -15,7 +16,7 @@ export type Result<T, E extends Error = Error> = PromiseSettledResult<T> & {
  * `ResultHandler` allows two functions to be provided to handle both the success
  * and error case.
  */
-export interface ResultHandler<T, E extends Error, R1, R2> {
+interface ResultHandler<T, E extends Error, R1, R2> {
   fulfilled(value: T): R1
   rejected(e: E): R2
 }
@@ -33,14 +34,15 @@ export const Result = {
   },
 
   /**
-   * `Result.of` wraps a function call in a try catch and returns a `Result`
+   * `Result.wrap` wraps a function call in a try catch and returns a `Result`
    */
-  of:
-    <T, A extends unknown[]>(fn: (...args: A) => Promise<T>) =>
+  wrap:
+    <T, A extends unknown[]>(fn: (...args: A) => Promise<T>, onError: (e: Error) => void = () => null) =>
     async (...args: A): Promise<Result<T>> => {
       try {
         return Result.fulfilled(await fn(...args))
       } catch (e) {
+        onError(e)
         return Result.rejected(e)
       }
     },
@@ -64,6 +66,7 @@ export const Result = {
     status: 'fulfilled',
     value,
     isFulfilled: () => true,
+    map: <R>(map: (v: T) => R) => Result.fulfilled(map(value)),
     handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => handler.fulfilled(value),
     getOrThrow: () => value,
     getOrHandle: () => value,
@@ -77,11 +80,12 @@ export const Result = {
     status: 'rejected',
     reason: error,
     isFulfilled: () => false,
+    map: <R>(_m: (v: T) => R) => this as Result<R, E>,
     handle: <R1, R2>(handler: ResultHandler<T, E, R1, R2>) => handler.rejected(error),
     getOrThrow: () => {
       throw error
     },
-    getOrHandle: <R1>(handler: (e: E) => R1) => handler(error),
+    getOrHandle: <R>(handler: (e: E) => R) => handler(error),
     getOrNull: () => null,
   }),
 }

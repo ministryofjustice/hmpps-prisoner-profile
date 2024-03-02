@@ -57,6 +57,7 @@ import { NonAssociationSummary } from '../interfaces/nonAssociationSummary'
 import { PrisonerNonAssociations } from '../interfaces/nonAssociationsApi/prisonerNonAssociations'
 import { ComplexityApiClient } from '../data/interfaces/complexityApiClient'
 import { ComplexityLevel } from '../interfaces/complexityApi/complexityOfNeed'
+import { Result } from '../utils/result/result'
 
 export default class OverviewPageService {
   constructor(
@@ -72,14 +73,23 @@ export default class OverviewPageService {
     private readonly complexityApiClientBuilder: RestClientBuilder<ComplexityApiClient>,
   ) {}
 
-  public async get(
-    clientToken: string,
-    prisonerData: Prisoner,
-    staffId: number,
-    inmateDetail: InmateDetail,
-    userCaseLoads: CaseLoad[] = [],
-    userRoles: string[] = [],
-  ): Promise<OverviewPage> {
+  public async get({
+    clientToken,
+    prisonerData,
+    staffId,
+    inmateDetail,
+    userCaseLoads = [],
+    userRoles = [],
+    pageErrorCallback = () => null,
+  }: {
+    clientToken: string
+    prisonerData: Prisoner
+    staffId: number
+    inmateDetail: InmateDetail
+    userCaseLoads?: CaseLoad[]
+    userRoles?: string[]
+    pageErrorCallback?: (error: Error) => void
+  }): Promise<OverviewPage> {
     const {
       bookingId,
       prisonerNumber,
@@ -103,6 +113,11 @@ export default class OverviewPageService {
       config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
       (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
 
+    const getLearnerNeurodivergence = async (): Promise<LearnerNeurodivergence[]> => {
+      if (!neurodiversityEnabled(prisonerData.prisonId)) return []
+      return curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber)
+    }
+
     const [
       staffRoles,
       learnerNeurodivergence,
@@ -118,7 +133,7 @@ export default class OverviewPageService {
       prisonerDetail,
     ] = await Promise.all([
       prisonApiClient.getStaffRoles(staffId, userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId),
-      curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
+      Result.wrap(getLearnerNeurodivergence, pageErrorCallback)(),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
@@ -559,13 +574,13 @@ export default class OverviewPageService {
   private getStatuses(
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
-    learnerNeurodivergence: LearnerNeurodivergence[],
+    learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
     scheduledTransfers: PrisonerPrisonSchedule[],
   ): Status[] {
     return [
       ...this.getLocationStatus(prisonerData),
       ...this.getListenerStatus(inmateDetail),
-      ...this.getNeurodiversitySupportStatus(prisonerData, learnerNeurodivergence),
+      ...this.getNeurodiversitySupportStatus(learnerNeurodivergence),
       ...this.getScheduledTransferStatus(scheduledTransfers),
     ]
   }
@@ -607,20 +622,13 @@ export default class OverviewPageService {
     return []
   }
 
-  private getNeurodiversitySupportStatus(
-    prisonerData: Prisoner,
-    learnerNeurodivergence: LearnerNeurodivergence[],
-  ): Status[] {
-    return (
-      (learnerNeurodivergence?.length &&
-        neurodiversityEnabled(prisonerData.prisonId) && [
-          {
-            label: 'Support needed',
-            subText: 'Has neurodiversity needs',
-          },
-        ]) ||
-      []
-    )
+  private getNeurodiversitySupportStatus(learnerNeurodivergence: Result<LearnerNeurodivergence[]>): Status[] {
+    const supportNeededStatus = { label: 'Support needed', subText: 'Has neurodiversity needs' }
+    const supportNeededErrorStatus = { label: 'Support needs unavailable', subText: 'Try again later', error: true }
+    return learnerNeurodivergence.handle({
+      fulfilled: it => (it?.length && [supportNeededStatus]) || [],
+      rejected: () => [supportNeededErrorStatus],
+    })
   }
 
   private getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[]): Status[] {
