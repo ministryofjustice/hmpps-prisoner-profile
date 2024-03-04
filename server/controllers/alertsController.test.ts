@@ -425,7 +425,7 @@ describe('Alerts Controller', () => {
     })
   })
 
-  describe('Add more details page', () => {
+  describe('Add more details', () => {
     beforeEach(() => {
       req = {
         params: { prisonerNumber: 'G6123VU' },
@@ -458,7 +458,7 @@ describe('Alerts Controller', () => {
       jest.restoreAllMocks()
     })
 
-    it('should get existing alert record', async () => {
+    it('should get existing alert record and display page', async () => {
       const existingAlert = pagedActiveAlertsMock.content[0]
       const getAlertDetails = jest
         .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
@@ -523,7 +523,7 @@ describe('Alerts Controller', () => {
     })
   })
 
-  describe('Close page', () => {
+  describe('Close alert', () => {
     beforeEach(() => {
       req = {
         params: { prisonerNumber: 'G6123VU' },
@@ -556,7 +556,7 @@ describe('Alerts Controller', () => {
       jest.restoreAllMocks()
     })
 
-    it('should get existing alert record', async () => {
+    it('should get existing alert record and display page', async () => {
       const existingAlert = pagedActiveAlertsMock.content[0]
       const getAlertDetails = jest
         .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
@@ -585,7 +585,7 @@ describe('Alerts Controller', () => {
       })
     })
 
-    it('should get render already closed page if expired', async () => {
+    it('should render already closed page if expired', async () => {
       const getAlertDetails = jest
         .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
         .mockResolvedValue({ ...pagedActiveAlertsMock.content[0], expired: true })
@@ -622,6 +622,127 @@ describe('Alerts Controller', () => {
       expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, 1, {
         comment: 'New comment',
         expiryDate: formatDateISO(new Date()),
+      })
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
+  })
+
+  describe('Change or remove end date', () => {
+    beforeEach(() => {
+      req = {
+        params: { prisonerNumber: 'G6123VU' },
+        query: {},
+        path: 'alerts/1/change-end-date',
+        middleware: {
+          prisonerData: PrisonerMockDataA,
+          inmateDetail: inmateDetailMock,
+        },
+        flash: jest.fn(),
+      }
+      res = {
+        locals: {
+          user: {
+            activeCaseLoadId: 'MDI',
+            userRoles: [Role.UpdateAlert],
+            caseLoads: CaseLoadsDummyDataA,
+          },
+          clientToken: 'CLIENT_TOKEN',
+        },
+        render: jest.fn(),
+        redirect: jest.fn(),
+        send: jest.fn(),
+        sendStatus: jest.fn(),
+      }
+      next = jest.fn()
+      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+    })
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should get existing alert record and display page', async () => {
+      const existingAlert = pagedActiveAlertsMock.content[0]
+      const getAlertDetails = jest
+        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .mockResolvedValue(existingAlert)
+
+      await controller.displayChangeEndDate(req, res, next)
+
+      expect(getAlertDetails).toHaveBeenCalled()
+      expect(res.render).toHaveBeenCalledWith('pages/alerts/changeEndDate', {
+        pageTitle: 'Change or remove alert end date',
+        miniBannerData: {
+          prisonerName: 'John Saunders',
+          prisonerNumber: 'G6123VU',
+          cellLocation: formatLocation('1-1-035'),
+        },
+        alert: existingAlert,
+        formValues: {
+          bookingId: 1102484,
+          comment: existingAlert.comment,
+          expiryDate: '',
+          removeEndDate: '',
+        },
+        refererUrl: `/prisoner/G6123VU/alerts/active`,
+        today: formatDate(formatDateISO(new Date()), 'short'),
+        errors: [],
+      })
+    })
+
+    it('should render already closed page if expired', async () => {
+      const getAlertDetails = jest
+        .spyOn<any, string>(controller['alertsService'], 'getAlertDetails')
+        .mockResolvedValue({ ...pagedActiveAlertsMock.content[0], expired: true })
+
+      await controller.displayChangeEndDate(req, res, next)
+
+      expect(getAlertDetails).toHaveBeenCalled()
+      expect(res.render).toHaveBeenCalledWith('pages/alerts/alreadyClosed', {
+        pageTitle: 'Alert already closed',
+        refererUrl: `/prisoner/G6123VU/alerts/active`,
+      })
+    })
+
+    it('should redirect back to form if errors', async () => {
+      req.body = { bookingId: 123456, comment: '' }
+      req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
+      req.errors = [{ text: 'error' }]
+
+      await controller.postChangeEndDate()(req, res, next)
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/alerts/1/change-end-date`)
+    })
+
+    it('should remove end date on alert', async () => {
+      req.body = { bookingId: 123456, comment: 'New comment', removeEndDate: 'yes' }
+      req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
+
+      const updateAlert = jest
+        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
+        .mockResolvedValue(pagedActiveAlertsMock.content[0])
+
+      await controller.postChangeEndDate()(req, res, next)
+
+      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, 1, {
+        comment: 'New comment',
+        expiryDate: null,
+      })
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
+    })
+
+    it('should change end date on alert', async () => {
+      req.body = { bookingId: 123456, comment: 'New comment', expiryDate: '01/01/2199', removeEndDate: 'no' }
+      req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
+
+      const updateAlert = jest
+        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
+        .mockResolvedValue(pagedActiveAlertsMock.content[0])
+
+      await controller.postChangeEndDate()(req, res, next)
+
+      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, 1, {
+        comment: 'New comment',
+        expiryDate: '2199-01-01',
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
     })

@@ -8,7 +8,12 @@ import { Role } from '../data/enums/role'
 import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
 import checkUserCanEdit from '../middleware/checkUserCanEditMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
-import { AlertAddMoreDetailsValidator, AlertCloseValidator, AlertValidator } from '../validators/alertValidator'
+import {
+  AlertAddMoreDetailsValidator,
+  AlertChangeEndDateValidator,
+  AlertCloseValidator,
+  AlertValidator,
+} from '../validators/alertValidator'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
@@ -108,6 +113,23 @@ export default function alertsRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
     validationMiddleware(AlertCloseValidator),
     alertsController.postCloseAlert(),
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/alerts/:alertId/change-end-date',
+    auditPageAccessAttempt({ services, page: Page.AlertClose }),
+    getPrisonerData(services),
+    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    (req, res, next) => {
+      alertsController.displayChangeEndDate(req, res, next)
+    },
+  )
+
+  post(
+    '/prisoner/:prisonerNumber/alerts/:alertId/change-end-date',
+    auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
+    validationMiddleware(AlertChangeEndDateValidator),
+    alertsController.postChangeEndDate(),
   )
 
   /**
