@@ -110,7 +110,6 @@ describe('Case Notes Controller', () => {
     expect(res.render).toHaveBeenCalledWith('pages/caseNotes/addCaseNote', {
       today: formatDate(new Date().toISOString(), 'short'),
       refererUrl: req.headers.referer,
-      prisonerDisplayName: 'John Saunders',
       prisonerNumber: PrisonerMockDataA.prisonerNumber,
       formValues: {
         date: formatDate(new Date().toISOString(), 'short'),
@@ -151,6 +150,11 @@ describe('Case Notes Controller', () => {
         ],
       },
       behaviourPrompts: expect.objectContaining({}),
+      miniBannerData: {
+        cellLocation: '1-1-035',
+        prisonerName: 'Saunders, John',
+        prisonerNumber: 'G6123VU',
+      },
       errors: undefined,
     })
   })

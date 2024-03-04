@@ -5,4 +5,5 @@ export const alertFormMock: AlertForm = {
   alertCode: 'A1',
   alertDate: '30/01/2023',
   comment: 'Comment',
+  expiryDate: '30/01/2024',
 }

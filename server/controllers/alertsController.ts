@@ -1,12 +1,12 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { subDays } from 'date-fns'
+import { addDays, subDays } from 'date-fns'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import AlertsPageService from '../services/alertsPageService'
+import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { Role } from '../data/enums/role'
 import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { formatDate } from '../utils/dateHelpers'
+import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
 import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
@@ -18,7 +18,7 @@ import logger from '../../logger'
  */
 export default class AlertsController {
   constructor(
-    private readonly alertsPageService: AlertsPageService,
+    private readonly alertsService: AlertsService,
     private readonly referenceDataService: ReferenceDataService,
     private readonly auditService: AuditService,
   ) {}
@@ -39,6 +39,10 @@ export default class AlertsController {
     if (!isActive) queryParams.alertStatus = 'INACTIVE'
     if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
+    if (isActive && !queryParams.sort) {
+      queryParams.sort = 'dateCreated,DESC'
+    }
+
     // Set role based permissions
     const canUpdateAlert =
       userHasRoles([Role.UpdateAlert], res.locals.user.userRoles) && userCanEdit(res.locals.user, prisonerData)
@@ -49,7 +53,7 @@ export default class AlertsController {
     }
 
     // Get alerts based on given query params
-    const alertsPageData = await this.alertsPageService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
+    const alertsPageData = await this.alertsService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
     const showingAll = queryParams.showAll
 
     this.auditService
@@ -80,8 +84,9 @@ export default class AlertsController {
     const types = await this.referenceDataService.getAlertTypes(res.locals.clientToken)
 
     // Get data from middleware
-    const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId } = req.middleware.prisonerData
-    const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+    const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId, cellLocation } =
+      req.middleware.prisonerData
+    const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
     const existingAlerts = alerts
       .filter((alert: Alert) => !alert.expired)
@@ -119,31 +124,35 @@ export default class AlertsController {
     return res.render('pages/alerts/addAlert', {
       today: formatDate(now.toISOString(), 'short'),
       todayMinus8: formatDate(subDays(now, 7).toISOString(), 'short'),
-      prisonerDisplayName,
-      prisonerNumber,
       formValues,
       typeCodeMap,
       alertTypes,
       alertCodes,
       refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
       errors,
+      miniBannerData: {
+        prisonerName: prisonerBannerName,
+        prisonerNumber,
+        cellLocation: formatLocation(cellLocation),
+      },
     })
   }
 
   public post(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const { bookingId, existingAlerts, alertType, alertCode, comment, alertDate } = req.body
+      const { bookingId, existingAlerts, alertType, alertCode, comment, alertDate, expiryDate } = req.body
       const alert = {
         alertType,
         alertCode,
         comment,
         alertDate,
+        expiryDate,
       }
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsPageService.createAlert(res.locals.user.token, bookingId, alert)
+          await this.alertsService.createAlert(res.locals.user.token, bookingId, alert)
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -183,7 +192,7 @@ export default class AlertsController {
       const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const alerts: Alert[] = await Promise.all(
-        [alertIds].flat().map(alertId => this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId)),
+        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)),
       )
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
@@ -209,7 +218,7 @@ export default class AlertsController {
       const alertIds = req.query.ids
 
       const alerts: Alert[] = await Promise.all(
-        [alertIds].flat().map(alertId => this.alertsPageService.getAlertDetails(clientToken, bookingId, +alertId)),
+        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)),
       )
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
@@ -218,6 +227,204 @@ export default class AlertsController {
         alerts,
         allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
       })
+    }
+  }
+
+  public async displayAddMoreDetails(req: Request, res: Response, next: NextFunction) {
+    const { clientToken } = res.locals
+    const { alertId } = req.params
+
+    // Get data from middleware
+    const { firstName, middleNames, lastName, prisonerNumber, prisonId, cellLocation, bookingId } =
+      req.middleware.prisonerData
+    const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+
+    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)
+
+    // If alert already closed, redirect
+    if (alert.expired) {
+      return res.render('pages/alerts/alreadyClosed', {
+        pageTitle: 'Alert already closed',
+        refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      })
+    }
+
+    // Initialise form
+    const alertFlash = req.flash('alert')
+    const { comment } = alertFlash?.length ? (alertFlash[0] as never) : { comment: alert.comment }
+    const formValues = {
+      bookingId,
+      comment,
+    }
+
+    const errors = req.flash('errors') || []
+
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.AlertAddMoreDetails,
+      })
+      .catch(error => logger.error(error))
+
+    return res.render('pages/alerts/addMoreDetails', {
+      pageTitle: 'Add more details to alert',
+      miniBannerData: {
+        prisonerName,
+        prisonerNumber,
+        cellLocation: formatLocation(cellLocation),
+      },
+      alert,
+      formValues,
+      refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      errors,
+    })
+  }
+
+  public postAddMoreDetails(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, alertId } = req.params
+      const { bookingId, comment } = req.body
+
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, { comment })
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('alert', { comment })
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/add-more-details`)
+      }
+
+      req.flash('flashMessage', { text: 'Alert updated', type: FlashMessageType.success })
+      this.auditService
+        .sendPostSuccess({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AlertAddMoreDetails,
+          details: { comment },
+        })
+        .catch(error => logger.error(error))
+      return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
+    }
+  }
+
+  public async displayCloseAlert(req: Request, res: Response, next: NextFunction) {
+    const { clientToken } = res.locals
+    const { alertId } = req.params
+
+    // Get data from middleware
+    const { firstName, middleNames, lastName, prisonerNumber, prisonId, cellLocation, bookingId } =
+      req.middleware.prisonerData
+    const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
+
+    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)
+
+    // If alert already closed, redirect
+    if (alert.expired) {
+      return res.render('pages/alerts/alreadyClosed', {
+        pageTitle: 'Alert already closed',
+        refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      })
+    }
+
+    // Initialise form
+    const alertFlash = req.flash('alert')
+    const { comment, expiryDate, today } = alertFlash?.length
+      ? (alertFlash[0] as never)
+      : {
+          comment: alert.comment,
+          expiryDate: formatDate(alert.dateExpires, 'short'),
+          today: alert.dateExpires ? 'no' : 'yes',
+        }
+    const formValues = {
+      bookingId,
+      comment,
+      expiryDate,
+      today,
+    }
+
+    const errors = req.flash('errors') || []
+
+    this.auditService
+      .sendPageView({
+        userId: res.locals.user.username,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+        prisonerNumber,
+        prisonId,
+        correlationId: req.id,
+        page: Page.AlertClose,
+      })
+      .catch(error => logger.error(error))
+
+    return res.render('pages/alerts/closeAlert', {
+      pageTitle: 'Close alert',
+      miniBannerData: {
+        prisonerName,
+        prisonerNumber,
+        cellLocation: formatLocation(cellLocation),
+      },
+      alert,
+      formValues,
+      tomorrow: formatDate(addDays(new Date(), 1).toISOString(), 'short'),
+      refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
+      errors,
+    })
+  }
+
+  public postCloseAlert(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, alertId } = req.params
+      const { bookingId, comment, expiryDate, today } = req.body
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, {
+            comment,
+            expiryDate: today === 'yes' ? formatDateISO(new Date()) : formatDateISO(parseDate(expiryDate)),
+          })
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('alert', { comment, expiryDate, today })
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/close`)
+      }
+
+      req.flash('flashMessage', {
+        text: today === 'yes' ? 'Alert closed' : 'Alert updated',
+        type: FlashMessageType.success,
+      })
+      this.auditService
+        .sendPostSuccess({
+          userId: res.locals.user.username,
+          userCaseLoads: res.locals.user.caseLoads,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.AlertClose,
+          details: { comment, expiryDate },
+        })
+        .catch(error => logger.error(error))
+      return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
     }
   }
 

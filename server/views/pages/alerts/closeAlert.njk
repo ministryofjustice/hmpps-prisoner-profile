@@ -1,0 +1,150 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+
+{% extends "../index.njk" %}
+
+{% set anotherDateHtml %}
+    <div data-qa="another-date-section">
+        {{ hmppsDatepicker({
+            id: "expiryDate",
+            name: "expiryDate",
+            label: {
+                text: "End date"
+            },
+            errorMessage: errors | findError('expiryDate'),
+            classes: 'hmpps-datepicker--fixed-width',
+            value: formValues.expiryDate,
+            minDate: tomorrow,
+            attributes: { "data-qa": "end-date-field" }
+        }) }}
+    </div>
+{% endset -%}
+
+{% block body %}
+
+    {% if errors.length > 0 %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })}}
+    {% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1>{{ pageTitle }}</h1>
+    </div>
+</div>
+
+    {{ miniBanner(miniBannerData) }}
+
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
+
+        <div class="horizontal-information">
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Alert</div>
+                <div class="govuk-body" data-qa="alert-description">{{ alert.alertCodeDescription }} ({{ alert.alertCode }})</div>
+            </div>
+        </div>
+
+        <div class="horizontal-information">
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Added by</div>
+                <div class="govuk-body" data-qa="added-by">{{ alert.addedByFullName }} on {{ alert.dateCreated | formatDate }}</div>
+            </div>
+            {% if alert.expiredByFullName %}
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Last updated by</div>
+                <div class="govuk-body" data-qa="last-updated-by">{{ alert.expiredByFullName }} on {{ alert.modifiedDateTime | formatDate }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="horizontal-information">
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Start date</div>
+                <div class="govuk-body" data-qa="start-date">{{ alert.dateCreated | formatDate }}</div>
+            </div>
+            {% if alert.dateExpires %}
+            <div class="horizontal-information__item">
+                <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">End date</div>
+                <div class="govuk-body" data-qa="end-date">{{ alert.dateExpires | formatDate  }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="post" novalidate="novalidate" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
+
+            {{ govukCharacterCount({
+                name: "comment",
+                id: "comment",
+                maxlength: 1000,
+                rows: 10,
+                value: formValues.comment,
+                errorMessage: errors | findError('comment'),
+                label: {
+                    text: "Comments",
+                    classes: "govuk-!-font-weight-bold"
+                },
+                attributes: { "data-qa": "comments-field" }
+            }) }}
+
+            {{ govukRadios({
+                idPrefix: "today",
+                name: "today",
+                errorMessage: errors | findError('today'),
+                formGroup : {
+                    classes: "js-today-radios"
+                },
+                fieldset: {
+                    id: 'todayFieldset',
+                    legend: {
+                        text: "When should this alert close?",
+                        classes: "govuk-fieldset__legend--m"
+                    }
+                },
+                items: [{
+                        value: "yes",
+                        text: "Today",
+                        checked: formValues.today == 'yes'
+                    },
+                    {
+                        value: "no",
+                        text: "Another date",
+                        checked: formValues.today == 'no',
+                        conditional: {
+                            html: anotherDateHtml
+                        },
+                        attributes: { "data-qa": "another-date-radio" }
+                    }
+                ]
+            }) }}
+
+            {{ govukWarningText({
+                text: "Closing this alert will make it inactive. You will not be able to reactivate it.",
+                iconFallbackText: "Warning"
+            }) }}
+
+            <div class="govuk-button-group govuk-!-display-none-print">
+                {{ govukButton({
+                    text: "Confirm",
+                    type: "submit",
+                    preventDoubleClick: true,
+                    attributes: { "data-qa": "confirm-button" }
+                }) }}
+                <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="cancel-button">Cancel</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

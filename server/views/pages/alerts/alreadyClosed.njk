@@ -1,0 +1,20 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% extends "../index.njk" %}
+
+{% block body %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1>This alert has already been closed</h1>
+        <p>This alert is closed and cannot be changed.</p>
+        <div class="govuk-button-group govuk-!-margin-top-8 govuk-!-display-none-print">
+            {{ govukButton({
+                text: "Continue",
+                href: refererUrl
+            }) }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

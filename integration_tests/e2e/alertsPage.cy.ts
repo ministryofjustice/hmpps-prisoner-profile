@@ -57,8 +57,9 @@ context('Alerts Page - User does not have Update Alerts role', () => {
       alertsPage.addAlertButton().should('not.exist')
     })
 
-    it('Does not display the update alert link for each alert', () => {
-      alertsPage.updateAlertLink().should('not.exist')
+    it('Does not display the add more details or close alert link for each alert', () => {
+      alertsPage.addMoreDetailsLink().should('not.exist')
+      alertsPage.closeAlertLink().should('not.exist')
     })
 
     it('Displays the active alerts tab selected with correct count', () => {
@@ -157,10 +158,12 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     it('Moves to page 2 when clicking Next and back to page 1 when clicking Previous', () => {
       alertsPage.paginationCurrentPage().contains('1')
       alertsPage.paginationNextLink().first().click()
+      cy.location('href').should('contain', 'page=2')
       alertsPage.paginationCurrentPage().contains('2')
       alertsPage.paginationSummaryHeader().contains('Showing 21 to 40 of 80 alerts')
 
       alertsPage.paginationPreviousLink().first().click()
+      cy.location('href').should('contain', 'page=1')
       alertsPage.paginationCurrentPage().contains('1')
       alertsPage.paginationSummaryHeader().contains('Showing 1 to 20 of 80 alerts')
     })
@@ -176,7 +179,7 @@ context('Alerts Page - User does not have Update Alerts role', () => {
     })
 
     it('Displays the active alerts tab and sorts results by Created (oldest)', () => {
-      alertsPage.sort().invoke('attr', 'value').should('eq', '') // Default sort - Created (most recent)
+      alertsPage.sort().invoke('attr', 'value').should('eq', 'dateCreated,DESC') // Default sort - Created (most recent)
       alertsPage.alertsListItem().first().contains('Created: 24 October 2022 by James T Kirk')
 
       alertsPage.sort().select('Created (oldest)')
@@ -225,8 +228,9 @@ context('Alerts Page - User has Update Alert role', () => {
     alertsPage.addAlertButton()
   })
 
-  it('Displays the update alert link for each alert', () => {
-    alertsPage.updateAlertLink().should('have.length', 20)
+  it('Displays the add more details and close alert links for each alert', () => {
+    alertsPage.addMoreDetailsLink().should('be.visible')
+    alertsPage.closeAlertLink().should('be.visible')
   })
 
   it('Alert page should go to 404 not found page', () => {

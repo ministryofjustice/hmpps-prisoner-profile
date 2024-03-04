@@ -1,5 +1,5 @@
 import { Prisoner } from '../interfaces/prisoner'
-import AlertsPageService from './alertsPageService'
+import AlertsService from './alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
@@ -10,10 +10,10 @@ import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
 
 jest.mock('../data/prisonApiClient')
 
-describe('Alerts Page', () => {
+describe('Alerts Service', () => {
   let prisonApiClientSpy: PrisonApiClient
   let prisonerData: Prisoner
-  let alertsPageService: AlertsPageService
+  let alertsService: AlertsService
 
   beforeEach(() => {
     prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
@@ -34,8 +34,8 @@ describe('Alerts Page', () => {
       }))
       prisonApiClientSpy.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
 
-      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
-      const alertsPageData = await alertsPageService.get('', prisonerData, queryParams, true)
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alertsPageData = await alertsService.get('', prisonerData, queryParams, true)
 
       expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
       expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'ACTIVE' })
@@ -55,8 +55,8 @@ describe('Alerts Page', () => {
       }))
       prisonApiClientSpy.getAlerts = jest.fn(async () => pagedInactiveAlertsMock)
 
-      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
-      const alertsPageData = await alertsPageService.get('', prisonerData, queryParams, true)
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alertsPageData = await alertsService.get('', prisonerData, queryParams, true)
 
       expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
       expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'INACTIVE' })
@@ -72,8 +72,17 @@ describe('Alerts Page', () => {
     it('should call Prison API to create the alert', async () => {
       prisonApiClientSpy.createAlert = jest.fn(async () => pagedActiveAlertsMock.content[0])
 
-      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
-      const alert = await alertsPageService.createAlert('', 123456, alertFormMock)
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alert = await alertsService.createAlert('', 123456, alertFormMock)
+
+      expect(alert).toEqual(pagedActiveAlertsMock.content[0])
+    })
+
+    it('should call Prison API to create the alert without expiry date', async () => {
+      prisonApiClientSpy.createAlert = jest.fn(async () => pagedActiveAlertsMock.content[0])
+
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alert = await alertsService.createAlert('', 123456, { ...alertFormMock, expiryDate: null })
 
       expect(alert).toEqual(pagedActiveAlertsMock.content[0])
     })
@@ -83,12 +92,23 @@ describe('Alerts Page', () => {
     it('should call Prison API tp get alert details', async () => {
       prisonApiClientSpy.getAlertDetails = jest.fn(async () => alertDetailsMock)
 
-      alertsPageService = new AlertsPageService(() => prisonApiClientSpy)
-      const alertDetails = await alertsPageService.getAlertDetails('', 123456, 1)
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alertDetails = await alertsService.getAlertDetails('', 123456, 1)
 
       expect(prisonApiClientSpy.getAlertDetails).toHaveBeenCalledWith(prisonerData.bookingId, 1)
 
       expect(alertDetails).toEqual({ ...alertDetailsMock, addedByFullName: 'James T Kirk', expiredByFullName: '' })
+    })
+  })
+
+  describe('Update alert', () => {
+    it('should call Prison API to update the alert', async () => {
+      prisonApiClientSpy.updateAlert = jest.fn(async () => pagedActiveAlertsMock.content[0])
+
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alert = await alertsService.updateAlert('', 123456, 1, { comment: 'Comment' })
+
+      expect(alert).toEqual(pagedActiveAlertsMock.content[0])
     })
   })
 })

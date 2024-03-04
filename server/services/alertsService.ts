@@ -8,11 +8,10 @@ import { SortOption } from '../interfaces/sortSelector'
 import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import { Alert, AlertForm } from '../interfaces/prisonApi/alert'
-import config from '../config'
+import { Alert, AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
 import { RestClientBuilder } from '../data'
 
-export default class AlertsPageService {
+export default class AlertsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   /**
@@ -118,10 +117,12 @@ export default class AlertsPageService {
         pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
         pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
           ...alert,
-          updateLinkUrl:
+          addMoreDetailsLinkUrl:
             canUpdateAlert &&
             alert.active &&
-            `${config.serviceUrls.digitalPrison}/edit-alert?offenderNo=${prisonerData.prisonerNumber}&alertId=${alert.alertId}`,
+            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`,
+          closeAlertLinkUrl:
+            canUpdateAlert && alert.active && `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
           addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
           expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
         }))
@@ -147,7 +148,11 @@ export default class AlertsPageService {
   public async createAlert(token: string, bookingId: number, alert: AlertForm) {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    return prisonApiClient.createAlert(bookingId, { ...alert, alertDate: formatDateISO(parseDate(alert.alertDate)) })
+    return prisonApiClient.createAlert(bookingId, {
+      ...alert,
+      alertDate: formatDateISO(parseDate(alert.alertDate)),
+      expiryDate: alert.expiryDate ? formatDateISO(parseDate(alert.expiryDate)) : null,
+    })
   }
 
   public async getAlertDetails(token: string, bookingId: number, alertId: number) {
@@ -160,5 +165,10 @@ export default class AlertsPageService {
       addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
       expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
     }
+  }
+
+  public async updateAlert(token: string, bookingId: number, alertId: number, alertChanges: AlertChanges) {
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+    return prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
   }
 }

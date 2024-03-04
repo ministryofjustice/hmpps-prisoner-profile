@@ -1,13 +1,15 @@
-import { AlertValidator } from './alertValidator'
-import { formatDate } from '../utils/dateHelpers'
+import { addDays } from 'date-fns'
+import { AlertAddMoreDetailsValidator, AlertCloseValidator, AlertValidator } from './alertValidator'
+import { formatDate, formatDateISO } from '../utils/dateHelpers'
 
-describe('Validation middleware', () => {
+describe('Validation middleware - Add Alert', () => {
   it('should pass validation with good data', async () => {
     const alertForm = {
       alertType: 'TYPE',
       alertCode: 'CODE',
       comment: 'Note text',
       alertDate: formatDate(new Date().toISOString(), 'short'),
+      expiryDate: formatDate(addDays(new Date(), 10).toISOString(), 'short'),
     }
 
     const result = AlertValidator(alertForm)
@@ -82,6 +84,132 @@ describe('Validation middleware', () => {
       {
         text: 'Enter a date that is not more than 7 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
         href: '#alertDate',
+      },
+    ])
+  })
+
+  it.each([
+    ['on', '01/01/2000'],
+    ['before', '01/01/1999'],
+  ])('should fail validation with expiry date %s the start date', async (_, expiryDate) => {
+    const alertForm = {
+      alertType: 'X',
+      alertCode: 'X',
+      comment: 'X',
+      alertDate: '01/01/2000',
+      expiryDate,
+    }
+
+    const result = AlertValidator(alertForm)
+
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: "'Alert end date' must be later than the start date",
+          href: '#expiryDate',
+        }),
+      ]),
+    )
+  })
+})
+
+describe('Validation middleware - Add more details', () => {
+  it('should pass validation with good data', async () => {
+    const alertForm = {
+      comment: 'Note text',
+    }
+
+    const result = AlertAddMoreDetailsValidator(alertForm)
+
+    expect(result).toEqual([])
+  })
+
+  it('should fail validation with no data', async () => {
+    const alertForm = {
+      comment: '',
+    }
+
+    const result = AlertAddMoreDetailsValidator(alertForm)
+
+    expect(result).toEqual([{ text: 'Enter your comments on this alert', href: '#comment' }])
+  })
+
+  it('should fail validation with text over 1000 characters', async () => {
+    const alertForm = {
+      comment:
+        'XTG5Sujg6UchJnaaet5uq7wdUwxmtDo9EuGc3mHDtLeuDbFtZZ2dRfdQhA47hTYHZYO8bgDcxlIT1GvNxnSmVxH7ZGKEHo1C5jG6UmkBYOpw1LG9WJsGdgdOZjb4K1MEH0z2h0FfNeWkkl1KMiP10drFVyFK9SaD9UKdDsMAUjTtaIEBpBXeUuRw1coP0eLJfDtiPyqUZKhz5WE8aJru8w6gu6kWRIexF2njyDvWvxrQmpZKjm4Ys1Lzhx0nPPylgA2AxAkrszE8ZqAqvKvnLBagtPVszCux8NOrOqTBdOCi8KGVZtpdrTcPyJpZHOPiQUR59p8VFGGlsvMU8YXK0JxPlSyVsUEQmwaeYF3nFZQiREjefY0BzrN04b4Zpu4JxMdlXOE4CS9LJlbc2pOhpsJ5KuPzYomACGR9SuBFWIl6MDotFN7DZ7nxKePtcI2Z3CvnZpJNFDgr8opEKzWaBPyJoYkLXAM0gD6pTgaxTviHnfHqKbrGNWY2wAJII9Mbo1t6GCGn6ySpWeN3wcnNWDf77vSkHDuU0f6fhTrzhIroV8gsEceXwwUrT6Vq76c5CXQnnMV40LXwJtnVuQG4FVC4qZ0lgt473SbCp1RxQJfsJoMnpF09JZwwYLgYJWrKKfs3Ar2In7nPJRMBDK6ICNM91z8YTn0D35D70a1z0wrlV7XSxtptt3GkoxR9J1iEzImclgZLxhibX2grRW623ut4L9INNffKM3pXGNMzwhMgzC4ySElyNmyn8c3YgYBsg4Xu2yL3PiBWWKNBe9F0z7GFzYGsm4h2rMznUyU4spvdsTigHkdZKWdQ2KM8ZqTckyCMgPtJiOlNU6bjxX1Ip4s2dJof5X8wRM1wfgs6WfjttAcVfM2EQxgI12Ok0aDbhXqP7g62ifurJiUPqVHc2FpDI53nyN6CCdYcqyhzDX4gNyefz7xPdCihzCk8MlBAiFeTFQNTtlKb0TkbdXJA4vFJaBksickkP1JoeKlmF',
+    }
+
+    const result = AlertAddMoreDetailsValidator(alertForm)
+
+    expect(result).toEqual([{ text: 'Enter your comments using 1,000 characters or less', href: '#comment' }])
+  })
+})
+
+describe('Validation middleware - Close', () => {
+  it('should pass validation with good data - today', async () => {
+    const alertForm = {
+      comment: 'Note text',
+      expiryDate: '',
+      today: 'yes',
+    }
+
+    const result = AlertCloseValidator(alertForm)
+
+    expect(result).toEqual([])
+  })
+
+  it('should pass validation with good data - not today', async () => {
+    const alertForm = {
+      comment: 'Note text',
+      expiryDate: formatDate(formatDateISO(addDays(new Date(), 1)), 'short'),
+      today: 'no',
+    }
+
+    const result = AlertCloseValidator(alertForm)
+
+    expect(result).toEqual([])
+  })
+
+  it('should fail validation with no data', async () => {
+    const alertForm = {
+      comment: '',
+      expiryDate: '',
+      today: 'no',
+    }
+
+    const result = AlertCloseValidator(alertForm)
+
+    expect(result).toEqual([
+      { text: 'Enter your comments on this alert', href: '#comment' },
+      { text: 'Enter a real date in the format DD/MM/YYYY - for example, 27/03/2023', href: '#expiryDate' },
+    ])
+  })
+
+  it('should fail validation with text over 1000 characters', async () => {
+    const alertForm = {
+      comment:
+        'XTG5Sujg6UchJnaaet5uq7wdUwxmtDo9EuGc3mHDtLeuDbFtZZ2dRfdQhA47hTYHZYO8bgDcxlIT1GvNxnSmVxH7ZGKEHo1C5jG6UmkBYOpw1LG9WJsGdgdOZjb4K1MEH0z2h0FfNeWkkl1KMiP10drFVyFK9SaD9UKdDsMAUjTtaIEBpBXeUuRw1coP0eLJfDtiPyqUZKhz5WE8aJru8w6gu6kWRIexF2njyDvWvxrQmpZKjm4Ys1Lzhx0nPPylgA2AxAkrszE8ZqAqvKvnLBagtPVszCux8NOrOqTBdOCi8KGVZtpdrTcPyJpZHOPiQUR59p8VFGGlsvMU8YXK0JxPlSyVsUEQmwaeYF3nFZQiREjefY0BzrN04b4Zpu4JxMdlXOE4CS9LJlbc2pOhpsJ5KuPzYomACGR9SuBFWIl6MDotFN7DZ7nxKePtcI2Z3CvnZpJNFDgr8opEKzWaBPyJoYkLXAM0gD6pTgaxTviHnfHqKbrGNWY2wAJII9Mbo1t6GCGn6ySpWeN3wcnNWDf77vSkHDuU0f6fhTrzhIroV8gsEceXwwUrT6Vq76c5CXQnnMV40LXwJtnVuQG4FVC4qZ0lgt473SbCp1RxQJfsJoMnpF09JZwwYLgYJWrKKfs3Ar2In7nPJRMBDK6ICNM91z8YTn0D35D70a1z0wrlV7XSxtptt3GkoxR9J1iEzImclgZLxhibX2grRW623ut4L9INNffKM3pXGNMzwhMgzC4ySElyNmyn8c3YgYBsg4Xu2yL3PiBWWKNBe9F0z7GFzYGsm4h2rMznUyU4spvdsTigHkdZKWdQ2KM8ZqTckyCMgPtJiOlNU6bjxX1Ip4s2dJof5X8wRM1wfgs6WfjttAcVfM2EQxgI12Ok0aDbhXqP7g62ifurJiUPqVHc2FpDI53nyN6CCdYcqyhzDX4gNyefz7xPdCihzCk8MlBAiFeTFQNTtlKb0TkbdXJA4vFJaBksickkP1JoeKlmF',
+    }
+
+    const result = AlertCloseValidator(alertForm)
+
+    expect(result).toEqual([{ text: 'Enter your comments using 1,000 characters or less', href: '#comment' }])
+  })
+
+  it('should fail validation with today = no and date not after today', async () => {
+    const alertForm = {
+      comment: 'Existing comment',
+      expiryDate: formatDate(formatDateISO(new Date()), 'short'),
+      today: 'no',
+    }
+
+    const result = AlertCloseValidator(alertForm)
+
+    expect(result).toEqual([
+      {
+        text: 'Enter a date which is after today in the format DD/MM/YYYY - for example, 27/03/2029',
+        href: '#expiryDate',
       },
     ])
   })

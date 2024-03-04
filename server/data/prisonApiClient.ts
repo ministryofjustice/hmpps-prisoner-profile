@@ -40,7 +40,7 @@ import { AgenciesEmail, AgencyDetails } from '../interfaces/prisonApi/agencies'
 import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
 import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
 import { OffenderCellHistory } from '../interfaces/prisonApi/offenderCellHistoryInterface'
-import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
+import { Alert, AlertChanges, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
 import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
 import { Transaction } from '../interfaces/prisonApi/transaction'
 import { DamageObligationContainer } from '../interfaces/prisonApi/damageObligation'
@@ -324,9 +324,16 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   }
 
   async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
-    return (await this.restClient.post({
+    return this.restClient.post<Alert>({
       path: `/api/bookings/${bookingId}/alert`,
       data: alert,
+    })
+  }
+
+  async updateAlert(bookingId: number, alertId: number, alertChanges: AlertChanges): Promise<Alert> {
+    return (await this.restClient.put({
+      path: `/api/bookings/${bookingId}/alert/${alertId}`,
+      data: alertChanges,
     })) as Alert
   }
 
