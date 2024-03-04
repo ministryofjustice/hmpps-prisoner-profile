@@ -863,19 +863,19 @@ describe('OverviewPageService', () => {
         curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(new Error()))
         mockedNeurodiversityEnabled.mockImplementation(() => true)
 
-        let pageErrorFlag = false
+        let apiErrorFlag = false
         const overviewPageService = overviewPageServiceConstruct()
         const res = await overviewPageService.get({
           clientToken: 'token',
           prisonerData: { prisonerNumber, bookingId } as Prisoner,
           staffId: 1,
           inmateDetail: inmateDetailMock,
-          pageErrorCallback: () => {
-            pageErrorFlag = true
+          apiErrorCallback: () => {
+            apiErrorFlag = true
           },
         })
 
-        expect(pageErrorFlag).toBeTruthy()
+        expect(apiErrorFlag).toBeTruthy()
         expect(
           res.statuses.some(
             status =>

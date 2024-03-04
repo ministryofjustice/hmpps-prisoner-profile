@@ -38,7 +38,7 @@ export default class OverviewController {
         prisonerData,
         staffId: res.locals.user.staffId,
         inmateDetail,
-        pageErrorCallback: res.locals.pageErrorCallback,
+        apiErrorCallback: res.locals.apiErrorCallback,
         userCaseLoads: res.locals.user.caseLoads,
         userRoles: res.locals.user.userRoles,
       }),

@@ -644,8 +644,8 @@ context('Overview Page', () => {
     it('Displays a page error banner and highlights the failure in the status list', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
 
-      overviewPage.pageErrorBanner().should('exist')
-      overviewPage.pageErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
       overviewPage.statusList().should('exist')
       overviewPage.statusList().contains('li > p', 'Support needs unavailable')

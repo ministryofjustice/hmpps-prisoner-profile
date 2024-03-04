@@ -80,7 +80,7 @@ export default class OverviewPageService {
     inmateDetail,
     userCaseLoads = [],
     userRoles = [],
-    pageErrorCallback = () => null,
+    apiErrorCallback = () => null,
   }: {
     clientToken: string
     prisonerData: Prisoner
@@ -88,7 +88,7 @@ export default class OverviewPageService {
     inmateDetail: InmateDetail
     userCaseLoads?: CaseLoad[]
     userRoles?: string[]
-    pageErrorCallback?: (error: Error) => void
+    apiErrorCallback?: (error: Error) => void
   }): Promise<OverviewPage> {
     const {
       bookingId,
@@ -133,7 +133,7 @@ export default class OverviewPageService {
       prisonerDetail,
     ] = await Promise.all([
       prisonApiClient.getStaffRoles(staffId, userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId),
-      Result.wrap(getLearnerNeurodivergence, pageErrorCallback)(),
+      Result.wrap(getLearnerNeurodivergence, apiErrorCallback)(),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
