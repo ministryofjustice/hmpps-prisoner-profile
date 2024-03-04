@@ -98,8 +98,8 @@ export default class AlertsService {
 
     // Determine sort options
     const sortOptions: SortOption[] = [
-      { value: 'dateCreated,DESC', description: 'Created (most recent)' },
-      { value: 'dateCreated,ASC', description: 'Created (oldest)' },
+      { value: 'dateCreated,DESC', description: 'Start date (most recent)' },
+      { value: 'dateCreated,ASC', description: 'Start date (oldest)' },
     ]
     if (!isActiveAlertsQuery) {
       sortOptions.push(
@@ -122,7 +122,15 @@ export default class AlertsService {
             alert.active &&
             `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`,
           closeAlertLinkUrl:
-            canUpdateAlert && alert.active && `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
+            canUpdateAlert &&
+            alert.active &&
+            !alert.dateExpires &&
+            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
+          changeEndDateLinkUrl:
+            canUpdateAlert &&
+            alert.active &&
+            alert.dateExpires &&
+            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/change-end-date`,
           addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
           expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
         }))
