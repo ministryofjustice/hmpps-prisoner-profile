@@ -1,5 +1,10 @@
 import { addDays } from 'date-fns'
-import { AlertAddMoreDetailsValidator, AlertCloseValidator, AlertValidator } from './alertValidator'
+import {
+  AlertAddMoreDetailsValidator,
+  AlertChangeEndDateValidator,
+  AlertCloseValidator,
+  AlertValidator,
+} from './alertValidator'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
 
 describe('Validation middleware - Add Alert', () => {
@@ -182,7 +187,7 @@ describe('Validation middleware - Close', () => {
 
     expect(result).toEqual([
       { text: 'Enter your comments on this alert', href: '#comment' },
-      { text: 'Enter a real date in the format DD/MM/YYYY - for example, 27/03/2023', href: '#expiryDate' },
+      { text: 'Enter an end date in the format DD/MM/YYYY - for example, 27/03/2023', href: '#expiryDate' },
     ])
   })
 
@@ -208,9 +213,79 @@ describe('Validation middleware - Close', () => {
 
     expect(result).toEqual([
       {
-        text: 'Enter a date which is after today in the format DD/MM/YYYY - for example, 27/03/2029',
+        text: 'End date must be after today',
         href: '#expiryDate',
       },
     ])
+  })
+})
+
+describe('Validation middleware - Change end date', () => {
+  it('should pass validation with good data - change end date', async () => {
+    const alertForm = {
+      comment: 'Note text',
+      expiryDate: formatDate(formatDateISO(addDays(new Date(), 1)), 'short'),
+      removeEndDate: 'no',
+    }
+
+    const result = AlertChangeEndDateValidator(alertForm)
+
+    expect(result).toEqual([])
+  })
+
+  it('should pass validation with good data - remove end date', async () => {
+    const alertForm = {
+      comment: 'Note text',
+      expiryDate: '',
+      removeEndDate: 'yes',
+    }
+
+    const result = AlertChangeEndDateValidator(alertForm)
+
+    expect(result).toEqual([])
+  })
+
+  it('should fail validation with no data', async () => {
+    const alertForm = {
+      comment: '',
+      expiryDate: '',
+      removeEndDate: 'no',
+    }
+
+    const result = AlertChangeEndDateValidator(alertForm)
+
+    expect(result).toEqual([
+      { text: 'Enter your comments on this alert', href: '#comment' },
+      { text: 'Enter an end date in the format DD/MM/YYYY - for example, 27/03/2023', href: '#expiryDate' },
+    ])
+  })
+
+  it('should fail validation with no radio selected', async () => {
+    const alertForm = {
+      comment: 'Comment',
+      expiryDate: '',
+      removeEndDate: '',
+    }
+
+    const result = AlertChangeEndDateValidator(alertForm)
+
+    expect(result).toEqual([
+      {
+        text: 'Select if you would like to choose a different end date or remove the end date',
+        href: '#removeEndDate',
+      },
+    ])
+  })
+
+  it('should fail validation with text over 1000 characters', async () => {
+    const alertForm = {
+      comment:
+        'XTG5Sujg6UchJnaaet5uq7wdUwxmtDo9EuGc3mHDtLeuDbFtZZ2dRfdQhA47hTYHZYO8bgDcxlIT1GvNxnSmVxH7ZGKEHo1C5jG6UmkBYOpw1LG9WJsGdgdOZjb4K1MEH0z2h0FfNeWkkl1KMiP10drFVyFK9SaD9UKdDsMAUjTtaIEBpBXeUuRw1coP0eLJfDtiPyqUZKhz5WE8aJru8w6gu6kWRIexF2njyDvWvxrQmpZKjm4Ys1Lzhx0nPPylgA2AxAkrszE8ZqAqvKvnLBagtPVszCux8NOrOqTBdOCi8KGVZtpdrTcPyJpZHOPiQUR59p8VFGGlsvMU8YXK0JxPlSyVsUEQmwaeYF3nFZQiREjefY0BzrN04b4Zpu4JxMdlXOE4CS9LJlbc2pOhpsJ5KuPzYomACGR9SuBFWIl6MDotFN7DZ7nxKePtcI2Z3CvnZpJNFDgr8opEKzWaBPyJoYkLXAM0gD6pTgaxTviHnfHqKbrGNWY2wAJII9Mbo1t6GCGn6ySpWeN3wcnNWDf77vSkHDuU0f6fhTrzhIroV8gsEceXwwUrT6Vq76c5CXQnnMV40LXwJtnVuQG4FVC4qZ0lgt473SbCp1RxQJfsJoMnpF09JZwwYLgYJWrKKfs3Ar2In7nPJRMBDK6ICNM91z8YTn0D35D70a1z0wrlV7XSxtptt3GkoxR9J1iEzImclgZLxhibX2grRW623ut4L9INNffKM3pXGNMzwhMgzC4ySElyNmyn8c3YgYBsg4Xu2yL3PiBWWKNBe9F0z7GFzYGsm4h2rMznUyU4spvdsTigHkdZKWdQ2KM8ZqTckyCMgPtJiOlNU6bjxX1Ip4s2dJof5X8wRM1wfgs6WfjttAcVfM2EQxgI12Ok0aDbhXqP7g62ifurJiUPqVHc2FpDI53nyN6CCdYcqyhzDX4gNyefz7xPdCihzCk8MlBAiFeTFQNTtlKb0TkbdXJA4vFJaBksickkP1JoeKlmF',
+      removeEndDate: 'yes',
+    }
+
+    const result = AlertChangeEndDateValidator(alertForm)
+
+    expect(result).toEqual([{ text: 'Enter your comments using 1,000 characters or less', href: '#comment' }])
   })
 })

@@ -11,6 +11,7 @@ export enum Page {
   AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Alerts = 'ALERTS',
   AppointmentConfirmation = 'APPOINTMENT_CONFIRMATION',
@@ -58,6 +59,7 @@ export enum ApiAction {
 export enum PostAction {
   Alert = 'ADD_ALERT',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
