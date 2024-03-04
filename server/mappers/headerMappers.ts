@@ -80,7 +80,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
     hiddenLabel: 'View incentive level details',
     info: prisonerData.currentIncentive ? prisonerData.currentIncentive.level.description : 'Not entered',
     classes: 'remove-column-gutter-right',
-    url: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/incentive-level-details`,
+    url: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
   })
   return profileBannerTopLinks
 }
