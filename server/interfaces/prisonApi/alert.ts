@@ -53,4 +53,5 @@ export interface AlertCode {
 export interface AlertChanges {
   expiryDate?: string
   comment?: string
+  removeExpiryDate?: boolean
 }
