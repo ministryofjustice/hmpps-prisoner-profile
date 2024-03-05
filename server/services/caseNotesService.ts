@@ -1,17 +1,20 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, CaseNotesListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
 import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
+
 import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
-import { CaseNote, CaseNoteAmendment, CaseNoteForm, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
 import { UserDetails } from './userService'
 import validateDateRange from '../utils/validateDateRange'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
+import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
+import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
+import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 export default class CaseNotesService {
   constructor(private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>) {}

@@ -1,5 +1,5 @@
-import { InmateDetail } from '../../interfaces/prisonApi/inmateDetail'
-import { ProfileInformation, ProfileInformationType } from '../../interfaces/prisonApi/profileInformation'
+import InmateDetail from '../interfaces/prisonApi/InmateDetail'
+import ProfileInformation, { ProfileInformationType } from '../interfaces/prisonApi/ProfileInformation'
 
 export const recognisedListenerYes: ProfileInformation = {
   type: ProfileInformationType.RecognisedListener,

@@ -1,5 +1,5 @@
 import { User } from '../hmppsAuthClient'
-import { CaseLoad } from '../../interfaces/caseLoad'
+import CaseLoad from '../interfaces/prisonApi/CaseLoad'
 
 export const userMock: User = {
   name: 'John Smith',

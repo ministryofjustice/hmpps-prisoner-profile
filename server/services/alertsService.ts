@@ -1,15 +1,15 @@
 import { isBefore, isFuture } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { AlertsPageData } from '../interfaces/pages/alertsPageData'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
 import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
-import { Alert, AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
+import Alert, { AlertChanges, AlertForm } from '../data/interfaces/prisonApi/Alert'
 import { RestClientBuilder } from '../data'
+import PagedList, { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 export default class AlertsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}

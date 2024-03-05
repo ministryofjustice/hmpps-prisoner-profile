@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { PrisonerLocationHistoryService } from '../services/prisonerLocationHistoryService'
 
 export default class PrisonerLocationHistoryController {

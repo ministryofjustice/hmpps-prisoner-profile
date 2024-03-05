@@ -1,4 +1,4 @@
-import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
+import PropertyContainer from '../interfaces/prisonApi/PropertyContainer'
 
 export const propertyMock: PropertyContainer[] = [
   {

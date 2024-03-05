@@ -1,4 +1,4 @@
-import { Pom } from '../../interfaces/pom'
+import Pom from '../interfaces/allocationManagerApi/Pom'
 
 export const pomMock: Pom = {
   primary_pom: { staff_id: 485887, name: 'MARKE, ANDY' },

@@ -1,11 +1,5 @@
 import { AlertFlagLabel } from '../../interfaces/alertFlagLabels'
 
-export const AlertExample = {
-  alertCodes: ['HA1'],
-  classes: 'alert-status alert-status--self-harm',
-  label: 'ACCT post closure',
-}
-
 export const alertFlagLabels: AlertFlagLabel[] = [
   { alertCodes: ['HA'], classes: 'alert-status alert-status--self-harm', label: 'ACCT open' },
   {

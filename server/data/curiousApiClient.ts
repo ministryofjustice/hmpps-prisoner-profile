@@ -1,12 +1,12 @@
 import RestClient from './restClient'
 import config from '../config'
-import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
-import { LearnerProfile } from '../interfaces/learnerProfile'
-import { LearnerEducation } from '../interfaces/learnerEducation'
-import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
-import { LearnerGoals } from '../interfaces/learnerGoals'
-import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import { CuriousApiClient } from './interfaces/curiousApiClient'
+import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
+import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
+import LearnerProfile from './interfaces/curiousApi/LearnerProfile'
+import LearnerEducation from './interfaces/curiousApi/LearnerEducation'
+import LearnerLatestAssessment from './interfaces/curiousApi/LearnerLatestAssessment'
+import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
+import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
 
 export default class CuriousRestApiClient implements CuriousApiClient {
   private readonly restClient: RestClient

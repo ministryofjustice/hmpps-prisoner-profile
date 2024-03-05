@@ -1,4 +1,4 @@
-import { Belief } from '../../interfaces/prisonApi/belief'
+import Belief from '../interfaces/prisonApi/Belief'
 
 export const beliefHistoryMock: Belief[] = [
   {

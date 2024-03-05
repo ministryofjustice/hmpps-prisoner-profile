@@ -1,10 +1,12 @@
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-import { PagedList, CaseNotesListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
-import { CaseNoteType } from '../interfaces/caseNoteType'
-import { CaseNote, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+
 import config from '../config'
+import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
+import PagedList, { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
+import CaseNote from './interfaces/caseNotesApi/CaseNote'
+import CaseNoteType from './interfaces/caseNotesApi/CaseNoteType'
+import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   private readonly restClient: RestClient

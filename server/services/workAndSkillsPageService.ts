@@ -1,15 +1,10 @@
 import { format, startOfToday, sub } from 'date-fns'
 import { AbsenceOutcomeCodes } from '../data/enums/absenceOutcomeCodes'
-import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { GovSummaryGroup, GovSummaryItem } from '../interfaces/govSummaryItem'
-import { LearnerEducation } from '../interfaces/learnerEducation'
-import { LearnerEmployabilitySkills } from '../interfaces/learnerEmployabilitySkills'
-import { LearnerLatestAssessment } from '../interfaces/learnerLatestAssessments'
-import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import { LearnerProfile } from '../interfaces/learnerProfile'
-import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
-import { Prisoner } from '../interfaces/prisoner'
+
+import OffenderActivitiesHistory from '../data/interfaces/prisonApi/OffenderActivitiesHistory'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
@@ -18,6 +13,12 @@ import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPl
 import logger from '../../logger'
 import { CuriousGoals } from '../interfaces/curiousGoals'
 import toCuriousGoals from '../interfaces/mappers/curiousGoalsMapper'
+import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmployabilitySkills'
+import LearnerProfile from '../data/interfaces/curiousApi/LearnerProfile'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
+import LearnerEducation from '../data/interfaces/curiousApi/LearnerEducation'
+import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 
 interface WorkAndSkillsData {
   learnerEmployabilitySkills: LearnerEmployabilitySkills

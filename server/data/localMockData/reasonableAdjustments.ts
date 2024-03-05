@@ -1,4 +1,4 @@
-import { ReasonableAdjustments } from '../../interfaces/prisonApi/reasonableAdjustment'
+import { ReasonableAdjustments } from '../interfaces/prisonApi/ReasonableAdjustment'
 
 export const mockReasonableAdjustments: ReasonableAdjustments = {
   reasonableAdjustments: [

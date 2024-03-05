@@ -1,4 +1,4 @@
-import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
+import StaffDetails from '../../data/interfaces/prisonApi/StaffDetails'
 
 export interface LocationDetails {
   prisonerNumber: string

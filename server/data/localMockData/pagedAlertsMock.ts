@@ -1,5 +1,5 @@
-import { Alert } from '../../interfaces/prisonApi/alert'
-import { PagedList } from '../../interfaces/prisonApi/pagedList'
+import Alert from '../interfaces/prisonApi/Alert'
+import PagedList from '../interfaces/prisonApi/PagedList'
 
 export const pagedActiveAlertsMock: PagedList<Alert> = {
   content: [

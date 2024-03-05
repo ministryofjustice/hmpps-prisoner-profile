@@ -1,4 +1,4 @@
-import { Alert } from '../../interfaces/prisonApi/alert'
+import Alert from '../interfaces/prisonApi/Alert'
 
 export const alertDetailsMock: Alert = {
   alertId: 7,

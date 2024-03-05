@@ -3,8 +3,8 @@ import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
-import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
 import { calculateAge } from '../../server/utils/utils'
+import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })

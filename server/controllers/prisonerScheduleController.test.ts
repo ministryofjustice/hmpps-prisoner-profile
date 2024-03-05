@@ -4,7 +4,7 @@ import PrisonerScheduleController from './prisonerScheduleController'
 import { PrisonerScheduleThisWeekMock } from '../data/localMockData/prisonerScheduleMock'
 import { getEventsNextWeekMock, getEventsThisWeekMock } from '../data/localMockData/getEventsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 
 describe('Prisoner schedule', () => {

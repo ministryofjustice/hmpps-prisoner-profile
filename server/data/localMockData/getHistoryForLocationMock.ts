@@ -1,4 +1,4 @@
-import { HistoryForLocationItem } from '../../interfaces/prisonApi/historyForLocation'
+import HistoryForLocationItem from '../interfaces/prisonApi/HistoryForLocationItem'
 
 export const mockHistoryForLocation = (overrides: Partial<HistoryForLocationItem>[] = []): HistoryForLocationItem[] => {
   const defaultItem = {

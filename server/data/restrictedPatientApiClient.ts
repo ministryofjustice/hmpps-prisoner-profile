@@ -1,7 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
-import { RestrictedPatientApiClient } from './interfaces/restrictedPatientApiClient'
-import { RestrictedPatient } from '../interfaces/restrictedPatientApi/restrictedPatient'
+import { RestrictedPatientApiClient } from './interfaces/restrictedPatientApi/restrictedPatientApiClient'
+import RestrictedPatient from './interfaces/restrictedPatientApi/RestrictedPatient'
 
 export default class RestrictedPatientApiRestClient implements RestrictedPatientApiClient {
   private readonly restClient: RestClient

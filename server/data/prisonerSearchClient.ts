@@ -1,6 +1,6 @@
 import RestClient from './restClient'
-import { Prisoner } from '../interfaces/prisoner'
-import { PrisonerSearchClient } from './interfaces/prisonerSearchClient'
+import Prisoner from './interfaces/prisonerSearchApi/Prisoner'
+import { PrisonerSearchClient } from './interfaces/prisonerSearchApi/prisonerSearchClient'
 import config from '../config'
 
 export default class PrisonerSearchRestClient implements PrisonerSearchClient {

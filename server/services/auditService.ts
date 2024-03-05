@@ -1,6 +1,6 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
-import { CaseLoad } from '../interfaces/caseLoad'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 
 // The individual pages that contain user information

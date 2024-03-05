@@ -1,4 +1,4 @@
-import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import ProbationDocumentsService from './probationDocumentsService'
 import { mockProbationDocumentsResponse } from '../data/localMockData/deliusApi/probationDocuments'
 

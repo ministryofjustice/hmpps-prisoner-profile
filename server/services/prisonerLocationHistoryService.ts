@@ -1,15 +1,15 @@
 import { format } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Prisoner } from '../interfaces/prisoner'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { HistoryForLocationItem } from '../interfaces/prisonApi/historyForLocation'
-import { CellMoveReasonType } from '../interfaces/prisonApi/cellMoveReasonTypes'
-import { CaseLoad } from '../interfaces/caseLoad'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
+import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocationItem'
+import CellMoveReasonType from '../data/interfaces/prisonApi/CellMoveReasonTypes'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import LocationHistoryPageData from '../interfaces/pages/locationHistoryPageData'
 import { extractLocation, formatName, hasLength, putLastNameFirst, sortByDateTime } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 
 export type PrisonerLocationHistoryService = (
   token: string,

@@ -1,4 +1,4 @@
-import { Prisoner } from '../../interfaces/prisoner'
+import Prisoner from '../interfaces/prisonerSearchApi/Prisoner'
 
 export const PrisonerMockDataA: Prisoner = {
   prisonerNumber: 'G6123VU',

@@ -1,4 +1,4 @@
-import { CourtLocation } from '../../interfaces/whereaboutsApi/courtLocation'
+import CourtLocation from '../interfaces/whereaboutsApi/CourtLocation'
 import { SelectOption } from '../../utils/utils'
 
 export const courtLocationsMock: CourtLocation[] = [

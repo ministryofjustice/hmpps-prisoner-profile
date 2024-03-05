@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 import { PrisonerMockDataA, PrisonerOnRemandMockData } from '../../server/data/localMockData/prisoner'
-import { Prisoner } from '../../server/interfaces/prisoner'
+import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 
 export default {
   stubPrisonerData: ({

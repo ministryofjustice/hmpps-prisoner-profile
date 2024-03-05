@@ -1,7 +1,6 @@
-import { CourtDateResults } from './courtDateResults'
-import { Court } from './prisonApi/courtCase'
-import { CourtHearing } from './prisonApi/courtHearing'
-import { OffenceHistoryDetail } from './prisonApi/offenceHistoryDetail'
+import CourtDateResults from '../data/interfaces/prisonApi/CourtDateResults'
+import { Court, CourtHearing } from '../data/interfaces/prisonApi/CourtCase'
+import OffenceHistoryDetail from '../data/interfaces/prisonApi/OffenceHistoryDetail'
 
 export interface CourtCaseDataMapped {
   sentenced: boolean

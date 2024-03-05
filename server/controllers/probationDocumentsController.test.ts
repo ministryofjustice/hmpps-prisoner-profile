@@ -4,8 +4,8 @@ import ProbationDocumentsController from './probationDocumentsController'
 import ProbationDocumentsService from '../services/probationDocumentsService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import config from '../config'
-import { ProbationDocument } from '../interfaces/deliusApi/probationDocument'
-import { Conviction } from '../interfaces/deliusApi/conviction'
+import { ProbationDocument } from '../data/interfaces/deliusApi/ProbationDocuments'
+import Conviction from '../data/interfaces/deliusApi/Conviction'
 
 describe('Prisoner schedule', () => {
   const offenderNo = 'ABC123'

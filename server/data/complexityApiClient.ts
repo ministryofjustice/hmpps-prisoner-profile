@@ -1,7 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
-import { ComplexityOfNeed } from '../interfaces/complexityApi/complexityOfNeed'
-import { ComplexityApiClient } from './interfaces/complexityApiClient'
+import ComplexityApiClient from './interfaces/complexityApi/complexityApiClient'
+import ComplexityOfNeed from './interfaces/complexityApi/ComplexityOfNeed'
 
 export default class ComplexityApiRestClient implements ComplexityApiClient {
   private readonly restClient: RestClient

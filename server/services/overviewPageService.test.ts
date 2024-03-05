@@ -1,7 +1,7 @@
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 import OverviewPageService from './overviewPageService'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
   accountBalancesMock,
   adjudicationsSummaryDataMock,
@@ -29,11 +29,10 @@ import {
   suitableListenerNo,
   suitableListenerYes,
 } from '../data/localMockData/inmateDetailMock'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import { ProfileInformation } from '../interfaces/prisonApi/profileInformation'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 
-import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
-import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
+import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
 import { pomMock } from '../data/localMockData/pom'
 import { keyWorkerMock } from '../data/localMockData/keyWorker'
 import { StaffContactsHighComplexityMock, StaffContactsMock } from '../data/localMockData/staffContacts'
@@ -41,7 +40,7 @@ import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { formatDate } from '../utils/dateHelpers'
 import { convertToTitleCase, neurodiversityEnabled } from '../utils/utils'
-import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
+import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
@@ -49,24 +48,26 @@ import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/lo
 import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
 import OffencesPageService from './offencesPageService'
-import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
 import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
-import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
+
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
 import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
 import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
-import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
-import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
+import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApi/nonAssociationsApiClient'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
 import config from '../config'
-import { ComplexityApiClient } from '../data/interfaces/complexityApiClient'
 import { complexityOfNeedHighMock, complexityOfNeedLowMock } from '../data/localMockData/complexityOfNeedMock'
-import { AdjudicationSummaryAward } from '../interfaces/adjudicationSummary'
+import { AdjudicationSummaryAward } from '../data/interfaces/adjudicationsApi/AdjudicationsSummary'
+import AdjudicationsApiClient from '../data/interfaces/adjudicationsApi/adjudicationsApiClient'
+import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
+import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
+import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 
 jest.mock('../utils/utils', () => {
   const original = jest.requireActual('../utils/utils')

@@ -1,4 +1,4 @@
-import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
+import SecondaryLanguage from '../interfaces/prisonApi/SecondaryLanguage'
 
 export const secondaryLanguagesMock: SecondaryLanguage[] = [
   {

@@ -1,4 +1,4 @@
-import { ReferenceCode } from '../../interfaces/prisonApi/referenceCode'
+import ReferenceCode from '../interfaces/prisonApi/ReferenceCode'
 
 export const mockReferenceDomains: { health: ReferenceCode[]; healthTreatment: ReferenceCode[] } = {
   health: [

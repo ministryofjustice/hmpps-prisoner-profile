@@ -1,4 +1,4 @@
-import { VideoLinkBookingForm } from '../../interfaces/whereaboutsApi/videoLinkBooking'
+import VideoLinkBookingForm from '../interfaces/whereaboutsApi/VideoLinkBookingForm'
 
 export const videoLinkBookingMock: VideoLinkBookingForm = {
   bookingId: 1,

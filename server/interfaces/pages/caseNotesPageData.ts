@@ -1,8 +1,8 @@
-import { CaseNotesListQueryParams, PagedList } from '../prisonApi/pagedList'
 import { HmppsError } from '../hmppsError'
 import { ListMetadata } from '../listMetadata'
-import { CaseNoteType } from '../caseNoteType'
-import { CaseNote, CaseNoteAmendment } from '../caseNotesApi/caseNote'
+import CaseNote, { CaseNoteAmendment } from '../../data/interfaces/caseNotesApi/CaseNote'
+import CaseNoteType from '../../data/interfaces/caseNotesApi/CaseNoteType'
+import PagedList, { CaseNotesListQueryParams } from '../../data/interfaces/prisonApi/PagedList'
 
 export interface CaseNoteAmendmentPageData extends CaseNoteAmendment {
   authorName: string

@@ -1,8 +1,8 @@
 import RestClient from './restClient'
 import config from '../config'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
-import { PrisonerProfileDeliusApiClient } from './interfaces/prisonerProfileDeliusApiClient'
-import { ProbationDocuments } from '../interfaces/deliusApi/probationDocuments'
+import CommunityManager from './interfaces/deliusApi/CommunityManager'
+import { PrisonerProfileDeliusApiClient } from './interfaces/deliusApi/prisonerProfileDeliusApiClient'
+import ProbationDocuments from './interfaces/deliusApi/ProbationDocuments'
 
 export default class PrisonerProfileDeliusApiRestClient implements PrisonerProfileDeliusApiClient {
   private readonly restClient: RestClient

@@ -1,6 +1,6 @@
 import { Readable } from 'stream'
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 
 export default class OffenderService {
   constructor(private readonly prisonClientBuilder: RestClientBuilder<PrisonApiClient>) {}

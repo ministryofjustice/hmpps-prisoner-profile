@@ -10,7 +10,7 @@ import LocationDetailsService from '../services/locationDetailsService'
 import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
 import { Role } from '../data/enums/role'
 import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../services/interfaces/locationDetails'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import LocationDetailsConverter from './converters/locationDetailsConverter'
 
 describe('Prisoner Location Details', () => {

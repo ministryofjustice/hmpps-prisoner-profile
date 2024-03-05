@@ -1,7 +1,7 @@
 import { RestClientBuilder } from '../data'
-import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
-import { Conviction } from '../interfaces/deliusApi/conviction'
-import { ProbationDocument } from '../interfaces/deliusApi/probationDocument'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
+import Conviction from '../data/interfaces/deliusApi/Conviction'
+import { ProbationDocument } from '../data/interfaces/deliusApi/ProbationDocuments'
 
 interface GetCommunityDocumentsResponse {
   notFound: boolean

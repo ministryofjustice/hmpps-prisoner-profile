@@ -1,5 +1,5 @@
 import { SummaryListRow } from '../utils/utils'
-import { OffenderSentenceTerms } from './prisonApi/offenderSentenceTerms'
+import OffenderSentenceTerms from '../data/interfaces/prisonApi/OffenderSentenceTerms'
 
 export interface GroupedSentence {
   key: number

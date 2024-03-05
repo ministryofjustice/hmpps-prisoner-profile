@@ -1,4 +1,4 @@
-import { OffenderContacts } from '../../interfaces/prisonApi/offenderContacts'
+import { OffenderContacts } from '../interfaces/prisonApi/OffenderContact'
 
 export const mockOffenderContacts: OffenderContacts = {
   offenderContacts: [

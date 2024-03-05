@@ -1,10 +1,10 @@
 import { formatDate } from '../utils/dateHelpers'
 
-import { CsraAssessment, ClassificationCode } from '../interfaces/prisonApi/csraAssessment'
+import CsraAssessment, { ClassificationCode } from '../data/interfaces/prisonApi/CsraAssessment'
 import { formatName } from '../utils/utils'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import getCsraClassificationName from './getCsraClassificationName'
-import { Agency } from '../interfaces/prisonApi/agency'
+import Agency from '../data/interfaces/prisonApi/Agency'
 
 function approvedResultText(
   originalClassificationCode: ClassificationCode,

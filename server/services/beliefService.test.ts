@@ -1,5 +1,5 @@
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { beliefHistoryMock } from '../data/localMockData/beliefHistoryMock'
 import BeliefService from './beliefService'
 

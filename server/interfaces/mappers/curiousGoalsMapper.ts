@@ -1,6 +1,6 @@
-import { LearnerGoals } from '../learnerGoals'
 import { CuriousGoals } from '../curiousGoals'
 import { GovSummaryItem } from '../govSummaryItem'
+import LearnerGoals from '../../data/interfaces/curiousApi/LearnerGoals'
 
 /**
  * Simple mapper function to map from the Curious API type [LearnerGoals]
