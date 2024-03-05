@@ -6,6 +6,7 @@ import { Role } from '../data/enums/role'
 import { addMiddlewareError } from './middlewareHelpers'
 import { Prisoner } from '../interfaces/prisoner'
 import { CaseLoad } from '../interfaces/caseLoad'
+import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 
 export default function checkPrisonerInCaseload({
   allowGlobal = true,
@@ -70,8 +71,8 @@ export default function checkPrisonerInCaseload({
       return activeCaseLoadId === prisonerData.prisonId
     }
 
-    function authenticationError(message: string) {
-      return next(addMiddlewareError(req, next, new NotFoundError(message)))
+    function authenticationError(message: string, hmppsStatusCode: HmppsStatusCode = HmppsStatusCode.NOT_IN_CASELOAD) {
+      return next(addMiddlewareError(req, next, new NotFoundError(message, hmppsStatusCode)))
     }
 
     if (activeCaseloadOnly && !authenticateActiveCaseloadOnly()) {
@@ -80,14 +81,23 @@ export default function checkPrisonerInCaseload({
 
     if (restrictedPatient) {
       if (!authenticateRestictedPatient()) {
-        return authenticationError('CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient')
+        return authenticationError(
+          'CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient',
+          HmppsStatusCode.RESTRICTED_PATIENT,
+        )
       }
     } else if (inactiveBooking) {
       if (prisonerData.prisonId === 'OUT' && !authenticateOut()) {
-        return authenticationError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`)
+        return authenticationError(
+          `CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`,
+          HmppsStatusCode.PRISONER_IS_RELEASED,
+        )
       }
       if (prisonerData.prisonId === 'TRN' && !authenticateTransfer()) {
-        return authenticationError(`CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`)
+        return authenticationError(
+          `CheckPrisonerInCaseloadMiddleware: Prisoner is inactive [${prisonerData.prisonId}]`,
+          HmppsStatusCode.PRISONER_IS_TRANSFERRING,
+        )
       }
     } else if (!authenticateActiveBooking()) {
       return authenticationError('CheckPrisonerInCaseloadMiddleware: Prisoner not in caseloads')
