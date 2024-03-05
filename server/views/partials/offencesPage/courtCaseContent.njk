@@ -3,14 +3,17 @@
 
 {% if (courtCase.sentences.length > 0) or (courtCase.sentenced == false and courtCase.courtDateResults.length > 0) %}
     {% set accordionClass = 'govuk-accordion__section' %}
+    {% set accordionButtonClass = 'govuk-accordion__section-button' %}
+{% else %}
+    {% set accordionButtonClass = 'empty-accordion-header' %}
 {% endif %}
 
 <div class="{{ accordionClass }}">
     <div class="govuk-accordion__section-header">
       <h3 class="govuk-accordion__section-heading">
-        <div class="govuk-accordion__section-button govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-5" id="accordion-with-summary-sections-heading-{{index}}">
+        <span class="{{ accordionButtonClass }} govuk-!-display-block govuk-!-font-size-36 govuk-!-static-margin-top-2 govuk-!-static-padding-top-5" id="accordion-with-summary-sections-heading-{{index}}">
           <span class="govuk-!-static-margin-bottom-2 hmpps-display-block govuk-!-static-padding-bottom-1">Court case {{index}}</span>
-        </div>
+        </span>
       </h3>
       <div class="govuk-accordion__section-summary" id="accordion-with-summary-sections-summary-{{index}}">
         <div class="hmpps-grid-container">
