@@ -726,6 +726,7 @@ describe('Alerts Controller', () => {
       expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, 1, {
         comment: 'New comment',
         expiryDate: null,
+        removeExpiryDate: true,
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
     })
@@ -743,6 +744,7 @@ describe('Alerts Controller', () => {
       expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, 1, {
         comment: 'New comment',
         expiryDate: '2199-01-01',
+        removeExpiryDate: false,
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
     })

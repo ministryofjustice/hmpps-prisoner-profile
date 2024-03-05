@@ -502,6 +502,7 @@ export default class AlertsController {
           await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, {
             comment,
             expiryDate: removeEndDate === 'yes' ? null : formatDateISO(parseDate(expiryDate)),
+            removeExpiryDate: removeEndDate === 'yes',
           })
         } catch (error) {
           if (error.status === 400) {
