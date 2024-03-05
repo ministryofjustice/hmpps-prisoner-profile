@@ -21,6 +21,7 @@ import populateClientToken from './middleware/populateClientToken'
 import setUpPageNotFound from './middleware/setUpPageNotFound'
 import flashMessageMiddleware from './middleware/flashMessageMiddleware'
 import setUpEnvironmentName from './middleware/setUpEnvironmentName'
+import apiErrorMiddleware from './middleware/apiErrorMiddleware'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -43,6 +44,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCurrentUser(services))
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())
+  app.use(apiErrorMiddleware())
 
   app.use(routes(services))
 

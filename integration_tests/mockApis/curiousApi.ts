@@ -167,6 +167,25 @@ export default {
       },
     })
   },
+
+  stubGetLearnerNeurodivergenceError: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/curiousApi/learnerNeurodivergence/${prisonerNumber}`,
+      },
+      response: {
+        status: 500,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          errorCode: 'VC5001',
+          errorMessage: 'Service unavailable',
+          httpStatusCode: 500,
+        },
+      },
+    })
+  },
+
   stubGetOffenderAttendanceHistory: (prisonerNumber: string) => {
     const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
     const sixMonthsAgo = format(sub(startOfToday(), { months: 6 }), 'yyyy-MM-dd')
