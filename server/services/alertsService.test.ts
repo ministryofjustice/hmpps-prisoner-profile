@@ -2,7 +2,7 @@ import { Prisoner } from '../interfaces/prisoner'
 import AlertsService from './alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
@@ -26,7 +26,7 @@ describe('Alerts Service', () => {
 
   describe('Get Alerts', () => {
     it('should call Prison API tp get active alerts when queryParams includes ACTIVE', async () => {
-      const queryParams: PagedListQueryParams = { alertStatus: 'ACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
       prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
         ...inmateDetailMock,
         activeAlertCount: pagedActiveAlertsMock.totalElements,
@@ -47,7 +47,7 @@ describe('Alerts Service', () => {
     })
 
     it('should call Prison API to get inactive alerts when queryParams includes INACTIVE', async () => {
-      const queryParams: PagedListQueryParams = { alertStatus: 'INACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'INACTIVE' }
       prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
         ...inmateDetailMock,
         activeAlertCount: 0,

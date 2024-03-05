@@ -15,7 +15,7 @@ import { CaseNotesByTypeA } from './localMockData/caseNotes'
 import { inmateDetailMock } from './localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
 import { secondaryLanguagesMock } from './localMockData/secondaryLanguages'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
 import { CourtCasesMock } from './localMockData/courtCaseMock'
@@ -206,7 +206,7 @@ describe('prisonApiClient', () => {
   describe('getAlerts', () => {
     it('Should return data from the API', async () => {
       const bookingId = 123456
-      const queryParams: PagedListQueryParams = { alertStatus: 'ACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
       mockSuccessfulPrisonApiCall(
         `/api/bookings/${bookingId}/alerts/v2?size=20&alertStatus=ACTIVE`,
         pagedActiveAlertsMock,

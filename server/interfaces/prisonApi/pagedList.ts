@@ -39,12 +39,17 @@ export interface PagedListQueryParams {
   size?: number
   sort?: string
   showAll?: boolean
+}
 
-  from?: string
-  to?: string
+export interface AlertsListQueryParams extends PagedListQueryParams {
   alertStatus?: 'ACTIVE' | 'INACTIVE'
   alertType?: string | string[]
+  type?: string
+  from?: string
+  to?: string
+}
 
+export interface CaseNotesListQueryParams extends PagedListQueryParams {
   type?: string
   subType?: string
   startDate?: string

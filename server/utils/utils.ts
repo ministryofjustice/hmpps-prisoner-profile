@@ -213,13 +213,13 @@ export const convertNameCommaToHuman = (name: string): string => {
  * @param sortOptions
  * @param sortLabel
  */
-export const generateListMetadata = (
+export const generateListMetadata = <T extends PagedListQueryParams>(
   pagedList: PagedList<PagedListItem>,
-  queryParams: PagedListQueryParams,
+  queryParams: T,
   itemDescription: string,
   sortOptions: SortOption[],
   sortLabel: string,
-): ListMetadata => {
+): ListMetadata<T> => {
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
 
@@ -289,7 +289,7 @@ export const generateListMetadata = (
 
   const viewAllUrl = [`?${mapToQueryString(queryParams)}`, 'showAll=true'].filter(Boolean).join('&')
 
-  return <ListMetadata>{
+  return <ListMetadata<T>>{
     filtering: {
       ...queryParams,
       queryParams: { sort: queryParams.sort },

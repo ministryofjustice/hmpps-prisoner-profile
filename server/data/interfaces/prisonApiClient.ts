@@ -13,7 +13,7 @@ import { PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../../interfaces/offenderAttendanceHistory'
 import { SecondaryLanguage } from '../../interfaces/prisonApi/secondaryLanguage'
-import { PagedList, PagedListQueryParams } from '../../interfaces/prisonApi/pagedList'
+import { AlertsListQueryParams, PagedList } from '../../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../../interfaces/prisonApi/propertyContainer'
 import { CourtCase } from '../../interfaces/prisonApi/courtCase'
 import { OffenderSentenceTerms } from '../../interfaces/prisonApi/offenderSentenceTerms'
@@ -52,6 +52,8 @@ import { Telephone } from '../../interfaces/prisonApi/telephone'
 import { CsraAssessmentSummary } from '../../interfaces/prisonApi/csraAssessmentSummary'
 import { Belief } from '../../interfaces/prisonApi/belief'
 import { Reception } from '../../interfaces/prisonApi/reception'
+import { VisitWithVisitors } from '../../interfaces/prisonApi/visitWithVisitors'
+import { PrisonDetails } from '../../interfaces/prisonApi/prisonDetail'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -72,7 +74,7 @@ export interface PrisonApiClient {
     toDate: string,
   ): Promise<OffenderAttendanceHistory>
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
-  getAlerts(bookingId: number, queryParams: PagedListQueryParams): Promise<PagedList<Alert>>
+  getAlerts(bookingId: number, queryParams: AlertsListQueryParams): Promise<PagedList<Alert>>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
   getCourtCases(bookingId: number): Promise<CourtCase[]>
   getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]>
@@ -155,4 +157,6 @@ export interface PrisonApiClient {
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
   getAlertDetails(bookingId: number, alertId: number): Promise<Alert>
   getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
+  getVisitsForBookingWithVisitors(bookingId: number, params: object): Promise<PagedList<VisitWithVisitors>>
+  getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]>
 }

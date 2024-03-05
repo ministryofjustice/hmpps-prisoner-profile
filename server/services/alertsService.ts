@@ -3,7 +3,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
 import { AlertsPageData } from '../interfaces/pages/alertsPageData'
 import { Prisoner } from '../interfaces/prisoner'
 import { formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PagedList, AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
 import { AlertTypeFilter } from '../interfaces/alertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
@@ -47,7 +47,7 @@ export default class AlertsService {
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: PagedListQueryParams) {
+  private mapToApiParams(queryParams: AlertsListQueryParams) {
     const apiParams = { ...queryParams }
 
     if (apiParams.from) apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
@@ -68,7 +68,7 @@ export default class AlertsService {
   public async get(
     clientToken: string,
     prisonerData: Prisoner,
-    queryParams: PagedListQueryParams,
+    queryParams: AlertsListQueryParams,
     canUpdateAlert: boolean,
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'

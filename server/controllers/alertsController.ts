@@ -1,6 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addDays, isToday, subDays } from 'date-fns'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { Role } from '../data/enums/role'
@@ -29,7 +29,7 @@ export default class AlertsController {
 
     // Parse query params for paging, sorting and filtering data
     const { clientToken } = res.locals
-    const queryParams: PagedListQueryParams = {}
+    const queryParams: AlertsListQueryParams = {}
     if (req.query.page) queryParams.page = +req.query.page
     if (req.query.sort) queryParams.sort = req.query.sort as string
     if (req.query.alertType) queryParams.alertType = req.query.alertType as string[]

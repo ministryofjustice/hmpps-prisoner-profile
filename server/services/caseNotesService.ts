@@ -1,6 +1,6 @@
 import { Prisoner } from '../interfaces/prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PagedList, CaseNotesListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { SortOption } from '../interfaces/sortSelector'
 import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
 import { HmppsError } from '../interfaces/hmppsError'
@@ -22,7 +22,7 @@ export default class CaseNotesService {
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: PagedListQueryParams) {
+  private mapToApiParams(queryParams: CaseNotesListQueryParams) {
     const apiParams = { ...queryParams }
 
     if (apiParams.startDate)
@@ -47,7 +47,7 @@ export default class CaseNotesService {
   public async get(
     token: string,
     prisonerData: Prisoner,
-    queryParams: PagedListQueryParams,
+    queryParams: CaseNotesListQueryParams,
     canDeleteSensitiveCaseNotes: boolean,
     currentUserDetails: UserDetails,
   ): Promise<CaseNotesPageData> {

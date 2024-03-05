@@ -17,7 +17,7 @@ import { PersonalCareNeeds } from '../interfaces/personalCareNeeds'
 import { OffenderActivitiesHistory } from '../interfaces/offenderActivitiesHistory'
 import { OffenderAttendanceHistory } from '../interfaces/offenderAttendanceHistory'
 import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PagedList, AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
 import { CourtCase } from '../interfaces/prisonApi/courtCase'
 import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
@@ -57,6 +57,8 @@ import { Telephone } from '../interfaces/prisonApi/telephone'
 import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
 import { Belief } from '../interfaces/prisonApi/belief'
 import { Reception } from '../interfaces/prisonApi/reception'
+import { VisitWithVisitors } from '../interfaces/prisonApi/visitWithVisitors'
+import { PrisonDetails } from '../interfaces/prisonApi/prisonDetail'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -170,9 +172,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
   }
 
-  async getAlerts(bookingId: number, queryParams?: PagedListQueryParams): Promise<PagedList<Alert>> {
+  async getAlerts(bookingId: number, queryParams?: AlertsListQueryParams): Promise<PagedList<Alert>> {
     // Set defaults then apply queryParams
-    const params: PagedListQueryParams = {
+    const params: AlertsListQueryParams = {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }
@@ -536,5 +538,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       path: `/api/offenders/${prisonerNumber}/belief-history`,
       query: bookingId ? `bookingId=${bookingId}` : undefined,
     })
+  }
+
+  async getVisitsForBookingWithVisitors(_bookingId: number, _params: object): Promise<PagedList<VisitWithVisitors>> {
+    return null
+  }
+
+  async getVisitsPrisons(_bookingId: number): Promise<PrisonDetails[]> {
+    return null
   }
 }
