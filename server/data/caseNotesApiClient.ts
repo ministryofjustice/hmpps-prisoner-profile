@@ -1,6 +1,6 @@
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { PagedList, CaseNotesListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import { CaseNoteType } from '../interfaces/caseNoteType'
 import { CaseNote, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
@@ -29,9 +29,9 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.restClient.put(args)
   }
 
-  async getCaseNotes(offenderNumber: string, queryParams?: PagedListQueryParams): Promise<PagedList<CaseNote>> {
+  async getCaseNotes(offenderNumber: string, queryParams?: CaseNotesListQueryParams): Promise<PagedList<CaseNote>> {
     // Set defaults then apply queryParams
-    const params: PagedListQueryParams = {
+    const params: CaseNotesListQueryParams = {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }

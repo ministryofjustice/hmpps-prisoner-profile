@@ -1,4 +1,4 @@
-import { PagedList } from '../prisonApi/pagedList'
+import { CaseNotesListQueryParams, PagedList } from '../prisonApi/pagedList'
 import { HmppsError } from '../hmppsError'
 import { ListMetadata } from '../listMetadata'
 import { CaseNoteType } from '../caseNoteType'
@@ -18,7 +18,7 @@ export interface CaseNotePageData extends CaseNote {
 
 export interface CaseNotesPageData {
   pagedCaseNotes: PagedList<CaseNotePageData>
-  listMetadata: ListMetadata
+  listMetadata: ListMetadata<CaseNotesListQueryParams>
   caseNoteTypes: CaseNoteType[]
   fullName: string
   errors: HmppsError[]

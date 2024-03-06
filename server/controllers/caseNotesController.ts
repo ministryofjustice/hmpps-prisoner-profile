@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
+import { CaseNotesListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
@@ -31,7 +31,7 @@ export default class CaseNotesController {
   public displayCaseNotes(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
-      const queryParams: PagedListQueryParams = {}
+      const queryParams: CaseNotesListQueryParams = {}
       const { clientToken } = res.locals
       const userToken = res.locals.user.token
 

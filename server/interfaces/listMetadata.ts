@@ -1,15 +1,9 @@
 import { SortParams } from './sortSelector'
 
-export interface ListMetadata {
+export interface ListMetadata<TGeneric> {
   filtering: {
-    from: string
-    to: string
-    startDate: string
-    endDate: string
-    type: string
-    subType: string
     queryParams?: { [key: string]: string | number | boolean }
-  }
+  } & TGeneric
   sorting: SortParams
   pagination: {
     itemDescription: string
