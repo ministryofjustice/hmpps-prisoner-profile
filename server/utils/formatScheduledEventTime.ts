@@ -1,4 +1,4 @@
-import isValid from 'date-fns/isValid'
+import { isValid } from 'date-fns'
 import { ScheduledEvent } from '../interfaces/scheduledEvent'
 
 const padWithZero = (num: number) => (num.toString().length === 1 ? `0${num}` : `${num}`)

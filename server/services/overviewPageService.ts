@@ -118,6 +118,8 @@ export default class OverviewPageService {
       return curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber)
     }
 
+    const activeCaseloadId = userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId
+
     const [
       staffRoles,
       learnerNeurodivergence,
@@ -132,7 +134,7 @@ export default class OverviewPageService {
       communityManager,
       prisonerDetail,
     ] = await Promise.all([
-      prisonApiClient.getStaffRoles(staffId, userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId),
+      activeCaseloadId ? prisonApiClient.getStaffRoles(staffId, activeCaseloadId) : [],
       Result.wrap(getLearnerNeurodivergence, apiErrorCallback)(),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
