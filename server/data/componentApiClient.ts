@@ -1,7 +1,7 @@
 import RestClient from './restClient'
-import { ComponentApiClient, ComponentsApiResponse } from './interfaces/componentApiClient'
-import AvailableComponent from './interfaces/AvailableComponent'
 import config from '../config'
+import AvailableComponent from './interfaces/componentApi/AvailableComponent'
+import ComponentApiClient, { ComponentsApiResponse } from './interfaces/componentApi/componentApiClient'
 
 export default class ComponentApiRestClient implements ComponentApiClient {
   private restClient: RestClient

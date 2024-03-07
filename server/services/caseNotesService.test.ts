@@ -1,10 +1,12 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import CaseNotesService from './caseNotesService'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNote, CaseNoteForm, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
-import { PagedList } from '../interfaces/prisonApi/pagedList'
+import PagedList from '../data/interfaces/prisonApi/PagedList'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
+import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
+import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 
 jest.mock('../data/caseNotesApiClient')
 

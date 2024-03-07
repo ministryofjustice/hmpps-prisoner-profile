@@ -1,4 +1,4 @@
-import { OffenderActivitiesHistory } from '../../interfaces/offenderActivitiesHistory'
+import OffenderActivitiesHistory from '../interfaces/prisonApi/OffenderActivitiesHistory'
 
 export const OffenderActivitiesMock: OffenderActivitiesHistory = {
   content: [

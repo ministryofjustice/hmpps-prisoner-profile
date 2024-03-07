@@ -43,17 +43,16 @@ import { prisonerSentenceDetailsMock } from '../../server/data/localMockData/pri
 import { caseNoteUsageMock } from '../../server/data/localMockData/caseNoteUsageMock'
 import { caseNoteCountMock } from '../../server/data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
-import { CaseLoad } from '../../server/interfaces/caseLoad'
-import { CaseNoteUsage } from '../../server/interfaces/prisonApi/caseNoteUsage'
+import CaseLoad from '../../server/data/interfaces/prisonApi/CaseLoad'
 
 import {
   fullStatusMock,
   fullStatusRemandMock,
   mainOffenceMock,
 } from '../../server/data/localMockData/offenceOverviewMock'
-import { FullStatus } from '../../server/interfaces/prisonApi/fullStatus'
+import FullStatus from '../../server/data/interfaces/prisonApi/FullStatus'
 import { identifiersMock } from '../../server/data/localMockData/identifiersMock'
-import { StaffRole } from '../../server/interfaces/prisonApi/staffRole'
+import StaffRole from '../../server/data/interfaces/prisonApi/StaffRole'
 
 import {
   SentenceSummaryWithoutSentenceMock,
@@ -85,17 +84,17 @@ import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
 import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from '../../server/data/localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
-import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/historyForLocation'
-import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
-import { CsraAssessmentSummary } from '../../server/interfaces/prisonApi/csraAssessmentSummary'
-import { CsraAssessment } from '../../server/interfaces/prisonApi/csraAssessment'
+import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
+import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
+import CsraAssessment, { CsraAssessmentSummary } from '../../server/data/interfaces/prisonApi/CsraAssessment'
 import { beliefHistoryAllBookingsMock, beliefHistoryMock } from '../../server/data/localMockData/beliefHistoryMock'
 import receptionsWithCapacityMock from '../../server/data/localMockData/receptionsWithCapacityMock'
 import { OffenderCellHistoryMock } from '../../server/data/localMockData/offenderCellHistoryMock'
 import { mockInmateAtLocation } from '../../server/data/localMockData/locationsInmates'
-import { OffenderCellHistory } from '../../server/interfaces/prisonApi/offenderCellHistoryInterface'
-import { AgencyDetails } from '../../server/interfaces/prisonApi/agencies'
-import { OffenderBooking } from '../../server/interfaces/prisonApi/offenderBooking'
+import OffenderCellHistory from '../../server/data/interfaces/prisonApi/OffenderCellHistoryInterface'
+import OffenderBooking from '../../server/data/interfaces/prisonApi/OffenderBooking'
+import { CaseNoteUsage } from '../../server/data/interfaces/prisonApi/CaseNote'
+import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 

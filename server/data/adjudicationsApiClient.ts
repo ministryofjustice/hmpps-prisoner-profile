@@ -1,7 +1,7 @@
 import RestClient from './restClient'
-import { AdjudicationsApiClient } from './interfaces/adjudicationsApiClient'
-import { AdjudicationSummary } from '../interfaces/adjudicationSummary'
 import config from '../config'
+import AdjudicationsApiClient from './interfaces/adjudicationsApi/adjudicationsApiClient'
+import AdjudicationSummary from './interfaces/adjudicationsApi/AdjudicationsSummary'
 
 export default class AdjudicationsApiRestClient implements AdjudicationsApiClient {
   private readonly restClient: RestClient

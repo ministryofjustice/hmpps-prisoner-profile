@@ -1,6 +1,6 @@
 import { format, startOfToday } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Prisoner } from '../interfaces/prisoner'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import OffencesPageService from './offencesPageService'
 import {
   CourtCasesMock,

@@ -1,4 +1,4 @@
-import { Transaction } from '../../interfaces/prisonApi/transaction'
+import Transaction from '../interfaces/prisonApi/Transaction'
 import { AccountCode } from '../enums/accountCode'
 import { TransactionPostingType } from '../enums/transactionPostingType'
 import { TransactionPayType } from '../enums/transactionPayType'

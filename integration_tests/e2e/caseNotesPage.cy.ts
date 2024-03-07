@@ -2,7 +2,7 @@ import Page from '../pages/page'
 import CaseNotesPage from '../pages/caseNotesPage'
 import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
-import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
+import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })

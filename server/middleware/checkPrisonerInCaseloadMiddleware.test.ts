@@ -5,7 +5,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import checkPrisonerInCaseload from './checkPrisonerInCaseloadMiddleware'
 import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 
 let req: any
 let res: any

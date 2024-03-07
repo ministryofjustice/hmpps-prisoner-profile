@@ -1,4 +1,4 @@
-import { CaseNote } from '../../interfaces/caseNote'
+import CaseNote from '../interfaces/prisonApi/CaseNote'
 
 export const CaseNotesByTypeA: CaseNote[] = [
   {

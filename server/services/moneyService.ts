@@ -1,13 +1,13 @@
 import { endOfMonth, isFuture, isSameMonth } from 'date-fns'
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { AccountCode } from '../data/enums/accountCode'
-import { Transaction } from '../interfaces/prisonApi/transaction'
+import Transaction from '../data/interfaces/prisonApi/Transaction'
 import { formatDateISO } from '../utils/dateHelpers'
-import { AccountBalances } from '../interfaces/accountBalances'
-import { AgencyDetails } from '../interfaces/prisonApi/agencies'
+import AccountBalances from '../data/interfaces/prisonApi/AccountBalances'
+import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import { TransactionType } from '../data/enums/transactionType'
-import { DamageObligation } from '../interfaces/prisonApi/damageObligation'
+import DamageObligation from '../data/interfaces/prisonApi/DamageObligation'
 
 export default class MoneyService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}

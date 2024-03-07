@@ -1,4 +1,4 @@
-import { PrisonerPrisonSchedule } from '../../interfaces/prisonApi/prisonerSchedule'
+import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/PrisonerSchedule'
 
 export const scheduledTransfersMock: PrisonerPrisonSchedule[] = [
   {

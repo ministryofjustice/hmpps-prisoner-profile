@@ -1,4 +1,4 @@
-import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
+import StaffDetails from '../../data/interfaces/prisonApi/StaffDetails'
 import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../../services/interfaces/locationDetails'
 import {
   GroupedLocationDetailsForDisplay,

@@ -1,5 +1,5 @@
 import { isValid } from 'date-fns'
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 
 const padWithZero = (num: number) => (num.toString().length === 1 ? `0${num}` : `${num}`)
 const formatDateToTime = (dateString: string): string => {

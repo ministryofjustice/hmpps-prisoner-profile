@@ -1,4 +1,4 @@
-import { Details } from '../../interfaces/prisonApi/details'
+import Details from '../interfaces/prisonApi/Details'
 
 export const GetDetailsMock: Details = {
   offenderNo: 'A1234AA',

@@ -1,4 +1,4 @@
-import { Location } from '../../interfaces/prisonApi/location'
+import Location from '../interfaces/prisonApi/Location'
 import { SelectOption } from '../../utils/utils'
 
 export const locationsMock: Location[] = [

@@ -1,25 +1,26 @@
 import { format, startOfToday } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { Prisoner } from '../interfaces/prisoner'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatCurrency } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
-import { CourtHearing } from '../interfaces/prisonApi/courtHearing'
-import { FindConsecutiveSentence, Licence, OffenderSentenceTerms } from '../interfaces/prisonApi/offenderSentenceTerms'
+import OffenderSentenceTerms, {
+  FindConsecutiveSentence,
+  Licence,
+} from '../data/interfaces/prisonApi/OffenderSentenceTerms'
 import { GroupedSentence } from '../interfaces/groupSentencesBySequence'
-import { OffenceHistoryDetail } from '../interfaces/prisonApi/offenceHistoryDetail'
+import OffenceHistoryDetail from '../data/interfaces/prisonApi/OffenceHistoryDetail'
 import { Charge } from '../data/enums/chargeCodes'
-import { CourtCase } from '../interfaces/prisonApi/courtCase'
-import { CourtDateResults } from '../interfaces/courtDateResults'
+import CourtCase, { CourtHearing } from '../data/interfaces/prisonApi/CourtCase'
+import CourtDateResults from '../data/interfaces/prisonApi/CourtDateResults'
 import { CourtCaseDataMappedUnsentenced } from '../interfaces/courtCaseDataMapped'
-import {
-  SentenceSummary,
+import SentenceSummary, {
   SentenceSummaryCourtCaseExtended,
   SentenceSummaryCourtSentence,
   SentenceSummaryTermDetail,
-} from '../interfaces/prisonApi/sentenceSummary'
+} from '../data/interfaces/prisonApi/SentenceSummary'
 import { RestClientBuilder } from '../data'
 import { ReleaseDates } from '../interfaces/releaseDates'
-import { PrisonerSentenceDetails } from '../interfaces/prisonerSentenceDetails'
+import PrisonerSentenceDetails from '../data/interfaces/prisonApi/PrisonerSentenceDetails'
 
 export default class OffencesPageService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}

@@ -1,4 +1,4 @@
-import { ScheduledEvent } from '../../interfaces/scheduledEvent'
+import ScheduledEvent from '../interfaces/prisonApi/ScheduledEvent'
 
 const dummyScheduledEvents: ScheduledEvent[] = [
   {

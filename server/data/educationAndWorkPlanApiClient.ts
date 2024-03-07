@@ -1,7 +1,7 @@
-import { EducationAndWorkPlanApiClient } from './interfaces/educationAndWorkPlanApiClient'
+import EducationAndWorkPlanApiClient from './interfaces/educationAndWorkPlanApi/EducationAndWorkPlanApiClient'
 import RestClient from './restClient'
 import config from '../config'
-import { ActionPlanResponse } from '../interfaces/educationAndWorkPlanApi/actionPlanResponse'
+import { ActionPlanResponse } from './interfaces/educationAndWorkPlanApi/actionPlanResponse'
 
 /**
  * REST API client implementation of [EducationAndWorkPlanApiClient] (aka. the PLP API Client)

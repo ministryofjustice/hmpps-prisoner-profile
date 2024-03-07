@@ -1,4 +1,4 @@
-import { ContactDetail } from '../../interfaces/staffContacts'
+import { ContactDetail } from '../interfaces/prisonApi/StaffContacts'
 
 export const mockContactDetail: ContactDetail = {
   bookingId: 0,

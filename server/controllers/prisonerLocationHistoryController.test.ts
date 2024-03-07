@@ -12,7 +12,7 @@ import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import prisonerLocationHistoryService from '../services/prisonerLocationHistoryService'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 
 describe('Specific Prisoner Location History', () => {
   const offenderNo = 'ABC123'

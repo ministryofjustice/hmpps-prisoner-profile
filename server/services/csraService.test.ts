@@ -1,11 +1,11 @@
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import CsraService from './csraService'
 import csraAssessmentMock from '../data/localMockData/csraAssessmentMock'
 import csraAssessmentSummaryMock from '../data/localMockData/csraAssessmentSummaryMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import CsraAssessment from '../data/interfaces/prisonApi/CsraAssessment'
 import AgencyMock from '../data/localMockData/agency'
 import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
 

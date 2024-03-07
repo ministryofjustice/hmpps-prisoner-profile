@@ -1,5 +1,5 @@
 import { addDays, subDays, format } from 'date-fns'
-import { Address } from '../interfaces/prisonApi/address'
+import Address from '../data/interfaces/prisonApi/Address'
 import { getMostRecentAddress } from './getMostRecentAddress'
 
 describe('getMostRecentAddress', () => {

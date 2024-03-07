@@ -1,4 +1,4 @@
-import { AlertType } from '../../interfaces/prisonApi/alert'
+import { AlertType } from '../interfaces/prisonApi/Alert'
 
 export const alertTypesMock: AlertType[] = [
   {

@@ -1,4 +1,4 @@
-import { CommunityManager } from '../../interfaces/prisonerProfileDeliusApi/communityManager'
+import CommunityManager from '../interfaces/deliusApi/CommunityManager'
 
 export const communityManagerMock: CommunityManager = {
   code: 'ABC',

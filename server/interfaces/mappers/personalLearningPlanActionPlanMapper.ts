@@ -1,7 +1,7 @@
 import { parseISO } from 'date-fns'
 import { PersonalLearningPlanActionPlan, PersonalLearningPlanGoal } from '../personalLearningPlanGoals'
-import { ActionPlanResponse } from '../educationAndWorkPlanApi/actionPlanResponse'
-import { GoalResponse } from '../educationAndWorkPlanApi/goalResponse'
+import { ActionPlanResponse } from '../../data/interfaces/educationAndWorkPlanApi/actionPlanResponse'
+import GoalResponse from '../../data/interfaces/educationAndWorkPlanApi/GoalResponse'
 
 /**
  * Simple mapper function to map from the Education And Work Plan (PLP) API type [ActionPlanResponse]

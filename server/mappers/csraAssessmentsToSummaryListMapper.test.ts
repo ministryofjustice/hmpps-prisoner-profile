@@ -2,7 +2,7 @@ import csraAssessmentMock from '../data/localMockData/csraAssessmentMock'
 import AgencyMock from '../data/localMockData/agency'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
 import mapCsraReviewToSummaryList from './csraReviewToSummaryListMapper'
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import CsraAssessment from '../data/interfaces/prisonApi/CsraAssessment'
 
 describe('mapCsraReviewToSummaryList', () => {
   it('should map the csra review details to summary rows', async () => {

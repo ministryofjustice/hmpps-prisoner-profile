@@ -4,9 +4,9 @@ import NotFoundError from '../utils/notFoundError'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { addMiddlewareError } from './middlewareHelpers'
-import { Prisoner } from '../interfaces/prisoner'
-import { CaseLoad } from '../interfaces/caseLoad'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 export default function checkPrisonerInCaseload({
   allowGlobal = true,

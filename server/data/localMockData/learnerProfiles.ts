@@ -1,5 +1,5 @@
-import { LearnerProfile } from '../../interfaces/learnerProfile'
 import { AssessmentQualificationType } from '../enums/dpsCore'
+import LearnerProfile from '../interfaces/curiousApi/LearnerProfile'
 
 export const LearnerProfiles: LearnerProfile[] = [
   {

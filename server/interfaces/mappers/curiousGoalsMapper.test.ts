@@ -1,6 +1,7 @@
 import toCuriousGoals from './curiousGoalsMapper'
-import { LearnerGoals } from '../learnerGoals'
+
 import { CuriousGoals } from '../curiousGoals'
+import LearnerGoals from '../../data/interfaces/curiousApi/LearnerGoals'
 
 describe('curiousGoalsMapper', () => {
   it('should map to CuriousGoals given LearnerGoals', () => {

@@ -1,4 +1,4 @@
-import { IncentiveReviews } from '../../interfaces/IncentivesApi/incentiveReviews'
+import IncentiveReviews from '../interfaces/incentivesApi/IncentiveReviews'
 
 export const incentiveReviewsMock: IncentiveReviews = {
   iepDate: '2023-01-01',

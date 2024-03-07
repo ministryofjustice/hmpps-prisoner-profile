@@ -1,12 +1,12 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import AlertsService from './alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
-import { AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
+import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 jest.mock('../data/prisonApiClient')
 

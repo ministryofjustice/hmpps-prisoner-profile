@@ -1,17 +1,17 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addDays, isToday, subDays } from 'date-fns'
-import { AlertsListQueryParams } from '../interfaces/prisonApi/pagedList'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { Role } from '../data/enums/role'
 import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
-import { Alert, AlertForm, AlertType } from '../interfaces/prisonApi/alert'
+import Alert, { AlertForm, AlertType } from '../data/interfaces/prisonApi/Alert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
+import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 /**
  * Parse request for alerts page and orchestrate response

@@ -1,4 +1,4 @@
-import { PrisonerNonAssociations } from '../../interfaces/nonAssociationsApi/prisonerNonAssociations'
+import PrisonerNonAssociations from '../interfaces/nonAssociationsApi/PrisonerNonAssociations'
 
 export const prisonerNonAssociationsMock: PrisonerNonAssociations = {
   prisonerNumber: 'G6123VU',

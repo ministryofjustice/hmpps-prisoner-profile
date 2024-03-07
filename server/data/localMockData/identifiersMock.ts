@@ -1,4 +1,4 @@
-import { OffenderIdentifier } from '../../interfaces/prisonApi/offenderIdentifier'
+import OffenderIdentifier from '../interfaces/prisonApi/OffenderIdentifier'
 
 export const identifiersMock: OffenderIdentifier[] = [
   {

@@ -1,6 +1,6 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import MoneyService from './moneyService'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { transactionsMock } from '../data/localMockData/transactionsMock'
 import { accountBalancesMock } from '../data/localMockData/miniSummaryMock'

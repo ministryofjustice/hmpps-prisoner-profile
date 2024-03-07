@@ -1,5 +1,5 @@
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { AlertType } from '../interfaces/prisonApi/alert'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { AlertType } from '../data/interfaces/prisonApi/Alert'
 import { RestClientBuilder } from '../data'
 
 export default class ReferenceDataService {

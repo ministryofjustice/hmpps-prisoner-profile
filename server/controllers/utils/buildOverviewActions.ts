@@ -1,5 +1,5 @@
-import { Prisoner } from '../../interfaces/prisoner'
-import { Nominal } from '../../interfaces/pathfinderApi/nominal'
+import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
+import Nominal from '../../data/interfaces/manageSocCasesApi/Nominal'
 import { User } from '../../data/hmppsAuthClient'
 import { HmppsAction } from '../../interfaces/hmppsAction'
 import { canAddCaseNotes, canViewCalculateReleaseDates } from '../../utils/roleHelpers'
@@ -7,7 +7,7 @@ import { Icon } from '../../data/enums/icon'
 import { userCanEdit, userHasRoles } from '../../utils/utils'
 import { Role } from '../../data/enums/role'
 import conf from '../../config'
-import { HeaderFooterMeta } from '../../data/interfaces/component'
+import { HeaderFooterMeta } from '../../data/interfaces/componentApi/Component'
 import isServiceEnabled from '../../utils/isServiceEnabled'
 
 export default (

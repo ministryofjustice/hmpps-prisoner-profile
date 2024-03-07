@@ -1,4 +1,4 @@
-import { CellMoveReasonType } from '../../interfaces/prisonApi/cellMoveReasonTypes'
+import CellMoveReasonType from '../interfaces/prisonApi/CellMoveReasonTypes'
 
 export const getCellMoveReasonTypesMock: CellMoveReasonType[] = [
   {

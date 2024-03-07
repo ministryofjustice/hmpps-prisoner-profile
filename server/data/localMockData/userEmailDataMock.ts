@@ -1,4 +1,4 @@
-import { UserEmailData } from '../../interfaces/manageUsersApi/userEmailData'
+import UserEmailData from '../interfaces/manageUsersApi/UserEmailData'
 
 export const userEmailDataMock: UserEmailData = {
   username: 'JSMITH_GEN',

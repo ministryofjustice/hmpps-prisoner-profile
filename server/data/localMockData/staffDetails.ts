@@ -1,4 +1,4 @@
-import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
+import StaffDetails from '../interfaces/prisonApi/StaffDetails'
 
 const StaffDetailsMock: StaffDetails = {
   staffId: 231232,

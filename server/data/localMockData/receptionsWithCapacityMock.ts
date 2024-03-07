@@ -1,4 +1,4 @@
-import { Reception } from '../../interfaces/prisonApi/reception'
+import Reception from '../interfaces/prisonApi/Reception'
 
 const ReceptionsWithCapacityMock: Reception[] = [
   {

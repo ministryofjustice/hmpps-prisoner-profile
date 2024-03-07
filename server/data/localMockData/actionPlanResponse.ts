@@ -1,6 +1,6 @@
-import { ActionPlanResponse } from '../../interfaces/educationAndWorkPlanApi/actionPlanResponse'
-import { GoalResponse } from '../../interfaces/educationAndWorkPlanApi/goalResponse'
-import { StepResponse } from '../../interfaces/educationAndWorkPlanApi/stepResponse'
+import { ActionPlanResponse } from '../interfaces/educationAndWorkPlanApi/actionPlanResponse'
+import GoalResponse from '../interfaces/educationAndWorkPlanApi/GoalResponse'
+import StepResponse from '../interfaces/educationAndWorkPlanApi/StepResponse'
 
 const aValidActionPlanResponse = (options?: {
   reference?: string

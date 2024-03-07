@@ -1,4 +1,4 @@
-import { KeyWorker } from '../../interfaces/keyWorker'
+import KeyWorker from '../interfaces/keyWorkerApi/KeyWorker'
 
 export const keyWorkerMock: KeyWorker = {
   staffId: 3532453,

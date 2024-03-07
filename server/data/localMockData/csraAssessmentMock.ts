@@ -1,4 +1,4 @@
-import { CsraAssessment } from '../../interfaces/prisonApi/csraAssessment'
+import CsraAssessment from '../interfaces/prisonApi/CsraAssessment'
 
 const csraAssessmentMock: CsraAssessment = {
   bookingId: 111111,

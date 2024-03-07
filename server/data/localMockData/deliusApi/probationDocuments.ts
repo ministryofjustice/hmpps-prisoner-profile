@@ -1,4 +1,4 @@
-import { ProbationDocuments } from '../../../interfaces/deliusApi/probationDocuments'
+import ProbationDocuments from '../../interfaces/deliusApi/ProbationDocuments'
 
 export const mockProbationDocumentsResponse: ProbationDocuments = {
   crn: 'crn',

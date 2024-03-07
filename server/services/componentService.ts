@@ -1,6 +1,6 @@
 import { RestClientBuilder } from '../data'
-import { ComponentApiClient, ComponentsApiResponse } from '../data/interfaces/componentApiClient'
-import AvailableComponent from '../data/interfaces/AvailableComponent'
+import AvailableComponent from '../data/interfaces/componentApi/AvailableComponent'
+import ComponentApiClient, { ComponentsApiResponse } from '../data/interfaces/componentApi/componentApiClient'
 
 export default class ComponentService {
   constructor(private readonly componentApiClientBuilder: RestClientBuilder<ComponentApiClient>) {}

@@ -1,4 +1,4 @@
-import { Address } from '../../interfaces/prisonApi/address'
+import Address from '../interfaces/prisonApi/Address'
 
 export const mockAddresses: Address[] = [
   {

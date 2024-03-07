@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { Services } from '../services'
 import NotFoundError from '../utils/notFoundError'
-import { Assessment } from '../interfaces/prisonApi/assessment'
+import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
 

@@ -1,6 +1,6 @@
 import { Address } from '../address'
 import { GovSummaryItem } from '../govSummaryItem'
-import { LearnerNeurodivergence } from '../learnerNeurodivergence'
+import LearnerNeurodivergence from '../../data/interfaces/curiousApi/LearnerNeurodivergence'
 
 export interface PersonalDetails {
   age: { years: number; months: number }

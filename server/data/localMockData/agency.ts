@@ -1,4 +1,4 @@
-import { Agency } from '../../interfaces/prisonApi/agency'
+import Agency from '../interfaces/prisonApi/Agency'
 
 const AgencyMock: Agency = {
   agencyId: 'SHEFCC',

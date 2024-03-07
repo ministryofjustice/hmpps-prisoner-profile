@@ -1,7 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
-import { IncentivesApiClient } from './interfaces/incentivesApiClient'
-import { IncentiveReviews } from '../interfaces/IncentivesApi/incentiveReviews'
+import { IncentivesApiClient } from './interfaces/incentivesApi/incentivesApiClient'
+import IncentiveReviews from './interfaces/incentivesApi/IncentiveReviews'
 
 export default class IncentivesApiRestClient implements IncentivesApiClient {
   private readonly restClient: RestClient

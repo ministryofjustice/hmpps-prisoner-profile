@@ -1,4 +1,4 @@
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import { formatScheduledEventTime } from './formatScheduledEventTime'
 
 describe('formatScheduledEventTime', () => {

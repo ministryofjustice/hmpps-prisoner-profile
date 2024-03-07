@@ -1,6 +1,6 @@
 import nock from 'nock'
 import config from '../config'
-import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApiClient'
+import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import ManageSocCasesApiRestClient from './manageSocCasesApiClient'
 
 jest.mock('./tokenStore')

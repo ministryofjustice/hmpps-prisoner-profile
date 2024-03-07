@@ -1,5 +1,5 @@
 import { add, format, startOfToday } from 'date-fns'
-import { CourtCase } from '../../interfaces/prisonApi/courtCase'
+import CourtCase from '../interfaces/prisonApi/CourtCase'
 import AgencyMock from './agency'
 import { CourtHearingsMock, CourtHearingsMockA } from './courtHearingsMock'
 

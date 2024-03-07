@@ -1,4 +1,4 @@
-import { OffenceHistoryDetail } from '../../interfaces/prisonApi/offenceHistoryDetail'
+import OffenceHistoryDetail from '../interfaces/prisonApi/OffenceHistoryDetail'
 
 export const OffenceHistoryMock: OffenceHistoryDetail[] = [
   {

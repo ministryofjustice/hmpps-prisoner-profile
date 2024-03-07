@@ -1,7 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
-import { UserEmailData } from '../interfaces/manageUsersApi/userEmailData'
-import { ManageUsersApiClient } from './interfaces/manageUsersApiClient'
+import UserEmailData from './interfaces/manageUsersApi/UserEmailData'
+import { ManageUsersApiClient } from './interfaces/manageUsersApi/manageUsersApiClient'
 
 export default class ManageUsersApiRestClient implements ManageUsersApiClient {
   private readonly restClient: RestClient

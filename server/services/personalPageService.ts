@@ -1,5 +1,5 @@
 import { isSameYear, startOfYear } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import {
   Addresses,
   CareNeeds,
@@ -11,29 +11,28 @@ import {
   PropertyItem,
   ReasonableAdjustment as PersonalPageReasonableAdjustment,
 } from '../interfaces/pages/personalPage'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { addressToLines, formatName, calculateAge } from '../utils/utils'
-import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
-import {
+import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
+import OffenderIdentifier, {
   getOffenderIdentifierValue,
-  OffenderIdentifier,
   OffenderIdentifierType,
-} from '../interfaces/prisonApi/offenderIdentifier'
-import { Address } from '../interfaces/prisonApi/address'
-import { OffenderContacts } from '../interfaces/prisonApi/offenderContacts'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import { SecondaryLanguage } from '../interfaces/prisonApi/secondaryLanguage'
-import { PrisonerDetail } from '../interfaces/prisonerDetail'
-import { PropertyContainer } from '../interfaces/prisonApi/propertyContainer'
-import { ReferenceCode, ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
+} from '../data/interfaces/prisonApi/OffenderIdentifier'
+import Address from '../data/interfaces/prisonApi/Address'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
+import PrisonerDetail from '../data/interfaces/prisonApi/PrisonerDetail'
+import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
+import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import { GovSummaryItem } from '../interfaces/govSummaryItem'
-import { HealthDomainReferenceCode, PersonalCareNeed } from '../interfaces/personalCareNeeds'
-import { ReasonableAdjustment } from '../interfaces/prisonApi/reasonableAdjustment'
+import { HealthDomainReferenceCode, PersonalCareNeed } from '../data/interfaces/prisonApi/PersonalCareNeeds'
+import ReasonableAdjustment from '../data/interfaces/prisonApi/ReasonableAdjustment'
 import { RestClientBuilder } from '../data'
-import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
-import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
+import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 
 export default class PersonalPageService {
   constructor(

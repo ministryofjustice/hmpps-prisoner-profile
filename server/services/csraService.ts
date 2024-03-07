@@ -1,12 +1,11 @@
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
-import { AgencyDetails } from '../interfaces/prisonApi/agencies'
-import { StaffDetails } from '../interfaces/prisonApi/staffDetails'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import CsraAssessment, { CsraAssessmentSummary } from '../data/interfaces/prisonApi/CsraAssessment'
+import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
+import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import { sortByDateTime } from '../utils/utils'
 import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
 import { parseDate } from '../utils/dateHelpers'
-import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
 
 interface AssessmentViewModel {
   csraAssessment: CsraAssessment

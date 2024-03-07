@@ -1,4 +1,4 @@
-import { AppointmentDefaults } from '../../interfaces/whereaboutsApi/appointment'
+import { AppointmentDefaults } from '../interfaces/whereaboutsApi/Appointment'
 
 export const appointmentMock: AppointmentDefaults = {
   bookingId: 1,

@@ -1,8 +1,7 @@
 import { MiniSummary } from './miniSummary'
 import { PersonalDetails } from './personalDetails'
-import { CourtCase } from './prisonApi/courtCase'
-import { CourtHearing } from './prisonApi/courtHearing'
-import { FullStatus } from './prisonApi/fullStatus'
+import CourtCase, { CourtHearing } from '../data/interfaces/prisonApi/CourtCase'
+import FullStatus from '../data/interfaces/prisonApi/FullStatus'
 import { Status } from './status'
 import { NonAssociationSummary } from './nonAssociationSummary'
 

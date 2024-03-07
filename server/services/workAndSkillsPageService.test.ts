@@ -1,6 +1,6 @@
 import { format, startOfDay, subMonths } from 'date-fns'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
   accountBalancesMock,
   assessmentsMock,

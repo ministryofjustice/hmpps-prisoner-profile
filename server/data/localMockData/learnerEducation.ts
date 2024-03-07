@@ -1,4 +1,4 @@
-import { LearnerEducation } from '../../interfaces/learnerEducation'
+import LearnerEducation from '../interfaces/curiousApi/LearnerEducation'
 
 export const learnerEducation: LearnerEducation = {
   content: [

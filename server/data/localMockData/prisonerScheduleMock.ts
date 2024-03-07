@@ -1,6 +1,6 @@
 import { add, format, startOfToday } from 'date-fns'
 import { formatDate } from '../../utils/dateHelpers'
-import { ScheduledEvent } from '../../interfaces/scheduledEvent'
+import ScheduledEvent from '../interfaces/prisonApi/ScheduledEvent'
 
 export const PrisonerScheduleThisWeekMock = {
   pageTitle: 'Schedule',

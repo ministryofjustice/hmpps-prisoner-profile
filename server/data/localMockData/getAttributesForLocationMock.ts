@@ -1,4 +1,4 @@
-import { AttributesForLocation } from '../../interfaces/prisonApi/attributesForLocation'
+import AttributesForLocation from '../interfaces/prisonApi/AttributesForLocation'
 
 export const GetAttributesForLocation: AttributesForLocation = {
   id: 1,

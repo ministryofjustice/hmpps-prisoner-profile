@@ -1,6 +1,6 @@
 import RestClient from './restClient'
-import { Nominal } from '../interfaces/pathfinderApi/nominal'
-import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApiClient'
+import Nominal from './interfaces/manageSocCasesApi/Nominal'
+import { ManageSocCasesApiClient } from './interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import config from '../config'
 
 export default class ManageSocCasesApiRestClient implements ManageSocCasesApiClient {

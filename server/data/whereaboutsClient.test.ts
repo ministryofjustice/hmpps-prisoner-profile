@@ -1,6 +1,6 @@
 import nock from 'nock'
 import config from '../config'
-import { WhereaboutsApiClient } from './interfaces/whereaboutsApiClient'
+import { WhereaboutsApiClient } from './interfaces/whereaboutsApi/whereaboutsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
 import { courtLocationsMock } from './localMockData/courtLocationsMock'
 import { appointmentMock } from './localMockData/appointmentMock'
