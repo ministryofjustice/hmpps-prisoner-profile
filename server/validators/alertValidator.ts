@@ -1,6 +1,6 @@
 import { differenceInDays, isBefore, isFuture, startOfDay } from 'date-fns'
 import { Validator } from '../middleware/validationMiddleware'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 import { isRealDate, parseDate } from '../utils/dateHelpers'
 
 export const AlertValidator: Validator = (body: Record<string, string>) => {

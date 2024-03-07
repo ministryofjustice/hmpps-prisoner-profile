@@ -1,4 +1,4 @@
-import { CourtCaseDataMappedUnsentenced } from '../../interfaces/courtCaseDataMapped'
+import CourtCaseDataMappedUnsentenced from '../../services/interfaces/offencesPageService/CourtCaseDataMapped'
 import { SentenceSummaryCourtCaseExtended } from '../interfaces/prisonApi/SentenceSummary'
 import SentenceTerm from '../interfaces/prisonApi/SentenceTerms'
 import { CourtHearing } from '../interfaces/prisonApi/CourtCase'

@@ -1,16 +1,15 @@
 import { isSameYear, startOfYear } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import {
+import PersonalPage, {
   Addresses,
   CareNeeds,
   IdentityNumbers,
   NextOfKin,
   PersonalDetails,
-  PersonalPage,
   PhysicalCharacteristics,
   PropertyItem,
   ReasonableAdjustment as PersonalPageReasonableAdjustment,
-} from '../interfaces/pages/personalPage'
+} from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { addressToLines, formatName, calculateAge } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
@@ -26,7 +25,7 @@ import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
 import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
-import { GovSummaryItem } from '../interfaces/govSummaryItem'
+import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { HealthDomainReferenceCode, PersonalCareNeed } from '../data/interfaces/prisonApi/PersonalCareNeeds'
 import ReasonableAdjustment from '../data/interfaces/prisonApi/ReasonableAdjustment'
 import { RestClientBuilder } from '../data'

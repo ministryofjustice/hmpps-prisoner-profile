@@ -7,9 +7,11 @@ import { AuditService } from '../services/auditService'
 import config from '../config'
 import { prisonerLocationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
 import LocationDetailsService from '../services/locationDetailsService'
-import { LocationDetailsPageData } from '../interfaces/pages/locationDetailsPageData'
+import LocationDetailsPageData from '../services/interfaces/locationDetailsService/LocationDetailsPageData'
 import { Role } from '../data/enums/role'
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../services/interfaces/locationDetails'
+import LocationDetails, {
+  LocationDetailsGroupedByPeriodAtAgency,
+} from '../services/interfaces/locationDetailsService/LocationDetails'
 import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import LocationDetailsConverter from './converters/locationDetailsConverter'
 

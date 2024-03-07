@@ -37,8 +37,8 @@ import {
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { Address } from '../interfaces/address'
-import { HmppsError } from '../interfaces/hmppsError'
+import Address from '../services/interfaces/personalPageService/Address'
+import HmppsError from '../interfaces/HmppsError'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 import config from '../config'

@@ -1,4 +1,4 @@
-import { Status } from '../../interfaces/status'
+import Status from '../../services/interfaces/overviewPageService/Status'
 
 export const pregnantStatusMock: Status = {
   label: 'Pregnant',

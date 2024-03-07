@@ -5,7 +5,7 @@ import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereabo
 import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocationItem'
 import CellMoveReasonType from '../data/interfaces/prisonApi/CellMoveReasonTypes'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
-import LocationHistoryPageData from '../interfaces/pages/locationHistoryPageData'
+import LocationHistoryPageData from './interfaces/prisonerLocationHistoryService/LocationHistoryPageData'
 import { extractLocation, formatName, hasLength, putLastNameFirst, sortByDateTime } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'

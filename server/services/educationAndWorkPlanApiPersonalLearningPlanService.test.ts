@@ -1,9 +1,9 @@
 import { aValidActionPlanResponse } from '../data/localMockData/actionPlanResponse'
-import personalLearningPlanActionPlanMapper from '../interfaces/mappers/personalLearningPlanActionPlanMapper'
+import personalLearningPlanActionPlanMapper from './mappers/personalLearningPlanActionPlanMapper'
 import { aValidPersonalLearningPlanActionPlan } from '../data/localMockData/personalLearningPlanActionPlan'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
 
-jest.mock('../interfaces/mappers/personalLearningPlanActionPlanMapper')
+jest.mock('./mappers/personalLearningPlanActionPlanMapper')
 
 describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
   const prisonerNumber = 'A1234BC'

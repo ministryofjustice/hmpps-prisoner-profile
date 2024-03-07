@@ -1,4 +1,4 @@
-import { GovSummaryItem } from '../../interfaces/govSummaryItem'
+import GovSummaryItem from '../../interfaces/GovSummaryItem'
 
 export const addressSummaryMock: GovSummaryItem[] = [
   {

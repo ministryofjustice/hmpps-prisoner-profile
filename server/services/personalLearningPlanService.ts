@@ -1,4 +1,4 @@
-import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPlanGoals'
+import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 
 /**
  * Abstract class defining the Personal Learning Plan service methods.

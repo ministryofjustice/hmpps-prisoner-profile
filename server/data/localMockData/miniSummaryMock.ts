@@ -1,5 +1,5 @@
 import { formatMoney, formatPrivilegedVisitsSummary } from '../../utils/utils'
-import { MiniSummary, MiniSummaryData } from '../../interfaces/miniSummary'
+import MiniSummary, { MiniSummaryData } from '../../services/interfaces/overviewPageService/MiniSummary'
 import AccountBalances from '../interfaces/prisonApi/AccountBalances'
 import VisitSummary from '../interfaces/prisonApi/VisitSummary'
 import VisitBalances from '../interfaces/prisonApi/VisitBalances'

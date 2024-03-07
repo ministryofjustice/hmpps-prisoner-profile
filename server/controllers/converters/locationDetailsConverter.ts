@@ -1,8 +1,10 @@
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../../services/interfaces/locationDetails'
+import LocationDetails, {
+  LocationDetailsGroupedByPeriodAtAgency,
+} from '../../services/interfaces/locationDetailsService/LocationDetails'
 import {
   GroupedLocationDetailsForDisplay,
   LocationDetailsForDisplay,
-} from '../../interfaces/pages/locationDetailsPageData'
+} from '../../services/interfaces/locationDetailsService/LocationDetailsPageData'
 import { formatDate, formatDateTime, formatDateTimeISO } from '../../utils/dateHelpers'
 import { formatName } from '../../utils/utils'
 import config from '../../config'

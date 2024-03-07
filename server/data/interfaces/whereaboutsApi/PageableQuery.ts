@@ -1,4 +1,4 @@
-import { Sort } from '../../../interfaces/sort'
+import Sort from './Sort'
 
 export default interface PageableQuery {
   page: number

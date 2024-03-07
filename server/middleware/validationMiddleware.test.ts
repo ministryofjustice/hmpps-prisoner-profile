@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 import validationMiddleware, { Validator } from './validationMiddleware'
 
 describe('Validation middleware', () => {
