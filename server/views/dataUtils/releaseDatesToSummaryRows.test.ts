@@ -1,4 +1,4 @@
-import { ReleaseDates } from '../../interfaces/releaseDates'
+import ReleaseDates from '../../services/interfaces/offencesPageService/ReleaseDates'
 import releaseDatesToSummaryRows from './releaseDatesToSummaryRows'
 
 describe('releaseDatesToSummaryRows.test.ts', () => {

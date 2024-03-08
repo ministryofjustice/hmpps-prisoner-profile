@@ -1,4 +1,4 @@
-import { AlertFlagLabel } from '../../interfaces/alertFlagLabels'
+import AlertFlagLabel from '../../interfaces/AlertFlagLabels'
 
 export const alertFlagLabels: AlertFlagLabel[] = [
   { alertCodes: ['HA'], classes: 'alert-status alert-status--self-harm', label: 'ACCT open' },

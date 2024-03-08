@@ -1,5 +1,5 @@
 import { PageableData } from './PageableQuery'
-import { Sort } from '../../../interfaces/sort'
+import Sort from './Sort'
 
 export default interface UnacceptableAbsences {
   content: UnacceptableAbsencesItem[]

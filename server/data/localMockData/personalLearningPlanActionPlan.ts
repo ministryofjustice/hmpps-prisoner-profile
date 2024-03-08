@@ -1,4 +1,7 @@
-import { PersonalLearningPlanActionPlan, PersonalLearningPlanGoal } from '../../interfaces/personalLearningPlanGoals'
+import {
+  PersonalLearningPlanActionPlan,
+  PersonalLearningPlanGoal,
+} from '../../services/interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 
 const aValidPersonalLearningPlanActionPlan = (options?: {
   prisonerNumber?: string

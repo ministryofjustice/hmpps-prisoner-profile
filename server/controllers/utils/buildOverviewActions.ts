@@ -1,7 +1,7 @@
 import Prisoner from '../../data/interfaces/prisonerSearchApi/Prisoner'
 import Nominal from '../../data/interfaces/manageSocCasesApi/Nominal'
 import { User } from '../../data/hmppsAuthClient'
-import { HmppsAction } from '../../interfaces/hmppsAction'
+import HmppsAction from '../interfaces/HmppsAction'
 import { canAddCaseNotes, canViewCalculateReleaseDates } from '../../utils/roleHelpers'
 import { Icon } from '../../data/enums/icon'
 import { userCanEdit, userHasRoles } from '../../utils/utils'

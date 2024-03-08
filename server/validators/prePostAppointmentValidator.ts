@@ -1,5 +1,5 @@
 import { Validator } from '../middleware/validationMiddleware'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 
 // eslint-disable-next-line import/prefer-default-export
 export const PrePostAppointmentValidator: Validator = (body: Record<string, string>) => {

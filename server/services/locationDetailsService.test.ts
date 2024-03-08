@@ -9,7 +9,7 @@ import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapa
 import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
-import { LocationDetails } from './interfaces/locationDetails'
+import LocationDetails from './interfaces/locationDetailsService/LocationDetails'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 
 describe('prisonerLocationDetailsService', () => {

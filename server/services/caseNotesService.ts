@@ -1,10 +1,10 @@
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
-import { SortOption } from '../interfaces/sortSelector'
+import { SortOption } from '../interfaces/SortParams'
 import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 
-import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
+import CaseNotesPageData, { CaseNotePageData } from './interfaces/caseNotesService/CaseNotesPageData'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'

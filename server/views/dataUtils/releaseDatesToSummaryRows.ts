@@ -1,5 +1,5 @@
 import { formatDate } from '../../utils/dateHelpers'
-import { ReleaseDates } from '../../interfaces/releaseDates'
+import ReleaseDates from '../../services/interfaces/offencesPageService/ReleaseDates'
 
 interface SummaryRow {
   key: { text: string }

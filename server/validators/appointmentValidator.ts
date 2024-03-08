@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import { addYears, isAfter, isBefore, isPast, isWeekend, subDays } from 'date-fns'
 import { Validator } from '../middleware/validationMiddleware'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {

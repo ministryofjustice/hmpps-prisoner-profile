@@ -7,19 +7,19 @@ import OffenderSentenceTerms, {
   FindConsecutiveSentence,
   Licence,
 } from '../data/interfaces/prisonApi/OffenderSentenceTerms'
-import { GroupedSentence } from '../interfaces/groupSentencesBySequence'
+import GroupedSentence from './interfaces/offencesPageService/GroupSentencesBySequence'
 import OffenceHistoryDetail from '../data/interfaces/prisonApi/OffenceHistoryDetail'
 import { Charge } from '../data/enums/chargeCodes'
 import CourtCase, { CourtHearing } from '../data/interfaces/prisonApi/CourtCase'
 import CourtDateResults from '../data/interfaces/prisonApi/CourtDateResults'
-import { CourtCaseDataMappedUnsentenced } from '../interfaces/courtCaseDataMapped'
+import CourtCaseDataMappedUnsentenced from './interfaces/offencesPageService/CourtCaseDataMapped'
 import SentenceSummary, {
   SentenceSummaryCourtCaseExtended,
   SentenceSummaryCourtSentence,
   SentenceSummaryTermDetail,
 } from '../data/interfaces/prisonApi/SentenceSummary'
 import { RestClientBuilder } from '../data'
-import { ReleaseDates } from '../interfaces/releaseDates'
+import ReleaseDates from './interfaces/offencesPageService/ReleaseDates'
 import PrisonerSentenceDetails from '../data/interfaces/prisonApi/PrisonerSentenceDetails'
 
 export default class OffencesPageService {
