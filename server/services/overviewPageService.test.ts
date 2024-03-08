@@ -35,7 +35,6 @@ import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
 import { pomMock } from '../data/localMockData/pom'
 import { keyWorkerMock } from '../data/localMockData/keyWorker'
-import { StaffContactsHighComplexityMock, StaffContactsMock } from '../data/localMockData/staffContacts'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { formatDate } from '../utils/dateHelpers'
@@ -68,6 +67,7 @@ import AdjudicationsApiClient from '../data/interfaces/adjudicationsApi/adjudica
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
+import { Result } from '../utils/result/result'
 
 jest.mock('../utils/utils', () => {
   const original = jest.requireActual('../utils/utils')
@@ -562,17 +562,23 @@ describe('OverviewPageService', () => {
 
   describe('getStaffContactDetails', () => {
     it('should get the staff contact details for a prisoner', async () => {
-      const prisonerNumber = '123123'
-      const bookingId = 567567
-
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get({
         clientToken: 'token',
-        prisonerData: { ...PrisonerMockDataB, prisonerNumber, bookingId } as Prisoner,
+        prisonerData: PrisonerMockDataA,
         staffId: 1,
         inmateDetail: inmateDetailMock,
       })
-      expect(res.staffContacts).toEqual(expect.objectContaining(StaffContactsMock))
+      expect(res.staffContacts).toEqual({
+        keyWorker: Result.fulfilled({
+          name: `${convertToTitleCase(keyWorkerMock.firstName)} ${convertToTitleCase(keyWorkerMock.lastName)}`,
+          lastSession: '',
+        }).toPromiseSettledResult(),
+        prisonOffenderManager: 'Andy Marke',
+        coworkingPrisonOffenderManager: 'Andy Hudson',
+        communityOffenderManager: 'Terry Scott',
+        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
+      })
     })
 
     it('should get the staff contact details for a prisoner with complex needs', async () => {
@@ -583,7 +589,35 @@ describe('OverviewPageService', () => {
         staffId: 1,
         inmateDetail: inmateDetailMock,
       })
-      expect(res.staffContacts).toEqual(expect.objectContaining(StaffContactsHighComplexityMock))
+      expect(res.staffContacts).toEqual({
+        keyWorker: Result.fulfilled({
+          name: 'None - high complexity of need',
+          lastSession: '',
+        }).toPromiseSettledResult(),
+        prisonOffenderManager: 'Andy Marke',
+        coworkingPrisonOffenderManager: 'Andy Hudson',
+        communityOffenderManager: 'Terry Scott',
+        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
+      })
+    })
+
+    it('should handle an API error getting the key worker name', async () => {
+      const overviewPageService = overviewPageServiceConstruct()
+      keyWorkerApiClient.getOffendersKeyWorker = jest.fn().mockRejectedValue(Error('some error!'))
+
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: PrisonerMockDataA,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+      })
+      expect(res.staffContacts).toEqual({
+        keyWorker: Result.rejected(Error('some error!')).toPromiseSettledResult(),
+        prisonOffenderManager: 'Andy Marke',
+        coworkingPrisonOffenderManager: 'Andy Hudson',
+        communityOffenderManager: 'Terry Scott',
+        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
+      })
     })
   })
 

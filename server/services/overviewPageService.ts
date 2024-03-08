@@ -40,7 +40,6 @@ import MainOffence from '../data/interfaces/prisonApi/MainOffence'
 import { RestClientBuilder } from '../data'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApi/nonAssociationsApiClient'
-import KeyWorker from '../data/interfaces/keyWorkerApi/KeyWorker'
 import CaseNote from '../data/interfaces/prisonApi/CaseNote'
 import FullStatus from '../data/interfaces/prisonApi/FullStatus'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
@@ -108,13 +107,22 @@ export default class OverviewPageService {
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
     const complexityApiClient = this.complexityApiClientBuilder(clientToken)
 
-    const complexityLevel =
-      config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
-      (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
-
     const getLearnerNeurodivergence = async (): Promise<LearnerNeurodivergence[]> => {
       if (!neurodiversityEnabled(prisonerData.prisonId)) return []
       return curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber)
+    }
+
+    const getKeyWorkerName = async (): Promise<string> => {
+      const complexityLevel =
+        config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
+        (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
+
+      if (complexityLevel === ComplexityLevel.High) return 'None - high complexity of need'
+
+      const keyWorker = await keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber)
+      return keyWorker && keyWorker.firstName
+        ? `${convertToTitleCase(keyWorker.firstName)} ${convertToTitleCase(keyWorker.lastName)}`
+        : 'Not allocated'
     }
 
     const activeCaseloadId = userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId
@@ -125,7 +133,7 @@ export default class OverviewPageService {
       scheduledTransfers,
       prisonerNonAssociations,
       allocationManager,
-      offenderKeyWorker,
+      keyWorkerName,
       keyWorkerSessions,
       mainOffence,
       courtCaseData,
@@ -138,7 +146,7 @@ export default class OverviewPageService {
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      keyWorkerClient.getOffendersKeyWorker(prisonerData.prisonerNumber),
+      Result.wrap(getKeyWorkerName, apiErrorCallback)(),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
       prisonApiClient.getCourtCases(bookingId),
@@ -179,9 +187,8 @@ export default class OverviewPageService {
         prisonerData,
         communityManager,
         allocationManager,
-        offenderKeyWorker,
+        keyWorkerName,
         keyWorkerSessions,
-        complexityLevel,
       ),
       schedule,
       offencesOverview,
@@ -243,9 +250,8 @@ export default class OverviewPageService {
     prisonerData: Prisoner,
     communityManager: CommunityManager,
     allocationManager: Pom,
-    offenderKeyWorker: KeyWorker,
+    keyWorkerName: Result<string>,
     keyWorkerSessions: CaseNote[],
-    complexityLevel: ComplexityLevel,
   ): StaffContacts {
     const prisonOffenderManager =
       allocationManager &&
@@ -259,22 +265,16 @@ export default class OverviewPageService {
       (allocationManager as Pom).secondary_pom.name &&
       getNamesFromString((allocationManager as Pom).secondary_pom.name)
 
-    const keyworkerName =
-      // eslint-disable-next-line no-nested-ternary
-      complexityLevel === ComplexityLevel.High
-        ? 'None - high complexity of need'
-        : offenderKeyWorker && offenderKeyWorker.firstName
-          ? `${convertToTitleCase(offenderKeyWorker.firstName)} ${convertToTitleCase(offenderKeyWorker.lastName)}`
-          : 'Not allocated'
-
     return {
-      keyWorker: {
-        name: keyworkerName,
-        lastSession:
-          keyWorkerSessions !== undefined && keyWorkerSessions[0] !== undefined
-            ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
-            : '',
-      },
+      keyWorker: keyWorkerName
+        .map(name => ({
+          name,
+          lastSession:
+            keyWorkerSessions !== undefined && keyWorkerSessions[0] !== undefined
+              ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short')
+              : '',
+        }))
+        .toPromiseSettledResult(),
       prisonOffenderManager: prisonOffenderManager
         ? `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`
         : 'Not assigned',

@@ -67,14 +67,12 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
     analytics: { tagManagerContainerId },
   } = config
   njkEnv.addGlobal('tagManagerContainerId', tagManagerContainerId.trim())
-
   njkEnv.addGlobal('prisonerBelongsToUsersCaseLoad', prisonerBelongsToUsersCaseLoad)
   njkEnv.addGlobal('userHasRoles', userHasRoles)
-
   njkEnv.addGlobal('prisonerIsTRN', prisonerIsTRN)
   njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)
-
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
+  njkEnv.addGlobal('standardApiErrorText', () => 'We cannot show these details right now. Try again later.')
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)
