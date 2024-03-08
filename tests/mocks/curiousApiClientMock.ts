@@ -1,4 +1,4 @@
-import { CuriousApiClient } from '../../server/data/interfaces/curiousApiClient'
+import CuriousApiClient from '../../server/data/interfaces/curiousApi/curiousApiClient'
 
 export const curiousApiClientMock = (): CuriousApiClient => ({
   getLearnerEmployabilitySkills: jest.fn(),

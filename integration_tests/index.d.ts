@@ -1,7 +1,7 @@
-import { CaseLoad } from '../server/interfaces/caseLoad'
-import { StaffRole } from '../server/interfaces/prisonApi/staffRole'
-import { Prisoner } from '../server/interfaces/prisoner'
-import { ComplexityLevel } from '../server/interfaces/complexityApi/complexityOfNeed'
+import CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
+import StaffRole from '../server/data/interfaces/prisonApi/StaffRole'
+import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
+import { ComplexityLevel } from '../server/data/interfaces/complexityApi/ComplexityOfNeed'
 
 declare global {
   namespace Cypress {

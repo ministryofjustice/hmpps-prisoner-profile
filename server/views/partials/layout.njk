@@ -64,6 +64,13 @@
 {% endblock %}
 
 {% block beforeContent %}
+  {% if pageHasApiErrors %}
+    <div class="govuk-grid-column-full hmpps-api-error-banner">
+      <p>Sorry, there is a problem with the service</p>
+      <p>Some information on this page may be unavailable. Try again later.</p>
+    </div>
+  {% endif %}
+
   {% if flashMessage %}
     <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}">
       <p role="alert">{{ flashMessage.text }}</p>

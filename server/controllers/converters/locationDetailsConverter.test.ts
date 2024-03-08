@@ -1,9 +1,11 @@
-import { StaffDetails } from '../../interfaces/prisonApi/staffDetails'
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from '../../services/interfaces/locationDetails'
+import StaffDetails from '../../data/interfaces/prisonApi/StaffDetails'
+import LocationDetails, {
+  LocationDetailsGroupedByPeriodAtAgency,
+} from '../../services/interfaces/locationDetailsService/LocationDetails'
 import {
   GroupedLocationDetailsForDisplay,
   LocationDetailsForDisplay,
-} from '../../interfaces/pages/locationDetailsPageData'
+} from '../../services/interfaces/locationDetailsService/LocationDetailsPageData'
 import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
 import LocationDetailsConverter from './locationDetailsConverter'
 

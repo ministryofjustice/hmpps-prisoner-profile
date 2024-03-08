@@ -1,4 +1,4 @@
-import { CaseNoteType } from '../../interfaces/caseNoteType'
+import CaseNoteType from '../interfaces/caseNotesApi/CaseNoteType'
 
 export const caseNoteTypesMock: CaseNoteType[] = [
   {

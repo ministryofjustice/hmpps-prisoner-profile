@@ -1,4 +1,4 @@
-import { CellMoveReason } from '../../interfaces/cellMoveReason'
+import CellMoveReason from '../interfaces/whereaboutsApi/CellMoveReason'
 
 export const CellMoveReasonMock: CellMoveReason = {
   cellMoveReason: {

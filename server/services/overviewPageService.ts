@@ -1,7 +1,7 @@
 import { differenceInDays, format, isAfter, startOfToday } from 'date-fns'
-import { MiniSummary, MiniSummaryData } from '../interfaces/miniSummary'
-import { OverviewPage, OverviewSchedule, OverviewScheduleItem } from '../interfaces/overviewPage'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import MiniSummary, { MiniSummaryData } from './interfaces/overviewPageService/MiniSummary'
+import OverviewPage, { OverviewSchedule, OverviewScheduleItem } from './interfaces/overviewPageService/OverviewPage'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import {
   calculateAge,
   convertToTitleCase,
@@ -15,48 +15,48 @@ import {
   prisonerBelongsToUsersCaseLoad,
   userHasRoles,
 } from '../utils/utils'
-import { Assessment } from '../interfaces/prisonApi/assessment'
+import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
-import { Prisoner } from '../interfaces/prisoner'
-import { PersonalDetails } from '../interfaces/personalDetails'
-import { StaffContacts } from '../interfaces/staffContacts'
-import AllocationManagerClient from '../data/interfaces/allocationManagerClient'
-import KeyWorkerClient from '../data/interfaces/keyWorkerClient'
-import { Pom } from '../interfaces/pom'
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import PersonalDetails from './interfaces/overviewPageService/PersonalDetails'
+import StaffContacts from '../data/interfaces/prisonApi/StaffContacts'
+import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
+import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
-import { Status } from '../interfaces/status'
-import { getProfileInformationValue, ProfileInformationType } from '../interfaces/prisonApi/profileInformation'
+import Status from './interfaces/overviewPageService/Status'
+import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import { BooleanString } from '../data/enums/booleanString'
 import { pluralise } from '../utils/pluralise'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
-import { IncentivesApiClient } from '../data/interfaces/incentivesApiClient'
+import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
 import OffencesPageService from './offencesPageService'
-import { CourtHearing } from '../interfaces/prisonApi/courtHearing'
-import { CourtCase } from '../interfaces/prisonApi/courtCase'
+import CourtCase, { CourtHearing } from '../data/interfaces/prisonApi/CourtCase'
 import config from '../config'
 import { Role } from '../data/enums/role'
-import { CaseLoad } from '../interfaces/caseLoad'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
-import { MainOffence } from '../interfaces/prisonApi/mainOffence'
+import MainOffence from '../data/interfaces/prisonApi/MainOffence'
 import { RestClientBuilder } from '../data'
-import { AdjudicationsApiClient } from '../data/interfaces/adjudicationsApiClient'
-import { CuriousApiClient } from '../data/interfaces/curiousApiClient'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApiClient'
-import { LearnerNeurodivergence } from '../interfaces/learnerNeurodivergence'
-import { KeyWorker } from '../interfaces/keyWorker'
-import { CaseNote } from '../interfaces/caseNote'
-import { FullStatus } from '../interfaces/prisonApi/fullStatus'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
-import { PrisonerProfileDeliusApiClient } from '../data/interfaces/prisonerProfileDeliusApiClient'
-import { PrisonerPrisonSchedule } from '../interfaces/prisonApi/prisonerSchedule'
-import { PrisonerDetail } from '../interfaces/prisonerDetail'
-import { NonAssociationSummary } from '../interfaces/nonAssociationSummary'
-import { PrisonerNonAssociations } from '../interfaces/nonAssociationsApi/prisonerNonAssociations'
-import { ComplexityApiClient } from '../data/interfaces/complexityApiClient'
-import { ComplexityLevel } from '../interfaces/complexityApi/complexityOfNeed'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApi/nonAssociationsApiClient'
+import KeyWorker from '../data/interfaces/keyWorkerApi/KeyWorker'
+import CaseNote from '../data/interfaces/prisonApi/CaseNote'
+import FullStatus from '../data/interfaces/prisonApi/FullStatus'
+import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
+import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSchedule'
+import PrisonerDetail from '../data/interfaces/prisonApi/PrisonerDetail'
+import NonAssociationSummary from './interfaces/overviewPageService/NonAssociationSummary'
+import PrisonerNonAssociations from '../data/interfaces/nonAssociationsApi/PrisonerNonAssociations'
+import { Result } from '../utils/result/result'
+import AdjudicationsApiClient from '../data/interfaces/adjudicationsApi/adjudicationsApiClient'
+import Pom from '../data/interfaces/allocationManagerApi/Pom'
+import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
+import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
+import { ComplexityLevel } from '../data/interfaces/complexityApi/ComplexityOfNeed'
+import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 
 export default class OverviewPageService {
   constructor(
@@ -72,14 +72,23 @@ export default class OverviewPageService {
     private readonly complexityApiClientBuilder: RestClientBuilder<ComplexityApiClient>,
   ) {}
 
-  public async get(
-    clientToken: string,
-    prisonerData: Prisoner,
-    staffId: number,
-    inmateDetail: InmateDetail,
-    userCaseLoads: CaseLoad[] = [],
-    userRoles: string[] = [],
-  ): Promise<OverviewPage> {
+  public async get({
+    clientToken,
+    prisonerData,
+    staffId,
+    inmateDetail,
+    userCaseLoads = [],
+    userRoles = [],
+    apiErrorCallback = () => null,
+  }: {
+    clientToken: string
+    prisonerData: Prisoner
+    staffId: number
+    inmateDetail: InmateDetail
+    userCaseLoads?: CaseLoad[]
+    userRoles?: string[]
+    apiErrorCallback?: (error: Error) => void
+  }): Promise<OverviewPage> {
     const {
       bookingId,
       prisonerNumber,
@@ -103,6 +112,13 @@ export default class OverviewPageService {
       config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
       (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
 
+    const getLearnerNeurodivergence = async (): Promise<LearnerNeurodivergence[]> => {
+      if (!neurodiversityEnabled(prisonerData.prisonId)) return []
+      return curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber)
+    }
+
+    const activeCaseloadId = userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId
+
     const [
       staffRoles,
       learnerNeurodivergence,
@@ -117,8 +133,8 @@ export default class OverviewPageService {
       communityManager,
       prisonerDetail,
     ] = await Promise.all([
-      prisonApiClient.getStaffRoles(staffId, userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId),
-      curiousApiClient.getLearnerNeurodivergence(prisonerData.prisonerNumber),
+      activeCaseloadId ? prisonApiClient.getStaffRoles(staffId, activeCaseloadId) : [],
+      Result.wrap(getLearnerNeurodivergence, apiErrorCallback)(),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
@@ -559,13 +575,13 @@ export default class OverviewPageService {
   private getStatuses(
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
-    learnerNeurodivergence: LearnerNeurodivergence[],
+    learnerNeurodivergence: Result<LearnerNeurodivergence[]>,
     scheduledTransfers: PrisonerPrisonSchedule[],
   ): Status[] {
     return [
       ...this.getLocationStatus(prisonerData),
       ...this.getListenerStatus(inmateDetail),
-      ...this.getNeurodiversitySupportStatus(prisonerData, learnerNeurodivergence),
+      ...this.getNeurodiversitySupportStatus(learnerNeurodivergence),
       ...this.getScheduledTransferStatus(scheduledTransfers),
     ]
   }
@@ -607,20 +623,13 @@ export default class OverviewPageService {
     return []
   }
 
-  private getNeurodiversitySupportStatus(
-    prisonerData: Prisoner,
-    learnerNeurodivergence: LearnerNeurodivergence[],
-  ): Status[] {
-    return (
-      (learnerNeurodivergence?.length &&
-        neurodiversityEnabled(prisonerData.prisonId) && [
-          {
-            label: 'Support needed',
-            subText: 'Has neurodiversity needs',
-          },
-        ]) ||
-      []
-    )
+  private getNeurodiversitySupportStatus(learnerNeurodivergence: Result<LearnerNeurodivergence[]>): Status[] {
+    const supportNeededStatus = { label: 'Support needed', subText: 'Has neurodiversity needs' }
+    const supportNeededErrorStatus = { label: 'Support needs unavailable', subText: 'Try again later', error: true }
+    return learnerNeurodivergence.handle({
+      fulfilled: it => (it?.length && [supportNeededStatus]) || [],
+      rejected: () => [supportNeededErrorStatus],
+    })
   }
 
   private getScheduledTransferStatus(scheduledTransfers: PrisonerPrisonSchedule[]): Status[] {

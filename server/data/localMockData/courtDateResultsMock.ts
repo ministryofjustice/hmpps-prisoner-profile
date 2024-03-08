@@ -1,4 +1,4 @@
-import { CourtDateResults } from '../../interfaces/courtDateResults'
+import CourtDateResults from '../interfaces/prisonApi/CourtDateResults'
 
 export const CourtDateResultsMock: CourtDateResults[] = [
   {

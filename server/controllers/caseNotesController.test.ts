@@ -6,7 +6,7 @@ import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import CaseNotesService from '../services/caseNotesService'
 import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import { formatDate } from '../utils/dateHelpers'
@@ -14,7 +14,7 @@ import config from '../config'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
-import { UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 
 let req: any
 let res: any

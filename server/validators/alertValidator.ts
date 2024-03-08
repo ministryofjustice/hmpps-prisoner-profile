@@ -1,6 +1,6 @@
-import { differenceInDays, isFuture } from 'date-fns'
+import { differenceInDays, isBefore, isFuture, startOfDay } from 'date-fns'
 import { Validator } from '../middleware/validationMiddleware'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 import { isRealDate, parseDate } from '../utils/dateHelpers'
 
 export const AlertValidator: Validator = (body: Record<string, string>) => {
@@ -122,14 +122,56 @@ export const AlertCloseValidator: Validator = (body: Record<string, string>) => 
   if (today === 'no') {
     if (!expiryDate || !isRealDate(expiryDate)) {
       errors.push({
-        text: 'Enter a real date in the format DD/MM/YYYY - for example, 27/03/2023',
+        text: 'Enter an end date in the format DD/MM/YYYY - for example, 27/03/2023',
         href: '#expiryDate',
       })
     }
 
     if (expiryDate && isRealDate(expiryDate) && !isFuture(parseDate(expiryDate))) {
       errors.push({
-        text: 'Enter a date which is after today in the format DD/MM/YYYY - for example, 27/03/2029',
+        text: 'End date must be after today',
+        href: '#expiryDate',
+      })
+    }
+  }
+
+  return errors
+}
+
+export const AlertChangeEndDateValidator: Validator = (body: Record<string, string>) => {
+  const errors: HmppsError[] = []
+  const { comment, expiryDate, removeEndDate } = body
+
+  if (comment && comment.length > 1000) {
+    errors.push({
+      text: 'Enter your comments using 1,000 characters or less',
+      href: '#comment',
+    })
+  }
+
+  if (!comment || !comment.trim()) {
+    errors.push({
+      text: 'Enter your comments on this alert',
+      href: '#comment',
+    })
+  }
+
+  if (!removeEndDate) {
+    errors.push({
+      text: 'Select if you would like to choose a different end date or remove the end date',
+      href: '#removeEndDate',
+    })
+  } else if (removeEndDate === 'no') {
+    if (!expiryDate || !isRealDate(expiryDate)) {
+      errors.push({
+        text: 'Enter an end date in the format DD/MM/YYYY - for example, 27/03/2023',
+        href: '#expiryDate',
+      })
+    }
+
+    if (expiryDate && isRealDate(expiryDate) && isBefore(parseDate(expiryDate), startOfDay(new Date()))) {
+      errors.push({
+        text: 'End date must be on or later than today',
         href: '#expiryDate',
       })
     }

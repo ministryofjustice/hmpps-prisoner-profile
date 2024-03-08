@@ -1,12 +1,12 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import AlertsService from './alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { alertDetailsMock } from '../data/localMockData/alertDetailsMock'
+import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 jest.mock('../data/prisonApiClient')
 
@@ -26,7 +26,7 @@ describe('Alerts Service', () => {
 
   describe('Get Alerts', () => {
     it('should call Prison API tp get active alerts when queryParams includes ACTIVE', async () => {
-      const queryParams: PagedListQueryParams = { alertStatus: 'ACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
       prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
         ...inmateDetailMock,
         activeAlertCount: pagedActiveAlertsMock.totalElements,
@@ -47,7 +47,7 @@ describe('Alerts Service', () => {
     })
 
     it('should call Prison API to get inactive alerts when queryParams includes INACTIVE', async () => {
-      const queryParams: PagedListQueryParams = { alertStatus: 'INACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'INACTIVE' }
       prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
         ...inmateDetailMock,
         activeAlertCount: 0,
@@ -74,6 +74,15 @@ describe('Alerts Service', () => {
 
       alertsService = new AlertsService(() => prisonApiClientSpy)
       const alert = await alertsService.createAlert('', 123456, alertFormMock)
+
+      expect(alert).toEqual(pagedActiveAlertsMock.content[0])
+    })
+
+    it('should call Prison API to create the alert without expiry date', async () => {
+      prisonApiClientSpy.createAlert = jest.fn(async () => pagedActiveAlertsMock.content[0])
+
+      alertsService = new AlertsService(() => prisonApiClientSpy)
+      const alert = await alertsService.createAlert('', 123456, { ...alertFormMock, expiryDate: null })
 
       expect(alert).toEqual(pagedActiveAlertsMock.content[0])
     })

@@ -1,4 +1,4 @@
-import { LearnerNeurodivergence } from '../../interfaces/learnerNeurodivergence'
+import LearnerNeurodivergence from '../interfaces/curiousApi/LearnerNeurodivergence'
 
 export const LearnerNeurodivergenceMock: LearnerNeurodivergence[] = [
   {

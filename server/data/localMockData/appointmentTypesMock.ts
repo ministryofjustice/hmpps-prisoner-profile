@@ -1,4 +1,4 @@
-import { ReferenceCode } from '../../interfaces/prisonApi/referenceCode'
+import ReferenceCode from '../interfaces/prisonApi/ReferenceCode'
 import { SelectOption } from '../../utils/utils'
 
 export const appointmentTypesMock: ReferenceCode[] = [

@@ -1,5 +1,5 @@
 import { UserDetails } from '../../services/userService'
-import { HmppsError } from '../../interfaces/hmppsError'
+import HmppsError from '../../interfaces/HmppsError'
 
 export default {}
 

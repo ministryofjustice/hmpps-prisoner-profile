@@ -1,4 +1,4 @@
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
+import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import groupEventsByPeriod from './groupEventsByPeriod'
 
 const eventsForHours = (hours: string[]): ScheduledEvent[] =>

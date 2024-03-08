@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 import { complexityOfNeedHighMock, complexityOfNeedLowMock } from '../../server/data/localMockData/complexityOfNeedMock'
-import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
+import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 
 export default {
   stubComplexityData: (params: { prisonerNumber: string; complexityLevel: ComplexityLevel }) => {

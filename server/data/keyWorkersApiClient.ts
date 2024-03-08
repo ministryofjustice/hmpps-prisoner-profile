@@ -1,5 +1,5 @@
 import RestClient from './restClient'
-import { KeyWorker } from '../interfaces/keyWorker'
+import KeyWorker from './interfaces/keyWorkerApi/KeyWorker'
 import config from '../config'
 
 export default class KeyWorkerClient {

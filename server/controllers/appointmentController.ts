@@ -16,7 +16,7 @@ import {
   AppointmentForm,
   PrePostAppointmentDetails,
   repeatOptions,
-} from '../interfaces/whereaboutsApi/appointment'
+} from '../data/interfaces/whereaboutsApi/Appointment'
 import {
   calculateEndDate,
   dateToIsoDate,
@@ -30,7 +30,7 @@ import { PrisonerSearchService } from '../services'
 import { pluralise } from '../utils/pluralise'
 import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
-import { VideoLinkBookingForm } from '../interfaces/whereaboutsApi/videoLinkBooking'
+import VideoLinkBookingForm from '../data/interfaces/whereaboutsApi/VideoLinkBookingForm'
 import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../services/auditService'
 import config from '../config'
 import logger from '../../logger'

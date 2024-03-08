@@ -1,6 +1,6 @@
 import nock from 'nock'
 import config from '../config'
-import { NonAssociationsApiClient } from './interfaces/nonAssociationsApiClient'
+import { NonAssociationsApiClient } from './interfaces/nonAssociationsApi/nonAssociationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import { prisonerNonAssociationsMock } from './localMockData/prisonerNonAssociationsMock'
 

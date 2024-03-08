@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { jwtDecode } from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
-import { CaseLoad } from '../interfaces/caseLoad'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 export function populateCurrentUser(userService: UserService): RequestHandler {
   return async (req, res, next) => {

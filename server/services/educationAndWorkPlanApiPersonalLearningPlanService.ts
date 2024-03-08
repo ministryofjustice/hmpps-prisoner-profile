@@ -1,7 +1,7 @@
 import { RestClientBuilder } from '../data'
-import { EducationAndWorkPlanApiClient } from '../data/interfaces/educationAndWorkPlanApiClient'
-import { PersonalLearningPlanActionPlan } from '../interfaces/personalLearningPlanGoals'
-import toPersonalLearningPlanActionPlan from '../interfaces/mappers/personalLearningPlanActionPlanMapper'
+import EducationAndWorkPlanApiClient from '../data/interfaces/educationAndWorkPlanApi/EducationAndWorkPlanApiClient'
+import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
+import toPersonalLearningPlanActionPlan from './mappers/personalLearningPlanActionPlanMapper'
 import logger from '../../logger'
 import PersonalLearningPlanService from './personalLearningPlanService'
 

@@ -1,4 +1,4 @@
-import { RestrictedPatient } from '../../../interfaces/restrictedPatientApi/restrictedPatient'
+import RestrictedPatient from '../../interfaces/restrictedPatientApi/RestrictedPatient'
 
 export const restrictedPatientMock: RestrictedPatient = {
   prisonerNumber: 'ABC123',

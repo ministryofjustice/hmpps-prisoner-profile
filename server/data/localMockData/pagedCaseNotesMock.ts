@@ -1,5 +1,5 @@
-import { CaseNote } from '../../interfaces/caseNotesApi/caseNote'
-import { PagedList } from '../../interfaces/prisonApi/pagedList'
+import PagedList from '../interfaces/prisonApi/PagedList'
+import CaseNote from '../interfaces/caseNotesApi/CaseNote'
 
 export const pagedCaseNotesMock: PagedList<CaseNote> = {
   content: [

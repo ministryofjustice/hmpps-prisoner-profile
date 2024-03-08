@@ -3,8 +3,8 @@ import OverviewPage from '../pages/overviewPage'
 import { Role } from '../../server/data/enums/role'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
-import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
 import { calculateAge } from '../../server/utils/utils'
+import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -30,6 +30,7 @@ context('Overview Page', () => {
 
     permissionsTests({ prisonerNumber, pageToDisplay: OverviewPage, visitPage })
   })
+
   context('Given the prisoner is not within the users caseload', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
@@ -628,6 +629,26 @@ context('Overview Page', () => {
         overviewPage.staffContacts().should('exist')
         overviewPage.staffContacts().find('[data-qa=keyworker-name]').should('contain.text', 'Dave Stevens')
       })
+    })
+  })
+
+  context('Given API call to get learner neurodivergence fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubGetLearnerNeurodivergenceError', 'G6123VU')
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the status list', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage.statusList().should('exist')
+      overviewPage.statusList().contains('li > p', 'Support needs unavailable')
     })
   })
 })

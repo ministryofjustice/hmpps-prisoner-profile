@@ -1,6 +1,6 @@
 import AppointmentService from './appointmentService'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { appointmentTypesMock } from '../data/localMockData/appointmentTypesMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { locationsMock } from '../data/localMockData/locationsMock'
@@ -10,7 +10,7 @@ import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock
 import { offenderSentenceDetailsMock } from '../data/localMockData/offenderSentenceDetailsMock'
 import { courtEventPrisonerSchedulesMock, prisonerSchedulesMock } from '../data/localMockData/prisonerSchedulesMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
-import { ManageUsersApiClient } from '../data/interfaces/manageUsersApiClient'
+import { ManageUsersApiClient } from '../data/interfaces/manageUsersApi/manageUsersApiClient'
 import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 
 jest.mock('../data/prisonApiClient')

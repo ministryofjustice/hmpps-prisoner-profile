@@ -1,4 +1,4 @@
-import { CaseLoad } from '../../interfaces/caseLoad'
+import CaseLoad from '../interfaces/prisonApi/CaseLoad'
 
 export const CaseLoadsDummyDataA: CaseLoad[] = [
   {

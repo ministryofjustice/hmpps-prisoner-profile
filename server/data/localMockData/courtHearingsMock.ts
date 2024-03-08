@@ -1,4 +1,4 @@
-import { CourtHearing } from '../../interfaces/prisonApi/courtHearing'
+import { CourtHearing } from '../interfaces/prisonApi/CourtCase'
 
 export const CourtHearingsMock: CourtHearing[] = [
   {

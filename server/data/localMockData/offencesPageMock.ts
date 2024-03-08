@@ -1,5 +1,5 @@
 import { SummaryListRow } from '../../utils/utils'
-import { ReleaseDates } from '../../interfaces/releaseDates'
+import ReleaseDates from '../../services/interfaces/offencesPageService/ReleaseDates'
 
 export const OffencesPageMockSentences = {
   courtCaseData: [

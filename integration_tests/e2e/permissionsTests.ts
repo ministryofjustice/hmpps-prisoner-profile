@@ -1,4 +1,4 @@
-import { Prisoner } from '../../server/interfaces/prisoner'
+import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 import { Role } from '../../server/data/enums/role'
 import NotFoundPage from '../pages/notFoundPage'
 import Page from '../pages/page'

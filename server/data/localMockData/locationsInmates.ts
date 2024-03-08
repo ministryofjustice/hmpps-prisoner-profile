@@ -1,4 +1,4 @@
-import { OffenderBooking } from '../../interfaces/prisonApi/offenderBooking'
+import OffenderBooking from '../interfaces/prisonApi/OffenderBooking'
 
 export const mockInmateAtLocation: OffenderBooking = {
   bookingId: 1234134,

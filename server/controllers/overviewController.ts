@@ -2,16 +2,16 @@ import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewPageService from '../services/overviewPageService'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
 import { User } from '../data/hmppsAuthClient'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
-import { Nominal } from '../interfaces/pathfinderApi/nominal'
-import { PathfinderApiClient } from '../data/interfaces/pathfinderApiClient'
-import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApiClient'
+import Nominal from '../data/interfaces/manageSocCasesApi/Nominal'
+import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
+import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import buildOverviewActions from './utils/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
@@ -33,14 +33,15 @@ export default class OverviewController {
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
 
     const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
-      this.overviewPageService.get(
+      this.overviewPageService.get({
         clientToken,
         prisonerData,
-        res.locals.user.staffId,
+        staffId: res.locals.user.staffId,
         inmateDetail,
-        res.locals.user.caseLoads,
-        res.locals.user.userRoles,
-      ),
+        apiErrorCallback: res.locals.apiErrorCallback,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+      }),
       pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
     ])

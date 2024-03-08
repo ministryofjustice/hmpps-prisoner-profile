@@ -1,8 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { Role } from '../data/enums/role'
 import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import { formatLocation, formatName, userHasRoles } from '../utils/utils'
@@ -10,13 +9,15 @@ import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
 import config from '../config'
-import { CaseNoteType } from '../interfaces/caseNoteType'
 import { behaviourPrompts } from '../data/constants/caseNoteTypeBehaviourPrompts'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { CaseNote, CaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
 import { AuditService, Page, PostAction, PutAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
+import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
+import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
+import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
+import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -31,7 +32,7 @@ export default class CaseNotesController {
   public displayCaseNotes(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
-      const queryParams: PagedListQueryParams = {}
+      const queryParams: CaseNotesListQueryParams = {}
       const { clientToken } = res.locals
       const userToken = res.locals.user.token
 

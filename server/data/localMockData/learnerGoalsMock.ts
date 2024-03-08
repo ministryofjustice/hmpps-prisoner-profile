@@ -1,4 +1,4 @@
-import { LearnerGoals } from '../../interfaces/learnerGoals'
+import LearnerGoals from '../interfaces/curiousApi/LearnerGoals'
 
 const aValidLearnerGoals = (options?: {
   prn?: string

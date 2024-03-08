@@ -1,8 +1,10 @@
 import { extractLocation, groupBy, isTemporaryLocation } from '../utils/utils'
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { OffenderBooking } from '../interfaces/prisonApi/offenderBooking'
-import { LocationDetails, LocationDetailsGroupedByPeriodAtAgency } from './interfaces/locationDetails'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import OffenderBooking from '../data/interfaces/prisonApi/OffenderBooking'
+import LocationDetails, {
+  LocationDetailsGroupedByPeriodAtAgency,
+} from './interfaces/locationDetailsService/LocationDetails'
 
 export default class LocationDetailsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}

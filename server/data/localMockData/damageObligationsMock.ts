@@ -1,4 +1,4 @@
-import { DamageObligation, DamageObligationContainer } from '../../interfaces/prisonApi/damageObligation'
+import DamageObligation, { DamageObligationContainer } from '../interfaces/prisonApi/DamageObligation'
 
 export const damageObligationsMock: DamageObligation[] = [
   {

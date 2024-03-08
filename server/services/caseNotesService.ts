@@ -1,17 +1,20 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { convertNameCommaToHuman, formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { SortOption } from '../interfaces/sortSelector'
+import { SortOption } from '../interfaces/SortParams'
 import { formatDateTimeISO, parseDate } from '../utils/dateHelpers'
-import { HmppsError } from '../interfaces/hmppsError'
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { CaseNotePageData, CaseNotesPageData } from '../interfaces/pages/caseNotesPageData'
-import { CaseNote, CaseNoteAmendment, CaseNoteForm, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import HmppsError from '../interfaces/HmppsError'
+
+import CaseNotesPageData, { CaseNotePageData } from './interfaces/caseNotesService/CaseNotesPageData'
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
 import { UserDetails } from './userService'
 import validateDateRange from '../utils/validateDateRange'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
+import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
+import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
+import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 export default class CaseNotesService {
   constructor(private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>) {}
@@ -22,7 +25,7 @@ export default class CaseNotesService {
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: PagedListQueryParams) {
+  private mapToApiParams(queryParams: CaseNotesListQueryParams) {
     const apiParams = { ...queryParams }
 
     if (apiParams.startDate)
@@ -47,7 +50,7 @@ export default class CaseNotesService {
   public async get(
     token: string,
     prisonerData: Prisoner,
-    queryParams: PagedListQueryParams,
+    queryParams: CaseNotesListQueryParams,
     canDeleteSensitiveCaseNotes: boolean,
     currentUserDetails: UserDetails,
   ): Promise<CaseNotesPageData> {

@@ -1,19 +1,19 @@
 import { differenceInMonths, parse } from 'date-fns'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { PagedList, PagedListItem, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { SortOption } from '../interfaces/sortSelector'
-import { Address } from '../interfaces/address'
-import { HmppsError } from '../interfaces/hmppsError'
-import { ListMetadata } from '../interfaces/listMetadata'
-import { CaseLoad } from '../interfaces/caseLoad'
-import { Prisoner } from '../interfaces/prisoner'
+import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { SortOption } from '../interfaces/SortParams'
+import Address from '../services/interfaces/personalPageService/Address'
+import HmppsError from '../interfaces/HmppsError'
+import ListMetadata from '../interfaces/ListMetadata'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
-import { type OverviewNonAssociation } from '../interfaces/overviewPage'
-import { ScheduledEvent } from '../interfaces/scheduledEvent'
-import { ReferenceCode } from '../interfaces/prisonApi/referenceCode'
-import { CommunityManager } from '../interfaces/prisonerProfileDeliusApi/communityManager'
+import { type OverviewNonAssociation } from '../services/interfaces/overviewPageService/OverviewPage'
+import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
+import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
+import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -213,13 +213,13 @@ export const convertNameCommaToHuman = (name: string): string => {
  * @param sortOptions
  * @param sortLabel
  */
-export const generateListMetadata = (
+export const generateListMetadata = <T extends PagedListQueryParams>(
   pagedList: PagedList<PagedListItem>,
-  queryParams: PagedListQueryParams,
+  queryParams: T,
   itemDescription: string,
   sortOptions: SortOption[],
   sortLabel: string,
-): ListMetadata => {
+): ListMetadata<T> => {
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
 
@@ -289,7 +289,7 @@ export const generateListMetadata = (
 
   const viewAllUrl = [`?${mapToQueryString(queryParams)}`, 'showAll=true'].filter(Boolean).join('&')
 
-  return <ListMetadata>{
+  return <ListMetadata<T>>{
     filtering: {
       ...queryParams,
       queryParams: { sort: queryParams.sort },

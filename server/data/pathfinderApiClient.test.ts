@@ -1,7 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import PathfinderApiRestClient from './pathfinderApiClient'
-import { PathfinderApiClient } from './interfaces/pathfinderApiClient'
+import { PathfinderApiClient } from './interfaces/pathfinderApi/pathfinderApiClient'
 
 jest.mock('./tokenStore')
 

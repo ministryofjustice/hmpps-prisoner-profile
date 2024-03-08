@@ -1,5 +1,5 @@
-import { FullStatus } from '../../interfaces/prisonApi/fullStatus'
-import { MainOffence } from '../../interfaces/prisonApi/mainOffence'
+import FullStatus from '../interfaces/prisonApi/FullStatus'
+import MainOffence from '../interfaces/prisonApi/MainOffence'
 
 export const mainOffenceMock: MainOffence[] = [
   {

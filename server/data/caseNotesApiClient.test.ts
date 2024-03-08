@@ -1,10 +1,11 @@
 import nock from 'nock'
 import config from '../config'
-import { CaseNotesApiClient } from './interfaces/caseNotesApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import { pagedCaseNotesMock } from './localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
-import { CaseNote, UpdateCaseNoteForm } from '../interfaces/caseNotesApi/caseNote'
+import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
+import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
+import CaseNote from './interfaces/caseNotesApi/CaseNote'
 
 jest.mock('./tokenStore')
 

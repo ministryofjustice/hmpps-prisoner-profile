@@ -1,4 +1,4 @@
-import { PrisonApiClient } from '../../server/data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../../server/data/interfaces/prisonApi/prisonApiClient'
 
 export const prisonApiClientMock = (): PrisonApiClient => ({
   createAlert: jest.fn(),
@@ -71,4 +71,6 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getBeliefHistory: jest.fn(),
   getReceptionsWithCapacity: jest.fn(),
   updateAlert: jest.fn(),
+  getVisitsForBookingWithVisitors: jest.fn(),
+  getVisitsPrisons: jest.fn(),
 })

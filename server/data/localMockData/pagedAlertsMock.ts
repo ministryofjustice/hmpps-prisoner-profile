@@ -1,5 +1,5 @@
-import { Alert } from '../../interfaces/prisonApi/alert'
-import { PagedList } from '../../interfaces/prisonApi/pagedList'
+import Alert from '../interfaces/prisonApi/Alert'
+import PagedList from '../interfaces/prisonApi/PagedList'
 
 export const pagedActiveAlertsMock: PagedList<Alert> = {
   content: [
@@ -24,10 +24,14 @@ export const pagedActiveAlertsMock: PagedList<Alert> = {
       alertCodeDescription: 'ViSOR Nominal',
       comment: 'Test',
       dateCreated: '2022-10-07',
+      dateExpires: '2199-10-07',
+      modifiedDateTime: '2022-10-07T00:00:00',
       expired: false,
       active: true,
       addedByFirstName: 'DEBORAH',
       addedByLastName: 'FERN',
+      expiredByFirstName: 'JAMES T',
+      expiredByLastName: 'KIRK',
     },
     {
       alertId: 2109,

@@ -1,4 +1,4 @@
-import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
+import { CsraAssessmentSummary } from '../data/interfaces/prisonApi/CsraAssessment'
 
 const getCsraClassificationName: Record<CsraAssessmentSummary['classificationCode'], string> = {
   LOW: 'Low',

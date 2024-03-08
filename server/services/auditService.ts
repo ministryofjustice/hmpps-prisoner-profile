@@ -1,6 +1,6 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
-import { CaseLoad } from '../interfaces/caseLoad'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
 
 // The individual pages that contain user information
@@ -11,6 +11,7 @@ export enum Page {
   AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Alerts = 'ALERTS',
   AppointmentConfirmation = 'APPOINTMENT_CONFIRMATION',
@@ -44,6 +45,7 @@ export enum Page {
   WorkAndSkills = 'WORK_AND_SKILLS',
   XRayBodyScans = 'XRAY_BODY_SCANS',
   ProbationDocuments = 'PROBATION_DOCUMENTS',
+  VisitDetails = 'VISIT_DETAILS',
 }
 
 // eslint-disable-next-line no-shadow
@@ -58,6 +60,7 @@ export enum ApiAction {
 export enum PostAction {
   Alert = 'ADD_ALERT',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
+  AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',

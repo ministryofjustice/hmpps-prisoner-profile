@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { HmppsError } from '../interfaces/hmppsError'
+import HmppsError from '../interfaces/HmppsError'
 
 export type Validator = (body: Record<string, string>) => HmppsError[] | Promise<HmppsError[]>
 

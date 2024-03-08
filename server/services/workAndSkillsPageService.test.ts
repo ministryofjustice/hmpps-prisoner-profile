@@ -1,6 +1,6 @@
 import { format, startOfDay, subMonths } from 'date-fns'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
   accountBalancesMock,
   assessmentsMock,
@@ -22,10 +22,10 @@ import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { CuriousGoals } from '../interfaces/curiousGoals'
-import toCuriousGoals from '../interfaces/mappers/curiousGoalsMapper'
+import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
+import toCuriousGoals from './mappers/curiousGoalsMapper'
 
-jest.mock('../interfaces/mappers/curiousGoalsMapper')
+jest.mock('./mappers/curiousGoalsMapper')
 
 describe('WorkAndSkillsService', () => {
   const curiousGoalsMapperMock = toCuriousGoals as jest.MockedFunction<typeof toCuriousGoals>

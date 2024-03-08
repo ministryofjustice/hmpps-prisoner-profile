@@ -3,7 +3,7 @@ import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
 import { userMock } from '../../data/localMockData/user'
 import config from '../../config'
-import { HeaderFooterMeta } from '../../data/interfaces/component'
+import { HeaderFooterMeta } from '../../data/interfaces/componentApi/Component'
 
 const pathfinderNominal = { id: 1 }
 const socNominal = { id: 2 }

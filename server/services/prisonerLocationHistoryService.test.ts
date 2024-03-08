@@ -1,6 +1,5 @@
-import { CaseNotesApiClient } from '../data/interfaces/caseNotesApiClient'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import prisonerLocationHistoryService, { PrisonerLocationHistoryService } from './prisonerLocationHistoryService'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
@@ -14,6 +13,7 @@ import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveRea
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
+import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient

@@ -1,6 +1,6 @@
 import { addDays, startOfYear } from 'date-fns'
 
-import { PersonalCareNeed, PersonalCareNeeds } from '../../interfaces/personalCareNeeds'
+import PersonalCareNeeds, { PersonalCareNeed } from '../interfaces/prisonApi/PersonalCareNeeds'
 
 export const pregnantCareNeedMock: PersonalCareNeed = {
   personalCareNeedId: 1,

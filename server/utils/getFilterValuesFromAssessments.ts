@@ -1,4 +1,4 @@
-import { CsraAssessment } from '../interfaces/prisonApi/csraAssessment'
+import CsraAssessment from '../data/interfaces/prisonApi/CsraAssessment'
 import { CsraSummary } from '../mappers/csraAssessmentsToSummaryListMapper'
 
 interface CsraFilterValues {

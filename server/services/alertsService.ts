@@ -1,15 +1,15 @@
 import { isBefore, isFuture } from 'date-fns'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
-import { AlertsPageData } from '../interfaces/pages/alertsPageData'
-import { Prisoner } from '../interfaces/prisoner'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import AlertsPageData from './interfaces/alertsService/AlertsPageData'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatName, generateListMetadata } from '../utils/utils'
-import { PagedList, PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
-import { SortOption } from '../interfaces/sortSelector'
-import { AlertTypeFilter } from '../interfaces/alertsMetadata'
+import { SortOption } from '../interfaces/SortParams'
+import AlertTypeFilter from './interfaces/alertsService/AlertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
-import { HmppsError } from '../interfaces/hmppsError'
-import { Alert, AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
+import HmppsError from '../interfaces/HmppsError'
+import Alert, { AlertChanges, AlertForm } from '../data/interfaces/prisonApi/Alert'
 import { RestClientBuilder } from '../data'
+import PagedList, { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 
 export default class AlertsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -47,7 +47,7 @@ export default class AlertsService {
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: PagedListQueryParams) {
+  private mapToApiParams(queryParams: AlertsListQueryParams) {
     const apiParams = { ...queryParams }
 
     if (apiParams.from) apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
@@ -68,7 +68,7 @@ export default class AlertsService {
   public async get(
     clientToken: string,
     prisonerData: Prisoner,
-    queryParams: PagedListQueryParams,
+    queryParams: AlertsListQueryParams,
     canUpdateAlert: boolean,
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
@@ -98,8 +98,8 @@ export default class AlertsService {
 
     // Determine sort options
     const sortOptions: SortOption[] = [
-      { value: 'dateCreated,DESC', description: 'Created (most recent)' },
-      { value: 'dateCreated,ASC', description: 'Created (oldest)' },
+      { value: 'dateCreated,DESC', description: 'Start date (most recent)' },
+      { value: 'dateCreated,ASC', description: 'Start date (oldest)' },
     ]
     if (!isActiveAlertsQuery) {
       sortOptions.push(
@@ -122,7 +122,15 @@ export default class AlertsService {
             alert.active &&
             `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`,
           closeAlertLinkUrl:
-            canUpdateAlert && alert.active && `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
+            canUpdateAlert &&
+            alert.active &&
+            !alert.dateExpires &&
+            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
+          changeEndDateLinkUrl:
+            canUpdateAlert &&
+            alert.active &&
+            alert.dateExpires &&
+            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/change-end-date`,
           addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
           expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
         }))
@@ -151,7 +159,7 @@ export default class AlertsService {
     return prisonApiClient.createAlert(bookingId, {
       ...alert,
       alertDate: formatDateISO(parseDate(alert.alertDate)),
-      expiryDate: formatDateISO(parseDate(alert.expiryDate)),
+      expiryDate: alert.expiryDate ? formatDateISO(parseDate(alert.expiryDate)) : null,
     })
   }
 

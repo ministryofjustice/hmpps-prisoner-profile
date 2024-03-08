@@ -1,4 +1,4 @@
-import { OffenderSentenceDetail } from '../../interfaces/prisonApi/offenderSentenceDetail'
+import OffenderSentenceDetail from '../interfaces/prisonApi/OffenderSentenceDetail'
 
 export const offenderSentenceDetailsMock: OffenderSentenceDetail[] = [
   {

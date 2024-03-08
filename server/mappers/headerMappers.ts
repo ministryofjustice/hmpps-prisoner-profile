@@ -1,4 +1,4 @@
-import { Prisoner } from '../interfaces/prisoner'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import {
   formatCategoryALabel,
@@ -12,9 +12,9 @@ import config from '../config'
 import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import { User } from '../data/hmppsAuthClient'
-import { InmateDetail } from '../interfaces/prisonApi/inmateDetail'
-import { Alert } from '../interfaces/prisonApi/alert'
-import { AlertFlagLabel } from '../interfaces/alertFlagLabels'
+import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
+import Alert from '../data/interfaces/prisonApi/Alert'
+import AlertFlagLabel from '../interfaces/AlertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'

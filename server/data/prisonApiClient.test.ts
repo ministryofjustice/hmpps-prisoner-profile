@@ -15,7 +15,6 @@ import { CaseNotesByTypeA } from './localMockData/caseNotes'
 import { inmateDetailMock } from './localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from './localMockData/personalCareNeedsMock'
 import { secondaryLanguagesMock } from './localMockData/secondaryLanguages'
-import { PagedListQueryParams } from '../interfaces/prisonApi/pagedList'
 import { pagedActiveAlertsMock } from './localMockData/pagedAlertsMock'
 import { propertyMock } from './localMockData/property'
 import { CourtCasesMock } from './localMockData/courtCaseMock'
@@ -25,14 +24,14 @@ import { mockAddresses } from './localMockData/addresses'
 import { mockOffenderContacts } from './localMockData/offenderContacts'
 import { mockReferenceDomains } from './localMockData/referenceDomains'
 import { mockReasonableAdjustments } from './localMockData/reasonableAdjustments'
-import { ReferenceCodeDomain } from '../interfaces/prisonApi/referenceCode'
+import { ReferenceCodeDomain } from './interfaces/prisonApi/ReferenceCode'
 import { caseNoteUsageMock } from './localMockData/caseNoteUsageMock'
 import { formatDateISO } from '../utils/dateHelpers'
 import { mockStaffRoles } from './localMockData/staffRoles'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
-import { AlertChanges, AlertForm } from '../interfaces/prisonApi/alert'
+import { AlertChanges, AlertForm } from './interfaces/prisonApi/Alert'
 import { alertTypesMock } from './localMockData/alertTypesMock'
 import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
@@ -52,6 +51,7 @@ import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
 import { alertDetailsMock } from './localMockData/alertDetailsMock'
 import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 import { mockInmateAtLocation } from './localMockData/locationsInmates'
+import { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
 
 jest.mock('./tokenStore')
 
@@ -206,7 +206,7 @@ describe('prisonApiClient', () => {
   describe('getAlerts', () => {
     it('Should return data from the API', async () => {
       const bookingId = 123456
-      const queryParams: PagedListQueryParams = { alertStatus: 'ACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
       mockSuccessfulPrisonApiCall(
         `/api/bookings/${bookingId}/alerts/v2?size=20&alertStatus=ACTIVE`,
         pagedActiveAlertsMock,

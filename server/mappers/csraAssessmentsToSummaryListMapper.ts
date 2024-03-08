@@ -1,6 +1,6 @@
-import { AgencyDetails } from '../interfaces/prisonApi/agencies'
+import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import getCsraClassificationName from './getCsraClassificationName'
-import { CsraAssessmentSummary } from '../interfaces/prisonApi/csraAssessmentSummary'
+import { CsraAssessmentSummary } from '../data/interfaces/prisonApi/CsraAssessment'
 
 export interface CsraSummary extends CsraAssessmentSummary {
   classification: string

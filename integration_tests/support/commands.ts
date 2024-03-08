@@ -1,6 +1,6 @@
-import { HistoryForLocationItem } from '../../server/interfaces/prisonApi/historyForLocation'
-import { InmateDetail } from '../../server/interfaces/prisonApi/inmateDetail'
-import { ComplexityLevel } from '../../server/interfaces/complexityApi/complexityOfNeed'
+import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
+import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
+import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options

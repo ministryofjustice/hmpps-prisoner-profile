@@ -1,7 +1,7 @@
 import UserService from './userService'
 import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { CaseLoad } from '../interfaces/caseLoad'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 const token = 'some token'
 

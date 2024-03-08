@@ -8,7 +8,7 @@ import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import { Services } from '../../services'
-import { Context } from '../../interfaces/context'
+import Context from '../../interfaces/Context'
 
 export const user: Context = {
   firstName: 'first',

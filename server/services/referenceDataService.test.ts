@@ -1,5 +1,5 @@
 import ReferenceDataService from './referenceDataService'
-import { PrisonApiClient } from '../data/interfaces/prisonApiClient'
+import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { alertTypesMock } from '../data/localMockData/alertTypesMock'
 

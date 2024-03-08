@@ -1,5 +1,5 @@
 import { startOfToday, format } from 'date-fns'
-import { Movement } from '../../interfaces/prisonApi/movement'
+import Movement from '../interfaces/prisonApi/Movement'
 
 export default function movementsMock(prisonerNumber: string, movementDate?: string): Movement[] {
   return [
