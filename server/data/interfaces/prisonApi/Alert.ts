@@ -21,8 +21,6 @@ export default interface Alert extends PagedListItem {
   expiredByFirstName?: string
   expiredByLastName?: string
   expiredByFullName?: string
-  addMoreDetailsLinkUrl?: string
-  closeAlertLinkUrl?: string
 }
 
 export interface AlertForm {

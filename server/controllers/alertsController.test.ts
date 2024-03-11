@@ -276,6 +276,18 @@ describe('Alerts Controller', () => {
       expect(res.render).toHaveBeenCalled()
     })
 
+    it('should filter out  "OCG Nominal - Do not share" subtype', async () => {
+      jest.spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
+
+      await controller.displayAddAlert(req, res, next)
+
+      expect(res.render.mock.calls[0][1].typeCodeMap).toEqual({
+        A: [{ text: 'AAA111', value: 'A1' }],
+        B: [{ text: 'BBB111', value: 'B1' }],
+        C: [{ text: 'CCC111', value: 'C1' }],
+      })
+    })
+
     it('should add alert', async () => {
       req.body = { ...alertFormMock, bookingId: 123456 }
 
