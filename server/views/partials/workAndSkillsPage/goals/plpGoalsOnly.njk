@@ -5,7 +5,7 @@
   {% for goal in personalLearningPlanActionPlan.goals %}
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Goal {{ goal.sequenceNumber }}</h3>
     <div class="hmpps-goal-container">
-      <p class="govuk-body">{{ goal.title | formatMultilineText | safe }}</p>
+      <p class="govuk-body app-u-multiline-text">{{ goal.title }}</p>
     </div>
   {% endfor %}
   {% if canEditEducationWorkPlan %}
