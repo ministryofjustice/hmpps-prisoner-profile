@@ -424,7 +424,7 @@ export default class OverviewPageService {
           )} has no incentive level history`,
           bottomClass: 'small',
           linkLabel: 'Incentive level details',
-          linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+          linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
         }
       }
 
@@ -456,7 +456,7 @@ export default class OverviewPageService {
             : undefined,
           bottomClass: 'small',
           linkLabel: 'Incentive level details',
-          linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+          linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
         }
       }
     } catch (e) {
@@ -466,7 +466,7 @@ export default class OverviewPageService {
         bottomContentLine1: 'We cannot show these details right now',
         bottomClass: 'small',
         linkLabel: 'Incentive level details',
-        linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/incentive-level-details`,
+        linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
       }
     }
 

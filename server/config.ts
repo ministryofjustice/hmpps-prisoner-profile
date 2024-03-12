@@ -242,6 +242,7 @@ export default {
     adjudications: get('ADJUDICATIONS_UI_URL', '', requiredInProduction),
     learningAndWorkProgress: get('LEARNING_AND_WORK_PROGRESS_UI_URL', 'http://localhost:3001', requiredInProduction),
     changeSomeonesCell: get('CHANGE_SOMEONES_CELL_UI_URL', 'http://localhost:3001', requiredInProduction),
+    incentives: get('INCENTIVES_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
