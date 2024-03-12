@@ -6,7 +6,7 @@ import { Role } from '../data/enums/role'
 import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
-import Alert, { AlertForm, AlertType } from '../data/interfaces/prisonApi/Alert'
+import Alert, { AlertCode, AlertForm, AlertType } from '../data/interfaces/prisonApi/Alert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
@@ -542,18 +542,12 @@ export default class AlertsController {
    * @param type - preselected alert type to determine list of codes
    */
   private mapAlertTypes(types: AlertType[], type?: string) {
-    const alertTypes = types
-      ?.filter(t => t.activeFlag === 'Y')
-      .map(t => ({ value: t.code, text: t.description }))
-      .sort((a, b) => a.text.localeCompare(b.text))
+    const alertTypes = this.mapActiveSortedAlertTypes(types)
 
     const typeCodeMap: { [key: string]: { value: string; text: string }[] } = types.reduce(
       (ts, t) => ({
         ...ts,
-        [t.code]: t.subCodes
-          ?.filter(sc => sc.activeFlag === 'Y')
-          .map(s => ({ value: s.code, text: s.description }))
-          .sort((a, b) => a.text.localeCompare(b.text)),
+        [t.code]: this.mapActiveSortedAlertTypes(t.subCodes),
       }),
       {},
     )
@@ -562,15 +556,19 @@ export default class AlertsController {
     if (type) {
       const selectedType = types.find(t => t.code === type)
       if (selectedType) {
-        alertCodes = selectedType.subCodes
-          ?.filter(sc => sc.activeFlag === 'Y')
-          .map(subType => ({
-            value: subType.code,
-            text: subType.description,
-          }))
-          .sort((a, b) => a.text.localeCompare(b.text))
+        alertCodes = this.mapActiveSortedAlertTypes(selectedType.subCodes)
       }
     }
     return { alertTypes, alertCodes, typeCodeMap }
+  }
+
+  private mapActiveSortedAlertTypes(alertTypes: (AlertType | AlertCode)[]): { text: string; value: string }[] {
+    return alertTypes
+      ?.filter(alertType => alertType.activeFlag === 'Y' && alertType.code !== 'DOCGM') // Exclude 'OCG Nominal - Do not share'
+      .map(alertType => ({
+        value: alertType.code,
+        text: alertType.description,
+      }))
+      .sort((a, b) => a.text.localeCompare(b.text))
   }
 }

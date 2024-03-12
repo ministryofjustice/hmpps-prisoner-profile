@@ -1,7 +1,12 @@
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import AlertsService from './alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import {
+  pagedActiveAlertsMock,
+  pagedActiveAlertsMockProcessedForView,
+  pagedInactiveAlertsMock,
+  pagedInactiveAlertsMockProcessedForView,
+} from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
@@ -40,7 +45,7 @@ describe('Alerts Service', () => {
       expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
       expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'ACTIVE' })
 
-      expect(alertsPageData.pagedAlerts).toEqual(pagedActiveAlertsMock)
+      expect(alertsPageData.pagedAlerts).toEqual(pagedActiveAlertsMockProcessedForView)
       expect(alertsPageData.activeAlertCount).toEqual(80)
       expect(alertsPageData.inactiveAlertCount).toEqual(0)
       expect(alertsPageData.fullName).toEqual('John Smith')
@@ -61,7 +66,7 @@ describe('Alerts Service', () => {
       expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
       expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, { alertStatus: 'INACTIVE' })
 
-      expect(alertsPageData.pagedAlerts).toEqual(pagedInactiveAlertsMock)
+      expect(alertsPageData.pagedAlerts).toEqual(pagedInactiveAlertsMockProcessedForView)
       expect(alertsPageData.activeAlertCount).toEqual(0)
       expect(alertsPageData.inactiveAlertCount).toEqual(80)
       expect(alertsPageData.fullName).toEqual('John Smith')

@@ -10,6 +10,7 @@ import HmppsError from '../interfaces/HmppsError'
 import Alert, { AlertChanges, AlertForm } from '../data/interfaces/prisonApi/Alert'
 import { RestClientBuilder } from '../data'
 import PagedList, { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import AlertView from './interfaces/alertsService/AlertView'
 
 export default class AlertsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -109,33 +110,13 @@ export default class AlertsService {
     }
 
     const errors = this.validateFilters(queryParams.from, queryParams.to)
+    const shouldGetActiveAlerts = activeAlertCount && isActiveAlertsQuery
+    const shouldGetInactiveAlerts = inactiveAlertCount && !isActiveAlertsQuery
 
-    let pagedAlerts: PagedList<Alert>
-
-    if (!errors.length) {
-      if ((activeAlertCount && isActiveAlertsQuery) || (inactiveAlertCount && !isActiveAlertsQuery)) {
-        pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
-        pagedAlerts.content = pagedAlerts.content.map((alert: Alert) => ({
-          ...alert,
-          addMoreDetailsLinkUrl:
-            canUpdateAlert &&
-            alert.active &&
-            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`,
-          closeAlertLinkUrl:
-            canUpdateAlert &&
-            alert.active &&
-            !alert.dateExpires &&
-            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`,
-          changeEndDateLinkUrl:
-            canUpdateAlert &&
-            alert.active &&
-            alert.dateExpires &&
-            `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/change-end-date`,
-          addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
-          expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
-        }))
-      }
-    }
+    const pagedAlerts =
+      !errors.length && (shouldGetActiveAlerts || shouldGetInactiveAlerts)
+        ? await this.getPagedAlerts(prisonApiClient, prisonerData, queryParams, canUpdateAlert)
+        : null
 
     // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
     const params = queryParams
@@ -144,12 +125,46 @@ export default class AlertsService {
 
     return {
       pagedAlerts,
-      listMetadata: generateListMetadata(pagedAlerts, { ...params }, 'alert', sortOptions, 'Sort by'),
+      listMetadata: generateListMetadata(pagedAlerts, params, 'alert', sortOptions, 'Sort by'),
       alertTypes,
       activeAlertCount,
       inactiveAlertCount,
       fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
       errors,
+    }
+  }
+
+  private async getPagedAlerts(
+    prisonApiClient: PrisonApiClient,
+    prisonerData: Prisoner,
+    queryParams: AlertsListQueryParams,
+    canUpdateAlert: boolean,
+  ): Promise<PagedList<AlertView> | null> {
+    const pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
+
+    const alertContentsForView = pagedAlerts.content.map<AlertView>((alert: Alert) => {
+      const alertUpdatable = canUpdateAlert && alert.active && alert.alertCode !== 'DOCGM'
+      return {
+        ...alert,
+        addMoreDetailsLinkUrl: alertUpdatable
+          ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`
+          : null,
+        closeAlertLinkUrl:
+          alertUpdatable && !alert.dateExpires
+            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`
+            : null,
+        changeEndDateLinkUrl:
+          alertUpdatable && alert.dateExpires
+            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/change-end-date`
+            : null,
+        addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
+        expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
+      }
+    })
+
+    return {
+      ...pagedAlerts,
+      content: alertContentsForView,
     }
   }
 
