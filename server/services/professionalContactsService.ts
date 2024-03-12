@@ -59,6 +59,10 @@ export default class ProfessionalContactsService {
           const personContactDetails = await this.getPersonContactDetails(clientToken, contact.personId)
           const { addresses, emails, phones } = personContactDetails
 
+          if (addresses?.length === 0) {
+            return [mapPrisonApiContactToProfessionalContact(contact, null, emails, phones)]
+          }
+
           return addresses
             .filter(address => !address.endDate || new Date(address.endDate) >= currentDate)
             .sort((left, right) => this.sortByPrimaryAndStartDate(left, right))
@@ -195,9 +199,11 @@ function mapPrisonApiContactToProfessionalContact(
   return {
     firstName,
     lastName,
-    address: { ...address, label: address.primary ? 'Main address' : 'Other address' },
+    address: address
+      ? { ...address, label: address.primary ? 'Main address' : 'Other address' }
+      : { label: 'Not entered', primary: true, noFixedAddress: false },
     emails: emails.map(email => email.email),
-    phones: [...phones, ...(address.phones ?? [])].map(phone => phone.number),
+    phones: [...phones, ...(address?.phones ?? [])].map(phone => phone.number),
     relationshipDescription: contact.relationshipDescription,
     relationship: contact.relationship,
   }

@@ -14,7 +14,7 @@ import { propertyMock } from '../../server/data/localMockData/property'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { mockOffenderContacts } from '../../server/data/localMockData/offenderContacts'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
-import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
+import { mockContactDetail, mockContactDetailWithNotEntered } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
 import { personalCareNeedsMock, xrayCareNeeds } from '../../server/data/localMockData/personalCareNeedsMock'
@@ -200,7 +200,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockContactDetail,
+        jsonBody: bookingId === 99 ? mockContactDetailWithNotEntered : mockContactDetail,
       },
     })
   },
@@ -300,7 +300,7 @@ export default {
     })
   },
 
-  stubPersonAddresses: () => {
+  stubPersonAddresses: (personId?: number) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -311,7 +311,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockAddresses,
+        jsonBody: personId === 9876543 ? [] : mockAddresses,
       },
     })
   },
@@ -1174,7 +1174,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
+        jsonBody: personId === 9876543 ? [] : [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
       },
     })
   },
@@ -1206,7 +1206,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: [{ number: '07700000000', type: 'mobile' }],
+        jsonBody: personId === 9876543 ? [] : [{ number: '07700000000', type: 'mobile' }],
       },
     })
   },

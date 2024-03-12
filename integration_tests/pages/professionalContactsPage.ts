@@ -33,6 +33,14 @@ export default class ProfessionalContactsPage extends Page {
     address: (): PageElement => this.comContact().panel().find('[data-qa="contact-address"]'),
   })
 
+  resettlementWorkerContact = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(4),
+    header: (): PageElement => this.resettlementWorkerContact().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.resettlementWorkerContact().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.resettlementWorkerContact().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.resettlementWorkerContact().panel().find('[data-qa="contact-address"]'),
+  })
+
   firstPrisonContact = () => ({
     panel: (): PageElement => cy.get('.hmpps-summary-card').eq(4),
     header: (): PageElement => this.firstPrisonContact().panel().get('[data-qa="summary-header"]'),

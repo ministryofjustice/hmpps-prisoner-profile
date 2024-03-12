@@ -276,5 +276,26 @@ describe('professionalContactsService', () => {
 
       expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
+
+    it('should return a "Not entered" contact if there are no addresses for a person', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [PrisonerContactBuilder()],
+      }
+      prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+      )
+
+      const response = await service.getContacts('token', 'A1234AA', 1)
+
+      expect(response.find(contact => contact.address?.label === 'Not entered')).toBeTruthy()
+    })
   })
 })
