@@ -14,7 +14,7 @@ import { propertyMock } from '../../server/data/localMockData/property'
 import { mockAddresses } from '../../server/data/localMockData/addresses'
 import { mockOffenderContacts } from '../../server/data/localMockData/offenderContacts'
 import { CaseNotesByTypeA } from '../../server/data/localMockData/caseNotes'
-import { mockContactDetail, mockContactDetailWithNotEntered } from '../../server/data/localMockData/contactDetail'
+import { mockContactDetail } from '../../server/data/localMockData/contactDetail'
 import { mapToQueryString } from '../../server/utils/utils'
 import { mockReferenceDomains } from '../../server/data/localMockData/referenceDomains'
 import { personalCareNeedsMock, xrayCareNeeds } from '../../server/data/localMockData/personalCareNeedsMock'
@@ -189,18 +189,18 @@ export default {
       },
     })
   },
-  stubGetOffenderContacts: (bookingId: number) => {
+  stubGetOffenderContacts: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/contacts`,
+        urlPattern: `/prison/api/bookings/\\d*/contacts`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: bookingId === 99 ? mockContactDetailWithNotEntered : mockContactDetail,
+        jsonBody: resp ?? mockContactDetail,
       },
     })
   },
@@ -300,7 +300,7 @@ export default {
     })
   },
 
-  stubPersonAddresses: (personId?: number) => {
+  stubPersonAddresses: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -311,7 +311,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: personId === 9876543 ? [] : mockAddresses,
+        jsonBody: resp ?? mockAddresses,
       },
     })
   },
@@ -1163,18 +1163,18 @@ export default {
     })
   },
 
-  stubPersonEmails: (personId: number) => {
+  stubPersonEmails: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/persons/${personId}/emails`,
+        urlPattern: `/prison/api/persons/\\d*/emails`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: personId === 9876543 ? [] : [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
+        jsonBody: resp ?? [{ email: 'email1@email.com' }, { email: 'email2@email.com' }],
       },
     })
   },
@@ -1195,18 +1195,18 @@ export default {
     })
   },
 
-  stubPersonPhones: (personId: number) => {
+  stubPersonPhones: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/persons/${personId}/phones`,
+        urlPattern: `/prison/api/persons/\\d*/phones`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: personId === 9876543 ? [] : [{ number: '07700000000', type: 'mobile' }],
+        jsonBody: resp ?? [{ number: '07700000000', type: 'mobile' }],
       },
     })
   },

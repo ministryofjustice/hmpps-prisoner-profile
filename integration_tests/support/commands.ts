@@ -38,7 +38,7 @@ Cypress.Commands.add(
     cy.task('stubPomData', prisonerNumber)
     cy.task('stubKeyWorkerData', prisonerNumber)
     cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId })
-    cy.task('stubGetOffenderContacts', bookingId)
+    cy.task('stubGetOffenderContacts')
     cy.task('stubEventsForProfileImage', prisonerNumber)
     cy.task('stubGetMainOffence', bookingId)
     cy.task('stubGetFullStatus', prisonerNumber)

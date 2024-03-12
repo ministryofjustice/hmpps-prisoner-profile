@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import ProfessionalContactsPage from '../pages/professionalContactsPage'
+import { mockContactDetailWithNotEntered } from '../../server/data/localMockData/contactDetail'
 
 const visitProfessionalContactsPage = (): ProfessionalContactsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/professional-contacts' })
@@ -14,13 +15,13 @@ context('Professional contacts list page', () => {
     cy.setupUserAuth()
 
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
-    cy.task('stubGetOffenderContacts', 1102484)
+    cy.task('stubGetOffenderContacts')
     cy.task('stubGetCommunityManager')
     cy.task('stubKeyWorkerData', 'G6123VU')
     cy.task('stubPomData', 'G6123VU')
-    cy.task('stubPersonAddresses', 5871791)
-    cy.task('stubPersonEmails', 5871791)
-    cy.task('stubPersonPhones', 5871791)
+    cy.task('stubPersonAddresses')
+    cy.task('stubPersonEmails')
+    cy.task('stubPersonPhones')
     professionalContactsPage = visitProfessionalContactsPage()
   })
 
@@ -73,14 +74,14 @@ context('Professional contacts list page - with address not entered', () => {
     cy.task('reset')
     cy.setupUserAuth()
 
-    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU', overrides: { bookingId: 99 } })
-    cy.task('stubGetOffenderContacts', 99)
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
     cy.task('stubGetCommunityManager')
     cy.task('stubKeyWorkerData', 'G6123VU')
     cy.task('stubPomData', 'G6123VU')
-    cy.task('stubPersonAddresses', 9876543)
-    cy.task('stubPersonEmails', 9876543)
-    cy.task('stubPersonPhones', 9876543)
+    cy.task('stubPersonAddresses', [])
+    cy.task('stubPersonEmails', [])
+    cy.task('stubPersonPhones', [])
     professionalContactsPage = visitProfessionalContactsPage()
   })
 
