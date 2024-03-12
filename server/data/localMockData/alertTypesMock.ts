@@ -38,6 +38,12 @@ export const alertTypesMock: AlertType[] = [
         activeFlag: 'Y',
         parentCode: 'C',
       },
+      {
+        code: 'DOCGM',
+        description: 'OCG Nominal - Do not share',
+        activeFlag: 'Y',
+        parentCode: 'C',
+      },
     ],
   },
 ]
