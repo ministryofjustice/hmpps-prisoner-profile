@@ -1,12 +1,12 @@
 export default interface StaffContacts {
-  keyWorker: KeyWorkerUI
+  keyWorker: PromiseSettledResult<KeyWorkerSummary>
   prisonOffenderManager: string
   coworkingPrisonOffenderManager: string
   communityOffenderManager: string
   linkUrl: string
 }
 
-export interface KeyWorkerUI {
+export interface KeyWorkerSummary {
   name: string
   lastSession: string
 }
