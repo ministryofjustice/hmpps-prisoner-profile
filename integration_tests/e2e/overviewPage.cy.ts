@@ -605,7 +605,7 @@ context('Overview Page', () => {
         overviewPage.staffContacts().should('exist')
         overviewPage
           .staffContacts()
-          .find('[data-qa=keyworker-name]')
+          .find('[data-qa=keyworker-details]')
           .should('contain.text', 'None - high complexity of need')
       })
     })
@@ -627,7 +627,7 @@ context('Overview Page', () => {
       it('Displays the offender staff contact details', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.staffContacts().should('exist')
-        overviewPage.staffContacts().find('[data-qa=keyworker-name]').should('contain.text', 'Dave Stevens')
+        overviewPage.staffContacts().find('[data-qa=keyworker-details]').should('contain.text', 'Dave Stevens')
       })
     })
   })
@@ -637,7 +637,7 @@ context('Overview Page', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-      cy.task('stubGetLearnerNeurodivergenceError', 'G6123VU')
+      cy.task('stubGetLearnerNeurodivergence', { prisonerNumber: 'G6123VU', error: true })
       visitOverviewPage()
     })
 
@@ -649,6 +649,28 @@ context('Overview Page', () => {
 
       overviewPage.statusList().should('exist')
       overviewPage.statusList().contains('li > p', 'Support needs unavailable')
+    })
+  })
+
+  context('Given API call to get key worker name fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', error: true })
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the status list', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage
+        .staffContacts()
+        .find('[data-qa=keyworker-details]')
+        .should('contain.text', 'We cannot show these details right now. Try again later.')
     })
   })
 })
