@@ -1,6 +1,6 @@
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { getNamesFromString, sortByDateTime } from '../utils/utils'
+import { apiErrorMessage, getNamesFromString, sortByDateTime } from '../utils/utils'
 import Address from '../data/interfaces/prisonApi/Address'
 import { Contact, PomContact } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
@@ -11,6 +11,7 @@ import { AgenciesEmail } from '../data/interfaces/prisonApi/Agency'
 import Telephone from '../data/interfaces/prisonApi/Telephone'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
+import { Result } from '../utils/result/result'
 
 interface ProfessionalContact {
   relationshipDescription: string
@@ -36,6 +37,7 @@ export default class ProfessionalContactsService {
     prisonerNumber: string,
     bookingId: number,
     isYouthPrisoner: boolean,
+    apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<ProfessionalContact[]> {
     const [contacts, allocationManager, communityManager, keyWorker] = await Promise.all([
       this.prisonApiClientBuilder(clientToken).getBookingContacts(bookingId),
@@ -43,7 +45,7 @@ export default class ProfessionalContactsService {
       isYouthPrisoner
         ? null
         : this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
-      isYouthPrisoner ? null : this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
+      isYouthPrisoner ? Result.fulfilled(null) : Result.wrap(this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber), apiErrorCallback),
     ])
 
     // filter out COM and POM from prison API contacts as they are reliably retrieved from other API calls
@@ -172,8 +174,12 @@ function mapCommunityManagerToProfessionalContact(communityManager: CommunityMan
   }
 }
 
-function mapKeyWorkerToProfessionalContact(keyWorker: KeyWorker): ProfessionalContact {
-  const { firstName, lastName, email } = keyWorker
+function mapKeyWorkerToProfessionalContact(keyWorker: Result<KeyWorker>): ProfessionalContact {
+  const { firstName, lastName, email } = keyWorker.getOrHandle(() => ({
+    firstName: apiErrorMessage,
+    lastName: '',
+    email: apiErrorMessage,
+  }))
 
   return {
     firstName,

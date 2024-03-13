@@ -12,6 +12,7 @@ import { communityManagerMock } from '../data/localMockData/communityManagerMock
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
+import { apiErrorMessage } from '../utils/utils'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -206,6 +207,45 @@ describe('professionalContactsService', () => {
       expect(response[4].relationshipDescription).toEqual('Prison Guard')
       expect(response[5].relationshipDescription).toEqual('Prison Guard')
       expect(response[6].relationshipDescription).toEqual('Responsible officer')
+    })
+
+    it('should handle keyworker API error', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [PrisonerContactBuilder()],
+      }
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      keyWorkerApiClient.getOffendersKeyWorker = jest.fn(async () => Promise.reject(Error('some error!')))
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+      )
+
+      const response = await service.getContacts('token', 'A1234AA', 1)
+
+      expect(response).toEqual([
+        ...[{ ...expectedKeyWorkerResponse[0], firstName: apiErrorMessage, lastName: '', emails: [apiErrorMessage] }],
+        ...expectedPomResponse,
+        ...expectedComResponse,
+        {
+          address: {
+            label: 'Main address',
+            noFixedAddress: false,
+            premise: 'Address',
+            primary: true,
+          },
+          emails: ['e@mail.com'],
+          firstName: 'John',
+          lastName: 'Smith',
+          phones: ['077111111'],
+          relationshipDescription: 'Probation Officer',
+          relationship: 'PROBATION',
+        },
+      ])
     })
 
     it('should remove contacts with address with past the enddate', async () => {
