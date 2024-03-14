@@ -5,6 +5,7 @@ import {
   formatCategoryCodeDescription,
   formatName,
   prisonerBelongsToUsersCaseLoad,
+  prisonerIsTRN,
   userHasRoles,
 } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -21,10 +22,13 @@ export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
   const { userRoles, caseLoads } = user
+  const { prisonId } = prisonerData
   const profileBannerTopLinks = []
-  const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads)
+  const canViewCsraHistory =
+    prisonerBelongsToUsersCaseLoad(prisonId, caseLoads) ||
+    (prisonerIsTRN(prisonId) && userHasRoles([Role.GlobalSearch], userRoles))
 
-  if (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads)) {
+  if (prisonerBelongsToUsersCaseLoad(prisonId, caseLoads)) {
     profileBannerTopLinks.push({
       heading: 'Location',
       hiddenLabel: 'View location details',
@@ -32,7 +36,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
       classes: '',
       url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
     })
-  } else if (userHasRoles([Role.InactiveBookings], userRoles) && prisonerData.prisonId === 'OUT') {
+  } else if (userHasRoles([Role.InactiveBookings], userRoles) && prisonId === 'OUT') {
     profileBannerTopLinks.push({
       heading: 'Location',
       hiddenLabel: 'View location details',
@@ -40,7 +44,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
       classes: '',
       url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
     })
-  } else if (userHasRoles([Role.InactiveBookings], userRoles) && prisonerData.prisonId === 'TRN') {
+  } else if (userHasRoles([Role.InactiveBookings], userRoles) && prisonId === 'TRN') {
     profileBannerTopLinks.push({
       heading: 'Location',
       hiddenLabel: 'View location details',
@@ -73,7 +77,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
     hiddenLabel: 'View CSRA history',
     info: prisonerData.csra ? prisonerData.csra : 'Not entered',
     classes: '',
-    url: !belongsToCaseLoad ? undefined : `/prisoner/${prisonerData.prisonerNumber}/csra-history`,
+    url: canViewCsraHistory ? `/prisoner/${prisonerData.prisonerNumber}/csra-history` : undefined,
   })
   profileBannerTopLinks.push({
     heading: 'Incentive level',
