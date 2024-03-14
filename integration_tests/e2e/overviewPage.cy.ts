@@ -5,6 +5,7 @@ import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
+import { mockContactDetailYouthEstate } from '../../server/data/localMockData/contactDetail'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -628,6 +629,34 @@ context('Overview Page', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.staffContacts().should('exist')
         overviewPage.staffContacts().find('[data-qa=keyworker-details]').should('contain.text', 'Dave Stevens')
+      })
+    })
+  })
+
+  context('Given the prisoner is in the youth estate', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        caseLoads: [{ caseLoadId: 'WYI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
+      })
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        prisonerDataOverrides: { prisonId: 'WYI' },
+      })
+      cy.task('stubGetOffenderContacts', mockContactDetailYouthEstate)
+      visitOverviewPage()
+    })
+
+    context('Staff contacts', () => {
+      it('Displays the offender staff contact details', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.staffContacts().should('exist')
+        overviewPage.staffContacts().should('contain.text', 'CuSP Officer')
+        overviewPage.staffContacts().should('contain.text', 'CuSP Officer (backup)')
+        overviewPage.staffContacts().should('contain.text', 'Youth Justice Worker')
+        overviewPage.staffContacts().should('contain.text', 'Resettlement Practitioner')
+        overviewPage.staffContacts().should('contain.text', 'Youth Justice Service')
       })
     })
   })

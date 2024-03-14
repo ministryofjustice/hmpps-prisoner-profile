@@ -16,7 +16,11 @@
     {% include "./nonAssociations/nonAssociationSummary.njk" %}
   </div>
   <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
-    {% include "./staffContacts/staffContacts.njk" %}
+    {% if isYouthPrisoner %}
+      {% include "./staffContacts/staffContactsYouthEstate.njk" %}
+    {% else %}
+      {% include "./staffContacts/staffContacts.njk" %}
+    {% endif %}
   </div>
 </div>
 <div class="govuk-grid-row">

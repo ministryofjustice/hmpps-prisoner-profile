@@ -31,12 +31,19 @@ export default class ProfessionalContactsService {
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
   ) {}
 
-  async getContacts(clientToken: string, prisonerNumber: string, bookingId: number): Promise<ProfessionalContact[]> {
+  async getContacts(
+    clientToken: string,
+    prisonerNumber: string,
+    bookingId: number,
+    isYouthPrisoner: boolean,
+  ): Promise<ProfessionalContact[]> {
     const [contacts, allocationManager, communityManager, keyWorker] = await Promise.all([
       this.prisonApiClientBuilder(clientToken).getBookingContacts(bookingId),
-      this.allocationApiClientBuilder(clientToken).getPomByOffenderNo(prisonerNumber),
-      this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
-      this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
+      isYouthPrisoner ? null : this.allocationApiClientBuilder(clientToken).getPomByOffenderNo(prisonerNumber),
+      isYouthPrisoner
+        ? null
+        : this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
+      isYouthPrisoner ? null : this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
     ])
 
     // filter out COM and POM from prison API contacts as they are reliably retrieved from other API calls
@@ -88,6 +95,11 @@ export default class ProfessionalContactsService {
       'Prison Offender Manager',
       'Co-working Prison Offender Manager',
       'Community Offender Manager',
+      'CuSP Officer',
+      'CuSP Officer (backup)',
+      'Youth Justice Worker',
+      'Resettlement Practitioner',
+      'Youth Justice Service',
     ]
     const leftJobTitleIndex = jobTitleOrder.indexOf(left.relationshipDescription)
     const rightJobTitleIndex = jobTitleOrder.indexOf(right.relationshipDescription)

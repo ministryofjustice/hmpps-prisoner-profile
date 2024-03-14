@@ -6,6 +6,15 @@ export default interface StaffContacts {
   linkUrl: string
 }
 
+export interface YouthStaffContacts {
+  cuspOfficer: string
+  cuspOfficerBackup: string
+  youthJusticeWorker: string
+  resettlementPractitioner: string
+  youthJusticeService: string
+  linkUrl: string
+}
+
 export interface KeyWorkerSummary {
   name: string
   lastSession: string
@@ -14,18 +23,18 @@ export interface KeyWorkerSummary {
 export interface Contact {
   lastName: string
   firstName: string
-  middleName: string
+  middleName?: string
   contactType: string
   contactTypeDescription: string
   relationship: string
   relationshipDescription: string
-  commentText: string
+  commentText?: string
   emergencyContact: boolean
   nextOfKin: boolean
   relationshipId: number
   personId: number
   activeFlag: boolean
-  expiryDate: string
+  expiryDate?: string
   approvedVisitorFlag: boolean
   canBeContactedFlag: boolean
   awareOfChargesFlag: boolean

@@ -11,6 +11,7 @@ import { keyWorkerMock } from '../data/localMockData/keyWorker'
 import { communityManagerMock } from '../data/localMockData/communityManagerMock'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
+import { ContactRelationship } from '../data/enums/ContactRelationship'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -153,7 +154,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1)
+      const response = await service.getContacts('token', 'A1234AA', 1, false)
 
       expect(response).toEqual([
         ...expectedKeyWorkerResponse,
@@ -195,7 +196,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1)
+      const response = await service.getContacts('token', 'A1234AA', 1, false)
 
       expect(response.length).toEqual(7)
       expect(response[0].relationshipDescription).toEqual('Key Worker')
@@ -223,7 +224,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1)
+      const response = await service.getContacts('token', 'A1234AA', 1, false)
 
       expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
@@ -247,7 +248,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1)
+      const response = await service.getContacts('token', 'A1234AA', 1, false)
 
       expect(response.find(contact => contact.address?.endDate === '2050-01-01')).toBeTruthy()
       expect(response.find(contact => contact.address?.addressId === 999)).toBeTruthy()
@@ -272,7 +273,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1)
+      const response = await service.getContacts('token', 'A1234AA', 1, false)
 
       expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
@@ -293,9 +294,66 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1)
+      const response = await service.getContacts('token', 'A1234AA', 1, false)
 
       expect(response.find(contact => contact.address?.label === 'Not entered')).toBeTruthy()
+    })
+
+    it('should return YOI contacts and not POM, COM, Key Worker if the prisoner is in a youthEstatePrison', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [
+          PrisonerContactBuilder({
+            personId: 1,
+            relationship: ContactRelationship.CuspOfficer,
+            relationshipDescription: 'CuSP Officer',
+          }),
+          PrisonerContactBuilder({
+            personId: 2,
+            relationship: ContactRelationship.CuspOfficerBackup,
+            relationshipDescription: 'CuSP Officer (backup)',
+          }),
+          PrisonerContactBuilder({
+            personId: 3,
+            relationship: ContactRelationship.YouthJusticeWorker,
+            relationshipDescription: 'Youth Justice Worker',
+          }),
+          PrisonerContactBuilder({
+            personId: 4,
+            relationship: ContactRelationship.ResettlementPractitioner,
+            relationshipDescription: 'Resettlement Practitioner',
+          }),
+          PrisonerContactBuilder({
+            personId: 5,
+            relationship: ContactRelationship.YouthJusticeService,
+            relationshipDescription: 'Youth Justice Service',
+          }),
+        ],
+      }
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+      )
+
+      const response = await service.getContacts('token', 'A1234AA', 1, true)
+
+      expect(response.find(contact => contact.relationshipDescription === 'Key Worker')).toBeFalsy()
+      expect(response.find(contact => contact.relationshipDescription === 'Prison Offender Manager')).toBeFalsy()
+      expect(
+        response.find(contact => contact.relationshipDescription === 'Co-working Prison Offender Manager'),
+      ).toBeFalsy()
+      expect(response.find(contact => contact.relationshipDescription === 'Community Offender Manager')).toBeFalsy()
+
+      expect(response.find(contact => contact.relationshipDescription === 'CuSP Officer')).toBeTruthy()
+      expect(response.find(contact => contact.relationshipDescription === 'CuSP Officer (backup)')).toBeTruthy()
+      expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Worker')).toBeTruthy()
+      expect(response.find(contact => contact.relationshipDescription === 'Resettlement Practitioner')).toBeTruthy()
+      expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Service')).toBeTruthy()
     })
   })
 })
