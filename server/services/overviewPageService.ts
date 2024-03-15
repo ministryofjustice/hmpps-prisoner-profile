@@ -147,11 +147,11 @@ export default class OverviewPageService {
       contacts,
     ] = await Promise.all([
       activeCaseloadId ? prisonApiClient.getStaffRoles(staffId, activeCaseloadId) : [],
-      Result.wrap(getLearnerNeurodivergence, apiErrorCallback)(),
+      Result.wrap(getLearnerNeurodivergence(), apiErrorCallback),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       isYouthPrisoner ? null : allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      isYouthPrisoner ? null : Result.wrap(getKeyWorkerName, apiErrorCallback)(),
+      isYouthPrisoner ? null : Result.wrap(getKeyWorkerName(), apiErrorCallback),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),

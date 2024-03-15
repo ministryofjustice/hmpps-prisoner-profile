@@ -4,7 +4,6 @@ import {
   mockContactDetailWithNotEntered,
   mockContactDetailYouthEstate,
 } from '../../server/data/localMockData/contactDetail'
-import OverviewPage from '../pages/overviewPage'
 
 const visitProfessionalContactsPage = (): ProfessionalContactsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/professional-contacts' })
@@ -185,15 +184,11 @@ context('Professional contacts list page - given API to get key worker name fail
   })
 
   it('Displays a page error banner and an error message replacing the key worker details', () => {
-    const overviewPage = Page.verifyOnPage(OverviewPage)
-
-    overviewPage.apiErrorBanner().should('exist')
-    overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+    professionalContactsPage.apiErrorBanner().should('exist')
+    professionalContactsPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
     const keyWorkerContact = professionalContactsPage.keyWorkerContact()
     keyWorkerContact.header().contains('Key Worker')
-    keyWorkerContact.name().contains('We cannot show these details right now. Try again later.')
-    keyWorkerContact.contactDetails().contains('We cannot show these details right now. Try again later.')
-    keyWorkerContact.address().contains('Not entered')
+    keyWorkerContact.errorMessage().contains('We cannot show these details right now. Try again later.')
   })
 })
