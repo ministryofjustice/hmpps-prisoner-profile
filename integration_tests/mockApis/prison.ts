@@ -95,6 +95,8 @@ import OffenderCellHistory from '../../server/data/interfaces/prisonApi/Offender
 import OffenderBooking from '../../server/data/interfaces/prisonApi/OffenderBooking'
 import { CaseNoteUsage } from '../../server/data/interfaces/prisonApi/CaseNote'
 import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
+import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
+import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -770,6 +772,22 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: jsonResp,
+      },
+    })
+  },
+
+  stubGetNextCourtEvent: ({ bookingId, resp = nextCourtEventMock }: { bookingId: number; resp: CourtEvent }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/court/${bookingId}/next-court-event`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
       },
     })
   },
