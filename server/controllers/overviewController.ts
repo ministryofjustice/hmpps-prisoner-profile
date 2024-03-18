@@ -5,7 +5,7 @@ import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
 import { User } from '../data/hmppsAuthClient'
-import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import Nominal from '../data/interfaces/manageSocCasesApi/Nominal'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
@@ -15,6 +15,9 @@ import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import buildOverviewActions from './utils/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
+import OffencesService from '../services/offencesService'
+import OverviewPageData from './interfaces/OverviewPageData'
+import mapCourtCaseSummary from './mappers/mapCourtCaseSummary'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -25,14 +28,19 @@ export default class OverviewController {
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
     private readonly auditService: AuditService,
+    private readonly offencesService: OffencesService,
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = res.locals
+    const { userRoles } = res.locals.user
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
+    const canViewCourtCasesSummary =
+      config.featureToggles.courCasesSummaryEnabled &&
+      userHasRoles([Role.ReleaseDatesCalculator], res.locals.user.userRoles)
 
-    const [overviewPageData, pathfinderNominal, socNominal] = await Promise.all([
+    const [overviewPageData, pathfinderNominal, socNominal, nextCourtAppearance] = await Promise.all([
       this.overviewPageService.get({
         clientToken,
         prisonerData,
@@ -44,6 +52,9 @@ export default class OverviewController {
       }),
       pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
+      canViewCourtCasesSummary
+        ? this.offencesService.getNextCourtAppearanceSummary(clientToken, prisonerData.bookingId)
+        : undefined,
     ])
 
     const overviewActions = buildOverviewActions(
@@ -74,7 +85,7 @@ export default class OverviewController {
       })
       .catch(error => logger.error(error))
 
-    res.render('pages/overviewPage', {
+    const viewData: OverviewPageData = {
       pageTitle: 'Overview',
       ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
       ...overviewPageData,
@@ -82,7 +93,11 @@ export default class OverviewController {
       overviewInfoLinks,
       canView,
       canAdd,
-    })
+      courtCaseSummary: mapCourtCaseSummary(nextCourtAppearance, userRoles, prisonerData.prisonerNumber),
+      prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
+    }
+
+    res.render('pages/overviewPage', viewData)
   }
 
   private buildOverviewInfoLinks(

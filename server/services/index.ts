@@ -23,6 +23,7 @@ import BeliefService from './beliefService'
 import LocationDetailsService from './locationDetailsService'
 import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFactory'
 import ProbationDocumentsService from './probationDocumentsService'
+import OffencesService from './offencesService'
 
 export const services = () => {
   const {
@@ -59,6 +60,7 @@ export const services = () => {
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
   const alertsService = new AlertsService(prisonApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
+  const offencesService = new OffencesService(prisonApiClientBuilder)
   const overviewPageService = new OverviewPageService(
     prisonApiClientBuilder,
     allocationManagerApiClientBuilder,
@@ -124,6 +126,7 @@ export const services = () => {
     beliefService,
     auditService,
     probationDocumentsService,
+    offencesService,
   }
 }
 

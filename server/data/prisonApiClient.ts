@@ -56,6 +56,7 @@ import { OffenderContacts } from './interfaces/prisonApi/OffenderContact'
 import PagedList, { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
 import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
+import CourtEvent from './interfaces/prisonApi/CourtEvent'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -543,5 +544,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getVisitsPrisons(_bookingId: number): Promise<PrisonDetails[]> {
     return null
+  }
+
+  async getNextCourtEvent(bookingId: number): Promise<CourtEvent> {
+    return this.restClient.get<CourtEvent>({ path: `/api/court/${bookingId}/next-court-event` })
   }
 }
