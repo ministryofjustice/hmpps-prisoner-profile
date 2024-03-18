@@ -4,12 +4,15 @@ import HmppsAction from './HmppsAction'
 
 export default interface OverviewPageData extends OverviewPage {
   pageTitle: string
-  courtCaseSummary?: CourtCaseSummary
+  courtCaseSummary: CourtCaseSummary
   overviewActions: HmppsAction[]
   overviewInfoLinks: { text: string; url: string; dataQA: string }[]
   canView: boolean
   canAdd: boolean
   prisonerDisplayName: string
+  options: {
+    showCourtCaseSummary: boolean
+  }
 }
 
 export interface CourtCaseSummary {
