@@ -26,7 +26,7 @@ describe('offencesService', () => {
 
       const offencesService = new OffencesService(() => prisonApiClientSpy)
 
-      const result = await offencesService.getNextCourtAppearanceSummary('token', 1)
+      const result = await offencesService.getNextCourtHearingSummary('token', 1)
 
       expect(result).toEqual({
         caseReference: 'caseReference',
@@ -41,9 +41,21 @@ describe('offencesService', () => {
 
       const offencesService = new OffencesService(() => prisonApiClientSpy)
 
-      const result = await offencesService.getNextCourtAppearanceSummary('token', 1)
+      const result = await offencesService.getNextCourtHearingSummary('token', 1)
 
       expect(result).toBeNull()
+    })
+  })
+
+  describe('getActiveCourtCasesCount', () => {
+    it('should return the active court cases count', async () => {
+      prisonApiClientSpy.getActiveCourtCasesCount = jest.fn().mockResolvedValue(1)
+
+      const offencesService = new OffencesService(() => prisonApiClientSpy)
+
+      const result = await offencesService.getActiveCourtCasesCount('token', 1)
+
+      expect(result).toEqual(1)
     })
   })
 })

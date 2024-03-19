@@ -765,6 +765,22 @@ export default {
     })
   },
 
+  stubGetCourtCasesCount: ({ bookingId, resp = 5 }: { bookingId: number; resp: number }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/court/${bookingId}/count-active-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
+      },
+    })
+  },
+
   stubGetIdentifiers: (bookingId: number) => {
     return stubFor({
       request: {

@@ -5,7 +5,7 @@
   <div class="govuk-grid-row" data-qa="court-cases-release-dates">
     <div class="govuk-grid-column-full">
       <p data-qa="overview-active-court-cases" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1">Active court cases</p>
-      <p class="govuk-!-font-size-36">0</p>
+      <p class="govuk-!-font-size-36" data-qa="overview-court-cases-count">{{ courtCaseSummary.activeCourtCasesCount or 0 }}</p>
       <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2" />
     </div>
     <div data-qa="overview-next-court-appearance" class="govuk-grid-column-full">
@@ -33,7 +33,7 @@
           ]
         }) }}
       {% else %}
-          <p>No upcoming court hearings.</p>
+          <p>There are no upcoming court hearings.</p>
       {% endif %}
       <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2" />
     </div>

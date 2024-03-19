@@ -5,9 +5,14 @@ import { mapNextCourtAppearanceSummary } from './mappers/courtAppearanceAndRelea
 export default class OffencesService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
-  async getNextCourtAppearanceSummary(token: string, bookingId: number) {
+  async getNextCourtHearingSummary(token: string, bookingId: number) {
     const prisonApi = this.prisonApiClientBuilder(token)
     const response = await prisonApi.getNextCourtEvent(bookingId)
     return mapNextCourtAppearanceSummary(response)
+  }
+
+  getActiveCourtCasesCount(token: string, bookingId: number) {
+    const prisonApi = this.prisonApiClientBuilder(token)
+    return prisonApi.getActiveCourtCasesCount(bookingId)
   }
 }

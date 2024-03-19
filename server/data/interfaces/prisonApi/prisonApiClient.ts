@@ -158,4 +158,5 @@ export interface PrisonApiClient {
   getVisitsForBookingWithVisitors(bookingId: number, params: object): Promise<PagedList<VisitWithVisitors>>
   getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]>
   getNextCourtEvent(bookingId: number): Promise<CourtEvent>
+  getActiveCourtCasesCount(bookingId: number): Promise<number>
 }

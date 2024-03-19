@@ -6,6 +6,7 @@ import config from '../../config'
 
 export default function mapCourtCaseSummary(
   nextCourtCaseAppearance: CourtAppearanceSummary,
+  activeCourtCasesCount: number,
   userRoles: Role[],
   prisonerNumber: string,
 ): CourtCaseSummary | null {
@@ -14,6 +15,7 @@ export default function mapCourtCaseSummary(
 
   return {
     nextCourtAppearance: nextCourtCaseAppearance,
+    activeCourtCasesCount,
     link: {
       text: userHasRoles([Role.AdjustmentsMaintainer], userRoles)
         ? 'Court cases and release dates'
