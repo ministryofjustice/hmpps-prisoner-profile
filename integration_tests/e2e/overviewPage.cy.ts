@@ -724,6 +724,7 @@ context('Court cases and release dates', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
 
         overviewPage.offencesHeader().should('not.exist')
+        overviewPage.courtCasesAndReleaseDates().courtCasesCount().should('contain.text', '5')
         overviewPage.courtCasesAndReleaseDates().nextCourtAppearance().caseReference().should('contain.text', 'ABC123')
         overviewPage
           .courtCasesAndReleaseDates()
@@ -751,7 +752,7 @@ context('Court cases and release dates', () => {
           .courtCasesAndReleaseDates()
           .nextCourtAppearance()
           .placeHolderText()
-          .should('contain.text', 'No upcoming court hearings.')
+          .should('contain.text', 'There are no upcoming court hearings.')
       })
     })
   })

@@ -194,6 +194,7 @@ export default class OverviewPage extends Page {
 
   courtCasesAndReleaseDates = () => ({
     card: (): PageElement => cy.get('[data-qa="court-cases-release-dates"]'),
+    courtCasesCount: (): PageElement => cy.get('[data-qa="overview-court-cases-count"]'),
     nextCourtAppearance: () => ({
       caseReference: (): PageElement =>
         cy.get(

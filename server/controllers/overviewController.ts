@@ -40,20 +40,22 @@ export default class OverviewController {
       config.featureToggles.courCasesSummaryEnabled &&
       userHasRoles([Role.ReleaseDatesCalculator], res.locals.user.userRoles)
 
-    const [overviewPageData, pathfinderNominal, socNominal, nextCourtAppearance] = await Promise.all([
-      this.overviewPageService.get({
-        clientToken,
-        prisonerData,
-        staffId: res.locals.user.staffId,
-        inmateDetail,
-        apiErrorCallback: res.locals.apiErrorCallback,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
-      }),
-      pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
-      manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
-      this.offencesService.getNextCourtAppearanceSummary(clientToken, prisonerData.bookingId),
-    ])
+    const [overviewPageData, pathfinderNominal, socNominal, nextCourtAppearance, activeCourtCasesCount] =
+      await Promise.all([
+        this.overviewPageService.get({
+          clientToken,
+          prisonerData,
+          staffId: res.locals.user.staffId,
+          inmateDetail,
+          apiErrorCallback: res.locals.apiErrorCallback,
+          userCaseLoads: res.locals.user.caseLoads,
+          userRoles: res.locals.user.userRoles,
+        }),
+        pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
+        manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
+        this.offencesService.getNextCourtHearingSummary(clientToken, prisonerData.bookingId),
+        this.offencesService.getActiveCourtCasesCount(clientToken, prisonerData.bookingId),
+      ])
 
     const overviewActions = buildOverviewActions(
       prisonerData,
@@ -91,7 +93,12 @@ export default class OverviewController {
       overviewInfoLinks,
       canView,
       canAdd,
-      courtCaseSummary: mapCourtCaseSummary(nextCourtAppearance, userRoles, prisonerData.prisonerNumber),
+      courtCaseSummary: mapCourtCaseSummary(
+        nextCourtAppearance,
+        activeCourtCasesCount,
+        userRoles,
+        prisonerData.prisonerNumber,
+      ),
       prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
       options: {
         showCourtCaseSummary,

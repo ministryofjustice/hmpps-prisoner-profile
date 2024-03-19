@@ -549,4 +549,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getNextCourtEvent(bookingId: number): Promise<CourtEvent> {
     return this.restClient.get<CourtEvent>({ path: `/api/court/${bookingId}/next-court-event` })
   }
+
+  async getActiveCourtCasesCount(bookingId: number): Promise<number> {
+    return this.restClient.get<number>({ path: `/api/court/${bookingId}/count-active-cases` })
+  }
 }
