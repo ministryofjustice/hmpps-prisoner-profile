@@ -6,7 +6,7 @@
     {{ statusList(statuses) }}
   </section>
 </div>
-{% if courtCaseSummary %}
+{% if options.showCourtCaseSummary %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "./courtCases/courtCasesAndReleaseDates.njk" %}
@@ -44,7 +44,7 @@
   </div>
 </div>
 
-{% if not courtCaseSummary %}
+{% if not options.showCourtCaseSummary %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full" data-qa="overview-offences">
       {% include "./offences/offences.njk" %}

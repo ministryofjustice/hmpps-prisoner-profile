@@ -36,7 +36,7 @@ export default class OverviewController {
     const { userRoles } = res.locals.user
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
-    const canViewCourtCasesSummary =
+    const showCourtCaseSummary =
       config.featureToggles.courCasesSummaryEnabled &&
       userHasRoles([Role.ReleaseDatesCalculator], res.locals.user.userRoles)
 
@@ -52,9 +52,7 @@ export default class OverviewController {
       }),
       pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
-      canViewCourtCasesSummary
-        ? this.offencesService.getNextCourtAppearanceSummary(clientToken, prisonerData.bookingId)
-        : undefined,
+      this.offencesService.getNextCourtAppearanceSummary(clientToken, prisonerData.bookingId),
     ])
 
     const overviewActions = buildOverviewActions(
@@ -95,6 +93,9 @@ export default class OverviewController {
       canAdd,
       courtCaseSummary: mapCourtCaseSummary(nextCourtAppearance, userRoles, prisonerData.prisonerNumber),
       prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
+      options: {
+        showCourtCaseSummary,
+      },
     }
 
     res.render('pages/overviewPage', viewData)

@@ -164,6 +164,7 @@ export default class OffencesPageService {
     return [...summarySentencedCourtCasesMapped, ...courtCaseDataMappedUnsentenced]
   }
 
+  // should be able to remove this and use the new api used in offences service
   getNextCourtAppearance(courtCase: CourtCase, todaysDate: string) {
     let nextCourtAppearance: CourtHearing = {} as CourtHearing
     if (courtCase.courtHearings) {

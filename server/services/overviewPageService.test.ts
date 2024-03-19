@@ -44,7 +44,7 @@ import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock
 import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
-import { CourtCasesMock, CourtCaseWithNextCourtAppearance } from '../data/localMockData/courtCaseMock'
+import { CourtCasesMock } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
 import OffencesPageService from './offencesPageService'
 import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
@@ -980,28 +980,6 @@ describe('OverviewPageService', () => {
         inmateDetail: inmateDetailMock,
       })
       expect(res.offencesOverview).toEqual(offenceOverviewMock)
-    })
-
-    it('should get the next court appearance from all court cases for the overview page', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-      const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: {
-          prisonerNumber,
-          bookingId,
-          inOutStatus: 'OUT',
-          locationDescription: 'Moorland (HMP & YOI)',
-        } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-
-      const nextCourtAppearance = await overviewPageService.getNextCourtAppearanceForOverview(
-        CourtCaseWithNextCourtAppearance,
-      )
-      expect(nextCourtAppearance).toEqual(CourtCaseWithNextCourtAppearance[1].courtHearings[2])
     })
   })
   describe('Staff roles', () => {

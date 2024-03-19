@@ -528,6 +528,7 @@ context('Overview Page', () => {
           bookingId: 1102484,
           prisonerDataOverrides: { confirmedReleaseDate: '2024-02-20' },
         })
+        cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
         visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.offencesHeader().should('exist')
@@ -546,6 +547,7 @@ context('Overview Page', () => {
 
       it('should display main offence and conditional release date if there is no confirmed release date and hide the next court appearance', () => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
         visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.offencesHeader().should('exist')
@@ -573,7 +575,7 @@ context('Overview Page', () => {
     })
 
     context('Main offence overview', () => {
-      it('should display main offence and the next court appearance and hide the conditional release date', () => {
+      it('should display main offence and the next court appearance and display the conditional release date', () => {
         const overviewPage = visitOverviewPageOnRemand()
         overviewPage.offencesHeader().should('exist')
         overviewPage.offenceCardContent().should('exist')
