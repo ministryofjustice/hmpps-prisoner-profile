@@ -51,6 +51,7 @@ import { OffenderContacts } from './OffenderContact'
 import PagedList, { AlertsListQueryParams } from './PagedList'
 import VisitWithVisitors from './VisitWithVisitors'
 import PrisonDetails from './PrisonDetails'
+import CourtEvent from './CourtEvent'
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
@@ -156,4 +157,6 @@ export interface PrisonApiClient {
   getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
   getVisitsForBookingWithVisitors(bookingId: number, params: object): Promise<PagedList<VisitWithVisitors>>
   getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]>
+  getNextCourtEvent(bookingId: number): Promise<CourtEvent>
+  getActiveCourtCasesCount(bookingId: number): Promise<number>
 }

@@ -27,12 +27,7 @@ import {
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
-import {
-  CourtCasesMock,
-  CourtCasesSentencedMockA,
-  CourtCasesUnsentencedMockA,
-  CourtCaseWithNextCourtAppearance,
-} from '../../server/data/localMockData/courtCaseMock'
+import { CourtCasesMock, CourtCasesUnsentencedMockA } from '../../server/data/localMockData/courtCaseMock'
 import { OffenceHistoryMock } from '../../server/data/localMockData/offenceHistoryMock'
 import { MappedUnsentencedCourtCasesMock, sentenceTermsMock } from '../../server/data/localMockData/sentenceTermsMock'
 import {
@@ -95,6 +90,8 @@ import OffenderCellHistory from '../../server/data/interfaces/prisonApi/Offender
 import OffenderBooking from '../../server/data/interfaces/prisonApi/OffenderBooking'
 import { CaseNoteUsage } from '../../server/data/interfaces/prisonApi/CaseNote'
 import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
+import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
+import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -752,24 +749,34 @@ export default {
     })
   },
 
-  stubGetCourtCases: (bookingId: number) => {
-    let jsonResp
-    if (bookingId === 1234568) {
-      jsonResp = CourtCaseWithNextCourtAppearance
-    } else {
-      jsonResp = CourtCasesSentencedMockA
-    }
+  stubGetNextCourtEvent: ({ bookingId, resp = nextCourtEventMock }: { bookingId: number; resp: CourtEvent }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/court-cases`,
+        urlPattern: `/prison/api/court/${bookingId}/next-court-event`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: resp,
+      },
+    })
+  },
+
+  stubGetCourtCasesCount: ({ bookingId, resp = 5 }: { bookingId: number; resp: number }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/court/${bookingId}/count-active-cases`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
       },
     })
   },

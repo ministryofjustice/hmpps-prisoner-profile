@@ -529,6 +529,7 @@ context('Overview Page', () => {
           bookingId: 1102484,
           prisonerDataOverrides: { confirmedReleaseDate: '2024-02-20' },
         })
+        cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
         visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.offencesHeader().should('exist')
@@ -542,10 +543,12 @@ context('Overview Page', () => {
         overviewPage.overviewConditionalReleaseLabel().should('not.exist')
         overviewPage.overviewConditionalRelease().should('not.exist')
         overviewPage.nextAppearanceDate().should('not.exist')
+        overviewPage.courtCasesAndReleaseDates().card().should('not.exist')
       })
 
       it('should display main offence and conditional release date if there is no confirmed release date and hide the next court appearance', () => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
         visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.offencesHeader().should('exist')
@@ -573,7 +576,7 @@ context('Overview Page', () => {
     })
 
     context('Main offence overview', () => {
-      it('should display main offence and the next court appearance and hide the conditional release date', () => {
+      it('should display main offence and the next court appearance and display the conditional release date', () => {
         const overviewPage = visitOverviewPageOnRemand()
         overviewPage.offencesHeader().should('exist')
         overviewPage.offenceCardContent().should('exist')
@@ -720,6 +723,86 @@ context('Overview Page - Prisoner not found', () => {
         cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/asudhsdudhid' })
         Page.verifyOnPage(NotFoundPage)
       })
+    })
+  })
+})
+
+context('Court cases and release dates', () => {
+  context('Given the user has release dates calculator role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    })
+
+    it('should display the link with correct text', () => {
+      visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage
+        .courtCasesAndReleaseDates()
+        .card()
+        .contains('a[href="http://localhost:9091/ccrd/prisoner/G6123VU/overview"]', 'Calculate release dates')
+    })
+
+    context('data is returned from the API', () => {
+      it('should display the court cases and release dates panel and not the offences panel', () => {
+        visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+
+        overviewPage.offencesHeader().should('not.exist')
+        overviewPage.courtCasesAndReleaseDates().courtCasesCount().should('contain.text', '5')
+        overviewPage.courtCasesAndReleaseDates().nextCourtAppearance().caseReference().should('contain.text', 'ABC123')
+        overviewPage
+          .courtCasesAndReleaseDates()
+          .nextCourtAppearance()
+          .location()
+          .should('contain.text', 'Test court location')
+        overviewPage
+          .courtCasesAndReleaseDates()
+          .nextCourtAppearance()
+          .hearingType()
+          .should('contain.text', 'Sentencing')
+        overviewPage.courtCasesAndReleaseDates().nextCourtAppearance().date().should('contain.text', '1 January 2030')
+      })
+    })
+
+    context('no data is returned from the API', () => {
+      it('should display the placeholder text', () => {
+        cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
+
+        visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+
+        overviewPage.offencesHeader().should('not.exist')
+        overviewPage
+          .courtCasesAndReleaseDates()
+          .nextCourtAppearance()
+          .placeHolderText()
+          .should('contain.text', 'There are no upcoming court hearings.')
+      })
+    })
+  })
+
+  context('Given the user has release dates calculator and adjustments maintainer role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator, Role.AdjustmentsMaintainer],
+      })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    })
+
+    it('should display the link with correct text', () => {
+      visitOverviewPage()
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage
+        .courtCasesAndReleaseDates()
+        .card()
+        .contains('a[href="http://localhost:9091/ccrd/prisoner/G6123VU/overview"]', 'Court cases and release dates')
     })
   })
 })

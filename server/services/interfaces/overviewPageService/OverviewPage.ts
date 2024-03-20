@@ -1,6 +1,5 @@
 import MiniSummary from './MiniSummary'
 import PersonalDetails from './PersonalDetails'
-import CourtCase, { CourtHearing } from '../../../data/interfaces/prisonApi/CourtCase'
 import FullStatus from '../../../data/interfaces/prisonApi/FullStatus'
 import Status from './Status'
 import NonAssociationSummary from './NonAssociationSummary'
@@ -15,12 +14,10 @@ export default interface OverviewPage {
   schedule: OverviewSchedule
   offencesOverview: {
     mainOffenceDescription: string
-    courtCaseData: CourtCase[]
     fullStatus: FullStatus
     imprisonmentStatusDescription: string
     conditionalReleaseDate: string
     confirmedReleaseDate: string
-    nextCourtAppearance: CourtHearing
   }
   prisonName: string
   staffRoles: string[]

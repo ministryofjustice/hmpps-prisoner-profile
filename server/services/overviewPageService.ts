@@ -1,4 +1,4 @@
-import { differenceInDays, format, isAfter, startOfToday } from 'date-fns'
+import { differenceInDays, isAfter } from 'date-fns'
 import MiniSummary, { MiniSummaryData } from './interfaces/overviewPageService/MiniSummary'
 import OverviewPage, { OverviewSchedule, OverviewScheduleItem } from './interfaces/overviewPageService/OverviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
@@ -33,7 +33,6 @@ import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
 import OffencesPageService from './offencesPageService'
-import CourtCase, { CourtHearing } from '../data/interfaces/prisonApi/CourtCase'
 import config from '../config'
 import { Role } from '../data/enums/role'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
@@ -142,7 +141,6 @@ export default class OverviewPageService {
       keyWorkerName,
       keyWorkerSessions,
       mainOffence,
-      courtCaseData,
       fullStatus,
       communityManager,
       prisonerDetail,
@@ -156,7 +154,6 @@ export default class OverviewPageService {
       isYouthPrisoner ? null : Result.wrap(getKeyWorkerName, apiErrorCallback)(),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
-      prisonApiClient.getCourtCases(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
       isYouthPrisoner ? null : prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -180,7 +177,6 @@ export default class OverviewPageService {
         conditionalReleaseDate,
         confirmedReleaseDate,
         mainOffence,
-        courtCaseData,
         fullStatus,
       ),
     ])
@@ -209,48 +205,20 @@ export default class OverviewPageService {
     conditionalReleaseDate: string,
     confirmedReleaseDate: string,
     mainOffence: MainOffence[],
-    courtCaseData: CourtCase[],
     fullStatus: FullStatus,
   ) {
-    const nextCourtAppearance = await this.getNextCourtAppearanceForOverview(courtCaseData)
-
     const mainOffenceDescription = await this.getMainOffenceDescription(mainOffence)
     return {
       mainOffenceDescription,
-      courtCaseData,
       fullStatus,
       imprisonmentStatusDescription,
       conditionalReleaseDate,
       confirmedReleaseDate,
-      nextCourtAppearance,
     }
   }
 
   async getMainOffenceDescription(mainOffence: MainOffence[]): Promise<string> {
     return mainOffence[0] && mainOffence[0].offenceDescription ? mainOffence[0].offenceDescription : 'Not entered'
-  }
-
-  async getNextCourtAppearanceForOverview(courtCaseData: CourtCase[]) {
-    const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
-    let nextCourtAppearance: CourtHearing = {} as CourtHearing
-    if (Array.isArray(courtCaseData)) {
-      await Promise.all(
-        courtCaseData.map(async (courtCase: CourtCase) => {
-          const courtAppearance = this.offencesPageService.getNextCourtAppearance(courtCase, todaysDate)
-
-          if (!nextCourtAppearance.dateTime && courtAppearance.dateTime) {
-            nextCourtAppearance = courtAppearance
-          } else if (courtAppearance.dateTime && nextCourtAppearance.dateTime) {
-            const courtDate = format(new Date(courtAppearance.dateTime), 'yyyy-MM-dd')
-            const currentNextDate = format(new Date(nextCourtAppearance.dateTime), 'yyyy-MM-dd')
-            if (courtDate < currentNextDate) {
-              nextCourtAppearance = courtAppearance
-            }
-          }
-        }),
-      )
-    }
-    return nextCourtAppearance
   }
 
   public getStaffContacts(

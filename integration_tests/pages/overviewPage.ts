@@ -191,4 +191,32 @@ export default class OverviewPage extends Page {
     otherPrisonsCount: (): PageElement => cy.get('[data-qa=overview-na-other-prisons-count]'),
     nonAssociationsLink: (): PageElement => cy.get('[data-qa=overview-non-associations-link] a'),
   })
+
+  courtCasesAndReleaseDates = () => ({
+    card: (): PageElement => cy.get('[data-qa="court-cases-release-dates"]'),
+    courtCasesCount: (): PageElement => cy.get('[data-qa="overview-court-cases-count"]'),
+    nextCourtAppearance: () => ({
+      caseReference: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value',
+        ),
+
+      location: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value',
+        ),
+
+      hearingType: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value',
+        ),
+
+      date: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-next-court-appearance"] > .govuk-summary-list > :nth-child(4) > .govuk-summary-list__value',
+        ),
+
+      placeHolderText: (): PageElement => cy.get('[data-qa="overview-next-court-appearance"] > :nth-child(2)'),
+    }),
+  })
 }

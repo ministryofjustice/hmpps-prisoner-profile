@@ -243,6 +243,7 @@ export default {
     learningAndWorkProgress: get('LEARNING_AND_WORK_PROGRESS_UI_URL', 'http://localhost:3001', requiredInProduction),
     changeSomeonesCell: get('CHANGE_SOMEONES_CELL_UI_URL', 'http://localhost:3001', requiredInProduction),
     incentives: get('INCENTIVES_UI_URL', 'http://localhost:3001', requiredInProduction),
+    courtCaseReleaseDates: get('CCRD_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
@@ -304,5 +305,6 @@ export default {
     complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
+    courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
   },
 }
