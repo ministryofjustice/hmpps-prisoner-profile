@@ -478,7 +478,7 @@ export enum SortType {
   DESC = 'DESC',
 }
 
-export const sortArrayOfObjectsByDate = (arrayOfObjects: object[], dateKey: string, sortType: SortType): object[] => {
+export const sortArrayOfObjectsByDate = <T>(arrayOfObjects: T[], dateKey: string, sortType: SortType): T[] => {
   return arrayOfObjects.sort((a, b) => {
     const dateA = new Date(a[dateKey]).getTime()
     const dateB = new Date(b[dateKey]).getTime()

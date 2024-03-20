@@ -1,0 +1,60 @@
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "Staff contacts"}) -%}
+  <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
+    <div class="govuk-grid-column-full">
+      {{ govukSummaryList({
+          classes: 'govuk-summary-list--no-border',
+          rows: [
+            {
+              key: {
+                text: "CuSP Officer"
+              },
+              value: {
+                text: staffContacts.cuspOfficer
+              }
+            },
+            {
+              key: {
+                text: "CuSP Officer (backup)"
+              },
+              value: {
+                text: staffContacts.cuspOfficerBackup
+              }
+            },
+            {
+              key: {
+                text: "Youth Justice Worker"
+              },
+              value: {
+                text: staffContacts.youthJusticeWorker
+              }
+            },
+            {
+              key: {
+                text: "Resettlement Practitioner"
+              },
+              value: {
+                text: staffContacts.resettlementPractitioner
+              }
+            },
+            {
+              key: {
+                text: "Youth Justice Service"
+              },
+              value: {
+                text: staffContacts.youthJusticeService
+              }
+            }
+          ] | summaryListOneHalfWidth
+        }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <p class="govuk-body">
+        <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="{{ staffContacts.linkUrl }}">Professional contacts</a>
+      </p>
+    </div>
+  </div>
+{%- endcall -%}

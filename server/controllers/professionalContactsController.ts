@@ -2,18 +2,20 @@ import { Request, Response } from 'express'
 import ProfessionalContactsService from '../services/professionalContactsService'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
 
 export default class ProfessionalContactsController {
   constructor(private readonly professionalContactsService: ProfessionalContactsService) {}
 
   public async displayProfessionalContacts(req: Request, res: Response) {
-    const { firstName, middleNames, lastName, prisonerNumber, bookingId } = req.middleware.prisonerData
+    const { firstName, middleNames, lastName, prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
     const { clientToken } = res.locals
 
     const professionalContacts = await this.professionalContactsService.getContacts(
       clientToken,
       prisonerNumber,
       bookingId,
+      youthEstatePrisons.includes(prisonId),
     )
 
     return res.render('pages/professionalContacts/professionalContactsPage', {

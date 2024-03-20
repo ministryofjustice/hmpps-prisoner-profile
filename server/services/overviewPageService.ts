@@ -13,13 +13,15 @@ import {
   getNamesFromString,
   neurodiversityEnabled,
   prisonerBelongsToUsersCaseLoad,
+  sortArrayOfObjectsByDate,
+  SortType,
   userHasRoles,
 } from '../utils/utils'
 import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import PersonalDetails from './interfaces/overviewPageService/PersonalDetails'
-import StaffContacts from '../data/interfaces/prisonApi/StaffContacts'
+import StaffContacts, { Contact, ContactDetail, YouthStaffContacts } from '../data/interfaces/prisonApi/StaffContacts'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
@@ -55,6 +57,8 @@ import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiC
 import { ComplexityLevel } from '../data/interfaces/complexityApi/ComplexityOfNeed'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import { ContactRelationship } from '../data/enums/ContactRelationship'
 
 export default class OverviewPageService {
   constructor(
@@ -126,6 +130,8 @@ export default class OverviewPageService {
 
     const activeCaseloadId = userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId
 
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonerData.prisonId)
+
     const [
       staffRoles,
       learnerNeurodivergence,
@@ -138,18 +144,20 @@ export default class OverviewPageService {
       fullStatus,
       communityManager,
       prisonerDetail,
+      contacts,
     ] = await Promise.all([
       activeCaseloadId ? prisonApiClient.getStaffRoles(staffId, activeCaseloadId) : [],
       Result.wrap(getLearnerNeurodivergence, apiErrorCallback)(),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
-      allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      Result.wrap(getKeyWorkerName, apiErrorCallback)(),
+      isYouthPrisoner ? null : allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
+      isYouthPrisoner ? null : Result.wrap(getKeyWorkerName, apiErrorCallback)(),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
-      prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
+      isYouthPrisoner ? null : prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
       prisonApiClient.getPrisoner(prisonerNumber),
+      isYouthPrisoner ? prisonApiClient.getBookingContacts(bookingId) : null,
     ])
 
     const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
@@ -173,23 +181,22 @@ export default class OverviewPageService {
       ),
     ])
 
+    const staffContacts = isYouthPrisoner
+      ? this.getYouthStaffContacts(contacts, prisonerNumber)
+      : this.getStaffContacts(prisonerNumber, communityManager, allocationManager, keyWorkerName, keyWorkerSessions)
+
     return {
       miniSummaryGroupA,
       miniSummaryGroupB,
       statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
       nonAssociationSummary: this.getNonAssociationSummary(prisonerNonAssociations),
       personalDetails,
-      staffContacts: this.getStaffContacts(
-        prisonerData,
-        communityManager,
-        allocationManager,
-        keyWorkerName,
-        keyWorkerSessions,
-      ),
+      staffContacts,
       schedule,
       offencesOverview,
       prisonName: prisonerData.prisonName,
       staffRoles: staffRoles?.map(role => role.role),
+      isYouthPrisoner,
     }
   }
 
@@ -215,7 +222,7 @@ export default class OverviewPageService {
   }
 
   public getStaffContacts(
-    prisonerData: Prisoner,
+    prisonerNumber: string,
     communityManager: CommunityManager,
     allocationManager: Pom,
     keyWorkerName: Result<string>,
@@ -250,8 +257,43 @@ export default class OverviewPageService {
         ? `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`
         : 'Not assigned',
       communityOffenderManager: formatCommunityManager(communityManager),
-      linkUrl: `/prisoner/${prisonerData.prisonerNumber}/professional-contacts`,
+      linkUrl: `/prisoner/${prisonerNumber}/professional-contacts`,
     }
+  }
+
+  public getYouthStaffContacts(contacts: ContactDetail, prisonerNumber: string): YouthStaffContacts {
+    const youthStaffContacts = {
+      cuspOfficer: 'Not assigned',
+      cuspOfficerBackup: 'Not assigned',
+      youthJusticeWorker: 'Not assigned',
+      resettlementPractitioner: 'Not assigned',
+      youthJusticeService: 'Not assigned',
+      linkUrl: `/prisoner/${prisonerNumber}/professional-contacts`,
+    }
+
+    // Return the most recently created record for each of the YOI contact relationships if available
+    sortArrayOfObjectsByDate<Contact>(contacts.otherContacts, 'createdDateTime', SortType.ASC).forEach(c => {
+      switch (c.relationship) {
+        case ContactRelationship.CuspOfficer:
+          youthStaffContacts.cuspOfficer = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.CuspOfficerBackup:
+          youthStaffContacts.cuspOfficerBackup = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeWorker:
+          youthStaffContacts.youthJusticeWorker = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.ResettlementPractitioner:
+          youthStaffContacts.resettlementPractitioner = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeService:
+          youthStaffContacts.youthJusticeService = formatName(c.firstName, null, c.lastName)
+          break
+        default:
+      }
+    })
+
+    return youthStaffContacts
   }
 
   public async getPersonalDetails(

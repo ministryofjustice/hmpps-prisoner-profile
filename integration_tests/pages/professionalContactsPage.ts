@@ -48,4 +48,52 @@ export default class ProfessionalContactsPage extends Page {
     contactDetails: (): PageElement => this.firstPrisonContact().panel().find('[data-qa="contact-details"]'),
     address: (): PageElement => this.firstPrisonContact().panel().find('[data-qa="contact-address"]'),
   })
+
+  cuspOfficer = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(0),
+    header: (): PageElement => this.cuspOfficer().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.cuspOfficer().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.cuspOfficer().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.cuspOfficer().panel().find('[data-qa="contact-address"]'),
+  })
+
+  cuspOfficerBackup = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(1),
+    header: (): PageElement => this.cuspOfficerBackup().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.cuspOfficerBackup().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.cuspOfficerBackup().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.cuspOfficerBackup().panel().find('[data-qa="contact-address"]'),
+  })
+
+  youthJusticeWorkerLatest = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(2),
+    header: (): PageElement => this.youthJusticeWorkerLatest().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeWorkerLatest().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.youthJusticeWorkerLatest().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeWorkerLatest().panel().find('[data-qa="contact-address"]'),
+  })
+
+  youthJusticeWorkerOther = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(3),
+    header: (): PageElement => this.youthJusticeWorkerOther().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeWorkerOther().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.youthJusticeWorkerOther().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeWorkerOther().panel().find('[data-qa="contact-address"]'),
+  })
+
+  resettlementPractitioner = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(4),
+    header: (): PageElement => this.resettlementPractitioner().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.resettlementPractitioner().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.resettlementPractitioner().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.resettlementPractitioner().panel().find('[data-qa="contact-address"]'),
+  })
+
+  youthJusticeService = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(5),
+    header: (): PageElement => this.youthJusticeService().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-address"]'),
+  })
 }

@@ -21,6 +21,7 @@ export default interface OverviewPage {
   }
   prisonName: string
   staffRoles: string[]
+  isYouthPrisoner: boolean
 }
 
 export interface OverviewScheduleItem {

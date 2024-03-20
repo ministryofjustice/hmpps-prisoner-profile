@@ -68,6 +68,7 @@ import AllocationManagerClient from '../data/interfaces/allocationManagerApi/all
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { Result } from '../utils/result/result'
+import { mockContactDetail, mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
 
 jest.mock('../utils/utils', () => {
   const original = jest.requireActual('../utils/utils')
@@ -170,6 +171,7 @@ describe('OverviewPageService', () => {
     prisonApiClient.getFullStatus = jest.fn(async () => fullStatusMock)
     prisonApiClient.getStaffRoles = jest.fn(async () => [])
     prisonApiClient.getScheduledTransfers = jest.fn(async () => [])
+    prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
 
     adjudicationsApiClient = adjudicationsApiClientMock()
     adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
@@ -561,7 +563,7 @@ describe('OverviewPageService', () => {
   })
 
   describe('getStaffContactDetails', () => {
-    it('should get the staff contact details for a prisoner', async () => {
+    it('should get the staff contact details for an adult prisoner', async () => {
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get({
         clientToken: 'token',
@@ -577,6 +579,26 @@ describe('OverviewPageService', () => {
         prisonOffenderManager: 'Andy Marke',
         coworkingPrisonOffenderManager: 'Andy Hudson',
         communityOffenderManager: 'Terry Scott',
+        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
+      })
+    })
+
+    it('should get the staff contact details for a youth prisoner', async () => {
+      const overviewPageService = overviewPageServiceConstruct()
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetailYouthEstate)
+
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { ...PrisonerMockDataA, prisonId: 'WYI' },
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+      })
+      expect(res.staffContacts).toEqual({
+        cuspOfficer: 'Mike Tester',
+        cuspOfficerBackup: 'Katie Testing',
+        youthJusticeWorker: 'Emma Justice',
+        resettlementPractitioner: 'Shauna Michaels',
+        youthJusticeService: 'Outer York',
         linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
       })
     })

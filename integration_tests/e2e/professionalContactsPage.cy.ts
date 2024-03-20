@@ -1,6 +1,9 @@
 import Page from '../pages/page'
 import ProfessionalContactsPage from '../pages/professionalContactsPage'
-import { mockContactDetailWithNotEntered } from '../../server/data/localMockData/contactDetail'
+import {
+  mockContactDetailWithNotEntered,
+  mockContactDetailYouthEstate,
+} from '../../server/data/localMockData/contactDetail'
 
 const visitProfessionalContactsPage = (): ProfessionalContactsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/professional-contacts' })
@@ -94,5 +97,64 @@ context('Professional contacts list page - with address not entered', () => {
     resettlementWorkerContact.name().contains('Barry Jones')
     resettlementWorkerContact.contactDetails().contains('Not entered')
     resettlementWorkerContact.address().contains('Not entered')
+  })
+})
+
+context('Professional contacts list page - youth estate', () => {
+  let professionalContactsPage: ProfessionalContactsPage
+
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth({
+      caseLoads: [{ caseLoadId: 'WYI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
+    })
+
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU', overrides: { prisonId: 'WYI' } })
+    cy.task('stubGetOffenderContacts', mockContactDetailYouthEstate)
+    cy.task('stubPersonAddresses', [])
+    cy.task('stubPersonEmails', [])
+    cy.task('stubPersonPhones', [])
+    professionalContactsPage = visitProfessionalContactsPage()
+  })
+
+  it('should include YOI contacts', () => {
+    professionalContactsPage.h1().contains('John Saunders’ professional contacts')
+    professionalContactsPage.contacts().should('have.length', 6)
+
+    const cuspOfficer = professionalContactsPage.cuspOfficer()
+    cuspOfficer.header().contains('CuSP Officer')
+    cuspOfficer.name().contains('Mike Tester')
+    cuspOfficer.contactDetails().contains('Not entered')
+    cuspOfficer.address().contains('Not entered')
+
+    const cuspOfficerBackup = professionalContactsPage.cuspOfficerBackup()
+    cuspOfficerBackup.header().contains('CuSP Officer (backup)')
+    cuspOfficerBackup.name().contains('Katie Testing')
+    cuspOfficerBackup.contactDetails().contains('Not entered')
+    cuspOfficerBackup.address().contains('Not entered')
+
+    const youthJusticeWorkerLatest = professionalContactsPage.youthJusticeWorkerLatest()
+    youthJusticeWorkerLatest.header().contains('Youth Justice Worker')
+    youthJusticeWorkerLatest.name().contains('Emma Justice')
+    youthJusticeWorkerLatest.contactDetails().contains('Not entered')
+    youthJusticeWorkerLatest.address().contains('Not entered')
+
+    const youthJusticeWorkerOther = professionalContactsPage.youthJusticeWorkerOther()
+    youthJusticeWorkerOther.header().contains('Youth Justice Worker')
+    youthJusticeWorkerOther.name().contains('Emma Checked')
+    youthJusticeWorkerOther.contactDetails().contains('Not entered')
+    youthJusticeWorkerOther.address().contains('Not entered')
+
+    const resettlementPractitioner = professionalContactsPage.resettlementPractitioner()
+    resettlementPractitioner.header().contains('Resettlement Practitioner')
+    resettlementPractitioner.name().contains('Shauna Michaels')
+    resettlementPractitioner.contactDetails().contains('Not entered')
+    resettlementPractitioner.address().contains('Not entered')
+
+    const youthJusticeService = professionalContactsPage.youthJusticeService()
+    youthJusticeService.header().contains('Youth Justice Service')
+    youthJusticeService.name().contains('Outer York')
+    youthJusticeService.contactDetails().contains('Not entered')
+    youthJusticeService.address().contains('Not entered')
   })
 })
