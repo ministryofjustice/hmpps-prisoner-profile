@@ -1,4 +1,4 @@
-import { format, startOfToday } from 'date-fns'
+import { startOfToday } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import OffencesPageService from './offencesPageService'
@@ -11,7 +11,6 @@ import {
 } from '../data/localMockData/courtCaseMock'
 import { OffenceHistoryMock, OffenceHistoryMockA } from '../data/localMockData/offenceHistoryMock'
 import {
-  GenericMapMock,
   MappedSentenceSummaryCourtCasesMock,
   MappedUnsentencedCourtCasesMock,
   SentencedTermsMockA,
@@ -27,18 +26,351 @@ import {
 } from '../data/localMockData/offencesPageMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import {
-  CourtDateResultsMockA,
   CourtDateResultsUnsentencedMockB,
   UniqueCourtDateResultsUnsentencedMockA,
 } from '../data/localMockData/courtDateResultsMock'
-import { SentenceSummaryWithSentenceMock } from '../data/localMockData/sentenceSummaryMock'
+import { DeepPartial, SentenceSummaryWithSentenceMock } from '../data/localMockData/sentenceSummaryMock'
+import SentenceSummary from '../data/interfaces/prisonApi/SentenceSummary'
+import OffenceHistoryDetail from '../data/interfaces/prisonApi/OffenceHistoryDetail'
+import { ChargeResultCode } from '../data/enums/chargeCodes'
+import OffenderSentenceTerms from '../data/interfaces/prisonApi/OffenderSentenceTerms'
+
+const simpleSentenceSummary: DeepPartial<SentenceSummary> = {
+  prisonerNumber: 'G6123VU',
+  latestPrisonTerm: {
+    courtSentences: [
+      {
+        id: 111111,
+        sentences: [
+          {
+            lineSeq: 3,
+            sentenceTypeDescription: 'Sentence type description',
+            sentenceStartDate: '2016-10-14',
+            terms: [
+              {
+                years: 5,
+                months: 2,
+                weeks: 3,
+                days: 6,
+              },
+            ],
+            fineAmount: 5,
+            offences: [
+              {
+                offenceStartDate: '2016-07-14',
+                offenceCode: 'OFFCODE1',
+                statuteCode: 'STATUTE',
+              },
+              {
+                offenceStartDate: '2016-07-14',
+                offenceCode: 'OFFCODE3',
+                statuteCode: 'STATUTE',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 222222,
+        sentences: [
+          {
+            lineSeq: 3,
+            sentenceTypeDescription: 'Sentence type description',
+            sentenceStartDate: '2016-10-15',
+            consecutiveToSequence: 1,
+            terms: [
+              {
+                years: 5,
+                months: 2,
+                weeks: 3,
+                days: 6,
+              },
+            ],
+            fineAmount: 5,
+            offences: [
+              {
+                offenceStartDate: '2016-07-15',
+                offenceCode: 'OFFCODE2',
+                statuteCode: 'STATUTE',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+}
 
 describe('OffencesPageService', () => {
   let prisonApiClient: PrisonApiClient
-  const todaysDate = format(startOfToday(), 'yyyy-MM-dd')
 
   const offencesPageServiceConstruct = jest.fn(() => {
     return new OffencesPageService(() => prisonApiClient)
+  })
+
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(startOfToday())
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
+  describe('getCourtCaseData', () => {
+    beforeEach(() => {
+      const offenceHistory: DeepPartial<OffenceHistoryDetail>[] = [
+        {
+          offenceDate: '2016-07-14',
+          offenceCode: 'OFFCODE1',
+          offenceRangeDate: 'OFFENCE RANGE DATE',
+          statuteCode: 'STATUTE CODE',
+          primaryResultCode: ChargeResultCode.imprisonment,
+          caseId: 222222,
+        },
+        {
+          offenceDate: '2016-07-15',
+          offenceCode: 'OFFCODE2',
+          offenceRangeDate: 'OFFENCE RANGE DATE',
+          statuteCode: 'STATUTE CODE2',
+          primaryResultCode: ChargeResultCode.imprisonment,
+          caseId: 222222,
+        },
+      ]
+
+      prisonApiClient = prisonApiClientMock()
+      prisonApiClient.getCourtCases = jest.fn(async () => [])
+      // @ts-expect-error - returning partial data for test clarity
+      prisonApiClient.getOffenceHistory = jest.fn(async () => offenceHistory)
+      // @ts-expect-error - returning partial data for test clarity
+      prisonApiClient.getSentenceSummary = jest.fn(async () => simpleSentenceSummary)
+      prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTermsMock)
+      prisonApiClient.getPrisonerSentenceDetails = jest.fn(async () => prisonerSentenceDetailsMock)
+    })
+
+    describe('Offences list', () => {
+      it('should take data from any matching offences in offence history', async () => {
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[0].sentences[0].offences).toEqual([
+          {
+            offenceRangeDate: 'OFFENCE RANGE DATE',
+            offenceDate: '2016-07-14',
+            offenceCode: 'OFFCODE1',
+            statuteCode: 'STATUTE CODE',
+            offenceStartDate: '2016-07-14',
+          },
+          {
+            offenceCode: 'OFFCODE3',
+            offenceStartDate: '2016-07-14',
+          },
+        ])
+
+        expect(result[1].sentences[0].offences).toEqual([
+          {
+            offenceRangeDate: 'OFFENCE RANGE DATE',
+            offenceDate: '2016-07-15',
+            offenceCode: 'OFFCODE2',
+            statuteCode: 'STATUTE CODE2',
+            offenceStartDate: '2016-07-15',
+          },
+        ])
+      })
+    })
+
+    describe('sentence details', () => {
+      it('should decorate the sentences with data ', async () => {
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[0].sentences[0]).toMatchObject({
+          sentenceHeader: 'Count 3',
+          sentenceTypeDescription: 'Sentence type description',
+          sentenced: true,
+          sentenceStartDate: '14 October 2016',
+          sentenceLength: '5 years, 2 months, 3 weeks, 6 days',
+          fineAmountFormat: '£5.00',
+        })
+        expect(result[1].sentences[0]).toMatchObject({
+          sentenceHeader: 'Count 3',
+          sentenceTypeDescription: 'Sentence type description',
+          sentenced: true,
+          sentenceStartDate: '15 October 2016',
+          sentenceLength: '5 years, 2 months, 3 weeks, 6 days',
+          fineAmountFormat: '£5.00',
+        })
+      })
+
+      it('should add sentence licence terms taken from offender sentence terms ', async () => {
+        const sentenceTerms: DeepPartial<OffenderSentenceTerms>[] = [
+          {
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            lineSeq: 2,
+            caseId: '222222',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            sentenceTypeDescription: 'Sentence type description',
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'LIC',
+            years: 20,
+            months: 0,
+            weeks: 0,
+            days: 0,
+          },
+        ]
+
+        // @ts-expect-error - returning partial data for test clarity
+        prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTerms)
+
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[0].sentences[0].sentenceLicence).toEqual('20 years')
+      })
+
+      it('should use the fist licence term in the list', async () => {
+        const sentenceSummary: DeepPartial<OffenderSentenceTerms>[] = [
+          {
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            sentenceTypeDescription: 'Sentence type description',
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'LIC',
+            years: 5,
+            months: 0,
+            weeks: 0,
+            days: 0,
+          },
+          {
+            lineSeq: 2,
+            caseId: '222222',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'LIC',
+            years: 20,
+            months: 0,
+            weeks: 0,
+            days: 0,
+          },
+        ]
+
+        // @ts-expect-error - returning partial data for test clarity
+        prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceSummary)
+
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[0].sentences[0].sentenceLicence).toEqual('5 years')
+      })
+
+      it('should label as concurrent if term with sentenceSequence matches a sentence consecutiveToSequence and term includes lineSeq', async () => {
+        const summary = {
+          ...simpleSentenceSummary,
+          latestPrisonTerm: {
+            ...simpleSentenceSummary.latestPrisonTerm,
+            courtSentences: [
+              simpleSentenceSummary.latestPrisonTerm.courtSentences[0],
+              { ...simpleSentenceSummary.latestPrisonTerm.courtSentences[1], consecutiveToSequence: 1 },
+            ],
+          },
+        }
+
+        const sentenceTerms: DeepPartial<OffenderSentenceTerms>[] = [
+          {
+            sentenceSequence: 1,
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            sentenceSequence: 1,
+            lineSeq: 2,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+        ]
+
+        // @ts-expect-error - returning partial data for test clarity
+        prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTerms)
+
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[1].sentences[0].concurrentConsecutive).toEqual('Consecutive')
+      })
+
+      it('should label as concurrent if not multiple terms from same sequence with', async () => {
+        const sentenceTerms: DeepPartial<OffenderSentenceTerms>[] = [
+          {
+            sentenceSequence: 1,
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            sentenceSequence: 2,
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+        ]
+
+        // @ts-expect-error - returning partial data for test clarity
+        prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTerms)
+
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[0].sentences[0].concurrentConsecutive).toEqual('Concurrent')
+      })
+
+      it('should use the fist licence term in the list', async () => {
+        const sentenceSummary: DeepPartial<OffenderSentenceTerms>[] = [
+          {
+            sentenceSequence: 1,
+            lineSeq: 1,
+            caseId: '111111',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+          {
+            sentenceSequence: 1,
+            lineSeq: 2,
+            caseId: '222222',
+            sentenceTermCode: 'IMP',
+            sentenceTypeDescription: 'Sentence type description',
+          },
+        ]
+
+        // @ts-expect-error - returning partial data for test clarity
+        prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceSummary)
+
+        const offencesPageService = offencesPageServiceConstruct()
+        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        expect(result[0].sentences[0].concurrentConsecutive).toEqual('Concurrent')
+      })
+    })
   })
 
   describe('Offences Page', () => {
@@ -57,58 +389,38 @@ describe('OffencesPageService', () => {
 
       expect(res).toEqual(OffencesPageMockSentences)
     })
-    it('Get length text labels', async () => {
+
+    it('Get length text labels', () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const sentence1 = await offencesPageService.getLengthTextLabels(sentenceTermsMock[0])
-      const sentence2 = await offencesPageService.getLengthTextLabels(sentenceTermsMock[1])
-      const lifeSentence = await offencesPageService.getLengthTextLabels(sentenceTermsMock[4])
-      const undefinedSentenceData = await offencesPageService.getLengthTextLabels(undefined)
+      const sentence1 = offencesPageService.getLengthTextLabels(sentenceTermsMock[0])
+      const sentence2 = offencesPageService.getLengthTextLabels(sentenceTermsMock[1])
+      const lifeSentence = offencesPageService.getLengthTextLabels(sentenceTermsMock[4])
+      const undefinedSentenceData = offencesPageService.getLengthTextLabels(undefined)
       expect(sentence1).toEqual('100 years')
       expect(sentence2).toEqual('10 years')
       expect(lifeSentence).toEqual('Not entered')
       expect(undefinedSentenceData).toEqual(null)
     })
-    it('Merge most recent licence term', async () => {
+
+    it('Merge most recent licence term', () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.mergeMostRecentLicenceTerm(sentenceTermsMock)
+      const res = offencesPageService.mergeMostRecentLicenceTerm(sentenceTermsMock)
       expect(res).toEqual(MergeMostRecentLicenseTermMock)
     })
-    it('Group sentences by sequence', async () => {
+
+    it('Group sentences by sequence', () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.groupSentencesBySequence(sentenceTermsMock)
+      const res = offencesPageService.groupSentencesBySequence(sentenceTermsMock)
       expect(res).toEqual(GroupedSentencesMock)
     })
-    it('Find consecutive sentences', async () => {
+
+    it('Apply charge code filter', () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.findConsecutiveSentence({ sentences: sentenceTermsMock, consecutiveTo: 4 })
-      expect(res).toEqual('Consecutive')
-    })
-    it('Apply charge code filter', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.chargeCodesFilter(OffenceHistoryMock)
+      const res = offencesPageService.getCaseIdsFilteredByResultCode(OffenceHistoryMock)
       expect(res).toEqual([
         669502, 462833, 669502, 462833, 666929, 666929, 955236, 955236, 1434365, 1507172, 1563198, 669502, 1563148,
         1563148, 1563148, 1563201,
       ])
-    })
-
-    describe('getCaseIds', () => {
-      it('Gets the correct caseIds including ones from the sentence summary', () => {
-        const offencesPageService = offencesPageServiceConstruct()
-        const sentenceSummary = JSON.parse(JSON.stringify(SentenceSummaryWithSentenceMock))
-        const courtSentences = [...SentenceSummaryWithSentenceMock.latestPrisonTerm.courtSentences]
-        courtSentences.push({
-          ...SentenceSummaryWithSentenceMock.latestPrisonTerm.courtSentences[0],
-          id: 123321,
-        })
-        sentenceSummary.latestPrisonTerm.courtSentences = courtSentences
-        const res = offencesPageService.getSentencedCaseIds(OffenceHistoryMock, sentenceSummary)
-        const expectedIds = [
-          1434365, 1507172, 1563148, 1563198, 1563201, 462833, 666929, 669502, 955236, 123321, 1563202,
-        ]
-        expect(res.length).toEqual(expectedIds.length)
-        expect(res.sort()).toEqual(expectedIds.sort())
-      })
     })
 
     it('Get court case details', async () => {
@@ -122,98 +434,37 @@ describe('OffencesPageService', () => {
       expect(res).toEqual(GetReleaseDates)
     })
 
-    it('Get map for unsentenced court cases', async () => {
+    it('Get map for unsentenced court cases', () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getMapForUnsentencedCourtCases(
+      const res = offencesPageService.mapUnsentencedCourtCases(
         CourtCasesUnsentencedMockB,
-        todaysDate,
         CourtDateResultsUnsentencedMockB,
-        [123456],
       )
       expect(res).toEqual(MappedUnsentencedCourtCasesMock)
     })
 
-    it('Get map for sentence summary court cases', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getMapForSentenceSummaryCourtCases(
-        CourtCasesSentencedMockA,
-        [1434365],
-        OffenceHistoryMockA,
-        SentenceSummaryWithSentenceMock,
-        SentencedTermsMockA,
-      )
-      expect(res).toEqual(MappedSentenceSummaryCourtCasesMock)
-    })
-
     describe('Next court appearance', () => {
-      it('Should not contain a next court appearance', async () => {
+      it('Should not contain a next court appearance', () => {
         const offencesPageService = offencesPageServiceConstruct()
-        const res = await offencesPageService.getNextCourtAppearance(CourtCasesUnsentencedMockA[0], todaysDate)
-        expect(res).toEqual({})
+        const res = offencesPageService.getNextCourtAppearance(CourtCasesUnsentencedMockA[0])
+        expect(res).toEqual(undefined)
       })
-      it('Should contain a next court appearance', async () => {
+      it('Should contain a next court appearance', () => {
         const offencesPageService = offencesPageServiceConstruct()
-        const res = await offencesPageService.getNextCourtAppearance(CourtCaseWithNextCourtAppearance[0], todaysDate)
+        const res = offencesPageService.getNextCourtAppearance(CourtCaseWithNextCourtAppearance[0])
         expect(res).toEqual(CourtCaseWithNextCourtAppearance[0].courtHearings[0])
       })
-      it('Should contain a next court appearance', async () => {
+      it('Should contain a next court appearance', () => {
         const offencesPageService = offencesPageServiceConstruct()
-        const res = await offencesPageService.getNextCourtAppearance(CourtCaseWithNextCourtAppearance[1], todaysDate)
+        const res = offencesPageService.getNextCourtAppearance(CourtCaseWithNextCourtAppearance[1])
         expect(res).toEqual(CourtCaseWithNextCourtAppearance[1].courtHearings[2])
       })
     })
 
-    it('Get court hearings', async () => {
+    it('Get court name', () => {
       const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getCourtHearings(CourtCasesUnsentencedMockA[0])
-      expect(res).toEqual(CourtCasesUnsentencedMockA[0].courtHearings)
-    })
-
-    it('Get court info number', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getCourtInfoNumber(CourtCasesUnsentencedMockA[0])
-      expect(res).toEqual(CourtCasesUnsentencedMockA[0].caseInfoNumber)
-    })
-
-    it('Get court name', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getCourtName(CourtCasesUnsentencedMockA[0])
+      const res = offencesPageService.getCourtName(CourtCasesUnsentencedMockA[0])
       expect(res).toEqual(CourtCasesUnsentencedMockA[0].agency.description)
-    })
-
-    it('Get count text for any court case', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      expect(offencesPageService.getCountDisplayText(4)).toEqual('Count 4')
-      expect(offencesPageService.getCountDisplayText(1)).toEqual('Count 1')
-    })
-
-    it('Get count for unsentenced court cases', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getCountForUnsentencedCourtCase(CourtCasesUnsentencedMockA[0])
-      expect(res).toEqual(offencesPageService.getCountDisplayText(CourtCasesUnsentencedMockA[0].caseSeq))
-    })
-
-    it('Get count for sentenced court cases', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getCountForSentencedCourtCase(SentencedTermsMockA[0])
-      expect(res).toEqual(offencesPageService.getCountDisplayText(SentencedTermsMockA[0].lineSeq))
-    })
-
-    it('Get offences', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getOffences(
-        CourtCasesSentencedMockA[0],
-        OffenceHistoryMockA,
-        CourtDateResultsMockA,
-        SentenceSummaryWithSentenceMock,
-      )
-      expect(res).toEqual(OffenceHistoryMockA)
-    })
-
-    it('Get generic maps', async () => {
-      const offencesPageService = offencesPageServiceConstruct()
-      const res = await offencesPageService.getGenericMaps(CourtCasesSentencedMockA[0], todaysDate)
-      expect(res).toEqual(GenericMapMock)
     })
 
     it('Get unique charges from court date results', async () => {

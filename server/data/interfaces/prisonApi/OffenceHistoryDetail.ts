@@ -1,3 +1,5 @@
+import { ChargeResultCode } from '../../enums/chargeCodes'
+
 export default interface OffenceHistoryDetail {
   bookingId?: number
   offenceDate?: string
@@ -6,7 +8,7 @@ export default interface OffenceHistoryDetail {
   offenceCode: string
   statuteCode?: string
   mostSerious?: boolean
-  primaryResultCode?: string
+  primaryResultCode?: ChargeResultCode
   secondaryResultCode?: string
   primaryResultDescription?: string
   secondaryResultDescription?: string

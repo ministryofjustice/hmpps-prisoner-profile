@@ -265,7 +265,6 @@ export const MappedSentenceSummaryCourtCasesMock: SentenceSummaryCourtCaseExtend
 
 export const MappedUnsentencedCourtCasesMock: CourtCaseDataMappedUnsentenced[] = [
   {
-    nextCourtAppearance: {} as CourtHearing,
     courtHearings: [
       {
         id: 325084884,
