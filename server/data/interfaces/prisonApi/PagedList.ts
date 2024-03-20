@@ -55,3 +55,12 @@ export interface CaseNotesListQueryParams extends PagedListQueryParams {
   startDate?: string
   endDate?: string
 }
+
+export interface VisitsListQueryParams extends PagedListQueryParams {
+  fromDate?: string
+  toDate?: string
+  visitType?: string
+  visitStatus?: string
+  prisonId?: string
+  cancellationReason?: string
+}

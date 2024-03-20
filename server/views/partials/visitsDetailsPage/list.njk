@@ -1,0 +1,40 @@
+{% from '../../macros/hmppsPagedListHeader.njk' import hmppsPagedListHeader %}
+{% from '../../macros/hmppsPagedListFooter.njk' import hmppsPagedListFooter %}
+
+{{ hmppsPagedListHeader(listMetadata) }}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <div class="hmpps-case-note-card-list" role="list" data-qa="visits-list">
+      {% for visit in visits | toVisitsWithVisitorsList %}
+        <div class="govuk-grid-row" role="listitem" data-qa="visit">
+          <div class="govuk-grid-column-full">
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-font-size-24 govuk-!-margin-bottom-2">
+              {{ visit.type }}
+            </p>
+          </div>
+        </div>
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-third">
+            <p class="govuk-body govuk-!-margin-bottom-0">{{ visit.dateAndTime }}</p>
+            {% if visit.isBooked %}
+              <p class="govuk-body hmpps-green-text govuk-!-font-weight-bold">Booked</p>
+            {% else %}
+              <p class="govuk-body hmpps-secondary-text">{{ visit.status }}</p>
+            {% endif %}
+          </div>
+
+          <div class="govuk-grid-column-one-third">
+            {% for visitor in visit.visitors %}
+              <p class="govuk-body govuk-!-margin-bottom-0">{{ visitor }}</p>
+            {% endfor %}
+          </div>
+
+          <div class="govuk-grid-column-one-third">
+            <p class="govuk-body">{{ visit.prison }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{{ hmppsPagedListFooter(listMetadata) }}

@@ -92,6 +92,11 @@ import { CaseNoteUsage } from '../../server/data/interfaces/prisonApi/CaseNote'
 import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
 import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
 import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
+import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
+import { pagedVisitsMock, mockPagedVisits } from '../../server/data/localMockData/pagedVisitsWithVisitors'
+import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
+import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
+import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -460,7 +465,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockReferenceDomains.health,
+        jsonBody: mockReferenceDomains(ReferenceCodeDomain.Health),
       },
     })
   },
@@ -476,7 +481,23 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: mockReferenceDomains.healthTreatment,
+        jsonBody: mockReferenceDomains(ReferenceCodeDomain.HealthTreatments),
+      },
+    })
+  },
+
+  stubReferenceCodeDomain: ({ referenceDomain }: { referenceDomain: ReferenceCodeDomain }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/reference-domains/domains/${referenceDomain}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: mockReferenceDomains(referenceDomain),
       },
     })
   },
@@ -1411,6 +1432,48 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: pagedActiveAlertsMock.content[0],
+      },
+    })
+  },
+
+  stubVisitsWithVisitors: ({
+    bookingId,
+    visitsOverrides,
+    queryParams,
+  }: {
+    bookingId: number
+    visitsOverrides?: VisitWithVisitors[]
+    queryParams?: VisitsListQueryParams
+  }) => {
+    const queryString = mapToQueryString(queryParams)
+
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/visits-with-visitors${queryString ? `\\?${queryString}` : ''}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: visitsOverrides === undefined ? pagedVisitsMock : mockPagedVisits(visitsOverrides),
+      },
+    })
+  },
+
+  stubVisitPrisons: ({ bookingId }: { bookingId: number }) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/prison/api/bookings/${bookingId}/visits/prisons`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: visitPrisonsMock,
       },
     })
   },

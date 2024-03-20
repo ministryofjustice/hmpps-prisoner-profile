@@ -1,0 +1,40 @@
+{% extends "./index.njk" %}
+{% set title = "Visit details" %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+  { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+  { text: prisonerName.breadcrumb, href: "/prisoner/" + prisonerNumber }
+  ]
+%}
+
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ prisonerName.first | formatName('', prisonerName.last) | apostrophe }} visits</h1>
+    </div>
+  </div>
+
+  {% if hasVisits or hasNoVisitsForQuery %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
+        {% include '../partials/visitsDetailsPage/filter.njk' %}
+      </div>
+      {% if hasVisits %}
+        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
+          {% include '../partials/visitsDetailsPage/list.njk' %}
+        </div>
+      {% else %}
+          <div class="govuk-grid-column-three-quarters" data-qa="visits-empty-state">
+            <p class="govuk-body">No visits have been found for the selected filters.</p>
+          </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full" data-qa="visits-empty-state">
+        <p class="govuk-body">There are no visits for this person.</p>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
