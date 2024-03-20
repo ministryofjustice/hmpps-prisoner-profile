@@ -53,7 +53,7 @@ import Telephone from './interfaces/prisonApi/Telephone'
 import Belief from './interfaces/prisonApi/Belief'
 import Reception from './interfaces/prisonApi/Reception'
 import { OffenderContacts } from './interfaces/prisonApi/OffenderContact'
-import PagedList, { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
+import PagedList, { AlertsListQueryParams, VisitsListQueryParams } from './interfaces/prisonApi/PagedList'
 import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
 import CourtEvent from './interfaces/prisonApi/CourtEvent'
@@ -538,12 +538,20 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getVisitsForBookingWithVisitors(_bookingId: number, _params: object): Promise<PagedList<VisitWithVisitors>> {
-    return null
+  async getVisitsForBookingWithVisitors(
+    bookingId: number,
+    params: VisitsListQueryParams,
+  ): Promise<PagedList<VisitWithVisitors>> {
+    return this.restClient.get<PagedList<VisitWithVisitors>>({
+      path: `/api/bookings/${bookingId}/visits-with-visitors`,
+      query: mapToQueryString(params),
+    })
   }
 
-  async getVisitsPrisons(_bookingId: number): Promise<PrisonDetails[]> {
-    return null
+  async getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]> {
+    return this.restClient.get<PrisonDetails[]>({
+      path: `/api/bookings/${bookingId}/visits/prisons`,
+    })
   }
 
   async getNextCourtEvent(bookingId: number): Promise<CourtEvent> {

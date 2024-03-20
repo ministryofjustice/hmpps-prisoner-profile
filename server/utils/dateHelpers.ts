@@ -1,5 +1,19 @@
-import { add, addBusinessDays, addDays, addMonths, addWeeks, format, formatISO, isValid, parse } from 'date-fns'
+import {
+  add,
+  addBusinessDays,
+  addDays,
+  addMonths,
+  addWeeks,
+  differenceInDays,
+  differenceInMonths,
+  differenceInYears,
+  format,
+  formatISO,
+  isValid,
+  parse,
+} from 'date-fns'
 import logger from '../../logger'
+import { pluralise } from './pluralise'
 
 /**
  * Format a Date object as an ISO-8601 string, rendering only the date part.
@@ -158,4 +172,26 @@ export const calculateEndDate = (startDate: Date, repeatPeriod: string, times: n
     default:
       return null
   }
+}
+
+/**
+ * Formats the date of birth into an age string, defaulting to 18 if none is given
+ * @param dateOfBirth date of birth in the format yyyy-MM-dd
+ * @returns age with correct number of days and months
+ */
+export const ageAsString = (dateOfBirth?: string): string => {
+  const ageInYears = dateOfBirth ? differenceInYears(new Date(), new Date(dateOfBirth)) : 18
+
+  if (ageInYears === 0) {
+    const parsedDate = new Date(dateOfBirth)
+    const months = differenceInMonths(new Date(), parsedDate)
+
+    if (months === 0) {
+      const days = differenceInDays(new Date(), parsedDate)
+      return `${pluralise(days, 'day')} old`
+    }
+
+    return `${pluralise(months, 'month')} old`
+  }
+  return `${pluralise(ageInYears, 'year')} old`
 }

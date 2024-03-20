@@ -52,6 +52,8 @@ import { alertDetailsMock } from './localMockData/alertDetailsMock'
 import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 import { mockInmateAtLocation } from './localMockData/locationsInmates'
 import { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
+import { pagedVisitsMock } from './localMockData/pagedVisitsWithVisitors'
+import { visitPrisonsMock } from './localMockData/visitPrisons'
 
 jest.mock('./tokenStore')
 
@@ -287,9 +289,12 @@ describe('prisonApiClient', () => {
     it.each([ReferenceCodeDomain.Health, ReferenceCodeDomain.HealthTreatments])(
       'Should return data from the API',
       async (domain: ReferenceCodeDomain) => {
-        mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/${domain}`, mockReferenceDomains.health)
+        mockSuccessfulPrisonApiCall(
+          `/api/reference-domains/domains/${domain}`,
+          mockReferenceDomains(ReferenceCodeDomain.Health),
+        )
         const output = await prisonApiClient.getReferenceCodesByDomain(domain)
-        expect(output).toEqual(mockReferenceDomains.health)
+        expect(output).toEqual(mockReferenceDomains(ReferenceCodeDomain.Health))
       },
     )
   })
@@ -687,6 +692,24 @@ describe('prisonApiClient', () => {
 
       const output = await prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
       expect(output).toEqual(alert)
+    })
+  })
+
+  describe('getVisitsWithVisitors', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/visits-with-visitors?page=1`, pagedVisitsMock)
+      const output = await prisonApiClient.getVisitsForBookingWithVisitors(bookingId, { page: 1 })
+      expect(output).toEqual(pagedVisitsMock)
+    })
+  })
+
+  describe('getVisitsPrisons', () => {
+    it('Should return data from the API', async () => {
+      const bookingId = 123456
+      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/visits/prisons`, visitPrisonsMock)
+      const output = await prisonApiClient.getVisitsPrisons(bookingId)
+      expect(output).toEqual(visitPrisonsMock)
     })
   })
 })
