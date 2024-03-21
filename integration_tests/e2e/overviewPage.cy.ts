@@ -307,9 +307,9 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('should display calculate release dates link', () => {
+    it('should not display calculate release dates link', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
-      overviewPage.calculateReleaseDatesActionLink().should('exist')
+      overviewPage.calculateReleaseDatesActionLink().should('not.exist')
     })
   })
 
