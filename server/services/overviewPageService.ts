@@ -391,7 +391,7 @@ export default class OverviewPageService {
       bottomContentLine3: privilegedVisitsDescription,
       bottomClass: visitBalances?.remainingVo ? 'small' : 'big',
       linkLabel: 'Visits details',
-      linkHref: `${config.serviceUrls.digitalPrison}/prisoner/${prisonerNumber}/visits-details`,
+      linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     }
 
     const summaryData = []
