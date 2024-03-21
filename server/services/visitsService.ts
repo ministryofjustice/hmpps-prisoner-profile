@@ -15,11 +15,10 @@ export class VisitsService {
       left: Visitor & { ageInYearsOr18IfNoDob: number },
       right: Visitor & { ageInYearsOr18IfNoDob: number },
     ): number => {
-      // Extract to utils
       if (right.leadVisitor && right.ageInYearsOr18IfNoDob >= 18) return 1
       if (left.leadVisitor && left.ageInYearsOr18IfNoDob >= 18) return -1
 
-      // age set to 18 for people with no dob - assumed to be adults.  Need to sort them above the children
+      // age set to 18 for people with no dob - assumed to be adults. Need to sort them above the children
       if (right.ageInYearsOr18IfNoDob - left.ageInYearsOr18IfNoDob !== 0)
         return right.ageInYearsOr18IfNoDob - left.ageInYearsOr18IfNoDob
 
