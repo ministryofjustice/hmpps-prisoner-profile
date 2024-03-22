@@ -99,7 +99,8 @@ export default class ProfessionalContactsService {
       'CuSP Officer (backup)',
       'Youth Justice Worker',
       'Resettlement Practitioner',
-      'Youth Justice Service',
+      'Youth Justice Services Team',
+      'Youth Justice Services Case Manager',
     ]
     const leftJobTitleIndex = jobTitleOrder.indexOf(left.relationshipDescription)
     const rightJobTitleIndex = jobTitleOrder.indexOf(right.relationshipDescription)
