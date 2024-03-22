@@ -11,7 +11,8 @@ export interface YouthStaffContacts {
   cuspOfficerBackup: string
   youthJusticeWorker: string
   resettlementPractitioner: string
-  youthJusticeService: string
+  youthJusticeServicesTeam: string
+  youthJusticeServicesCaseManager: string
   linkUrl: string
 }
 

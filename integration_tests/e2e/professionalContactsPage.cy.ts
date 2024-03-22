@@ -119,7 +119,7 @@ context('Professional contacts list page - youth estate', () => {
 
   it('should include YOI contacts', () => {
     professionalContactsPage.h1().contains('John Saunders’ professional contacts')
-    professionalContactsPage.contacts().should('have.length', 6)
+    professionalContactsPage.contacts().should('have.length', 7)
 
     const cuspOfficer = professionalContactsPage.cuspOfficer()
     cuspOfficer.header().contains('CuSP Officer')
@@ -151,10 +151,16 @@ context('Professional contacts list page - youth estate', () => {
     resettlementPractitioner.contactDetails().contains('Not entered')
     resettlementPractitioner.address().contains('Not entered')
 
-    const youthJusticeService = professionalContactsPage.youthJusticeService()
-    youthJusticeService.header().contains('Youth Justice Service')
-    youthJusticeService.name().contains('Outer York')
-    youthJusticeService.contactDetails().contains('Not entered')
-    youthJusticeService.address().contains('Not entered')
+    const youthJusticeServicesTeam = professionalContactsPage.youthJusticeServicesTeam()
+    youthJusticeServicesTeam.header().contains('Youth Justice Services Team')
+    youthJusticeServicesTeam.name().contains('Outer York')
+    youthJusticeServicesTeam.contactDetails().contains('Not entered')
+    youthJusticeServicesTeam.address().contains('Not entered')
+
+    const youthJusticeServicesCaseManager = professionalContactsPage.youthJusticeServicesCaseManager()
+    youthJusticeServicesCaseManager.header().contains('Youth Justice Services Case Manager')
+    youthJusticeServicesCaseManager.name().contains('Barney Rubble')
+    youthJusticeServicesCaseManager.contactDetails().contains('Not entered')
+    youthJusticeServicesCaseManager.address().contains('Not entered')
   })
 })

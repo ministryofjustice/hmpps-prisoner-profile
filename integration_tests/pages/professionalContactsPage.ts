@@ -89,11 +89,20 @@ export default class ProfessionalContactsPage extends Page {
     address: (): PageElement => this.resettlementPractitioner().panel().find('[data-qa="contact-address"]'),
   })
 
-  youthJusticeService = () => ({
+  youthJusticeServicesTeam = () => ({
     panel: (): PageElement => cy.get('.hmpps-summary-card').eq(5),
-    header: (): PageElement => this.youthJusticeService().panel().get('[data-qa="summary-header"]'),
-    name: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-name"]'),
-    contactDetails: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-details"]'),
-    address: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-address"]'),
+    header: (): PageElement => this.youthJusticeServicesTeam().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeServicesTeam().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.youthJusticeServicesTeam().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeServicesTeam().panel().find('[data-qa="contact-address"]'),
+  })
+
+  youthJusticeServicesCaseManager = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(6),
+    header: (): PageElement => this.youthJusticeServicesCaseManager().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeServicesCaseManager().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement =>
+      this.youthJusticeServicesCaseManager().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeServicesCaseManager().panel().find('[data-qa="contact-address"]'),
   })
 }
