@@ -694,7 +694,7 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('Displays a page error banner and highlights the failure in the status list', () => {
+    it('Displays a page error banner and error message replacing the key worker details', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
 
       overviewPage.apiErrorBanner().should('exist')

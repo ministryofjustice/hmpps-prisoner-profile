@@ -12,6 +12,7 @@ import { communityManagerMock } from '../data/localMockData/communityManagerMock
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
+import { Result } from '../utils/result/result'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -71,26 +72,26 @@ const mockPom: Pom = {
 }
 
 const expectedPomResponse = [
-  {
+  Result.fulfilled({
     emails: [] as string[],
     firstName: 'John',
     lastName: 'Smith',
     phones: [] as string[],
     relationshipDescription: 'Prison Offender Manager',
     relationship: 'POM',
-  },
-  {
+  }).toPromiseSettledResult(),
+  Result.fulfilled({
     relationshipDescription: 'Co-working Prison Offender Manager',
     emails: [],
     firstName: 'Jane',
     lastName: 'Jones',
     phones: [],
     relationship: 'POM',
-  },
+  }).toPromiseSettledResult(),
 ]
 
 const expectedComResponse = [
-  {
+  Result.fulfilled({
     emails: ['terry@email.com', 'team@email.com'],
     firstName: 'Terry',
     lastName: 'Scott',
@@ -99,19 +100,20 @@ const expectedComResponse = [
     relationshipDescription: 'Community Offender Manager',
     relationship: 'COM',
     unallocated: false,
-  },
+  }).toPromiseSettledResult(),
 ]
 
 const expectedKeyWorkerResponse = [
-  {
+  Result.fulfilled({
     emails: ['1@1.com'],
     firstName: 'Dave',
     lastName: 'Stevens',
     phones: [] as string[],
     relationshipDescription: 'Key Worker',
     relationship: 'KW',
-  },
+  }).toPromiseSettledResult(),
 ]
+
 describe('professionalContactsService', () => {
   let prisonApiClient: PrisonApiClient
   let allocationManagerApiClient: AllocationManagerClient
@@ -154,13 +156,15 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, false)
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+        contact.toPromiseSettledResult(),
+      )
 
       expect(response).toEqual([
         ...expectedKeyWorkerResponse,
         ...expectedPomResponse,
         ...expectedComResponse,
-        {
+        Result.fulfilled({
           address: {
             label: 'Main address',
             noFixedAddress: false,
@@ -173,7 +177,7 @@ describe('professionalContactsService', () => {
           phones: ['077111111'],
           relationshipDescription: 'Probation Officer',
           relationship: 'PROBATION',
-        },
+        }).toPromiseSettledResult(),
       ])
     })
 
@@ -196,7 +200,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, false)
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
 
       expect(response.length).toEqual(7)
       expect(response[0].relationshipDescription).toEqual('Key Worker')
@@ -206,6 +210,47 @@ describe('professionalContactsService', () => {
       expect(response[4].relationshipDescription).toEqual('Prison Guard')
       expect(response[5].relationshipDescription).toEqual('Prison Guard')
       expect(response[6].relationshipDescription).toEqual('Responsible officer')
+    })
+
+    it('should handle keyworker API error', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [PrisonerContactBuilder()],
+      }
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      keyWorkerApiClient.getOffendersKeyWorker = jest.fn(async () => Promise.reject(Error('some error!')))
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+      )
+
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+        contact.toPromiseSettledResult(),
+      )
+
+      expect(response).toEqual([
+        Result.rejected({ relationship: 'KW', relationshipDescription: 'Key Worker' }).toPromiseSettledResult(),
+        ...expectedPomResponse,
+        ...expectedComResponse,
+        Result.fulfilled({
+          address: {
+            label: 'Main address',
+            noFixedAddress: false,
+            premise: 'Address',
+            primary: true,
+          },
+          emails: ['e@mail.com'],
+          firstName: 'John',
+          lastName: 'Smith',
+          phones: ['077111111'],
+          relationshipDescription: 'Probation Officer',
+          relationship: 'PROBATION',
+        }).toPromiseSettledResult(),
+      ])
     })
 
     it('should remove contacts with address with past the enddate', async () => {
@@ -224,7 +269,9 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, false)
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+        contact.toPromiseSettledResult(),
+      )
 
       expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
@@ -248,7 +295,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, false)
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
 
       expect(response.find(contact => contact.address?.endDate === '2050-01-01')).toBeTruthy()
       expect(response.find(contact => contact.address?.addressId === 999)).toBeTruthy()
@@ -273,7 +320,9 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, false)
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+        contact.toPromiseSettledResult(),
+      )
 
       expect(response).toEqual([...expectedKeyWorkerResponse, ...expectedPomResponse, ...expectedComResponse])
     })
@@ -294,7 +343,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, false)
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
 
       expect(response.find(contact => contact.address?.label === 'Not entered')).toBeTruthy()
     })
@@ -345,7 +394,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, true)
+      const response = (await service.getContacts('token', 'A1234AA', 1, true)).map(result => result.getOrThrow())
 
       expect(response.find(contact => contact.relationshipDescription === 'Key Worker')).toBeFalsy()
       expect(response.find(contact => contact.relationshipDescription === 'Prison Offender Manager')).toBeFalsy()

@@ -164,3 +164,31 @@ context('Professional contacts list page - youth estate', () => {
     youthJusticeServicesCaseManager.address().contains('Not entered')
   })
 })
+
+context('Professional contacts list page - given API to get key worker name fails', () => {
+  let professionalContactsPage: ProfessionalContactsPage
+
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
+    cy.task('stubGetCommunityManager')
+    cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', error: true })
+    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubPersonAddresses', [])
+    cy.task('stubPersonEmails', [])
+    cy.task('stubPersonPhones', [])
+    professionalContactsPage = visitProfessionalContactsPage()
+  })
+
+  it('Displays a page error banner and an error message replacing the key worker details', () => {
+    professionalContactsPage.apiErrorBanner().should('exist')
+    professionalContactsPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+    const keyWorkerContact = professionalContactsPage.keyWorkerContact()
+    keyWorkerContact.header().contains('Key Worker')
+    keyWorkerContact.errorMessage().contains('We cannot show these details right now. Try again later.')
+  })
+})

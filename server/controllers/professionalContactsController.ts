@@ -11,12 +11,15 @@ export default class ProfessionalContactsController {
     const { firstName, middleNames, lastName, prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
     const { clientToken } = res.locals
 
-    const professionalContacts = await this.professionalContactsService.getContacts(
-      clientToken,
-      prisonerNumber,
-      bookingId,
-      youthEstatePrisons.includes(prisonId),
-    )
+    const professionalContacts = (
+      await this.professionalContactsService.getContacts(
+        clientToken,
+        prisonerNumber,
+        bookingId,
+        youthEstatePrisons.includes(prisonId),
+        res.locals.apiErrorCallback,
+      )
+    ).map(contact => contact.toPromiseSettledResult())
 
     return res.render('pages/professionalContacts/professionalContactsPage', {
       professionalContacts,
