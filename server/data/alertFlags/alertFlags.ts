@@ -17,7 +17,7 @@ export const alertFlagLabels: AlertFlagLabel[] = [
     classes: 'alert-status alert-status--security',
     label: 'Arsonist',
     img: '/images/Arsonist_icon.png',
-  }, 
+  },
   {
     alertCodes: ['PEEP'],
     classes: 'alert-status alert-status--medical',
