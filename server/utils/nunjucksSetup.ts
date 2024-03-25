@@ -4,6 +4,7 @@ import nunjucks from 'nunjucks'
 import express from 'express'
 import {
   addressToLines,
+  apiErrorMessage,
   apostrophe,
   findError,
   formatMoney,
@@ -72,7 +73,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('prisonerIsTRN', prisonerIsTRN)
   njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
-  njkEnv.addGlobal('standardApiErrorText', () => 'We cannot show these details right now. Try again later.')
+  njkEnv.addGlobal('standardApiErrorText', () => apiErrorMessage)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)

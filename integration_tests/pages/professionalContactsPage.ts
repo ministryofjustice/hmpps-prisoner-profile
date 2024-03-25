@@ -11,6 +11,7 @@ export default class ProfessionalContactsPage extends Page {
     name: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-name"]'),
     contactDetails: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-details"]'),
     address: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-address"]'),
+    errorMessage: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-api-error"]'),
   })
 
   pomContact = () => ({

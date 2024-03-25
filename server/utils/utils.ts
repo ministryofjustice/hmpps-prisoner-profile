@@ -608,3 +608,5 @@ export const putLastNameFirst = (firstName: string, lastName: string): string =>
 
   return `${properCaseName(lastName)}, ${properCaseName(firstName)}`
 }
+
+export const apiErrorMessage = 'We cannot show these details right now. Try again later.'

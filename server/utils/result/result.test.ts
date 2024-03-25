@@ -48,7 +48,7 @@ describe('result', () => {
 
   describe('getOrHandle', () => {
     it.each([1, 'hello', { some: 'object' }])('can retrieve the value from a fulfilled result', value => {
-      expect(Result.fulfilled(value).getOrHandle(e => e.message)).toEqual(value)
+      expect(Result.fulfilled<unknown, Error>(value).getOrHandle(e => e.message)).toEqual(value)
     })
 
     it('can handle an error from a rejected result', () => {
@@ -103,8 +103,8 @@ describe('result', () => {
 
       const [a, b, c, d] = await Promise.all([
         Promise.resolve(1),
-        Result.wrap(functionReturnsAString)(),
-        Result.wrap(functionReturnsAnObject)(123, 'abc'),
+        Result.wrap(functionReturnsAString()),
+        Result.wrap(functionReturnsAnObject(123, 'abc')),
         Promise.resolve(1.23),
       ])
 
@@ -115,17 +115,15 @@ describe('result', () => {
     })
 
     it('wraps individual functions in a try catch to safely return rejected results', async () => {
-      const [a, b, c, d] = await Promise.all([
+      const [a, b, c] = await Promise.all([
         Promise.resolve(1),
-        Result.wrap(() => Promise.reject(error))(),
-        Result.wrap((_i: number, _s: string) => Promise.reject(error))(123, 'abc'),
+        Result.wrap(Promise.reject(error)),
         Promise.resolve(1.23),
       ])
 
       expect(a).toEqual(1)
       expect(b.getOrThrow).toThrow(error)
-      expect(c.getOrThrow).toThrow(error)
-      expect(d).toEqual(1.23)
+      expect(c).toEqual(1.23)
     })
   })
 
@@ -138,8 +136,19 @@ describe('result', () => {
       ).toEqual(2)
     })
 
-    it('maps a rejected result to itself', () => {
-      expect(Result.rejected(error).getOrThrow).toThrowError(error)
+    it('maps a rejected result to itself by default', () => {
+      expect(Result.rejected<number, Error>(error).map(value => value + 1).getOrThrow).toThrowError(error)
+    })
+
+    it('maps a rejected result', () => {
+      expect(
+        Result.rejected<number, Error>(error)
+          .map(
+            value => value + 1,
+            e => ({ mapped: e }),
+          )
+          .getOrHandle(e => e),
+      ).toEqual({ mapped: error })
     })
   })
 })
