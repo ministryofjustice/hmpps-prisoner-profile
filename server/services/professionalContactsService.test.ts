@@ -228,7 +228,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = (await service.getContacts('token', 'A1234AA', 1)).map(contact =>
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
         contact.toPromiseSettledResult(),
       )
 
@@ -394,7 +394,7 @@ describe('professionalContactsService', () => {
         () => keyWorkerApiClient,
       )
 
-      const response = await service.getContacts('token', 'A1234AA', 1, true)
+      const response = (await service.getContacts('token', 'A1234AA', 1, true)).map(result => result.getOrThrow())
 
       expect(response.find(contact => contact.relationshipDescription === 'Key Worker')).toBeFalsy()
       expect(response.find(contact => contact.relationshipDescription === 'Prison Offender Manager')).toBeFalsy()

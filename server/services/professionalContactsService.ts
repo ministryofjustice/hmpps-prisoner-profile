@@ -51,7 +51,10 @@ export default class ProfessionalContactsService {
       isYouthPrisoner
         ? null
         : this.prisonerProfileDeliusApiClientBuilder(clientToken).getCommunityManager(prisonerNumber),
-      isYouthPrisoner ? Result.fulfilled(null) : Result.wrap(this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber), apiErrorCallback),
+      Result.wrap(
+        isYouthPrisoner ? null : this.keyworkerApiClientBuilder(clientToken).getOffendersKeyWorker(prisonerNumber),
+        apiErrorCallback,
+      ),
     ])
 
     // filter out COM and POM from prison API contacts as they are reliably retrieved from other API calls

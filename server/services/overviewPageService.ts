@@ -151,7 +151,7 @@ export default class OverviewPageService {
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       isYouthPrisoner ? null : allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      isYouthPrisoner ? null : Result.wrap(getKeyWorkerName(), apiErrorCallback),
+      Result.wrap(isYouthPrisoner ? null : getKeyWorkerName(), apiErrorCallback),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
