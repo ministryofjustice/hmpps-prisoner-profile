@@ -4,6 +4,6 @@ export enum ContactRelationship {
   CuspOfficerBackup = 'CUSPO2',
   YouthJusticeWorker = 'YJW',
   ResettlementPractitioner = 'RESPRA',
-  YouthJusticeServicesTeam = 'YJST',
-  YouthJusticeServicesCaseManager = 'YJSCM',
+  YouthJusticeServices = 'YJS',
+  YouthJusticeServiceCaseManager = 'YJSCM',
 }
