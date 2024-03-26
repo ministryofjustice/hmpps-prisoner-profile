@@ -64,6 +64,7 @@ generic-service:
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api.hmpps.service.justice.gov.uk"
     RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api.hmpps.service.justice.gov.uk"
     CCRD_UI_URL: "https://court-cases-release-dates.hmpps.service.justice.gov.uk"
+    PRISON_REGISTER_API_URL: "https://prison-register.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
