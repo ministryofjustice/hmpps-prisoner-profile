@@ -209,7 +209,7 @@ export const mockContactDetailYouthEstate: ContactDetail = {
       contactType: 'O',
       contactTypeDescription: 'Official',
       relationship: 'YJS',
-      relationshipDescription: 'Youth Justice Services',
+      relationshipDescription: 'Youth Justice Service',
       emergencyContact: false,
       nextOfKin: false,
       relationshipId: 13702376,

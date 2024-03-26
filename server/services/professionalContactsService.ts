@@ -111,7 +111,7 @@ export default class ProfessionalContactsService {
       'CuSP Officer (backup)',
       'Youth Justice Worker',
       'Resettlement Practitioner',
-      'Youth Justice Services',
+      'Youth Justice Service',
       'Youth Justice Service Case Manager',
     ]
     const leftRelationshipDescription = left.getOrHandle(e => e).relationshipDescription

@@ -90,12 +90,12 @@ export default class ProfessionalContactsPage extends Page {
     address: (): PageElement => this.resettlementPractitioner().panel().find('[data-qa="contact-address"]'),
   })
 
-  youthJusticeServices = () => ({
+  youthJusticeService = () => ({
     panel: (): PageElement => cy.get('.hmpps-summary-card').eq(5),
-    header: (): PageElement => this.youthJusticeServices().panel().get('[data-qa="summary-header"]'),
-    name: (): PageElement => this.youthJusticeServices().panel().find('[data-qa="contact-name"]'),
-    contactDetails: (): PageElement => this.youthJusticeServices().panel().find('[data-qa="contact-details"]'),
-    address: (): PageElement => this.youthJusticeServices().panel().find('[data-qa="contact-address"]'),
+    header: (): PageElement => this.youthJusticeService().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-address"]'),
   })
 
   youthJusticeServiceCaseManager = () => ({

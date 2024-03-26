@@ -151,11 +151,11 @@ context('Professional contacts list page - youth estate', () => {
     resettlementPractitioner.contactDetails().contains('Not entered')
     resettlementPractitioner.address().contains('Not entered')
 
-    const youthJusticeServices = professionalContactsPage.youthJusticeServices()
-    youthJusticeServices.header().contains('Youth Justice Services')
-    youthJusticeServices.name().contains('Outer York')
-    youthJusticeServices.contactDetails().contains('Not entered')
-    youthJusticeServices.address().contains('Not entered')
+    const youthJusticeService = professionalContactsPage.youthJusticeService()
+    youthJusticeService.header().contains('Youth Justice Service')
+    youthJusticeService.name().contains('Outer York')
+    youthJusticeService.contactDetails().contains('Not entered')
+    youthJusticeService.address().contains('Not entered')
 
     const youthJusticeServiceCaseManager = professionalContactsPage.youthJusticeServiceCaseManager()
     youthJusticeServiceCaseManager.header().contains('Youth Justice Service Case Manager')
