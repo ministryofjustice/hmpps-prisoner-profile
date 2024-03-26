@@ -375,13 +375,13 @@ describe('professionalContactsService', () => {
           }),
           PrisonerContactBuilder({
             personId: 5,
-            relationship: ContactRelationship.YouthJusticeServicesTeam,
-            relationshipDescription: 'Youth Justice Services Team',
+            relationship: ContactRelationship.YouthJusticeServices,
+            relationshipDescription: 'Youth Justice Services',
           }),
           PrisonerContactBuilder({
             personId: 6,
-            relationship: ContactRelationship.YouthJusticeServicesCaseManager,
-            relationshipDescription: 'Youth Justice Services Case Manager',
+            relationship: ContactRelationship.YouthJusticeServiceCaseManager,
+            relationshipDescription: 'Youth Justice Service Case Manager',
           }),
         ],
       }
@@ -407,9 +407,9 @@ describe('professionalContactsService', () => {
       expect(response.find(contact => contact.relationshipDescription === 'CuSP Officer (backup)')).toBeTruthy()
       expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Worker')).toBeTruthy()
       expect(response.find(contact => contact.relationshipDescription === 'Resettlement Practitioner')).toBeTruthy()
-      expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Services Team')).toBeTruthy()
+      expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Services')).toBeTruthy()
       expect(
-        response.find(contact => contact.relationshipDescription === 'Youth Justice Services Case Manager'),
+        response.find(contact => contact.relationshipDescription === 'Youth Justice Service Case Manager'),
       ).toBeTruthy()
     })
   })

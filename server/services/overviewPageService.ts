@@ -267,8 +267,8 @@ export default class OverviewPageService {
       cuspOfficerBackup: 'Not assigned',
       youthJusticeWorker: 'Not assigned',
       resettlementPractitioner: 'Not assigned',
-      youthJusticeServicesTeam: 'Not assigned',
-      youthJusticeServicesCaseManager: 'Not assigned',
+      youthJusticeServices: 'Not assigned',
+      youthJusticeServiceCaseManager: 'Not assigned',
       linkUrl: `/prisoner/${prisonerNumber}/professional-contacts`,
     }
 
@@ -287,11 +287,11 @@ export default class OverviewPageService {
         case ContactRelationship.ResettlementPractitioner:
           youthStaffContacts.resettlementPractitioner = formatName(c.firstName, null, c.lastName)
           break
-        case ContactRelationship.YouthJusticeServicesTeam:
-          youthStaffContacts.youthJusticeServicesTeam = formatName(c.firstName, null, c.lastName)
+        case ContactRelationship.YouthJusticeServices:
+          youthStaffContacts.youthJusticeServices = formatName(c.firstName, null, c.lastName)
           break
-        case ContactRelationship.YouthJusticeServicesCaseManager:
-          youthStaffContacts.youthJusticeServicesCaseManager = formatName(c.firstName, null, c.lastName)
+        case ContactRelationship.YouthJusticeServiceCaseManager:
+          youthStaffContacts.youthJusticeServiceCaseManager = formatName(c.firstName, null, c.lastName)
           break
         default:
       }
