@@ -119,7 +119,7 @@ context('Professional contacts list page - youth estate', () => {
 
   it('should include YOI contacts', () => {
     professionalContactsPage.h1().contains('John Saunders’ professional contacts')
-    professionalContactsPage.contacts().should('have.length', 6)
+    professionalContactsPage.contacts().should('have.length', 7)
 
     const cuspOfficer = professionalContactsPage.cuspOfficer()
     cuspOfficer.header().contains('CuSP Officer')
@@ -151,10 +151,44 @@ context('Professional contacts list page - youth estate', () => {
     resettlementPractitioner.contactDetails().contains('Not entered')
     resettlementPractitioner.address().contains('Not entered')
 
-    const youthJusticeService = professionalContactsPage.youthJusticeService()
-    youthJusticeService.header().contains('Youth Justice Service')
-    youthJusticeService.name().contains('Outer York')
-    youthJusticeService.contactDetails().contains('Not entered')
-    youthJusticeService.address().contains('Not entered')
+    const youthJusticeServices = professionalContactsPage.youthJusticeServices()
+    youthJusticeServices.header().contains('Youth Justice Services')
+    youthJusticeServices.name().contains('Outer York')
+    youthJusticeServices.contactDetails().contains('Not entered')
+    youthJusticeServices.address().contains('Not entered')
+
+    const youthJusticeServiceCaseManager = professionalContactsPage.youthJusticeServiceCaseManager()
+    youthJusticeServiceCaseManager.header().contains('Youth Justice Service Case Manager')
+    youthJusticeServiceCaseManager.name().contains('Barney Rubble')
+    youthJusticeServiceCaseManager.contactDetails().contains('Not entered')
+    youthJusticeServiceCaseManager.address().contains('Not entered')
+  })
+})
+
+context('Professional contacts list page - given API to get key worker name fails', () => {
+  let professionalContactsPage: ProfessionalContactsPage
+
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
+    cy.task('stubGetCommunityManager')
+    cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', error: true })
+    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubPersonAddresses', [])
+    cy.task('stubPersonEmails', [])
+    cy.task('stubPersonPhones', [])
+    professionalContactsPage = visitProfessionalContactsPage()
+  })
+
+  it('Displays a page error banner and an error message replacing the key worker details', () => {
+    professionalContactsPage.apiErrorBanner().should('exist')
+    professionalContactsPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+    const keyWorkerContact = professionalContactsPage.keyWorkerContact()
+    keyWorkerContact.header().contains('Key Worker')
+    keyWorkerContact.errorMessage().contains('We cannot show these details right now. Try again later.')
   })
 })

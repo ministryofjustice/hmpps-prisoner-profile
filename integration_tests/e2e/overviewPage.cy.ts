@@ -659,7 +659,8 @@ context('Overview Page', () => {
         overviewPage.staffContacts().should('contain.text', 'CuSP Officer (backup)')
         overviewPage.staffContacts().should('contain.text', 'Youth Justice Worker')
         overviewPage.staffContacts().should('contain.text', 'Resettlement Practitioner')
-        overviewPage.staffContacts().should('contain.text', 'Youth Justice Service')
+        overviewPage.staffContacts().should('contain.text', 'Youth Justice Services')
+        overviewPage.staffContacts().should('contain.text', 'Youth Justice Service Case Manager')
       })
     })
   })
@@ -693,7 +694,7 @@ context('Overview Page', () => {
       visitOverviewPage()
     })
 
-    it('Displays a page error banner and highlights the failure in the status list', () => {
+    it('Displays a page error banner and error message replacing the key worker details', () => {
       const overviewPage = Page.verifyOnPage(OverviewPage)
 
       overviewPage.apiErrorBanner().should('exist')

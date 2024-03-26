@@ -26,4 +26,6 @@ export default abstract class Page {
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
 
   manageDetails = (): PageElement => cy.get('[data-qa=manageDetails]')
+
+  apiErrorBanner = (): PageElement => cy.get('.hmpps-api-error-banner')
 }

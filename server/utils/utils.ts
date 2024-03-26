@@ -615,3 +615,5 @@ export const putLastNameFirst = (firstName: string, lastName: string): string =>
 }
 
 export const compareStrings = (l: string, r: string): number => l.localeCompare(r, 'en', { ignorePunctuation: true })
+
+export const apiErrorMessage = 'We cannot show these details right now. Try again later.'

@@ -2,6 +2,7 @@ import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import ProfessionalContactsService from '../services/professionalContactsService'
 import ProfessionalContactsController from './professionalContactsController'
+import { Result } from '../utils/result/result'
 
 describe('Prisoner schedule', () => {
   const offenderNo = 'ABC123'
@@ -34,7 +35,7 @@ describe('Prisoner schedule', () => {
   describe('displayProfessionalContacts', () => {
     it('should call the service and render the page', async () => {
       const professionalContacts = [
-        {
+        Result.fulfilled({
           relationship: 'Prison Offender Manager',
           contacts: [
             {
@@ -46,11 +47,11 @@ describe('Prisoner schedule', () => {
               name: 'Jane Jones',
             },
           ],
-        },
+        }).toPromiseSettledResult(),
       ]
       jest
         .spyOn<any, string>(controller['professionalContactsService'], 'getContacts')
-        .mockResolvedValue(professionalContacts)
+        .mockResolvedValue(professionalContacts.map(Result.from))
 
       await controller.displayProfessionalContacts(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/professionalContacts/professionalContactsPage', {

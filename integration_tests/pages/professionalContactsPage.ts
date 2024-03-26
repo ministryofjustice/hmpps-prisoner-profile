@@ -11,6 +11,7 @@ export default class ProfessionalContactsPage extends Page {
     name: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-name"]'),
     contactDetails: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-details"]'),
     address: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-address"]'),
+    errorMessage: (): PageElement => this.keyWorkerContact().panel().find('[data-qa="contact-api-error"]'),
   })
 
   pomContact = () => ({
@@ -89,11 +90,20 @@ export default class ProfessionalContactsPage extends Page {
     address: (): PageElement => this.resettlementPractitioner().panel().find('[data-qa="contact-address"]'),
   })
 
-  youthJusticeService = () => ({
+  youthJusticeServices = () => ({
     panel: (): PageElement => cy.get('.hmpps-summary-card').eq(5),
-    header: (): PageElement => this.youthJusticeService().panel().get('[data-qa="summary-header"]'),
-    name: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-name"]'),
-    contactDetails: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-details"]'),
-    address: (): PageElement => this.youthJusticeService().panel().find('[data-qa="contact-address"]'),
+    header: (): PageElement => this.youthJusticeServices().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeServices().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement => this.youthJusticeServices().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeServices().panel().find('[data-qa="contact-address"]'),
+  })
+
+  youthJusticeServiceCaseManager = () => ({
+    panel: (): PageElement => cy.get('.hmpps-summary-card').eq(6),
+    header: (): PageElement => this.youthJusticeServiceCaseManager().panel().get('[data-qa="summary-header"]'),
+    name: (): PageElement => this.youthJusticeServiceCaseManager().panel().find('[data-qa="contact-name"]'),
+    contactDetails: (): PageElement =>
+      this.youthJusticeServiceCaseManager().panel().find('[data-qa="contact-details"]'),
+    address: (): PageElement => this.youthJusticeServiceCaseManager().panel().find('[data-qa="contact-address"]'),
   })
 }

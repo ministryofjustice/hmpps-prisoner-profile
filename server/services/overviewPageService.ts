@@ -147,11 +147,11 @@ export default class OverviewPageService {
       contacts,
     ] = await Promise.all([
       activeCaseloadId ? prisonApiClient.getStaffRoles(staffId, activeCaseloadId) : [],
-      Result.wrap(getLearnerNeurodivergence, apiErrorCallback)(),
+      Result.wrap(getLearnerNeurodivergence(), apiErrorCallback),
       prisonApiClient.getScheduledTransfers(prisonerData.prisonerNumber),
       nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, { includeOtherPrisons: 'true' }),
       isYouthPrisoner ? null : allocationManagerClient.getPomByOffenderNo(prisonerData.prisonerNumber),
-      isYouthPrisoner ? null : Result.wrap(getKeyWorkerName, apiErrorCallback)(),
+      Result.wrap(isYouthPrisoner ? null : getKeyWorkerName(), apiErrorCallback),
       prisonApiClient.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
       prisonApiClient.getMainOffence(bookingId),
       prisonApiClient.getFullStatus(prisonerNumber),
@@ -267,7 +267,8 @@ export default class OverviewPageService {
       cuspOfficerBackup: 'Not assigned',
       youthJusticeWorker: 'Not assigned',
       resettlementPractitioner: 'Not assigned',
-      youthJusticeService: 'Not assigned',
+      youthJusticeServices: 'Not assigned',
+      youthJusticeServiceCaseManager: 'Not assigned',
       linkUrl: `/prisoner/${prisonerNumber}/professional-contacts`,
     }
 
@@ -286,8 +287,11 @@ export default class OverviewPageService {
         case ContactRelationship.ResettlementPractitioner:
           youthStaffContacts.resettlementPractitioner = formatName(c.firstName, null, c.lastName)
           break
-        case ContactRelationship.YouthJusticeService:
-          youthStaffContacts.youthJusticeService = formatName(c.firstName, null, c.lastName)
+        case ContactRelationship.YouthJusticeServices:
+          youthStaffContacts.youthJusticeServices = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeServiceCaseManager:
+          youthStaffContacts.youthJusticeServiceCaseManager = formatName(c.firstName, null, c.lastName)
           break
         default:
       }
