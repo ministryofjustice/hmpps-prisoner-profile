@@ -4,18 +4,12 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import OffencesPageService from './offencesPageService'
 import {
   CourtCasesMock,
-  CourtCasesSentencedMockA,
   CourtCasesUnsentencedMockA,
   CourtCasesUnsentencedMockB,
   CourtCaseWithNextCourtAppearance,
 } from '../data/localMockData/courtCaseMock'
-import { OffenceHistoryMock, OffenceHistoryMockA } from '../data/localMockData/offenceHistoryMock'
-import {
-  MappedSentenceSummaryCourtCasesMock,
-  MappedUnsentencedCourtCasesMock,
-  SentencedTermsMockA,
-  sentenceTermsMock,
-} from '../data/localMockData/sentenceTermsMock'
+import { OffenceHistoryMock } from '../data/localMockData/offenceHistoryMock'
+import { MappedUnsentencedCourtCasesMock, sentenceTermsMock } from '../data/localMockData/sentenceTermsMock'
 import { prisonerSentenceDetailsMock } from '../data/localMockData/prisonerSentenceDetails'
 import {
   GetCourtCaseData,
@@ -29,11 +23,13 @@ import {
   CourtDateResultsUnsentencedMockB,
   UniqueCourtDateResultsUnsentencedMockA,
 } from '../data/localMockData/courtDateResultsMock'
-import { DeepPartial, SentenceSummaryWithSentenceMock } from '../data/localMockData/sentenceSummaryMock'
+import { SentenceSummaryWithSentenceMock } from '../data/localMockData/sentenceSummaryMock'
 import SentenceSummary from '../data/interfaces/prisonApi/SentenceSummary'
 import OffenceHistoryDetail from '../data/interfaces/prisonApi/OffenceHistoryDetail'
 import { ChargeResultCode } from '../data/enums/chargeCodes'
 import OffenderSentenceTerms from '../data/interfaces/prisonApi/OffenderSentenceTerms'
+import SentencedCourtCase from './interfaces/offencesPageService/SentencedCourtCase'
+import DeepPartial from '../interfaces/DeepPartial'
 
 const simpleSentenceSummary: DeepPartial<SentenceSummary> = {
   prisonerNumber: 'G6123VU',
@@ -150,7 +146,12 @@ describe('OffencesPageService', () => {
     describe('Offences list', () => {
       it('should take data from any matching offences in offence history', async () => {
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
+
         expect(result[0].sentences[0].offences).toEqual([
           {
             offenceRangeDate: 'OFFENCE RANGE DATE',
@@ -180,7 +181,12 @@ describe('OffencesPageService', () => {
     describe('sentence details', () => {
       it('should decorate the sentences with data ', async () => {
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
+
         expect(result[0].sentences[0]).toMatchObject({
           sentenceHeader: 'Count 3',
           sentenceTypeDescription: 'Sentence type description',
@@ -235,7 +241,11 @@ describe('OffencesPageService', () => {
         prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTerms)
 
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
         expect(result[0].sentences[0].sentenceLicence).toEqual('20 years')
       })
 
@@ -278,22 +288,16 @@ describe('OffencesPageService', () => {
         prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceSummary)
 
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
+
         expect(result[0].sentences[0].sentenceLicence).toEqual('5 years')
       })
 
       it('should label as concurrent if term with sentenceSequence matches a sentence consecutiveToSequence and term includes lineSeq', async () => {
-        const summary = {
-          ...simpleSentenceSummary,
-          latestPrisonTerm: {
-            ...simpleSentenceSummary.latestPrisonTerm,
-            courtSentences: [
-              simpleSentenceSummary.latestPrisonTerm.courtSentences[0],
-              { ...simpleSentenceSummary.latestPrisonTerm.courtSentences[1], consecutiveToSequence: 1 },
-            ],
-          },
-        }
-
         const sentenceTerms: DeepPartial<OffenderSentenceTerms>[] = [
           {
             sentenceSequence: 1,
@@ -315,7 +319,11 @@ describe('OffencesPageService', () => {
         prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTerms)
 
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
         expect(result[1].sentences[0].concurrentConsecutive).toEqual('Consecutive')
       })
 
@@ -341,7 +349,11 @@ describe('OffencesPageService', () => {
         prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceTerms)
 
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
         expect(result[0].sentences[0].concurrentConsecutive).toEqual('Concurrent')
       })
 
@@ -367,7 +379,12 @@ describe('OffencesPageService', () => {
         prisonApiClient.getSentenceTerms = jest.fn(async () => sentenceSummary)
 
         const offencesPageService = offencesPageServiceConstruct()
-        const result = await offencesPageService.getCourtCasesData('token', 1102484, 'G6123VU')
+        const result = (await offencesPageService.getCourtCasesData(
+          'token',
+          1102484,
+          'G6123VU',
+        )) as SentencedCourtCase[]
+
         expect(result[0].sentences[0].concurrentConsecutive).toEqual('Concurrent')
       })
     })

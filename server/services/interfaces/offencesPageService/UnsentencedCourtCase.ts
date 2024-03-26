@@ -1,7 +1,7 @@
 import CourtDateResults from '../../../data/interfaces/prisonApi/CourtDateResults'
 import { CourtHearing } from '../../../data/interfaces/prisonApi/CourtCase'
 
-export default interface CourtCaseDataMappedUnsentenced {
+export default interface UnsentencedCourtCase {
   sentenced: boolean
   nextCourtAppearance?: CourtHearing
   courtHearings: CourtHearing[]

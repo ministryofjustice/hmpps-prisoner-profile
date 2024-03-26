@@ -9,7 +9,7 @@ import OffenceHistoryDetail from '../data/interfaces/prisonApi/OffenceHistoryDet
 import { ChargeResultCode } from '../data/enums/chargeCodes'
 import CourtCase from '../data/interfaces/prisonApi/CourtCase'
 import CourtDateResults from '../data/interfaces/prisonApi/CourtDateResults'
-import CourtCaseDataMappedUnsentenced from './interfaces/offencesPageService/CourtCaseDataMapped'
+import UnsentencedCourtCase from './interfaces/offencesPageService/UnsentencedCourtCase'
 import SentenceSummary, {
   SentenceSummaryCourtSentence,
   SentenceSummaryTermDetail,
@@ -17,6 +17,7 @@ import SentenceSummary, {
 import { RestClientBuilder } from '../data'
 import ReleaseDates from './interfaces/offencesPageService/ReleaseDates'
 import PrisonerSentenceDetails from '../data/interfaces/prisonApi/PrisonerSentenceDetails'
+import SentencedCourtCase from './interfaces/offencesPageService/SentencedCourtCase'
 
 export default class OffencesPageService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -90,7 +91,7 @@ export default class OffencesPageService {
     }, [])
   }
 
-  private getConcurrentConsectutive(
+  private getConcurrentConsecutive(
     sentenceTerms: OffenderSentenceTerms[],
     sentence: SentenceSummaryCourtSentence,
   ): 'Consecutive' | 'Concurrent' {
@@ -99,7 +100,7 @@ export default class OffencesPageService {
   }
 
   getCaseIdsFilteredByResultCode(offenceHistory: OffenceHistoryDetail[]) {
-    const requiredChargeCodes = Object.values(ChargeResultCode)
+    const requiredChargeCodes = Object.values(ChargeResultCode) as string[]
     return offenceHistory
       .filter(offence => requiredChargeCodes.includes(offence.primaryResultCode))
       .map(offence => offence.caseId)
@@ -125,10 +126,7 @@ export default class OffencesPageService {
     const sentencedCourtCaseIds = sentencedCourtCases.map(sentenceSummaryCourtCase => sentenceSummaryCourtCase.id)
 
     const rawUnsentencedCourtCases = courtCaseData.filter(courtCase => !sentencedCourtCaseIds.includes(courtCase.id))
-    const unsentencedCourtCases: CourtCaseDataMappedUnsentenced[] = this.mapUnsentencedCourtCases(
-      rawUnsentencedCourtCases,
-      courtDateResults,
-    )
+    const unsentencedCourtCases = this.mapUnsentencedCourtCases(rawUnsentencedCourtCases, courtDateResults)
 
     return [...sentencedCourtCases, ...unsentencedCourtCases]
   }
@@ -156,7 +154,7 @@ export default class OffencesPageService {
     return [...new Map(courtDateResults?.map(item => [item.charge.chargeId, item])).values()]
   }
 
-  mapUnsentencedCourtCases(courtCaseData: CourtCase[], courtDateResults: CourtDateResults[]) {
+  mapUnsentencedCourtCases(courtCaseData: CourtCase[], courtDateResults: CourtDateResults[]): UnsentencedCourtCase[] {
     return courtCaseData.map(courtCase => ({
       nextCourtAppearance: this.getNextCourtAppearance(courtCase),
       courtHearings: courtCase.courtHearings,
@@ -196,7 +194,7 @@ export default class OffencesPageService {
     offenceHistory: OffenceHistoryDetail[],
     courtCaseData: CourtCase[],
     sentenceTermsData: OffenderSentenceTerms[],
-  ) {
+  ): SentencedCourtCase[] {
     const sentencedCourtCases = sentenceSummary.latestPrisonTerm.courtSentences
     const groupedSentenceTerms = this.groupSentencesBySequence(sentenceTermsData)
 
@@ -218,7 +216,7 @@ export default class OffencesPageService {
             sentenceLength: sentence.terms ? this.getLengthTextLabels(sentence.terms[0]) : undefined,
             fineAmountFormat: sentence.fineAmount ? formatCurrency(sentence.fineAmount, 'GBP').toString() : undefined,
             sentenceLicence: this.getSentenceLicence(mostRecentLicenceTerms, courtSentence.id, sentence),
-            concurrentConsecutive: this.getConcurrentConsectutive(sentenceTermsData, sentence),
+            concurrentConsecutive: this.getConcurrentConsecutive(sentenceTermsData, sentence),
             offences: sentence.offences.map(offence => {
               // find corresponding offence from offence history and take required fields
               const offenceHistoryDetail = offenceHistory.find(

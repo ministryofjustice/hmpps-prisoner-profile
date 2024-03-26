@@ -1,44 +1,4 @@
 import SentenceSummary, { SentenceAdjustments } from '../interfaces/prisonApi/SentenceSummary'
-import OffenceHistoryDetail from '../interfaces/prisonApi/OffenceHistoryDetail'
-import { ChargeResultCode } from '../enums/chargeCodes'
-
-export type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>
-    }
-  : T
-
-const simpleSentenceSummary: DeepPartial<SentenceSummary> = {
-  prisonerNumber: 'G6123VU',
-  latestPrisonTerm: {
-    courtSentences: [
-      {
-        id: 111111,
-        sentences: [
-          {
-            offences: [
-              {
-                offenceDate: '2016-07-14',
-                offenceCode: 'OFFCODE1',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-}
-
-const offenceHistory: DeepPartial<OffenceHistoryDetail>[] = [
-  {
-    offenceDate: '2016-07-14',
-    offenceCode: 'OFFCODE1',
-    offenceRangeDate: 'OFFENCE RANGE DATE',
-    statuteCode: 'STATUTE CODE',
-    primaryResultCode: ChargeResultCode.Code_1002,
-    caseId: 222222,
-  },
-]
 
 export const SentenceSummaryWithSentenceMock: SentenceSummary = {
   prisonerNumber: 'G6123VU',

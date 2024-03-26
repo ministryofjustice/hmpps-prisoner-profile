@@ -8,7 +8,7 @@ export default interface OffenceHistoryDetail {
   offenceCode: string
   statuteCode?: string
   mostSerious?: boolean
-  primaryResultCode?: ChargeResultCode
+  primaryResultCode?: ChargeResultCode | string
   secondaryResultCode?: string
   primaryResultDescription?: string
   secondaryResultDescription?: string
