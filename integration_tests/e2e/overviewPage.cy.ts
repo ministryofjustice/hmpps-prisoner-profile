@@ -659,7 +659,7 @@ context('Overview Page', () => {
         overviewPage.staffContacts().should('contain.text', 'CuSP Officer (backup)')
         overviewPage.staffContacts().should('contain.text', 'Youth Justice Worker')
         overviewPage.staffContacts().should('contain.text', 'Resettlement Practitioner')
-        overviewPage.staffContacts().should('contain.text', 'Youth Justice Services')
+        overviewPage.staffContacts().should('contain.text', 'Youth Justice Service')
         overviewPage.staffContacts().should('contain.text', 'Youth Justice Service Case Manager')
       })
     })
