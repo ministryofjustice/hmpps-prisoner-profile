@@ -9,7 +9,7 @@ import logger from '../../logger'
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
     try {
-      const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(res.locals.clientToken)
+      const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
       const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
 
       if (prisonerData.prisonerNumber === undefined) {
@@ -24,7 +24,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       // Get Assessment details and Inmate details, and add to prisonerData
       // Needed for CSRA and Category data
       // Need to update prisoner search endpoint to return the data needed, then this can be removed
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
+      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
       const [assessments, inmateDetail] = await Promise.all([
         prisonApiClient.getAssessments(prisonerData.bookingId),
         prisonApiClient.getInmateDetail(prisonerData.bookingId),

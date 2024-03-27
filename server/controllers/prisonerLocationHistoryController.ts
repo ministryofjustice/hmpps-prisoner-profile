@@ -12,7 +12,7 @@ export default class PrisonerLocationHistoryController {
   constructor(private readonly prisonerLocationHistoryService: PrisonerLocationHistoryService) {}
 
   public async displayPrisonerLocationHistory(req: Request, res: Response, prisonerData: Prisoner) {
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const { agencyId, locationId, fromDate, toDate } = req.query
     const { firstName, lastName, prisonerNumber, bookingId } = prisonerData
     const userCaseLoadIds = res.locals.user.caseLoads.map((caseLoad: CaseLoad) => caseLoad.caseLoadId)

@@ -33,7 +33,7 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
-      const { clientToken } = res.locals
+      const { clientToken } = req.middleware
 
       if (req.query.page) queryParams.page = +req.query.page
       if (req.query.sort) queryParams.sort = req.query.sort as string
@@ -198,7 +198,7 @@ export default class CaseNotesController {
         }
 
         try {
-          await this.caseNotesService.addCaseNote(res.locals.clientToken, prisonerNumber, caseNote)
+          await this.caseNotesService.addCaseNote(req.middleware.clientToken, prisonerNumber, caseNote)
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -237,7 +237,7 @@ export default class CaseNotesController {
   public displayUpdateCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { caseNoteId } = req.params
-      const { clientToken } = res.locals
+      const { clientToken } = req.middleware
       const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
       const canEditSensitiveCaseNotes = userHasRoles(
@@ -297,7 +297,7 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, caseNoteId } = req.params
       const { text, isExternal, currentLength, username } = req.body
-      const { clientToken } = res.locals
+      const { clientToken } = req.middleware
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
       const canEditSensitiveCaseNotes = userHasRoles(
         [Role.PomUser, Role.AddSensitiveCaseNotes],
@@ -312,7 +312,7 @@ export default class CaseNotesController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.caseNotesService.updateCaseNote(res.locals.clientToken, prisonerNumber, caseNoteId, {
+          await this.caseNotesService.updateCaseNote(req.middleware.clientToken, prisonerNumber, caseNoteId, {
             text,
             isExternal,
             currentLength: +currentLength,

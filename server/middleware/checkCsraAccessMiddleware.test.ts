@@ -15,6 +15,7 @@ describe('CheckCsraAccessMiddleware', () => {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: { ...PrisonerMockDataA, prisonId: 'TRN' },
       },
     }
@@ -25,7 +26,6 @@ describe('CheckCsraAccessMiddleware', () => {
           userRoles: [Role.GlobalSearch],
           caseLoads: CaseLoadsDummyDataB,
         },
-        clientToken: 'CLIENT_TOKEN',
       },
       render: jest.fn(),
     }

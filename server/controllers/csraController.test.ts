@@ -24,6 +24,7 @@ describe('CSRA Controller', () => {
         query: { assessmentSeq: '123', bookingId: '456' },
         path: 'alerts/active',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -36,7 +37,6 @@ describe('CSRA Controller', () => {
             caseLoads: CaseLoadsDummyDataA,
             token: 'TOKEN',
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
       }

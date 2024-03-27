@@ -63,8 +63,7 @@ export class VisitsController {
   public visitsDetails(): RequestHandler {
     return async (req, res, next) => {
       const queryParams: VisitsListQueryParams = {}
-      const { clientToken } = res.locals
-      const prisonerData: Prisoner = req.middleware?.prisonerData
+      const { clientToken, prisonerData } = req.middleware
 
       const visitStatusString = req.query.visitStatus as string
       const fromDateString = req.query.fromDate as string

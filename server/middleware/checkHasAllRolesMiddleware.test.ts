@@ -13,6 +13,9 @@ describe('CheckHasAllRolesMiddleware', () => {
     req = {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+      },
     }
     res = {
       locals: {
@@ -21,7 +24,6 @@ describe('CheckHasAllRolesMiddleware', () => {
           userRoles: [Role.PomUser, Role.ReceptionUser],
           caseLoads: CaseLoadsDummyDataA,
         },
-        clientToken: 'CLIENT_TOKEN',
       },
       render: jest.fn(),
     }
@@ -30,7 +32,7 @@ describe('CheckHasAllRolesMiddleware', () => {
 
   it('should return next() on success', async () => {
     await checkHasAllRoles([Role.PomUser, Role.ReceptionUser])(req, res, next)
-    expect(req.middleware).not.toBeDefined()
+    expect(req.middleware.errors).toBeUndefined()
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith()
   })
@@ -59,7 +61,7 @@ describe('CheckHasAllRolesMiddleware', () => {
 
     it('should return next(error) on fail', async () => {
       await checkHasAllRoles([Role.PomUser, Role.CategorisationSecurity])(req, res, next)
-      expect(req.middleware.errors).not.toBeDefined()
+      expect(req.middleware.errors).toBeUndefined()
       expect(next).toHaveBeenCalledTimes(1)
       expect(next).toHaveBeenCalledWith(new RoleError('CheckHasAllRolesMiddleware: not authorised for test/path'))
     })

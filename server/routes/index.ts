@@ -118,7 +118,7 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
 
       const { personalPageService } = services
-      const personalPageData = await personalPageService.get(res.locals.clientToken, prisonerData)
+      const personalPageData = await personalPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
@@ -147,7 +147,7 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const { workAndSkillsPageService } = services
-      const workAndSkillsPageData = await workAndSkillsPageService.get(res.locals.clientToken, prisonerData)
+      const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
 
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
@@ -202,7 +202,7 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const { offencesPageService } = services
-      const { courtCaseData, releaseDates } = await offencesPageService.get(res.locals.clientToken, prisonerData)
+      const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
         userId: res.locals.user.username,
@@ -254,7 +254,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(res.locals.clientToken)
+      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
       const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 
       await services.auditService.sendPageView({
