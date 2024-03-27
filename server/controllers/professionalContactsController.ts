@@ -9,7 +9,7 @@ export default class ProfessionalContactsController {
 
   public async displayProfessionalContacts(req: Request, res: Response) {
     const { firstName, middleNames, lastName, prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
 
     const professionalContacts = (
       await this.professionalContactsService.getContacts(

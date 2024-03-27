@@ -16,7 +16,7 @@ export default class CsraController {
 
   public async displayHistory(req: Request, res: Response, next: NextFunction) {
     const { firstName, lastName, middleNames, prisonerNumber, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
     const breadcrumbPrisonerName = formatName(firstName, middleNames, lastName, {
       style: NameFormatStyle.lastCommaFirst,
@@ -70,7 +70,7 @@ export default class CsraController {
       prisonerData: { firstName, lastName, middleNames },
     } = req.middleware
     const { assessmentSeq, bookingId } = req.query
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const breadcrumbPrisonerName = formatName(firstName, middleNames, lastName, {
       style: NameFormatStyle.lastCommaFirst,
     })

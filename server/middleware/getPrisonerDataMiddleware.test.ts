@@ -26,6 +26,9 @@ describe('GetPrisonerDataMiddleware', () => {
     req = {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+      },
     }
     res = {
       locals: {
@@ -34,7 +37,6 @@ describe('GetPrisonerDataMiddleware', () => {
           userRoles: [Role.PrisonUser],
           caseLoads: CaseLoadsDummyDataA,
         },
-        clientToken: 'CLIENT_TOKEN',
       },
       render: jest.fn(),
     }
@@ -65,7 +67,7 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(next).toBeCalledWith(new NotFoundError())
     expect(prisonApiClient.getInmateDetail).not.toBeCalled()
     expect(prisonApiClient.getAssessments).not.toBeCalled()
-    expect(req.middleware).toBeUndefined()
+    expect(req.middleware.prisonerData).toBeUndefined()
   })
 
   it('should prisonerData and inmateDetail in middleware', async () => {
@@ -74,7 +76,6 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(prisonerSearchApiClient.getPrisonerDetails).toBeCalled()
     expect(prisonApiClient.getInmateDetail).toBeCalled()
     expect(prisonApiClient.getAssessments).toBeCalled()
-    expect(req.middleware).toBeDefined()
     expect(req.middleware.prisonerData).toEqual({
       ...PrisonerMockDataA,
       assessments: assessmentsMock,

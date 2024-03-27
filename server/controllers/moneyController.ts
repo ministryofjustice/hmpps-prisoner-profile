@@ -49,7 +49,7 @@ export default class MoneyController {
 
   private async getDamageObligations(req: Request, res: Response) {
     const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
 
     const [accountBalances, damageObligations] = await Promise.all([
       this.moneyService.getAccountBalances(clientToken, bookingId),
@@ -92,7 +92,7 @@ export default class MoneyController {
     const month: number = req.query.month === undefined ? now.getMonth() : +req.query.month
     const year: number = +req.query.year || now.getFullYear()
     const { prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const isPrivateCash = accountCode === AccountCode.PrivateCash
 
     const [accountBalances, allTransactions, addHoldFunds, withheldFunds] = await Promise.all([
