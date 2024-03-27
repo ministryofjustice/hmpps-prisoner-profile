@@ -306,5 +306,8 @@ export default {
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
+    newCourseAndQualificationHistoryEnabled: toBoolean(
+      get('NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED', false, requiredInProduction),
+    ),
   },
 }
