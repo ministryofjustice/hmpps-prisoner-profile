@@ -375,8 +375,8 @@ describe('professionalContactsService', () => {
           }),
           PrisonerContactBuilder({
             personId: 5,
-            relationship: ContactRelationship.YouthJusticeServices,
-            relationshipDescription: 'Youth Justice Services',
+            relationship: ContactRelationship.YouthJusticeService,
+            relationshipDescription: 'Youth Justice Service',
           }),
           PrisonerContactBuilder({
             personId: 6,
@@ -407,7 +407,7 @@ describe('professionalContactsService', () => {
       expect(response.find(contact => contact.relationshipDescription === 'CuSP Officer (backup)')).toBeTruthy()
       expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Worker')).toBeTruthy()
       expect(response.find(contact => contact.relationshipDescription === 'Resettlement Practitioner')).toBeTruthy()
-      expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Services')).toBeTruthy()
+      expect(response.find(contact => contact.relationshipDescription === 'Youth Justice Service')).toBeTruthy()
       expect(
         response.find(contact => contact.relationshipDescription === 'Youth Justice Service Case Manager'),
       ).toBeTruthy()

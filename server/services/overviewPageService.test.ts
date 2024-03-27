@@ -598,7 +598,7 @@ describe('OverviewPageService', () => {
         cuspOfficerBackup: 'Katie Testing',
         youthJusticeWorker: 'Emma Justice',
         resettlementPractitioner: 'Shauna Michaels',
-        youthJusticeServices: 'Outer York',
+        youthJusticeService: 'Outer York',
         youthJusticeServiceCaseManager: 'Barney Rubble',
         linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
       })
