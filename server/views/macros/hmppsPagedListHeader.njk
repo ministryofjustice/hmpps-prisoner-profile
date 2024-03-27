@@ -5,7 +5,9 @@
 {% macro hmppsPagedListHeader(listMetadata) %}
 <div class="hmpps-paged-list-header">
     <div class="govuk-!-display-none-print">
-        {{ hmppsSortSelector(listMetadata.sorting) }}
+        {% if listMetadata.sorting %}
+            {{ hmppsSortSelector(listMetadata.sorting) }}
+        {% endif %}
         {{ hmppsPagination(listMetadata.pagination) }}
     </div>
     <div>

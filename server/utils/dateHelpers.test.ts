@@ -1,4 +1,6 @@
+import { format, subDays, subMonths, subYears } from 'date-fns'
 import {
+  ageAsString,
   calculateEndDate,
   dateToIsoDate,
   formatDate,
@@ -169,5 +171,24 @@ describe('calculateEndDate', () => {
     [new Date('2023-01-02'), 'MONTHLY', 3, new Date('2023-03-02')],
   ])('Calculate end date from %s %s %s times', (date: Date, repeatPeriod: string, times: number, expected: Date) => {
     expect(calculateEndDate(date, repeatPeriod, times)).toEqual(expected)
+  })
+})
+
+describe('ageAsString', () => {
+  it.each([
+    [{ y: 18, m: 0, d: 0 }, '18 years old'],
+    [{ y: 1, m: 0, d: 0 }, '1 year old'],
+    [{ y: 0, m: 11, d: 0 }, '11 months old'],
+    [{ y: 0, m: 1, d: 0 }, '1 month old'],
+    [{ y: 0, m: 0, d: 12 }, '12 days old'],
+    [{ y: 0, m: 0, d: 1 }, '1 day old'],
+  ])('Calculate the age as a string for age %s', ({ y, m, d }, expected) => {
+    const dob = subDays(subMonths(subYears(new Date(), y), m), d)
+    const result = ageAsString(format(dob, 'yyyy-MM-dd'))
+    expect(result).toEqual(expected)
+  })
+
+  it('Defaults to 18', () => {
+    expect(ageAsString(undefined)).toEqual('18 years old')
   })
 })
