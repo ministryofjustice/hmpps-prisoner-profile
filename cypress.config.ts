@@ -19,6 +19,7 @@ import prisonerProfileDeliusApi from './integration_tests/mockApis/prisonerProfi
 import whereAboutsApi from './integration_tests/mockApis/whereAboutsApi'
 import complexityApi from './integration_tests/mockApis/complexityApi'
 import restrictedPatientApi from './integration_tests/mockApis/restrictedPatient'
+import prisonRegisterApi from './integration_tests/mockApis/prisonRegisterApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -56,6 +57,7 @@ export default defineConfig({
         ...whereAboutsApi,
         ...complexityApi,
         ...restrictedPatientApi,
+        ...prisonRegisterApi,
       })
     },
     baseUrl: 'http://localhost:3007',
