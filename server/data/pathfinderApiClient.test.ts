@@ -3,7 +3,7 @@ import config from '../config'
 import PathfinderApiRestClient from './pathfinderApiClient'
 import { PathfinderApiClient } from './interfaces/pathfinderApi/pathfinderApiClient'
 
-jest.mock('./tokenStore')
+jest.mock('./cache/tokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
