@@ -2,7 +2,7 @@ import { stubFor } from './wiremock'
 import { pomMock } from '../../server/data/localMockData/pom'
 
 export default {
-  stubPomData: (prisonerNumber: string) => {
+  stubPomData: ({ prisonerNumber, resp }: { prisonerNumber: string; resp?: never }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -13,7 +13,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pomMock,
+        jsonBody: resp !== undefined ? resp : pomMock,
       },
     })
   },

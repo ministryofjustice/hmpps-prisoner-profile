@@ -97,6 +97,11 @@
         {% endif %}
     {% endfor %}
 
+        {% if professionalContacts.length === 0 %}
+            <p data-qa="no-contacts-message">No professional contacts have been entered.</p>
+        {% endif %}
+
+        <a href="/prisoner/{{ prisonerNumber }}" class="govuk-link govuk-link--no-visited-state" data-qa="back-link">Return to prisoner's profile</a>
     </div>
 </div>
 
