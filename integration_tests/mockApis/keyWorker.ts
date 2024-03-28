@@ -2,7 +2,16 @@ import { stubFor } from './wiremock'
 import { keyWorkerMock } from '../../server/data/localMockData/keyWorker'
 
 export default {
-  stubKeyWorkerData: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
+  stubKeyWorkerData: ({
+    prisonerNumber,
+    notFound = false,
+    error = false,
+  }: {
+    prisonerNumber: string
+    notFound: boolean
+    error: boolean
+  }) => {
+    // eslint-disable-next-line no-nested-ternary
     const response = error
       ? {
           status: 500,
@@ -12,13 +21,22 @@ export default {
             httpStatusCode: 500,
           },
         }
-      : {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-          },
-          jsonBody: keyWorkerMock,
-        }
+      : notFound
+        ? {
+            status: 404,
+            headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+            jsonBody: {
+              errorMessage: 'Not found',
+              httpStatusCode: 404,
+            },
+          }
+        : {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+            },
+            jsonBody: keyWorkerMock,
+          }
     return stubFor({
       request: {
         method: 'GET',

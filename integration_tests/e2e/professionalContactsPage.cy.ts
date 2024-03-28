@@ -21,7 +21,7 @@ context('Professional contacts list page', () => {
     cy.task('stubGetOffenderContacts')
     cy.task('stubGetCommunityManager')
     cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU' })
-    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubPomData', { prisonerNumber: 'G6123VU' })
     cy.task('stubPersonAddresses')
     cy.task('stubPersonEmails')
     cy.task('stubPersonPhones')
@@ -67,6 +67,8 @@ context('Professional contacts list page', () => {
       .contains('07700000000')
       .contains('4444555566')
     firstPrisonContact.address().contains('Flat 7, premises address, street field')
+
+    professionalContactsPage.backLink().should('exist')
   })
 })
 
@@ -81,7 +83,7 @@ context('Professional contacts list page - with address not entered', () => {
     cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
     cy.task('stubGetCommunityManager')
     cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU' })
-    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubPomData', { prisonerNumber: 'G6123VU' })
     cy.task('stubPersonAddresses', [])
     cy.task('stubPersonEmails', [])
     cy.task('stubPersonPhones', [])
@@ -176,7 +178,7 @@ context('Professional contacts list page - given API to get key worker name fail
     cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
     cy.task('stubGetCommunityManager')
     cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', error: true })
-    cy.task('stubPomData', 'G6123VU')
+    cy.task('stubPomData', { prisonerNumber: 'G6123VU' })
     cy.task('stubPersonAddresses', [])
     cy.task('stubPersonEmails', [])
     cy.task('stubPersonPhones', [])
@@ -190,5 +192,31 @@ context('Professional contacts list page - given API to get key worker name fail
     const keyWorkerContact = professionalContactsPage.keyWorkerContact()
     keyWorkerContact.header().contains('Key Worker')
     keyWorkerContact.errorMessage().contains('We cannot show these details right now. Try again later.')
+  })
+})
+
+context('Professional contacts list page - no contacts', () => {
+  let professionalContactsPage: ProfessionalContactsPage
+
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubGetOffenderContacts', [])
+    cy.task('stubGetCommunityManager', null)
+    cy.task('stubKeyWorkerData', { prisonerNumber: 'G6123VU', notFound: true })
+    cy.task('stubPomData', { prisonerNumber: 'G6123VU', resp: null })
+    cy.task('stubPersonAddresses', [])
+    cy.task('stubPersonEmails', [])
+    cy.task('stubPersonPhones', [])
+    professionalContactsPage = visitProfessionalContactsPage()
+  })
+
+  it('should show no contacts message', () => {
+    professionalContactsPage.h1().contains('John Saunders’ professional contacts')
+    professionalContactsPage.contacts().should('have.length', 0)
+
+    professionalContactsPage.noContactsMessage().should('be.visible')
   })
 })

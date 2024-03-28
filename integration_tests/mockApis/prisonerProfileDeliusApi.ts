@@ -3,7 +3,7 @@ import { communityManagerMock } from '../../server/data/localMockData/communityM
 import { mockProbationDocumentsResponse } from '../../server/data/localMockData/deliusApi/probationDocuments'
 
 export default {
-  stubGetCommunityManager: () => {
+  stubGetCommunityManager: (resp?: never) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -14,7 +14,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: communityManagerMock,
+        jsonBody: resp !== undefined ? resp : communityManagerMock,
       },
     })
   },
