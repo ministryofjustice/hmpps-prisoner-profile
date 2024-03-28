@@ -18,6 +18,7 @@ describe('GuardMiddleware', () => {
       params: { prisonerNumber: 'G6123VU' },
       path: 'test/path',
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
     }
@@ -28,7 +29,6 @@ describe('GuardMiddleware', () => {
           userRoles: [Role.PrisonUser],
           caseLoads: CaseLoadsDummyDataA,
         },
-        clientToken: 'CLIENT_TOKEN',
       },
       render: jest.fn(),
     }

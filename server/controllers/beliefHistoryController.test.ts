@@ -19,6 +19,7 @@ describe('Prisoner belief history', () => {
   beforeEach(() => {
     req = {
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
@@ -36,7 +37,6 @@ describe('Prisoner belief history', () => {
           caseLoads: CaseLoadsDummyDataA,
           token: 'TOKEN',
         },
-        clientToken: 'CLIENT_TOKEN',
       },
       render: jest.fn(),
       status: jest.fn(),

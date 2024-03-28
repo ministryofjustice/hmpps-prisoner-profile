@@ -23,7 +23,7 @@ describe('Prisoner goals controller', () => {
     query: {} as Record<string, string>,
     headers: {} as Record<string, string>,
     session: {} as SessionData,
-    middleware: { prisonerData: {} },
+    middleware: { clientToken: 'token', prisonerData: {} },
     path: '',
     flash: jest.fn(),
   }
@@ -38,6 +38,7 @@ describe('Prisoner goals controller', () => {
     req.params = { prisonerNumber: 'A9999AA' }
     req.query = {}
     req.middleware = {
+      clientToken: 'CLIENT_TOKEN',
       prisonerData: PrisonerMockDataA,
     }
     req.headers = {
@@ -49,7 +50,6 @@ describe('Prisoner goals controller', () => {
     } as SessionData
 
     res.locals = {
-      clientToken: 'CLIENT_TOKEN',
       user: {
         userRoles: [Role.PrisonUser],
         staffId: 487023,
@@ -78,7 +78,7 @@ describe('Prisoner goals controller', () => {
 
       // Then
       expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', expectedView)
-      expect(getGoals).toHaveBeenCalledWith(res.locals.clientToken, req.middleware.prisonerData)
+      expect(getGoals).toHaveBeenCalledWith(req.middleware.clientToken, req.middleware.prisonerData)
     })
   })
 })

@@ -23,6 +23,7 @@ describe('Specific Prisoner Location History', () => {
   beforeEach(() => {
     req = {
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
       },
@@ -34,7 +35,6 @@ describe('Specific Prisoner Location History', () => {
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           userRoles: [],
           staffId: 487023,

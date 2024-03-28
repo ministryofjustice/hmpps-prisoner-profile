@@ -32,6 +32,7 @@ describe('Money Controller', () => {
       params: { prisonerNumber: 'A9999AA' },
       query: {},
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
       headers: {
@@ -45,7 +46,6 @@ describe('Money Controller', () => {
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           userRoles: [Role.PrisonUser],
           staffId: 487023,
@@ -120,11 +120,11 @@ describe('Money Controller', () => {
     await controller['getDamageObligations'](req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.bookingId,
     )
     expect(moneyService.getDamageObligations).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.prisonerNumber,
     )
     expect(mapToObligationTableRows).toHaveBeenCalledWith(damageObligationsMock, [AgenciesMock])
@@ -200,7 +200,7 @@ describe('Money Controller', () => {
     )
 
     expect(moneyService.getTransactions).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.prisonerNumber,
       AccountCode.Spends,
       0,
@@ -225,11 +225,11 @@ describe('Money Controller', () => {
     await controller['getTransactions'](AccountCode.Spends, 'Spends', Page.MoneySpends, req, res)
 
     expect(moneyService.getAccountBalances).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.bookingId,
     )
     expect(moneyService.getTransactions).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       req.middleware.prisonerData.prisonerNumber,
       AccountCode.Spends,
       month,

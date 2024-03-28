@@ -14,7 +14,7 @@ export default class ProbationDocumentsController {
   public async displayDocuments(req: Request, res: Response) {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const [communityDocuments] = await Promise.all([
-      this.probationDocumentsService.getDocuments(res.locals.clientToken, prisonerNumber),
+      this.probationDocumentsService.getDocuments(req.middleware.clientToken, prisonerNumber),
     ])
 
     this.auditService.sendPageView({
