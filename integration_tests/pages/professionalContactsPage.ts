@@ -106,4 +106,8 @@ export default class ProfessionalContactsPage extends Page {
       this.youthJusticeServiceCaseManager().panel().find('[data-qa="contact-details"]'),
     address: (): PageElement => this.youthJusticeServiceCaseManager().panel().find('[data-qa="contact-address"]'),
   })
+
+  noContactsMessage = (): PageElement => cy.get('[data-qa=no-contacts-message]')
+
+  backLink = (): PageElement => cy.get('[data-qa=back-link]')
 }
