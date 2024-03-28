@@ -53,7 +53,7 @@ import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 import { mockInmateAtLocation } from './localMockData/locationsInmates'
 import { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
 
-jest.mock('./tokenStore')
+jest.mock('./cache/tokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 

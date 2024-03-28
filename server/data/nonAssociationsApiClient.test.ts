@@ -4,7 +4,7 @@ import { NonAssociationsApiClient } from './interfaces/nonAssociationsApi/nonAss
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import { prisonerNonAssociationsMock } from './localMockData/prisonerNonAssociationsMock'
 
-jest.mock('./tokenStore')
+jest.mock('./cache/tokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
