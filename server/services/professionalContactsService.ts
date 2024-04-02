@@ -244,7 +244,7 @@ function mapPrisonApiContactToProfessionalContact(
     lastName,
     address: address
       ? { ...address, label: address.primary ? 'Main address' : 'Other address' }
-      : { label: 'Not entered', primary: true, noFixedAddress: false },
+      : { label: 'Not entered', primary: true, mail: false, noFixedAddress: false },
     emails: emails.map(email => email.email),
     phones: [...phones, ...(address?.phones ?? [])].map(phone => phone.number),
     relationshipDescription: contact.relationshipDescription,

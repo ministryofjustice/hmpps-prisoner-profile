@@ -38,6 +38,7 @@ $govuk-page-width: $moj-page-width;
 @import 'server/views/components/scheduledEvents/scheduledEvents';
 @import './pages/add-appointment';
 @import './pages/add-case-note';
+@import './pages/addresses';
 @import './pages/appointment-confirmation';
 @import './pages/alerts';
 @import './pages/belief-history';

@@ -159,3 +159,15 @@ export const calculateEndDate = (startDate: Date, repeatPeriod: string, times: n
       return null
   }
 }
+
+/**
+ * Formats an ISO-8601 date string as month and year for addresses, e.g. January 2023
+ *
+ * @param isoDate ISO-8601 format date string
+ * @returns formatted date string
+ */
+export const formatAddressDate = (isoDate: string): string => {
+  if (!isoDate) return ''
+
+  return format(isoDate, 'MMMM yyyy')
+}

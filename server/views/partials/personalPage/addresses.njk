@@ -11,9 +11,11 @@
           classes: 'govuk-summary-list--bottom-border',
           rows: addressSummary
       }) }}
-      <p class="govuk-body">Added on <span data-qa="address-added-on">{{ addresses.addedOn | formatDate }}</span></p>
+      <p class="govuk-body">From <span data-qa="address-added-on">{{ addresses.addedOn | formatAddressDate }}</span></p>
+      <p><a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses" data-qa="all-addresses-link">All addresses</a></p>
       {% elseif addresses and not addresses.isPrimaryAddress %}
         <p>No active, primary address entered.</p>
+        <p><a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/addresses" data-qa="all-addresses-link">All addresses</a></p>
       {% else %}
         <p>You cannot view this prisoner’s addresses.</p>
       {% endif %}

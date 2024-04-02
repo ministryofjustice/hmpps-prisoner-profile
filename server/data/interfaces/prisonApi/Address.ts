@@ -14,6 +14,7 @@ export default interface Address {
   country?: string
   comment?: string
   primary: boolean
+  mail: boolean
   noFixedAddress: boolean
   startDate?: string
   endDate?: string

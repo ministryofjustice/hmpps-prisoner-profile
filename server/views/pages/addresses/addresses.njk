@@ -1,0 +1,80 @@
+{% extends "../index.njk" %}
+
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: breadcrumbPrisonerName,
+        href: "/prisoner/" + prisonerNumber
+    }
+] %}
+
+{% block body %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">{{ prisonerName | apostrophe }} addresses</h1>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters hmpps-full-width-print address-cards">
+
+    {% if primaryAddress.rows.length > 0 %}
+    {%- call summaryCard({title: primaryAddressLabel, id: "primary-address"}) -%}
+        <div class="govuk-grid-row" data-qa="primary-address">
+            <div class="govuk-grid-column-full">
+                {{ govukSummaryList({
+                    classes: 'govuk-!-margin-bottom-0',
+                    rows: primaryAddress.rows
+                }) }}
+                <div class="govuk-body address-metadata">From <span data-qa="address-from">{{ primaryAddress.startDate | formatAddressDate }}</span></div>
+            </div>
+        </div>
+    {%- endcall -%}
+    {% endif %}
+
+    {% if mailAddress.rows.length > 0 %}
+    {%- call summaryCard({title: "Mail address", id: "mail-address"}) -%}
+        <div class="govuk-grid-row" data-qa="mail-address">
+            <div class="govuk-grid-column-full">
+                {{ govukSummaryList({
+                    classes: 'govuk-!-margin-bottom-0',
+                    rows: mailAddress.rows
+                }) }}
+                <div class="govuk-body address-metadata">From <span data-qa="address-from">{{ mailAddress.startDate | formatAddressDate }}</span></div>
+            </div>
+        </div>
+    {%- endcall -%}
+    {% endif %}
+
+    {% if otherAddresses.length > 0 %}
+    {%- call summaryCard({title: "Other active addresses", id: "other-addresses"}) -%}
+        {% for address in otherAddresses %}
+        {% set dividerClass = "address-section-divider" if not loop.last %}
+        <div class="govuk-grid-row" data-qa="other-address">
+            <div class="govuk-grid-column-full">
+                {{ govukSummaryList({
+                    classes: 'govuk-!-margin-bottom-0',
+                    rows: address.rows
+                }) }}
+                <div class="govuk-body address-metadata {{ dividerClass }}">From <span data-qa="address-from">{{ address.startDate | formatAddressDate }}</span></div>
+            </div>
+        </div>
+        {% endfor %}
+    {%- endcall -%}
+    {% endif %}
+
+    {% if primaryAddress.rows.length === 0 and mailAddress.rows.length === 0 and otherAddresses.length === 0 %}
+        <div data-qa="no-addresses-message">No addresses have been entered.</div>
+    {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
