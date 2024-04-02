@@ -1,7 +1,7 @@
 import PrisonRegisterStore from './prisonRegisterStore'
-import { RedisClient } from './redisClient'
-import { PrisonDto } from './interfaces/prisonRegisterApi/prisonRegisterApiTypes'
-import { prisonsKeyedByPrisonId } from './localMockData/prisonRegisterMockData'
+import { RedisClient } from '../redisClient'
+import { PrisonDto } from '../interfaces/prisonRegisterApi/prisonRegisterApiTypes'
+import { prisonsKeyedByPrisonId } from '../localMockData/prisonRegisterMockData'
 
 const redisClient = {
   on: jest.fn(),
@@ -9,12 +9,6 @@ const redisClient = {
   set: jest.fn(),
   connect: jest.fn(),
 }
-
-const allPrisons: Array<PrisonDto> = [
-  prisonsKeyedByPrisonId['AKI'], // not an active prison
-  prisonsKeyedByPrisonId['ASI'], // an active prison
-  prisonsKeyedByPrisonId['MDI'], // an active prison
-]
 
 const activePrisons: Array<PrisonDto> = [
   prisonsKeyedByPrisonId['ASI'], // an active prison
@@ -38,7 +32,7 @@ describe('prisonRegisterStore', () => {
     const durationDays = 2
 
     // When
-    await prisonRegisterStore.setActivePrisons(allPrisons, durationDays)
+    await prisonRegisterStore.setActivePrisons(activePrisons, durationDays)
 
     // Then
     expect(redisClient.set).toHaveBeenCalledWith(

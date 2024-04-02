@@ -1,6 +1,6 @@
-import { RedisClient } from './redisClient'
-import { PrisonDto } from './interfaces/prisonRegisterApi/prisonRegisterApiTypes'
-import logger from '../../logger'
+import { PrisonDto } from '../interfaces/prisonRegisterApi/prisonRegisterApiTypes'
+import { RedisClient } from '../redisClient'
+import logger from '../../../logger'
 
 const ACTIVE_PRISONS = 'activePrisons'
 
@@ -17,9 +17,8 @@ export default class PrisonRegisterStore {
     }
   }
 
-  async setActivePrisons(prisons: Array<PrisonDto>, durationDays = 1): Promise<string> {
+  async setActivePrisons(activePrisons: Array<PrisonDto>, durationDays = 1): Promise<string> {
     await this.ensureConnected()
-    const activePrisons = prisons.filter(prison => prison.active === true)
     return this.client.set(ACTIVE_PRISONS, JSON.stringify(activePrisons), { EX: durationDays * 24 * 60 * 60 })
   }
 
