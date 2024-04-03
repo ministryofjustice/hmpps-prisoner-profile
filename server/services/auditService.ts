@@ -10,6 +10,7 @@ export enum Page {
   AddAlert = 'ADD_ALERT',
   AddAppointment = 'ADD_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
+  Addresses = 'ADDRESSES',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
   AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',

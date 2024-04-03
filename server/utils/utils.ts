@@ -2,7 +2,6 @@ import { differenceInMonths, parse } from 'date-fns'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { SortOption } from '../interfaces/SortParams'
-import Address from '../services/interfaces/personalPageService/Address'
 import HmppsError from '../interfaces/HmppsError'
 import ListMetadata from '../interfaces/ListMetadata'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
@@ -14,6 +13,9 @@ import { type OverviewNonAssociation } from '../services/interfaces/overviewPage
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import GovSummaryItem from '../interfaces/GovSummaryItem'
+import Address from '../data/interfaces/prisonApi/Address'
+import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -328,7 +330,15 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
 export const formatCurrency = (number: number, currency: string): string =>
   typeof number === 'number' ? number.toLocaleString('en-GB', { style: 'currency', currency: currency || 'GBP' }) : ''
 
-export const addressToLines = ({ flat, premise, street, town, county, postalCode, country }: Address): string[] => {
+export const addressToLines = ({
+  flat,
+  premise,
+  street,
+  town,
+  county,
+  postalCode,
+  country,
+}: Addresses['address']): string[] => {
   let lineOne = [premise, street].filter(s => s).join(', ')
   if (flat) {
     lineOne = `Flat ${flat}, ${lineOne}`
@@ -612,6 +622,46 @@ export const putLastNameFirst = (firstName: string, lastName: string): string =>
   if (firstName && !lastName) return properCaseName(firstName)
 
   return `${properCaseName(lastName)}, ${properCaseName(firstName)}`
+}
+
+export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {
+  if (!address) return []
+
+  const addressSummary = {
+    key: { text: 'Address' },
+    value: { html: address.noFixedAddress ? 'No fixed address' : addressToLines(address).join('<br/>') },
+    classes: 'govuk-summary-list__row--no-border',
+  }
+
+  const addressUsage = {
+    key: { text: 'Type of address' },
+    value: {
+      html: address.addressUsages.filter(usage => usage.activeFlag).length
+        ? address.addressUsages
+            .filter(usage => usage.activeFlag)
+            .map(usage => usage.addressUsageDescription)
+            .join('<br/>')
+        : 'Not entered',
+    },
+  }
+
+  const phones = address.phones?.length
+    ? {
+        key: { text: 'Phone' },
+        value: {
+          html: address.phones.map(phone => phone.number).join('<br/>'),
+        },
+      }
+    : undefined
+
+  const comment = address.comment
+    ? {
+        key: { text: 'Comment' },
+        value: { text: address.comment },
+      }
+    : undefined
+
+  return [addressSummary, addressUsage, phones, comment].filter(Boolean)
 }
 
 export const apiErrorMessage = 'We cannot show these details right now. Try again later.'

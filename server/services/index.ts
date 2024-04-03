@@ -25,6 +25,7 @@ import PersonalLearningPlanServiceFactory from './personalLearningPlanServiceFac
 import ProbationDocumentsService from './probationDocumentsService'
 import OffencesService from './offencesService'
 import { VisitsService } from './visitsService'
+import AddressService from './addressService'
 
 export const services = () => {
   const {
@@ -100,6 +101,7 @@ export const services = () => {
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
   const visitsService = new VisitsService(prisonApiClientBuilder)
+  const addressService = new AddressService(prisonApiClientBuilder)
 
   return {
     dataAccess,
@@ -131,6 +133,7 @@ export const services = () => {
     probationDocumentsService,
     offencesService,
     visitsService,
+    addressService,
   }
 }
 

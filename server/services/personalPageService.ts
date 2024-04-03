@@ -11,7 +11,7 @@ import PersonalPage, {
   ReasonableAdjustment as PersonalPageReasonableAdjustment,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { addressToLines, formatName, calculateAge } from '../utils/utils'
+import { addressToLines, calculateAge, formatName } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
   getOffenderIdentifierValue,
@@ -108,6 +108,7 @@ export default class PersonalPageService {
       addressSummary.push({
         key: { text: 'Address' },
         value: { html: addressToLines(addresses.address).join('<br/>') },
+        classes: 'govuk-summary-list__row--no-border',
       })
       addressSummary.push({
         key: { text: 'Type of address' },
