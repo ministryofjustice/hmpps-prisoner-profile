@@ -44,6 +44,7 @@ const mockAddress = (overrides?: Partial<Address>): Address => ({
   noFixedAddress: false,
   premise: 'Address',
   primary: true,
+  mail: false,
   ...overrides,
 })
 
@@ -170,6 +171,7 @@ describe('professionalContactsService', () => {
             noFixedAddress: false,
             premise: 'Address',
             primary: true,
+            mail: false,
           },
           emails: ['e@mail.com'],
           firstName: 'John',
@@ -242,6 +244,7 @@ describe('professionalContactsService', () => {
             noFixedAddress: false,
             premise: 'Address',
             primary: true,
+            mail: false,
           },
           emails: ['e@mail.com'],
           firstName: 'John',

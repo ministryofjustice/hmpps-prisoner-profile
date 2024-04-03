@@ -127,7 +127,7 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)
   cy.task('stubProperty', bookingId)
-  cy.task('stubAddresses', prisonerNumber)
+  cy.task('stubAddresses', { prisonerNumber })
   cy.task('stubOffenderContacts', prisonerNumber)
   cy.task('stubPersonAddresses')
   cy.task('stubImages')

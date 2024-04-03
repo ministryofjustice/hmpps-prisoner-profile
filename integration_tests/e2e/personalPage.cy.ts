@@ -37,7 +37,7 @@ context('When signed in', () => {
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubSecondaryLanguages', 1102484)
       cy.task('stubProperty', 1102484)
-      cy.task('stubAddresses', 'G6123VU')
+      cy.task('stubAddresses', { prisonerNumber: 'G6123VU' })
       cy.task('stubOffenderContacts', 'G6123VU')
       cy.task('stubPersonAddresses')
       cy.task('stubImages')
@@ -211,7 +211,7 @@ context('When signed in', () => {
         page.addresess().phoneNumbers().should('include.text', '0800 222333')
 
         page.addresess().comments().should('include.text', mockAddresses[0].comment)
-        page.addresess().addedOn().should('include.text', '1 May 2020')
+        page.addresess().addedOn().should('include.text', 'May 2020')
       })
     })
 

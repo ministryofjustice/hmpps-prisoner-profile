@@ -4,6 +4,7 @@ import nunjucks from 'nunjucks'
 import express from 'express'
 import {
   addressToLines,
+  addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
   findError,
@@ -22,7 +23,7 @@ import {
   userHasRoles,
 } from './utils'
 import { pluralise } from './pluralise'
-import { formatDate, formatDateTime, timeFormat } from './dateHelpers'
+import { formatAddressDate, formatDate, formatDateTime, timeFormat } from './dateHelpers'
 import config from '../config'
 import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
 import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
@@ -152,4 +153,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCsraAssessmentSummaryList', mapCsraReviewToSummaryList)
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
   njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
+  njkEnv.addFilter('formatAddressDate', formatAddressDate)
+  njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
 }

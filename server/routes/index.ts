@@ -26,6 +26,7 @@ import locationDetailsRouter from './locationDetailsRouter'
 import { getRequest } from './routerUtils'
 import probationDocumentsRouter from './probationDocumentsRouter'
 import visitsRouter from './visitsRouter'
+import addressRouter from './addressRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -232,6 +233,7 @@ export default function routes(services: Services): Router {
   router.use(locationDetailsRouter(services))
   router.use(probationDocumentsRouter(services))
   router.use(visitsRouter(services))
+  router.use(addressRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/schedule',

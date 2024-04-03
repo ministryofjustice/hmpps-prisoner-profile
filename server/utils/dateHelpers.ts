@@ -195,3 +195,15 @@ export const ageAsString = (dateOfBirth?: string): string => {
   }
   return `${pluralise(ageInYears, 'year')} old`
 }
+
+/**
+ * Formats an ISO-8601 date string as month and year for addresses, e.g. January 2023
+ *
+ * @param isoDate ISO-8601 format date string
+ * @returns formatted date string
+ */
+export const formatAddressDate = (isoDate: string): string => {
+  if (!isoDate) return ''
+
+  return format(isoDate, 'MMMM yyyy')
+}
