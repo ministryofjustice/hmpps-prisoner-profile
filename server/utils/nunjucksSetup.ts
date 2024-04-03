@@ -4,6 +4,7 @@ import nunjucks from 'nunjucks'
 import express from 'express'
 import {
   addressToLines,
+  addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
   findError,
@@ -153,4 +154,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
   njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
   njkEnv.addFilter('formatAddressDate', formatAddressDate)
+  njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
 }

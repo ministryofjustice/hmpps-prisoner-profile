@@ -270,7 +270,7 @@ export default {
     })
   },
 
-  stubAddresses: ({ prisonerNumber, resp }: { prisonerNumber: string; resp?: never }) => {
+  stubAddresses: ({ prisonerNumber, resp = mockAddresses }: { prisonerNumber: string; resp: unknown }) => {
     return stubFor({
       request: {
         method: 'GET',
@@ -281,7 +281,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: resp !== undefined ? resp : mockAddresses,
+        jsonBody: resp,
       },
     })
   },

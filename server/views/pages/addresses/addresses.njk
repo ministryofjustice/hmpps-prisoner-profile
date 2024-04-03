@@ -25,13 +25,13 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters hmpps-full-width-print address-cards">
 
-    {% if primaryAddress.rows.length > 0 %}
+    {% if primaryAddress %}
     {%- call summaryCard({title: primaryAddressLabel, id: "primary-address"}) -%}
         <div class="govuk-grid-row" data-qa="primary-address">
             <div class="govuk-grid-column-full">
                 {{ govukSummaryList({
                     classes: 'govuk-!-margin-bottom-0',
-                    rows: primaryAddress.rows
+                    rows: primaryAddress | addressToSummaryItems
                 }) }}
                 <div class="govuk-body address-metadata">From <span data-qa="address-from">{{ primaryAddress.startDate | formatAddressDate }}</span></div>
             </div>
@@ -39,13 +39,13 @@
     {%- endcall -%}
     {% endif %}
 
-    {% if mailAddress.rows.length > 0 %}
+    {% if mailAddress %}
     {%- call summaryCard({title: "Mail address", id: "mail-address"}) -%}
         <div class="govuk-grid-row" data-qa="mail-address">
             <div class="govuk-grid-column-full">
                 {{ govukSummaryList({
                     classes: 'govuk-!-margin-bottom-0',
-                    rows: mailAddress.rows
+                    rows: mailAddress | addressToSummaryItems
                 }) }}
                 <div class="govuk-body address-metadata">From <span data-qa="address-from">{{ mailAddress.startDate | formatAddressDate }}</span></div>
             </div>
@@ -61,7 +61,7 @@
             <div class="govuk-grid-column-full">
                 {{ govukSummaryList({
                     classes: 'govuk-!-margin-bottom-0',
-                    rows: address.rows
+                    rows: address | addressToSummaryItems
                 }) }}
                 <div class="govuk-body address-metadata {{ dividerClass }}">From <span data-qa="address-from">{{ address.startDate | formatAddressDate }}</span></div>
             </div>
@@ -70,7 +70,7 @@
     {%- endcall -%}
     {% endif %}
 
-    {% if primaryAddress.rows.length === 0 and mailAddress.rows.length === 0 and otherAddresses.length === 0 %}
+    {% if not primaryAddress and not mailAddress and otherAddresses.length === 0 %}
         <div data-qa="no-addresses-message">No addresses have been entered.</div>
     {% endif %}
 

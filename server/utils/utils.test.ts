@@ -1,5 +1,6 @@
 import {
   addressToLines,
+  addressToSummaryItems,
   apostrophe,
   arrayToQueryString,
   calculateAge,
@@ -37,7 +38,6 @@ import {
   userHasRoles,
 } from './utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import Address from '../services/interfaces/personalPageService/Address'
 import HmppsError from '../interfaces/HmppsError'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
@@ -49,6 +49,9 @@ import {
 } from '../data/localMockData/personalCareNeedsMock'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
+import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import Address from '../data/interfaces/prisonApi/Address'
+import GovSummaryItem from '../interfaces/GovSummaryItem'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -304,7 +307,7 @@ describe('utils', () => {
 
   describe('Address to lines', () => {
     it('Maps a full address', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         flat: '7',
         premise: 'premises address',
         street: 'street field',
@@ -324,7 +327,7 @@ describe('utils', () => {
     })
 
     it('Maps a partial address', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         premise: 'premises address',
         street: 'street field',
         locality: 'locality field',
@@ -341,7 +344,7 @@ describe('utils', () => {
     })
 
     it('does not return a country on its own', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         country: 'England',
       }
 
@@ -350,7 +353,7 @@ describe('utils', () => {
     })
 
     it('does return single lines that are not country', () => {
-      const address: Address = {
+      const address: Addresses['address'] = {
         premise: 'premises address',
       }
 
@@ -727,6 +730,72 @@ describe('utils', () => {
         [group1Key]: [group1Item1, group1Item2],
         [group2Key]: [group2Item1],
       })
+    })
+  })
+
+  describe('address to summary items', () => {
+    it.each([
+      [
+        'Full normal address',
+        {
+          primary: true,
+          mail: true,
+          noFixedAddress: false,
+          startDate: '2024-01-01',
+          street: 'Street',
+          town: 'Town',
+          postalCode: 'AB1 1AB',
+          phones: [{ type: 'HOME', number: '1234567890' }],
+          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: true }],
+          comment: 'Comment',
+        } as Address,
+        [
+          {
+            key: { text: 'Address' },
+            value: { html: 'Street<br/>Town<br/>AB1 1AB' },
+            classes: 'govuk-summary-list__row--no-border',
+          },
+          {
+            key: { text: 'Type of address' },
+            value: { html: 'Reception' },
+          },
+          {
+            key: { text: 'Phone' },
+            value: { html: '1234567890' },
+          },
+          {
+            key: { text: 'Comment' },
+            value: { text: 'Comment' },
+          },
+        ],
+      ],
+      [
+        'No fixed address with no phone or comment',
+        {
+          primary: true,
+          mail: true,
+          noFixedAddress: true,
+          startDate: '2024-01-01',
+          street: 'Street',
+          town: 'Town',
+          postalCode: 'AB1 1AB',
+          addressUsages: [{ addressUsage: 'RECEP', addressUsageDescription: 'Reception', activeFlag: false }],
+        } as Address,
+        [
+          {
+            key: { text: 'Address' },
+            value: { html: 'No fixed address' },
+            classes: 'govuk-summary-list__row--no-border',
+          },
+          {
+            key: { text: 'Type of address' },
+            value: { html: 'Not entered' },
+          },
+        ],
+      ],
+      ['No address', null, []],
+    ])('%s: addressToSummaryItems(%s, %s, %s)', (_: string, address: Address, expected: GovSummaryItem[]) => {
+      expect(addressToSummaryItems(address)).toEqual(expected)
     })
   })
 })
