@@ -27,7 +27,6 @@ describe('Visits controller', () => {
         ],
         visitsWithPaginationInfo: pagedVisitsMock,
       })),
-      calculateStatus: jest.fn(),
     } as any
 
     req = {

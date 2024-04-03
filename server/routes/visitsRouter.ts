@@ -15,7 +15,7 @@ export default function visitsRouter(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/visits-details',
     auditPageAccessAttempt({ services, page: Page.VisitDetails }),
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     checkPrisonerInCaseload(),
     visitsController.visitsDetails(),
   )

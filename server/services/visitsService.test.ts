@@ -62,6 +62,14 @@ describe('visitsService', () => {
       const result = await service.getVisits('', prisoner, {} as VisitsListQueryParams)
       expect(result.visitsWithPaginationInfo).toEqual(mockVisits)
     })
+
+    it('Zero indexes the page', async () => {
+      await service.getVisits('', prisoner, { page: 1 } as VisitsListQueryParams)
+      expect(prisonApiClient.getVisitsForBookingWithVisitors).toHaveBeenCalledWith(
+        prisoner.bookingId,
+        expect.objectContaining({ page: 0 }),
+      )
+    })
   })
 
   describe('Sort visitors', () => {

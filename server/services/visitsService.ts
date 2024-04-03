@@ -1,7 +1,7 @@
-import { differenceInYears, isAfter } from 'date-fns'
+import { differenceInYears } from 'date-fns'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { VisitDetails, Visitor } from '../data/interfaces/prisonApi/VisitWithVisitors'
+import { Visitor } from '../data/interfaces/prisonApi/VisitWithVisitors'
 import { compareStrings, sortByDateTime } from '../utils/utils'
 import { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
@@ -35,34 +35,17 @@ export class VisitsService {
       .sort(sortFunc)
   }
 
-  public calculateStatus({
-    cancelReasonDescription,
-    completionStatusDescription,
-    completionStatus,
-    searchTypeDescription,
-    startTime,
-  }: VisitDetails) {
-    switch (completionStatus) {
-      case 'CANC':
-        return { status: 'Cancelled', subStatus: cancelReasonDescription }
-      case 'SCH': {
-        if (isAfter(new Date(startTime), new Date())) return { status: 'Scheduled' }
-        return { status: searchTypeDescription || 'Not entered' }
-      }
-      default:
-        return { status: completionStatusDescription, subStatus: searchTypeDescription }
-    }
-  }
-
   public async getVisits(token: string, prisonerData: Prisoner, visitsQuery: VisitsListQueryParams) {
     const { bookingId } = prisonerData
+    const apiParams = { ...visitsQuery }
+    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
 
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const [completionReasons, cancellationReasons, prisons, visitsWithVisitors] = await Promise.all([
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.VisitCompletionReasons),
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.VisitCancellationReasons),
       prisonApiClient.getVisitsPrisons(bookingId),
-      prisonApiClient.getVisitsForBookingWithVisitors(bookingId, visitsQuery),
+      prisonApiClient.getVisitsForBookingWithVisitors(bookingId, apiParams),
     ])
 
     return {
