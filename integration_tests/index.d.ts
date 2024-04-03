@@ -2,6 +2,7 @@ import CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
 import StaffRole from '../server/data/interfaces/prisonApi/StaffRole'
 import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
 import { ComplexityLevel } from '../server/data/interfaces/complexityApi/ComplexityOfNeed'
+import VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
 
 declare global {
   namespace Cypress {
@@ -63,6 +64,11 @@ declare global {
           firstName: string
           lastName: string
         }[]
+      }): Chainable<AUTWindow>
+      setupVisitsDetailsPageStubs(options: {
+        prisonerNumber: string
+        bookingId: number
+        visitsOverrides?: VisitWithVisitors[]
       }): Chainable<AUTWindow>
     }
   }

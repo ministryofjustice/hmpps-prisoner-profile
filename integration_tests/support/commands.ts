@@ -1,6 +1,7 @@
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
+import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -198,3 +199,11 @@ Cypress.Commands.add(
     })
   },
 )
+
+Cypress.Commands.add('setupVisitsDetailsPageStubs', ({ prisonerNumber, bookingId, visitsOverrides }) => {
+  cy.task('stubPrisonerData', { prisonerNumber })
+  cy.task('stubReferenceCodeDomain', { referenceDomain: ReferenceCodeDomain.VisitCompletionReasons })
+  cy.task('stubReferenceCodeDomain', { referenceDomain: ReferenceCodeDomain.VisitCancellationReasons })
+  cy.task('stubVisitsWithVisitors', { bookingId, visitsOverrides })
+  cy.task('stubVisitPrisons', { bookingId })
+})

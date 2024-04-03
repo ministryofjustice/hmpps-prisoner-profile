@@ -15,4 +15,6 @@ export default interface ReferenceCode {
 export enum ReferenceCodeDomain {
   Health = 'HEALTH',
   HealthTreatments = 'HEALTH_TREAT',
+  VisitCompletionReasons = 'VIS_COMPLETE',
+  VisitCancellationReasons = 'MOVE_CANC_RS',
 }

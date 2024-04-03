@@ -4,7 +4,7 @@
     {% else %}
         <p class="moj-pagination__results"><b>0</b> {{ params.totalElements | pluralise(params.itemDescription, { includeCount: false }) }}</p>
     {% endif %}
-    {% if params.totalPages > 1 and not params.showingAll %}
+    {% if params.totalPages > 1 and not params.showingAll and params.enableShowAll %}
         <div class="hmpps-pagination-view-all govuk-!-display-none-print"><a href="{{ params.viewAllUrl }}" class="govuk-link govuk-link--no-visited-state">View all {{ params.totalElements | pluralise(params.itemDescription, { includeCount: false }) }}</a></div>
     {% endif %}
 {% endmacro %}

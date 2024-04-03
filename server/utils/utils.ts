@@ -217,8 +217,9 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
   pagedList: PagedList<PagedListItem>,
   queryParams: T,
   itemDescription: string,
-  sortOptions: SortOption[],
-  sortLabel: string,
+  sortOptions?: SortOption[],
+  sortLabel?: string,
+  enableShowAll?: boolean,
 ): ListMetadata<T> => {
   const query = mapToQueryString(queryParams)
   const currentPage = pagedList?.pageable ? pagedList.pageable.pageNumber + 1 : undefined
@@ -294,16 +295,19 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
       ...queryParams,
       queryParams: { sort: queryParams.sort },
     },
-    sorting: {
-      id: 'sort',
-      label: sortLabel,
-      options: sortOptions,
-      sort: queryParams.sort,
-      queryParams: {
-        ...queryParams,
-        sort: undefined,
-      },
-    },
+    sorting:
+      sortOptions && sortLabel
+        ? {
+            id: 'sort',
+            label: sortLabel,
+            options: sortOptions,
+            sort: queryParams.sort,
+            queryParams: {
+              ...queryParams,
+              sort: undefined,
+            },
+          }
+        : null,
     pagination: {
       itemDescription,
       previous,
@@ -316,6 +320,7 @@ export const generateListMetadata = <T extends PagedListQueryParams>(
       elementsOnPage: pagedList?.numberOfElements,
       pages,
       viewAllUrl,
+      enableShowAll: enableShowAll === undefined ? false : enableShowAll,
     },
   }
 }
@@ -610,3 +615,5 @@ export const putLastNameFirst = (firstName: string, lastName: string): string =>
 }
 
 export const apiErrorMessage = 'We cannot show these details right now. Try again later.'
+
+export const compareStrings = (l: string, r: string): number => l.localeCompare(r, 'en', { ignorePunctuation: true })
