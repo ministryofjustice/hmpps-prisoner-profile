@@ -37,16 +37,9 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) => {
-      switch (domain) {
-        case ReferenceCodeDomain.Health:
-          return mockReferenceDomains.health
-        case ReferenceCodeDomain.HealthTreatments:
-          return mockReferenceDomains.healthTreatment
-        default:
-          return []
-      }
-    })
+    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) =>
+      mockReferenceDomains(domain),
+    )
     prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
     prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)

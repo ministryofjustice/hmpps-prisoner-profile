@@ -4,7 +4,7 @@ export default interface ListMetadata<TGeneric> {
   filtering: {
     queryParams?: { [key: string]: string | number | boolean }
   } & TGeneric
-  sorting: SortParams
+  sorting?: SortParams
   pagination: {
     itemDescription: string
     previous: { href: string; text: string }

@@ -115,6 +115,7 @@ export default class CaseNotesService {
         'case note',
         sortOptions,
         'Sort by',
+        true,
       ),
       caseNoteTypes,
       fullName: prisonerFullName,

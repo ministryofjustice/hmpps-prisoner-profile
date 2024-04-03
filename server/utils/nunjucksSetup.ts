@@ -27,6 +27,7 @@ import config from '../config'
 import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
 import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
 import mapCsraQuestionsToSummaryList from '../mappers/csraQuestionsToSummaryListMapper'
+import visitsWithVisitorsToListMapper from '../mappers/visitsWithVisitorsToListMapper'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -110,6 +111,16 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       })),
   )
 
+  njkEnv.addFilter(
+    'setChecked',
+    (items: { value: string; text: string }[], checked: string[]) =>
+      items &&
+      items.map(entry => ({
+        ...entry,
+        checked: entry && checked.includes(String(entry.value)),
+      })),
+  )
+
   njkEnv.addFilter('apostrophe', apostrophe)
   njkEnv.addFilter('prependBaseUrl', prependBaseUrl)
   njkEnv.addFilter('prependHmppsAuthBaseUrl', prependHmppsAuthBaseUrl)
@@ -140,4 +151,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatName', formatName)
   njkEnv.addFilter('toCsraAssessmentSummaryList', mapCsraReviewToSummaryList)
   njkEnv.addFilter('toCsraQuestionsSummaryList', mapCsraQuestionsToSummaryList)
+  njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
 }
