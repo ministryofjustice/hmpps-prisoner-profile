@@ -58,6 +58,7 @@ Cypress.Commands.add(
     cy.task('stubPrisonerDetail', prisonerNumber)
     cy.task('stubAlertDetails')
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
+    cy.task('stubGetLatestCalculation', { prisonerNumber })
   },
 )
 

@@ -65,6 +65,7 @@ generic-service:
     RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api.hmpps.service.justice.gov.uk"
     CCRD_UI_URL: "https://court-cases-release-dates.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register.hmpps.service.justice.gov.uk"
+    CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"

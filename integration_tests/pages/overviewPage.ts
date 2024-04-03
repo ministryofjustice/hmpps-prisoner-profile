@@ -216,5 +216,21 @@ export default class OverviewPage extends Page {
 
       placeHolderText: (): PageElement => cy.get('[data-qa="overview-next-court-appearance"] > :nth-child(2)'),
     }),
+    latestCalculation: () => ({
+      dateOfCalculation: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-latest-calculation"] > .govuk-summary-list > :nth-child(1) > .govuk-summary-list__value',
+        ),
+      establishment: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-latest-calculation"] > .govuk-summary-list > :nth-child(2) > .govuk-summary-list__value',
+        ),
+      reason: (): PageElement =>
+        cy.get(
+          '[data-qa="overview-latest-calculation"] > .govuk-summary-list > :nth-child(3) > .govuk-summary-list__value',
+        ),
+
+      placeHolderText: (): PageElement => cy.get('[data-qa="overview-latest-calculation"] > :nth-child(2)'),
+    }),
   })
 }

@@ -1,14 +1,19 @@
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import OffencesService from './offencesService'
+import { calculateReleaseDatesApiClientMock } from '../../tests/mocks/calculateReleaseDatesApiClientMock'
+import CalculateReleaseDatesApiClient from '../data/interfaces/calculateReleaseDatesApi/calculateReleaseDatesApiClient'
+import { latestCalculation, latestCalculationWithNomisSource } from '../data/localMockData/latestCalculationMock'
 
 jest.mock('../data/prisonApiClient')
 
 describe('offencesService', () => {
   let prisonApiClientSpy: PrisonApiClient
+  let calculateReleaseDatesApiClientSpy: CalculateReleaseDatesApiClient
 
   beforeEach(() => {
     prisonApiClientSpy = prisonApiClientMock()
+    calculateReleaseDatesApiClientSpy = calculateReleaseDatesApiClientMock()
   })
 
   afterEach(() => {
@@ -24,7 +29,10 @@ describe('offencesService', () => {
         startTime: '2021-01-01T00:00:00',
       })
 
-      const offencesService = new OffencesService(() => prisonApiClientSpy)
+      const offencesService = new OffencesService(
+        () => prisonApiClientSpy,
+        () => calculateReleaseDatesApiClientSpy,
+      )
 
       const result = await offencesService.getNextCourtHearingSummary('token', 1)
 
@@ -39,7 +47,10 @@ describe('offencesService', () => {
     it('should return null if there is no next court appearance', async () => {
       prisonApiClientSpy.getNextCourtEvent = jest.fn().mockResolvedValue({})
 
-      const offencesService = new OffencesService(() => prisonApiClientSpy)
+      const offencesService = new OffencesService(
+        () => prisonApiClientSpy,
+        () => calculateReleaseDatesApiClientSpy,
+      )
 
       const result = await offencesService.getNextCourtHearingSummary('token', 1)
 
@@ -51,11 +62,48 @@ describe('offencesService', () => {
     it('should return the active court cases count', async () => {
       prisonApiClientSpy.getActiveCourtCasesCount = jest.fn().mockResolvedValue(1)
 
-      const offencesService = new OffencesService(() => prisonApiClientSpy)
+      const offencesService = new OffencesService(
+        () => prisonApiClientSpy,
+        () => calculateReleaseDatesApiClientSpy,
+      )
 
       const result = await offencesService.getActiveCourtCasesCount('token', 1)
 
       expect(result).toEqual(1)
+    })
+  })
+
+  describe('getLatestReleaseCalculation', () => {
+    it('should return the response mapped to LatestCalculationSummary', async () => {
+      calculateReleaseDatesApiClientSpy.getLatestCalculation = jest.fn().mockResolvedValue(latestCalculation)
+      const offencesService = new OffencesService(
+        () => prisonApiClientSpy,
+        () => calculateReleaseDatesApiClientSpy,
+      )
+
+      const result = await offencesService.getLatestReleaseCalculation('token', 'prisonNumber')
+      expect(result).toEqual({
+        calculationDate: '2024-03-07T15:16:14',
+        establishment: 'Kirkham (HMP)',
+        reason: 'Correcting an earlier sentence',
+      })
+    })
+
+    it('should return null for establishment if source is NOMIS', async () => {
+      calculateReleaseDatesApiClientSpy.getLatestCalculation = jest
+        .fn()
+        .mockResolvedValue(latestCalculationWithNomisSource)
+      const offencesService = new OffencesService(
+        () => prisonApiClientSpy,
+        () => calculateReleaseDatesApiClientSpy,
+      )
+
+      const result = await offencesService.getLatestReleaseCalculation('token', 'prisonNumber')
+      expect(result).toEqual({
+        calculationDate: '2024-03-07T15:16:14',
+        establishment: null,
+        reason: 'Correcting an earlier sentence',
+      })
     })
   })
 })

@@ -3,10 +3,12 @@ import CourtAppearanceSummary from '../../services/interfaces/offencesService/Co
 import { Role } from '../../data/enums/role'
 import { userHasRoles } from '../../utils/utils'
 import config from '../../config'
+import LatestCalculationSummary from '../../services/interfaces/offencesService/LatestCalculationSummary'
 
 export default function mapCourtCaseSummary(
   nextCourtCaseAppearance: CourtAppearanceSummary,
   activeCourtCasesCount: number,
+  latestCalculation: LatestCalculationSummary | null,
   userRoles: Role[],
   prisonerNumber: string,
 ): CourtCaseSummary | null {
@@ -16,6 +18,7 @@ export default function mapCourtCaseSummary(
   return {
     nextCourtAppearance: nextCourtCaseAppearance,
     activeCourtCasesCount,
+    latestCalculation,
     link: {
       text: userHasRoles([Role.AdjustmentsMaintainer], userRoles)
         ? 'Court cases and release dates'
