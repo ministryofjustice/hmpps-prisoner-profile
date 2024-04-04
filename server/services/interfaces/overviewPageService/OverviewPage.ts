@@ -5,8 +5,8 @@ import Status from './Status'
 import NonAssociationSummary from './NonAssociationSummary'
 
 export default interface OverviewPage {
-  miniSummaryGroupA: MiniSummary[]
-  miniSummaryGroupB: MiniSummary[]
+  moneyVisitsAdjudicationsGroup: MiniSummary[]
+  categoryIncentiveCsraGroup: MiniSummary[]
   statuses: Status[]
   nonAssociationSummary: NonAssociationSummary
   personalDetails: PersonalDetails
