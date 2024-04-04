@@ -239,6 +239,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/add-alert',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -251,7 +252,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
@@ -309,6 +309,7 @@ describe('Alerts Controller', () => {
         params: { prisonerNumber: '' },
         query: {},
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -321,7 +322,6 @@ describe('Alerts Controller', () => {
             caseLoads: CaseLoadsDummyDataA,
             token: 'TOKEN',
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
       }
@@ -383,6 +383,7 @@ describe('Alerts Controller', () => {
         params: { prisonerNumber: '' },
         query: {},
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -395,7 +396,6 @@ describe('Alerts Controller', () => {
             caseLoads: CaseLoadsDummyDataA,
             token: 'TOKEN',
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
       }
@@ -444,6 +444,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/1/add-more-details',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -456,7 +457,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
@@ -542,6 +542,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/1/close',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -554,7 +555,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
@@ -646,6 +646,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/1/change-end-date',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -658,7 +659,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
