@@ -6,6 +6,7 @@ import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { mockContactDetailYouthEstate } from '../../server/data/localMockData/contactDetail'
+import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -752,37 +753,52 @@ context('Court cases and release dates', () => {
       it('should display the court cases and release dates panel and not the offences panel', () => {
         visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        const nextCourtAppearance = overviewPage.courtCasesAndReleaseDates().nextCourtAppearance()
+        const latestCalculation = overviewPage.courtCasesAndReleaseDates().latestCalculation()
 
         overviewPage.offencesHeader().should('not.exist')
         overviewPage.courtCasesAndReleaseDates().courtCasesCount().should('contain.text', '5')
-        overviewPage.courtCasesAndReleaseDates().nextCourtAppearance().caseReference().should('contain.text', 'ABC123')
-        overviewPage
-          .courtCasesAndReleaseDates()
-          .nextCourtAppearance()
-          .location()
-          .should('contain.text', 'Test court location')
-        overviewPage
-          .courtCasesAndReleaseDates()
-          .nextCourtAppearance()
-          .hearingType()
-          .should('contain.text', 'Sentencing')
-        overviewPage.courtCasesAndReleaseDates().nextCourtAppearance().date().should('contain.text', '1 January 2030')
+
+        nextCourtAppearance.caseReference().should('contain.text', 'ABC123')
+        nextCourtAppearance.location().should('contain.text', 'Test court location')
+        nextCourtAppearance.hearingType().should('contain.text', 'Sentencing')
+        nextCourtAppearance.date().should('contain.text', '1 January 2030')
+
+        latestCalculation.dateOfCalculation().should('contain.text', '7 March 2024')
+        latestCalculation.establishment().should('contain.text', 'Kirkham (HMP)')
+        latestCalculation.reason().should('contain.text', 'Correcting an earlier sentence')
+      })
+
+      context('given the source of the latest calculation is Nomis', () => {
+        it('should not display an establishment', () => {
+          cy.task('stubGetLatestCalculation', { resp: latestCalculationWithNomisSource })
+
+          visitOverviewPage()
+          const overviewPage = Page.verifyOnPage(OverviewPage)
+          const latestCalculation = overviewPage.courtCasesAndReleaseDates().latestCalculation()
+
+          latestCalculation.dateOfCalculation().should('contain.text', '7 March 2024')
+          latestCalculation.establishment().should('contain.text', 'Not entered')
+          latestCalculation.reason().should('contain.text', 'Correcting an earlier sentence')
+        })
       })
     })
 
     context('no data is returned from the API', () => {
       it('should display the placeholder text', () => {
         cy.task('stubGetNextCourtEvent', { bookingId: 1102484, resp: {} })
+        cy.task('stubGetLatestCalculation', { status: 404, resp: null })
 
         visitOverviewPage()
         const overviewPage = Page.verifyOnPage(OverviewPage)
+        const nextCourtAppearance = overviewPage.courtCasesAndReleaseDates().nextCourtAppearance()
+        const latestCalculation = overviewPage.courtCasesAndReleaseDates().latestCalculation()
 
         overviewPage.offencesHeader().should('not.exist')
-        overviewPage
-          .courtCasesAndReleaseDates()
-          .nextCourtAppearance()
+        nextCourtAppearance.placeHolderText().should('contain.text', 'There are no upcoming court hearings.')
+        latestCalculation
           .placeHolderText()
-          .should('contain.text', 'There are no upcoming court hearings.')
+          .should('contain.text', 'There are no release dates calculated for John Saunders')
       })
     })
   })

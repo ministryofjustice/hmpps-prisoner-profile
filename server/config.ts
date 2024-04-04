@@ -233,6 +233,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISON_REGISTER_API_TIMEOUT_RESPONSE', 5000))),
     },
+    calculateReleaseDatesApi: {
+      url: get('CALCULATE_RELEASE_DATES_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('CALCULATE_RELEASE_DATES_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('CALCULATE_RELEASE_DATES_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('CALCULATE_RELEASE_DATES_API_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),

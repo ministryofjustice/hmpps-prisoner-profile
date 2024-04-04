@@ -40,22 +40,31 @@ export default class OverviewController {
       config.featureToggles.courCasesSummaryEnabled &&
       userHasRoles([Role.ReleaseDatesCalculator], res.locals.user.userRoles)
 
-    const [overviewPageData, pathfinderNominal, socNominal, nextCourtAppearance, activeCourtCasesCount] =
-      await Promise.all([
-        this.overviewPageService.get({
-          clientToken,
-          prisonerData,
-          staffId: res.locals.user.staffId,
-          inmateDetail,
-          apiErrorCallback: res.locals.apiErrorCallback,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
-        }),
-        pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
-        manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
-        this.offencesService.getNextCourtHearingSummary(clientToken, prisonerData.bookingId),
-        this.offencesService.getActiveCourtCasesCount(clientToken, prisonerData.bookingId),
-      ])
+    const [
+      overviewPageData,
+      pathfinderNominal,
+      socNominal,
+      nextCourtAppearance,
+      activeCourtCasesCount,
+      latestReleaseDate,
+    ] = await Promise.all([
+      this.overviewPageService.get({
+        clientToken,
+        prisonerData,
+        staffId: res.locals.user.staffId,
+        inmateDetail,
+        apiErrorCallback: res.locals.apiErrorCallback,
+        userCaseLoads: res.locals.user.caseLoads,
+        userRoles: res.locals.user.userRoles,
+      }),
+      pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
+      manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
+      this.offencesService.getNextCourtHearingSummary(clientToken, prisonerData.bookingId),
+      this.offencesService.getActiveCourtCasesCount(clientToken, prisonerData.bookingId),
+      showCourtCaseSummary
+        ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerData.prisonerNumber)
+        : null,
+    ])
 
     const overviewActions = buildOverviewActions(
       prisonerData,
@@ -96,6 +105,7 @@ export default class OverviewController {
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
+        latestReleaseDate,
         userRoles,
         prisonerData.prisonerNumber,
       ),
