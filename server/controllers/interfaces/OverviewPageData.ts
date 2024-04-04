@@ -2,6 +2,7 @@ import OverviewPage from '../../services/interfaces/overviewPageService/Overview
 import CourtAppearanceSummary from '../../services/interfaces/offencesService/CourtAppearanceSummary'
 import HmppsAction from './HmppsAction'
 import LatestCalculationSummary from '../../services/interfaces/offencesService/LatestCalculationSummary'
+import { ResultError } from '../../utils/result/result'
 
 export default interface OverviewPageData extends OverviewPage {
   pageTitle: string
@@ -19,7 +20,7 @@ export default interface OverviewPageData extends OverviewPage {
 export interface CourtCaseSummary {
   nextCourtAppearance: CourtAppearanceSummary | null
   activeCourtCasesCount: number
-  latestCalculation: LatestCalculationSummary | null
+  latestCalculation: LatestCalculationSummary | null | ResultError
   link: {
     text: string
     href: string

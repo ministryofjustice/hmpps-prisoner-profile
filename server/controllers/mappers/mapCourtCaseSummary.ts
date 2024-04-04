@@ -4,11 +4,12 @@ import { Role } from '../../data/enums/role'
 import { userHasRoles } from '../../utils/utils'
 import config from '../../config'
 import LatestCalculationSummary from '../../services/interfaces/offencesService/LatestCalculationSummary'
+import { ResultError } from '../../utils/result/result'
 
 export default function mapCourtCaseSummary(
   nextCourtCaseAppearance: CourtAppearanceSummary,
   activeCourtCasesCount: number,
-  latestCalculation: LatestCalculationSummary | null,
+  latestCalculation: LatestCalculationSummary | null | ResultError,
   userRoles: Role[],
   prisonerNumber: string,
 ): CourtCaseSummary | null {

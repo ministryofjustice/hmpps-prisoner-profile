@@ -18,6 +18,7 @@ import logger from '../../logger'
 import OffencesService from '../services/offencesService'
 import OverviewPageData from './interfaces/OverviewPageData'
 import mapCourtCaseSummary from './mappers/mapCourtCaseSummary'
+import { Result } from '../utils/result/result'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -46,7 +47,7 @@ export default class OverviewController {
       socNominal,
       nextCourtAppearance,
       activeCourtCasesCount,
-      latestReleaseDate,
+      latestReleaseDateCalculation,
     ] = await Promise.all([
       this.overviewPageService.get({
         clientToken,
@@ -62,7 +63,7 @@ export default class OverviewController {
       this.offencesService.getNextCourtHearingSummary(clientToken, prisonerData.bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, prisonerData.bookingId),
       showCourtCaseSummary
-        ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerData.prisonerNumber)
+        ? Result.wrap(this.offencesService.getLatestReleaseCalculation(clientToken, prisonerData.prisonerNumber))
         : null,
     ])
 
@@ -105,7 +106,7 @@ export default class OverviewController {
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
-        latestReleaseDate,
+        latestReleaseDateCalculation.getOrError(),
         userRoles,
         prisonerData.prisonerNumber,
       ),

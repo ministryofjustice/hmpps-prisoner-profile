@@ -3,6 +3,8 @@
  * adding some functions that make accessing and handling the result a bit easier,
  * avoiding the need for if else statements everywhere.
  */
+export type ResultError = { error: true }
+
 export type Result<T, E = Error> = PromiseSettledResult<T> & {
   isFulfilled: () => boolean
   map: <R, E2>(map: (value: T) => R, mapError?: (error: E) => E2) => Result<R, E2>
@@ -10,6 +12,7 @@ export type Result<T, E = Error> = PromiseSettledResult<T> & {
   getOrThrow: () => T
   getOrHandle: <R>(handler: (e: E) => R) => T | R
   getOrNull: () => T
+  getOrError: () => T | ResultError
   toPromiseSettledResult: () => PromiseSettledResult<T>
 }
 
@@ -71,6 +74,7 @@ export const Result = {
     getOrThrow: () => value,
     getOrHandle: () => value,
     getOrNull: () => value,
+    getOrError: () => value,
     toPromiseSettledResult: () => ({ status: 'fulfilled', value }),
   }),
 
@@ -89,6 +93,7 @@ export const Result = {
     },
     getOrHandle: <R>(handler: (e: E) => R) => handler(error),
     getOrNull: () => null,
+    getOrError: () => ({ error: true }),
     toPromiseSettledResult: () => ({ status: 'rejected', reason: error }),
   }),
 }
