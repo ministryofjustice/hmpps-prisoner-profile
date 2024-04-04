@@ -21,9 +21,9 @@ export default class OverviewPage extends Page {
 
   // Mini Summary
 
-  miniSummaryGroupA = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
+  moneyVisitsAdjudicationsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
 
-  miniSummaryGroupA_MacroHeader = (): PageElement =>
+  moneyVisitsAdjudicationsGroup_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=summary-header]')
 
   moneyCard = (): PageElement =>
@@ -35,9 +35,9 @@ export default class OverviewPage extends Page {
   visitsCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
 
-  miniSummaryGroupB = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
+  categoryIncentiveCsraGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
 
-  miniSummaryGroupB_MacroHeader = (): PageElement =>
+  categoryIncentiveCsraGroup_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
 
   categoryCard = (): PageElement =>

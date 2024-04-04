@@ -12,7 +12,7 @@ import {
   incentiveSummaryDataMock,
   incentiveSummaryErrorMock,
   incentiveSummaryNoDataMock,
-  miniSummaryGroupBMock,
+  categoryIncentiveCsraGroupMock,
   moneySummaryDataMock,
   visitBalancesMock,
   visitsSummaryDataMock,
@@ -46,7 +46,6 @@ import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
 import { CourtCasesMock } from '../data/localMockData/courtCaseMock'
 import { Role } from '../data/enums/role'
-import OffencesPageService from './offencesPageService'
 import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
 
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
@@ -146,7 +145,6 @@ describe('OverviewPageService', () => {
       () => keyWorkerApiClient,
       () => incentivesApi,
       () => adjudicationsApiClient,
-      new OffencesPageService(null),
       () => curiousApiClient,
       () => nonAssociationsApiClient,
       () => prisonerProfileDeliusApiClient,
@@ -196,7 +194,7 @@ describe('OverviewPageService', () => {
     })
   })
 
-  describe('getMiniSummaryGroupA', () => {
+  describe('getmoneyVisitsAdjudicationsGroup', () => {
     describe('When visit balances returns 404', () => {
       it('Displays no visit information', async () => {
         const prisonerNumber = 'A1234BC'
@@ -212,32 +210,15 @@ describe('OverviewPageService', () => {
           userCaseLoads: CaseLoadsDummyDataA,
         })
 
-        expect(res.miniSummaryGroupA.length).toEqual(3)
-        const visitSummary = res.miniSummaryGroupA[2]
+        expect(res.moneyVisitsAdjudicationsGroup.length).toEqual(3)
+        const visitSummary = res.moneyVisitsAdjudicationsGroup[2]
         expect(visitSummary.data.bottomClass).toEqual('big')
         expect(visitSummary.data.bottomContentLine1).toEqual('0')
         expect(visitSummary.data.bottomContentLine3).toEqual('')
       })
     })
 
-    it('should get the account, adjudication and visit summaries for the prisoner', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-      expect(prisonApiClient.getAccountBalances).toHaveBeenCalledWith(bookingId)
-      expect(adjudicationsApiClient.getAdjudications).toHaveBeenCalledWith(bookingId)
-      expect(prisonApiClient.getVisitSummary).toHaveBeenCalledWith(bookingId)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledWith(prisonerNumber)
-    })
-
-    it('should map api results into page data', async () => {
+    it('should get data and map money, adjudication and visits summary data if user in caseload', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
@@ -250,13 +231,11 @@ describe('OverviewPageService', () => {
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.miniSummaryGroupA).toEqual(
-        expect.arrayContaining([
-          { data: expect.objectContaining(moneySummaryDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(visitsSummaryDataMock), classes: 'govuk-grid-row card-body' },
-        ]),
-      )
+      expect(res.moneyVisitsAdjudicationsGroup).toEqual([
+        { data: expect.objectContaining(moneySummaryDataMock), classes: 'govuk-grid-row card-body' },
+        { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+        { data: expect.objectContaining(visitsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+      ])
     })
 
     it('should add a link to active punishments if awards list length > 0', async () => {
@@ -287,7 +266,7 @@ describe('OverviewPageService', () => {
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.miniSummaryGroupA).toEqual(
+      expect(res.moneyVisitsAdjudicationsGroup).toEqual(
         expect.arrayContaining([
           {
             data: expect.objectContaining({
@@ -314,7 +293,7 @@ describe('OverviewPageService', () => {
           inmateDetail: inmateDetailMock,
         })
 
-        expect(res.miniSummaryGroupA).toEqual([])
+        expect(res.moneyVisitsAdjudicationsGroup).toEqual([])
       })
 
       it.each([Role.PomUser, Role.ReceptionUser])(
@@ -333,17 +312,15 @@ describe('OverviewPageService', () => {
             userRoles: [userRole],
           })
 
-          expect(res.miniSummaryGroupA).toEqual(
-            expect.arrayContaining([
-              { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
-            ]),
-          )
+          expect(res.moneyVisitsAdjudicationsGroup).toEqual([
+            { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
+          ])
         },
       )
     })
   })
 
-  describe('getMiniSummaryGroupB', () => {
+  describe('getcategoryIncentiveCsraGroup', () => {
     it('should get the category, incentive and csra summaries for the prisoner', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
@@ -385,7 +362,7 @@ describe('OverviewPageService', () => {
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.miniSummaryGroupB).toEqual(
+      expect(res.categoryIncentiveCsraGroup).toEqual(
         expect.arrayContaining([
           { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
           { data: expect.objectContaining(incentiveSummaryDataMock), classes: 'govuk-grid-row card-body' },
@@ -414,7 +391,7 @@ describe('OverviewPageService', () => {
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.miniSummaryGroupB).toEqual(
+      expect(res.categoryIncentiveCsraGroup).toEqual(
         expect.arrayContaining([
           { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
           { data: expect.objectContaining(incentiveSummaryNoDataMock), classes: 'govuk-grid-row card-body' },
@@ -443,7 +420,7 @@ describe('OverviewPageService', () => {
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.miniSummaryGroupB).toEqual(
+      expect(res.categoryIncentiveCsraGroup).toEqual(
         expect.arrayContaining([
           { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
           { data: expect.objectContaining(incentiveSummaryErrorMock), classes: 'govuk-grid-row card-body' },
@@ -472,14 +449,14 @@ describe('OverviewPageService', () => {
           inmateDetail: inmateDetailMock,
         })
 
-        expect(res.miniSummaryGroupB).toEqual([
+        expect(res.categoryIncentiveCsraGroup).toEqual([
           {
-            classes: miniSummaryGroupBMock[0].classes,
-            data: { ...miniSummaryGroupBMock[0].data, linkHref: undefined, linkLabel: undefined },
+            classes: categoryIncentiveCsraGroupMock[0].classes,
+            data: { ...categoryIncentiveCsraGroupMock[0].data, linkHref: undefined, linkLabel: undefined },
           },
           {
-            classes: miniSummaryGroupBMock[2].classes,
-            data: { ...miniSummaryGroupBMock[2].data, linkHref: undefined, linkLabel: undefined },
+            classes: categoryIncentiveCsraGroupMock[2].classes,
+            data: { ...categoryIncentiveCsraGroupMock[2].data, linkHref: undefined, linkLabel: undefined },
           },
         ])
       })
@@ -501,8 +478,8 @@ describe('OverviewPageService', () => {
           inmateDetail: inmateDetailMock,
         })
 
-        expect(res.miniSummaryGroupB[0].data.linkLabel).toBeUndefined()
-        expect(res.miniSummaryGroupB[0].data.linkHref).toBeUndefined()
+        expect(res.categoryIncentiveCsraGroup[0].data.linkLabel).toBeUndefined()
+        expect(res.categoryIncentiveCsraGroup[0].data.linkHref).toBeUndefined()
       })
 
       it('should not return have the links on the CSRA card', async () => {
@@ -522,8 +499,8 @@ describe('OverviewPageService', () => {
           inmateDetail: inmateDetailMock,
         })
 
-        expect(res.miniSummaryGroupB[1].data.linkLabel).toBeUndefined()
-        expect(res.miniSummaryGroupB[1].data.linkHref).toBeUndefined()
+        expect(res.categoryIncentiveCsraGroup[1].data.linkLabel).toBeUndefined()
+        expect(res.categoryIncentiveCsraGroup[1].data.linkHref).toBeUndefined()
       })
     })
   })
@@ -1017,14 +994,6 @@ describe('OverviewPageService', () => {
       })
       expect(prisonApiClient.getStaffRoles).toHaveBeenCalledWith(1, 'MDI')
       expect(staffRoles).toEqual(['A', 'B'])
-    })
-  })
-
-  describe('Main offence', () => {
-    it('should return the main offence description', async () => {
-      const overviewPageService = await overviewPageServiceConstruct()
-      const desc = await overviewPageService.getMainOffenceDescription(mainOffenceMock)
-      expect(desc).toEqual(mainOffenceMock[0].offenceDescription)
     })
   })
 

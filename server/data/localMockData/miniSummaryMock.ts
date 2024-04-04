@@ -142,7 +142,7 @@ export const csraSummaryDataMock: MiniSummaryData = {
   linkLabel: 'CSRA history',
 } as MiniSummaryData
 
-export const miniSummaryGroupAMock: MiniSummary[] = [
+export const moneyVisitsAdjudicationsGroupMock: MiniSummary[] = [
   {
     data: moneySummaryDataMock,
     classes: 'govuk-grid-row card-body',
@@ -157,7 +157,7 @@ export const miniSummaryGroupAMock: MiniSummary[] = [
   },
 ]
 
-export const miniSummaryGroupBMock: MiniSummary[] = [
+export const categoryIncentiveCsraGroupMock: MiniSummary[] = [
   {
     data: categorySummaryDataMock,
     classes: 'govuk-grid-row card-body',

@@ -17,7 +17,6 @@ import {
   SortType,
   userHasRoles,
 } from '../utils/utils'
-import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import PersonalDetails from './interfaces/overviewPageService/PersonalDetails'
@@ -32,7 +31,6 @@ import { pluralise } from '../utils/pluralise'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
-import OffencesPageService from './offencesPageService'
 import config from '../config'
 import { Role } from '../data/enums/role'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
@@ -59,6 +57,7 @@ import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
+import VisitBalances from '../data/interfaces/prisonApi/VisitBalances'
 
 export default class OverviewPageService {
   constructor(
@@ -67,7 +66,6 @@ export default class OverviewPageService {
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
     private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
     private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>,
-    private readonly offencesPageService: OffencesPageService,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly nonAssociationsApiClientBuilder: RestClientBuilder<NonAssociationsApiClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
@@ -160,9 +158,15 @@ export default class OverviewPageService {
       isYouthPrisoner ? prisonApiClient.getBookingContacts(bookingId) : null,
     ])
 
-    const [miniSummaryGroupA, miniSummaryGroupB, personalDetails, schedule, offencesOverview] = await Promise.all([
-      this.getMiniSummaryGroupA(prisonerData, userCaseLoads, userRoles, prisonApiClient, adjudicationsApiClient),
-      this.getMiniSummaryGroupB(
+    const [moneyVisitsAdjudicationsGroup, categoryIncentiveCsraGroup, schedule] = await Promise.all([
+      this.getMoneyVisitsAdjudicationsGroup(
+        prisonerData,
+        userCaseLoads,
+        userRoles,
+        prisonApiClient,
+        adjudicationsApiClient,
+      ),
+      this.getCategoryIncentiveCsraGroup(
         prisonerData,
         inmateDetail,
         userCaseLoads,
@@ -170,15 +174,7 @@ export default class OverviewPageService {
         incentivesApiClient,
         prisonApiClient,
       ),
-      this.getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
       this.getSchedule(prisonerData, prisonApiClient),
-      this.getOffencesOverview(
-        imprisonmentStatusDescription,
-        conditionalReleaseDate,
-        confirmedReleaseDate,
-        mainOffence,
-        fullStatus,
-      ),
     ])
 
     const staffContacts = isYouthPrisoner
@@ -186,30 +182,35 @@ export default class OverviewPageService {
       : this.getStaffContacts(prisonerNumber, communityManager, allocationManager, keyWorkerName, keyWorkerSessions)
 
     return {
-      miniSummaryGroupA,
-      miniSummaryGroupB,
+      moneyVisitsAdjudicationsGroup,
+      categoryIncentiveCsraGroup,
       statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
       nonAssociationSummary: this.getNonAssociationSummary(prisonerNonAssociations),
-      personalDetails,
+      personalDetails: this.getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
       staffContacts,
       schedule,
-      offencesOverview,
+      offencesOverview: this.getOffencesOverview(
+        imprisonmentStatusDescription,
+        conditionalReleaseDate,
+        confirmedReleaseDate,
+        mainOffence,
+        fullStatus,
+      ),
       prisonName: prisonerData.prisonName,
       staffRoles: staffRoles?.map(role => role.role),
       isYouthPrisoner,
     }
   }
 
-  public async getOffencesOverview(
+  private getOffencesOverview(
     imprisonmentStatusDescription: string,
     conditionalReleaseDate: string,
     confirmedReleaseDate: string,
     mainOffence: MainOffence[],
     fullStatus: FullStatus,
   ) {
-    const mainOffenceDescription = await this.getMainOffenceDescription(mainOffence)
     return {
-      mainOffenceDescription,
+      mainOffenceDescription: mainOffence[0]?.offenceDescription ?? 'Not entered',
       fullStatus,
       imprisonmentStatusDescription,
       conditionalReleaseDate,
@@ -217,11 +218,7 @@ export default class OverviewPageService {
     }
   }
 
-  async getMainOffenceDescription(mainOffence: MainOffence[]): Promise<string> {
-    return mainOffence[0] && mainOffence[0].offenceDescription ? mainOffence[0].offenceDescription : 'Not entered'
-  }
-
-  public getStaffContacts(
+  private getStaffContacts(
     prisonerNumber: string,
     communityManager: CommunityManager,
     allocationManager: Pom,
@@ -229,16 +226,10 @@ export default class OverviewPageService {
     keyWorkerSessions: CaseNote[],
   ): StaffContacts {
     const prisonOffenderManager =
-      allocationManager &&
-      (allocationManager as Pom).primary_pom &&
-      (allocationManager as Pom).primary_pom.name &&
-      getNamesFromString((allocationManager as Pom).primary_pom.name)
+      allocationManager?.primary_pom?.name && getNamesFromString(allocationManager.primary_pom.name)
 
     const coworkingPrisonOffenderManager =
-      allocationManager &&
-      (allocationManager as Pom).secondary_pom &&
-      (allocationManager as Pom).secondary_pom.name &&
-      getNamesFromString((allocationManager as Pom).secondary_pom.name)
+      allocationManager?.secondary_pom?.name && getNamesFromString(allocationManager.secondary_pom.name)
 
     return {
       keyWorker: keyWorkerName
@@ -261,7 +252,7 @@ export default class OverviewPageService {
     }
   }
 
-  public getYouthStaffContacts(contacts: ContactDetail, prisonerNumber: string): YouthStaffContacts {
+  private getYouthStaffContacts(contacts: ContactDetail, prisonerNumber: string): YouthStaffContacts {
     const youthStaffContacts = {
       cuspOfficer: 'Not assigned',
       cuspOfficerBackup: 'Not assigned',
@@ -300,19 +291,19 @@ export default class OverviewPageService {
     return youthStaffContacts
   }
 
-  public async getPersonalDetails(
+  private getEthnicGroupText(prisonerDetail: PrisonerDetail): string {
+    const { ethnicity, ethnicityCode } = prisonerDetail
+
+    if (ethnicity && ethnicityCode) return `${prisonerDetail?.ethnicity} (${prisonerDetail.ethnicityCode})`
+    if (ethnicity) return prisonerDetail?.ethnicity
+    return 'Not entered'
+  }
+
+  private getPersonalDetails(
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
-  ): Promise<PersonalDetails> {
-    let ethnicGroup = 'Not entered'
-    if (prisonerDetail?.ethnicity) {
-      ethnicGroup = `${prisonerDetail?.ethnicity}`
-      if (prisonerDetail?.ethnicityCode) {
-        ethnicGroup += ` (${prisonerDetail.ethnicityCode})`
-      }
-    }
-
+  ): PersonalDetails {
     return {
       personalDetailsMain: {
         preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : 'None',
@@ -322,7 +313,7 @@ export default class OverviewPageService {
         spokenLanguage: inmateDetail.language ? inmateDetail.language : 'No language entered',
       },
       personalDetailsSide: {
-        ethnicGroup,
+        ethnicGroup: this.getEthnicGroupText(prisonerDetail),
         religionOrBelief: prisonerData.religion ? prisonerData.religion : 'Not entered',
         croNumber: prisonerData.croNumber ? prisonerData.croNumber : 'None',
         pncNumber: prisonerData.pncNumber ? prisonerData.pncNumber : 'None',
@@ -330,7 +321,7 @@ export default class OverviewPageService {
     }
   }
 
-  private async getMiniSummaryGroupA(
+  private async getMoneyVisitsAdjudicationsGroup(
     prisonerData: Prisoner,
     userCaseLoads: CaseLoad[],
     userRoles: string[],
@@ -338,33 +329,42 @@ export default class OverviewPageService {
     adjudicationsApiClient: AdjudicationsApiClient,
   ): Promise<MiniSummary[]> {
     const { prisonerNumber, bookingId, prisonId } = prisonerData
-    const [accountBalances, adjudicationSummary, visitSummary, visitBalances] = await Promise.all([
-      prisonApiClient.getAccountBalances(bookingId),
-      adjudicationsApiClient.getAdjudications(bookingId),
-      prisonApiClient.getVisitSummary(bookingId),
-      prisonApiClient.getVisitBalances(prisonerNumber),
+    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
+    const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
+
+    if (!belongsToCaseLoad && !isPomOrReceptionUser) return []
+
+    // prisoner not in caseload, user is POM or reception user: return just adjudications summary
+    if (!belongsToCaseLoad) {
+      const adjudicationsSummaryData = await this.getAdjudicationsSummary(
+        bookingId,
+        prisonerNumber,
+        adjudicationsApiClient,
+      )
+      return [{ data: adjudicationsSummaryData, classes: 'govuk-grid-row card-body' }]
+    }
+
+    // prisoner is in caseload: return all summaries
+    const [moneySummaryData, visitsSummaryData, adjudicationsSummaryData] = await Promise.all([
+      this.getMoneySummary(bookingId, prisonerNumber, prisonApiClient),
+      this.getVisitsSummary(bookingId, prisonerNumber, prisonApiClient),
+      this.getAdjudicationsSummary(bookingId, prisonerNumber, adjudicationsApiClient),
     ])
 
-    let privilegedVisitsDescription = ''
-    if (visitBalances?.remainingPvo) {
-      privilegedVisitsDescription = formatPrivilegedVisitsSummary(visitBalances.remainingPvo)
-    } else if (visitBalances?.remainingVo) {
-      privilegedVisitsDescription = 'No privileged visits'
-    }
+    return [
+      { data: moneySummaryData, classes: 'govuk-grid-row card-body' },
+      { data: adjudicationsSummaryData, classes: 'govuk-grid-row card-body' },
+      { data: visitsSummaryData, classes: 'govuk-grid-row card-body' },
+    ]
+  }
 
-    const moneySummaryData: MiniSummaryData = {
-      heading: 'Money',
-      topLabel: 'Spends',
-      topContent: formatMoney(accountBalances.spends),
-      topClass: 'big',
-      bottomLabel: 'Private cash',
-      bottomContentLine1: formatMoney(accountBalances.cash),
-      bottomClass: 'big',
-      linkLabel: 'Transactions and savings',
-      linkHref: `/prisoner/${prisonerNumber}/money/spends`,
-    }
-
-    const adjudicationsSummaryData: MiniSummaryData = {
+  private async getAdjudicationsSummary(
+    bookingId: number,
+    prisonerNumber: string,
+    adjudicationsApiClient: AdjudicationsApiClient,
+  ): Promise<MiniSummaryData> {
+    const adjudicationSummary = await adjudicationsApiClient.getAdjudications(bookingId)
+    return {
       heading: 'Adjudications',
       topLabel: 'Proven in last 3 months',
       topContent: adjudicationSummary.adjudicationCount,
@@ -380,39 +380,59 @@ export default class OverviewPageService {
       linkLabel: 'Adjudication history',
       linkHref: `${config.serviceUrls.adjudications}/adjudication-history/${prisonerNumber}`,
     }
+  }
 
-    const visitsSummaryData: MiniSummaryData = {
+  private async getMoneySummary(
+    bookingId: number,
+    prisonerNumber: string,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<MiniSummaryData> {
+    const accountBalances = await prisonApiClient.getAccountBalances(bookingId)
+
+    return {
+      heading: 'Money',
+      topLabel: 'Spends',
+      topContent: formatMoney(accountBalances.spends),
+      topClass: 'big',
+      bottomLabel: 'Private cash',
+      bottomContentLine1: formatMoney(accountBalances.cash),
+      bottomClass: 'big',
+      linkLabel: 'Transactions and savings',
+      linkHref: `/prisoner/${prisonerNumber}/money/spends`,
+    }
+  }
+
+  private getPrivilegedVisitsDescription = (visitBalances: VisitBalances): string => {
+    if (visitBalances?.remainingPvo) return formatPrivilegedVisitsSummary(visitBalances.remainingPvo)
+    if (visitBalances?.remainingVo) return 'No privileged visits'
+    return ''
+  }
+
+  private async getVisitsSummary(
+    bookingId: number,
+    prisonerNumber: string,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<MiniSummaryData> {
+    const [visitSummary, visitBalances] = await Promise.all([
+      prisonApiClient.getVisitSummary(bookingId),
+      prisonApiClient.getVisitBalances(prisonerNumber),
+    ])
+
+    return {
       heading: 'Visits',
       topLabel: 'Next visit date',
       topContent: visitSummary.startDateTime ? formatDate(visitSummary.startDateTime, 'short') : 'None scheduled',
       topClass: visitSummary.startDateTime ? 'big' : 'small',
       bottomLabel: 'Remaining visits',
       bottomContentLine1: visitBalances?.remainingVo ? visitBalances.remainingVo : '0',
-      bottomContentLine3: privilegedVisitsDescription,
+      bottomContentLine3: this.getPrivilegedVisitsDescription(visitBalances),
       bottomClass: visitBalances?.remainingVo ? 'small' : 'big',
       linkLabel: 'Visits details',
       linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     }
-
-    const summaryData = []
-    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
-
-    if (belongsToCaseLoad) {
-      summaryData.push({ data: moneySummaryData, classes: 'govuk-grid-row card-body' })
-    }
-
-    if (belongsToCaseLoad || userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)) {
-      summaryData.push({ data: adjudicationsSummaryData, classes: 'govuk-grid-row card-body' })
-    }
-
-    if (belongsToCaseLoad) {
-      summaryData.push({ data: visitsSummaryData, classes: 'govuk-grid-row card-body' })
-    }
-
-    return summaryData
   }
 
-  private async getMiniSummaryGroupB(
+  private async getCategoryIncentiveCsraGroup(
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
     userCaseLoads: CaseLoad[],
@@ -420,130 +440,144 @@ export default class OverviewPageService {
     incentivesApiClient: IncentivesApiClient,
     prisonApiClient: PrisonApiClient,
   ): Promise<MiniSummary[]> {
-    const { prisonerNumber, bookingId, prisonId } = prisonerData
-
-    let incentiveSummaryData: MiniSummaryData
-
-    try {
-      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
-
-      if (incentiveReviews === null) {
-        // Fallback if incentives API returns 404
-        incentiveSummaryData = {
-          bottomLabel: 'Incentives: since last review',
-          bottomContentLine1: `${formatName(
-            prisonerData.firstName,
-            null,
-            prisonerData.lastName,
-          )} has no incentive level history`,
-          bottomClass: 'small',
-          linkLabel: 'Incentive level details',
-          linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
-        }
-      }
-
-      if (incentiveReviews) {
-        const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
-          prisonApiClient.getCaseNoteCount(
-            bookingId,
-            CaseNoteType.PositiveBehaviour,
-            CaseNoteSubType.IncentiveEncouragement,
-            incentiveReviews?.iepDate,
-            formatDateISO(new Date()),
-          ),
-          prisonApiClient.getCaseNoteCount(
-            bookingId,
-            CaseNoteType.NegativeBehaviour,
-            CaseNoteSubType.IncentiveWarning,
-            incentiveReviews?.iepDate,
-            formatDateISO(new Date()),
-          ),
-        ])
-
-        incentiveSummaryData = {
-          bottomLabel: 'Incentives: since last review',
-          bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
-          bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
-          bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
-          bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
-            ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
-            : undefined,
-          bottomClass: 'small',
-          linkLabel: 'Incentive level details',
-          linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
-        }
-      }
-    } catch (e) {
-      // Fallback if incentives API returns an error
-      incentiveSummaryData = {
-        bottomLabel: 'Incentives: since last review',
-        bottomContentLine1: 'We cannot show these details right now',
-        bottomClass: 'small',
-        linkLabel: 'Incentive level details',
-        linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerData.prisonerNumber}`,
-      }
-    }
-
-    const category: Assessment =
-      prisonerData.assessments?.find(
-        (assessment: Assessment) => assessment.assessmentCode === AssessmentCode.category,
-      ) || null
-    const csra: Assessment =
-      prisonerData.assessments?.find((assessment: Assessment) =>
-        assessment.assessmentDescription.includes(AssessmentCode.csra),
-      ) || null
-
+    const { bookingId, prisonId } = prisonerData
     const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
+    const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
 
-    const categorySummaryData: MiniSummaryData = {
-      bottomLabel: 'Category',
-      bottomContentLine1: formatCategoryCodeDescription(category?.classificationCode, inmateDetail.category),
-      bottomContentLine3: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
-      bottomClass: 'small',
-      linkLabel: undefined,
-      linkHref: undefined,
-    }
+    const categorySummaryData = this.getCategorySummary(prisonerData, inmateDetail, belongsToCaseLoad, userRoles)
+    const csraSummaryData = this.getCsraSummary(prisonerData, belongsToCaseLoad)
 
-    if (belongsToCaseLoad) {
-      categorySummaryData.linkLabel = userHasRoles(
-        [
-          Role.CreateRecategorisation,
-          Role.ApproveCategorisation,
-          Role.CreateRecategorisation,
-          Role.CategorisationSecurity,
-        ],
-        userRoles,
-      )
-        ? 'Manage category'
-        : 'Category'
-      categorySummaryData.linkHref = `${config.serviceUrls.offenderCategorisation}/${bookingId}`
-    }
+    // not in caseload, not a global search user: return CSRA and category summary only
+    if (!belongsToCaseLoad && !isGlobalSearchUser)
+      return [
+        { data: categorySummaryData, classes: 'govuk-grid-row card-body' },
+        { data: csraSummaryData, classes: 'govuk-grid-row card-body' },
+      ]
+
+    // in caseload or a global search user: return incentives summary as well
+    const incentiveSummaryData = await this.getIncentiveSummary(
+      bookingId,
+      prisonerData,
+      incentivesApiClient,
+      prisonApiClient,
+    )
+
+    return [
+      { data: categorySummaryData, classes: 'govuk-grid-row card-body' },
+      { data: incentiveSummaryData, classes: 'govuk-grid-row card-body' },
+      { data: csraSummaryData, classes: 'govuk-grid-row card-body' },
+    ]
+  }
+
+  private getCsraSummary({ assessments, prisonerNumber }: Prisoner, belongsToCaseLoad: boolean): MiniSummaryData {
+    const csra = assessments?.find(assessment => assessment.assessmentDescription.includes(AssessmentCode.csra))
 
     const csraSummaryData: MiniSummaryData = {
       bottomLabel: 'CSRA',
       bottomContentLine1: csra ? csra.classification : 'Not entered',
       bottomContentLine3: csra ? `Last review: ${formatDate(csra.assessmentDate, 'short')}` : '',
       bottomClass: 'small',
-      linkLabel: undefined,
-      linkHref: undefined,
     }
 
-    if (belongsToCaseLoad) {
-      csraSummaryData.linkLabel = 'CSRA history'
-      csraSummaryData.linkHref = `/prisoner/${prisonerNumber}/csra-history`
+    if (belongsToCaseLoad)
+      return {
+        ...csraSummaryData,
+        linkLabel: 'CSRA history',
+        linkHref: `/prisoner/${prisonerNumber}/csra-history`,
+      }
+
+    return csraSummaryData
+  }
+
+  private getCategorySummary(
+    { assessments, bookingId }: Prisoner,
+    inmateDetail: InmateDetail,
+    belongsToCaseload: boolean,
+    userRoles: string[],
+  ): MiniSummaryData {
+    const category = assessments?.find(assessment => assessment.assessmentCode === AssessmentCode.category)
+    const userCanManage = userHasRoles(
+      [
+        Role.CreateRecategorisation,
+        Role.ApproveCategorisation,
+        Role.CreateRecategorisation,
+        Role.CategorisationSecurity,
+      ],
+      userRoles,
+    )
+
+    const categorySummaryData: MiniSummaryData = {
+      bottomLabel: 'Category',
+      bottomContentLine1: formatCategoryCodeDescription(category?.classificationCode, inmateDetail.category),
+      bottomContentLine3: category ? `Next review: ${formatDate(category.nextReviewDate, 'short')}` : '',
+      bottomClass: 'small',
     }
 
-    const summaryData = []
+    if (belongsToCaseload)
+      return {
+        ...categorySummaryData,
+        linkLabel: userCanManage ? 'Manage category' : 'Category',
+        linkHref: `${config.serviceUrls.offenderCategorisation}/${bookingId}`,
+      }
 
-    summaryData.push({ data: categorySummaryData, classes: 'govuk-grid-row card-body' })
+    return categorySummaryData
+  }
 
-    if (belongsToCaseLoad || userHasRoles([Role.GlobalSearch], userRoles)) {
-      summaryData.push({ data: incentiveSummaryData, classes: 'govuk-grid-row card-body' })
+  private async getIncentiveSummary(
+    bookingId: number,
+    { firstName, lastName, prisonerNumber }: Prisoner,
+    incentivesApiClient: IncentivesApiClient,
+    prisonApiClient: PrisonApiClient,
+  ): Promise<MiniSummaryData> {
+    try {
+      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
+      if (!incentiveReviews)
+        return {
+          bottomLabel: 'Incentives: since last review',
+          bottomContentLine1: `${formatName(firstName, null, lastName)} has no incentive level history`,
+          bottomClass: 'small',
+          linkLabel: 'Incentive level details',
+          linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
+        }
+
+      const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
+        prisonApiClient.getCaseNoteCount(
+          bookingId,
+          CaseNoteType.PositiveBehaviour,
+          CaseNoteSubType.IncentiveEncouragement,
+          incentiveReviews?.iepDate,
+          formatDateISO(new Date()),
+        ),
+        prisonApiClient.getCaseNoteCount(
+          bookingId,
+          CaseNoteType.NegativeBehaviour,
+          CaseNoteSubType.IncentiveWarning,
+          incentiveReviews?.iepDate,
+          formatDateISO(new Date()),
+        ),
+      ])
+
+      return {
+        bottomLabel: 'Incentives: since last review',
+        bottomContentLine1: `Positive behaviours: ${positiveBehaviourCount.count}`,
+        bottomContentLine2: `Negative behaviours: ${negativeBehaviourCount.count}`,
+        bottomContentLine3: `Next review by: ${formatDate(incentiveReviews?.nextReviewDate, 'short')}`,
+        bottomContentError: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
+          ? `${pluralise(differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate)), 'day')} overdue`
+          : undefined,
+        bottomClass: 'small',
+        linkLabel: 'Incentive level details',
+        linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
+      }
+    } catch (e) {
+      return {
+        bottomLabel: 'Incentives: since last review',
+        bottomContentLine1: 'We cannot show these details right now',
+        bottomClass: 'small',
+        linkLabel: 'Incentive level details',
+        linkHref: `${config.serviceUrls.incentives}/incentive-reviews/prisoner/${prisonerNumber}`,
+      }
     }
-
-    summaryData.push({ data: csraSummaryData, classes: 'govuk-grid-row card-body' })
-
-    return summaryData
   }
 
   private async getSchedule(prisonerData: Prisoner, prisonApiClient: PrisonApiClient): Promise<OverviewSchedule> {

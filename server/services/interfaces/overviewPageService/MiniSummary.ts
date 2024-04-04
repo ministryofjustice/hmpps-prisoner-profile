@@ -15,6 +15,6 @@ export interface MiniSummaryData {
   bottomContentLine3?: string | number
   bottomContentError?: string
   bottomClass: string // 'big' | 'small'
-  linkLabel: string
-  linkHref: string
+  linkLabel?: string
+  linkHref?: string
 }

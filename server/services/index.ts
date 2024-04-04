@@ -70,7 +70,6 @@ export const services = () => {
     keyworkerApiClientBuilder,
     incentivesApiClientBuilder,
     adjudicationsApiClientBuilder,
-    offencesPageService,
     curiousApiClientBuilder,
     nonAssociationsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,

@@ -82,12 +82,12 @@ context('Overview Page', () => {
     context('Mini Summary A', () => {
       it('Mini summary list is displayed', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.miniSummaryGroupA().should('exist')
+        overviewPage.moneyVisitsAdjudicationsGroup().should('exist')
       })
 
       it('Mini summary Group A should display the macro header', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.miniSummaryGroupA_MacroHeader().should('exist')
+        overviewPage.moneyVisitsAdjudicationsGroup_MacroHeader().should('exist')
       })
 
       it('Mini summary Group A should contain Money card with correct data', () => {
@@ -130,12 +130,12 @@ context('Overview Page', () => {
     context('Mini Summary B', () => {
       it('Mini summary list is displayed', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.miniSummaryGroupB().should('exist')
+        overviewPage.categoryIncentiveCsraGroup().should('exist')
       })
 
       it('Mini summary Group B should hide the macro header', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.miniSummaryGroupB_MacroHeader().should('not.exist')
+        overviewPage.categoryIncentiveCsraGroup_MacroHeader().should('not.exist')
       })
 
       it('Mini summary Group B should contain Category card with correct data', () => {
