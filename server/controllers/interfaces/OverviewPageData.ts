@@ -19,7 +19,7 @@ export default interface OverviewPageData extends OverviewPage {
 export interface CourtCaseSummary {
   nextCourtAppearance: CourtAppearanceSummary | null
   activeCourtCasesCount: number
-  latestCalculation: LatestCalculationSummary | null
+  latestCalculation: PromiseSettledResult<LatestCalculationSummary | null>
   link: {
     text: string
     href: string
