@@ -1,8 +1,8 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import prisonerLocationHistoryService, { PrisonerLocationHistoryService } from './prisonerLocationHistoryService'
-import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
+import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
+import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { GetAttributesForLocation } from '../data/localMockData/getAttributesForLocationMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { mockHistoryForLocation } from '../data/localMockData/getHistoryForLocationMock'
@@ -10,7 +10,7 @@ import StaffDetailsMock from '../data/localMockData/staffDetails'
 import { GetDetailsMock } from '../data/localMockData/getDetailsMock'
 import { agencyDetailsMock } from '../data/localMockData/agency'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import { inmateDetailMock, inmateDetailMockOverride } from '../data/localMockData/inmateDetailMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
@@ -57,117 +57,195 @@ describe('prisonerLocationHistoryService', () => {
     const caseNotesApiClientBuilder = () => caseNotesApiClient
     const whereaboutsApiClientBuilder = () => whereaboutsApiClient
 
-    service = prisonerLocationHistoryService({
+    service = new PrisonerLocationHistoryService(
       prisonApiClientBuilder,
       whereaboutsApiClientBuilder,
       caseNotesApiClientBuilder,
-    })
+    )
   })
 
-  it('Populates the page data with information about the prisoner', async () => {
-    const pageData = await service(
+  it('Returns the agency details from the API', async () => {
+    const res = await service.getPrisonerLocationHistory(
       'token',
       PrisonerMockDataA,
       'LEI',
       'locationId',
-      '2022-01-01',
       '2023-01-01',
-      CaseLoadsDummyDataA,
+      '2024-01-01',
     )
-    expect(pageData.prisonerName).toEqual('John Saunders')
-    expect(pageData.prisonerNumber).toEqual(PrisonerMockDataA.prisonerNumber)
+
+    expect(prisonApiClient.getAgencyDetails).toHaveBeenCalledWith('LEI')
+    expect(res.agencyDetails).toEqual(agencyDetailsMock)
   })
 
-  it('Populates the location name with the description from the API', async () => {
-    const pageData = await service(
+  it('Returns the cell move reason types', async () => {
+    const { cellMoveReasonTypes } = await service.getPrisonerLocationHistory(
       'token',
       PrisonerMockDataA,
       'LEI',
       'locationId',
-      '2022-01-01',
       '2023-01-01',
-      CaseLoadsDummyDataA,
+      '2024-01-01',
     )
-    expect(pageData.locationName).toEqual('1-1')
+
+    expect(cellMoveReasonTypes).toEqual(getCellMoveReasonTypesMock)
   })
 
-  describe('Location details', () => {
-    it('Populates the location details with information from the API', async () => {
-      const { locationDetails } = await service(
-        'token',
-        PrisonerMockDataA,
-        'LEI',
-        'locationId',
-        '2022-01-01',
-        '2023-01-01',
-        CaseLoadsDummyDataA,
-      )
+  it('Returns the details of the current prisoner', async () => {
+    prisonApiClient.getHistoryForLocation = jest.fn(async () =>
+      mockHistoryForLocation([
+        { bookingId: PrisonerMockDataA.bookingId, livingUnitId: 1234321 },
+        { bookingId: 1 },
+        { bookingId: 2 },
+        { bookingId: 3 },
+      ]),
+    )
 
-      expect(locationDetails.description).toEqual('Leeds (HMP)')
-      expect(locationDetails.movedIn).toEqual('05/07/2021 - 10:35')
-      expect(locationDetails.movedOut).toEqual('05/07/2021 - 10:35')
-      expect(locationDetails.movedBy).toEqual('John Smith')
-      expect(locationDetails.reasonForMove).toEqual('Some description')
-      expect(locationDetails.whatHappened).toEqual('Initial text for case note.')
-      expect(locationDetails.attributes).toEqual(GetAttributesForLocation.attributes)
-    })
+    const { currentPrisonerDetails } = await service.getPrisonerLocationHistory(
+      'token',
+      PrisonerMockDataA,
+      'LEI',
+      'locationId',
+      '2023-01-01',
+      '2024-01-01',
+    )
+
+    expect(currentPrisonerDetails.livingUnitId).toEqual(1234321)
   })
 
-  describe('Location sharing history', () => {
-    it('Returns the location sharing history from the API', async () => {
-      const prisonerBInmateDetail = {
-        ...inmateDetailMock,
-        bookingId: PrisonerMockDataB.bookingId,
-        firstName: 'Second',
-        lastName: 'Person',
-        offenderNo: 'A1234BC',
+  it('Returns the location attributes from the API', async () => {
+    const res = await service.getPrisonerLocationHistory(
+      'token',
+      PrisonerMockDataA,
+      'LEI',
+      'locationId',
+      '2023-01-01',
+      '2024-01-01',
+    )
+
+    expect(prisonApiClient.getAttributesForLocation).toHaveBeenCalledWith('locationId')
+    expect(res.locationAttributes).toEqual(GetAttributesForLocation)
+  })
+
+  it('Gets the location history and populates it with details of the prisoner', async () => {
+    prisonApiClient.getHistoryForLocation = jest.fn(async () =>
+      mockHistoryForLocation([
+        { bookingId: PrisonerMockDataA.bookingId },
+        { bookingId: 1 },
+        { bookingId: 2 },
+        { bookingId: 3 },
+      ]),
+    )
+    prisonApiClient.getInmateDetail = jest.fn(async (bookingId: number) => {
+      switch (bookingId) {
+        case 1:
+          return inmateDetailMockOverride({ bookingId: 1, firstName: 'BookingId1' })
+        case 2:
+          return inmateDetailMockOverride({ bookingId: 2, firstName: 'BookingId2' })
+        case 3:
+          return inmateDetailMockOverride({ bookingId: 3, firstName: 'BookingId3' })
+        default:
+          return inmateDetailMock
       }
+    })
+
+    const res = await service.getPrisonerLocationHistory(
+      'token',
+      PrisonerMockDataA,
+      'LEI',
+      'locationId',
+      '2023-01-01',
+      '2024-01-01',
+    )
+
+    expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(1)
+    expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(2)
+    expect(prisonApiClient.getInmateDetail).toHaveBeenCalledWith(3)
+    expect(res.locationHistoryWithPrisoner).toEqual(
+      expect.arrayContaining([expect.objectContaining({ firstName: 'BookingId1' })]),
+    )
+    expect(res.locationHistoryWithPrisoner).toEqual(
+      expect.arrayContaining([expect.objectContaining({ firstName: 'BookingId2' })]),
+    )
+    expect(res.locationHistoryWithPrisoner).toEqual(
+      expect.arrayContaining([expect.objectContaining({ firstName: 'BookingId3' })]),
+    )
+  })
+
+  it('Returns the staff name of the staff member who made the movement', async () => {
+    const res = await service.getPrisonerLocationHistory(
+      'token',
+      PrisonerMockDataA,
+      'LEI',
+      'locationId',
+      '2023-01-01',
+      '2024-01-01',
+    )
+
+    expect(prisonApiClient.getAgencyDetails).toHaveBeenCalledWith('LEI')
+    expect(res.agencyDetails).toEqual(agencyDetailsMock)
+  })
+
+  describe('whatHappened', () => {
+    beforeEach(() => {
       prisonApiClient.getHistoryForLocation = jest.fn(async () =>
-        mockHistoryForLocation([
-          { bookingId: PrisonerMockDataA.bookingId },
-          { bookingId: PrisonerMockDataB.bookingId },
-        ]),
+        mockHistoryForLocation([{ bookingId: PrisonerMockDataA.bookingId, bedAssignmentHistorySequence: 10 }]),
       )
-      prisonApiClient.getInmateDetail = jest.fn(async bookingId => {
-        if (bookingId === PrisonerMockDataA.bookingId) return inmateDetailMock
-        return prisonerBInmateDetail
+    })
+
+    describe('Given no cell move reason', () => {
+      it('Returns null', async () => {
+        whereaboutsApiClient.getCellMoveReason = jest.fn(async () => null)
+        const res = await service.getPrisonerLocationHistory(
+          'token',
+          PrisonerMockDataA,
+          'LEI',
+          'locationId',
+          '2023-01-01',
+          '2024-01-01',
+        )
+
+        expect(res.whatHappenedDetails).toEqual(null)
+      })
+    })
+
+    describe('Given a cell move reason', () => {
+      describe('and no relevant case note', () => {
+        it('Returns null', async () => {
+          caseNotesApiClient.getCaseNote = jest.fn(async () => null)
+          const res = await service.getPrisonerLocationHistory(
+            'token',
+            PrisonerMockDataA,
+            'LEI',
+            'locationId',
+            '2023-01-01',
+            '2024-01-01',
+          )
+
+          expect(res.whatHappenedDetails).toEqual(null)
+        })
       })
 
-      const { locationSharingHistory } = await service(
-        'token',
-        PrisonerMockDataA,
-        'LEI',
-        'locationId',
-        '2022-01-01',
-        '2023-01-01',
-        CaseLoadsDummyDataA,
-      )
+      describe('and a relevant case note', () => {
+        it('Returns the text of the case note', async () => {
+          const res = await service.getPrisonerLocationHistory(
+            'token',
+            PrisonerMockDataA,
+            'LEI',
+            'locationId',
+            '2023-01-01',
+            '2024-01-01',
+          )
 
-      expect(locationSharingHistory.length).toEqual(1)
-      const history = locationSharingHistory[0]
-      expect(history.movedIn).toEqual('05/07/2021 - 10:35')
-      expect(history.movedOut).toEqual('05/07/2021 - 10:35')
-      expect(history.name).toEqual('Person, Second')
-      expect(history.number).toEqual('A1234BC')
-      expect(history.shouldLink).toEqual(true)
-    })
-  })
-
-  describe('Given no cell move reason', () => {
-    it('Puts placeholder text in for the what happened', async () => {
-      whereaboutsApiClient.getCellMoveReason = jest.fn(async () => null)
-
-      const pageData = await service(
-        'token',
-        PrisonerMockDataA,
-        'LEI',
-        'locationId',
-        '2022-01-01',
-        '2023-01-01',
-        CaseLoadsDummyDataA,
-      )
-
-      expect(pageData.locationDetails.whatHappened).toEqual('Not entered')
+          expect(whereaboutsApiClient.getCellMoveReason).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, 10, true)
+          expect(caseNotesApiClient.getCaseNote).toHaveBeenCalledWith(
+            PrisonerMockDataA.prisonerNumber,
+            CellMoveReasonMock.cellMoveReason.caseNoteId.toString(),
+            true,
+          )
+          expect(res.whatHappenedDetails).toEqual(pagedCaseNotesMock.content[0].text)
+        })
+      })
     })
   })
 })

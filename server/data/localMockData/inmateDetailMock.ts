@@ -2746,3 +2746,8 @@ export const inmateDetailMock: InmateDetail = {
   locationDescription: 'Moorland (HMP & YOI)',
   latestLocationId: 'MDI',
 }
+
+export const inmateDetailMockOverride = (overrides: Partial<InmateDetail>): InmateDetail => ({
+  ...inmateDetailMock,
+  ...overrides,
+})
