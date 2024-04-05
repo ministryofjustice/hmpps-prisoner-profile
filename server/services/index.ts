@@ -15,7 +15,7 @@ import CsraService from './csraService'
 import ComponentService from './componentService'
 import MoneyService from './moneyService'
 import AppointmentService from './appointmentService'
-import prisonerLocationHistoryService from './prisonerLocationHistoryService'
+import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import ProfessionalContactsService from './professionalContactsService'
 import { auditService as AuditService } from './auditService'
 import config from '../config'
@@ -101,6 +101,11 @@ export const services = () => {
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
   const visitsService = new VisitsService(prisonApiClientBuilder)
   const addressService = new AddressService(prisonApiClientBuilder)
+  const prisonerLocationHistoryService = new PrisonerLocationHistoryService(
+    prisonApiClientBuilder,
+    whereaboutsApiClientBuilder,
+    caseNotesApiClientBuilder,
+  )
 
   return {
     dataAccess,
@@ -121,11 +126,7 @@ export const services = () => {
     moneyService,
     appointmentService,
     prisonerLocationDetailsPageService,
-    prisonerLocationHistoryService: prisonerLocationHistoryService({
-      prisonApiClientBuilder,
-      whereaboutsApiClientBuilder,
-      caseNotesApiClientBuilder,
-    }),
+    prisonerLocationHistoryService,
     professionalContactsService,
     beliefService,
     auditService,

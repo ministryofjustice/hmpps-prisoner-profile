@@ -10,7 +10,7 @@ import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { getCellMoveReasonTypesMock } from '../data/localMockData/getCellMoveReasonTypesMock'
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
-import prisonerLocationHistoryService from '../services/prisonerLocationHistoryService'
+import PrisonerLocationHistoryService from '../services/prisonerLocationHistoryService'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 
@@ -76,11 +76,11 @@ describe('Specific Prisoner Location History', () => {
     caseNotesApiClient.getCaseNote = jest.fn().mockResolvedValue(pagedCaseNotesMock.content[0])
 
     controller = new PrisonerLocationHistoryController(
-      prisonerLocationHistoryService({
-        prisonApiClientBuilder: () => prisonApiClient,
-        whereaboutsApiClientBuilder: () => whereaboutsApiClient,
-        caseNotesApiClientBuilder: () => caseNotesApiClient,
-      }),
+      new PrisonerLocationHistoryService(
+        () => prisonApiClient,
+        () => whereaboutsApiClient,
+        () => caseNotesApiClient,
+      ),
     )
   })
 
