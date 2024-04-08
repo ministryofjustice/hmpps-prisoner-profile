@@ -548,6 +548,7 @@ export default class AppointmentController {
           location: appointmentData.location,
           preAppointmentInfo: appointmentData.pre || 'None requested',
           postAppointmentInfo: appointmentData.post || 'None requested',
+          court: appointmentData.court,
         }
 
         try {
