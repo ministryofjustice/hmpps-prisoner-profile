@@ -26,6 +26,7 @@ import ProbationDocumentsService from './probationDocumentsService'
 import OffencesService from './offencesService'
 import { VisitsService } from './visitsService'
 import AddressService from './addressService'
+import PrisonService from './prisonService'
 
 export const services = () => {
   const {
@@ -45,6 +46,8 @@ export const services = () => {
     manageUsersApiClientBuilder,
     complexityApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
+    prisonRegisterApiClientBuilder,
+    prisonRegisterStore,
   } = dataAccess
 
   const auditService = AuditService({
@@ -106,6 +109,7 @@ export const services = () => {
     whereaboutsApiClientBuilder,
     caseNotesApiClientBuilder,
   )
+  const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
 
   return {
     dataAccess,
@@ -134,6 +138,7 @@ export const services = () => {
     offencesService,
     visitsService,
     addressService,
+    prisonService,
   }
 }
 

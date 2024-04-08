@@ -29,6 +29,7 @@ import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
 import RestrictedPatientApiRestClient from './restrictedPatientApiClient'
 import PrisonRegisterStore from './prisonRegisterStore/prisonRegisterStore'
 import CalculateReleaseDatesApiClient from './calculateReleaseDatesApiClient'
+import PrisonRegisterApiRestClient from './prisonRegisterApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo())
@@ -57,6 +58,7 @@ export const dataAccess = {
   complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token),
   educationAndWorkPlanApiClientBuilder: (token: string) => new EducationAndWorkPlanApiRestClient(token),
   restrictedPatientApiClientBuilder: (token: string) => new RestrictedPatientApiRestClient(token),
+  prisonRegisterApiClientBuilder: (token: string) => new PrisonRegisterApiRestClient(token),
   prisonRegisterStore: new PrisonRegisterStore(createRedisClient()),
   calculateReleaseDatesApiClientBuilder: (token: string) => new CalculateReleaseDatesApiClient(token),
 }
