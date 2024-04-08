@@ -177,7 +177,7 @@
     "sass": "^1.74.1",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.4"
   },
   "overrides": {
     "semver": "^7.5.3",
