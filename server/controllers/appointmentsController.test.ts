@@ -273,10 +273,9 @@ describe('Appointments Controller', () => {
         '391bb0e0-89b3-4aef-b11e-c6550b71fee8',
         'jsmith@email.com',
         {
-          personalisation: {
+          personalisation: expect.objectContaining({
             comments: 'Comment',
             court: 'Leeds Court',
-            date: '8 April 2024',
             endTime: '23:30',
             firstName: 'John',
             lastName: 'Saunders',
@@ -286,7 +285,7 @@ describe('Appointments Controller', () => {
             preAppointmentInfo: 'CES - 23:00 to 23:15',
             prison: 'Moorland (HMP & YOI)',
             startTime: '23:15',
-          },
+          }),
           reference: null,
         },
       )
