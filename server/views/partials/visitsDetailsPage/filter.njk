@@ -17,7 +17,7 @@
             label: {
                 text: "Type"
             },
-            items: visitTypes | addDefaultSelectedValue('Choose type') | setSelected(listMetadata.filtering.visitType)
+            items: visitTypes | addDefaultSelectedValue('Choose type', false) | setSelected(listMetadata.filtering.visitType)
         }) }}
 
         {{ govukSelect({
@@ -26,7 +26,7 @@
             label: {
                 text: "Status"
             },
-            items: statuses | addDefaultSelectedValue('Choose status') | setSelected(visitStatusSelected)
+            items: statuses | addDefaultSelectedValue('Choose status', false) | setSelected(visitStatusSelected)
         }) }}
 
         {{ govukSelect({
@@ -35,7 +35,7 @@
             label: {
                 text: "Establishment"
             },
-            items: prisons | addDefaultSelectedValue('Choose establishment') | setSelected(listMetadata.filtering.prisonId)
+            items: prisons | addDefaultSelectedValue('Choose establishment', false) | setSelected(listMetadata.filtering.prisonId)
         }) }}
 
         {{ hmppsDatepicker({
