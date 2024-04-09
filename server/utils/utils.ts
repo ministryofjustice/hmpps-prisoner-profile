@@ -667,3 +667,21 @@ export const addressToSummaryItems = (address: Address): GovSummaryItem[] => {
 export const apiErrorMessage = 'We cannot show these details right now. Try again later.'
 
 export const compareStrings = (l: string, r: string): number => l.localeCompare(r, 'en', { ignorePunctuation: true })
+
+export const addDefaultSelectedValue = (
+  items: SelectOption[],
+  text: string,
+  setHidden = true,
+): SelectOption[] | null => {
+  if (!items) return null
+
+  return [
+    {
+      text,
+      value: '',
+      selected: true,
+      attributes: setHidden ? { hidden: 'hidden' } : undefined,
+    },
+    ...items,
+  ]
+}

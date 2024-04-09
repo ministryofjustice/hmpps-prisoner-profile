@@ -3,6 +3,7 @@ import * as pathModule from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
 import {
+  addDefaultSelectedValue,
   addressToLines,
   addressToSummaryItems,
   apiErrorMessage,
@@ -86,21 +87,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('pluralise', pluralise)
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('findError', findError)
-  njkEnv.addFilter('addDefaultSelectedValue', (items, text) => {
-    if (!items) return null
-
-    return [
-      {
-        text,
-        value: '',
-        selected: true,
-        attributes: {
-          hidden: 'hidden',
-        },
-      },
-      ...items,
-    ]
-  })
+  njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
 
   njkEnv.addFilter(
     'setSelected',
