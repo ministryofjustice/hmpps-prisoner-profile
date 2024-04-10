@@ -29,7 +29,7 @@ const visitReasonsToStatus = (details: VisitDetails): string => {
     details
   switch (completionStatus) {
     case 'CANC':
-      return `Cancelled: ${cancelReasonDescription}`
+      return cancelReasonDescription ? `Cancelled: ${cancelReasonDescription}` : 'Cancelled'
     case 'SCH': {
       if (isAfter(new Date(startTime), new Date())) return 'Scheduled'
       return searchTypeDescription || 'Not entered'
@@ -49,7 +49,7 @@ export default (visits: VisitWithVisitors[]): MapppedVisitWithVisitors[] => {
       prison: v.visitDetails.prison || 'Not entered',
       visitors: v.visitors.map(
         ({ firstName, lastName, relationship, dateOfBirth }) =>
-          `${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} (${relationship} ${ageAsString(dateOfBirth)})`,
+          `${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} (${relationship}, ${ageAsString(dateOfBirth)})`,
       ),
     }
   })

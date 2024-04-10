@@ -11,7 +11,7 @@ describe('visitsWithVisitorsToListMapper', () => {
     expect(first.status).toEqual('Not entered')
     expect(first.isBooked).toEqual(false)
     expect(first.prison).toEqual('Moorland (HMP & YOI)')
-    expect(first.visitors).toEqual(['John Smith (Grandfather 54 years old)'])
+    expect(first.visitors).toEqual(['John Smith (Grandfather, 54 years old)'])
   })
 
   it('Marks visits as booked if they are in the future', () => {
@@ -28,6 +28,13 @@ describe('visitsWithVisitorsToListMapper', () => {
       const result = visitsWithVisitorsToListMapper(visits)
 
       expect(result[0].status).toEqual('Cancelled: Reason')
+    })
+
+    it('Calculates cancelled status without a valid reason', () => {
+      const visits = [mockVisit({ visitDetails: { completionStatus: 'CANC', cancelReasonDescription: undefined } })]
+      const result = visitsWithVisitorsToListMapper(visits)
+
+      expect(result[0].status).toEqual('Cancelled')
     })
 
     it('Calculates scheduled status when in the future', () => {
