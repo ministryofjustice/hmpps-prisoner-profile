@@ -11,7 +11,13 @@ import {
 import { caseNoteTypesMock } from '../../server/data/localMockData/caseNoteTypesMock'
 
 export default {
-  stubGetCaseNotes: (prisonerNumber: string) => {
+  stubGetCaseNotes: ({
+    prisonerNumber,
+    includeSensitive = false,
+  }: {
+    prisonerNumber: string
+    includeSensitive?: boolean
+  }) => {
     let jsonResp
     if (prisonerNumber === 'G6123VU') {
       jsonResp = pagedCaseNotesMock
@@ -21,7 +27,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20${includeSensitive ? '&includeSensitive=true' : ''}`,
       },
       response: {
         status: 200,
@@ -141,7 +147,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=OMIC`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=OMIC&includeSensitive=true`,
       },
       response: {
         status: 200,

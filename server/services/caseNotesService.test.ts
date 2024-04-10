@@ -34,14 +34,36 @@ describe('Case Notes Page', () => {
 
   describe('Get Case Notes', () => {
     it('should call Case Notes API to get case notes', async () => {
-      const caseNotesPageData = await caseNotesService.get('', prisonerData, {}, true, {
-        displayName: 'A Name',
-        name: 'Name',
+      const caseNotesPageData = await caseNotesService.get({
+        token: '',
+        prisonerData,
+        currentUserDetails: {
+          displayName: 'A Name',
+          name: 'Name',
+        },
       })
 
-      expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {})
       expect(caseNotesPageData.fullName).toEqual('John Smith')
+      expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
+        includeSensitive: false,
+      })
+    })
+
+    it('should allow inclusion of sensitive case notes', async () => {
+      await caseNotesService.get({
+        token: '',
+        prisonerData,
+        currentUserDetails: {
+          displayName: 'A Name',
+          name: 'Name',
+        },
+        canViewSensitiveCaseNotes: true,
+      })
+
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
+        includeSensitive: true,
+      })
     })
   })
 
@@ -109,9 +131,13 @@ describe('Case Notes Page', () => {
 
         const {
           pagedCaseNotes: { content },
-        } = await caseNotesService.get('', prisonerData, {}, true, {
-          displayName: 'A Name',
-          name: 'Name',
+        } = await caseNotesService.get({
+          token: '',
+          prisonerData,
+          currentUserDetails: {
+            displayName: 'A Name',
+            name: 'Name',
+          },
         })
 
         expect(content[0].printIncentiveWarningLink).toBeTruthy()

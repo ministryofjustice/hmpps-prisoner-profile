@@ -10,6 +10,7 @@ import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 export default function checkPrisonerInCaseload({
   allowGlobal = true,
+  allowGlobalPom = true,
   allowInactive = true,
   activeCaseloadOnly = false,
 } = {}): RequestHandler {
@@ -36,7 +37,7 @@ export default function checkPrisonerInCaseload({
      * - POM users who have the supporting prison ID in their case loads
      * - Users with the inactive bookings role
      */
-    function authenticateRestictedPatient() {
+    function authenticateRestrictedPatient() {
       return (
         (pomUser && prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)) || inactiveBookingsUser
       )
@@ -63,7 +64,7 @@ export default function checkPrisonerInCaseload({
         return true
       }
 
-      return allowGlobal && globalSearchUser
+      return (allowGlobal && globalSearchUser) || (allowGlobalPom && pomUser && globalSearchUser)
     }
 
     // Some routes can only be accessed if the prisoner is within your active caseload
@@ -80,7 +81,7 @@ export default function checkPrisonerInCaseload({
     }
 
     if (restrictedPatient) {
-      if (!authenticateRestictedPatient()) {
+      if (!authenticateRestrictedPatient()) {
         return authenticationError(
           'CheckPrisonerInCaseloadMiddleware: Prisoner is restricted patient',
           HmppsStatusCode.RESTRICTED_PATIENT,

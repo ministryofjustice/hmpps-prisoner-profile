@@ -8,8 +8,6 @@ export default interface OverviewPageData extends OverviewPage {
   courtCaseSummary: CourtCaseSummary
   overviewActions: HmppsAction[]
   overviewInfoLinks: { text: string; url: string; dataQA: string }[]
-  canView: boolean
-  canAdd: boolean
   prisonerDisplayName: string
   options: {
     showCourtCaseSummary: boolean

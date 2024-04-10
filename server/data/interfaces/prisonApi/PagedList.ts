@@ -54,6 +54,7 @@ export interface CaseNotesListQueryParams extends PagedListQueryParams {
   subType?: string
   startDate?: string
   endDate?: string
+  includeSensitive?: boolean
 }
 
 export interface VisitsListQueryParams extends PagedListQueryParams {

@@ -154,7 +154,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
 
       describe('Given a POM user', () => {
         beforeEach(() => {
-          res.locals.user.userRoles = [Role.PrisonUser, 'POM']
+          res.locals.user.userRoles = [Role.PrisonUser, Role.PomUser]
         })
 
         it('Does not let users view a patient without the supporting prison caseload', async () => {
@@ -318,6 +318,15 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
           res.locals.user.userRoles = [Role.GlobalSearch]
 
           await checkPrisonerInCaseload()(req, res, next)
+          expectAccessToBeGranted()
+        })
+
+        it('should return next() if user has roles POM and GLOBAL_SEARCH, allowGlobal is false but allowGlobalPom is true', async () => {
+          res.locals.user.userRoles = [Role.PomUser, Role.GlobalSearch]
+
+          setPrisonerData({ prisonId: 'ZZZ' })
+
+          await checkPrisonerInCaseload({ allowGlobal: false, allowGlobalPom: true })(req, res, next)
           expectAccessToBeGranted()
         })
       })

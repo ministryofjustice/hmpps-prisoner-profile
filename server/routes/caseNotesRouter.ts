@@ -8,6 +8,7 @@ import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import { UpdateCaseNoteValidator } from '../validators/updateCaseNoteValidator'
+import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 
 export default function caseNotesRouter(services: Services): Router {
   const router = Router()
@@ -24,6 +25,7 @@ export default function caseNotesRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/case-notes',
     auditPageAccessAttempt({ services, page: Page.CaseNotes }),
     getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowGlobalPom: true }),
     caseNotesController.displayCaseNotes(),
   )
 
@@ -31,11 +33,15 @@ export default function caseNotesRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/add-case-note',
     auditPageAccessAttempt({ services, page: Page.AddCaseNote }),
     getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowGlobalPom: true }),
     caseNotesController.displayAddCaseNote(),
   )
+
   post(
     '/prisoner/:prisonerNumber/add-case-note',
     auditPageAccessAttempt({ services, page: Page.PostAddCaseNote }),
+    getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowGlobalPom: true }),
     validationMiddleware(CaseNoteValidator),
     caseNotesController.post(),
   )
@@ -44,11 +50,15 @@ export default function caseNotesRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/update-case-note/:caseNoteId',
     auditPageAccessAttempt({ services, page: Page.UpdateCaseNote }),
     getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowGlobalPom: true }),
     caseNotesController.displayUpdateCaseNote(),
   )
+
   post(
     '/prisoner/:prisonerNumber/update-case-note/:caseNoteId',
     auditPageAccessAttempt({ services, page: Page.PostUpdateCaseNote }),
+    getPrisonerData(services),
+    checkPrisonerInCaseload({ allowGlobal: false, allowGlobalPom: true }),
     validationMiddleware(UpdateCaseNoteValidator),
     caseNotesController.postUpdate(),
   )
