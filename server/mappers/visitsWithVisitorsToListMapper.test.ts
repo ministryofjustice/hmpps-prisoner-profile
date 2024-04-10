@@ -30,6 +30,13 @@ describe('visitsWithVisitorsToListMapper', () => {
       expect(result[0].status).toEqual('Cancelled: Reason')
     })
 
+    it('Calculates cancelled status without a valid reason', () => {
+      const visits = [mockVisit({ visitDetails: { completionStatus: 'CANC', cancelReasonDescription: undefined } })]
+      const result = visitsWithVisitorsToListMapper(visits)
+
+      expect(result[0].status).toEqual('Cancelled')
+    })
+
     it('Calculates scheduled status when in the future', () => {
       const visits = [
         mockVisit({
