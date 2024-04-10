@@ -1,4 +1,5 @@
 import {
+  addDefaultSelectedValue,
   addressToLines,
   addressToSummaryItems,
   apostrophe,
@@ -30,6 +31,7 @@ import {
   prisonerIsTRN,
   properCaseName,
   refDataToSelectOptions,
+  SelectOption,
   sortArrayOfObjectsByDate,
   SortType,
   summaryListOneHalfWidth,
@@ -797,5 +799,26 @@ describe('utils', () => {
     ])('%s: addressToSummaryItems(%s, %s, %s)', (_: string, address: Address, expected: GovSummaryItem[]) => {
       expect(addressToSummaryItems(address)).toEqual(expected)
     })
+  })
+
+  describe('add default selected value', () => {
+    const testItems: SelectOption[] = [{ value: 'val', text: 'text' }]
+
+    it.each([
+      ['null', null, 'default', undefined, null],
+      [
+        'Hide default',
+        testItems,
+        'default',
+        undefined,
+        [{ text: 'default', value: '', selected: true, attributes: { hidden: 'hidden' } }, ...testItems],
+      ],
+      ['Keep default', testItems, 'default', false, [{ text: 'default', value: '', selected: true }, ...testItems]],
+    ])(
+      '%s: addDefaultSelectedValue(%s, %s, %s, %s)',
+      (_: string, items: SelectOption[], text: string, setHidden: boolean, expected: SelectOption[] | null) => {
+        expect(addDefaultSelectedValue(items, text, setHidden)).toEqual(expected)
+      },
+    )
   })
 })

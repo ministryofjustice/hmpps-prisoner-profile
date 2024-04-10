@@ -249,6 +249,47 @@ describe('Appointments Controller', () => {
       expect(req.flash).toHaveBeenCalledWith('refererUrl', 'http://referer')
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-appointment`)
     })
+
+    it('should call Notify with the correct data', async () => {
+      const flash = {
+        appointmentDefaults: {
+          startTime: appointmentsToCreate.startTime,
+          endTime: appointmentsToCreate.endTime,
+          locationId: appointmentsToCreate.locationId,
+          comment: appointmentsToCreate.comment,
+        },
+        formValues: formBodyVLB,
+      }
+      req.flash = (key: string) => {
+        if (key === 'prePostAppointmentDetails') {
+          return [flash]
+        }
+        return []
+      }
+
+      await controller.displayPrePostAppointmentConfirmation()(req, res)
+
+      expect(controller['notifyClient'].sendEmail).toHaveBeenCalledWith(
+        '391bb0e0-89b3-4aef-b11e-c6550b71fee8',
+        'jsmith@email.com',
+        {
+          personalisation: expect.objectContaining({
+            comments: 'Comment',
+            court: 'Leeds Court',
+            endTime: '23:30',
+            firstName: 'John',
+            lastName: 'Saunders',
+            location: 'CES',
+            offenderNo: 'G6123VU',
+            postAppointmentInfo: 'Chapel - 23:30 to 23:45',
+            preAppointmentInfo: 'CES - 23:00 to 23:15',
+            prison: 'Moorland (HMP & YOI)',
+            startTime: '23:15',
+          }),
+          reference: null,
+        },
+      )
+    })
   })
 
   it('should display appointment confirmation', async () => {
