@@ -43,14 +43,8 @@
 
 {% macro incorrectDetails(probationDetails) %}
   <p class="govuk-body">
-    We have retrieved this information from the probation system where the prisoner’s name is recorded as
-    <strong data-qa="probation-details-name">{{ probationDetails.name }}</strong>. If something does not look right you
-    should ask a Community offender manager to check the details in Delius, the case reference number (CRN) is
-    <strong data-qa="probation-details-crn">{{ probationDetails.crn }}</strong>.
-  </p>
-  <p class="govuk-body">
-    The Delius record should have the prison number assigned to the Delius NOMS number and the Throughcare (custody)
-    details may need to be updated using the Search DSS feature.
+    This information is from the probation system. Contact a probation practitioner if you think it’s incorrect.
+    The CRN (case reference number) is <strong data-qa="probation-details-crn">{{ probationDetails.crn }}</strong>.
   </p>
 {% endmacro %}
 
@@ -111,28 +105,31 @@
 
 {% block content %}
   <h1 class="govuk-heading-l">Documents held by probation</h1>
+  <article class="govuk-!-width-two-thirds">
   {% if probationDetails %}
     {{
       govukDetails({
-      summaryText: "These details don't look correct",
+      summaryText: "What to do if these details look incorrect",
       html: incorrectDetails(probationDetails)
       })
     }}
   {% else %}
     {{
       govukDetails({
-      summaryText: "What can I do to find the probation documents",
-      text: "If something does not look right you should ask a Community offender manager to check the details in Delius. It is possible that the offender record does exist in Delius, but the Delius NOMS number has not been set correctly to the prison number. Ask a someone to update the Delius record and try again."
+      summaryText: "How to find probation documents",
+      text: "If you think something is missing, ask a probation practitioner to update the record in the probation system."
       })
     }}
   {% endif %}
+  </article>
 
   {% if probationDocumentsNotFound %}
     {{
       govukErrorSummary({
       titleText: "There is a problem",
-      errorList: [{text: "We are unable to display documents for this prisoner because we cannot find the offender record in the probation system"}],
-      attributes: { 'data-qa-errors': true }
+      errorList: [{text: "We are unable to display documents for this prisoner because we cannot find the record in the probation system."}],
+      attributes: { 'data-qa-errors': true },
+      classes: 'govuk-!-width-two-thirds'
       })
     }}
   {% else %}
