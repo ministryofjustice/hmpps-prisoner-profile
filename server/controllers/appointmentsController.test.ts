@@ -545,7 +545,7 @@ describe('Appointments Controller', () => {
     req.query.date = '02/01/2023'
     req.query.repeats = 'DAILY'
     req.query.times = 5
-    const endDate = formatDate(dateToIsoDate('06/01/2023'), 'full').replace(',', '')
+    const endDate = formatDate(dateToIsoDate('06/01/2023'), 'full')
 
     await controller.getRecurringEndDate()(req, res)
 
