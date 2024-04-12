@@ -113,7 +113,7 @@ export default class PrisonerScheduleController {
     }
 
     const days = selectedWeekDates?.map(day => ({
-      date: formatDate(day?.date, 'full').replace(',', ''),
+      date: formatDate(day?.date, 'full'),
       periods: groupedByDate
         ? eventsAction(groupedByDate[day?.date])
         : {

@@ -697,7 +697,7 @@ export default class AppointmentController {
 
       const endDate = formatDateISO(calculateEndDate(date, repeats, times))
 
-      return res.send(formatDate(endDate, 'full').replace(',', ''))
+      return res.send(formatDate(endDate, 'full'))
     }
   }
 }
