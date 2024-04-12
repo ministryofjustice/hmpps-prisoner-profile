@@ -95,7 +95,10 @@ export default (
       dataQA: 'refer-to-pathfinder-action-link',
     })
   }
-  if (userHasRoles([Role.SocCustody, Role.SocCommunity], user.userRoles) && !socNominal) {
+  if (
+    userHasRoles([Role.SocCustody, Role.SocCommunity, Role.SocDataAnalyst, Role.SocDataManager], user.userRoles) &&
+    !socNominal
+  ) {
     actions.push({
       text: 'Add to SOC',
       icon: Icon.AddToSOC,
