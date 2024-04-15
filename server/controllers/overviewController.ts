@@ -17,6 +17,7 @@ import logger from '../../logger'
 import OffencesService from '../services/offencesService'
 import OverviewPageData from './interfaces/OverviewPageData'
 import mapCourtCaseSummary from './mappers/mapCourtCaseSummary'
+import { Result } from '../utils/result/result'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -31,7 +32,7 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
-    const { clientToken } = res.locals
+    const { clientToken, apiErrorCallback } = res.locals
     const { userRoles } = res.locals.user
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
@@ -52,7 +53,7 @@ export default class OverviewController {
         prisonerData,
         staffId: res.locals.user.staffId,
         inmateDetail,
-        apiErrorCallback: res.locals.apiErrorCallback,
+        apiErrorCallback,
         userCaseLoads: res.locals.user.caseLoads,
         userRoles: res.locals.user.userRoles,
       }),
@@ -60,9 +61,12 @@ export default class OverviewController {
       manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
       this.offencesService.getNextCourtHearingSummary(clientToken, prisonerData.bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, prisonerData.bookingId),
-      showCourtCaseSummary
-        ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerData.prisonerNumber)
-        : null,
+      Result.wrap(
+        showCourtCaseSummary
+          ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerData.prisonerNumber)
+          : null,
+        apiErrorCallback,
+      ),
     ])
 
     const overviewActions = buildOverviewActions(
