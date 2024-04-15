@@ -6,7 +6,6 @@ import HmppsError from '../interfaces/HmppsError'
 import ListMetadata from '../interfaces/ListMetadata'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
 import OverviewNonAssociation from '../services/interfaces/overviewPageService/OverviewNonAssociation'
@@ -16,6 +15,7 @@ import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import Address from '../data/interfaces/prisonApi/Address'
 import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import { User } from '../data/interfaces/manageUsersApi/User'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word

@@ -1,9 +1,9 @@
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
-import { User } from '../../../data/hmppsAuthClient'
 import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../../../utils/utils'
 import { Role } from '../../../data/enums/role'
 import config from '../../../config'
+import { User } from '../../../data/interfaces/manageUsersApi/User'
 
 export default function buildOverviewInfoLinks(
   prisonerData: Prisoner,

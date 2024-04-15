@@ -1,6 +1,5 @@
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
-import { User } from '../../../data/hmppsAuthClient'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { canAddCaseNotes, canViewCalculateReleaseDates } from '../../../utils/roleHelpers'
 import { Icon } from '../../../data/enums/icon'
@@ -10,6 +9,7 @@ import conf from '../../../config'
 import { HeaderFooterMeta } from '../../../data/interfaces/componentApi/Component'
 import isServiceEnabled from '../../../utils/isServiceEnabled'
 import StaffRole from '../../../data/interfaces/prisonApi/StaffRole'
+import { User } from '../../../data/interfaces/manageUsersApi/User'
 
 export default (
   prisonerData: Prisoner,

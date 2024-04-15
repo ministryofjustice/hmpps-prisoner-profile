@@ -12,13 +12,11 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
-import { User } from '../data/hmppsAuthClient'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import Alert from '../data/interfaces/prisonApi/Alert'
 import AlertFlagLabel from '../interfaces/AlertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
-
-export const placeHolderImagePath = '/assets/images/prisoner-profile-photo.png'
+import { User } from '../data/interfaces/manageUsersApi/User'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
   const { userRoles, caseLoads } = user
