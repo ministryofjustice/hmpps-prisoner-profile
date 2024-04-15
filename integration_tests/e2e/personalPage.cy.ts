@@ -82,7 +82,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
-      cy.task('stubAuthUser')
+      cy.task('stubUser')
       cy.task('stubUserCaseLoads')
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       visitPersonalDetailsPage()
@@ -369,7 +369,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
-      cy.task('stubAuthUser')
+      cy.task('stubUser')
       cy.task('stubUserCaseLoads')
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
     })
@@ -413,7 +413,7 @@ context('When signed in', () => {
         roles: [Role.GlobalSearch],
       })
       cy.task('stubSignIn')
-      cy.task('stubAuthUser')
+      cy.task('stubUser')
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       visitPersonalDetailsPage()
     })

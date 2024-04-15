@@ -119,7 +119,7 @@ Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, boo
 Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'MDI' } = {}) => {
   cy.task('stubSignIn', roles)
   cy.task('stubUserCaseLoads', caseLoads)
-  cy.task('stubAuthUser', { activeCaseLoadId })
+  cy.task('stubUser', { activeCaseLoadId })
 })
 
 Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {

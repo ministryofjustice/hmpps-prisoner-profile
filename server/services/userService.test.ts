@@ -1,29 +1,31 @@
 import UserService from './userService'
-import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { ManageUsersApiClient } from '../data/interfaces/manageUsersApi/manageUsersApiClient'
+import ManageUsersApiRestClient from '../data/manageUsersApiClient'
+import { User } from '../data/interfaces/manageUsersApi/User'
 
 const token = 'some token'
 
-jest.mock('../data/hmppsAuthClient')
+jest.mock('../data/manageUsersApiClient')
 
 describe('User service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
+  let manageUsersApiClient: jest.Mocked<ManageUsersApiClient>
   let prisonApiClient: PrisonApiClient
   let userService: UserService
   let expectedCaseLoads: CaseLoad[]
 
   beforeEach(() => {
-    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-    hmppsAuthClient.getUser.mockResolvedValue({ name: 'john smith' } as User)
+    manageUsersApiClient = new ManageUsersApiRestClient(null) as jest.Mocked<ManageUsersApiRestClient>
+    manageUsersApiClient.getUser.mockResolvedValue({ name: 'john smith' } as User)
 
     prisonApiClient = prisonApiClientMock()
     expectedCaseLoads = [{ caseloadFunction: '', caseLoadId: '1', currentlyActive: true, description: '', type: '' }]
     prisonApiClient.getUserCaseLoads = jest.fn(async () => expectedCaseLoads)
 
     userService = new UserService(
-      () => hmppsAuthClient,
+      () => manageUsersApiClient,
       () => prisonApiClient,
     )
   })
@@ -40,7 +42,7 @@ describe('User service', () => {
     })
 
     it('Propagates error', async () => {
-      hmppsAuthClient.getUser.mockRejectedValue(new Error('some error'))
+      manageUsersApiClient.getUser.mockRejectedValue(new Error('some error'))
 
       await expect(userService.getUser(token)).rejects.toEqual(new Error('some error'))
     })
