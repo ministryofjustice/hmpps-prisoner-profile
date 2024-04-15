@@ -25,7 +25,7 @@ export default class PrisonerScheduleController {
     const { firstName, middleNames, lastName } = prisonerData
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     const selectedWeekDates: SelectedWeekDates[] = [] as SelectedWeekDates[]

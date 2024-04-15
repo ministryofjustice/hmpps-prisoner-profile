@@ -31,7 +31,7 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const { userRoles } = res.locals.user
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)

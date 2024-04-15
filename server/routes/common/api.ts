@@ -32,7 +32,7 @@ export default class CommonApiRoutes {
       res.redirect(categoryAImage)
     } else {
       this.offenderService
-        .getPrisonerImage(res.locals.clientToken, prisonerNumber, fullSizeImage)
+        .getPrisonerImage(req.middleware.clientToken, prisonerNumber, fullSizeImage)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')
           res.removeHeader('pragma')
@@ -61,7 +61,7 @@ export default class CommonApiRoutes {
       res.sendFile(placeHolderImage)
     } else {
       this.offenderService
-        .getImage(res.locals.clientToken, imageId)
+        .getImage(req.middleware.clientToken, imageId)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')
           res.removeHeader('pragma')

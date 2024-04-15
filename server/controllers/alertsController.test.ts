@@ -33,6 +33,7 @@ describe('Alerts Controller', () => {
         query: { page: '0', sort: 'dateCreated,ASC', alertType: 'R', from: '01/01/2023', to: '02/02/2023' },
         path: 'alerts/active',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -45,7 +46,6 @@ describe('Alerts Controller', () => {
             caseLoads: CaseLoadsDummyDataA,
             token: 'TOKEN',
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
       }
@@ -62,7 +62,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         PrisonerMockDataA,
         {
           alertStatus: 'ACTIVE',
@@ -88,7 +88,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, false)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         PrisonerMockDataA,
         {
           alertStatus: 'INACTIVE',
@@ -112,7 +112,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         PrisonerMockDataA,
         {
           alertStatus: 'ACTIVE',
@@ -137,7 +137,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         PrisonerMockDataA,
         {
           alertStatus: 'ACTIVE',
@@ -163,7 +163,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         { ...PrisonerMockDataA, prisonId: 'XYZ' },
         {
           alertStatus: 'ACTIVE',
@@ -190,7 +190,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         { ...PrisonerMockDataA, prisonId: 'OUT' },
         {
           alertStatus: 'ACTIVE',
@@ -217,7 +217,7 @@ describe('Alerts Controller', () => {
       await controller.displayAlerts(req, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         { ...PrisonerMockDataA, prisonId: 'TRN' },
         {
           alertStatus: 'ACTIVE',
@@ -239,6 +239,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/add-alert',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -251,7 +252,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
@@ -309,6 +309,7 @@ describe('Alerts Controller', () => {
         params: { prisonerNumber: '' },
         query: {},
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -321,7 +322,6 @@ describe('Alerts Controller', () => {
             caseLoads: CaseLoadsDummyDataA,
             token: 'TOKEN',
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
       }
@@ -339,7 +339,7 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlert()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, 1)
       expect(res.render).toHaveBeenCalledWith('pages/alerts/alertDetailsPage', {
         pageTitle: 'Alerts',
         miniBannerData: {
@@ -362,8 +362,8 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlert()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 2)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, 2)
 
       expect(res.render).toHaveBeenCalledWith('pages/alerts/alertDetailsPage', {
         pageTitle: 'Alerts',
@@ -383,6 +383,7 @@ describe('Alerts Controller', () => {
         params: { prisonerNumber: '' },
         query: {},
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -395,7 +396,6 @@ describe('Alerts Controller', () => {
             caseLoads: CaseLoadsDummyDataA,
             token: 'TOKEN',
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
       }
@@ -412,7 +412,7 @@ describe('Alerts Controller', () => {
 
       await controller.getAlertDetails()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, 1)
       expect(res.render).toHaveBeenCalledWith('partials/alerts/alertDetails', {
         alerts: [alertDetailsMock],
         allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -428,8 +428,8 @@ describe('Alerts Controller', () => {
 
       await controller.getAlertDetails()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 1)
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(res.locals.clientToken, PrisonerMockDataA.bookingId, 2)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, 1)
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, 2)
       expect(res.render).toHaveBeenCalledWith('partials/alerts/alertDetails', {
         alerts: [alertDetailsMock, alertDetailsMock],
         allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -444,6 +444,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/1/add-more-details',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -456,7 +457,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
@@ -542,6 +542,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/1/close',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -554,7 +555,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),
@@ -646,6 +646,7 @@ describe('Alerts Controller', () => {
         query: {},
         path: 'alerts/1/change-end-date',
         middleware: {
+          clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
         },
@@ -658,7 +659,6 @@ describe('Alerts Controller', () => {
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,
           },
-          clientToken: 'CLIENT_TOKEN',
         },
         render: jest.fn(),
         redirect: jest.fn(),

@@ -113,13 +113,13 @@ describe('Appointments Controller', () => {
         userDetails: { displayName: 'A Name' },
       },
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
       flash: jest.fn(),
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           userRoles: [Role.PrisonUser],
           staffId: 487023,
@@ -163,7 +163,7 @@ describe('Appointments Controller', () => {
     await controller.displayAddAppointment()(req, res)
 
     expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       res.locals.user.activeCaseLoadId,
     )
 
@@ -316,7 +316,7 @@ describe('Appointments Controller', () => {
     await controller.displayAppointmentConfirmation()(req, res)
 
     expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       res.locals.user.activeCaseLoadId,
     )
     expect(res.render).toHaveBeenCalledWith('pages/appointments/appointmentConfirmation', {
@@ -366,7 +366,7 @@ describe('Appointments Controller', () => {
     await controller.displayPrePostAppointments()(req, res)
 
     expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       res.locals.user.activeCaseLoadId,
     )
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
@@ -488,7 +488,7 @@ describe('Appointments Controller', () => {
     await controller.displayPrePostAppointmentConfirmation()(req, res)
 
     expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
-      res.locals.clientToken,
+      req.middleware.clientToken,
       res.locals.user.activeCaseLoadId,
     )
     expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()

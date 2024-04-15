@@ -43,6 +43,7 @@ describe('Case Notes Controller', () => {
         referer: 'http://referer',
       },
       middleware: {
+        clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
       },
       path: 'case-notes',
@@ -53,7 +54,6 @@ describe('Case Notes Controller', () => {
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           username: 'AB123456',
           userRoles: [Role.DeleteSensitiveCaseNotes],
@@ -87,7 +87,7 @@ describe('Case Notes Controller', () => {
 
       expect(prisonApiClient.getCaseNotesUsage).toHaveBeenCalledWith(req.params.prisonerNumber)
       expect(getCaseNotesSpy).toHaveBeenCalledWith({
-        token: res.locals.clientToken,
+        token: req.middleware.clientToken,
         prisonerData: PrisonerMockDataA,
         queryParams: {
           page: 0,
@@ -121,7 +121,7 @@ describe('Case Notes Controller', () => {
         await controller.displayCaseNotes()(req, res)
 
         expect(getCaseNotesSpy).toHaveBeenCalledWith({
-          token: res.locals.clientToken,
+          token: req.middleware.clientToken,
           prisonerData: PrisonerMockDataA,
           queryParams: {
             page: 0,
@@ -210,6 +210,7 @@ describe('Case Notes Controller', () => {
         minutes: '30',
       }
       req = {
+        ...req,
         params: {
           prisonerNumber: PrisonerMockDataA.prisonerNumber,
         },
@@ -217,7 +218,6 @@ describe('Case Notes Controller', () => {
           ...caseNoteForm,
           refererUrl: 'http://referer',
         },
-        flash: jest.fn(),
       }
       const addCaseNoteSpy = jest
         .spyOn<any, string>(controller['caseNotesService'], 'addCaseNote')
@@ -230,7 +230,7 @@ describe('Case Notes Controller', () => {
       await controller.post()(req, res, next)
 
       expect(addCaseNoteSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         PrisonerMockDataA.prisonerNumber,
         caseNoteForm,
       )
@@ -286,7 +286,7 @@ describe('Case Notes Controller', () => {
       await controller.displayUpdateCaseNote()(req, res)
 
       expect(getCaseNoteSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         req.params.prisonerNumber,
         req.params.caseNoteId,
       )
@@ -343,6 +343,7 @@ describe('Case Notes Controller', () => {
       const caseNoteId = 'abc123'
 
       req = {
+        ...req,
         params: {
           prisonerNumber: PrisonerMockDataA.prisonerNumber,
           caseNoteId,
@@ -351,7 +352,6 @@ describe('Case Notes Controller', () => {
           ...updateCaseNoteForm,
           refererUrl: 'http://referer',
         },
-        flash: jest.fn(),
       }
       const updateCaseNoteSpy = jest
         .spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
@@ -364,7 +364,7 @@ describe('Case Notes Controller', () => {
       await controller.postUpdate()(req, res)
 
       expect(updateCaseNoteSpy).toHaveBeenCalledWith(
-        res.locals.clientToken,
+        req.middleware.clientToken,
         PrisonerMockDataA.prisonerNumber,
         caseNoteId,
         updateCaseNoteForm,
@@ -378,6 +378,7 @@ describe('Case Notes Controller', () => {
         res.locals.user.userRoles = [value]
         const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
         req = {
+          ...req,
           params: {
             prisonerNumber: PrisonerMockDataA.prisonerNumber,
           },
@@ -388,7 +389,6 @@ describe('Case Notes Controller', () => {
             currentLength: 100,
             refererUrl: 'http://referer',
           },
-          flash: jest.fn(),
         }
 
         const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
@@ -404,6 +404,7 @@ describe('Case Notes Controller', () => {
       res.locals.user.userRoles = []
       const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
       req = {
+        ...req,
         params: {
           prisonerNumber: PrisonerMockDataA.prisonerNumber,
         },
@@ -414,7 +415,6 @@ describe('Case Notes Controller', () => {
           currentLength: 100,
           refererUrl: 'http://referer',
         },
-        flash: jest.fn(),
       }
 
       const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')

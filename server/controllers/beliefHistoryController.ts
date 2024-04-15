@@ -13,7 +13,7 @@ export default class BeliefHistoryController {
 
   public async displayBeliefHistory(req: Request, res: Response) {
     const { firstName, lastName, prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
 
     const beliefs = await this.beliefService.getBeliefHistory(clientToken, prisonerNumber, bookingId)
 

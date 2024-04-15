@@ -28,7 +28,7 @@ export default class AlertsController {
     const { prisonerData, inmateDetail } = req.middleware
 
     // Parse query params for paging, sorting and filtering data
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const queryParams: AlertsListQueryParams = {}
     if (req.query.page) queryParams.page = +req.query.page
     if (req.query.sort) queryParams.sort = req.query.sort as string
@@ -81,7 +81,7 @@ export default class AlertsController {
   }
 
   public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
-    const types = await this.referenceDataService.getAlertTypes(res.locals.clientToken)
+    const types = await this.referenceDataService.getAlertTypes(req.middleware.clientToken)
 
     // Get data from middleware
     const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId, cellLocation } =
@@ -186,7 +186,7 @@ export default class AlertsController {
       const {
         prisonerData: { bookingId, firstName, lastName, prisonerNumber, cellLocation },
       } = req.middleware
-      const { clientToken } = res.locals
+      const { clientToken } = req.middleware
       const alertIds = req.query.ids
 
       const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
@@ -214,7 +214,7 @@ export default class AlertsController {
       const {
         prisonerData: { bookingId, prisonerNumber },
       } = req.middleware
-      const { clientToken } = res.locals
+      const { clientToken } = req.middleware
       const alertIds = req.query.ids
 
       const alerts: Alert[] = await Promise.all(
@@ -231,7 +231,7 @@ export default class AlertsController {
   }
 
   public async displayAddMoreDetails(req: Request, res: Response, next: NextFunction) {
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const { alertId } = req.params
 
     // Get data from middleware
@@ -323,7 +323,7 @@ export default class AlertsController {
   }
 
   public async displayCloseAlert(req: Request, res: Response, next: NextFunction) {
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const { alertId } = req.params
 
     // Get data from middleware
@@ -429,7 +429,7 @@ export default class AlertsController {
   }
 
   public async displayChangeEndDate(req: Request, res: Response, next: NextFunction) {
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const { alertId } = req.params
 
     // Get data from middleware
