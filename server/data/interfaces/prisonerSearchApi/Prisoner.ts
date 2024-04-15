@@ -120,7 +120,6 @@ export default interface Prisoner {
   tattoos?: BodyPartDetail[]
   scars?: BodyPartDetail[]
   marks?: BodyPartDetail[]
-  otherMarks?: BodyPartDetail[]
 }
 
 export interface Alias {
