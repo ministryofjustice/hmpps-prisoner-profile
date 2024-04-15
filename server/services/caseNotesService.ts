@@ -38,22 +38,21 @@ export default class CaseNotesService {
     return apiParams
   }
 
-  /**
-   * Handle request for case notes
-   *
-   * @param token
-   * @param prisonerData
-   * @param queryParams
-   * @param canDeleteSensitiveCaseNotes
-   * @param currentUserDetails
-   */
-  public async get(
-    token: string,
-    prisonerData: Prisoner,
-    queryParams: CaseNotesListQueryParams,
-    canDeleteSensitiveCaseNotes: boolean,
-    currentUserDetails: UserDetails,
-  ): Promise<CaseNotesPageData> {
+  public async get({
+    token,
+    prisonerData,
+    queryParams = {},
+    canViewSensitiveCaseNotes = false,
+    canDeleteSensitiveCaseNotes = false,
+    currentUserDetails,
+  }: {
+    token: string
+    prisonerData: Prisoner
+    queryParams?: CaseNotesListQueryParams
+    canViewSensitiveCaseNotes?: boolean
+    canDeleteSensitiveCaseNotes?: boolean
+    currentUserDetails: UserDetails
+  }): Promise<CaseNotesPageData> {
     const sortOptions: SortOption[] = [
       { value: 'creationDateTime,DESC', description: 'Created (most recent)' },
       { value: 'creationDateTime,ASC', description: 'Created (oldest)' },
@@ -69,10 +68,10 @@ export default class CaseNotesService {
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {
-      const { content, ...rest } = await caseNotesApiClient.getCaseNotes(
-        prisonerData.prisonerNumber,
-        this.mapToApiParams(queryParams),
-      )
+      const { content, ...rest } = await caseNotesApiClient.getCaseNotes(prisonerData.prisonerNumber, {
+        ...this.mapToApiParams(queryParams),
+        includeSensitive: canViewSensitiveCaseNotes,
+      })
 
       const pagedCaseNotesContent = content?.map((caseNote: CaseNote) => {
         return {

@@ -51,8 +51,8 @@ export default class AppointmentController {
 
   public displayAddAppointment(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
+      const { clientToken } = req.middleware
       const {
-        clientToken,
         user: { activeCaseLoadId },
       } = res.locals
       const { prisonerNumber } = req.params
@@ -205,8 +205,8 @@ export default class AppointmentController {
   public displayAppointmentConfirmation(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
       const {
-        clientToken,
         user: { activeCaseLoadId },
       } = res.locals
       const appointmentFlash = req.flash('appointmentForm')
@@ -292,8 +292,8 @@ export default class AppointmentController {
   public displayPrePostAppointments(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
       const {
-        clientToken,
         user: { activeCaseLoadId },
       } = res.locals
       const appointmentFlash = req.flash('prePostAppointmentDetails')
@@ -462,8 +462,8 @@ export default class AppointmentController {
   public displayPrePostAppointmentConfirmation(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
       const {
-        clientToken,
         user: { activeCaseLoadId, username },
       } = res.locals
 
@@ -623,9 +623,9 @@ export default class AppointmentController {
 
   public getOffenderEvents(): RequestHandler {
     return async (req: Request, res: Response) => {
+      const { clientToken } = req.middleware
       const {
         user: { activeCaseLoadId },
-        clientToken,
       } = res.locals
 
       const isoDate = dateToIsoDate(req.query.date as string)
@@ -657,9 +657,9 @@ export default class AppointmentController {
 
   public getLocationExistingEvents(): RequestHandler {
     return async (req: Request, res: Response) => {
+      const { clientToken } = req.middleware
       const {
         user: { activeCaseLoadId },
-        clientToken,
       } = res.locals
 
       const isoDate = dateToIsoDate(req.query.date as string)
@@ -697,7 +697,7 @@ export default class AppointmentController {
 
       const endDate = formatDateISO(calculateEndDate(date, repeats, times))
 
-      return res.send(formatDate(endDate, 'full').replace(',', ''))
+      return res.send(formatDate(endDate, 'full'))
     }
   }
 }

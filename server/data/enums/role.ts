@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-shadow
 export enum Role {
   ActivityHub = 'ROLE_ACTIVITY_HUB',
+  AddSensitiveCaseNotes = 'ROLE_ADD_SENSITIVE_CASE_NOTES',
   AdjustmentsMaintainer = 'ROLE_ADJUSTMENTS_MAINTAINER',
   ApproveCategorisation = 'ROLE_APPROVE_CATEGORISATION',
   CategorisationSecurity = 'ROLE_CATEGORISATION_SECURITY',
@@ -25,6 +26,10 @@ export enum Role {
   ReleaseDatesCalculator = 'ROLE_RELEASE_DATES_CALCULATOR',
   SocCommunity = 'ROLE_SOC_COMMUNITY',
   SocCustody = 'ROLE_SOC_CUSTODY',
+  SocDataAnalyst = 'ROLE_SOC_DATA_ANALYST',
+  SocDataManager = 'ROLE_SOC_DATA_MANAGER',
+  SocHq = 'ROLE_SOC_HQ',
   UpdateAlert = 'ROLE_UPDATE_ALERT',
   ViewProbationDocuments = 'ROLE_VIEW_PROBATION_DOCUMENTS',
+  ViewSensitiveCaseNotes = 'ROLE_VIEW_SENSITIVE_CASE_NOTES',
 }

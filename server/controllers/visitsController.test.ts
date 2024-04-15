@@ -37,6 +37,7 @@ describe('Visits controller', () => {
       },
       middleware: {
         prisonerData: PrisonerMockDataA,
+        clientToken: 'CLIENT_TOKEN',
       },
       path: 'case-notes',
       session: {
@@ -46,7 +47,6 @@ describe('Visits controller', () => {
     }
     res = {
       locals: {
-        clientToken: 'CLIENT_TOKEN',
         user: {
           username: 'AB123456',
           userRoles: [Role.DeleteSensitiveCaseNotes],

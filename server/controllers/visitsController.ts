@@ -4,7 +4,6 @@ import { VisitsService } from '../services/visitsService'
 import { VisitsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import { compareStrings, formatName, generateListMetadata, hasLength } from '../utils/utils'
-import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import PrisonDetails from '../data/interfaces/prisonApi/PrisonDetails'
 import { VisitType } from '../data/interfaces/prisonApi/VisitWithVisitors'
 import { parseDate } from '../utils/dateHelpers'
@@ -63,8 +62,7 @@ export class VisitsController {
   public visitsDetails(): RequestHandler {
     return async (req, res, next) => {
       const queryParams: VisitsListQueryParams = {}
-      const { clientToken } = res.locals
-      const prisonerData: Prisoner = req.middleware?.prisonerData
+      const { clientToken, prisonerData } = req.middleware
 
       const visitStatusString = req.query.visitStatus as string
       const fromDateString = req.query.fromDate as string

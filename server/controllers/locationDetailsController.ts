@@ -24,7 +24,7 @@ export default class LocationDetailsController {
     const { prisonerNumber, bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
     const profileUrl = `/prisoner/${prisonerNumber}`
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
 
     const isTransfer = prisonId === 'TRN'
     const isReleased = prisonId === 'OUT'

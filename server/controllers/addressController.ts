@@ -13,7 +13,7 @@ export default class AddressController {
 
   public async displayAddresses(req: Request, res: Response) {
     const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
 
     const addresses = (await this.addressService.getAddresses(clientToken, prisonerNumber)) ?? []
 

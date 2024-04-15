@@ -13,7 +13,7 @@ context('Update Case Note Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-    cy.task('stubGetCaseNotes', 'G6123VU')
+    cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetCaseNotesUsage', 'G6123VU')
     cy.task('stubGetCaseNoteTypes')
     cy.task('stubGetCaseNoteTypesForUser')
@@ -28,11 +28,12 @@ context('Update Case Note Page', () => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
-      caseNotesPage = visitCaseNotesPage()
     })
 
     context('Update a case note', () => {
       beforeEach(() => {
+        caseNotesPage = visitCaseNotesPage()
+
         cy.task('stubGetCaseNote', { prisonerNumber: 'G6123VU', caseNoteId: '123456', isOmic: false })
         caseNotesPage.addMoreDetailsButton().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/update-case-note/123456')
@@ -55,8 +56,15 @@ context('Update Case Note Page', () => {
 
     context('Updating an OMiC Open Case Note', () => {
       beforeEach(() => {
+        cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.PomUser] })
+        cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
+        cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU', includeSensitive: true })
         cy.task('stubGetCaseNote', { prisonerNumber: 'G6123VU', caseNoteId: '123456', isOmic: true })
+
+        caseNotesPage = visitCaseNotesPage()
+
         caseNotesPage.addMoreDetailsButton().first().click()
+
         cy.location('pathname').should('eq', '/prisoner/G6123VU/update-case-note/123456')
         updateCaseNotePage = new UpdateCaseNotePage('Add more details to John Saunders’ case note')
       })
@@ -69,6 +77,7 @@ context('Update Case Note Page', () => {
 
     context('Attempting to update with validation errors', () => {
       beforeEach(() => {
+        caseNotesPage = visitCaseNotesPage()
         cy.task('stubGetCaseNote', { prisonerNumber: 'G6123VU', caseNoteId: '123456', isOmic: false, longText: true })
         caseNotesPage.addMoreDetailsButton().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/update-case-note/123456')
@@ -110,6 +119,7 @@ context('Update Case Note Page', () => {
         cy.task('stubPrisonerDetail', 'G6123VU')
         cy.task('stubGetCaseNotesUsage', 'G6123VU')
         cy.task('stubGetCaseNotes', 'G6123VU')
+        cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
       })
 
       it('Displays Page Not Found', () => {

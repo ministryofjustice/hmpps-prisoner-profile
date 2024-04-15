@@ -4,6 +4,7 @@ import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
 import { userMock } from '../../data/localMockData/user'
 import config from '../../config'
 import { HeaderFooterMeta } from '../../data/interfaces/componentApi/Component'
+import Nominal from '../../data/interfaces/manageSocCasesApi/Nominal'
 
 const pathfinderNominal = { id: 1 }
 const socNominal = { id: 2 }
@@ -184,6 +185,36 @@ describe('buildOverviewActions', () => {
       ).toEqual(visible)
     })
   })
+
+  test.each([
+    [[Role.SocCustody], undefined, true],
+    [[Role.SocCommunity], undefined, true],
+    [[Role.SocDataAnalyst], undefined, true],
+    [[Role.SocDataManager], undefined, true],
+    [[], undefined, false],
+    [[Role.SocHq], undefined, false],
+    [[Role.SocCustody], socNominal, false],
+  ])(
+    `user with roles: %s and soc nominal: %s, can see: $s`,
+    (roles: Role[], socNominalToUse: Nominal | undefined, visible: boolean) => {
+      const user = { ...userMock, userRoles: roles }
+      const resp = buildOverviewActions(
+        PrisonerMockDataA,
+        pathfinderNominal,
+        socNominalToUse,
+        user,
+        staffRoles,
+        config,
+        undefined,
+      )
+      expect(
+        !!resp.find(
+          action =>
+            action.url === `${config.serviceUrls.manageSocCases}/refer/offender/${PrisonerMockDataA.prisonerNumber}`,
+        ),
+      ).toEqual(visible)
+    },
+  )
 
   describe('Calculate release dates', () => {
     test.each`

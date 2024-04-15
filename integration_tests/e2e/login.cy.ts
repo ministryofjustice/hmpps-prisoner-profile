@@ -23,7 +23,6 @@ context('SignIn', () => {
   })
 
   it('User name visible in header', () => {
-    cy.setupUserAuth()
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)

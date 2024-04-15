@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewPageService from '../services/overviewPageService'
-import { canAddCaseNotes, canViewCaseNotes } from '../utils/roleHelpers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
 import { User } from '../data/hmppsAuthClient'
@@ -32,7 +31,7 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
-    const { clientToken } = res.locals
+    const { clientToken } = req.middleware
     const { userRoles } = res.locals.user
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
@@ -78,10 +77,6 @@ export default class OverviewController {
 
     const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
 
-    // Set role based permissions
-    const canView = canViewCaseNotes(res.locals.user, prisonerData)
-    const canAdd = canAddCaseNotes(res.locals.user, prisonerData)
-
     this.auditService
       .sendPageView({
         userId: res.locals.user.username,
@@ -100,8 +95,6 @@ export default class OverviewController {
       ...overviewPageData,
       overviewActions,
       overviewInfoLinks,
-      canView,
-      canAdd,
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
