@@ -98,15 +98,6 @@ export const formatMoney = (
   return ((val || 0) / (usePence ? 100 : 1)).toLocaleString('en-GB', { style: 'currency', currency })
 }
 
-/**
- * Format a number of privileged visits into a summary string.
- *
- * @param count
- */
-export const formatPrivilegedVisitsSummary = (count: number): string => {
-  return `Including ${count} privileged visits`
-}
-
 export const arrayToQueryString = (array: string[] | number[] | boolean[], key: string): string =>
   array && array.map(item => `${key}=${encodeURIComponent(item)}`).join('&')
 

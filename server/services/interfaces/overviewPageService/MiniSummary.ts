@@ -1,9 +1,4 @@
-export default interface MiniSummary {
-  data: MiniSummaryData
-  classes: string
-}
-
-export interface MiniSummaryData {
+export default interface MiniSummaryData {
   heading?: string
   topLabel?: string
   topContent?: string | number

@@ -8,19 +8,19 @@
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
       <dl class="govuk-summary-list">
-        {{ summaryListRow("Preferred name", personalDetails.personalDetailsMain.preferredName, "preferred-name") }}
-        {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth, "date-of-birth") }}
+        {{ summaryListRow("Preferred name", personalDetails.personalDetailsMain.preferredName or 'None', "preferred-name") }}
+        {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth or 'None', "date-of-birth") }}
         {{ summaryListRow("Age", age, "age") }}
-        {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality, "nationality") }}
-        {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage, "spoken-language") }}
+        {{ summaryListRow("Nationality", personalDetails.personalDetailsMain.nationality or 'None', "nationality") }}
+        {{ summaryListRow("Spoken language", personalDetails.personalDetailsMain.spokenLanguage or 'No language entered', "spoken-language") }}
       </dl>
     </div>
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
       <dl class="govuk-summary-list">
-        {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup, "ethnic-group") }}
-        {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief, "religion-or-belief") }}
-        {{ summaryListRow("CRO number", personalDetails.personalDetailsSide.croNumber, "cro-number") }}
-        {{ summaryListRow("PNC number", personalDetails.personalDetailsSide.pncNumber, "pnc-number") }}
+        {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup or 'Not entered', "ethnic-group") }}
+        {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
+        {{ summaryListRow("CRO number", personalDetails.personalDetailsSide.croNumber or 'None', "cro-number") }}
+        {{ summaryListRow("PNC number", personalDetails.personalDetailsSide.pncNumber or 'None', "pnc-number") }}
       </dl>
     </div>
   </div>

@@ -6,7 +6,7 @@
       <div class="govuk-grid-column-full">
         <p data-qa="overview-main-offence" class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-2 govuk-!-margin-bottom-1">Main offence</p>
         <p>
-            {{offencesOverview.mainOffenceDescription}}
+            {{offencesOverview.mainOffenceDescription or 'Not entered'}}
         </p>
         <hr class="govuk-section-break govuk-section-break--visible" />
         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-top-4 govuk-!-margin-bottom-1">Imprisonment status</p>

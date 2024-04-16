@@ -255,7 +255,7 @@ export default {
     activities: get('ACTIVITIES_URL', 'http://localhost:3001', requiredInProduction),
     appointments: get('APPOINTMENTS_URL', 'http://localhost:3001', requiredInProduction),
     nonAssociations: get('NON_ASSOCIATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
-    adjudications: get('ADJUDICATIONS_UI_URL', '', requiredInProduction),
+    adjudications: get('ADJUDICATIONS_UI_URL', 'http://localhost:3001', requiredInProduction),
     learningAndWorkProgress: get('LEARNING_AND_WORK_PROGRESS_UI_URL', 'http://localhost:3001', requiredInProduction),
     changeSomeonesCell: get('CHANGE_SOMEONES_CELL_UI_URL', 'http://localhost:3001', requiredInProduction),
     incentives: get('INCENTIVES_UI_URL', 'http://localhost:3001', requiredInProduction),
