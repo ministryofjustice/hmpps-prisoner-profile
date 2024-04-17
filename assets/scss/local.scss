@@ -39,3 +39,16 @@
 .app-u-multiline-text {
   white-space: pre-line;
 }
+
+// Override govuk accordion styling to support only having toggle as link
+.govuk-frontend-supported .govuk-accordion__section-button {
+  border-top: none;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 10px;
+  width: auto;
+}
+
+.govuk-frontend-supported .govuk-accordion__section-toggle {
+  margin-bottom: 5px
+}
