@@ -16,9 +16,9 @@ export default class OffencesPage extends Page {
 
   showAllText = (): PageElement => cy.get('.govuk-accordion__show-all-text')
 
-  sectionHeading = (): PageElement => cy.get('.govuk-accordion__section-heading-text-focus')
+  sectionHeading = (): PageElement => cy.get('[data-qa=accordion-section-header]')
 
-  sectionSummary = (): PageElement => cy.get('.govuk-accordion__section-summary-focus')
+  sectionSummary = (): PageElement => cy.get('[data-qa=accordion-section-summary]')
 
   sectionToggleText = (): PageElement => cy.get('.govuk-accordion__section-toggle-text')
 
