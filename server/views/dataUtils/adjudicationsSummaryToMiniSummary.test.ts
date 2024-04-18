@@ -1,9 +1,9 @@
 import adjudicationsSummaryToMiniSummary from './adjudicationsSummaryToMiniSummary'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
+import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 
 describe('adjudicationsSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
-    const adjudicationsSummary: OverviewPage['adjudicationSummary'] = {
+    const adjudicationsSummary: AdjudicationsOverviewSummary = {
       adjudicationCount: 1,
       activePunishments: 2,
     }
@@ -24,7 +24,7 @@ describe('adjudicationsSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with no active punishments message if there are no active punishments', () => {
-    const adjudicationsSummary: OverviewPage['adjudicationSummary'] = {
+    const adjudicationsSummary: AdjudicationsOverviewSummary = {
       adjudicationCount: 1,
       activePunishments: 0,
     }

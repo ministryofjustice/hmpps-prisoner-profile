@@ -1,5 +1,5 @@
 import incentiveSummaryToMiniSummary from './incentiveSummaryToMiniSummary'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
+import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
 
 describe('incentiveSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
@@ -38,7 +38,7 @@ describe('incentiveSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with no data message if all values are null', () => {
-    const incentiveSummary: OverviewPage['incentiveSummary'] = {
+    const incentiveSummary: IncentiveSummary = {
       positiveBehaviourCount: null,
       negativeBehaviourCount: null,
       nextReviewDate: null,

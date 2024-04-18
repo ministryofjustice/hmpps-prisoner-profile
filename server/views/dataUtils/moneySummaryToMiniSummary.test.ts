@@ -1,9 +1,12 @@
 import moneySummaryToMiniSummary from './moneySummaryToMiniSummary'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
+import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
 
 describe('moneySummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
-    const moneySummary: OverviewPage['moneySummary'] = {
+    const moneySummary: AccountBalances = {
+      currency: '',
+      damageObligations: 0,
+      savings: 0,
       spends: 1.23,
       cash: 7.89,
     }

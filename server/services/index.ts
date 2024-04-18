@@ -27,6 +27,9 @@ import OffencesService from './offencesService'
 import { VisitsService } from './visitsService'
 import AddressService from './addressService'
 import PrisonService from './prisonService'
+import AdjudicationsService from './adjudicationsService'
+import PrisonerScheduleService from './prisonerScheduleService'
+import IncentivesService from './incentivesService'
 
 export const services = () => {
   const {
@@ -72,7 +75,6 @@ export const services = () => {
     allocationManagerApiClientBuilder,
     keyworkerApiClientBuilder,
     incentivesApiClientBuilder,
-    adjudicationsApiClientBuilder,
     curiousApiClientBuilder,
     nonAssociationsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
@@ -110,6 +112,9 @@ export const services = () => {
     caseNotesApiClientBuilder,
   )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
+  const adjudicationsService = new AdjudicationsService(adjudicationsApiClientBuilder)
+  const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
+  const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
 
   return {
     dataAccess,
@@ -139,6 +144,9 @@ export const services = () => {
     visitsService,
     addressService,
     prisonService,
+    adjudicationsService,
+    prisonerScheduleService,
+    incentivesService,
   }
 }
 

@@ -6,6 +6,7 @@ import { compareStrings, sortByDateTime } from '../utils/utils'
 import { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { VisitsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import VisitsOverviewSummary from './interfaces/visitsService/VisitsOverviewSummary'
 
 export class VisitsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -53,6 +54,24 @@ export class VisitsService {
       cancellationReasons,
       prisons,
       visitsWithPaginationInfo: visitsWithVisitors,
+    }
+  }
+
+  async getVisitsOverview(
+    clientToken: string,
+    bookingId: number,
+    prisonerNumber: string,
+  ): Promise<VisitsOverviewSummary> {
+    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    const [visitSummary, visitBalances] = await Promise.all([
+      prisonApiClient.getVisitSummary(bookingId),
+      prisonApiClient.getVisitBalances(prisonerNumber),
+    ])
+
+    return {
+      startDate: visitSummary.startDateTime,
+      remainingVo: visitBalances?.remainingVo,
+      remainingPvo: visitBalances?.remainingPvo,
     }
   }
 }

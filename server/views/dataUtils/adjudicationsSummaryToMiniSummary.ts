@@ -1,9 +1,9 @@
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import { pluralise } from '../../utils/pluralise'
 import config from '../../config'
+import AdjudicationsOverviewSummary from '../../services/interfaces/adjudicationsService/AdjudicationsOverviewSummary'
 
-export default (adjudicationSummary: OverviewPage['adjudicationSummary'], prisonerNumber: string): MiniSummaryData => {
+export default (adjudicationSummary: AdjudicationsOverviewSummary, prisonerNumber: string): MiniSummaryData => {
   return {
     heading: 'Adjudications',
     topLabel: 'Proven in last 3 months',

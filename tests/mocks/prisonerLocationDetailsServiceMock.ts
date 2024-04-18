@@ -1,8 +1,5 @@
 import LocationDetailsService from '../../server/services/locationDetailsService'
-
-type Interface<T> = {
-  [P in keyof T]: T[P]
-}
+import Interface from './Interface'
 
 export const prisonerLocationDetailsServiceMock = (): Interface<LocationDetailsService> => ({
   getInmatesAtLocation: jest.fn(),

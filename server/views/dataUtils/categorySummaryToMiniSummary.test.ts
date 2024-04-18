@@ -1,9 +1,9 @@
 import categorySummaryToMiniSummary from './categorySummaryToMiniSummary'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 describe('categorySummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
-    const categorySummary: OverviewPage['categorySummary'] = {
+    const categorySummary: OverviewPageData['categorySummary'] = {
       codeDescription: 'CODE',
       nextReviewDate: '2021-01-01',
       userCanManage: false,
@@ -21,7 +21,7 @@ describe('categorySummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with manage link if user can manage', () => {
-    const categorySummary: OverviewPage['categorySummary'] = {
+    const categorySummary: OverviewPageData['categorySummary'] = {
       codeDescription: 'CODE',
       nextReviewDate: '2021-01-01',
       userCanManage: true,
@@ -39,7 +39,7 @@ describe('categorySummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object without a link if prisoner is not in caseload', () => {
-    const categorySummary: OverviewPage['categorySummary'] = {
+    const categorySummary: OverviewPageData['categorySummary'] = {
       codeDescription: 'CODE',
       nextReviewDate: '2021-01-01',
       userCanManage: false,

@@ -1,9 +1,9 @@
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import visitsSummaryToMiniSummary from './visitsSummaryToMiniSummary'
+import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
 
 describe('visitsSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
-    const visitsSummary: OverviewPage['visitsSummary'] = {
+    const visitsSummary: VisitsOverviewSummary = {
       startDate: '2021-01-01',
       remainingVo: 3,
       remainingPvo: 4,
@@ -25,7 +25,7 @@ describe('visitsSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with no scheduled visit', () => {
-    const visitsSummary: OverviewPage['visitsSummary'] = {
+    const visitsSummary: VisitsOverviewSummary = {
       startDate: undefined,
       remainingVo: 0,
       remainingPvo: 0,
@@ -47,7 +47,7 @@ describe('visitsSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with no privileged visits', () => {
-    const visitsSummary: OverviewPage['visitsSummary'] = {
+    const visitsSummary: VisitsOverviewSummary = {
       startDate: '2021-01-01',
       remainingVo: 3,
       remainingPvo: 0,
@@ -69,7 +69,7 @@ describe('visitsSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with no visits', () => {
-    const visitsSummary: OverviewPage['visitsSummary'] = {
+    const visitsSummary: VisitsOverviewSummary = {
       startDate: undefined,
       remainingVo: 0,
       remainingPvo: 0,

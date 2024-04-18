@@ -1,34 +1,24 @@
-import { differenceInDays, isAfter } from 'date-fns'
-import OverviewPage, { OverviewSchedule, OverviewScheduleItem } from './interfaces/overviewPageService/OverviewPage'
+import OverviewPage from './interfaces/overviewPageService/OverviewPage'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import {
   calculateAge,
   convertToTitleCase,
-  formatCategoryCodeDescription,
   formatCommunityManager,
   formatName,
   getNamesFromString,
   neurodiversityEnabled,
-  prisonerBelongsToUsersCaseLoad,
   sortArrayOfObjectsByDate,
   SortType,
-  userHasRoles,
 } from '../utils/utils'
-import { AssessmentCode } from '../data/enums/assessmentCode'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import StaffContacts, { Contact, ContactDetail, YouthStaffContacts } from '../data/interfaces/prisonApi/StaffContacts'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
-import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
-import groupEventsByPeriod from '../utils/groupEventsByPeriod'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import { BooleanString } from '../data/enums/booleanString'
-import { formatDate, formatDateISO } from '../utils/dateHelpers'
+import { formatDate } from '../utils/dateHelpers'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
-import { CaseNoteSubType, CaseNoteType } from '../data/enums/caseNoteType'
 import config from '../config'
-import { Role } from '../data/enums/role'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
-import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import { RestClientBuilder } from '../data'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { NonAssociationsApiClient } from '../data/interfaces/nonAssociationsApi/nonAssociationsApiClient'
@@ -39,7 +29,6 @@ import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSch
 import PrisonerDetail from '../data/interfaces/prisonApi/PrisonerDetail'
 import PrisonerNonAssociations from '../data/interfaces/nonAssociationsApi/PrisonerNonAssociations'
 import { Result } from '../utils/result/result'
-import AdjudicationsApiClient from '../data/interfaces/adjudicationsApi/adjudicationsApiClient'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
@@ -55,7 +44,6 @@ export default class OverviewPageService {
     private readonly allocationManagerApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
     private readonly incentivesApiClientBuilder: RestClientBuilder<IncentivesApiClient>,
-    private readonly adjudicationsApiClientBuilder: RestClientBuilder<AdjudicationsApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly nonAssociationsApiClientBuilder: RestClientBuilder<NonAssociationsApiClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
@@ -68,7 +56,6 @@ export default class OverviewPageService {
     staffId,
     inmateDetail,
     userCaseLoads = [],
-    userRoles = [],
     apiErrorCallback = () => null,
   }: {
     clientToken: string
@@ -76,7 +63,6 @@ export default class OverviewPageService {
     staffId: number
     inmateDetail: InmateDetail
     userCaseLoads?: CaseLoad[]
-    userRoles?: string[]
     apiErrorCallback?: (error: Error) => void
   }): Promise<OverviewPage> {
     const {
@@ -91,8 +77,6 @@ export default class OverviewPageService {
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
     const allocationManagerClient = this.allocationManagerApiClientBuilder(clientToken)
     const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
-    const incentivesApiClient = this.incentivesApiClientBuilder(clientToken)
-    const adjudicationsApiClient = this.adjudicationsApiClientBuilder(clientToken)
     const curiousApiClient = this.curiousApiClientBuilder(clientToken)
     const nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
     const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
@@ -117,9 +101,6 @@ export default class OverviewPageService {
     }
 
     const activeCaseloadId = userCaseLoads.find(caseload => caseload.currentlyActive)?.caseLoadId
-    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads)
-    const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
-    const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
 
     const isYouthPrisoner = youthEstatePrisons.includes(prisonerData.prisonId)
 
@@ -136,13 +117,6 @@ export default class OverviewPageService {
       communityManager,
       prisonerDetail,
       contacts,
-      adjudicationSummary,
-      visitsSummary,
-      moneySummary,
-      schedule,
-      categorySummary,
-      csraSummary,
-      incentiveSummary,
     ] = await Promise.all([
       activeCaseloadId ? prisonApiClient.getStaffRoles(staffId, activeCaseloadId) : [],
       Result.wrap(getLearnerNeurodivergence(), apiErrorCallback),
@@ -156,17 +130,6 @@ export default class OverviewPageService {
       isYouthPrisoner ? null : prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
       prisonApiClient.getPrisoner(prisonerNumber),
       isYouthPrisoner ? prisonApiClient.getBookingContacts(bookingId) : null,
-      belongsToCaseLoad || isPomOrReceptionUser
-        ? await this.getAdjudicationSummary(bookingId, adjudicationsApiClient)
-        : null,
-      belongsToCaseLoad ? await this.getVisitsSummary(bookingId, prisonerNumber, prisonApiClient) : null,
-      belongsToCaseLoad ? await this.getMoneySummary(bookingId, prisonApiClient) : null,
-      this.getSchedule(prisonerData, prisonApiClient),
-      this.getCategorySummary(prisonerData, inmateDetail, userRoles),
-      this.getCsraSummary(prisonerData),
-      belongsToCaseLoad || isGlobalSearchUser
-        ? await this.getIncentiveSummary(bookingId, incentivesApiClient, prisonApiClient)
-        : null,
     ])
 
     const staffContacts = isYouthPrisoner
@@ -174,17 +137,10 @@ export default class OverviewPageService {
       : this.getStaffContacts(communityManager, allocationManager, keyWorkerName, keyWorkerSessions)
 
     return {
-      moneySummary,
-      adjudicationSummary,
-      visitsSummary,
-      categorySummary,
-      csraSummary,
-      incentiveSummary,
       statuses: this.getStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
       nonAssociationSummary: this.getNonAssociationSummary(prisonerNonAssociations),
       personalDetails: this.getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
       staffContacts,
-      schedule,
       offencesOverview: {
         mainOffenceDescription: mainOffence[0]?.offenceDescription,
         fullStatus,
@@ -292,142 +248,6 @@ export default class OverviewPageService {
         croNumber: prisonerData.croNumber,
         pncNumber: prisonerData.pncNumber,
       },
-    }
-  }
-
-  private async getAdjudicationSummary(
-    bookingId: number,
-    adjudicationsApiClient: AdjudicationsApiClient,
-  ): Promise<OverviewPage['adjudicationSummary']> {
-    const adjudicationSummary = await adjudicationsApiClient.getAdjudications(bookingId)
-    return {
-      adjudicationCount: adjudicationSummary.adjudicationCount,
-      activePunishments: adjudicationSummary.awards?.length,
-    }
-  }
-
-  private async getMoneySummary(
-    bookingId: number,
-    prisonApiClient: PrisonApiClient,
-  ): Promise<OverviewPage['moneySummary']> {
-    const accountBalances = await prisonApiClient.getAccountBalances(bookingId)
-
-    return {
-      spends: accountBalances.spends,
-      cash: accountBalances.cash,
-    }
-  }
-
-  private async getVisitsSummary(
-    bookingId: number,
-    prisonerNumber: string,
-    prisonApiClient: PrisonApiClient,
-  ): Promise<OverviewPage['visitsSummary']> {
-    const [visitSummary, visitBalances] = await Promise.all([
-      prisonApiClient.getVisitSummary(bookingId),
-      prisonApiClient.getVisitBalances(prisonerNumber),
-    ])
-
-    return {
-      startDate: visitSummary.startDateTime,
-      remainingVo: visitBalances?.remainingVo,
-      remainingPvo: visitBalances?.remainingPvo,
-    }
-  }
-
-  private getCsraSummary({ assessments }: Prisoner): OverviewPage['csraSummary'] {
-    const csra = assessments?.find(assessment => assessment.assessmentDescription.includes(AssessmentCode.csra))
-
-    return {
-      classification: csra?.classification,
-      assessmentDate: csra?.assessmentDate,
-    }
-  }
-
-  private getCategorySummary(
-    { assessments }: Prisoner,
-    inmateDetail: InmateDetail,
-    userRoles: string[],
-  ): OverviewPage['categorySummary'] {
-    const category = assessments?.find(assessment => assessment.assessmentCode === AssessmentCode.category)
-    const userCanManage = userHasRoles(
-      [
-        Role.CreateRecategorisation,
-        Role.ApproveCategorisation,
-        Role.CreateRecategorisation,
-        Role.CategorisationSecurity,
-      ],
-      userRoles,
-    )
-
-    return {
-      codeDescription: formatCategoryCodeDescription(category?.classificationCode, inmateDetail.category),
-      nextReviewDate: category?.nextReviewDate,
-      userCanManage,
-    }
-  }
-
-  private async getIncentiveSummary(
-    bookingId: number,
-    incentivesApiClient: IncentivesApiClient,
-    prisonApiClient: PrisonApiClient,
-  ): Promise<OverviewPage['incentiveSummary']> {
-    // TODO use the RESULT type for this
-    try {
-      const incentiveReviews = await incentivesApiClient.getReviews(bookingId)
-
-      if (!incentiveReviews)
-        return { positiveBehaviourCount: null, negativeBehaviourCount: null, nextReviewDate: null, daysOverdue: null }
-
-      const [positiveBehaviourCount, negativeBehaviourCount] = await Promise.all([
-        prisonApiClient.getCaseNoteCount(
-          bookingId,
-          CaseNoteType.PositiveBehaviour,
-          CaseNoteSubType.IncentiveEncouragement,
-          incentiveReviews?.iepDate,
-          formatDateISO(new Date()),
-        ),
-        prisonApiClient.getCaseNoteCount(
-          bookingId,
-          CaseNoteType.NegativeBehaviour,
-          CaseNoteSubType.IncentiveWarning,
-          incentiveReviews?.iepDate,
-          formatDateISO(new Date()),
-        ),
-      ])
-
-      return {
-        positiveBehaviourCount: positiveBehaviourCount.count,
-        negativeBehaviourCount: negativeBehaviourCount.count,
-        nextReviewDate: incentiveReviews?.nextReviewDate,
-        daysOverdue: isAfter(new Date(), new Date(incentiveReviews?.nextReviewDate))
-          ? differenceInDays(new Date(), new Date(incentiveReviews?.nextReviewDate))
-          : undefined,
-      }
-    } catch (e) {
-      return { error: true }
-    }
-  }
-
-  private async getSchedule(prisonerData: Prisoner, prisonApiClient: PrisonApiClient): Promise<OverviewSchedule> {
-    const formatEventForOverview = (event: ScheduledEvent): OverviewScheduleItem => {
-      const name = event.eventSubType === 'PA' ? event.eventSourceDesc : event.eventSubTypeDesc
-      const { startTime, endTime } = formatScheduledEventTime(event)
-
-      return {
-        name,
-        startTime,
-        endTime,
-      }
-    }
-
-    const scheduledEvents = await prisonApiClient.getEventsScheduledForToday(prisonerData.bookingId)
-    const groupedEvents = groupEventsByPeriod(scheduledEvents)
-
-    return {
-      morning: groupedEvents.morningEvents.map(formatEventForOverview),
-      afternoon: groupedEvents.afternoonEvents.map(formatEventForOverview),
-      evening: groupedEvents.eveningEvents.map(formatEventForOverview),
     }
   }
 
