@@ -4,18 +4,9 @@ import OverviewPageService from './overviewPageService'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
   accountBalancesMock,
-  adjudicationsSummaryDataMock,
   adjudicationSummaryMock,
   assessmentsMock,
-  categorySummaryDataMock,
-  csraSummaryDataMock,
-  incentiveSummaryDataMock,
-  incentiveSummaryErrorMock,
-  incentiveSummaryNoDataMock,
-  categoryIncentiveCsraGroupMock,
-  moneySummaryDataMock,
   visitBalancesMock,
-  visitsSummaryDataMock,
   visitSummaryMock,
 } from '../data/localMockData/miniSummaryMock'
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
@@ -61,7 +52,6 @@ import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfers
 import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
 import config from '../config'
 import { complexityOfNeedHighMock, complexityOfNeedLowMock } from '../data/localMockData/complexityOfNeedMock'
-import { AdjudicationSummaryAward } from '../data/interfaces/adjudicationsApi/AdjudicationsSummary'
 import AdjudicationsApiClient from '../data/interfaces/adjudicationsApi/adjudicationsApiClient'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
@@ -194,7 +184,109 @@ describe('OverviewPageService', () => {
     })
   })
 
-  describe('getmoneyVisitsAdjudicationsGroup', () => {
+  describe('moneySummary', () => {
+    it('should get data and map money summary if user in caseload', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+      })
+
+      expect(res.moneySummary).toEqual({ cash: 35, spends: 240.51 })
+    })
+
+    it('should return null when the not in caseload', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+      })
+
+      expect(res.moneySummary).toEqual(null)
+    })
+  })
+
+  describe('adjudicationSummary', () => {
+    it('should get data and map adjudication if user in caseload', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+      })
+
+      expect(res.adjudicationSummary).toEqual({ activePunishments: 0, adjudicationCount: 4 })
+    })
+
+    it('should return null when not in caseload and no specific roles', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+      })
+
+      expect(res.adjudicationSummary).toEqual(null)
+    })
+
+    it.each([Role.PomUser, Role.ReceptionUser])(
+      'should return the adjudications when not in caseload but user has a specific role',
+      async userRole => {
+        const prisonerNumber = 'A1234BC'
+        const bookingId = 123456
+
+        const overviewPageService = overviewPageServiceConstruct()
+        const res = await overviewPageService.get({
+          clientToken: 'token',
+          prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+          staffId: 1,
+          inmateDetail: inmateDetailMock,
+          userCaseLoads: CaseLoadsDummyDataA,
+          userRoles: [userRole],
+        })
+
+        expect(res.adjudicationSummary).toEqual({ activePunishments: 0, adjudicationCount: 4 })
+      },
+    )
+  })
+
+  describe('visitsSummary', () => {
+    it('should get data and map visits summary data if user in caseload', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+      })
+
+      expect(res.visitsSummary).toEqual({ remainingPvo: 2, remainingVo: 6, startDate: '2023-09-15' })
+    })
+
     describe('When visit balances returns 404', () => {
       it('Displays no visit information', async () => {
         const prisonerNumber = 'A1234BC'
@@ -210,197 +302,180 @@ describe('OverviewPageService', () => {
           userCaseLoads: CaseLoadsDummyDataA,
         })
 
-        expect(res.moneyVisitsAdjudicationsGroup.length).toEqual(3)
-        const visitSummary = res.moneyVisitsAdjudicationsGroup[2]
-        expect(visitSummary.data.bottomClass).toEqual('big')
-        expect(visitSummary.data.bottomContentLine1).toEqual('0')
-        expect(visitSummary.data.bottomContentLine3).toEqual('')
+        const visitSummary = res.visitsSummary
+        expect(visitSummary).toEqual({ remainingPvo: undefined, remainingVo: undefined, startDate: '2023-09-15' })
       })
     })
 
-    it('should get data and map money, adjudication and visits summary data if user in caseload', async () => {
+    it('should return null when the not in caseload', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get({
         clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
         staffId: 1,
         inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.moneyVisitsAdjudicationsGroup).toEqual([
-        { data: expect.objectContaining(moneySummaryDataMock), classes: 'govuk-grid-row card-body' },
-        { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
-        { data: expect.objectContaining(visitsSummaryDataMock), classes: 'govuk-grid-row card-body' },
-      ])
-    })
-
-    it('should add a link to active punishments if awards list length > 0', async () => {
-      adjudicationsApiClient.getAdjudications = jest.fn(async () => ({
-        ...adjudicationSummaryMock,
-        awards: [
-          {
-            sanctionCode: 'MESS',
-            status: 'IMMEDIATE',
-            sanctionDescription: 'loss of privileges',
-            days: 1,
-            bookingId: 'bod',
-            sanctionCodeDescription: 'loss of privileges',
-            comment: 'comment',
-            effectiveDate: '2021-01-01',
-          } as undefined as AdjudicationSummaryAward,
-        ],
-      }))
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.moneyVisitsAdjudicationsGroup).toEqual(
-        expect.arrayContaining([
-          {
-            data: expect.objectContaining({
-              ...adjudicationsSummaryDataMock,
-              bottomContentLine1: '1 active punishment',
-              bottomContentLine1Href: `${config.serviceUrls.adjudications}/active-punishments/A1234BC`,
-            }),
-            classes: 'govuk-grid-row card-body',
-          },
-        ]),
-      )
-    })
-
-    describe('When the prisoner is not part of the users case loads', () => {
-      it('should return empty when the user has no specific roles', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get({
-          clientToken: 'token',
-          prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-          staffId: 1,
-          inmateDetail: inmateDetailMock,
-        })
-
-        expect(res.moneyVisitsAdjudicationsGroup).toEqual([])
-      })
-
-      it.each([Role.PomUser, Role.ReceptionUser])(
-        'should return the adjudications when the user has a specific role',
-        async userRole => {
-          const prisonerNumber = 'A1234BC'
-          const bookingId = 123456
-
-          const overviewPageService = overviewPageServiceConstruct()
-          const res = await overviewPageService.get({
-            clientToken: 'token',
-            prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-            staffId: 1,
-            inmateDetail: inmateDetailMock,
-            userCaseLoads: CaseLoadsDummyDataA,
-            userRoles: [userRole],
-          })
-
-          expect(res.moneyVisitsAdjudicationsGroup).toEqual([
-            { data: expect.objectContaining(adjudicationsSummaryDataMock), classes: 'govuk-grid-row card-body' },
-          ])
-        },
-      )
+      expect(res.visitsSummary).toEqual(null)
     })
   })
 
-  describe('getcategoryIncentiveCsraGroup', () => {
-    it('should get the category, incentive and csra summaries for the prisoner', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: {
-          ...PrisonerMockDataA,
-          prisonerNumber,
-          bookingId,
-          prisonId: 'MDI',
-          csra: 'Standard',
-          assessments: assessmentsMock,
-        } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-      expect(incentivesApiClient.getReviews).toHaveBeenCalledWith(bookingId)
-    })
-
-    it('should map api results into page data', async () => {
+  describe('categorySummary', () => {
+    it('should get data and map category summary data', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct()
       const res = await overviewPageService.get({
         clientToken: 'token',
-        prisonerData: {
-          ...PrisonerMockDataA,
-          prisonerNumber,
-          bookingId,
-          prisonId: 'MDI',
-          csra: 'Standard',
-          assessments: assessmentsMock,
-        } as Prisoner,
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
         staffId: 1,
         inmateDetail: inmateDetailMock,
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.categoryIncentiveCsraGroup).toEqual(
-        expect.arrayContaining([
-          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(incentiveSummaryDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
-        ]),
-      )
+      expect(res.categorySummary).toEqual({ codeDescription: 'B', nextReviewDate: '2023-02-19', userCanManage: false })
     })
 
-    it('should use no incentives text', async () => {
+    it.each([
+      Role.CreateRecategorisation,
+      Role.ApproveCategorisation,
+      Role.CreateRecategorisation,
+      Role.CategorisationSecurity,
+    ])('should set userCanManage to true when user has a specific role', async userRole => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+        userRoles: [userRole],
+      })
+
+      expect(res.categorySummary).toEqual({
+        codeDescription: 'B',
+        nextReviewDate: '2023-02-19',
+        userCanManage: true,
+      })
+    })
+  })
+
+  describe('csraSummary', () => {
+    it('should get data and map csra summary data', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+      })
+
+      expect(res.csraSummary).toEqual({
+        assessmentDate: '2021-02-19',
+        classification: 'Standard',
+      })
+    })
+  })
+
+  describe('incentiveSummary', () => {
+    beforeAll(() => {
+      jest.useFakeTimers().setSystemTime(new Date('2024-01-03'))
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+    it('should get data and map incentive summary data', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+      })
+
+      expect(res.incentiveSummary).toEqual({
+        daysOverdue: 2,
+        negativeBehaviourCount: 1,
+        nextReviewDate: '2024-01-01',
+        positiveBehaviourCount: 1,
+      })
+    })
+
+    it('should return null when the not in caseload', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+      })
+
+      expect(res.incentiveSummary).toEqual(null)
+    })
+
+    it('should return data when the not in caseload but global search user', async () => {
+      const prisonerNumber = 'A1234BC'
+      const bookingId = 123456
+
+      const overviewPageService = overviewPageServiceConstruct()
+      const res = await overviewPageService.get({
+        clientToken: 'token',
+        prisonerData: { prisonerNumber, bookingId, prisonId: '123', assessments: assessmentsMock } as Prisoner,
+        staffId: 1,
+        inmateDetail: inmateDetailMock,
+        userCaseLoads: CaseLoadsDummyDataA,
+        userRoles: [Role.GlobalSearch],
+      })
+
+      expect(res.incentiveSummary).toEqual({
+        daysOverdue: 2,
+        negativeBehaviourCount: 1,
+        nextReviewDate: '2024-01-01',
+        positiveBehaviourCount: 1,
+      })
+    })
+
+    it('should return null if no data', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
       const overviewPageService = overviewPageServiceConstruct({ useNull: true })
       const res = await overviewPageService.get({
         clientToken: 'token',
-        prisonerData: {
-          ...PrisonerMockDataA,
-          prisonerNumber,
-          bookingId,
-          prisonId: 'MDI',
-          csra: 'Standard',
-          assessments: assessmentsMock,
-        } as Prisoner,
+        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
         staffId: 1,
         inmateDetail: inmateDetailMock,
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.categoryIncentiveCsraGroup).toEqual(
-        expect.arrayContaining([
-          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(incentiveSummaryNoDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
-        ]),
-      )
+      expect(res.incentiveSummary).toEqual({
+        daysOverdue: null,
+        negativeBehaviourCount: null,
+        nextReviewDate: null,
+        positiveBehaviourCount: null,
+      })
     })
 
-    it('should use incentives API error text', async () => {
+    it('should return error object if api errors', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
 
@@ -420,88 +495,7 @@ describe('OverviewPageService', () => {
         userCaseLoads: CaseLoadsDummyDataA,
       })
 
-      expect(res.categoryIncentiveCsraGroup).toEqual(
-        expect.arrayContaining([
-          { data: expect.objectContaining(categorySummaryDataMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(incentiveSummaryErrorMock), classes: 'govuk-grid-row card-body' },
-          { data: expect.objectContaining(csraSummaryDataMock), classes: 'govuk-grid-row card-body' },
-        ]),
-      )
-    })
-
-    describe('When the prisoner is not part of the users case loads', () => {
-      it('should not return the incentives data', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get({
-          clientToken: 'token',
-          prisonerData: {
-            ...PrisonerMockDataA,
-            prisonerNumber,
-            bookingId,
-            prisonId: '123',
-            csra: 'Standard',
-            assessments: assessmentsMock,
-          } as Prisoner,
-          staffId: 1,
-          inmateDetail: inmateDetailMock,
-        })
-
-        expect(res.categoryIncentiveCsraGroup).toEqual([
-          {
-            classes: categoryIncentiveCsraGroupMock[0].classes,
-            data: { ...categoryIncentiveCsraGroupMock[0].data, linkHref: undefined, linkLabel: undefined },
-          },
-          {
-            classes: categoryIncentiveCsraGroupMock[2].classes,
-            data: { ...categoryIncentiveCsraGroupMock[2].data, linkHref: undefined, linkLabel: undefined },
-          },
-        ])
-      })
-
-      it('should not return have the links on the category card', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get({
-          clientToken: 'token',
-          prisonerData: {
-            ...PrisonerMockDataA,
-            prisonerNumber,
-            bookingId,
-            prisonId: '123',
-          } as Prisoner,
-          staffId: 1,
-          inmateDetail: inmateDetailMock,
-        })
-
-        expect(res.categoryIncentiveCsraGroup[0].data.linkLabel).toBeUndefined()
-        expect(res.categoryIncentiveCsraGroup[0].data.linkHref).toBeUndefined()
-      })
-
-      it('should not return have the links on the CSRA card', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get({
-          clientToken: 'token',
-          prisonerData: {
-            ...PrisonerMockDataA,
-            prisonerNumber,
-            bookingId,
-            prisonId: '123',
-          } as Prisoner,
-          staffId: 1,
-          inmateDetail: inmateDetailMock,
-        })
-
-        expect(res.categoryIncentiveCsraGroup[1].data.linkLabel).toBeUndefined()
-        expect(res.categoryIncentiveCsraGroup[1].data.linkHref).toBeUndefined()
-      })
+      expect(res.incentiveSummary).toEqual({ error: true })
     })
   })
 
@@ -556,7 +550,6 @@ describe('OverviewPageService', () => {
         prisonOffenderManager: 'Andy Marke',
         coworkingPrisonOffenderManager: 'Andy Hudson',
         communityOffenderManager: 'Terry Scott',
-        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
       })
     })
 
@@ -577,7 +570,6 @@ describe('OverviewPageService', () => {
         resettlementPractitioner: 'Shauna Michaels',
         youthJusticeService: 'Outer York',
         youthJusticeServiceCaseManager: 'Barney Rubble',
-        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
       })
     })
 
@@ -597,7 +589,6 @@ describe('OverviewPageService', () => {
         prisonOffenderManager: 'Andy Marke',
         coworkingPrisonOffenderManager: 'Andy Hudson',
         communityOffenderManager: 'Terry Scott',
-        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
       })
     })
 
@@ -616,7 +607,6 @@ describe('OverviewPageService', () => {
         prisonOffenderManager: 'Andy Marke',
         coworkingPrisonOffenderManager: 'Andy Hudson',
         communityOffenderManager: 'Terry Scott',
-        linkUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}/professional-contacts`,
       })
     })
   })
@@ -1012,7 +1002,6 @@ describe('OverviewPageService', () => {
         prisonName: 'Moorland (HMP & YOI)',
         prisonCount: 1,
         otherPrisonsCount: 1,
-        nonAssociationsUrl: `${config.serviceUrls.nonAssociations}/prisoner/G6123VU/non-associations`,
       })
     })
   })

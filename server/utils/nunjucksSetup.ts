@@ -30,6 +30,12 @@ import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryR
 import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
 import mapCsraQuestionsToSummaryList from '../mappers/csraQuestionsToSummaryListMapper'
 import visitsWithVisitorsToListMapper from '../mappers/visitsWithVisitorsToListMapper'
+import moneySummaryToMiniSummary from '../views/dataUtils/moneySummaryToMiniSummary'
+import adjudicationsSummaryToMiniSummary from '../views/dataUtils/adjudicationsSummaryToMiniSummary'
+import visitsSummaryToMiniSummary from '../views/dataUtils/visitsSummaryToMiniSummary'
+import csraSummaryToMiniSummary from '../views/dataUtils/csraSummaryToMiniSummary'
+import categorySummaryToMiniSummary from '../views/dataUtils/categorySummaryToMiniSummary'
+import incentiveSummaryToMiniSummary from '../views/dataUtils/incentiveSummaryToMiniSummary'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -142,4 +148,10 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toVisitsWithVisitorsList', visitsWithVisitorsToListMapper)
   njkEnv.addFilter('formatAddressDate', formatAddressDate)
   njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
+  njkEnv.addFilter('toMoneySummaryDisplay', moneySummaryToMiniSummary)
+  njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
+  njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
+  njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
+  njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
+  njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
 }

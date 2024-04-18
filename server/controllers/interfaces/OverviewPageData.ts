@@ -9,6 +9,8 @@ export default interface OverviewPageData extends OverviewPage {
   overviewActions: HmppsAction[]
   overviewInfoLinks: { text: string; url: string; dataQA: string }[]
   prisonerDisplayName: string
+  prisonerInCaseload: boolean
+  bookingId: number
   options: {
     showCourtCaseSummary: boolean
   }

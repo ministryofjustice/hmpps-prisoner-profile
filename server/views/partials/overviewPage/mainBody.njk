@@ -1,5 +1,4 @@
 {% from "./macros/statusListMacro.njk" import statusList %}
-{% from "./miniSummaryBoxes/miniSummaryBoxList.njk" import  miniSummaryListMacro %}
 {% from "./miniSummaryBoxes/macro.njk" import  miniSummaryMacro %}
 <div class="govuk-grid-row">
   <section class="govuk-grid-column-full" aria-label="Status List">
@@ -15,7 +14,23 @@
 {% endif %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-a">
-    {{ miniSummaryListMacro(moneyVisitsAdjudicationsGroup) }}
+    <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
+      {% if moneySummary %}
+        <div class="govuk-grid-column-one-third">
+          {{ miniSummaryMacro(moneySummary | toMoneySummaryDisplay(prisonerNumber)) }}
+        </div>
+      {% endif %}
+      {% if adjudicationSummary %}
+        <div class="govuk-grid-column-one-third">
+          {{ miniSummaryMacro(adjudicationSummary | toAdjudicationsSummaryDisplay(prisonerNumber)) }}
+        </div>
+      {% endif %}
+      {% if visitsSummary %}
+        <div class="govuk-grid-column-one-third">
+          {{ miniSummaryMacro(visitsSummary | toVisitsSummaryDisplay(prisonerNumber)) }}
+        </div>
+      {% endif %}
+    </div>
   </div>
 </div>
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
@@ -37,7 +52,19 @@
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
-    {{ miniSummaryListMacro(categoryIncentiveCsraGroup) }}
+      <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
+          <div class="govuk-grid-column-one-third">
+              {{ miniSummaryMacro(categorySummary | toCategorySummaryDisplay(prisonerInCaseload, bookingId)) }}
+          </div>
+          {% if incentiveSummary %}
+              <div class="govuk-grid-column-one-third">
+                  {{ miniSummaryMacro(incentiveSummary | toIncentiveSummaryDisplay(prisonerNumber, prisonerDisplayName)) }}
+              </div>
+          {% endif %}
+          <div class="govuk-grid-column-one-third">
+              {{ miniSummaryMacro(csraSummary | toCsraSummaryDisplay(prisonerInCaseload, prisonerNumber)) }}
+          </div>
+      </div>
   </div>
 </div>
 <div class="govuk-grid-row">

@@ -103,6 +103,8 @@ export default class OverviewController {
         prisonerData.prisonerNumber,
       ),
       prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
+      prisonerInCaseload: prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads),
+      bookingId: prisonerData.bookingId,
       options: {
         showCourtCaseSummary,
       },

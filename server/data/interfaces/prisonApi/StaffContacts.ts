@@ -3,17 +3,15 @@ export default interface StaffContacts {
   prisonOffenderManager: string
   coworkingPrisonOffenderManager: string
   communityOffenderManager: string
-  linkUrl: string
 }
 
 export interface YouthStaffContacts {
-  cuspOfficer: string
-  cuspOfficerBackup: string
-  youthJusticeWorker: string
-  resettlementPractitioner: string
-  youthJusticeService: string
-  youthJusticeServiceCaseManager: string
-  linkUrl: string
+  cuspOfficer: string | null
+  cuspOfficerBackup: string | null
+  youthJusticeWorker: string | null
+  resettlementPractitioner: string | null
+  youthJusticeService: string | null
+  youthJusticeServiceCaseManager: string | null
 }
 
 export interface KeyWorkerSummary {
