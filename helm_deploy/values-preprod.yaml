@@ -84,7 +84,6 @@ generic-service:
     - internal
     - prisons
     - private_prisons
-    - police
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
