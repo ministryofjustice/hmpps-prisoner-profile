@@ -19,7 +19,7 @@ export default (visitSummary: VisitsOverviewSummary, prisonerNumber: string): Mi
     topContent: startDate ? formatDate(startDate, 'short') : 'None scheduled',
     topClass: startDate ? 'big' : 'small',
     bottomLabel: 'Remaining visits',
-    bottomContentLine1: String(remainingVo) || '0',
+    bottomContentLine1: remainingVo ? String(remainingVo) : '0',
     bottomContentLine3: getPrivilegedVisitsDescription(remainingPvo, remainingVo),
     bottomClass: remainingVo ? 'small' : 'big',
     linkLabel: 'Visits details',
