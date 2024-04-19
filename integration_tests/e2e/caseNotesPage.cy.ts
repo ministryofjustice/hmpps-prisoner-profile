@@ -42,10 +42,23 @@ context('Case Notes Page', () => {
       caseNotesPage.addCaseNoteButton()
     })
 
-    it('Displays the add more details link for the case note authored by the user', () => {
+    it('Displays the add more details link for the case note authored with staff id', () => {
       caseNotesPage
         .caseNotesList()
         .get('.hmpps-case-note-card-list-item:nth-of-type(2) [data-qa="case-notes-add-more-details-link"]')
+    })
+
+    it('Displays the add more details link for the case note authored with username', () => {
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(3) [data-qa="case-notes-add-more-details-link"]')
+    })
+
+    it('Does not display the add more details link for case notes authored by somebody else', () => {
+      caseNotesPage
+        .caseNotesList()
+        .get('.hmpps-case-note-card-list-item:nth-of-type(4) [data-qa="case-notes-add-more-details-link"]')
+        .should('not.exist')
     })
 
     it('Displays the list with 20 items', () => {

@@ -1,4 +1,4 @@
-{% macro caseNoteCard(caseNote, staffId) %}
+{% macro caseNoteCard(caseNote, username, staffId) %}
 <div class="hmpps-case-note-card-list-item" role="listitem">
     <div class="hmpps-case-note-card-list-item__content">
         <div class="hmpps-case-note-card-list-item__metadata">{{ caseNote.creationDateTime | formatDateTime('long') }}</div>
@@ -33,7 +33,7 @@
         {% endif %}
     </div>
     <div class="hmpps-case-note-card-list-item__link govuk-!-display-none-print">
-        {% if staffId == caseNote.authorUserId %}
+        {% if staffId == caseNote.authorUserId or username == caseNote.authorUserId %}
             <a href="{{ caseNote.addMoreLinkUrl }}" class="govuk-link govuk-link--no-visited-state" data-qa="case-notes-add-more-details-link">Add more details</a>
         {% endif %}
         {% if caseNote.deleteLinkUrl %}
