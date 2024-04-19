@@ -70,7 +70,7 @@ export default class CaseNotesService {
     if (!errors.length) {
       const { content, ...rest } = await caseNotesApiClient.getCaseNotes(prisonerData.prisonerNumber, {
         ...this.mapToApiParams(queryParams),
-        includeSensitive: canViewSensitiveCaseNotes,
+        includeSensitive: String(canViewSensitiveCaseNotes),
       })
 
       const pagedCaseNotesContent = content?.map((caseNote: CaseNote) => {

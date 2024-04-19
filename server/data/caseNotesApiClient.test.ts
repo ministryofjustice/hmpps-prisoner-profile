@@ -43,6 +43,20 @@ describe('caseNotesApiClient', () => {
       const output = await caseNotesApiClient.getCaseNotes(prisonerNumber, null)
       expect(output).toEqual(pagedCaseNotesMock)
     })
+
+    it.each(['true', 'false'])('Should map include sensitive query param (%s)', async includeSensitive => {
+      const prisonerNumber = 'AB1234Y'
+      mockSuccessfulCaseNotesApiCall(
+        `/case-notes/${prisonerNumber}?size=20&includeSensitive=${includeSensitive}`,
+        pagedCaseNotesMock,
+      )
+
+      const output = await caseNotesApiClient.getCaseNotes(prisonerNumber, {
+        includeSensitive,
+      })
+
+      expect(output).toEqual(pagedCaseNotesMock)
+    })
   })
 
   describe('getCaseNoteTypes', () => {
