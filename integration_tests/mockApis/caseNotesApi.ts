@@ -27,7 +27,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20${includeSensitive ? '&includeSensitive=true' : ''}`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
       },
       response: {
         status: 200,
@@ -49,7 +49,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&page=1`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&page=1&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -71,7 +71,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CASC`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CASC&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -93,7 +93,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=ACP`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=ACP&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -173,7 +173,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=${type}`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=${type}&includeSensitive=false`,
       },
       response: {
         status: 200,

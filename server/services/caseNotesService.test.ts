@@ -46,7 +46,7 @@ describe('Case Notes Page', () => {
       expect(caseNotesPageData.fullName).toEqual('John Smith')
       expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
       expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
-        includeSensitive: false,
+        includeSensitive: 'false',
       })
     })
 
@@ -62,7 +62,7 @@ describe('Case Notes Page', () => {
       })
 
       expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
-        includeSensitive: true,
+        includeSensitive: 'true',
       })
     })
   })
