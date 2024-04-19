@@ -800,6 +800,28 @@ context('Court cases and release dates', () => {
           .placeHolderText()
           .should('contain.text', 'There are no release dates calculated for John Saunders')
       })
+
+      it('should display the unavailable text if latest calculation call fails but still show the panel', () => {
+        cy.task('stubGetLatestCalculation', {
+          status: 500,
+          resp: {
+            errorCode: 'VC5001',
+            errorMessage: 'Service unavailable',
+            httpStatusCode: 500,
+          },
+        })
+
+        visitOverviewPage()
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        const nextCourtAppearance = overviewPage.courtCasesAndReleaseDates().nextCourtAppearance()
+        const latestCalculation = overviewPage.courtCasesAndReleaseDates().latestCalculation()
+
+        overviewPage.offencesHeader().should('not.exist')
+        nextCourtAppearance.location().should('contain.text', 'Test court location')
+        latestCalculation
+          .placeHolderText()
+          .should('contain.text', 'We cannot show these details right now. Try again later.')
+      })
     })
   })
 
