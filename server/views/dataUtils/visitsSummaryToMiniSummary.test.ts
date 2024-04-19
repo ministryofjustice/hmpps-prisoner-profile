@@ -89,4 +89,15 @@ describe('visitsSummaryToMiniSummary', () => {
       linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     })
   })
+
+  it('should default bottomContentLine1 to 0 if remainingVo in undefined', () => {
+    const visitsSummary: VisitsOverviewSummary = {
+      startDate: undefined,
+      remainingVo: undefined,
+      remainingPvo: 0,
+    }
+    const prisonerNumber = 'A1234BC'
+    const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
+    expect(miniSummary.bottomContentLine1).toEqual('0')
+  })
 })
