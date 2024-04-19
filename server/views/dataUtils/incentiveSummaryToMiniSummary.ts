@@ -1,11 +1,11 @@
-import OverviewPage, { isIncentiveSummaryError } from '../../services/interfaces/overviewPageService/OverviewPage'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import config from '../../config'
 import { formatDate } from '../../utils/dateHelpers'
 import { pluralise } from '../../utils/pluralise'
+import IncentiveSummary, { isIncentiveSummaryError } from '../../services/interfaces/incentivesService/IncentiveSummary'
 
 export default (
-  incentiveSummary: OverviewPage['incentiveSummary'] | undefined,
+  incentiveSummary: IncentiveSummary | { error: true } | undefined,
   prisonerNumber: string,
   prisonerDisplayName: string,
 ): MiniSummaryData => {

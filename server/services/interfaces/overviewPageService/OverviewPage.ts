@@ -1,17 +1,10 @@
 import FullStatus from '../../../data/interfaces/prisonApi/FullStatus'
 
 export default interface OverviewPage {
-  moneySummary?: MoneySummary
-  adjudicationSummary?: AdjudicationSummary
-  visitsSummary?: VisitsSummary
-  csraSummary: CsraSummary
-  categorySummary: CategorySummary
-  incentiveSummary?: IncentiveSummary | { error: true }
   statuses: OverviewStatus[]
   nonAssociationSummary: NonAssociationSummary
   personalDetails: PersonalDetails
   staffContacts: object
-  schedule: OverviewSchedule
   offencesOverview: {
     mainOffenceDescription: string
     fullStatus: FullStatus
@@ -22,18 +15,6 @@ export default interface OverviewPage {
   prisonName: string
   staffRoles: string[]
   isYouthPrisoner: boolean
-}
-
-export interface OverviewScheduleItem {
-  name: string
-  startTime?: string
-  endTime?: string
-}
-
-export interface OverviewSchedule {
-  morning: OverviewScheduleItem[]
-  afternoon: OverviewScheduleItem[]
-  evening: OverviewScheduleItem[]
 }
 
 export interface OverviewNonAssociation {
@@ -48,46 +29,6 @@ export interface AlertsSummary {
   activeAlertCount: number
   nonAssociationsCount: number
   nonAssociationsUrl: string
-}
-
-interface MoneySummary {
-  spends: number
-  cash: number
-}
-
-interface AdjudicationSummary {
-  adjudicationCount: number
-  activePunishments: number
-}
-
-interface VisitsSummary {
-  startDate: string
-  remainingVo: number
-  remainingPvo: number
-}
-
-interface CsraSummary {
-  classification?: string
-  assessmentDate?: string
-}
-
-interface CategorySummary {
-  codeDescription: string
-  nextReviewDate?: string
-  userCanManage: boolean
-}
-
-interface IncentiveSummary {
-  positiveBehaviourCount: number
-  negativeBehaviourCount: number
-  nextReviewDate: string
-  daysOverdue: number | undefined
-}
-
-export const isIncentiveSummaryError = (
-  incentiveSummary: IncentiveSummary | { error: true },
-): incentiveSummary is { error: true } => {
-  return 'error' in incentiveSummary
 }
 
 interface NonAssociationSummary {

@@ -4,7 +4,7 @@ import OverviewPageService from '../services/overviewPageService'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
 import { User } from '../data/hmppsAuthClient'
-import { formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { formatCategoryCodeDescription, formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import Nominal from '../data/interfaces/manageSocCasesApi/Nominal'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
@@ -17,6 +17,12 @@ import logger from '../../logger'
 import OffencesService from '../services/offencesService'
 import OverviewPageData from './interfaces/OverviewPageData'
 import mapCourtCaseSummary from './mappers/mapCourtCaseSummary'
+import MoneyService from '../services/moneyService'
+import AdjudicationsService from '../services/adjudicationsService'
+import { VisitsService } from '../services/visitsService'
+import PrisonerScheduleService from '../services/prisonerScheduleService'
+import { AssessmentCode } from '../data/enums/assessmentCode'
+import IncentivesService from '../services/incentivesService'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -28,11 +34,21 @@ export default class OverviewController {
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
     private readonly auditService: AuditService,
     private readonly offencesService: OffencesService,
+    private readonly moneyService: MoneyService,
+    private readonly adjudicationsService: AdjudicationsService,
+    private readonly visitsService: VisitsService,
+    private readonly prisonerScheduleService: PrisonerScheduleService,
+    private readonly incentivesService: IncentivesService,
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = req.middleware
-    const { userRoles } = res.locals.user
+    const { userRoles, caseLoads } = res.locals.user
+    const { prisonId, bookingId, prisonerNumber } = prisonerData
+    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, caseLoads)
+    const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
+    const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
+
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
     const showCourtCaseSummary =
@@ -46,6 +62,11 @@ export default class OverviewController {
       nextCourtAppearance,
       activeCourtCasesCount,
       latestReleaseDate,
+      moneySummary,
+      adjudicationSummary,
+      visitsSummary,
+      schedule,
+      incentiveSummary,
     ] = await Promise.all([
       this.overviewPageService.get({
         clientToken,
@@ -54,14 +75,20 @@ export default class OverviewController {
         inmateDetail,
         apiErrorCallback: res.locals.apiErrorCallback,
         userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
       }),
-      pathfinderApiClient.getNominal(prisonerData.prisonerNumber),
-      manageSocCasesApiClient.getNominal(prisonerData.prisonerNumber),
-      this.offencesService.getNextCourtHearingSummary(clientToken, prisonerData.bookingId),
-      this.offencesService.getActiveCourtCasesCount(clientToken, prisonerData.bookingId),
-      showCourtCaseSummary
-        ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerData.prisonerNumber)
+      pathfinderApiClient.getNominal(prisonerNumber),
+      manageSocCasesApiClient.getNominal(prisonerNumber),
+      this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
+      this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
+      showCourtCaseSummary ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber) : null,
+      belongsToCaseLoad ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
+      belongsToCaseLoad || isPomOrReceptionUser
+        ? await this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId)
+        : null,
+      belongsToCaseLoad ? await this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
+      await this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
+      belongsToCaseLoad || isGlobalSearchUser
+        ? await this.incentivesService.getIncentiveOverview(clientToken, bookingId)
         : null,
     ])
 
@@ -93,6 +120,13 @@ export default class OverviewController {
       pageTitle: 'Overview',
       ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
       ...overviewPageData,
+      moneySummary,
+      adjudicationSummary,
+      visitsSummary,
+      categorySummary: this.getCategorySummary(prisonerData, inmateDetail, userRoles),
+      csraSummary: this.getCsraSummary(prisonerData),
+      schedule,
+      incentiveSummary,
       overviewActions,
       overviewInfoLinks,
       courtCaseSummary: mapCourtCaseSummary(
@@ -166,5 +200,37 @@ export default class OverviewController {
     }
 
     return links
+  }
+
+  private getCategorySummary(
+    { assessments }: Prisoner,
+    inmateDetail: InmateDetail,
+    userRoles: string[],
+  ): OverviewPageData['categorySummary'] {
+    const category = assessments?.find(assessment => assessment.assessmentCode === AssessmentCode.category)
+    const userCanManage = userHasRoles(
+      [
+        Role.CreateRecategorisation,
+        Role.ApproveCategorisation,
+        Role.CreateRecategorisation,
+        Role.CategorisationSecurity,
+      ],
+      userRoles,
+    )
+
+    return {
+      codeDescription: formatCategoryCodeDescription(category?.classificationCode, inmateDetail.category),
+      nextReviewDate: category?.nextReviewDate,
+      userCanManage,
+    }
+  }
+
+  private getCsraSummary({ assessments }: Prisoner): OverviewPageData['csraSummary'] {
+    const csra = assessments?.find(assessment => assessment.assessmentDescription.includes(AssessmentCode.csra))
+
+    return {
+      classification: csra?.classification,
+      assessmentDate: csra?.assessmentDate,
+    }
   }
 }

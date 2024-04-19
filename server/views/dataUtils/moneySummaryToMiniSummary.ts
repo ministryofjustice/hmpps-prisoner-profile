@@ -1,8 +1,8 @@
 import { formatMoney } from '../../utils/utils'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
+import AccountBalances from '../../data/interfaces/prisonApi/AccountBalances'
 
-export default (moneySummary: OverviewPage['moneySummary'], prisonerNumber: string): MiniSummaryData => {
+export default (moneySummary: AccountBalances, prisonerNumber: string): MiniSummaryData => {
   return {
     heading: 'Money',
     topLabel: 'Spends',

@@ -1,6 +1,6 @@
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import { formatDate } from '../../utils/dateHelpers'
+import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
 
 const formatPrivilegedVisitsSummary = (count: number): string => {
   return `Including ${count} privileged visits`
@@ -10,7 +10,7 @@ const getPrivilegedVisitsDescription = (remainingPvo: number, remainingVo: numbe
   if (remainingVo) return 'No privileged visits'
   return ''
 }
-export default (visitSummary: OverviewPage['visitsSummary'], prisonerNumber: string): MiniSummaryData => {
+export default (visitSummary: VisitsOverviewSummary, prisonerNumber: string): MiniSummaryData => {
   const { remainingVo, remainingPvo, startDate } = visitSummary
 
   return {

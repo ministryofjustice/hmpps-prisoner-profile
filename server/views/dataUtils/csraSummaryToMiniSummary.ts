@@ -1,9 +1,9 @@
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import { formatDate } from '../../utils/dateHelpers'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 export default (
-  csraSummary: OverviewPage['csraSummary'],
+  csraSummary: OverviewPageData['csraSummary'],
   prisonerInCaseload: boolean,
   prisonerNumber: string,
 ): MiniSummaryData => {

@@ -1,9 +1,9 @@
 import csraSummaryToMiniSummary from './csraSummaryToMiniSummary'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 describe('csraSummaryToMiniSummary', () => {
   it('should return a mini summary object', () => {
-    const csraSummary: OverviewPage['csraSummary'] = {
+    const csraSummary: OverviewPageData['csraSummary'] = {
       classification: 'Standard',
       assessmentDate: '2021-01-01',
     }
@@ -20,7 +20,7 @@ describe('csraSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object with no data message if classification is not entered', () => {
-    const csraSummary: OverviewPage['csraSummary'] = {
+    const csraSummary: OverviewPageData['csraSummary'] = {
       classification: null,
       assessmentDate: '2021-01-01',
     }
@@ -37,7 +37,7 @@ describe('csraSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object without a link if prisoner is not in caseload', () => {
-    const csraSummary: OverviewPage['csraSummary'] = {
+    const csraSummary: OverviewPageData['csraSummary'] = {
       classification: 'Standard',
       assessmentDate: '2021-01-01',
     }
@@ -52,7 +52,7 @@ describe('csraSummaryToMiniSummary', () => {
   })
 
   it('should return a mini summary object without a link if prisoner is not in caseload and classification is not entered', () => {
-    const csraSummary: OverviewPage['csraSummary'] = {
+    const csraSummary: OverviewPageData['csraSummary'] = {
       classification: null,
       assessmentDate: '2021-01-01',
     }

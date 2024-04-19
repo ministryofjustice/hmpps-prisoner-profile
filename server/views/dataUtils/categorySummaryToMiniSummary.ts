@@ -1,10 +1,10 @@
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import { formatDate } from '../../utils/dateHelpers'
 import config from '../../config'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 export default (
-  categorySummary: OverviewPage['categorySummary'],
+  categorySummary: OverviewPageData['categorySummary'],
   prisonerInCaseload: boolean,
   bookingId: number,
 ): MiniSummaryData => {

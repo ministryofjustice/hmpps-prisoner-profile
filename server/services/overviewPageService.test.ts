@@ -4,7 +4,6 @@ import OverviewPageService from './overviewPageService'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
   accountBalancesMock,
-  adjudicationSummaryMock,
   assessmentsMock,
   visitBalancesMock,
   visitSummaryMock,
@@ -32,12 +31,9 @@ import { formatDate } from '../utils/dateHelpers'
 import { convertToTitleCase, neurodiversityEnabled } from '../utils/utils'
 import { IncentivesApiClient } from '../data/interfaces/incentivesApi/incentivesApiClient'
 import { incentiveReviewsMock } from '../data/localMockData/incentiveReviewsMock'
-import { caseNoteCountMock } from '../data/localMockData/caseNoteCountMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { fullStatusMock, mainOffenceMock, offenceOverviewMock } from '../data/localMockData/offenceOverviewMock'
 import { CourtCasesMock } from '../data/localMockData/courtCaseMock'
-import { Role } from '../data/enums/role'
-import { adjudicationsApiClientMock } from '../../tests/mocks/adjudicationsApiClientMock'
 
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
@@ -52,7 +48,6 @@ import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfers
 import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
 import config from '../config'
 import { complexityOfNeedHighMock, complexityOfNeedLowMock } from '../data/localMockData/complexityOfNeedMock'
-import AdjudicationsApiClient from '../data/interfaces/adjudicationsApi/adjudicationsApiClient'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
@@ -100,8 +95,6 @@ describe('OverviewPageService', () => {
     getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
   }
 
-  let adjudicationsApiClient: AdjudicationsApiClient
-
   const nonAssociationsApiClient: NonAssociationsApiClient = {
     getPrisonerNonAssociations: jest.fn(async () => prisonerNonAssociationsMock),
   }
@@ -134,7 +127,6 @@ describe('OverviewPageService', () => {
       () => allocationManagerApiClient,
       () => keyWorkerApiClient,
       () => incentivesApi,
-      () => adjudicationsApiClient,
       () => curiousApiClient,
       () => nonAssociationsApiClient,
       () => prisonerProfileDeliusApiClient,
@@ -152,7 +144,6 @@ describe('OverviewPageService', () => {
     prisonApiClient.getPrisoner = jest.fn(async () => prisonerDetailMock)
     prisonApiClient.getVisitBalances = jest.fn(async () => visitBalancesMock)
     prisonApiClient.getVisitSummary = jest.fn(async () => visitSummaryMock)
-    prisonApiClient.getCaseNoteCount = jest.fn(async () => caseNoteCountMock)
     prisonApiClient.getUserCaseLoads = jest.fn(async () => CaseLoadsDummyDataA)
     prisonApiClient.getMainOffence = jest.fn(async () => mainOffenceMock)
     prisonApiClient.getCourtCases = jest.fn(async () => CourtCasesMock)
@@ -160,9 +151,6 @@ describe('OverviewPageService', () => {
     prisonApiClient.getStaffRoles = jest.fn(async () => [])
     prisonApiClient.getScheduledTransfers = jest.fn(async () => [])
     prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetail)
-
-    adjudicationsApiClient = adjudicationsApiClientMock()
-    adjudicationsApiClient.getAdjudications = jest.fn(async () => adjudicationSummaryMock)
 
     nonAssociationsApiClient.getPrisonerNonAssociations = jest.fn(async () => prisonerNonAssociationsMock)
   })
@@ -181,321 +169,6 @@ describe('OverviewPageService', () => {
         inmateDetail: inmateDetailMock,
       })
       expect(prisonName).toEqual(PrisonerMockDataA.prisonName)
-    })
-  })
-
-  describe('moneySummary', () => {
-    it('should get data and map money summary if user in caseload', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.moneySummary).toEqual({ cash: 35, spends: 240.51 })
-    })
-
-    it('should return null when the not in caseload', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-
-      expect(res.moneySummary).toEqual(null)
-    })
-  })
-
-  describe('adjudicationSummary', () => {
-    it('should get data and map adjudication if user in caseload', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.adjudicationSummary).toEqual({ activePunishments: 0, adjudicationCount: 4 })
-    })
-
-    it('should return null when not in caseload and no specific roles', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-
-      expect(res.adjudicationSummary).toEqual(null)
-    })
-
-    it.each([Role.PomUser, Role.ReceptionUser])(
-      'should return the adjudications when not in caseload but user has a specific role',
-      async userRole => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get({
-          clientToken: 'token',
-          prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-          staffId: 1,
-          inmateDetail: inmateDetailMock,
-          userCaseLoads: CaseLoadsDummyDataA,
-          userRoles: [userRole],
-        })
-
-        expect(res.adjudicationSummary).toEqual({ activePunishments: 0, adjudicationCount: 4 })
-      },
-    )
-  })
-
-  describe('visitsSummary', () => {
-    it('should get data and map visits summary data if user in caseload', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.visitsSummary).toEqual({ remainingPvo: 2, remainingVo: 6, startDate: '2023-09-15' })
-    })
-
-    describe('When visit balances returns 404', () => {
-      it('Displays no visit information', async () => {
-        const prisonerNumber = 'A1234BC'
-        const bookingId = 123456
-
-        prisonApiClient.getVisitBalances = jest.fn(async () => null)
-        const overviewPageService = overviewPageServiceConstruct()
-        const res = await overviewPageService.get({
-          clientToken: 'token',
-          prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-          staffId: 1,
-          inmateDetail: inmateDetailMock,
-          userCaseLoads: CaseLoadsDummyDataA,
-        })
-
-        const visitSummary = res.visitsSummary
-        expect(visitSummary).toEqual({ remainingPvo: undefined, remainingVo: undefined, startDate: '2023-09-15' })
-      })
-    })
-
-    it('should return null when the not in caseload', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-
-      expect(res.visitsSummary).toEqual(null)
-    })
-  })
-
-  describe('categorySummary', () => {
-    it('should get data and map category summary data', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.categorySummary).toEqual({ codeDescription: 'B', nextReviewDate: '2023-02-19', userCanManage: false })
-    })
-
-    it.each([
-      Role.CreateRecategorisation,
-      Role.ApproveCategorisation,
-      Role.CreateRecategorisation,
-      Role.CategorisationSecurity,
-    ])('should set userCanManage to true when user has a specific role', async userRole => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-        userRoles: [userRole],
-      })
-
-      expect(res.categorySummary).toEqual({
-        codeDescription: 'B',
-        nextReviewDate: '2023-02-19',
-        userCanManage: true,
-      })
-    })
-  })
-
-  describe('csraSummary', () => {
-    it('should get data and map csra summary data', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.csraSummary).toEqual({
-        assessmentDate: '2021-02-19',
-        classification: 'Standard',
-      })
-    })
-  })
-
-  describe('incentiveSummary', () => {
-    beforeAll(() => {
-      jest.useFakeTimers().setSystemTime(new Date('2024-01-03'))
-    })
-    afterAll(() => {
-      jest.useRealTimers()
-    })
-    it('should get data and map incentive summary data', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.incentiveSummary).toEqual({
-        daysOverdue: 2,
-        negativeBehaviourCount: 1,
-        nextReviewDate: '2024-01-01',
-        positiveBehaviourCount: 1,
-      })
-    })
-
-    it('should return null when the not in caseload', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: '123' } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.incentiveSummary).toEqual(null)
-    })
-
-    it('should return data when the not in caseload but global search user', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct()
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: '123', assessments: assessmentsMock } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-        userRoles: [Role.GlobalSearch],
-      })
-
-      expect(res.incentiveSummary).toEqual({
-        daysOverdue: 2,
-        negativeBehaviourCount: 1,
-        nextReviewDate: '2024-01-01',
-        positiveBehaviourCount: 1,
-      })
-    })
-
-    it('should return null if no data', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct({ useNull: true })
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.incentiveSummary).toEqual({
-        daysOverdue: null,
-        negativeBehaviourCount: null,
-        nextReviewDate: null,
-        positiveBehaviourCount: null,
-      })
-    })
-
-    it('should return error object if api errors', async () => {
-      const prisonerNumber = 'A1234BC'
-      const bookingId = 123456
-
-      const overviewPageService = overviewPageServiceConstruct({ useError: true })
-      const res = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: {
-          ...PrisonerMockDataA,
-          prisonerNumber,
-          bookingId,
-          prisonId: 'MDI',
-          csra: 'Standard',
-          assessments: assessmentsMock,
-        } as Prisoner,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-        userCaseLoads: CaseLoadsDummyDataA,
-      })
-
-      expect(res.incentiveSummary).toEqual({ error: true })
     })
   })
 
@@ -608,74 +281,6 @@ describe('OverviewPageService', () => {
         coworkingPrisonOffenderManager: 'Andy Hudson',
         communityOffenderManager: 'Terry Scott',
       })
-    })
-  })
-
-  describe('Schedule', () => {
-    it('Gets events for today from the prison api', async () => {
-      const overviewPageService = overviewPageServiceConstruct()
-      await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: PrisonerMockDataA,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-      expect(prisonApiClient.getEventsScheduledForToday).toBeCalledWith(PrisonerMockDataA.bookingId)
-    })
-
-    it('Groups the events', async () => {
-      const overviewPageService = overviewPageServiceConstruct()
-      const { schedule } = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: PrisonerMockDataA,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-      const { morning, afternoon, evening } = schedule
-      expect(morning.length).toEqual(1)
-      expect(afternoon.length).toEqual(1)
-      expect(evening.length).toEqual(2)
-    })
-
-    it('Uses the event source description for PA sub types', async () => {
-      const events = [{ ...dummyScheduledEvents[0] }]
-      events[0].eventSubType = 'PA'
-      events[0].eventSourceDesc = 'The event description'
-      prisonApiClient.getEventsScheduledForToday = jest.fn(async () => events)
-      const overviewPageService = overviewPageServiceConstruct()
-      const { schedule } = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: PrisonerMockDataA,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-      const { morning } = schedule
-      expect(morning[0].name).toEqual('The event description')
-    })
-
-    it('Creates the overview page schedule from the events', async () => {
-      const overviewPageService = overviewPageServiceConstruct()
-      const { schedule } = await overviewPageService.get({
-        clientToken: 'token',
-        prisonerData: PrisonerMockDataA,
-        staffId: 1,
-        inmateDetail: inmateDetailMock,
-      })
-      const { morning, afternoon, evening } = schedule
-
-      expect(morning[0].name).toEqual('Joinery AM')
-      expect(morning[0].startTime).toEqual('08:30')
-
-      expect(afternoon[0].name).toEqual('Joinery PM')
-      expect(afternoon[0].startTime).toEqual('13:15')
-      expect(afternoon[0].endTime).toEqual('16:15')
-
-      expect(evening[0].name).toEqual('Gym - Football')
-      expect(evening[0].startTime).toEqual('18:00')
-      expect(evening[0].endTime).toEqual('19:00')
-      expect(evening[1].name).toEqual('VLB - Test')
-      expect(evening[1].startTime).toEqual('18:00')
-      expect(evening[1].endTime).toEqual('19:00')
     })
   })
 
@@ -996,7 +601,6 @@ describe('OverviewPageService', () => {
         staffId: 1,
         inmateDetail: inmateDetailMock,
         userCaseLoads: CaseLoadsDummyDataA,
-        userRoles: [],
       })
       expect(res.nonAssociationSummary).toEqual({
         prisonName: 'Moorland (HMP & YOI)',
