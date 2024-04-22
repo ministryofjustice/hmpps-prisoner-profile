@@ -41,6 +41,7 @@ generic-service:
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
     NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED: "false"
+    CONTENTFUL_HOST: "https://graphql.contentful.com"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

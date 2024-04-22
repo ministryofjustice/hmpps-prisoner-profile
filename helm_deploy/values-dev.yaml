@@ -64,7 +64,6 @@ generic-service:
     RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api-dev.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
-    CONTENTFUL_HOST: "https://graphql.contentful.com"
 
     # Feature flags
     AUDIT_ENABLED: "true"

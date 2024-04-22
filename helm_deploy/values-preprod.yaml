@@ -63,7 +63,6 @@ generic-service:
     CCRD_UI_URL: "https://court-cases-release-dates-preprod.hmpps.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-preprod.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-preprod.hmpps.service.justice.gov.uk"
-    CONTENTFUL_HOST: "https://graphql.contentful.com"
 
     # Feature flags
     AUDIT_ENABLED: "true"

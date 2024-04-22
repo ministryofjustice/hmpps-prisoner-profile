@@ -242,7 +242,7 @@ export default {
       agent: new AgentConfig(Number(get('CALCULATE_RELEASE_DATES_API_TIMEOUT_DEADLINE', 10000))),
     },
     contentful: {
-      host: get('CONTENTFUL_HOST', ''), // This is only required for Cypress testing
+      host: get('CONTENTFUL_HOST', '', requiredInProduction),
       spaceId: get('CONTENTFUL_SPACE_ID', 'spaceId', requiredInProduction),
       accessToken: get('CONTENTFUL_ACCESS_TOKEN', 'token', requiredInProduction),
     },

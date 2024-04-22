@@ -40,7 +40,7 @@ docker-compose pull && docker-compose up
 <details>
 <summary>Click here for an example of the .env file</summary>
 <br>
-Note, client credentials need to be retrieved from the dev kubernetes secrets to provide the missing client id and secret variables.
+Note, client credentials and contentful details need to be retrieved from the dev kubernetes secrets to provide the missing client id and secret variables.
 
 ```
 PORT=3000
@@ -87,6 +87,9 @@ WELCOME_PEOPLE_INTO_PRISON_UI_URL=https://welcome-dev.prison.service.justice.gov
 WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
 LEARNING_AND_WORK_PROGRESS_UI_URL=https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk
 EDUCATION_AND_WORK_PLAN_API_URL=https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk
+CONTENTFUL_HOST=https://graphql.contentful.com
+CONTENTFUL_SPACE_ID=
+CONTENTFUL_ACCESS_TOKEN=
 ```
 </details>
 
