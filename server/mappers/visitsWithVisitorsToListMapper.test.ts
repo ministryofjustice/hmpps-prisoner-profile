@@ -4,6 +4,8 @@ import visitsWithVisitorsToListMapper from './visitsWithVisitorsToListMapper'
 
 describe('visitsWithVisitorsToListMapper', () => {
   it('Maps visits with visitors into a formatted list', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2024-04-22'))
+
     const res = visitsWithVisitorsToListMapper(pagedVisitsMock.content)
     const first = res[0]
     expect(first.type).toEqual('Social visit')
@@ -11,7 +13,9 @@ describe('visitsWithVisitorsToListMapper', () => {
     expect(first.status).toEqual('Not entered')
     expect(first.isBooked).toEqual(false)
     expect(first.prison).toEqual('Moorland (HMP & YOI)')
-    expect(first.visitors).toEqual(['John Smith (Grandfather, 54 years old)'])
+    expect(first.visitors).toEqual(['John Smith (Grandfather, 55 years old)'])
+
+    jest.useRealTimers()
   })
 
   it('Marks visits as booked if they are in the future', () => {
