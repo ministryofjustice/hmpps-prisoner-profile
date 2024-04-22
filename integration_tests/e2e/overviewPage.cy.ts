@@ -7,6 +7,7 @@ import { calculateAge } from '../../server/utils/utils'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { mockContactDetailYouthEstate } from '../../server/data/localMockData/contactDetail'
 import { latestCalculationWithNomisSource } from '../../server/data/localMockData/latestCalculationMock'
+import IndexPage from '../pages'
 
 const visitOverviewPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU' })
@@ -820,6 +821,21 @@ context('Court cases and release dates', () => {
         .courtCasesAndReleaseDates()
         .card()
         .contains('a[href="http://localhost:9091/ccrd/prisoner/G6123VU/overview"]', 'Court cases and release dates')
+    })
+  })
+
+  context('Given feedback banner is published in contentful', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.task('stubBanner')
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      visitOverviewPage()
+    })
+
+    it('Displays the feedback banner', () => {
+      const indexPage = new IndexPage()
+      indexPage.banner().should('contain.text', 'Banner')
     })
   })
 })

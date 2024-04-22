@@ -41,6 +41,7 @@ generic-service:
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
     NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED: "false"
+    CONTENTFUL_HOST: "https://graphql.contentful.com"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -57,6 +58,8 @@ generic-service:
       SESSION_SECRET: "SESSION_SECRET"
       TAG_MANAGER_CONTAINER_ID: "TAG_MANAGER_CONTAINER_ID"
       NOTIFY_API_KEY: "NOTIFY_API_KEY"
+      CONTENTFUL_SPACE_ID: "CONTENTFUL_SPACE_ID"
+      CONTENTFUL_ACCESS_TOKEN: "CONTENTFUL_ACCESS_TOKEN"
       BERWYN_OMU_EMAIL: "BERWYN_OMU_EMAIL"
       BIRMINGHAM_OMU_EMAIL: "BIRMINGHAM_OMU_EMAIL"
       BRONZEFIELD_OMU_EMAIL: "BRONZEFIELD_OMU_EMAIL"

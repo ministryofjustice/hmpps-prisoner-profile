@@ -1,4 +1,5 @@
 import { SQSClient } from '@aws-sdk/client-sqs'
+import { ApolloClient, InMemoryCache } from '@apollo/client/core'
 import { dataAccess } from '../data'
 import CommonApiRoutes from '../routes/common/api'
 import AlertsService from './alertsService'
@@ -30,6 +31,7 @@ import PrisonService from './prisonService'
 import AdjudicationsService from './adjudicationsService'
 import PrisonerScheduleService from './prisonerScheduleService'
 import IncentivesService from './incentivesService'
+import ContentfulService from './contentfulService'
 
 export const services = () => {
   const {
@@ -116,6 +118,21 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
 
+  const apolloClient = new ApolloClient({
+    cache: new InMemoryCache(),
+    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/master`,
+    headers: {
+      Authorization: `Bearer ${config.apis.contentful.accessToken}`,
+    },
+    ssrMode: true,
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'cache-and-network',
+      },
+    },
+  })
+  const contentfulService = new ContentfulService(apolloClient)
+
   return {
     dataAccess,
     commonApiRoutes,
@@ -147,6 +164,7 @@ export const services = () => {
     adjudicationsService,
     prisonerScheduleService,
     incentivesService,
+    contentfulService,
   }
 }
 

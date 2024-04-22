@@ -52,3 +52,19 @@
 .govuk-frontend-supported .govuk-accordion__section-toggle {
   margin-bottom: 5px
 }
+
+.dps-banner {
+  min-height: 70px;
+  border-left: 10px solid govuk-colour('green');
+  background-color: govuk-colour('light-grey');
+
+  p {
+    font-weight: 300;
+    padding: 22px;
+    margin: 0;
+
+    a:link, a:visited {
+      color: $govuk-text-colour;
+    }
+  }
+}
