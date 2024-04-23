@@ -1,8 +1,16 @@
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { getNamesFromString, sortByDateTime } from '../utils/utils'
+import {
+  convertToTitleCase,
+  formatCommunityManager,
+  formatName,
+  getNamesFromString,
+  sortArrayOfObjectsByDate,
+  sortByDateTime,
+  SortType,
+} from '../utils/utils'
 import Address from '../data/interfaces/prisonApi/Address'
-import { Contact, PomContact } from '../data/interfaces/prisonApi/StaffContacts'
+import StaffContacts, { Contact, PomContact, YouthStaffContacts } from '../data/interfaces/prisonApi/StaffContacts'
 import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/prisonerProfileDeliusApiClient'
 import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import KeyWorkerClient from '../data/interfaces/keyWorkerApi/keyWorkerClient'
@@ -12,6 +20,13 @@ import Telephone from '../data/interfaces/prisonApi/Telephone'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import { Result } from '../utils/result/result'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import { ContactRelationship } from '../data/enums/ContactRelationship'
+import { formatDate } from '../utils/dateHelpers'
+import config from '../config'
+import { ComplexityLevel } from '../data/interfaces/complexityApi/ComplexityOfNeed'
+import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
 
 interface ProfessionalContact {
   relationshipDescription: string
@@ -36,6 +51,7 @@ export default class ProfessionalContactsService {
     private readonly allocationApiClientBuilder: RestClientBuilder<AllocationManagerClient>,
     private readonly prisonerProfileDeliusApiClientBuilder: RestClientBuilder<PrisonerProfileDeliusApiClient>,
     private readonly keyworkerApiClientBuilder: RestClientBuilder<KeyWorkerClient>,
+    private readonly complexityApiClientBuilder: RestClientBuilder<ComplexityApiClient>,
   ) {}
 
   async getContacts(
@@ -98,7 +114,7 @@ export default class ProfessionalContactsService {
       .sort(this.sortProfessionalContacts)
   }
 
-  sortProfessionalContacts = (
+  private sortProfessionalContacts = (
     left: Result<ProfessionalContact, ProfessionalContactApiError>,
     right: Result<ProfessionalContact, ProfessionalContactApiError>,
   ) => {
@@ -139,7 +155,7 @@ export default class ProfessionalContactsService {
     return left.getOrThrow().lastName.localeCompare(right.getOrThrow().lastName)
   }
 
-  async getPersonContactDetails(token: string, personId: number) {
+  private async getPersonContactDetails(token: string, personId: number) {
     const prisonApi = this.prisonApiClientBuilder(token)
     const [addresses, emails, phones] = await Promise.all([
       prisonApi.getAddressesForPerson(personId),
@@ -159,6 +175,115 @@ export default class ProfessionalContactsService {
     if (!left.primary && right.primary) return 1
 
     return sortByDateTime(right.startDate, left.startDate) // Most recently added first
+  }
+
+  getProfessionalContactsOverview(
+    clientToken: string,
+    { prisonId, bookingId, prisonerNumber }: Prisoner,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<YouthStaffContacts | StaffContacts> {
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
+    return isYouthPrisoner
+      ? this.getYouthStaffContactsOverview(clientToken, bookingId)
+      : this.getStaffContactsOverview(clientToken, bookingId, prisonerNumber, prisonId, apiErrorCallback)
+  }
+
+  private async getYouthStaffContactsOverview(clientToken: string, bookingId: number) {
+    const prisonApi = this.prisonApiClientBuilder(clientToken)
+    const contacts = await prisonApi.getBookingContacts(bookingId)
+
+    const youthStaffContacts: YouthStaffContacts = {
+      cuspOfficer: null,
+      cuspOfficerBackup: null,
+      youthJusticeWorker: null,
+      resettlementPractitioner: null,
+      youthJusticeService: null,
+      youthJusticeServiceCaseManager: null,
+    }
+
+    // Return the most recently created record for each of the YOI contact relationships if available
+    sortArrayOfObjectsByDate<Contact>(contacts.otherContacts, 'createdDateTime', SortType.ASC).forEach(c => {
+      switch (c.relationship) {
+        case ContactRelationship.CuspOfficer:
+          youthStaffContacts.cuspOfficer = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.CuspOfficerBackup:
+          youthStaffContacts.cuspOfficerBackup = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeWorker:
+          youthStaffContacts.youthJusticeWorker = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.ResettlementPractitioner:
+          youthStaffContacts.resettlementPractitioner = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeService:
+          youthStaffContacts.youthJusticeService = formatName(c.firstName, null, c.lastName)
+          break
+        case ContactRelationship.YouthJusticeServiceCaseManager:
+          youthStaffContacts.youthJusticeServiceCaseManager = formatName(c.firstName, null, c.lastName)
+          break
+        default:
+      }
+    })
+
+    return youthStaffContacts
+  }
+
+  private async getStaffContactsOverview(
+    clientToken: string,
+    bookingId: number,
+    prisonerNumber: string,
+    prisonId: string,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<StaffContacts> {
+    const prisonApi = this.prisonApiClientBuilder(clientToken)
+    const prisonerProfileDeliusApiClient = this.prisonerProfileDeliusApiClientBuilder(clientToken)
+    const allocationManagerApiClient = this.allocationApiClientBuilder(clientToken)
+
+    const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions] = await Promise.all([
+      prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
+      allocationManagerApiClient.getPomByOffenderNo(prisonerNumber),
+      Result.wrap(this.getKeyWorkerName(clientToken, prisonerNumber, prisonId), apiErrorCallback),
+      prisonApi.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
+    ])
+
+    const prisonOffenderManager =
+      allocationManager?.primary_pom?.name && getNamesFromString(allocationManager.primary_pom.name)
+
+    const coworkingPrisonOffenderManager =
+      allocationManager?.secondary_pom?.name && getNamesFromString(allocationManager.secondary_pom.name)
+
+    return {
+      keyWorker: keyWorkerName
+        .map(name => ({
+          name,
+          lastSession:
+            keyWorkerSessions?.[0] !== undefined ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short') : '',
+        }))
+        .toPromiseSettledResult(),
+      prisonOffenderManager: prisonOffenderManager && `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`,
+
+      coworkingPrisonOffenderManager:
+        coworkingPrisonOffenderManager && `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`,
+
+      communityOffenderManager: formatCommunityManager(communityManager),
+    }
+  }
+
+  private getKeyWorkerName = async (clientToken: string, prisonerNumber: string, prisonId: string): Promise<string> => {
+    const keyWorkerClient = this.keyworkerApiClientBuilder(clientToken)
+    const complexityApiClient = this.complexityApiClientBuilder(clientToken)
+
+    const complexityLevel =
+      config.featureToggles.complexityEnabledPrisons.includes(prisonId) &&
+      (await complexityApiClient.getComplexityOfNeed(prisonerNumber))?.level
+
+    if (complexityLevel === ComplexityLevel.High) return 'None - high complexity of need'
+
+    const keyWorker = await keyWorkerClient.getOffendersKeyWorker(prisonerNumber)
+    return keyWorker && keyWorker.firstName
+      ? `${convertToTitleCase(keyWorker.firstName)} ${convertToTitleCase(keyWorker.lastName)}`
+      : 'Not allocated'
   }
 }
 

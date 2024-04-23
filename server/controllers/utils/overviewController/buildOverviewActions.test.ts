@@ -1,14 +1,14 @@
-import { Role } from '../../data/enums/role'
+import { Role } from '../../../data/enums/role'
 import buildOverviewActions from './buildOverviewActions'
-import { PrisonerMockDataA } from '../../data/localMockData/prisoner'
-import { userMock } from '../../data/localMockData/user'
-import config from '../../config'
-import { HeaderFooterMeta } from '../../data/interfaces/componentApi/Component'
-import Nominal from '../../data/interfaces/manageSocCasesApi/Nominal'
+import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
+import { userMock } from '../../../data/localMockData/user'
+import config from '../../../config'
+import { HeaderFooterMeta } from '../../../data/interfaces/componentApi/Component'
+import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
 
 const pathfinderNominal = { id: 1 }
 const socNominal = { id: 2 }
-const staffRoles = ['KW']
+const staffRoles = [{ role: 'KW' }]
 describe('buildOverviewActions', () => {
   describe('Calculate release dates', () => {
     test.each`
@@ -61,10 +61,10 @@ describe('buildOverviewActions', () => {
 
   describe('Add key worker session', () => {
     test.each`
-      staffRolesToUse  | visible
-      ${['KW']}        | ${true}
-      ${['SOMETHING']} | ${false}
-      ${[]}            | ${false}
+      staffRolesToUse            | visible
+      ${[{ role: 'KW' }]}        | ${true}
+      ${[{ role: 'SOMETHING' }]} | ${false}
+      ${[]}                      | ${false}
     `('user with roles: $expected, can see: $visible', ({ staffRolesToUse, visible }) => {
       const resp = buildOverviewActions(
         PrisonerMockDataA,

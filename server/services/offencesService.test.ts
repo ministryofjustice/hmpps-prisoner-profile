@@ -4,6 +4,7 @@ import OffencesService from './offencesService'
 import { calculateReleaseDatesApiClientMock } from '../../tests/mocks/calculateReleaseDatesApiClientMock'
 import CalculateReleaseDatesApiClient from '../data/interfaces/calculateReleaseDatesApi/calculateReleaseDatesApiClient'
 import { latestCalculation, latestCalculationWithNomisSource } from '../data/localMockData/latestCalculationMock'
+import { fullStatusMock } from '../data/localMockData/offenceOverviewMock'
 
 jest.mock('../data/prisonApiClient')
 
@@ -103,6 +104,25 @@ describe('offencesService', () => {
         calculationDate: '2024-03-07T15:16:14',
         establishment: null,
         reason: 'Correcting an earlier sentence',
+      })
+    })
+  })
+
+  describe('getOffencesOverview', () => {
+    it('should get main offence and status', async () => {
+      prisonApiClientSpy.getMainOffence = jest.fn().mockResolvedValue([{ offenceDescription: 'description' }])
+      prisonApiClientSpy.getFullStatus = jest.fn().mockResolvedValue(fullStatusMock)
+
+      const offencesService = new OffencesService(
+        () => prisonApiClientSpy,
+        () => calculateReleaseDatesApiClientSpy,
+      )
+
+      const result = await offencesService.getOffencesOverview('token', 1, 'prisonerNumber')
+
+      expect(result).toEqual({
+        mainOffenceDescription: 'description',
+        fullStatus: fullStatusMock,
       })
     })
   })

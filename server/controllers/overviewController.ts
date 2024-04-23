@@ -1,35 +1,44 @@
 import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
-import OverviewPageService from '../services/overviewPageService'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { User } from '../data/hmppsAuthClient'
-import { formatCategoryCodeDescription, formatName, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { formatName, neurodiversityEnabled, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
-import Nominal from '../data/interfaces/manageSocCasesApi/Nominal'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
-import buildOverviewActions from './utils/buildOverviewActions'
+import buildOverviewActions from './utils/overviewController/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
 import OffencesService from '../services/offencesService'
 import OverviewPageData from './interfaces/OverviewPageData'
-import mapCourtCaseSummary from './mappers/mapCourtCaseSummary'
+import mapCourtCaseSummary from './utils/overviewController/mapCourtCaseSummary'
 import MoneyService from '../services/moneyService'
 import AdjudicationsService from '../services/adjudicationsService'
 import { VisitsService } from '../services/visitsService'
 import PrisonerScheduleService from '../services/prisonerScheduleService'
-import { AssessmentCode } from '../data/enums/assessmentCode'
 import IncentivesService from '../services/incentivesService'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
+import { UserService } from '../services'
+import PersonalPageService from '../services/personalPageService'
+import { Result } from '../utils/result/result'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import OffenderService from '../services/offenderService'
+import ProfessionalContactsService from '../services/professionalContactsService'
+import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
+import getOverviewStatuses from './utils/overviewController/getOverviewStatuses'
+import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfoLinks'
+import getPersonalDetails from './utils/overviewController/getPersonalDetails'
+import getCsraSummary from './utils/overviewController/getCsraSummary'
+import getCategorySummary from './utils/overviewController/getCategorySummary'
+import StaffRole from '../data/interfaces/prisonApi/StaffRole'
 
 /**
  * Parse request for overview page and orchestrate response
  */
 export default class OverviewController {
   constructor(
-    private readonly overviewPageService: OverviewPageService,
     private readonly pathfinderApiClientBuilder: RestClientBuilder<PathfinderApiClient>,
     private readonly manageSocCasesApiClientBuilder: RestClientBuilder<ManageSocCasesApiClient>,
     private readonly auditService: AuditService,
@@ -39,24 +48,30 @@ export default class OverviewController {
     private readonly visitsService: VisitsService,
     private readonly prisonerScheduleService: PrisonerScheduleService,
     private readonly incentivesService: IncentivesService,
+    private readonly userService: UserService,
+    private readonly personalPageService: PersonalPageService,
+    private readonly offenderService: OffenderService,
+    private readonly professionalContactsService: ProfessionalContactsService,
   ) {}
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = req.middleware
-    const { userRoles, caseLoads } = res.locals.user
-    const { prisonId, bookingId, prisonerNumber } = prisonerData
+    const { userRoles, caseLoads, staffId } = res.locals.user
+    const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
+    const { courCasesSummaryEnabled } = config.featureToggles
+
+    const activeCaseloadId = caseLoads.find((caseload: CaseLoad) => caseload.currentlyActive)?.caseLoadId
     const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, caseLoads)
     const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
     const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonerData.prisonId)
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
-    const showCourtCaseSummary =
-      config.featureToggles.courCasesSummaryEnabled &&
-      userHasRoles([Role.ReleaseDatesCalculator], res.locals.user.userRoles)
+    const showCourtCaseSummary = courCasesSummaryEnabled && userHasRoles([Role.ReleaseDatesCalculator], userRoles)
 
     const [
-      overviewPageData,
+      staffRoles,
       pathfinderNominal,
       socNominal,
       nextCourtAppearance,
@@ -67,15 +82,14 @@ export default class OverviewController {
       visitsSummary,
       schedule,
       incentiveSummary,
+      learnerNeurodivergence,
+      scheduledTransfers,
+      prisonerDetail,
+      staffContacts,
+      offencesOverview,
+      nonAssociationSummary,
     ] = await Promise.all([
-      this.overviewPageService.get({
-        clientToken,
-        prisonerData,
-        staffId: res.locals.user.staffId,
-        inmateDetail,
-        apiErrorCallback: res.locals.apiErrorCallback,
-        userCaseLoads: res.locals.user.caseLoads,
-      }),
+      activeCaseloadId ? this.userService.getStaffRoles(clientToken, staffId, activeCaseloadId) : ([] as StaffRole[]),
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
@@ -90,6 +104,16 @@ export default class OverviewController {
       belongsToCaseLoad || isGlobalSearchUser
         ? await this.incentivesService.getIncentiveOverview(clientToken, bookingId)
         : null,
+      Result.wrap(this.getLearnerNeurodivergence(clientToken, prisonId, prisonerNumber), res.locals.apiErrorCallback),
+      this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
+      this.offenderService.getPrisoner(clientToken, prisonerNumber),
+      this.professionalContactsService.getProfessionalContactsOverview(
+        clientToken,
+        prisonerData,
+        res.locals.apiErrorCallback,
+      ),
+      this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
+      this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
     ])
 
     const overviewActions = buildOverviewActions(
@@ -97,13 +121,65 @@ export default class OverviewController {
       pathfinderNominal,
       socNominal,
       res.locals.user,
-      overviewPageData.staffRoles ?? [],
+      staffRoles,
       config,
       res.locals.feComponentsMeta,
     )
 
-    const overviewInfoLinks = this.buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user)
+    this.auditOverviewPageView(req, res, prisonerData)
 
+    const viewData: OverviewPageData = {
+      pageTitle: 'Overview',
+      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
+      moneySummary,
+      adjudicationSummary,
+      visitsSummary,
+      categorySummary: getCategorySummary(prisonerData, inmateDetail, userRoles),
+      csraSummary: getCsraSummary(prisonerData),
+      schedule,
+      incentiveSummary,
+      overviewActions,
+      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user),
+      courtCaseSummary: mapCourtCaseSummary(
+        nextCourtAppearance,
+        activeCourtCasesCount,
+        latestReleaseDate,
+        userRoles,
+        prisonerData.prisonerNumber,
+      ),
+      statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
+      prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
+      prisonerInCaseload: prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads),
+      bookingId: prisonerData.bookingId,
+      personalDetails: getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
+      staffContacts,
+      isYouthPrisoner,
+      prisonName,
+      offencesOverview: {
+        ...offencesOverview,
+        imprisonmentStatusDescription: prisonerData.imprisonmentStatusDescription,
+        confirmedReleaseDate: prisonerData.confirmedReleaseDate,
+        conditionalReleaseDate: prisonerData.conditionalReleaseDate,
+      },
+      nonAssociationSummary,
+      options: {
+        showCourtCaseSummary,
+      },
+    }
+
+    res.render('pages/overviewPage', viewData)
+  }
+
+  private getLearnerNeurodivergence = async (
+    clientToken: string,
+    prisonId: string,
+    prisonerNumber: string,
+  ): Promise<LearnerNeurodivergence[]> => {
+    if (!neurodiversityEnabled(prisonId)) return []
+    return this.personalPageService.getLearnerNeurodivergence(clientToken, prisonerNumber)
+  }
+
+  private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {
     this.auditService
       .sendPageView({
         userId: res.locals.user.username,
@@ -115,122 +191,5 @@ export default class OverviewController {
         page: Page.Overview,
       })
       .catch(error => logger.error(error))
-
-    const viewData: OverviewPageData = {
-      pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
-      ...overviewPageData,
-      moneySummary,
-      adjudicationSummary,
-      visitsSummary,
-      categorySummary: this.getCategorySummary(prisonerData, inmateDetail, userRoles),
-      csraSummary: this.getCsraSummary(prisonerData),
-      schedule,
-      incentiveSummary,
-      overviewActions,
-      overviewInfoLinks,
-      courtCaseSummary: mapCourtCaseSummary(
-        nextCourtAppearance,
-        activeCourtCasesCount,
-        latestReleaseDate,
-        userRoles,
-        prisonerData.prisonerNumber,
-      ),
-      prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
-      prisonerInCaseload: prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads),
-      bookingId: prisonerData.bookingId,
-      options: {
-        showCourtCaseSummary,
-      },
-    }
-
-    res.render('pages/overviewPage', viewData)
-  }
-
-  private buildOverviewInfoLinks(
-    prisonerData: Prisoner,
-    pathfinderNominal: Nominal,
-    socNominal: Nominal,
-    user: User,
-  ): { text: string; url: string; dataQA: string }[] {
-    const links: { text: string; url: string; dataQA: string }[] = []
-
-    if (
-      userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
-      (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads) ||
-        ['OUT', 'TRN'].includes(prisonerData.prisonId))
-    ) {
-      links.push({
-        text: 'Probation documents',
-        url: `/prisoner/${prisonerData.prisonerNumber}/probation-documents`,
-        dataQA: 'probation-documents-info-link',
-      })
-    }
-
-    if (
-      userHasRoles(
-        [
-          Role.PathfinderApproval,
-          Role.PathfinderStdPrison,
-          Role.PathfinderStdProbation,
-          Role.PathfinderHQ,
-          Role.PathfinderUser,
-          Role.PathfinderLocalReader,
-          Role.PathfinderNationalReader,
-          Role.PathfinderPolice,
-          Role.PathfinderPsychologist,
-        ],
-        user.userRoles,
-      ) &&
-      pathfinderNominal
-    ) {
-      links.push({
-        text: 'Pathfinder profile',
-        url: `${config.serviceUrls.pathfinder}/nominal/${pathfinderNominal.id}`,
-        dataQA: 'pathfinder-profile-info-link',
-      })
-    }
-
-    if (userHasRoles([Role.SocCommunity, Role.SocCustody], user.userRoles) && socNominal) {
-      links.push({
-        text: 'SOC profile',
-        url: `${config.serviceUrls.manageSocCases}/nominal/${socNominal.id}`,
-        dataQA: 'soc-profile-info-link',
-      })
-    }
-
-    return links
-  }
-
-  private getCategorySummary(
-    { assessments }: Prisoner,
-    inmateDetail: InmateDetail,
-    userRoles: string[],
-  ): OverviewPageData['categorySummary'] {
-    const category = assessments?.find(assessment => assessment.assessmentCode === AssessmentCode.category)
-    const userCanManage = userHasRoles(
-      [
-        Role.CreateRecategorisation,
-        Role.ApproveCategorisation,
-        Role.CreateRecategorisation,
-        Role.CategorisationSecurity,
-      ],
-      userRoles,
-    )
-
-    return {
-      codeDescription: formatCategoryCodeDescription(category?.classificationCode, inmateDetail.category),
-      nextReviewDate: category?.nextReviewDate,
-      userCanManage,
-    }
-  }
-
-  private getCsraSummary({ assessments }: Prisoner): OverviewPageData['csraSummary'] {
-    const csra = assessments?.find(assessment => assessment.assessmentDescription.includes(AssessmentCode.csra))
-
-    return {
-      classification: csra?.classification,
-      assessmentDate: csra?.assessmentDate,
-    }
   }
 }

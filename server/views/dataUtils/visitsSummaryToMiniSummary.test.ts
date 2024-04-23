@@ -90,7 +90,7 @@ describe('visitsSummaryToMiniSummary', () => {
     })
   })
 
-  it('should default bottomContentLine1 to 0 if remainingVo in undefined', () => {
+  it('should default bottomContentLine1 to 0 if remainingVo is undefined', () => {
     const visitsSummary: VisitsOverviewSummary = {
       startDate: undefined,
       remainingVo: undefined,

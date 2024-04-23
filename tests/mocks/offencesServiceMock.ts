@@ -5,4 +5,5 @@ export const offencesServiceMock = (): Interface<OffencesService> => ({
   getNextCourtHearingSummary: jest.fn(),
   getActiveCourtCasesCount: jest.fn(),
   getLatestReleaseCalculation: jest.fn(),
+  getOffencesOverview: jest.fn(),
 })

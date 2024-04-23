@@ -1,6 +1,14 @@
 import OverviewController from './overviewController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import {
+  inmateDetailMock,
+  recognisedListenerBlank,
+  recognisedListenerNo,
+  recognisedListenerYes,
+  suitableListenerBlank,
+  suitableListenerNo,
+  suitableListenerYes,
+} from '../data/localMockData/inmateDetailMock'
 import { CaseLoadsDummyDataA, CaseLoadsDummyDataB } from '../data/localMockData/caseLoad'
 import MoneyService from '../services/moneyService'
 import { moneyServiceMock } from '../../tests/mocks/moneyServiceMock'
@@ -16,8 +24,6 @@ import AdjudicationsService from '../services/adjudicationsService'
 import { adjudicationsServiceMock } from '../../tests/mocks/adjudicationsServiceMock'
 import { VisitsService } from '../services/visitsService'
 import { visitsServiceMock } from '../../tests/mocks/visitsServiceMock'
-import OverviewPageService from '../services/overviewPageService'
-import { overviewPageServiceMock } from '../../tests/mocks/overviewPageServiceMock'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { Role } from '../data/enums/role'
 import { prisonerScheduleServiceMock } from '../../tests/mocks/prisonerScheduleServiceMock'
@@ -26,6 +32,18 @@ import { assessmentsMock } from '../data/localMockData/miniSummaryMock'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import IncentivesService from '../services/incentivesService'
 import { incentiveServiceMock } from '../../tests/mocks/incentiveServiceMock'
+import { UserService } from '../services'
+import { userServiceMock } from '../../tests/mocks/userServiceMock'
+import PersonalPageService from '../services/personalPageService'
+import { personalPageServiceMock } from '../../tests/mocks/personalPageServiceMock'
+import OffenderService from '../services/offenderService'
+import { offenderServiceMock } from '../../tests/mocks/offenderServiceMock'
+import ProfessionalContactsService from '../services/professionalContactsService'
+import { professionalContactsServiceMock } from '../../tests/mocks/professionalContactsServiceMock'
+import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
+import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
+import { OverviewStatus } from './interfaces/OverviewPageData'
+import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
@@ -56,9 +74,12 @@ describe('overviewController', () => {
   let offencesService: OffencesService
   let adjudicationsService: AdjudicationsService
   let visitsService: VisitsService
-  let overviewPageService: OverviewPageService
   let prisonerScheduleService: PrisonerScheduleService
   let incentiveService: IncentivesService
+  let userService: UserService
+  let personalPageService: PersonalPageService
+  let offenderService: OffenderService
+  let professionalContactsService: ProfessionalContactsService
 
   beforeEach(() => {
     req = {
@@ -85,12 +106,14 @@ describe('overviewController', () => {
     offencesService = offencesServiceMock() as OffencesService
     adjudicationsService = adjudicationsServiceMock() as AdjudicationsService
     visitsService = visitsServiceMock() as VisitsService
-    overviewPageService = overviewPageServiceMock() as OverviewPageService
     prisonerScheduleService = prisonerScheduleServiceMock() as PrisonerScheduleService
     incentiveService = incentiveServiceMock() as IncentivesService
+    userService = userServiceMock() as UserService
+    personalPageService = personalPageServiceMock() as PersonalPageService
+    offenderService = offenderServiceMock() as OffenderService
+    professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
 
     controller = new OverviewController(
-      overviewPageService,
       () => pathfinderApiClient,
       () => manageSocCasesApiClient,
       auditService,
@@ -100,7 +123,13 @@ describe('overviewController', () => {
       visitsService,
       prisonerScheduleService,
       incentiveService,
+      userService,
+      personalPageService,
+      offenderService,
+      professionalContactsService,
     )
+
+    offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
   })
 
   describe('moneySummary', () => {
@@ -380,6 +409,266 @@ describe('overviewController', () => {
             negativeBehaviourCount: 1,
             nextReviewDate: '2026-01-01',
             daysOverdue: undefined,
+          },
+        }),
+      )
+    })
+  })
+
+  describe('statuses', () => {
+    it('should get statuses for Current Location, Recognised Listener and Neurodiversity', async () => {
+      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
+
+      await controller.displayOverview(req, res, { ...PrisonerMockDataA, prisonId: 'LII' }, inmateDetailMock)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          statuses: [
+            { label: 'In Moorland (HMP & YOI)' },
+            { label: 'Recognised Listener' },
+            { label: 'Support needed', subText: 'Has neurodiversity needs' },
+          ],
+        }),
+      )
+    })
+
+    it('should not return Neurodiversity if not at supported prison', async () => {
+      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
+
+      await controller.displayOverview(req, res, { ...PrisonerMockDataA, prisonId: 'LEI' }, inmateDetailMock)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          statuses: [{ label: 'In Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+        }),
+      )
+    })
+
+    it('should indicate an error with neurodiversity support status when API fails', async () => {
+      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+      personalPageService.getLearnerNeurodivergence = jest.fn().mockRejectedValue('ERROR')
+
+      await controller.displayOverview(req, res, { ...PrisonerMockDataA, prisonId: 'LII' }, inmateDetailMock)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          statuses: [
+            { label: 'In Moorland (HMP & YOI)' },
+            { label: 'Recognised Listener' },
+            { label: 'Support needs unavailable', subText: 'Try again later', error: true },
+          ],
+        }),
+      )
+    })
+
+    it('should display out location of temporarily out of prison', async () => {
+      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+
+      await controller.displayOverview(
+        req,
+        res,
+        { ...PrisonerMockDataA, prisonId: 'LII', inOutStatus: 'OUT', status: 'ACTIVE OUT' },
+        inmateDetailMock,
+      )
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          statuses: [{ label: 'Out from Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+        }),
+      )
+    })
+
+    it('should display out location if released from prison', async () => {
+      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+
+      await controller.displayOverview(
+        req,
+        res,
+        {
+          ...PrisonerMockDataA,
+          prisonId: 'LII',
+          inOutStatus: 'OUT',
+          status: 'INACTIVE OUT',
+          locationDescription: 'Outside - released from Moorland (HMP & YOI)',
+        },
+        inmateDetailMock,
+      )
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          statuses: [{ label: 'Outside - released from Moorland (HMP & YOI)' }, { label: 'Recognised Listener' }],
+        }),
+      )
+    })
+
+    it('should display "Being transferred" if TRN', async () => {
+      offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+
+      await controller.displayOverview(
+        req,
+        res,
+        {
+          ...PrisonerMockDataA,
+          prisonId: 'LII',
+          inOutStatus: 'TRN',
+        },
+        inmateDetailMock,
+      )
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          statuses: [{ label: 'Being transferred' }, { label: 'Recognised Listener' }],
+        }),
+      )
+    })
+
+    it.each([
+      ['Suitable Blank/Recognised Blank', suitableListenerBlank, recognisedListenerBlank, false, false],
+      ['Suitable No/Recognised Blank', suitableListenerNo, recognisedListenerBlank, false, false],
+      ['Suitable No/Recognised No', suitableListenerNo, recognisedListenerNo, false, false],
+      ['Suitable Yes/Recognised Blank', suitableListenerYes, recognisedListenerBlank, true, false],
+      ['Suitable Yes/Recognised No', suitableListenerYes, recognisedListenerNo, true, false],
+      ['Suitable Yes/Recognised Yes', suitableListenerYes, recognisedListenerYes, false, true],
+      ['Suitable Blank/Recognised Yes', suitableListenerBlank, recognisedListenerYes, false, true],
+      ['Suitable No/Recognised Yes', suitableListenerNo, recognisedListenerYes, false, true],
+      ['Suitable None/Recognised No', null, recognisedListenerNo, false, false],
+    ])(
+      'given %s should show correct suitable and/or recognised listener statuses',
+      async (
+        _: string,
+        suitableListener: ProfileInformation,
+        recognisedListener: ProfileInformation,
+        displaySuitable: boolean,
+        displayRecognised: boolean,
+      ) => {
+        const profileInformation = [suitableListener, recognisedListener].filter(Boolean)
+        offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+
+        await controller.displayOverview(req, res, PrisonerMockDataA, { ...inmateDetailMock, profileInformation })
+
+        const { statuses } = res.render.mock.calls[0][1]
+
+        expect(statuses.some((status: OverviewStatus) => status.label === 'Suitable Listener')).toEqual(displaySuitable)
+        expect(statuses.some((status: OverviewStatus) => status.label === 'Recognised Listener')).toEqual(
+          displayRecognised,
+        )
+      },
+    )
+
+    describe('upcoming transfers', () => {
+      const scheduledTransferLabel = 'Scheduled transfer'
+
+      describe('Given a scheduled transfer for the prisoner', () => {
+        it('Adds a status', async () => {
+          offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+          prisonerScheduleService.getScheduledTransfers = jest.fn(async () => scheduledTransfersMock)
+
+          await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+
+          expect(res.render).toHaveBeenCalledWith(
+            'pages/overviewPage',
+            expect.objectContaining({
+              statuses: expect.arrayContaining([{ label: scheduledTransferLabel, subText: 'To Moorland (HMP & YOI)' }]),
+            }),
+          )
+        })
+      })
+
+      describe('Given no scheduled transfers', () => {
+        it('Adds a status', async () => {
+          offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
+          prisonerScheduleService.getScheduledTransfers = jest.fn(async () => [])
+
+          await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+          expect(res.render).toHaveBeenCalledWith(
+            'pages/overviewPage',
+            expect.objectContaining({
+              statuses: expect.not.arrayContaining([
+                { label: scheduledTransferLabel, subText: 'To Moorland (HMP & YOI)' },
+              ]),
+            }),
+          )
+        })
+      })
+    })
+  })
+
+  describe('offencesSummary', () => {
+    it('should call offencesService.getOffencesOverview and include response with data from prisonerData', async () => {
+      offencesService.getOffencesOverview = jest
+        .fn()
+        .mockResolvedValue({ mainOffenceDescription: 'Offence', fullStatus: 'Full Status' })
+
+      await controller.displayOverview(
+        req,
+        res,
+        {
+          ...PrisonerMockDataA,
+          imprisonmentStatusDescription: 'ISD',
+          confirmedReleaseDate: 'CnRD',
+          conditionalReleaseDate: 'CdRD',
+        },
+        inmateDetailMock,
+      )
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          offencesOverview: {
+            mainOffenceDescription: 'Offence',
+            fullStatus: 'Full Status',
+            imprisonmentStatusDescription: 'ISD',
+            confirmedReleaseDate: 'CnRD',
+            conditionalReleaseDate: 'CdRD',
+          },
+        }),
+      )
+    })
+  })
+
+  describe('Non-associations summary', () => {
+    it('Returns the staff role codes from the prison API', async () => {
+      offenderService.getPrisonerNonAssociationOverview = jest
+        .fn()
+        .mockResolvedValue({ prisonName: 'A', prisonCount: 1, otherPrisonsCount: 2 })
+
+      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          nonAssociationSummary: { prisonName: 'A', prisonCount: 1, otherPrisonsCount: 2 },
+        }),
+      )
+    })
+  })
+
+  describe('Staff-contacts', () => {
+    it('Returns the staff contacts from the professional contacts service', async () => {
+      professionalContactsService.getProfessionalContactsOverview = jest.fn().mockResolvedValue({
+        keyWorker: 'KW',
+        prisonOffenderManager: 'POM',
+        communityOffenderManager: 'COM',
+        coworkingPrisonOffenderManager: 'CW',
+      })
+
+      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          staffContacts: {
+            keyWorker: 'KW',
+            prisonOffenderManager: 'POM',
+            communityOffenderManager: 'COM',
+            coworkingPrisonOffenderManager: 'CW',
           },
         }),
       )

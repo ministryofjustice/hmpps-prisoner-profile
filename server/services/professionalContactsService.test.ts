@@ -13,6 +13,10 @@ import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import AllocationManagerClient from '../data/interfaces/allocationManagerApi/allocationManagerClient'
 import { ContactRelationship } from '../data/enums/ContactRelationship'
 import { Result } from '../utils/result/result'
+import ComplexityApiClient from '../data/interfaces/complexityApi/complexityApiClient'
+import { complexityOfNeedHighMock } from '../data/localMockData/complexityOfNeedMock'
+import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { mockContactDetailYouthEstate } from '../data/localMockData/contactDetail'
 
 function PrisonerContactBuilder(overrides?: Partial<Contact>): Contact {
   return {
@@ -120,6 +124,7 @@ describe('professionalContactsService', () => {
   let allocationManagerApiClient: AllocationManagerClient
   let professionalContactsClient: PrisonerProfileDeliusApiClient
   let keyWorkerApiClient: KeyWorkerClient
+  let complexityApiClient: ComplexityApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -139,6 +144,10 @@ describe('professionalContactsService', () => {
     keyWorkerApiClient = {
       getOffendersKeyWorker: jest.fn(async () => keyWorkerMock),
     }
+
+    complexityApiClient = {
+      getComplexityOfNeed: jest.fn(async () => complexityOfNeedHighMock),
+    }
   })
 
   describe('getContacts', () => {
@@ -155,6 +164,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -200,6 +210,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
@@ -228,6 +239,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -270,6 +282,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -296,6 +309,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
@@ -321,6 +335,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
@@ -344,6 +359,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact => contact.getOrThrow())
@@ -395,6 +411,7 @@ describe('professionalContactsService', () => {
         () => allocationManagerApiClient,
         () => professionalContactsClient,
         () => keyWorkerApiClient,
+        () => complexityApiClient,
       )
 
       const response = (await service.getContacts('token', 'A1234AA', 1, true)).map(result => result.getOrThrow())
@@ -414,6 +431,80 @@ describe('professionalContactsService', () => {
       expect(
         response.find(contact => contact.relationshipDescription === 'Youth Justice Service Case Manager'),
       ).toBeTruthy()
+    })
+  })
+
+  describe('getProfessionalContactsOverview', () => {
+    let professionalContactsService: ProfessionalContactsService
+    beforeEach(() => {
+      professionalContactsService = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+        () => complexityApiClient,
+      )
+    })
+
+    it('should get the staff contact details for an adult prisoner', async () => {
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
+
+      expect(result).toEqual({
+        keyWorker: Result.fulfilled({
+          name: 'Dave Stevens',
+          lastSession: '',
+        }).toPromiseSettledResult(),
+        prisonOffenderManager: 'John Smith',
+        coworkingPrisonOffenderManager: 'Jane Jones',
+        communityOffenderManager: 'Terry Scott',
+      })
+    })
+
+    it('should get the staff contact details for a youth prisoner', async () => {
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockContactDetailYouthEstate)
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', {
+        ...PrisonerMockDataA,
+        prisonId: 'WYI',
+      })
+
+      expect(result).toEqual({
+        cuspOfficer: 'Mike Tester',
+        cuspOfficerBackup: 'Katie Testing',
+        youthJusticeWorker: 'Emma Justice',
+        resettlementPractitioner: 'Shauna Michaels',
+        youthJusticeService: 'Outer York',
+        youthJusticeServiceCaseManager: 'Barney Rubble',
+      })
+    })
+
+    it('should get the staff contact details for a prisoner with complex needs', async () => {
+      complexityApiClient.getComplexityOfNeed = jest.fn().mockResolvedValue(complexityOfNeedHighMock)
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', {
+        ...PrisonerMockDataA,
+        prisonId: 'AGI',
+      })
+
+      expect(result).toEqual({
+        keyWorker: Result.fulfilled({
+          name: 'None - high complexity of need',
+          lastSession: '',
+        }).toPromiseSettledResult(),
+        prisonOffenderManager: 'John Smith',
+        coworkingPrisonOffenderManager: 'Jane Jones',
+        communityOffenderManager: 'Terry Scott',
+      })
+    })
+
+    it('should handle error getting keyworkers name', async () => {
+      keyWorkerApiClient.getOffendersKeyWorker = jest.fn().mockRejectedValue('Some error')
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
+
+      expect(result).toEqual({
+        keyWorker: { status: 'rejected', reason: 'Some error' },
+        prisonOffenderManager: 'John Smith',
+        coworkingPrisonOffenderManager: 'Jane Jones',
+        communityOffenderManager: 'Terry Scott',
+      })
     })
   })
 })
