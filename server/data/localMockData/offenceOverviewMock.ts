@@ -1,6 +1,6 @@
 import FullStatus from '../interfaces/prisonApi/FullStatus'
 import MainOffence from '../interfaces/prisonApi/MainOffence'
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
+import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 export const mainOffenceMock: MainOffence[] = [
   {
@@ -45,7 +45,7 @@ export const fullStatusRemandMock: FullStatus = {
   establishmentName: 'Transfer',
 }
 
-export const offenceOverviewMock: OverviewPage['offencesOverview'] = {
+export const offenceOverviewMock: OverviewPageData['offencesOverview'] = {
   conditionalReleaseDate: undefined,
   confirmedReleaseDate: undefined,
   fullStatus: {

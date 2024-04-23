@@ -1,4 +1,3 @@
-import OverviewPage from '../../services/interfaces/overviewPageService/OverviewPage'
 import CourtAppearanceSummary from '../../services/interfaces/offencesService/CourtAppearanceSummary'
 import HmppsAction from './HmppsAction'
 import LatestCalculationSummary from '../../services/interfaces/offencesService/LatestCalculationSummary'
@@ -7,8 +6,11 @@ import AdjudicationsOverviewSummary from '../../services/interfaces/adjudication
 import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
 import OverviewSchedule from '../../services/interfaces/scheduleService/OverviewSchedule'
 import IncentiveSummary from '../../services/interfaces/incentivesService/IncentiveSummary'
+import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonApi/StaffContacts'
+import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
+import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 
-export default interface OverviewPageData extends OverviewPage {
+export default interface OverviewPageData {
   pageTitle: string
   courtCaseSummary: CourtCaseSummary
   overviewActions: HmppsAction[]
@@ -16,9 +18,6 @@ export default interface OverviewPageData extends OverviewPage {
   prisonerDisplayName: string
   prisonerInCaseload: boolean
   bookingId: number
-  options: {
-    showCourtCaseSummary: boolean
-  }
   moneySummary: AccountBalances | null
   adjudicationSummary: AdjudicationsOverviewSummary | null
   visitsSummary: VisitsOverviewSummary | null
@@ -26,6 +25,22 @@ export default interface OverviewPageData extends OverviewPage {
   csraSummary: CsraSummary
   categorySummary: CategorySummary
   incentiveSummary: IncentiveSummary | { error: true } | null
+  statuses: OverviewStatus[]
+  personalDetails: PersonalDetails
+  staffContacts: YouthStaffContacts | StaffContacts
+  isYouthPrisoner: boolean
+  prisonName: string
+  offencesOverview: {
+    mainOffenceDescription: string
+    fullStatus: FullStatus
+    imprisonmentStatusDescription: string
+    conditionalReleaseDate: string
+    confirmedReleaseDate: string
+  }
+  nonAssociationSummary: NonAssociationSummary
+  options: {
+    showCourtCaseSummary: boolean
+  }
 }
 
 export interface CourtCaseSummary {
@@ -47,4 +62,27 @@ interface CategorySummary {
   codeDescription: string
   nextReviewDate?: string
   userCanManage: boolean
+}
+
+export interface OverviewStatus {
+  label: string
+  date?: string
+  subText?: string
+  error?: boolean
+}
+
+interface PersonalDetails {
+  personalDetailsMain: {
+    preferredName: string
+    dateOfBirth: string
+    age: { years: number; months: number } | null
+    nationality: string
+    spokenLanguage: string
+  }
+  personalDetailsSide: {
+    ethnicGroup: string
+    religionOrBelief: string
+    croNumber: string
+    pncNumber: string
+  }
 }

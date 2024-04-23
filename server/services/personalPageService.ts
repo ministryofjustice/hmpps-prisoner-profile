@@ -30,7 +30,6 @@ import { HealthDomainReferenceCode, PersonalCareNeed } from '../data/interfaces/
 import ReasonableAdjustment from '../data/interfaces/prisonApi/ReasonableAdjustment'
 import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
-import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 
 export default class PersonalPageService {
@@ -41,7 +40,6 @@ export default class PersonalPageService {
 
   public async get(token: string, prisonerData: Prisoner): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
-    const curiousApiClient = this.curiousApiClientBuilder(token)
 
     const { bookingId, prisonerNumber } = prisonerData
     const [
@@ -96,7 +94,7 @@ export default class PersonalPageService {
         xrays: this.xrays(personalCareNeeds),
       },
       careNeeds: await this.careNeeds(healthReferenceCodes, personalCareNeeds, reasonableAdjustments),
-      learnerNeurodivergence: await this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
+      learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
     }
   }
@@ -380,9 +378,8 @@ export default class PersonalPageService {
     }
   }
 
-  private async getLearnerNeurodivergence(prisonerNumber: string, curiousApiClient: CuriousApiClient) {
-    const learnerNeurodivergence: LearnerNeurodivergence[] =
-      await curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
-    return learnerNeurodivergence
+  getLearnerNeurodivergence(clientToken: string, prisonerNumber: string) {
+    const curiousApiClient = this.curiousApiClientBuilder(clientToken)
+    return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
 }

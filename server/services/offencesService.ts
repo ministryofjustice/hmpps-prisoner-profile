@@ -29,4 +29,17 @@ export default class OffencesService {
 
     return mapLatestCalculationSummary(response)
   }
+
+  async getOffencesOverview(token: string, bookingId: number, prisonerNumber: string) {
+    const prisonApi = this.prisonApiClientBuilder(token)
+    const [mainOffence, fullStatus] = await Promise.all([
+      prisonApi.getMainOffence(bookingId),
+      prisonApi.getFullStatus(prisonerNumber),
+    ])
+
+    return {
+      mainOffenceDescription: mainOffence[0]?.offenceDescription,
+      fullStatus,
+    }
+  }
 }

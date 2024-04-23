@@ -4,6 +4,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import ScheduledEvent from '../data/interfaces/prisonApi/ScheduledEvent'
 import { formatScheduledEventTime } from '../utils/formatScheduledEventTime'
 import groupEventsByPeriod from '../utils/groupEventsByPeriod'
+import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSchedule'
 
 export default class PrisonerScheduleService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -30,5 +31,10 @@ export default class PrisonerScheduleService {
       afternoon: groupedEvents.afternoonEvents.map(this.formatEventForOverview),
       evening: groupedEvents.eveningEvents.map(this.formatEventForOverview),
     }
+  }
+
+  async getScheduledTransfers(clientToken: string, prisonerNumber: string): Promise<PrisonerPrisonSchedule[]> {
+    const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    return prisonApiClient.getScheduledTransfers(prisonerNumber)
   }
 }

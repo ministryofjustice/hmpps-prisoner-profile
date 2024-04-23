@@ -6,7 +6,6 @@ import AlertsService from './alertsService'
 import CaseNotesService from './caseNotesService'
 import OffencesPageService from './offencesPageService'
 import OffenderService from './offenderService'
-import OverviewPageService from './overviewPageService'
 import PersonalPageService from './personalPageService'
 import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
@@ -65,23 +64,13 @@ export const services = () => {
 
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(hmppsAuthClientBuilder, prisonApiClientBuilder)
-  const offenderService = new OffenderService(prisonApiClientBuilder)
+  const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
   const alertsService = new AlertsService(prisonApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
-  const overviewPageService = new OverviewPageService(
-    prisonApiClientBuilder,
-    allocationManagerApiClientBuilder,
-    keyworkerApiClientBuilder,
-    incentivesApiClientBuilder,
-    curiousApiClientBuilder,
-    nonAssociationsApiClientBuilder,
-    prisonerProfileDeliusApiClientBuilder,
-    complexityApiClientBuilder,
-  )
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
@@ -103,6 +92,7 @@ export const services = () => {
     allocationManagerApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     keyworkerApiClientBuilder,
+    complexityApiClientBuilder,
   )
   const beliefService = new BeliefService(prisonApiClientBuilder)
   const probationDocumentsService = new ProbationDocumentsService(prisonerProfileDeliusApiClientBuilder)
@@ -141,7 +131,6 @@ export const services = () => {
     caseNotesService,
     prisonerSearchService,
     alertsService,
-    overviewPageService,
     personalPageService,
     workAndSkillsPageService,
     personalLearningPlansService,

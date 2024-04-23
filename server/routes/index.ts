@@ -41,7 +41,6 @@ export default function routes(services: Services): Router {
   })
 
   const overviewController = new OverviewController(
-    services.overviewPageService,
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
     services.auditService,
@@ -51,6 +50,10 @@ export default function routes(services: Services): Router {
     services.visitsService,
     services.prisonerScheduleService,
     services.incentivesService,
+    services.userService,
+    services.personalPageService,
+    services.offenderService,
+    services.professionalContactsService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(

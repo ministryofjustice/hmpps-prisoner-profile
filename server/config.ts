@@ -322,8 +322,12 @@ export default {
     },
   },
   featureToggles: {
-    neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || [],
-    complexityEnabledPrisons: get('PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS', [], requiredInProduction),
+    neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || ['BLI', 'NHI', 'LII', 'SLI'],
+    complexityEnabledPrisons: get(
+      'PRISONS_WITH_OFFENDERS_THAT_HAVE_COMPLEX_NEEDS',
+      ['AGI', 'BZI', 'DHI', 'DWI', 'ESI', 'EWI', 'FHI', 'LNI', 'NHI', 'PFI', 'SDI', 'STI'],
+      requiredInProduction,
+    ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction),
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
