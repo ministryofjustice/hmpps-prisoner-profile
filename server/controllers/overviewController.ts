@@ -19,7 +19,6 @@ import AdjudicationsService from '../services/adjudicationsService'
 import { VisitsService } from '../services/visitsService'
 import PrisonerScheduleService from '../services/prisonerScheduleService'
 import IncentivesService from '../services/incentivesService'
-import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { UserService } from '../services'
 import PersonalPageService from '../services/personalPageService'
 import { Result } from '../utils/result/result'
@@ -56,15 +55,14 @@ export default class OverviewController {
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = req.middleware
-    const { userRoles, caseLoads, staffId } = res.locals.user
+    const { userRoles, caseLoads, staffId, activeCaseLoadId } = res.locals.user
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
 
-    const activeCaseloadId = caseLoads.find((caseload: CaseLoad) => caseload.currentlyActive)?.caseLoadId
     const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, caseLoads)
     const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
     const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
-    const isYouthPrisoner = youthEstatePrisons.includes(prisonerData.prisonId)
+    const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
@@ -89,7 +87,7 @@ export default class OverviewController {
       offencesOverview,
       nonAssociationSummary,
     ] = await Promise.all([
-      activeCaseloadId ? this.userService.getStaffRoles(clientToken, staffId, activeCaseloadId) : ([] as StaffRole[]),
+      activeCaseLoadId ? this.userService.getStaffRoles(clientToken, staffId, activeCaseLoadId) : ([] as StaffRole[]),
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
