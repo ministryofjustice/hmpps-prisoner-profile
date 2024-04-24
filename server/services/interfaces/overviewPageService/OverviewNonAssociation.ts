@@ -1,4 +1,4 @@
-export interface OverviewNonAssociation {
+export default interface OverviewNonAssociation {
   nonAssociationName: string
   offenderNo: string
   assignedLivingUnitDescription: string

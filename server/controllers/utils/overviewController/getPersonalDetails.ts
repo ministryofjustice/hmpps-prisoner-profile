@@ -30,7 +30,7 @@ export default function getPersonalDetails(
 function getEthnicGroupText(prisonerDetail: PrisonerDetail): string {
   const { ethnicity, ethnicityCode } = prisonerDetail
 
-  if (ethnicity && ethnicityCode) return `${prisonerDetail?.ethnicity} (${prisonerDetail.ethnicityCode})`
+  if (ethnicity && ethnicityCode) return `${ethnicity} (${ethnicityCode})`
   if (ethnicity) return prisonerDetail?.ethnicity
   return null
 }
