@@ -87,6 +87,7 @@ export class VisitsController {
         await this.visitsService.getVisits(clientToken, prisonerData, queryParams)
 
       return res.render('pages/visitsDetails', {
+        pageTitle: 'Visits details',
         prisonerName: {
           first: prisonerData.firstName,
           last: prisonerData.lastName,
