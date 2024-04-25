@@ -28,6 +28,7 @@ export default class ProbationDocumentsController {
     })
 
     res.render('pages/probationDocuments/probationDocuments', {
+      pageTitle: 'Probation documents',
       dpsUrl: config.serviceUrls.digitalPrison,
       prisonerNumber,
       prisonerBreadcrumbName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),

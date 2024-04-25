@@ -48,6 +48,7 @@ describe('Prisoner schedule', () => {
 
       await controller.displayDocuments(req, res)
       expect(res.render).toHaveBeenCalledWith('pages/probationDocuments/probationDocuments', {
+        pageTitle: 'Probation documents',
         ...probationDocuments.data,
         prisonerNumber: 'G6123VU',
         dpsUrl: config.serviceUrls.digitalPrison,
