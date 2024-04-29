@@ -46,7 +46,6 @@ describe('Appointment Service', () => {
       getUnacceptableAbsences: jest.fn(),
     }
     manageUsersApiClient = {
-      getUser: jest.fn(),
       getUserEmail: jest.fn(async () => userEmailDataMock),
     }
     appointmentService = new AppointmentService(

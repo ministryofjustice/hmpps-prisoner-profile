@@ -113,7 +113,6 @@ context('Add More Details Page', () => {
       cy.setupUserAuth({
         roles: [Role.GlobalSearch],
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'ZZZ',
       })
       cy.task('stubGetAlertTypes')
     })

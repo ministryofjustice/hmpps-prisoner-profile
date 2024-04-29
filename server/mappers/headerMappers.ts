@@ -4,7 +4,7 @@ import {
   formatCategoryALabel,
   formatCategoryCodeDescription,
   formatName,
-  prisonerBelongsToUsersCaseLoad,
+  isInUsersCaseLoad,
   prisonerIsTRN,
   userHasRoles,
 } from '../utils/utils'
@@ -16,17 +16,16 @@ import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import Alert from '../data/interfaces/prisonApi/Alert'
 import AlertFlagLabel from '../interfaces/AlertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
-import { User } from '../data/interfaces/manageUsersApi/User'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
-export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: User) {
-  const { userRoles, caseLoads } = user
+export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: HmppsUser) {
+  const { userRoles } = user
   const { prisonId } = prisonerData
   const profileBannerTopLinks = []
   const canViewCsraHistory =
-    prisonerBelongsToUsersCaseLoad(prisonId, caseLoads) ||
-    (prisonerIsTRN(prisonId) && userHasRoles([Role.GlobalSearch], userRoles))
+    isInUsersCaseLoad(prisonId, user) || (prisonerIsTRN(prisonId) && userHasRoles([Role.GlobalSearch], userRoles))
 
-  if (prisonerBelongsToUsersCaseLoad(prisonId, caseLoads)) {
+  if (isInUsersCaseLoad(prisonId, user)) {
     profileBannerTopLinks.push({
       heading: 'Location',
       hiddenLabel: 'View location details',
@@ -101,7 +100,7 @@ export function mapAlerts(inmateDetail: InmateDetail, alertFlags: AlertFlagLabel
 export function mapHeaderData(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
-  user?: User,
+  user?: HmppsUser,
   pageId?: string,
   hideBanner?: boolean,
 ) {

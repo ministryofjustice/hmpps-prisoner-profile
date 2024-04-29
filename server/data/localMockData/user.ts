@@ -1,8 +1,13 @@
 import CaseLoad from '../interfaces/prisonApi/CaseLoad'
-import { User } from '../interfaces/manageUsersApi/User'
+import { PrisonUser } from '../../interfaces/HmppsUser'
 
-export const userMock: User = {
-  name: 'John Smith',
+export const prisonUserMock: PrisonUser = {
+  authSource: 'nomis',
+  username: 'JSMITH_GEN',
+  userId: '1111',
+  staffId: 1111,
+  name: 'JOHN SMITH',
+  displayName: 'John Smith',
   caseLoads: [{ caseLoadId: 'MDI', currentlyActive: true } as CaseLoad],
   activeCaseLoadId: 'MDI',
   userRoles: [],

@@ -13,10 +13,10 @@ import {
   formatName,
   formatScheduleItem,
   initialiseName,
+  isInUsersCaseLoad,
   neurodiversityEnabled,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
-  prisonerBelongsToUsersCaseLoad,
   prisonerIsOut,
   prisonerIsTRN,
   summaryListOneHalfWidth,
@@ -77,7 +77,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
     analytics: { tagManagerContainerId },
   } = config
   njkEnv.addGlobal('tagManagerContainerId', tagManagerContainerId.trim())
-  njkEnv.addGlobal('prisonerBelongsToUsersCaseLoad', prisonerBelongsToUsersCaseLoad)
+  njkEnv.addGlobal('isInUsersCaseLoad', isInUsersCaseLoad)
   njkEnv.addGlobal('userHasRoles', userHasRoles)
   njkEnv.addGlobal('prisonerIsTRN', prisonerIsTRN)
   njkEnv.addGlobal('prisonerIsOut', prisonerIsOut)

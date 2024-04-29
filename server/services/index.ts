@@ -62,7 +62,7 @@ export const services = () => {
   })
 
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
-  const userService = new UserService(manageUsersApiClientBuilder, prisonApiClientBuilder)
+  const userService = new UserService(prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)

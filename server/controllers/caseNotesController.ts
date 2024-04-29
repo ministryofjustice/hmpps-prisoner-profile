@@ -69,7 +69,7 @@ export default class CaseNotesController {
           queryParams,
           canViewSensitiveCaseNotes,
           canDeleteSensitiveCaseNotes,
-          currentUserDetails: req.session.userDetails,
+          currentUserDetails: res.locals.user,
         }),
         prisonApiClient.getInmateDetail(prisonerData.bookingId),
       ])
@@ -86,9 +86,7 @@ export default class CaseNotesController {
 
       this.auditService
         .sendSearch({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
@@ -146,9 +144,7 @@ export default class CaseNotesController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -222,8 +218,7 @@ export default class CaseNotesController {
       req.flash('flashMessage', { text: 'Case note added', type: FlashMessageType.success })
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.CaseNote,
@@ -268,9 +263,7 @@ export default class CaseNotesController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -334,8 +327,7 @@ export default class CaseNotesController {
       req.flash('flashMessage', { text: 'Case note updated', type: FlashMessageType.success })
       this.auditService
         .sendPutSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PutAction.CaseNote,

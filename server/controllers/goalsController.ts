@@ -16,9 +16,7 @@ export default class GoalsController {
     const workAndSkillsPageData = await this.workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
 
     await this.auditService.sendPageView({
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
+      user: res.locals.user,
       prisonerNumber,
       prisonId,
       correlationId: req.id,

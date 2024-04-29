@@ -25,15 +25,6 @@ describe('manageUsersApiClient', () => {
     fakeManageUsersApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
-  describe('getUser', () => {
-    it('Should return data from the API', async () => {
-      mockSuccessfulApiCall(`/users/me`, { name: 'Bob' })
-
-      const output = await manageUsersApiClient.getUser()
-      expect(output).toEqual({ name: 'Bob' })
-    })
-  })
-
   describe('getUserEmail', () => {
     it('Should return data from the API', async () => {
       const username = 'USER123'

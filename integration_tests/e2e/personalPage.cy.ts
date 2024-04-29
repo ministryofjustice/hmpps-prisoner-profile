@@ -81,9 +81,7 @@ context('When signed in', () => {
   context('As a user belonging to the prisoners case load', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubUser')
-      cy.task('stubUserCaseLoads')
+      cy.setupUserAuth()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       visitPersonalDetailsPage()
     })
@@ -368,9 +366,7 @@ context('When signed in', () => {
   context('X-ray details', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubUser')
-      cy.task('stubUserCaseLoads')
+      cy.setupUserAuth()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
     })
 
@@ -409,11 +405,8 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth({
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'MDI',
         roles: [Role.GlobalSearch],
       })
-      cy.task('stubSignIn')
-      cy.task('stubUser')
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       visitPersonalDetailsPage()
     })

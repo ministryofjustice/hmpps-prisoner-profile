@@ -1,15 +1,24 @@
 import jwt from 'jsonwebtoken'
 import { Response } from 'superagent'
 
-import { stubFor, getMatchingRequests } from './wiremock'
+import { getMatchingRequests, stubFor } from './wiremock'
 import tokenVerification from './tokenVerification'
 
-const createToken = (userRoles: string[]) => {
+export interface UserToken {
+  name?: string
+  username?: string
+  userId?: number
+  roles?: string[]
+}
+
+const createToken = (userToken: UserToken) => {
   const payload = {
-    user_name: 'USER1',
+    name: userToken.name || 'john smith',
+    user_name: userToken.username || 'USER1',
+    user_id: userToken.userId || 231232,
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: userRoles,
+    authorities: userToken.roles || ['ROLE_PRISON'],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -95,7 +104,7 @@ const manageDetails = () =>
     },
   })
 
-const token = (userRoles: string[]) =>
+const token = (userToken: UserToken) =>
   stubFor({
     request: {
       method: 'POST',
@@ -108,7 +117,8 @@ const token = (userRoles: string[]) =>
         Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
       jsonBody: {
-        access_token: createToken(userRoles),
+        access_token: createToken(userToken),
+        auth_source: 'nomis',
         token_type: 'bearer',
         user_name: 'USER1',
         expires_in: 599,
@@ -121,15 +131,13 @@ const token = (userRoles: string[]) =>
 export default {
   getSignInUrl,
   stubAuthPing: ping,
-  stubSignIn: (
-    userRoles: string[] = ['ROLE_PRISON'],
-  ): Promise<[Response, Response, Response, Response, Response, Response]> =>
+  stubSignIn: (userToken: UserToken): Promise<[Response, Response, Response, Response, Response, Response]> =>
     Promise.all([
       favicon(),
       redirect(),
       signOut(),
       manageDetails(),
-      token(userRoles),
+      token(userToken),
       tokenVerification.stubVerifyToken(),
     ]),
 }

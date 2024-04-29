@@ -16,7 +16,7 @@ export default interface OverviewPageData {
   overviewActions: HmppsAction[]
   overviewInfoLinks: { text: string; url: string; dataQA: string }[]
   prisonerDisplayName: string
-  prisonerInCaseload: boolean
+  prisonerInCaseLoad: boolean
   bookingId: number
   moneySummary: AccountBalances | null
   adjudicationSummary: AdjudicationsOverviewSummary | null

@@ -49,9 +49,7 @@ export default class LocationDetailsController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,

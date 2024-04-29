@@ -1,22 +1,21 @@
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
-import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../../../utils/utils'
+import { isInUsersCaseLoad, userHasRoles } from '../../../utils/utils'
 import { Role } from '../../../data/enums/role'
 import config from '../../../config'
-import { User } from '../../../data/interfaces/manageUsersApi/User'
+import { HmppsUser } from '../../../interfaces/HmppsUser'
 
 export default function buildOverviewInfoLinks(
   prisonerData: Prisoner,
   pathfinderNominal: Nominal,
   socNominal: Nominal,
-  user: User,
+  user: HmppsUser,
 ): { text: string; url: string; dataQA: string }[] {
   const links: { text: string; url: string; dataQA: string }[] = []
 
   if (
     userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
-    (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, user.caseLoads) ||
-      ['OUT', 'TRN'].includes(prisonerData.prisonId))
+    (isInUsersCaseLoad(prisonerData.prisonId, user) || ['OUT', 'TRN'].includes(prisonerData.prisonId))
   ) {
     links.push({
       text: 'Probation documents',

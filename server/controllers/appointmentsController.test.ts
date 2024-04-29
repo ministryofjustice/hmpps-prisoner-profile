@@ -18,12 +18,23 @@ import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { notifyClient } from '../utils/notifyClient'
 import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 let req: any
 let res: any
 let controller: any
 
+const user: Partial<HmppsUser> = {
+  displayName: 'A Name',
+  userRoles: [Role.PrisonUser],
+  staffId: 487023,
+  caseLoads: CaseLoadsDummyDataA,
+  token: 'USER_TOKEN',
+  activeCaseLoadId: 'MDI',
+}
+
 const today = formatDateTimeISO(new Date(), { startOfDay: true })
+
 const formBody = {
   appointmentType: appointmentTypesSelectOptionsMock[0].value,
   location: locationsSelectOptionsMock[0].value as number,
@@ -109,9 +120,7 @@ describe('Appointments Controller', () => {
       body: {},
       query: {},
       path: 'appointments',
-      session: {
-        userDetails: { displayName: 'A Name' },
-      },
+      session: {},
       middleware: {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
@@ -119,15 +128,7 @@ describe('Appointments Controller', () => {
       flash: jest.fn(),
     }
     res = {
-      locals: {
-        user: {
-          userRoles: [Role.PrisonUser],
-          staffId: 487023,
-          caseLoads: CaseLoadsDummyDataA,
-          token: 'USER_TOKEN',
-          activeCaseLoadId: 'MDI',
-        },
-      },
+      locals: { user },
       render: jest.fn(),
       send: jest.fn(),
       redirect: jest.fn(),

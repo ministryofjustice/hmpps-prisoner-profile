@@ -8,18 +8,6 @@ import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import { Services } from '../../services'
-import Context from '../../interfaces/Context'
-
-export const user: Context = {
-  firstName: 'first',
-  lastName: 'last',
-  userId: 'id',
-  token: 'token',
-  username: 'user1',
-  displayName: 'First Last',
-  activeCaseLoadId: 'MDI',
-  authSource: 'NOMIS',
-}
 
 export const flashProvider = jest.fn()
 
@@ -49,7 +37,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
 export function appWithAllRoutes({
   production = false,
   services = {},
-  userSupplier = () => user,
+  userSupplier = () => null,
 }: {
   production?: boolean
   services?: Partial<Services>

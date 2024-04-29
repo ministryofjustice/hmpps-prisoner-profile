@@ -16,6 +16,7 @@ import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
 import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 let req: any
 let res: any
@@ -27,6 +28,16 @@ jest.mock('../data/prisonApiClient.ts')
 
 describe('Case Notes Controller', () => {
   let prisonApiClient: PrisonApiClient
+
+  const user: Partial<HmppsUser> = {
+    authSource: 'nomis',
+    displayName: 'A Name',
+    username: 'AB123456',
+    userRoles: [Role.DeleteSensitiveCaseNotes],
+    staffId: 487023,
+    caseLoads: CaseLoadsDummyDataA,
+    token: 'USER_TOKEN',
+  }
 
   beforeEach(() => {
     req = {
@@ -47,20 +58,11 @@ describe('Case Notes Controller', () => {
         prisonerData: PrisonerMockDataA,
       },
       path: 'case-notes',
-      session: {
-        userDetails: { displayName: 'A Name' },
-      },
       flash: jest.fn(),
     }
     res = {
       locals: {
-        user: {
-          username: 'AB123456',
-          userRoles: [Role.DeleteSensitiveCaseNotes],
-          staffId: 487023,
-          caseLoads: CaseLoadsDummyDataA,
-          token: 'USER_TOKEN',
-        },
+        user,
       },
       render: jest.fn(),
       redirect: jest.fn(),
@@ -99,7 +101,7 @@ describe('Case Notes Controller', () => {
         },
         canViewSensitiveCaseNotes: false,
         canDeleteSensitiveCaseNotes: true,
-        currentUserDetails: { displayName: 'A Name' },
+        currentUserDetails: user,
       })
       expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, res.locals.user, 'case-notes')
     })
@@ -133,7 +135,7 @@ describe('Case Notes Controller', () => {
           },
           canViewSensitiveCaseNotes: true,
           canDeleteSensitiveCaseNotes: false,
-          currentUserDetails: { displayName: 'A Name' },
+          currentUserDetails: user,
         })
       },
     )

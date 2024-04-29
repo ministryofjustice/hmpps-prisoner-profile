@@ -5,7 +5,7 @@ import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 export default (
   categorySummary: OverviewPageData['categorySummary'],
-  prisonerInCaseload: boolean,
+  prisonerInCaseLoad: boolean,
   bookingId: number,
 ): MiniSummaryData => {
   const { codeDescription, nextReviewDate, userCanManage } = categorySummary
@@ -17,7 +17,7 @@ export default (
     bottomClass: 'small',
   }
 
-  if (prisonerInCaseload)
+  if (prisonerInCaseLoad)
     return {
       ...categorySummaryData,
       linkLabel: userCanManage ? 'Manage category' : 'Category',

@@ -26,7 +26,7 @@
                 >View work and activities for the last 12 months</a
               >
             </p>
-            {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: '7-day-schedule'}) -%}
+            {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: '7-day-schedule'}) -%}
               <p class="govuk-body">
                 <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="{{ workAndActivities7DayLinkUrl }}"
                   >View 7 day schedule</a

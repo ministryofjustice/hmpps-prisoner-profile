@@ -8,13 +8,13 @@ import CaseNotesPageData, { CaseNotePageData } from './interfaces/caseNotesServi
 import { CaseNoteSource } from '../data/enums/caseNoteSource'
 import config from '../config'
 import { RestClientBuilder } from '../data'
-import { UserDetails } from './userService'
 import validateDateRange from '../utils/validateDateRange'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class CaseNotesService {
   constructor(private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>) {}
@@ -51,7 +51,7 @@ export default class CaseNotesService {
     queryParams?: CaseNotesListQueryParams
     canViewSensitiveCaseNotes?: boolean
     canDeleteSensitiveCaseNotes?: boolean
-    currentUserDetails: UserDetails
+    currentUserDetails: HmppsUser
   }): Promise<CaseNotesPageData> {
     const sortOptions: SortOption[] = [
       { value: 'creationDateTime,DESC', description: 'Created (most recent)' },
