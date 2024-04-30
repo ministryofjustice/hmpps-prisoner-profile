@@ -1,5 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addDays, isToday, subDays } from 'date-fns'
+import { HttpError } from 'http-errors'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
 import { Role } from '../data/enums/role'
@@ -295,9 +296,7 @@ export default class AlertsController {
         try {
           await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, { comment })
         } catch (error) {
-          if (error.status === 400) {
-            errors.push({ text: error.message })
-          } else throw error
+          errors.push(this.handleUpdateErrors(error))
         }
       }
 
@@ -398,9 +397,7 @@ export default class AlertsController {
             expiryDate: today === 'yes' ? formatDateISO(new Date()) : formatDateISO(parseDate(expiryDate)),
           })
         } catch (error) {
-          if (error.status === 400) {
-            errors.push({ text: error.message })
-          } else throw error
+          errors.push(this.handleUpdateErrors(error))
         }
       }
 
@@ -505,9 +502,7 @@ export default class AlertsController {
             removeExpiryDate: removeEndDate === 'yes',
           })
         } catch (error) {
-          if (error.status === 400) {
-            errors.push({ text: error.message })
-          } else throw error
+          errors.push(this.handleUpdateErrors(error))
         }
       }
 
@@ -570,5 +565,18 @@ export default class AlertsController {
         text: alertType.description,
       }))
       .sort((a, b) => a.text.localeCompare(b.text))
+  }
+
+  private handleUpdateErrors(error: HttpError): { text: string } {
+    if (error.status === 400) {
+      return { text: error.message }
+    }
+    if (error.status === 423) {
+      // Handle alert being locked in NOMIS
+      return {
+        text: 'This alert cannot be updated because someone else has opened it in NOMIS. Try again later.',
+      }
+    }
+    throw error
   }
 }

@@ -24,13 +24,13 @@ context('Close Alert Page', () => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       cy.task('stubGetAlertTypes')
-      cy.task('stubUpdateAlert')
       alertsPage = visitAlertsPage()
     })
 
     context('Valid update closing today', () => {
       beforeEach(() => {
         cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlert')
         alertsPage.closeAlertLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/close')
         closeAlertPage = new CloseAlertPage('Close alert')
@@ -52,6 +52,7 @@ context('Close Alert Page', () => {
     context('Valid update closing tomorrow', () => {
       beforeEach(() => {
         cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlert')
         alertsPage.closeAlertLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/close')
         closeAlertPage = new CloseAlertPage('Close alert')
@@ -75,6 +76,7 @@ context('Close Alert Page', () => {
     context('Attempting to perform invalid update', () => {
       beforeEach(() => {
         cy.task('stubAlertDetailsExpires')
+        cy.task('stubUpdateAlert')
         alertsPage.closeAlertLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/close')
         closeAlertPage = new CloseAlertPage('Close alert')
@@ -102,6 +104,29 @@ context('Close Alert Page', () => {
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/close')
         closeAlertPage.errorBlock().should('exist')
         closeAlertPage.errorBlock().should('contain.text', 'Enter your comments using 1,000 characters or less')
+      })
+    })
+
+    context('Alert is locked in NOMIS when updating', () => {
+      beforeEach(() => {
+        cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlertLocked')
+        alertsPage.closeAlertLink().first().click()
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/close')
+        closeAlertPage = new CloseAlertPage('Close alert')
+      })
+
+      it('should show error message', () => {
+        closeAlertPage.comments().type('Attempted new comment')
+        closeAlertPage.confirmButton().click()
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/close')
+        closeAlertPage.errorBlock().should('exist')
+        closeAlertPage
+          .errorBlock()
+          .should(
+            'contain.text',
+            'This alert cannot be updated because someone else has opened it in NOMIS. Try again later.',
+          )
       })
     })
   })

@@ -93,7 +93,7 @@ import { AgencyDetails } from '../../server/data/interfaces/prisonApi/Agency'
 import { nextCourtEventMock } from '../../server/data/localMockData/nextCourtEventMock'
 import CourtEvent from '../../server/data/interfaces/prisonApi/CourtEvent'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
-import { pagedVisitsMock, mockPagedVisits } from '../../server/data/localMockData/pagedVisitsWithVisitors'
+import { mockPagedVisits, pagedVisitsMock } from '../../server/data/localMockData/pagedVisitsWithVisitors'
 import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
 import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
@@ -1424,10 +1424,26 @@ export default {
     return stubFor({
       request: {
         method: 'PUT',
-        urlPattern: `/prison/api/bookings/1102484/alert/\\d*`,
+        urlPattern: `/prison/api/bookings/1102484/alert/[\\d|\\w|-]*\\?lockTimeout=true`,
       },
       response: {
         status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedActiveAlertsMock.content[0],
+      },
+    })
+  },
+
+  stubUpdateAlertLocked: () => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/prison/api/bookings/1102484/alert/[\\d|\\w|-]*\\?lockTimeout=true`,
+      },
+      response: {
+        status: 423,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },

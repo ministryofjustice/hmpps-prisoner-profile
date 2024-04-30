@@ -24,13 +24,13 @@ context('Add More Details Page', () => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       cy.task('stubGetAlertTypes')
-      cy.task('stubUpdateAlert')
       alertsPage = visitAlertsPage()
     })
 
     context('Valid update', () => {
       beforeEach(() => {
         cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlert')
         alertsPage.addMoreDetailsLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/add-more-details')
         addMoreDetailsPage = new AddMoreDetailsPage('Add more details to alert')
@@ -52,6 +52,7 @@ context('Add More Details Page', () => {
     context('Attempting to perform invalid update', () => {
       beforeEach(() => {
         cy.task('stubAlertDetailsExpires')
+        cy.task('stubUpdateAlert')
         alertsPage.addMoreDetailsLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/add-more-details')
         addMoreDetailsPage = new AddMoreDetailsPage('Add more details to alert')
@@ -79,6 +80,29 @@ context('Add More Details Page', () => {
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/add-more-details')
         addMoreDetailsPage.errorBlock().should('exist')
         addMoreDetailsPage.errorBlock().should('contain.text', 'Enter your comments using 1,000 characters or less')
+      })
+    })
+
+    context('Alert is locked in NOMIS when updating', () => {
+      beforeEach(() => {
+        cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlertLocked')
+        alertsPage.addMoreDetailsLink().first().click()
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/add-more-details')
+        addMoreDetailsPage = new AddMoreDetailsPage('Add more details to alert')
+      })
+
+      it('should show error message', () => {
+        addMoreDetailsPage.comments().type('Attempted new comment')
+        addMoreDetailsPage.updateButton().click()
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2113/add-more-details')
+        addMoreDetailsPage.errorBlock().should('exist')
+        addMoreDetailsPage
+          .errorBlock()
+          .should(
+            'contain.text',
+            'This alert cannot be updated because someone else has opened it in NOMIS. Try again later.',
+          )
       })
     })
   })

@@ -688,7 +688,7 @@ describe('prisonApiClient', () => {
       const alertChanges: AlertChanges = {
         comment: 'Comment',
       }
-      mockSuccessfulPrisonApiPut(`/api/bookings/${bookingId}/alert/${alertId}`, alertChanges, alert)
+      mockSuccessfulPrisonApiPut(`/api/bookings/${bookingId}/alert/${alertId}?lockTimeout=true`, alertChanges, alert)
 
       const output = await prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
       expect(output).toEqual(alert)
