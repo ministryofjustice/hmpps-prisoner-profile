@@ -510,7 +510,7 @@ describe('Alerts Controller', () => {
       })
     })
 
-    it('should redirect back to form if errors', async () => {
+    it('should redirect back to form if validation errors', async () => {
       req.body = { bookingId: 123456, comment: '' }
       req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
       req.errors = [{ text: 'error' }]
@@ -518,6 +518,36 @@ describe('Alerts Controller', () => {
       await controller.postAddMoreDetails()(req, res, next)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/alerts/1/add-more-details`)
+    })
+
+    it('should redirect back to form with generic error message on 400 from API', async () => {
+      req.body = { bookingId: 123456, comment: 'Comment' }
+      req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
+
+      jest
+        .spyOn<any, string>(controller['alertsService'], 'updateAlert')
+        .mockRejectedValue({ status: 400, message: 'Bad request' })
+
+      await controller.postAddMoreDetails()(req, res, next)
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/alerts/1/add-more-details`)
+      expect(req.flash).toHaveBeenNthCalledWith(1, 'alert', { comment: 'Comment' })
+      expect(req.flash).toHaveBeenNthCalledWith(2, 'errors', [{ text: 'Bad request' }])
+    })
+
+    it('should redirect back to form with record lock error message on 423 from API', async () => {
+      req.body = { bookingId: 123456, comment: 'Comment' }
+      req.params = { prisonerNumber: 'G6123VU', alertId: '1' }
+
+      jest.spyOn<any, string>(controller['alertsService'], 'updateAlert').mockRejectedValue({ status: 423 })
+
+      await controller.postAddMoreDetails()(req, res, next)
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/alerts/1/add-more-details`)
+      expect(req.flash).toHaveBeenNthCalledWith(1, 'alert', { comment: 'Comment' })
+      expect(req.flash).toHaveBeenNthCalledWith(2, 'errors', [
+        { text: 'This alert cannot be updated because someone else has opened it in NOMIS. Try again later.' },
+      ])
     })
 
     it('should update alert', async () => {

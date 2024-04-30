@@ -1436,6 +1436,22 @@ export default {
     })
   },
 
+  stubUpdateAlertLocked: () => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `/prison/api/bookings/1102484/alert/[\\d|\\w|-]*\\?lockTimeout=true`,
+      },
+      response: {
+        status: 423,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: pagedActiveAlertsMock.content[0],
+      },
+    })
+  },
+
   stubVisitsWithVisitors: ({
     bookingId,
     visitsOverrides,

@@ -24,13 +24,13 @@ context('Change End Date Page', () => {
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       cy.task('stubGetAlertTypes')
-      cy.task('stubUpdateAlert')
       alertsPage = visitAlertsPage()
     })
 
     context('Valid update closing alert in future', () => {
       beforeEach(() => {
         cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlert')
         alertsPage.changeEndDateLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2112/change-end-date')
         changeEndDatePage = new ChangeEndDatePage('Change or remove alert end date')
@@ -55,6 +55,7 @@ context('Change End Date Page', () => {
     context('Valid update removing end date', () => {
       beforeEach(() => {
         cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlert')
         alertsPage.changeEndDateLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2112/change-end-date')
         changeEndDatePage = new ChangeEndDatePage('Change or remove alert end date')
@@ -77,6 +78,7 @@ context('Change End Date Page', () => {
     context('Attempting to perform invalid update', () => {
       beforeEach(() => {
         cy.task('stubAlertDetailsExpires')
+        cy.task('stubUpdateAlert')
         alertsPage.changeEndDateLink().first().click()
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2112/change-end-date')
         changeEndDatePage = new ChangeEndDatePage('Change or remove alert end date')
@@ -104,6 +106,32 @@ context('Change End Date Page', () => {
         cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2112/change-end-date')
         changeEndDatePage.errorBlock().should('exist')
         changeEndDatePage.errorBlock().should('contain.text', 'Enter your comments using 1,000 characters or less')
+      })
+    })
+
+    context('Alert is locked in NOMIS when updating', () => {
+      beforeEach(() => {
+        cy.task('stubAlertDetails')
+        cy.task('stubUpdateAlertLocked')
+        alertsPage.changeEndDateLink().first().click()
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2112/change-end-date')
+        changeEndDatePage = new ChangeEndDatePage('Change or remove alert end date')
+      })
+
+      it('should show error message', () => {
+        changeEndDatePage.comments().type('Attempted new comment')
+        changeEndDatePage.changeEndDateRadio().click()
+        changeEndDatePage.changeEndDateSection().should('be.visible')
+        changeEndDatePage.endDateField().type('01/01/2199')
+        changeEndDatePage.confirmButton().click()
+        cy.location('pathname').should('eq', '/prisoner/G6123VU/alerts/2112/change-end-date')
+        changeEndDatePage.errorBlock().should('exist')
+        changeEndDatePage
+          .errorBlock()
+          .should(
+            'contain.text',
+            'This alert cannot be updated because someone else has opened it in NOMIS. Try again later.',
+          )
       })
     })
   })
