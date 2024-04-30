@@ -333,6 +333,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async updateAlert(bookingId: number, alertId: number, alertChanges: AlertChanges): Promise<Alert> {
     return (await this.restClient.put({
       path: `/api/bookings/${bookingId}/alert/${alertId}`,
+      query: mapToQueryString({ lockTimeout: true }),
       data: alertChanges,
     })) as Alert
   }
