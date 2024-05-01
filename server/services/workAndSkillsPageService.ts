@@ -17,8 +17,9 @@ import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmp
 import LearnerProfile from '../data/interfaces/curiousApi/LearnerProfile'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
-import LearnerEducation from '../data/interfaces/curiousApi/LearnerEducation'
 import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
+import CuriousService from './curiousService'
+import { InPrisonCourse, InPrisonCourseRecords } from './interfaces/curiousService/CuriousInPrisonCourses'
 
 interface WorkAndSkillsData {
   learnerEmployabilitySkills: LearnerEmployabilitySkills
@@ -45,6 +46,7 @@ interface UnacceptableAttendanceData {
 export default class WorkAndSkillsPageService {
   constructor(
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly curiousService: CuriousService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly personalLearningPlanService: PersonalLearningPlanService,
   ) {}
@@ -68,7 +70,7 @@ export default class WorkAndSkillsPageService {
     ] = await Promise.all([
       this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient),
       this.getLearnerProfiles(prisonerNumber, curiousApiClient),
-      this.getLearnerEducation(prisonerNumber, curiousApiClient),
+      this.getLearnerEducation(prisonerNumber, token),
       this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient),
       this.getCuriousGoals(prisonerNumber, curiousApiClient),
       this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
@@ -161,20 +163,27 @@ export default class WorkAndSkillsPageService {
     return learnerProfiles
   }
 
-  private async getLearnerEducation(
-    prisonerNumber: string,
-    curiousApiClient: CuriousApiClient,
-  ): Promise<GovSummaryItem[]> {
-    const learnerEducation: LearnerEducation = await curiousApiClient.getLearnerEducation(prisonerNumber)
-    const coursesAndQualifications: GovSummaryItem[] = []
-    learnerEducation?.content?.forEach(content => {
-      const item = {
-        key: { text: content.courseName },
-        value: { text: `Planned end date on ${formatDate(content.learningPlannedEndDate, 'long')}` },
-      }
-      coursesAndQualifications.push(item)
-    })
-    return coursesAndQualifications
+  private async getLearnerEducation(prisonerNumber: string, token: string): Promise<GovSummaryItem[]> {
+    const inPrisonCourseRecords: InPrisonCourseRecords = await this.curiousService.getPrisonerInPrisonCourses(
+      prisonerNumber,
+      token,
+    )
+
+    /* InPrisonCourseRecords are already grouped by course status. At the moment the current UI does not differentiate by status
+       so all courses are merged into a single array.
+       TODO - RR-630 will refactor this and display and sort courses by status
+     */
+    const allCourses: InPrisonCourse[] = [
+      ...(inPrisonCourseRecords.coursesByStatus?.COMPLETED || []),
+      ...(inPrisonCourseRecords.coursesByStatus?.IN_PROGRESS || []),
+      ...(inPrisonCourseRecords.coursesByStatus?.WITHDRAWN || []),
+      ...(inPrisonCourseRecords.coursesByStatus?.TEMPORARILY_WITHDRAWN || []),
+    ]
+
+    return allCourses.map(course => ({
+      key: { text: course.courseName },
+      value: { text: `Planned end date on ${formatDate(course.coursePlannedEndDate?.toISOString(), 'long')}` },
+    }))
   }
 
   private async getLearnerLatestAssessments(

@@ -3,7 +3,7 @@ import config from '../config'
 import CuriousApiClient from './interfaces/curiousApi/curiousApiClient'
 import LearnerEmployabilitySkills from './interfaces/curiousApi/LearnerEmployabilitySkills'
 import LearnerProfile from './interfaces/curiousApi/LearnerProfile'
-import LearnerEducation from './interfaces/curiousApi/LearnerEducation'
+import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEducation'
 import LearnerLatestAssessment from './interfaces/curiousApi/LearnerLatestAssessment'
 import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
 import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
@@ -29,9 +29,12 @@ export default class CuriousRestApiClient implements CuriousApiClient {
     })
   }
 
-  async getLearnerEducation(offenderNumber: string): Promise<LearnerEducation> {
-    return this.restClient.get<LearnerEducation>({
+  async getLearnerEducation(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse> {
+    return this.restClient.get<LearnerEductionPagedResponse>({
       path: `/learnerEducation/${offenderNumber}`,
+      query: {
+        page,
+      },
       ignore404: true,
     })
   }

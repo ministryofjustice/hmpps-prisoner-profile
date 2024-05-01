@@ -5,6 +5,7 @@ import {
 } from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 import { ActionPlanResponse } from '../../data/interfaces/educationAndWorkPlanApi/actionPlanResponse'
 import GoalResponse from '../../data/interfaces/educationAndWorkPlanApi/GoalResponse'
+import dateComparator from '../../utils/dateComparator'
 
 /**
  * Simple mapper function to map from the Education And Work Plan (PLP) API type [ActionPlanResponse]
@@ -62,16 +63,6 @@ const toPersonalLearningPlanGoal = (
     updatedByDisplayName: apiGoalResponse.updatedByDisplayName,
     sequenceNumber: goalSequenceNumber,
   }
-}
-
-const dateComparator = (left: Date, right: Date, direction: 'ASC' | 'DESC' = 'DESC'): number => {
-  if (left > right) {
-    return direction === 'DESC' ? -1 : 1
-  }
-  if (left < right) {
-    return direction === 'DESC' ? 1 : -1
-  }
-  return 0
 }
 
 /**

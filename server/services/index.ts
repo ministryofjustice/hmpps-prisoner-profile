@@ -31,6 +31,7 @@ import AdjudicationsService from './adjudicationsService'
 import PrisonerScheduleService from './prisonerScheduleService'
 import IncentivesService from './incentivesService'
 import ContentfulService from './contentfulService'
+import CuriousService from './curiousService'
 
 export const services = () => {
   const {
@@ -71,8 +72,11 @@ export const services = () => {
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
+  const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
+  const curiousService = new CuriousService(curiousApiClientBuilder, prisonService)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
+    curiousService,
     prisonApiClientBuilder,
     personalLearningPlansService,
   )
@@ -102,7 +106,6 @@ export const services = () => {
     whereaboutsApiClientBuilder,
     caseNotesApiClientBuilder,
   )
-  const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
   const adjudicationsService = new AdjudicationsService(adjudicationsApiClientBuilder)
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)

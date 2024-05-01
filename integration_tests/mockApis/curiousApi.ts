@@ -1,7 +1,6 @@
 import { format, startOfToday, sub } from 'date-fns'
 import { stubFor } from './wiremock'
 import { learnerEmployabilitySkills } from '../../server/data/localMockData/learnerEmployabilitySkills'
-import { learnerEducation } from '../../server/data/localMockData/learnerEducation'
 import { LearnerProfiles } from '../../server/data/localMockData/learnerProfiles'
 import { LearnerLatestAssessmentsMock } from '../../server/data/localMockData/learnerLatestAssessmentsMock'
 import aValidLearnerGoals from '../../server/data/localMockData/learnerGoalsMock'
@@ -11,6 +10,7 @@ import {
   OffenderActivitiesEmptyMock,
   OffenderActivitiesMock,
 } from '../../server/data/localMockData/offenderActivitiesMock'
+import { learnerEducationPagedResponse } from '../../server/data/localMockData/learnerEducationPagedResponse'
 
 export default {
   stubGetLearnerEmployabilitySkills: (prisonerNumber: string) => {
@@ -28,18 +28,21 @@ export default {
       },
     })
   },
-  stubGetLearnerEducation: (prisonerNumber: string) => {
+  stubGetLearnerEducation: (prisonerNumber: string, page = 0) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        queryParameters: {
+          page: { equalTo: `${page}` },
+        },
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: learnerEducation,
+        jsonBody: learnerEducationPagedResponse(prisonerNumber),
       },
     })
   },
