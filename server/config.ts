@@ -334,5 +334,8 @@ export default {
     newCourseAndQualificationHistoryEnabled: toBoolean(
       get('NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED', false, requiredInProduction),
     ),
+    editRoutesEnabled: toBoolean(
+      get('EDIT_ROUTES_ENABLED', false, requiredInProduction),
+    )
   },
 }

@@ -73,6 +73,7 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
     COURT_CASES_SUMMARY_ENABLED: "true"
+    EDIT_ROUTES_ENABLED: "false"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
