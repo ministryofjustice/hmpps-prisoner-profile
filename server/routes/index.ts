@@ -243,9 +243,9 @@ export default function routes(services: Services): Router {
   router.use(probationDocumentsRouter(services))
   router.use(visitsRouter(services))
   router.use(addressRouter(services))
-  
+
   // Disable any edit routes
-  if(config.featureToggles.editRoutesEnabled) {
+  if (config.featureToggles.editRoutesEnabled) {
     router.use(editRouter(services))
   }
 

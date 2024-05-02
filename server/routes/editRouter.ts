@@ -1,16 +1,13 @@
-import { Router } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
-import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { formatName, hasLength } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType, getProfileInformationValue } from '../data/interfaces/prisonApi/ProfileInformation'
-import { isNumberObject } from 'util/types'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import HmppsError from '../interfaces/HmppsError'
 
@@ -21,90 +18,112 @@ export default function editRouter(services: Services): Router {
   const get = getRequest(router)
   const post = postRequest(router)
 
-  const fieldConfig = {
-    height: {},
-    weight: {},
-    'number-of-children': {},
+  type GetSingleFieldOptions<TField> = {
+    fieldName: string
+    fieldValue: (prisoner: Prisoner, inmateDetail: InmateDetail) => TField
+    pageTitle: string
+    fieldSuffix?: string
   }
 
-  // Generic field edit page for basic things? Going off one field per page gov design
-  // Easier for validations/etc
-  get(
-    '/prisoner/:prisonerNumber/edit/height',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    async (req, res, next) => {
+  function getField<TField>({ fieldName, fieldValue, pageTitle, fieldSuffix }: GetSingleFieldOptions<TField>) {
+    return async (req: Request, res: Response, _next: NextFunction) => {
       const { prisonerNumber } = req.params
       const prisonerData: Prisoner = req.middleware?.prisonerData
+      const inmateDetail: InmateDetail = req.middleware?.inmateDetail
       const fieldValueFlash = req.flash('fieldValue')
       const errors = req.flash('errors')
 
       return res.render('pages/edit/edit', {
-        pageTitle: 'Edit height',
-        fieldName: 'height',
+        pageTitle,
+        fieldName,
         breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
           style: NameFormatStyle.lastCommaFirst,
         }),
         prisonerNumber,
-        fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonerData.heightCentimetres,
-        fieldSuffix: 'cm',
-        errors: hasLength(errors) ? errors : []
+        fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : fieldValue(prisonerData, inmateDetail),
+        fieldSuffix: fieldSuffix || undefined,
+        errors: hasLength(errors) ? errors : [],
       })
-    },
-  )
+    }
+  }
 
-  post(
-    '/prisoner/:prisonerNumber/edit/height',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    async (req, res, next) => {
+  type PostSingleFieldOptions = {
+    editRoute: (prisonerNumber: string) => string
+    validate: (fieldValue: string, errors: HmppsError[]) => void
+    onSuccess: (req: Request, res: Response) => void
+  }
+
+  function postField({ editRoute, validate, onSuccess }: PostSingleFieldOptions) {
+    return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
       const { editField } = req.body
       const errors: HmppsError[] = []
 
-      const validate = (str: string, errors: HmppsError[]) => {
-        const height = parseInt(str)
-        if (Number.isNaN(height) || height <= 0) {
-          errors.push({ text: 'Enter a number greater than 0' })
-        }
-      }
-
       validate(editField, errors)
 
       if (errors.length === 0) {
-        console.log('Height edited')
-        req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
-        return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+        return onSuccess(req, res)
       } else {
         req.flash('fieldValue', editField)
         req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/edit/height`)
+        return res.redirect(editRoute(prisonerNumber))
       }
+    }
+  }
+
+  function singleFieldPage<TField>(
+    route: string,
+    options: { get: GetSingleFieldOptions<TField>; post: PostSingleFieldOptions },
+  ) {
+    get(
+      route,
+      getPrisonerData(services),
+      checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+      getField<TField>(options.get),
+    )
+
+    post(
+      route,
+      getPrisonerData(services),
+      checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+      postField(options.post),
+    )
+  }
+
+  singleFieldPage<number>('/prisoner/:prisonerNumber/edit/height', {
+    get: {
+      fieldName: 'height',
+      pageTitle: 'Edit height',
+      fieldSuffix: 'cm',
+      fieldValue: (prisoner, _inmateDetail) => prisoner.heightCentimetres,
     },
-  )
+    post: {
+      editRoute: prisonerNumber => `/prisoner/${prisonerNumber}/edit/height`,
+      validate: (fieldValue, errors) => {
+        const height = parseInt(fieldValue)
+        if (Number.isNaN(height) || height <= 0) {
+          errors.push({ text: 'Enter a number greater than 0' })
+        }
+      },
+      onSuccess: (req, res) => {
+        const { prisonerNumber } = req.params
+        console.log('Height edited')
+        req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
+        return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+      },
+    },
+  })
 
   get(
     '/prisoner/:prisonerNumber/edit/weight',
     getPrisonerData(services),
     checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    async (req, res, next) => {
-      const { prisonerNumber } = req.params
-      const prisonerData: Prisoner = req.middleware?.prisonerData
-      const fieldValueFlash = req.flash('fieldValue')
-      const errors = req.flash('errors')
-
-      return res.render('pages/edit/edit', {
-        pageTitle: 'Edit weight',
-        fieldName: 'weight',
-        breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-          style: NameFormatStyle.lastCommaFirst,
-        }),
-        prisonerNumber,
-        errors,
-        fieldValue: hasLength(fieldValueFlash) ? fieldValueFlash[0] : prisonerData.weightKilograms,
-        fieldSuffix: 'kg',
-      })
-    },
+    getField<number>({
+      fieldName: 'weight',
+      pageTitle: 'Edit weight',
+      fieldValue: (prisoner, _inmateDetail) => prisoner.weightKilograms,
+      fieldSuffix: 'kg',
+    }),
   )
 
   post(
@@ -141,24 +160,12 @@ export default function editRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/edit/number-of-children',
     getPrisonerData(services),
     checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    async (req, res, next) => {
-      const { prisonerNumber, caseNoteId } = req.params
-      const prisonerData: Prisoner = req.middleware?.prisonerData
-      const inmateDetail: InmateDetail = req.middleware?.inmateDetail
-
-      return res.render('pages/edit/edit', {
-        pageTitle: 'Edit number of children',
-        fieldName: 'number of children',
-        breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-          style: NameFormatStyle.lastCommaFirst,
-        }),
-        prisonerNumber,
-        fieldValue: getProfileInformationValue(
-          ProfileInformationType.NumberOfChildren,
-          inmateDetail.profileInformation,
-        ),
-      })
-    },
+    getField<string>({
+      fieldName: 'number of children',
+      pageTitle: 'Edit number of children',
+      fieldValue: (_prisoner, inmateDetail) =>
+        getProfileInformationValue(ProfileInformationType.NumberOfChildren, inmateDetail.profileInformation),
+    }),
   )
 
   post(
