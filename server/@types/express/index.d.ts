@@ -1,4 +1,5 @@
 import HmppsError from '../../interfaces/HmppsError'
+import { HmppsUser } from '../../interfaces/HmppsUser'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -27,6 +28,10 @@ export declare global {
       logout(done: (err: unknown) => void): void
 
       flash(type: string, message: unknown): number
+    }
+
+    interface Locals {
+      user: HmppsUser
     }
   }
 }

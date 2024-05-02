@@ -81,9 +81,6 @@ export default class CaseNotesController {
       )
       const showingAll = queryParams.showAll
 
-      // Get staffId to use in conditional logic for amend link
-      const { staffId } = res.locals.user
-
       this.auditService
         .sendSearch({
           user: res.locals.user,
@@ -106,7 +103,6 @@ export default class CaseNotesController {
         showingAll,
         hasCaseNotes,
         addCaseNoteLinkUrl,
-        staffId,
       })
     }
   }

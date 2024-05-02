@@ -1,6 +1,7 @@
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
 import { ApolloClient, gql } from '@apollo/client/core'
 import { BannerApollo } from '../data/interfaces/contentfulApi/bannerApollo'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class ContentfulService {
   constructor(private readonly apolloClient: ApolloClient<unknown>) {}
@@ -8,7 +9,9 @@ export default class ContentfulService {
   /**
    * Get `banner` entry.
    */
-  public async getBanner(activeCaseLoadId: string | undefined): Promise<string> {
+  public async getBanner(user: HmppsUser): Promise<string> {
+    const activeCaseLoadId = user.authSource === 'nomis' && user.activeCaseLoadId
+
     const filter = activeCaseLoadId
       ? { OR: [{ prisons_exists: false }, { prisons_contains_some: activeCaseLoadId }] }
       : { prisons_exists: false }

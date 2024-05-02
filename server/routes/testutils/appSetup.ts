@@ -8,6 +8,7 @@ import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import { Services } from '../../services'
+import { HmppsUser } from '../../interfaces/HmppsUser'
 
 export const flashProvider = jest.fn()
 
@@ -21,8 +22,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   app.use((req, res, next) => {
     req.user = userSupplier()
     req.flash = flashProvider
-    res.locals = {}
-    res.locals.user = { ...req.user }
+    res.locals = { user: { ...req.user } as HmppsUser }
     next()
   })
   app.use(express.json())

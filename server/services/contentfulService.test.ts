@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client/core'
 import ContentfulService from './contentfulService'
+import { HmppsUser, PrisonUser } from '../interfaces/HmppsUser'
 
 describe('ContentfulService', () => {
   let contentfulService: ContentfulService
@@ -13,7 +14,7 @@ describe('ContentfulService', () => {
       .spyOn<any, string>(contentfulService['apolloClient'], 'query')
       .mockResolvedValue({ data: { bannerCollection: [] } })
 
-    await contentfulService.getBanner('LEI')
+    await contentfulService.getBanner({ authSource: 'nomis', activeCaseLoadId: 'LEI' } as PrisonUser)
 
     expect(apolloSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -24,12 +25,19 @@ describe('ContentfulService', () => {
     )
   })
 
-  it('Should get the banner for the users without a caseload', async () => {
+  it.each([
+    { authSource: 'external' },
+    { authSource: 'delius' },
+    {
+      authSource: 'nomis',
+      activeCaseLoadId: null,
+    } as PrisonUser,
+  ])('Should get the banner for the users without an active caseload', async user => {
     const apolloSpy = jest
       .spyOn<any, string>(contentfulService['apolloClient'], 'query')
       .mockResolvedValue({ data: { bannerCollection: [] } })
 
-    await contentfulService.getBanner(undefined)
+    await contentfulService.getBanner(user as HmppsUser)
 
     expect(apolloSpy).toHaveBeenCalledWith(
       expect.objectContaining({
