@@ -3,27 +3,34 @@ import { jwtDecode } from 'jwt-decode'
 import logger from '../../logger'
 import UserService from '../services/userService'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
+import { convertToTitleCase } from '../utils/utils'
 
-export function populateCurrentUser(userService: UserService): RequestHandler {
+export function populateCurrentUser(): RequestHandler {
   return async (req, res, next) => {
     try {
-      if (!req.session.userDetails) {
-        const userDetails = res.locals.user && (await userService.getUser(res.locals.user.token))
-        if (userDetails) {
-          req.session.userDetails = userDetails
-        } else {
-          logger.info('No user details retrieved')
-        }
+      const {
+        name,
+        user_id: userId,
+        authorities: roles = [],
+      } = jwtDecode(res.locals.user.token) as {
+        name?: string
+        user_id?: string
+        authorities?: string[]
       }
 
       res.locals.user = {
-        ...req.session.userDetails,
         ...res.locals.user,
+        userId,
+        staffId: res.locals.user.authSource === 'nomis' ? userId : undefined,
+        name,
+        displayName: convertToTitleCase(name),
         backLink: req.session.userBackLink,
+        userRoles: roles,
       }
+
       next()
     } catch (error) {
-      logger.error(error, `Failed to retrieve user for: ${res.locals.user && res.locals.user.username}`)
+      logger.error(error, `Failed to populate user details for: ${res.locals.user && res.locals.user.username}`)
       next(error)
     }
   }
@@ -51,25 +58,6 @@ export function getUserCaseLoads(userService: UserService): RequestHandler {
       next()
     } catch (error) {
       logger.error(error, `Failed to retrieve case loads for: ${res.locals.user && res.locals.user.username}`)
-      next(error)
-    }
-  }
-}
-
-export function getUserRoles(): RequestHandler {
-  return async (req, res, next) => {
-    try {
-      if (res.locals.user) {
-        const { authorities: roles = [] } = jwtDecode(res.locals.user.token) as { authorities?: string[] }
-        if (roles) {
-          res.locals.user.userRoles = roles
-        } else {
-          logger.info('No user roles available')
-        }
-      }
-      next()
-    } catch (error) {
-      logger.error(error, `Failed to retrieve roles for: ${res.locals.user && res.locals.user.username}`)
       next(error)
     }
   }

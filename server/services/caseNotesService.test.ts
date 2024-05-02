@@ -7,6 +7,7 @@ import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClie
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 jest.mock('../data/caseNotesApiClient')
 
@@ -40,7 +41,7 @@ describe('Case Notes Page', () => {
         currentUserDetails: {
           displayName: 'A Name',
           name: 'Name',
-        },
+        } as HmppsUser,
       })
 
       expect(caseNotesPageData.fullName).toEqual('John Smith')
@@ -57,7 +58,7 @@ describe('Case Notes Page', () => {
         currentUserDetails: {
           displayName: 'A Name',
           name: 'Name',
-        },
+        } as HmppsUser,
         canViewSensitiveCaseNotes: true,
       })
 
@@ -67,7 +68,7 @@ describe('Case Notes Page', () => {
     })
   })
 
-  describe('Get Case Note Types for User', () => {
+  describe('Get Case Note Types for HmppsUser', () => {
     it('should call Case Notes API tp get case notes types for user', async () => {
       await caseNotesService.getCaseNoteTypesForUser('')
 
@@ -137,7 +138,7 @@ describe('Case Notes Page', () => {
           currentUserDetails: {
             displayName: 'A Name',
             name: 'Name',
-          },
+          } as HmppsUser,
         })
 
         expect(content[0].printIncentiveWarningLink).toBeTruthy()

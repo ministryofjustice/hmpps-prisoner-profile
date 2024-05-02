@@ -116,11 +116,25 @@ Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, boo
   cy.task('stubGetSentenceSummaryWithoutSentence', prisonerNumber)
 })
 
-Cypress.Commands.add('setupUserAuth', ({ roles, caseLoads, activeCaseLoadId = 'MDI' } = {}) => {
-  cy.task('stubSignIn', roles)
-  cy.task('stubUserCaseLoads', caseLoads)
-  cy.task('stubAuthUser', { activeCaseLoadId })
-})
+Cypress.Commands.add(
+  'setupUserAuth',
+  (
+    options = {
+      caseLoads: [
+        {
+          caseLoadId: 'MDI',
+          currentlyActive: true,
+          description: '',
+          type: '',
+          caseloadFunction: '',
+        },
+      ],
+    },
+  ) => {
+    cy.task('stubSignIn', options)
+    cy.task('stubUserCaseLoads', options.caseLoads)
+  },
+)
 
 Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })

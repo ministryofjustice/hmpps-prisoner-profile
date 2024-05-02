@@ -41,6 +41,7 @@ describe('Alerts Controller', () => {
       res = {
         locals: {
           user: {
+            authSource: 'nomis',
             activeCaseLoadId: 'MDI',
             userRoles: [Role.UpdateAlert],
             caseLoads: CaseLoadsDummyDataA,

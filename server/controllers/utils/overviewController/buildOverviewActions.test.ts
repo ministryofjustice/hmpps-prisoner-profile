@@ -1,7 +1,7 @@
 import { Role } from '../../../data/enums/role'
 import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
-import { userMock } from '../../../data/localMockData/user'
+import { prisonUserMock } from '../../../data/localMockData/user'
 import config from '../../../config'
 import { HeaderFooterMeta } from '../../../data/interfaces/componentApi/Component'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
@@ -16,7 +16,7 @@ describe('buildOverviewActions', () => {
       ${[Role.ReleaseDatesCalculator]} | ${true}
       ${[Role.GlobalSearch]}           | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, visible }) => {
-      const user = { ...userMock, userRoles: roles }
+      const user = { ...prisonUserMock, userRoles: roles }
       const resp = buildOverviewActions(
         PrisonerMockDataA,
         pathfinderNominal,
@@ -49,7 +49,11 @@ describe('buildOverviewActions', () => {
       ${[]}                                | ${['LEI']} | ${'MDI'} | ${true}           | ${false}
       ${[Role.PomUser]}                    | ${['LEI']} | ${'MDI'} | ${true}           | ${true}
     `('user with roles: $expected, can see: $visible', ({ roles, caseLoads, prisonId, restrictedPatient, visible }) => {
-      const user = { ...userMock, userRoles: roles, caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })) }
+      const user = {
+        ...prisonUserMock,
+        userRoles: roles,
+        caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })),
+      }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
       const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config, undefined)
@@ -70,7 +74,7 @@ describe('buildOverviewActions', () => {
         PrisonerMockDataA,
         pathfinderNominal,
         socNominal,
-        userMock,
+        prisonUserMock,
         staffRolesToUse,
         config,
         undefined,
@@ -93,7 +97,7 @@ describe('buildOverviewActions', () => {
       ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'ACTIVE OUT'} | ${false}
       ${[]}                 | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
     `('user can see: $visible', ({ roles, activeCaseLoadId, prisonId, availableServices, prisonerStatus, visible }) => {
-      const user = { ...userMock, userRoles: roles, activeCaseLoadId }
+      const user = { ...prisonUserMock, userRoles: roles, activeCaseLoadId }
       const prisoner = { ...PrisonerMockDataA, status: prisonerStatus, prisonId }
 
       const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config, {
@@ -114,7 +118,7 @@ describe('buildOverviewActions', () => {
       ${'MDI'}         | ${'MDI'} | ${true}           | ${false}
       ${'LEI'}         | ${'MDI'} | ${false}          | ${false}
     `('user can see: $visible', ({ activeCaseLoadId, prisonId, restrictedPatient, visible }) => {
-      const user = { ...userMock, activeCaseLoadId }
+      const user = { ...prisonUserMock, activeCaseLoadId }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
       const resp = buildOverviewActions(prisoner, pathfinderNominal, socNominal, user, staffRoles, config, undefined)
@@ -134,7 +138,11 @@ describe('buildOverviewActions', () => {
       ${[Role.PomUser]}          | ${['LEI']} | ${'MDI'} | ${true}           | ${[]}           | ${false}
       ${[]}                      | ${['MDI']} | ${'MDI'} | ${false}          | ${['MDI']}      | ${false}
     `('user can see: $visible', ({ roles, caseLoads, prisonId, restrictedPatient, disabledPrisons, visible }) => {
-      const user = { ...userMock, userRoles: roles, caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })) }
+      const user = {
+        ...prisonUserMock,
+        userRoles: roles,
+        caseLoads: caseLoads.map((cl: string) => ({ caseLoadId: cl })),
+      }
       const prisoner = { ...PrisonerMockDataA, prisonId, restrictedPatient }
 
       const resp = buildOverviewActions(
@@ -167,7 +175,7 @@ describe('buildOverviewActions', () => {
       ${[]}                            | ${undefined}           | ${false}
       ${[Role.PathfinderHQ]}           | ${pathfinderNominal}   | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, pathfinderNominalToUse, visible }) => {
-      const user = { ...userMock, userRoles: roles }
+      const user = { ...prisonUserMock, userRoles: roles }
       const resp = buildOverviewActions(
         PrisonerMockDataA,
         pathfinderNominalToUse,
@@ -197,7 +205,7 @@ describe('buildOverviewActions', () => {
   ])(
     `user with roles: %s and soc nominal: %s, can see: $s`,
     (roles: Role[], socNominalToUse: Nominal | undefined, visible: boolean) => {
-      const user = { ...userMock, userRoles: roles }
+      const user = { ...prisonUserMock, userRoles: roles }
       const resp = buildOverviewActions(
         PrisonerMockDataA,
         pathfinderNominal,
@@ -224,7 +232,7 @@ describe('buildOverviewActions', () => {
       ${[Role.SocCommunity]} | ${socNominal}   | ${false}
       ${[]}                  | ${undefined}    | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, socNominalToUse, visible }) => {
-      const user = { ...userMock, userRoles: roles }
+      const user = { ...prisonUserMock, userRoles: roles }
       const resp = buildOverviewActions(
         PrisonerMockDataA,
         pathfinderNominal,
@@ -252,7 +260,7 @@ describe('buildOverviewActions', () => {
       ${[Role.CategorisationSecurity]} | ${true}
       ${[]}                            | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, visible }) => {
-      const user = { ...userMock, userRoles: roles }
+      const user = { ...prisonUserMock, userRoles: roles }
       const resp = buildOverviewActions(
         PrisonerMockDataA,
         pathfinderNominal,

@@ -76,9 +76,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -189,8 +187,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPostAttempt({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.Appointment,
@@ -269,9 +266,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -336,9 +331,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -446,8 +439,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.Appointment,
@@ -570,9 +562,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,
@@ -603,9 +593,7 @@ export default class AppointmentController {
 
       this.auditService
         .sendPageView({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
-          userRoles: res.locals.user.userRoles,
+          user: res.locals.user,
           prisonerNumber,
           prisonId,
           correlationId: req.id,

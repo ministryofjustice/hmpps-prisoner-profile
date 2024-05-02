@@ -100,9 +100,7 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -129,9 +127,7 @@ export default function routes(services: Services): Router {
       const personalPageData = await personalPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -176,9 +172,7 @@ export default function routes(services: Services): Router {
         workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -213,9 +207,7 @@ export default function routes(services: Services): Router {
       const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -266,9 +258,7 @@ export default function routes(services: Services): Router {
       const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 
       await services.auditService.sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,

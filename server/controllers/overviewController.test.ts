@@ -54,6 +54,7 @@ const getResLocals = ({
 } = {}) => {
   return {
     user: {
+      authSource: 'nomis',
       userRoles,
       staffId: 487023,
       caseLoads,

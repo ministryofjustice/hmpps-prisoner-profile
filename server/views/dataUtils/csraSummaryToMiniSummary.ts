@@ -4,7 +4,7 @@ import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
 
 export default (
   csraSummary: OverviewPageData['csraSummary'],
-  prisonerInCaseload: boolean,
+  prisonerInCaseLoad: boolean,
   prisonerNumber: string,
 ): MiniSummaryData => {
   const { classification, assessmentDate } = csraSummary
@@ -16,7 +16,7 @@ export default (
     bottomClass: 'small',
   }
 
-  if (prisonerInCaseload)
+  if (prisonerInCaseLoad)
     return {
       ...csraSummaryData,
       linkLabel: 'CSRA history',

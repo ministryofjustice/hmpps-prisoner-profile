@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { formatName, neurodiversityEnabled, prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { formatName, isInUsersCaseLoad, neurodiversityEnabled, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
@@ -55,11 +55,11 @@ export default class OverviewController {
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = req.middleware
-    const { userRoles, caseLoads, staffId, activeCaseLoadId } = res.locals.user
+    const { userRoles, staffId, activeCaseLoadId } = res.locals.user
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
 
-    const belongsToCaseLoad = prisonerBelongsToUsersCaseLoad(prisonId, caseLoads)
+    const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, res.locals.user)
     const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
     const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
     const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
@@ -93,13 +93,13 @@ export default class OverviewController {
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
       showCourtCaseSummary ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber) : null,
-      belongsToCaseLoad ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
-      belongsToCaseLoad || isPomOrReceptionUser
+      prisonerInCaseLoad ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
+      prisonerInCaseLoad || isPomOrReceptionUser
         ? await this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId)
         : null,
-      belongsToCaseLoad ? await this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
+      prisonerInCaseLoad ? await this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
       await this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
-      belongsToCaseLoad || isGlobalSearchUser
+      prisonerInCaseLoad || isGlobalSearchUser
         ? await this.incentivesService.getIncentiveOverview(clientToken, bookingId)
         : null,
       Result.wrap(this.getLearnerNeurodivergence(clientToken, prisonId, prisonerNumber), res.locals.apiErrorCallback),
@@ -147,7 +147,7 @@ export default class OverviewController {
       ),
       statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
       prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
-      prisonerInCaseload: prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, res.locals.user.caseLoads),
+      prisonerInCaseLoad,
       bookingId: prisonerData.bookingId,
       personalDetails: getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),
       staffContacts,
@@ -180,9 +180,7 @@ export default class OverviewController {
   private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,

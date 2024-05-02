@@ -7,7 +7,7 @@ import { buildAppInsightsClient, initialiseAppInsights } from '../utils/azureApp
 import AllocationManagerApiClient from './allocationManagerApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import CuriousRestApiClient from './curiousApiClient'
-import HmppsAuthClient, { systemTokenBuilder } from './hmppsAuthClient'
+import { systemTokenBuilder } from './hmppsAuthClient'
 import IncentivesApiRestClient from './incentivesApiClient'
 import KeyWorkerRestClient from './keyWorkersApiClient'
 import ManageSocCasesApiRestClient from './manageSocCasesApiClient'
@@ -41,7 +41,6 @@ export const dataAccess = {
   allocationManagerApiClientBuilder: (token: string) => new AllocationManagerApiClient(token),
   caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token),
   curiousApiClientBuilder: (token: string) => new CuriousRestApiClient(token),
-  hmppsAuthClientBuilder: (token: string) => new HmppsAuthClient(token),
   incentivesApiClientBuilder: (token: string) => new IncentivesApiRestClient(token),
   keyworkerApiClientBuilder: (token: string) => new KeyWorkerRestClient(token),
   manageSocCasesApiClientBuilder: (token: string) => new ManageSocCasesApiRestClient(token),
@@ -65,4 +64,4 @@ export const dataAccess = {
 
 export type DataAccess = typeof dataAccess
 
-export { HmppsAuthClient, RestClientBuilder }
+export { RestClientBuilder }

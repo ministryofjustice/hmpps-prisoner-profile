@@ -36,20 +36,20 @@
       <dl class="govuk-summary-list">
         {{ summaryListRow("Preferred name", personalDetails.preferredName, "preferred-name", { hideIfEmpty: true }) }}
         {{ summaryListRow("Date of birth", dateOfBirthText, "date-of-birth") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'place-of-birth', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'place-of-birth', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Place of birth", personalDetails.placeOfBirth | title, "place-of-birth") }}
         {%- endcall -%}
         {{ summaryListRow("Nationality", personalDetails.nationality, "nationality") }}
         {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
         {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'religion-or-belief', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'religion-or-belief', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Religion or belief", religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), "religion-or-belief", { html: true }) }}
         {%- endcall -%}
         {{ summaryListRow("Sex", personalDetails.sex, "sex") }}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Sexual orientation", personalDetails.sexualOrientation, "sexual-orientation") }}
         {%- endcall -%}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'personal-details', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
+        {%- call conditionallyShow({condition:isInUsersCaseLoad(prisonId, user), id: 'personal-details', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
           {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
           {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
           {{ summaryListRow("Languages", languagesHtml(personalDetails), "languages", { html: true }) }}

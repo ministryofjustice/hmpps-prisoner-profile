@@ -39,14 +39,12 @@ describe('Money Controller', () => {
         referer: 'http://referer',
       },
       path: 'money/spends',
-      session: {
-        userDetails: { displayName: 'A Name' },
-      },
       flash: jest.fn(),
     }
     res = {
       locals: {
         user: {
+          displayName: 'A Name',
           userRoles: [Role.PrisonUser],
           staffId: 487023,
           caseLoads: CaseLoadsDummyDataA,

@@ -16,7 +16,7 @@
             <p>Some information may be hidden</p>
         </div>
     {% else %}
-      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads) != true, id: 'outside-establishment-banner'}) -%}
+      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user) != true, id: 'outside-establishment-banner'}) -%}
         <div class="hmpps-profile-banner-alert">
             <p class="govuk-heading-m">
               This prisoner is not in your establishment

@@ -40,14 +40,12 @@ describe('Visits controller', () => {
         clientToken: 'CLIENT_TOKEN',
       },
       path: 'case-notes',
-      session: {
-        userDetails: { displayName: 'A Name' },
-      },
       flash: jest.fn(),
     }
     res = {
       locals: {
         user: {
+          displayName: 'A Name',
           username: 'AB123456',
           userRoles: [Role.DeleteSensitiveCaseNotes],
           staffId: 487023,

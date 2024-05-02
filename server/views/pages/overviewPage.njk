@@ -18,7 +18,7 @@
       {% include "../partials/overviewPage/mainBody.njk" %}
     </div>
     <div class="govuk-grid-column-one-quarter govuk-!-display-none-print">
-      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'overview-side-bar'}) -%}
+      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'overview-side-bar'}) -%}
         {% include "../partials/overviewPage/sideBar.njk" %}
       {%- endcall -%}
     </div>

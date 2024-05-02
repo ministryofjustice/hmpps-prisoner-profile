@@ -12,7 +12,7 @@ describe('manageSocCasesApiClient', () => {
   let manageSocCasesApiClient: ManageSocCasesApiClient
 
   beforeEach(() => {
-    fakeManageSocCasesApi = nock(config.apis.caseNotesApi.url)
+    fakeManageSocCasesApi = nock(config.apis.manageSocCasesApi.url)
     manageSocCasesApiClient = new ManageSocCasesApiRestClient(token.access_token)
   })
 
@@ -25,7 +25,7 @@ describe('manageSocCasesApiClient', () => {
     fakeManageSocCasesApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
-  describe('getCaseNotes', () => {
+  describe('getNominal', () => {
     it('Should return data from the API', async () => {
       const prisonerNumber = 'AB1234Y'
       mockSuccessfulApiCall(`/soc/nominal/nomsId/${prisonerNumber}`, { id: 1 })

@@ -4,9 +4,7 @@ import PagedList, { PagedListItem, PagedListQueryParams } from '../data/interfac
 import { SortOption } from '../interfaces/SortParams'
 import HmppsError from '../interfaces/HmppsError'
 import ListMetadata from '../interfaces/ListMetadata'
-import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { User } from '../data/hmppsAuthClient'
 import { Role } from '../data/enums/role'
 import config from '../config'
 import OverviewNonAssociation from '../services/interfaces/overviewPageService/OverviewNonAssociation'
@@ -16,6 +14,7 @@ import CommunityManager from '../data/interfaces/deliusApi/CommunityManager'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import Address from '../data/interfaces/prisonApi/Address'
 import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -360,15 +359,14 @@ export const findError = (errors: HmppsError[], formFieldId: string) => {
   return null
 }
 
-/**
- * Whether or not the prisoner belongs to any of the users case loads
- *
- * @param prisonerAgencyId
- * @param userCaseLoads
- */
-export const prisonerBelongsToUsersCaseLoad = (prisonerAgencyId: string, userCaseLoads: CaseLoad[]): boolean => {
-  return userCaseLoads.some(caseLoad => caseLoad.caseLoadId === prisonerAgencyId)
-}
+export const isActiveCaseLoad = (prisonId: string, user: HmppsUser) =>
+  user.authSource === 'nomis' && user.activeCaseLoadId === prisonId
+
+export const includesActiveCaseLoad = (prisons: string[], user: HmppsUser) =>
+  user.authSource === 'nomis' && prisons.includes(user.activeCaseLoadId)
+
+export const isInUsersCaseLoad = (prisonId: string, user: HmppsUser): boolean =>
+  user.authSource === 'nomis' && user.caseLoads.some(caseLoad => caseLoad.caseLoadId === prisonId)
 
 /**
  * Whether any of the roles exist for the given user allowing for conditional role based access on any number of roles
@@ -397,9 +395,9 @@ export const userHasAllRoles = (rolesToCheck: string[], userRoles: string[]): bo
  * @param user
  * @param prisoner
  */
-export const userCanEdit = (user: User, prisoner: Partial<Prisoner>): boolean => {
+export const userCanEdit = (user: HmppsUser, prisoner: Partial<Prisoner>): boolean => {
   return (
-    user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId) ||
+    (user.authSource === 'nomis' && user.caseLoads?.some(caseload => caseload.caseLoadId === prisoner.prisonId)) ||
     (['OUT', 'TRN'].includes(prisoner.prisonId) && userHasRoles([Role.InactiveBookings], user.userRoles)) ||
     (prisoner.restrictedPatient && userHasRoles([Role.PomUser], user.userRoles))
   )
@@ -585,6 +583,7 @@ export interface SelectOption {
     hidden?: 'hidden'
   }
 }
+
 export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {
   return refData.map(r => ({
     text: r.description,

@@ -44,9 +44,7 @@ export default class CsraController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
@@ -83,9 +81,7 @@ export default class CsraController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,

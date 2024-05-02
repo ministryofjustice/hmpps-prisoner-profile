@@ -23,6 +23,7 @@ describe('CheckUserCanEditMiddleware', () => {
     res = {
       locals: {
         user: {
+          authSource: 'nomis',
           userRoles: [Role.PrisonUser],
           caseLoads: CaseLoadsDummyDataA,
         },

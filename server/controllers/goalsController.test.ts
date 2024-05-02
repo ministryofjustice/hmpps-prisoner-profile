@@ -45,12 +45,10 @@ describe('Prisoner goals controller', () => {
       referer: 'http://referer',
     }
     req.path = 'goals'
-    req.session = {
-      userDetails: { displayName: 'A Name' },
-    } as SessionData
 
     res.locals = {
       user: {
+        displayName: 'A Name',
         userRoles: [Role.PrisonUser],
         staffId: 487023,
         caseLoads: CaseLoadsDummyDataA,
