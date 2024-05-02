@@ -1,0 +1,45 @@
+{% extends "../index.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/govuk-button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+  {
+  text: 'Digital Prison Services',
+  href:  "/" | prependBaseUrl
+  },
+  {
+  text: breadcrumbPrisonerName,
+  href: "/prisoner/" + prisonerNumber
+  }
+  ]
+%}
+
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">Edit {{ fieldName }}</h1>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form method="post" novalidate="novalidate" autocomplete="off">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        <div class="govuk-button-group">
+          {{ govukInput }}
+
+          {{
+            govukButton({
+            text: "Save",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "edit-submit-button" }
+            })
+          }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
