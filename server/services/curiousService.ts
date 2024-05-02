@@ -30,7 +30,7 @@ export default class CuriousService {
       // loop until the API response's `last` field is `true`
       while (apiPagedResponse.last === false) {
         // eslint-disable-next-line no-await-in-loop
-        apiPagedResponse = await this.curiousApiClientBuilder(token).getLearnerEducation(prisonNumber, page)
+        apiPagedResponse = await this.curiousApiClientBuilder(token).getLearnerEducationPage(prisonNumber, page)
         if (!apiPagedResponse) {
           return this.noLearnerEducationForPrisoner(prisonNumber)
         }

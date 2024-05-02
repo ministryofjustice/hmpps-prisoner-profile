@@ -8,7 +8,7 @@ import LearnerNeurodivergence from './LearnerNeurodivergence'
 export default interface CuriousApiClient {
   getLearnerEmployabilitySkills(prisonerNumber: string): Promise<LearnerEmployabilitySkills>
   getLearnerProfile(prisonerNumber: string): Promise<LearnerProfile[]>
-  getLearnerEducation(prisonerNumber: string, page?: number): Promise<LearnerEductionPagedResponse>
+  getLearnerEducationPage(prisonerNumber: string, page?: number): Promise<LearnerEductionPagedResponse>
   getLearnerLatestAssessments(prisonerNumber: string): Promise<LearnerLatestAssessment[]>
   getLearnerGoals(prisonerNumber: string): Promise<LearnerGoals>
   getLearnerNeurodivergence(prisonerNumber: string): Promise<LearnerNeurodivergence[]>

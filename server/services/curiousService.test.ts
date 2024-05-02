@@ -46,7 +46,7 @@ describe('curiousService', () => {
     it('should get In Prison Courses', async () => {
       // Given
       const learnerEducationPage1Of1: LearnerEductionPagedResponse = learnerEducationPagedResponse(prisonNumber)
-      curiousApiClient.getLearnerEducation.mockResolvedValue(learnerEducationPage1Of1)
+      curiousApiClient.getLearnerEducationPage.mockResolvedValue(learnerEducationPage1Of1)
 
       const expected: InPrisonCourseRecords = {
         problemRetrievingData: false,
@@ -155,7 +155,7 @@ describe('curiousService', () => {
 
       // Then
       expect(actual).toEqual(expected)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 0)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 0)
       expect(prisonService.getPrisonByPrisonId).toHaveBeenCalledWith('MDI', systemToken)
       expect(prisonService.getPrisonByPrisonId).toHaveBeenCalledWith('WDI', systemToken)
     })
@@ -163,7 +163,7 @@ describe('curiousService', () => {
     it('should get In Prison Courses given there is only 1 page of data in Curious for the prisoner', async () => {
       // Given
       const learnerEducationPage1Of1: LearnerEductionPagedResponse = learnerEducationPagedResponsePage1Of1(prisonNumber)
-      curiousApiClient.getLearnerEducation.mockResolvedValue(learnerEducationPage1Of1)
+      curiousApiClient.getLearnerEducationPage.mockResolvedValue(learnerEducationPage1Of1)
 
       const expected: InPrisonCourseRecords = {
         problemRetrievingData: false,
@@ -213,15 +213,15 @@ describe('curiousService', () => {
 
       // Then
       expect(actual).toEqual(expected)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 0)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 0)
     })
 
     it('should get In Prison Courses given there are 2 pages of data in Curious for the prisoner', async () => {
       // Given
       const learnerEducationPage1Of2: LearnerEductionPagedResponse = learnerEducationPagedResponsePage1Of2(prisonNumber)
-      curiousApiClient.getLearnerEducation.mockResolvedValueOnce(learnerEducationPage1Of2)
+      curiousApiClient.getLearnerEducationPage.mockResolvedValueOnce(learnerEducationPage1Of2)
       const learnerEducationPage2Of2: LearnerEductionPagedResponse = learnerEducationPagedResponsePage2Of2(prisonNumber)
-      curiousApiClient.getLearnerEducation.mockResolvedValueOnce(learnerEducationPage2Of2)
+      curiousApiClient.getLearnerEducationPage.mockResolvedValueOnce(learnerEducationPage2Of2)
 
       const expected: InPrisonCourseRecords = {
         problemRetrievingData: false,
@@ -285,8 +285,8 @@ describe('curiousService', () => {
 
       // Then
       expect(actual).toEqual(expected)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 0)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 1)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 0)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 1)
     })
 
     it('should not get In Prison Courses given the curious API request for page 1 returns an error response', async () => {
@@ -296,7 +296,7 @@ describe('curiousService', () => {
         status: 500,
         text: { errorCode: 'VC5000', errorMessage: 'Internal server error', httpStatusCode: 500 },
       }
-      curiousApiClient.getLearnerEducation.mockRejectedValue(curiousApiError)
+      curiousApiClient.getLearnerEducationPage.mockRejectedValue(curiousApiError)
 
       const expected = {
         problemRetrievingData: true,
@@ -307,21 +307,21 @@ describe('curiousService', () => {
 
       // Then
       expect(actual).toEqual(expected)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 0)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 0)
       expect(prisonService.getPrisonByPrisonId).not.toHaveBeenCalled()
     })
 
     it('should not get In Prison Courses given the Curious API request for page 2 returns an error response', async () => {
       // Given
       const learnerEducationPage1Of2: LearnerEductionPagedResponse = learnerEducationPagedResponsePage1Of2(prisonNumber)
-      curiousApiClient.getLearnerEducation.mockResolvedValueOnce(learnerEducationPage1Of2)
+      curiousApiClient.getLearnerEducationPage.mockResolvedValueOnce(learnerEducationPage1Of2)
 
       const curiousApiError = {
         message: 'Internal Server Error',
         status: 500,
         text: { errorCode: 'VC5000', errorMessage: 'Internal server error', httpStatusCode: 500 },
       }
-      curiousApiClient.getLearnerEducation.mockRejectedValueOnce(curiousApiError)
+      curiousApiClient.getLearnerEducationPage.mockRejectedValueOnce(curiousApiError)
 
       const expected = {
         problemRetrievingData: true,
@@ -332,14 +332,14 @@ describe('curiousService', () => {
 
       // Then
       expect(actual).toEqual(expected)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 0)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 1)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 0)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 1)
       expect(prisonService.getPrisonByPrisonId).not.toHaveBeenCalled()
     })
 
     it('should handle retrieval of In Prison Courses given Curious returns not found error for the learner education', async () => {
       // Given
-      curiousApiClient.getLearnerEducation.mockResolvedValue(null) // Curious API client method has `ignore404: true` which means the client method will return null in place of a 404 exception
+      curiousApiClient.getLearnerEducationPage.mockResolvedValue(null) // Curious API client method has `ignore404: true` which means the client method will return null in place of a 404 exception
 
       const expected: InPrisonCourseRecords = {
         problemRetrievingData: false, // A 404 from Curious is not considered an error; it simply means there is no data for the prisoner
@@ -359,7 +359,7 @@ describe('curiousService', () => {
 
       // Then
       expect(actual).toEqual(expected)
-      expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonNumber, 0)
+      expect(curiousApiClient.getLearnerEducationPage).toHaveBeenCalledWith(prisonNumber, 0)
       expect(prisonService.getPrisonByPrisonId).not.toHaveBeenCalled()
     })
   })

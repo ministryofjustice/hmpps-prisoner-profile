@@ -49,7 +49,7 @@ describe('curiousApiClient', () => {
     })
   })
 
-  describe('getLearnerEducation', () => {
+  describe('getLearnerEducationPage', () => {
     it('should get learner eduction page', async () => {
       // Given
       const prisonNumber = 'A1234BC'
@@ -62,7 +62,7 @@ describe('curiousApiClient', () => {
         .reply(200, learnerEducationPage1Of1)
 
       // When
-      const actual = await curiousApiClient.getLearnerEducation(prisonNumber, page)
+      const actual = await curiousApiClient.getLearnerEducationPage(prisonNumber, page)
 
       // Then
       expect(actual).toEqual(learnerEducationPage1Of1)
@@ -80,7 +80,7 @@ describe('curiousApiClient', () => {
         .reply(404, 'Not found')
 
       // When
-      const actual = await curiousApiClient.getLearnerEducation(prisonNumber, page)
+      const actual = await curiousApiClient.getLearnerEducationPage(prisonNumber, page)
 
       // Then
       expect(actual).toBe(null)
@@ -104,7 +104,7 @@ describe('curiousApiClient', () => {
 
       // When
       try {
-        await curiousApiClient.getLearnerEducation(prisonNumber, page)
+        await curiousApiClient.getLearnerEducationPage(prisonNumber, page)
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)

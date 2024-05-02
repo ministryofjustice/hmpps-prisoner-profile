@@ -29,7 +29,7 @@ export default class CuriousRestApiClient implements CuriousApiClient {
     })
   }
 
-  async getLearnerEducation(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse> {
+  async getLearnerEducationPage(offenderNumber: string, page = 0): Promise<LearnerEductionPagedResponse> {
     return this.restClient.get<LearnerEductionPagedResponse>({
       path: `/learnerEducation/${offenderNumber}`,
       query: {

@@ -54,7 +54,7 @@ describe('WorkAndSkillsService', () => {
   const curiousApiClient = {
     getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
     getLearnerProfile: jest.fn(async () => LearnerProfiles),
-    getLearnerEducation: jest.fn(),
+    getLearnerEducationPage: jest.fn(),
     getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
     getLearnerGoals: jest.fn(),
     getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
