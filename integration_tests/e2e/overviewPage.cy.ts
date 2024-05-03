@@ -328,9 +328,9 @@ context('Overview Page', () => {
         cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
       })
 
-      it('should not display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
+      it('should display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
         const overviewPage = visitOverviewPageAlt()
-        overviewPage.referToPathfinderActionLink().should('not.exist')
+        overviewPage.referToPathfinderActionLink().should('exist')
         overviewPage.pathfinderProfileInfoLink().should('not.exist')
       })
     })
