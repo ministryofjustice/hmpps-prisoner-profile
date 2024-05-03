@@ -29,7 +29,11 @@
       </div>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-          {% include "../partials/workAndSkillsPage/coursesAndQualifications.njk" %}
+          {% if config.featureToggles.newCourseAndQualificationHistoryEnabled %}
+            {% include "../partials/workAndSkillsPage/inPrisonQualificationsCompletedInLast12Months.njk" %}
+          {% else %}
+            {% include "../partials/workAndSkillsPage/coursesAndQualifications.njk" %}
+          {% endif %}
         </div>
       </div>
       <div class="govuk-grid-row">

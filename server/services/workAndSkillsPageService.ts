@@ -20,6 +20,7 @@ import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 import CuriousService from './curiousService'
 import { InPrisonCourse, InPrisonCourseRecords } from './interfaces/curiousService/CuriousInPrisonCourses'
+import config from '../config'
 
 interface WorkAndSkillsData {
   learnerEmployabilitySkills: LearnerEmployabilitySkills
@@ -70,7 +71,13 @@ export default class WorkAndSkillsPageService {
     ] = await Promise.all([
       this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient),
       this.getLearnerProfiles(prisonerNumber, curiousApiClient),
-      this.getLearnerEducation(prisonerNumber, token),
+
+      // TODO - RR-814 - when this feature toggle is removed course info will be retrieved via the `retrieveCuriousInPrisonCourses` middleware
+      // At that time the function getLearnerEducation can be removed along with the property it sets in the returned object
+      !config.featureToggles.newCourseAndQualificationHistoryEnabled
+        ? this.getLearnerEducation(prisonerNumber, token)
+        : undefined,
+
       this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient),
       this.getCuriousGoals(prisonerNumber, curiousApiClient),
       this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
@@ -169,10 +176,6 @@ export default class WorkAndSkillsPageService {
       token,
     )
 
-    /* InPrisonCourseRecords are already grouped by course status. At the moment the current UI does not differentiate by status
-       so all courses are merged into a single array.
-       TODO - RR-630 will refactor this and display and sort courses by status
-     */
     const allCourses: InPrisonCourse[] = [
       ...(inPrisonCourseRecords.coursesByStatus?.COMPLETED || []),
       ...(inPrisonCourseRecords.coursesByStatus?.IN_PROGRESS || []),

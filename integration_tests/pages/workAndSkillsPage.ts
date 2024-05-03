@@ -27,24 +27,22 @@ export default class WorkAndSkillsPage extends Page {
   // CAQ = Courses and Qualifications card
   CAQ_card = (): PageElement => cy.get('#courses-and-qualifications')
 
-  CAQ_header = (): PageElement => cy.get('#courses-and-qualifications > [data-qa="summary-header"] > h2')
+  CAQ_course_table = (): PageElement => cy.get('#completed-in-prison-courses-in-last-12-months-table')
 
-  CAQ_info = (): PageElement => cy.get('#courses-and-qualifications > .hmpps-summary-card__body > :nth-child(1)')
+  CAQ_completed_course_names = (): PageElement => cy.get('[data-qa=completed-course-name]')
 
-  CAQ_courses = (): PageElement => cy.get('#courses-and-qualifications > .hmpps-summary-card__body > .govuk-heading-s')
+  CAQ_no_in_prison_courses_message = (): PageElement => cy.get('[data-qa=no-in-prison-courses-message]')
 
-  CAQ_listKey = (): PageElement =>
-    cy.get(
-      '#courses-and-qualifications > .hmpps-summary-card__body > .govuk-summary-list > .govuk-summary-list__row > .govuk-summary-list__key',
-    )
+  CAQ_no_completed_in_prison_courses_message = (): PageElement =>
+    cy.get('[data-qa=no-completed-in-prison-courses-message]')
 
-  CAQ_listValue = (): PageElement =>
-    cy.get(
-      '#courses-and-qualifications > .hmpps-summary-card__body > .govuk-summary-list > .govuk-summary-list__row > .govuk-summary-list__value',
-    )
+  CAQ_no_completed_in_prison_courses_in_last_12_months_message = (): PageElement =>
+    cy.get('[data-qa=no-completed-in-prison-courses-in-last-12-months-message]')
 
-  CAQ_viewHistory = (): PageElement =>
-    cy.get('#courses-and-qualifications > .hmpps-summary-card__body > .govuk-body > .govuk-link--no-visited-state')
+  CAQ_view_all_in_prison_courses_link = (): PageElement => cy.get('[data-qa=link-to-view-all-in-prison-courses]')
+
+  CAQ_curious_unavailable_message = (): PageElement =>
+    cy.get('#courses-and-qualifications [data-qa=curious-unavailable-message]')
 
   // WAA = Work and activities card
   workAndActivities = () => {
