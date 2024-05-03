@@ -2,6 +2,7 @@ import UserService from './userService'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 const token = 'some token'
 
@@ -19,11 +20,28 @@ describe('HmppsUser service', () => {
   })
 
   describe('getStaffRoles', () => {
-    it('should retrieve and return staff roles from prison api', async () => {
-      prisonApiClient.getStaffRoles = jest.fn(async () => [{ role: 'role1' }, { role: 'role2' }])
+    describe('when the user is a prison user', () => {
+      it('should retrieve and return staff roles from prison api', async () => {
+        prisonApiClient.getStaffRoles = jest.fn(async () => [{ role: 'role1' }, { role: 'role2' }])
 
-      const result = await userService.getStaffRoles(token, 1, 'agency')
-      expect(result).toEqual([{ role: 'role1' }, { role: 'role2' }])
+        const result = await userService.getStaffRoles(token, {
+          authSource: 'nomis',
+          staffId: 1,
+          activeCaseLoadId: 'MDI',
+        } as HmppsUser)
+
+        expect(result).toEqual([{ role: 'role1' }, { role: 'role2' }])
+      })
+    })
+
+    describe('when the user is not a prison user', () => {
+      it.each(['delius', 'external'])('should return an empty list', async authSource => {
+        prisonApiClient.getStaffRoles = jest.fn(async () => [{ role: 'role1' }, { role: 'role2' }])
+
+        const result = await userService.getStaffRoles(token, { authSource } as HmppsUser)
+
+        expect(result).toEqual([])
+      })
     })
   })
 })

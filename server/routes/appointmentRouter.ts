@@ -91,12 +91,16 @@ export default function appointmentRouter(services: Services): Router {
   get(
     '/api/get-offender-events',
     auditPageAccessAttempt({ services, page: ApiAction.OffenderEvents }),
+    isCreateIndividualAppointmentRolledOut,
+    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.getOffenderEvents(),
   )
 
   get(
     '/api/get-location-events',
     auditPageAccessAttempt({ services, page: ApiAction.LocationEvents }),
+    isCreateIndividualAppointmentRolledOut,
+    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.getLocationExistingEvents(),
   )
 
