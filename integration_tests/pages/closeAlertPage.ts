@@ -13,11 +13,11 @@ export default class CloseAlertPage extends Page {
 
   endDate = (): PageElement => cy.get('[data-qa=end-date]')
 
-  comments = (): PageElement => cy.get('[data-qa=comments-field]')
+  comments = (): PageElement => cy.get('[data-qa=description-field]')
 
   anotherDateRadio = (): PageElement => cy.get('[data-qa=another-date-radio] + label')
 
-  endDateField = (): PageElement => cy.get('#expiryDate')
+  endDateField = (): PageElement => cy.get('#activeTo')
 
   confirmButton = (): PageElement => cy.get('[data-qa=confirm-button]')
 

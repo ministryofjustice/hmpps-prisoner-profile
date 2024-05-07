@@ -1,5 +1,4 @@
 import Assessment from './Assessment'
-import Alert from './Alert'
 import Alias from './Alias'
 import OffenderSentenceTerms from './OffenderSentenceTerms'
 import OffenceHistoryDetail from './OffenceHistoryDetail'
@@ -11,6 +10,7 @@ import PhysicalCharacteristic from './PhysicalCharacteristic'
 import PhysicalMark from './PhysicalMark'
 import OffenderIdentifier from './OffenderIdentifier'
 import ProfileInformation from './ProfileInformation'
+import PrisonApiAlert from './PrisonApiAlert'
 
 export default interface InmateDetail {
   offenderNo: string
@@ -34,7 +34,7 @@ export default interface InmateDetail {
   alertsCodes?: string[]
   activeAlertCount?: number
   inactiveAlertCount?: number
-  alerts?: Alert[]
+  alerts?: PrisonApiAlert[]
   assignedLivingUnit?: AssignedLivingUnit
   physicalAttributes?: PhysicalAttributes
   physicalCharacteristics?: PhysicalCharacteristic[]

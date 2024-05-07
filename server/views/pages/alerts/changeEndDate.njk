@@ -11,14 +11,14 @@
 {% set changeEndDateHtml %}
     <div data-qa="change-end-date-section">
         {{ hmppsDatepicker({
-            id: "expiryDate",
-            name: "expiryDate",
+            id: "activeTo",
+            name: "activeTo",
             label: {
                 text: "End date"
             },
-            errorMessage: errors | findError('expiryDate'),
+            errorMessage: errors | findError('activeTo'),
             classes: 'hmpps-datepicker--fixed-width',
-            value: formValues.expiryDate,
+            value: formValues.activeTo,
             minDate: today
         }) }}
     </div>
@@ -48,19 +48,19 @@
         <div class="horizontal-information">
             <div class="horizontal-information__item">
                 <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Alert</div>
-                <div class="govuk-body" data-qa="alert-description">{{ alert.alertCodeDescription }} ({{ alert.alertCode }})</div>
+                <div class="govuk-body" data-qa="alert-description">{{ alert.alertCode.description }} ({{ alert.alertCode.code }})</div>
             </div>
         </div>
 
         <div class="horizontal-information">
             <div class="horizontal-information__item">
                 <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Added by</div>
-                <div class="govuk-body" data-qa="added-by">{{ alert.addedByFullName }} on {{ alert.dateCreated | formatDate }}</div>
+                <div class="govuk-body" data-qa="added-by">{{ alert.createdByDisplayName }} on {{ alert.createdAt | formatDate }}</div>
             </div>
-            {% if alert.expiredByFullName %}
+            {% if alert.lastModifiedAt %}
             <div class="horizontal-information__item">
                 <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Last updated by</div>
-                <div class="govuk-body" data-qa="last-updated-by">{{ alert.expiredByFullName }} on {{ alert.modifiedDateTime | formatDate }}</div>
+                <div class="govuk-body" data-qa="last-updated-by">{{ alert.lastModifiedByDisplayName }} on {{ alert.lastModifiedAt | formatDate }}</div>
             </div>
             {% endif %}
         </div>
@@ -68,12 +68,12 @@
         <div class="horizontal-information">
             <div class="horizontal-information__item">
                 <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Start date</div>
-                <div class="govuk-body" data-qa="start-date">{{ alert.dateCreated | formatDate }}</div>
+                <div class="govuk-body" data-qa="start-date">{{ alert.activeFrom | formatDate }}</div>
             </div>
-            {% if alert.dateExpires %}
+            {% if alert.activeTo %}
             <div class="horizontal-information__item">
                 <div class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">End date</div>
-                <div class="govuk-body" data-qa="end-date">{{ alert.dateExpires | formatDate  }}</div>
+                <div class="govuk-body" data-qa="end-date">{{ alert.activeTo | formatDate  }}</div>
             </div>
             {% endif %}
         </div>
@@ -84,17 +84,17 @@
             <input type="hidden" name="startDate" value="{{ alert.dateCreated }}" />
 
             {{ govukCharacterCount({
-                name: "comment",
-                id: "comment",
+                name: "description",
+                id: "description",
                 maxlength: 1000,
                 rows: 10,
-                value: formValues.comment,
-                errorMessage: errors | findError('comment'),
+                value: formValues.description,
+                errorMessage: errors | findError('description'),
                 label: {
                     text: "Comments",
                     classes: "govuk-!-font-weight-bold"
                 },
-                attributes: { "data-qa": "comments-field" }
+                attributes: { "data-qa": "description-field" }
             }) }}
 
             {{ govukRadios({

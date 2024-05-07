@@ -1,5 +1,5 @@
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { AlertType } from '../data/interfaces/prisonApi/Alert'
+import { PrisonApiAlertType } from '../data/interfaces/prisonApi/PrisonApiAlert'
 import { RestClientBuilder } from '../data'
 
 export default class ReferenceDataService {
@@ -8,7 +8,7 @@ export default class ReferenceDataService {
   /**
    * Get AlertType reference data
    */
-  public async getAlertTypes(clientToken: string): Promise<AlertType[]> {
+  public async getAlertTypes(clientToken: string): Promise<PrisonApiAlertType[]> {
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
 
     return prisonApiClient.getAlertTypes()

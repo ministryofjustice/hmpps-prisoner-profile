@@ -5,7 +5,7 @@ import { isRealDate, parseDate } from '../utils/dateHelpers'
 
 export const AlertValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
-  const { existingAlerts, alertType, alertCode, alertDate, comment, expiryDate } = body
+  const { existingAlerts, alertType, alertCode, activeFrom, description, activeTo } = body
 
   if (!alertType) {
     errors.push({
@@ -28,52 +28,52 @@ export const AlertValidator: Validator = (body: Record<string, string>) => {
     })
   }
 
-  if (comment && comment.length > 1000) {
+  if (description && description.length > 1000) {
     errors.push({
       text: 'Enter why you are creating this alert using 1,000 characters or less',
-      href: '#comment',
+      href: '#description',
     })
   }
 
-  if (!comment || !comment.trim()) {
+  if (!description || !description.trim()) {
     errors.push({
       text: 'Enter why you are creating this alert',
-      href: '#comment',
+      href: '#description',
     })
   }
 
-  if (!alertDate) {
+  if (!activeFrom) {
     errors.push({
       text: 'Select the alert start date',
-      href: '#alertDate',
+      href: '#activeFrom',
     })
   }
 
-  if (alertDate && !isRealDate(alertDate)) {
+  if (activeFrom && !isRealDate(activeFrom)) {
     errors.push({
       text: 'Enter a real date in the format DD/MM/YYYY - for example, 27/03/2023',
-      href: '#alertDate',
+      href: '#activeFrom',
     })
   }
 
-  if (alertDate && isRealDate(alertDate) && isFuture(parseDate(alertDate))) {
+  if (activeFrom && isRealDate(activeFrom) && isFuture(parseDate(activeFrom))) {
     errors.push({
       text: 'Enter a date which is not in the future in the format DD/MM/YYYY - for example, 27/03/2020',
-      href: '#alertDate',
+      href: '#activeFrom',
     })
   }
 
-  if (alertDate && differenceInDays(new Date(), parseDate(alertDate)) > 7) {
+  if (activeFrom && differenceInDays(new Date(), parseDate(activeFrom)) > 7) {
     errors.push({
       text: 'Enter a date that is not more than 7 days in the past in the format DD/MM/YYYY - for example, 27/03/2020',
-      href: '#alertDate',
+      href: '#activeFrom',
     })
   }
 
-  if (alertDate && expiryDate && parseDate(expiryDate) <= parseDate(alertDate)) {
+  if (activeFrom && activeTo && parseDate(activeTo) <= parseDate(activeFrom)) {
     errors.push({
       text: "'Alert end date' must be later than the start date",
-      href: '#expiryDate',
+      href: '#activeTo',
     })
   }
 
@@ -82,19 +82,19 @@ export const AlertValidator: Validator = (body: Record<string, string>) => {
 
 export const AlertAddMoreDetailsValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
-  const { comment } = body
+  const { description } = body
 
-  if (comment && comment.length > 1000) {
+  if (description && description.length > 1000) {
     errors.push({
       text: 'Enter your comments using 1,000 characters or less',
-      href: '#comment',
+      href: '#description',
     })
   }
 
-  if (!comment || !comment.trim()) {
+  if (!description || !description.trim()) {
     errors.push({
       text: 'Enter your comments on this alert',
-      href: '#comment',
+      href: '#description',
     })
   }
 
@@ -103,34 +103,34 @@ export const AlertAddMoreDetailsValidator: Validator = (body: Record<string, str
 
 export const AlertCloseValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
-  const { comment, expiryDate, today } = body
+  const { description, activeTo, today } = body
 
-  if (comment && comment.length > 1000) {
+  if (description && description.length > 1000) {
     errors.push({
       text: 'Enter your comments using 1,000 characters or less',
-      href: '#comment',
+      href: '#description',
     })
   }
 
-  if (!comment || !comment.trim()) {
+  if (!description || !description.trim()) {
     errors.push({
       text: 'Enter your comments on this alert',
-      href: '#comment',
+      href: '#description',
     })
   }
 
   if (today === 'no') {
-    if (!expiryDate || !isRealDate(expiryDate)) {
+    if (!activeTo || !isRealDate(activeTo)) {
       errors.push({
         text: 'Enter an end date in the format DD/MM/YYYY - for example, 27/03/2023',
-        href: '#expiryDate',
+        href: '#activeTo',
       })
     }
 
-    if (expiryDate && isRealDate(expiryDate) && !isFuture(parseDate(expiryDate))) {
+    if (activeTo && isRealDate(activeTo) && !isFuture(parseDate(activeTo))) {
       errors.push({
         text: 'End date must be after today',
-        href: '#expiryDate',
+        href: '#activeTo',
       })
     }
   }
@@ -140,19 +140,19 @@ export const AlertCloseValidator: Validator = (body: Record<string, string>) => 
 
 export const AlertChangeEndDateValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
-  const { comment, expiryDate, removeEndDate } = body
+  const { description, activeTo, removeEndDate } = body
 
-  if (comment && comment.length > 1000) {
+  if (description && description.length > 1000) {
     errors.push({
       text: 'Enter your comments using 1,000 characters or less',
-      href: '#comment',
+      href: '#description',
     })
   }
 
-  if (!comment || !comment.trim()) {
+  if (!description || !description.trim()) {
     errors.push({
       text: 'Enter your comments on this alert',
-      href: '#comment',
+      href: '#description',
     })
   }
 
@@ -162,17 +162,17 @@ export const AlertChangeEndDateValidator: Validator = (body: Record<string, stri
       href: '#removeEndDate',
     })
   } else if (removeEndDate === 'no') {
-    if (!expiryDate || !isRealDate(expiryDate)) {
+    if (!activeTo || !isRealDate(activeTo)) {
       errors.push({
         text: 'Enter an end date in the format DD/MM/YYYY - for example, 27/03/2023',
-        href: '#expiryDate',
+        href: '#activeTo',
       })
     }
 
-    if (expiryDate && isRealDate(expiryDate) && isBefore(parseDate(expiryDate), startOfDay(new Date()))) {
+    if (activeTo && isRealDate(activeTo) && isBefore(parseDate(activeTo), startOfDay(new Date()))) {
       errors.push({
         text: 'End date must be on or later than today',
-        href: '#expiryDate',
+        href: '#activeTo',
       })
     }
   }

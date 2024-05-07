@@ -1,10 +1,9 @@
-import { PagedListItem } from './PagedList'
-
-export default interface Alert extends PagedListItem {
-  alertId: number
+export default interface PrisonApiAlert {
+  alertId: string
   // These two aren't returned in the API but are defined in the API docs
   // bookingId: number
   // offenderNo: string
+
   alertType: string
   alertTypeDescription: string
   alertCode: string
@@ -28,27 +27,34 @@ export interface AlertForm {
   existingAlerts?: string
   alertType: string
   alertCode: string
-  comment: string
-  alertDate: string
-  expiryDate?: string
-  expired?: boolean
+  description?: string
+  activeFrom: string
+  activeTo?: string
 }
 
-export interface AlertType {
+export interface PrisonApiCreateAlert {
+  alertType: string
+  alertCode: string
+  comment?: string
+  alertDate: string
+  expiryDate?: string
+}
+
+export interface PrisonApiAlertType {
   code: string
   description: string
   activeFlag: 'Y' | 'N'
-  subCodes: AlertCode[]
+  subCodes: PrisonApiAlertCode[]
 }
 
-export interface AlertCode {
+export interface PrisonApiAlertCode {
   code: string
   description: string
   activeFlag: 'Y' | 'N'
   parentCode: string
 }
 
-export interface AlertChanges {
+export interface PrisonApiAlertChanges {
   expiryDate?: string
   comment?: string
   removeExpiryDate?: boolean

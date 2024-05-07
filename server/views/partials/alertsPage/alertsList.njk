@@ -6,7 +6,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <div class="hmpps-alert-card-list" role="list">
-            {% for alert in pagedAlerts.content %}
+            {% for alert in alertsList %}
                 {{ alertCard(alert) }}
             {% endfor %}
         </div>

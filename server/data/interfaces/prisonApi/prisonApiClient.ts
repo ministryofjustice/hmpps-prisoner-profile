@@ -31,7 +31,7 @@ import { AgenciesEmail, AgencyDetails } from './Agency'
 import OffenderCellHistory from './OffenderCellHistoryInterface'
 import StaffDetails from './StaffDetails'
 import OffenderBooking from './OffenderBooking'
-import Alert, { AlertChanges, AlertForm, AlertType } from './Alert'
+import PrisonApiAlert, { PrisonApiAlertChanges, PrisonApiAlertType, PrisonApiCreateAlert } from './PrisonApiAlert'
 import CsraAssessment, { CsraAssessmentSummary } from './CsraAssessment'
 import Transaction from './Transaction'
 import { DamageObligationContainer } from './DamageObligation'
@@ -72,7 +72,7 @@ export interface PrisonApiClient {
     toDate: string,
   ): Promise<OffenderAttendanceHistory>
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
-  getAlerts(bookingId: number, queryParams: AlertsListQueryParams): Promise<PagedList<Alert>>
+  getAlerts(bookingId: number, queryParams: AlertsListQueryParams): Promise<PagedList<PrisonApiAlert>>
   getProperty(bookingId: number): Promise<PropertyContainer[]>
   getCourtCases(bookingId: number): Promise<CourtCase[]>
   getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]>
@@ -104,9 +104,9 @@ export interface PrisonApiClient {
   getReceptionsWithCapacity(agencyId: string, attribute?: string): Promise<Reception[]>
   getStaffDetails(username: string): Promise<StaffDetails>
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
-  getAlertTypes(): Promise<AlertType[]>
-  createAlert(bookingId: number, alert: AlertForm): Promise<Alert>
-  updateAlert(bookingId: number, alertId: number, alertChanges: AlertChanges): Promise<Alert>
+  getAlertTypes(): Promise<PrisonApiAlertType[]>
+  createAlert(bookingId: number, alert: PrisonApiCreateAlert): Promise<PrisonApiAlert>
+  updateAlert(bookingId: number, alertId: string, alertChanges: PrisonApiAlertChanges): Promise<PrisonApiAlert>
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
   getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]>
   getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment>
@@ -153,7 +153,7 @@ export interface PrisonApiClient {
   getPersonEmails(personId: number): Promise<AgenciesEmail[]>
   getPersonPhones(personId: number): Promise<Telephone[]>
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
-  getAlertDetails(bookingId: number, alertId: number): Promise<Alert>
+  getAlertDetails(bookingId: number, alertId: string): Promise<PrisonApiAlert>
   getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
   getVisitsForBookingWithVisitors(
     bookingId: number,

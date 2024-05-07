@@ -57,12 +57,12 @@
             }) }}
 
             {{ govukCharacterCount({
-                name: "comment",
-                id: "comment",
+                name: "description",
+                id: "description",
                 maxlength: 1000,
                 rows: 10,
-                value: formValues.comment,
-                errorMessage: errors | findError('comment'),
+                value: formValues.description,
+                errorMessage: errors | findError('description'),
                 label: {
                     text: "Why are you creating this alert?",
                     classes: "govuk-!-font-weight-bold govuk-!-margin-top-8"
@@ -70,29 +70,29 @@
             }) }}
 
             {{ hmppsDatepicker({
-                id: "alertDate",
-                name: "alertDate",
+                id: "activeFrom",
+                name: "activeFrom",
                 label: {
                     text: "Alert start date",
                     classes: "govuk-!-font-weight-bold"
                 },
-                errorMessage: errors | findError('alertDate'),
+                errorMessage: errors | findError('activeFrom'),
                 classes: 'hmpps-datepicker--fixed-width',
-                value: formValues.alertDate,
+                value: formValues.activeFrom,
                 minDate: todayMinus8,
                 maxDate: today
             }) }}
 
             {{ hmppsDatepicker({
-                id: "expiryDate",
-                name: "expiryDate",
+                id: "activeTo",
+                name: "activeTo",
                 label: {
                     text: "Alert end date (optional)",
                     classes: "govuk-!-font-weight-bold"
                 },
-                errorMessage: errors | findError('expiryDate'),
+                errorMessage: errors | findError('activeTo'),
                 classes: 'hmpps-datepicker--fixed-width',
-                value: formValues.expiryDate,
+                value: formValues.activeTo,
                 minDate: todayMinus8
             }) }}
 

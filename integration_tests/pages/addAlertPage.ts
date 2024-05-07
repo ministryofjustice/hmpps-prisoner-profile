@@ -7,9 +7,9 @@ export default class AddAlertPage extends Page {
 
   subTypeField = (): PageElement => cy.get('#alertCode')
 
-  textField = (): PageElement => cy.get('#comment')
+  textField = (): PageElement => cy.get('#description')
 
-  dateField = (): PageElement => cy.get('#alertDate')
+  dateField = (): PageElement => cy.get('#activeFrom')
 
   saveButton = (): PageElement => cy.get('[data-qa=add-alert-submit-button]')
 
