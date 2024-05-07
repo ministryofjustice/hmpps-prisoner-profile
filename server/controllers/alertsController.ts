@@ -82,9 +82,7 @@ export default class AlertsController {
 
     this.auditService
       .sendSearch({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
@@ -137,9 +135,7 @@ export default class AlertsController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
@@ -195,8 +191,7 @@ export default class AlertsController {
       req.flash('flashMessage', { text: 'Alert added', type: FlashMessageType.success })
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.Alert,
@@ -287,9 +282,7 @@ export default class AlertsController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
@@ -334,8 +327,7 @@ export default class AlertsController {
       req.flash('flashMessage', { text: 'Alert updated', type: FlashMessageType.success })
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.AlertAddMoreDetails,
@@ -385,9 +377,7 @@ export default class AlertsController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
@@ -438,8 +428,7 @@ export default class AlertsController {
       })
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.AlertClose,
@@ -489,9 +478,7 @@ export default class AlertsController {
 
     this.auditService
       .sendPageView({
-        userId: res.locals.user.username,
-        userCaseLoads: res.locals.user.caseLoads,
-        userRoles: res.locals.user.userRoles,
+        user: res.locals.user,
         prisonerNumber,
         prisonId,
         correlationId: req.id,
@@ -542,8 +529,7 @@ export default class AlertsController {
       })
       this.auditService
         .sendPostSuccess({
-          userId: res.locals.user.username,
-          userCaseLoads: res.locals.user.caseLoads,
+          user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.AlertChangeEndDate,

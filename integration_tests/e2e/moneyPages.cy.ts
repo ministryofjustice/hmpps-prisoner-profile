@@ -25,7 +25,6 @@ context('Money Pages - Permissions', () => {
       cy.task('reset')
       cy.setupUserAuth({
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'ZZZ',
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -41,7 +40,6 @@ context('Money Pages - Permissions', () => {
       cy.task('reset')
       cy.setupUserAuth({
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'ZZZ',
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -57,7 +55,6 @@ context('Money Pages - Permissions', () => {
       cy.task('reset')
       cy.setupUserAuth({
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'ZZZ',
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -73,7 +70,6 @@ context('Money Pages - Permissions', () => {
       cy.task('reset')
       cy.setupUserAuth({
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
-        activeCaseLoadId: 'ZZZ',
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })

@@ -151,7 +151,12 @@ export default class AppointmentService {
     return this.prisonApiClientBuilder(token).getLocation(locationId)
   }
 
-  public async getExistingEventsForLocation(token: string, agencyId: string, locationId: number, date: string) {
+  public async getExistingEventsForLocation(
+    token: string,
+    agencyId: string,
+    locationId: number,
+    date: string,
+  ): Promise<OffenderEvent[]> {
     const eventsAtLocationByUsage = await Promise.all([
       this.prisonApiClientBuilder(token).getActivitiesAtLocation(locationId, date),
       this.prisonApiClientBuilder(token).getActivityList(agencyId, locationId, 'VISIT', date),

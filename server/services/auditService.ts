@@ -1,7 +1,7 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
-import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
-import { prisonerBelongsToUsersCaseLoad } from '../utils/utils'
+import { HmppsUser } from '../interfaces/HmppsUser'
+import { isInUsersCaseLoad } from '../utils/utils'
 
 // The individual pages that contain user information
 // eslint-disable-next-line no-shadow
@@ -85,17 +85,14 @@ export enum SubjectType {
 }
 
 export interface AccessAttemptAudit {
-  userId: string
-  userRoles: string
+  user: HmppsUser
   prisonerNumber: string
   page: Page | ApiAction
   correlationId: string
 }
 
 export interface PageViewAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
-  userRoles: string[]
+  user: HmppsUser
   prisonerNumber: string
   prisonId: string
   page: Page
@@ -103,16 +100,14 @@ export interface PageViewAudit {
 }
 
 interface AddAppointmentAudit {
-  userId: string
+  user: HmppsUser
   prisonerNumber: string
   correlationId: string
   details: object
 }
 
 interface SearchAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
-  userRoles: string[]
+  user: HmppsUser
   prisonerNumber: string
   prisonId: string
   correlationId: string
@@ -121,8 +116,7 @@ interface SearchAudit {
 }
 
 interface PostAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
+  user: HmppsUser
   prisonerNumber: string
   correlationId: string
   action: PostAction
@@ -130,8 +124,7 @@ interface PostAudit {
 }
 
 interface PutAudit {
-  userId: string
-  userCaseLoads: CaseLoad[]
+  user: HmppsUser
   prisonerNumber: string
   correlationId: string
   action: PutAction
@@ -199,24 +192,24 @@ export const auditService = ({
     }
   }
 
-  const sendAccessAttempt = async ({ userId, userRoles, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
+  const sendAccessAttempt = async ({ user, prisonerNumber, page, correlationId }: AccessAttemptAudit) => {
     await sendMessage({
       what: `ACCESS_ATTEMPT_${page.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
       correlationId,
-      details: JSON.stringify({ build, userRoles }),
+      details: JSON.stringify({ build, userRoles: user.userRoles }),
     })
   }
 
-  const sendPostAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
+  const sendPostAttempt = async ({ user, prisonerNumber, action, correlationId, details }: PostAudit) => {
     await sendMessage({
       what: `POST_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -225,11 +218,11 @@ export const auditService = ({
     })
   }
 
-  const sendPostSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PostAudit) => {
+  const sendPostSuccess = async ({ user, prisonerNumber, action, correlationId, details }: PostAudit) => {
     await sendMessage({
       what: `POST_SUCCESS_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -238,11 +231,11 @@ export const auditService = ({
     })
   }
 
-  const sendPutAttempt = async ({ userId, prisonerNumber, action, correlationId, details }: PutAudit) => {
+  const sendPutAttempt = async ({ user, prisonerNumber, action, correlationId, details }: PutAudit) => {
     await sendMessage({
       what: `PUT_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -251,11 +244,11 @@ export const auditService = ({
     })
   }
 
-  const sendPutSuccess = async ({ userId, prisonerNumber, action, correlationId, details }: PutAudit) => {
+  const sendPutSuccess = async ({ user, prisonerNumber, action, correlationId, details }: PutAudit) => {
     await sendMessage({
       what: `PUT_SUCCESS_${action.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -264,26 +257,18 @@ export const auditService = ({
     })
   }
 
-  const sendPageView = async ({
-    userId,
-    userCaseLoads,
-    userRoles,
-    prisonerNumber,
-    prisonId,
-    page,
-    correlationId,
-  }: PageViewAudit) => {
+  const sendPageView = async ({ user, prisonerNumber, prisonId, page, correlationId }: PageViewAudit) => {
     const details = {
-      globalView: !prisonerBelongsToUsersCaseLoad(prisonId, userCaseLoads),
+      globalView: !isInUsersCaseLoad(prisonId, user),
       releasedPrisonerView: ['OUT', 'TRN'].includes(prisonId),
-      userRoles,
+      userRoles: user.userRoles,
       build,
     }
 
     await sendMessage({
       what: `PAGE_VIEW_${page.toString()}`,
       when: new Date(),
-      who: userId,
+      who: user.username,
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       service: serviceName,
@@ -292,7 +277,7 @@ export const auditService = ({
     })
   }
 
-  const sendAddAppointment = async ({ userId, prisonerNumber, details, correlationId }: AddAppointmentAudit) => {
+  const sendAddAppointment = async ({ user, prisonerNumber, details, correlationId }: AddAppointmentAudit) => {
     await sendMessage({
       what: 'ADD_APPOINTMENT',
       correlationId,
@@ -301,11 +286,11 @@ export const auditService = ({
       subjectId: prisonerNumber,
       subjectType: SubjectType.PrisonerId,
       when: new Date(),
-      who: userId,
+      who: user.username,
     })
   }
 
-  const sendSearch = async ({ userId, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
+  const sendSearch = async ({ user, prisonerNumber, searchPage, details, correlationId }: SearchAudit) => {
     await sendMessage({
       what: `SEARCH_${searchPage}`,
       correlationId,
@@ -314,7 +299,7 @@ export const auditService = ({
       subjectId: prisonerNumber,
       subjectType: SubjectType.SearchTerm,
       when: new Date(),
-      who: userId,
+      who: user.username,
     })
   }
 

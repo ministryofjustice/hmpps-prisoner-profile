@@ -9,7 +9,7 @@
   ]
 %}
 {% set showSecurity  = security.interestToImmigration == "Yes" or security.travelRestrictions or security.xrays.total > 0 %}
-{% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoad.caseLoadId) and learnerNeurodivergence.length %}
+{% set showNeurodiversity = neurodiversityEnabled(user.activeCaseLoadId) and learnerNeurodivergence.length %}
 
 {% block body %}
   <div class="govuk-grid-row">
@@ -26,17 +26,17 @@
         {%- call conditionallyShow({condition: showNeurodiversity, id: 'neurodiversity'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#neurodiversity">Neurodiversity</a></li>
         {%- endcall -%}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance-nav'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'appearance-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#appearance">Appearance</a></li>
         {%- endcall -%}
         <li><a class="govuk-link govuk-link--no-visited-state" href="#addresses">Addresses</a></li>
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'next-of-kin-nav'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'next-of-kin-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#next-of-kin">Next of kin</a></li>
         {%- endcall -%}
         {%- call conditionallyShow({condition: showSecurity, id: 'security-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#security">Security</a></li>
         {%- endcall -%}
-        {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'property-nav'}) -%}
+        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'property-nav'}) -%}
           <li><a class="govuk-link govuk-link--no-visited-state" href="#property">Property</a></li>
         {%- endcall -%}
       </ul>
@@ -64,7 +64,7 @@
           </div>
         </div>
       {%- endcall -%}
-      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'appearance'}) -%}
+      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'appearance'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% include "../partials/personalPage/appearance.njk" %}
@@ -76,7 +76,7 @@
           {% include "../partials/personalPage/addresses.njk" %}
         </div>
       </div>
-      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'next-of-kin'}) -%}
+      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'next-of-kin'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% include "../partials/personalPage/nextOfKin.njk" %}
@@ -90,7 +90,7 @@
           </div>
         </div>
       {%- endcall -%}
-      {%- call conditionallyShow({condition: prisonerBelongsToUsersCaseLoad(prisonId, user.caseLoads), id: 'property'}) -%}
+      {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'property'}) -%}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             {% include "../partials/personalPage/property.njk" %}

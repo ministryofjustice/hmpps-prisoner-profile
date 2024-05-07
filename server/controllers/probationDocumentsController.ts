@@ -18,13 +18,11 @@ export default class ProbationDocumentsController {
     ])
 
     this.auditService.sendPageView({
+      user: res.locals.user,
       correlationId: req.id,
       page: Page.ProbationDocuments,
       prisonerNumber,
       prisonId,
-      userId: res.locals.user.username,
-      userCaseLoads: res.locals.user.caseLoads,
-      userRoles: res.locals.user.userRoles,
     })
 
     res.render('pages/probationDocuments/probationDocuments', {

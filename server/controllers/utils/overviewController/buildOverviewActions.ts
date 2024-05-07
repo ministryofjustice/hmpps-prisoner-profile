@@ -1,21 +1,21 @@
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
-import { User } from '../../../data/hmppsAuthClient'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { canAddCaseNotes, canViewCalculateReleaseDates } from '../../../utils/roleHelpers'
 import { Icon } from '../../../data/enums/icon'
-import { userCanEdit, userHasRoles } from '../../../utils/utils'
+import { includesActiveCaseLoad, isActiveCaseLoad, userCanEdit, userHasRoles } from '../../../utils/utils'
 import { Role } from '../../../data/enums/role'
 import conf from '../../../config'
 import { HeaderFooterMeta } from '../../../data/interfaces/componentApi/Component'
 import isServiceEnabled from '../../../utils/isServiceEnabled'
 import StaffRole from '../../../data/interfaces/prisonApi/StaffRole'
+import { HmppsUser } from '../../../interfaces/HmppsUser'
 
 export default (
   prisonerData: Prisoner,
   pathfinderNominal: Nominal | null,
   socNominal: Nominal | null,
-  user: User,
+  user: HmppsUser,
   staffRoles: StaffRole[],
   config: typeof conf,
   feComponentsMeta: HeaderFooterMeta | undefined,
@@ -33,6 +33,7 @@ export default (
       dataQA: 'calculate-release-dates-action-link',
     })
   }
+
   if (canAddCaseNotes(user, prisonerData)) {
     actions.push({
       text: 'Add case note',
@@ -41,6 +42,7 @@ export default (
       dataQA: 'add-case-note-action-link',
     })
   }
+
   if (staffRoles?.find(({ role }) => role === 'KW')) {
     actions.push({
       text: 'Add key worker session',
@@ -49,7 +51,8 @@ export default (
       dataQA: 'add-key-worker-session-action-link',
     })
   }
-  if (user.activeCaseLoadId === prisonerData.prisonId && !prisonerData.restrictedPatient) {
+
+  if (isActiveCaseLoad(prisonerData.prisonId, user) && !prisonerData.restrictedPatient) {
     actions.push({
       text: 'Add appointment',
       icon: Icon.AddAppointment,
@@ -57,10 +60,11 @@ export default (
       dataQA: 'add-appointment-action-link',
     })
   }
+
   if (
     userCanEdit(user, prisonerData) &&
     !prisonerData.restrictedPatient &&
-    !config.featureToggles.useOfForceDisabledPrisons.includes(user.activeCaseLoadId)
+    !includesActiveCaseLoad(config.featureToggles.useOfForceDisabledPrisons, user)
   ) {
     actions.push({
       text: 'Report use of force',
@@ -69,10 +73,11 @@ export default (
       dataQA: 'report-use-of-force-action-link',
     })
   }
+
   if (
     userHasRoles([Role.ActivityHub], user.userRoles) &&
     isServiceEnabled('activities', feComponentsMeta) &&
-    user.activeCaseLoadId === prisonerData.prisonId &&
+    isActiveCaseLoad(prisonerData.prisonId, user) &&
     prisonerData.status !== 'ACTIVE OUT'
   ) {
     actions.push({
@@ -82,6 +87,7 @@ export default (
       dataQA: 'log-an-activity-application-link',
     })
   }
+
   if (
     userHasRoles(
       [Role.PathfinderApproval, Role.PathfinderStdPrison, Role.PathfinderStdProbation, Role.PathfinderHQ],
@@ -96,6 +102,7 @@ export default (
       dataQA: 'refer-to-pathfinder-action-link',
     })
   }
+
   if (
     userHasRoles([Role.SocCustody, Role.SocCommunity, Role.SocDataAnalyst, Role.SocDataManager], user.userRoles) &&
     !socNominal
@@ -107,6 +114,7 @@ export default (
       dataQA: 'add-to-soc-action-link',
     })
   }
+
   if (
     userHasRoles(
       [Role.CreateCategorisation, Role.ApproveCategorisation, Role.CreateRecategorisation, Role.CategorisationSecurity],

@@ -1,14 +1,11 @@
-import { UserDetails } from '../../services/userService'
 import HmppsError from '../../interfaces/HmppsError'
+import { HmppsUser } from '../../interfaces/HmppsUser'
 
-export default {}
-
-declare module 'express-session' {
+export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
     nowInMinutes: number
-    userDetails: UserDetails
     userBackLink: string
     movementSlipData: object
   }
@@ -27,8 +24,14 @@ export declare global {
       id: string
       errors?: HmppsError[]
       middleware?: Record
+
       logout(done: (err: unknown) => void): void
+
       flash(type: string, message: unknown): number
+    }
+
+    interface Locals {
+      user: HmppsUser
     }
   }
 }

@@ -1,33 +1,20 @@
-import { convertToTitleCase } from '../utils/utils'
-import type HmppsAuthClient from '../data/hmppsAuthClient'
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import StaffRole from '../data/interfaces/prisonApi/StaffRole'
-
-export interface UserDetails {
-  name: string
-  displayName: string
-  activeCaseLoadId?: string
-  activeCaseLoad?: CaseLoad
-}
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class UserService {
-  constructor(
-    private readonly hmppsAuthClientBuilder: RestClientBuilder<HmppsAuthClient>,
-    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-  ) {}
-
-  async getUser(token: string): Promise<UserDetails> {
-    const user = await this.hmppsAuthClientBuilder(token).getUser()
-    return { ...user, displayName: convertToTitleCase(user.name) }
-  }
+  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
 
   getUserCaseLoads(token: string): Promise<CaseLoad[]> {
     return this.prisonApiClientBuilder(token).getUserCaseLoads()
   }
 
-  getStaffRoles(token: string, staffId: number, agencyId: string): Promise<StaffRole[]> {
-    return this.prisonApiClientBuilder(token).getStaffRoles(staffId, agencyId)
+  getStaffRoles(token: string, user: HmppsUser): Promise<StaffRole[]> {
+    if (user.authSource !== 'nomis') {
+      return Promise.resolve([])
+    }
+    return this.prisonApiClientBuilder(token).getStaffRoles(user.staffId, user.activeCaseLoadId)
   }
 }

@@ -40,6 +40,7 @@ describe('CheckPrisonerInCaseloadMiddleware', () => {
     res = {
       locals: {
         user: {
+          authSource: 'nomis',
           activeCaseLoadId: 'MDI',
           userRoles: [Role.PrisonUser],
           caseLoads: CaseLoadsDummyDataA,

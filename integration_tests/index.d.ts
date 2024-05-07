@@ -3,6 +3,7 @@ import StaffRole from '../server/data/interfaces/prisonApi/StaffRole'
 import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
 import { ComplexityLevel } from '../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
+import { UserToken } from './mockApis/auth'
 
 declare global {
   namespace Cypress {
@@ -12,11 +13,13 @@ declare global {
        * @example cy.signIn({ failOnStatusCode: boolean })
        */
       signIn(options?: { failOnStatusCode?: boolean; redirectPath?: string }): Chainable<AUTWindow>
+
       setupBannerStubs(options: {
         prisonerNumber: string
         prisonerDataOverrides?: Partial<Prisoner>
         bookingId?: number
       }): Chainable<AUTWindow>
+
       setupOverviewPageStubs(options: {
         prisonerNumber: string
         bookingId: number
@@ -26,29 +29,36 @@ declare global {
         staffRoles?: StaffRole[]
         complexityLevel?: ComplexityLevel
       }): Chainable<AUTWindow>
+
       setupAlertsPageStubs(options: {
         prisonerNumber: string
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
+
       setupPersonalPageSubs(options: {
         prisonerNumber: string
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
         caseLoads?: CaseLoad[]
       }): Chainable<AUTWindow>
+
       setupWorkAndSkillsPageStubs(options: { prisonerNumber: string; emptyStates?: boolean }): Chainable<AUTWindow>
+
       setupOffencesPageSentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+
       setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
-      setupUserAuth(options?: {
-        roles?: string[]
-        caseLoads?: CaseLoad[]
-        activeCaseLoadId?: string
-      }): Chainable<AUTWindow>
+
+      setupUserAuth(options?: UserToken & { caseLoads?: CaseLoad[] }): Chainable<AUTWindow>
+
       getDataQa(id: string): Chainable<JQuery<HTMLElement>>
+
       findDataQa(id: string): Chainable<JQuery<HTMLElement>>
+
       setupPrisonerSchedulePageStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
+
       setupMoneyStubs(options: { prisonerNumber: string; bookingId: number; prisonId: string }): Chainable<AUTWindow>
+
       setupSpecificLocationHistoryPageStubs(options?: {
         prisonerNumber?: string
         bookingId?: number
@@ -65,6 +75,7 @@ declare global {
           lastName: string
         }[]
       }): Chainable<AUTWindow>
+
       setupVisitsDetailsPageStubs(options: {
         prisonerNumber: string
         bookingId: number

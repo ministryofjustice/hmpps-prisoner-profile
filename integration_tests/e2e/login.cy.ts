@@ -76,13 +76,14 @@ context('SignIn', () => {
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
     const indexPage = Page.verifyOnPage(IndexPage)
+
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
     cy.request('/prisoner/G6123VU').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubAuthUser', { name: 'bobby brown' })
+    cy.setupUserAuth({ name: 'bobby brown', roles: ['ROLE_PRISON'] })
     cy.signIn()
 
     indexPage.headerUserName().contains('B. Brown')

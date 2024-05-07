@@ -1,12 +1,11 @@
 import { RequestHandler } from 'express'
 import ServerError from '../utils/serverError'
 import NotFoundError from '../utils/notFoundError'
-import { prisonerBelongsToUsersCaseLoad, userHasRoles } from '../utils/utils'
+import { isActiveCaseLoad, isInUsersCaseLoad, userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { addMiddlewareError } from './middlewareHelpers'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 export default function checkPrisonerInCaseload({
   allowGlobal = true,
@@ -16,11 +15,7 @@ export default function checkPrisonerInCaseload({
 } = {}): RequestHandler {
   return async (req, res, next) => {
     const prisonerData: Prisoner = req.middleware?.prisonerData
-    const {
-      activeCaseLoadId,
-      caseLoads,
-      userRoles,
-    }: { activeCaseLoadId: string; caseLoads: CaseLoad[]; userRoles: string[] } = res.locals.user
+    const { userRoles }: { userRoles: string[] } = res.locals.user
     // This function requires prisoner data - so ensure that's present before continuing
     if (!prisonerData) {
       return next(new ServerError('CheckPrisonerInCaseloadMiddleware: No PrisonerData found in middleware'))
@@ -38,9 +33,7 @@ export default function checkPrisonerInCaseload({
      * - Users with the inactive bookings role
      */
     function authenticateRestrictedPatient() {
-      return (
-        (pomUser && prisonerBelongsToUsersCaseLoad(prisonerData.supportingPrisonId, caseLoads)) || inactiveBookingsUser
-      )
+      return (pomUser && isInUsersCaseLoad(prisonerData.supportingPrisonId, res.locals.user)) || inactiveBookingsUser
     }
 
     // Prisoners with a caseload of OUT can only be accessed by people who have the inactive bookings role
@@ -60,7 +53,7 @@ export default function checkPrisonerInCaseload({
      * You are a global search user and the route is able to be accessed globally
      */
     function authenticateActiveBooking() {
-      if (prisonerBelongsToUsersCaseLoad(prisonerData.prisonId, caseLoads)) {
+      if (isInUsersCaseLoad(prisonerData.prisonId, res.locals.user)) {
         return true
       }
 
@@ -69,7 +62,7 @@ export default function checkPrisonerInCaseload({
 
     // Some routes can only be accessed if the prisoner is within your active caseload
     function authenticateActiveCaseloadOnly() {
-      return activeCaseLoadId === prisonerData.prisonId
+      return isActiveCaseLoad(prisonerData.prisonId, res.locals.user)
     }
 
     function authenticationError(message: string, hmppsStatusCode: HmppsStatusCode = HmppsStatusCode.NOT_IN_CASELOAD) {

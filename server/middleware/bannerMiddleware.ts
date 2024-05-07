@@ -6,7 +6,7 @@ import { Services } from '../services'
 export default function bannerMiddleware({ contentfulService }: Services): RequestHandler {
   return async (req, res, next) => {
     try {
-      res.locals.bannerText = await contentfulService.getBanner(res.locals.user.activeCaseLoadId)
+      res.locals.bannerText = await contentfulService.getBanner(res.locals.user)
 
       next()
     } catch (error) {

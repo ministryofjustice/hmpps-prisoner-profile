@@ -10,14 +10,12 @@ export default function auditPageAccessAttempt({
   page: Page | ApiAction
 }): RequestHandler {
   return async (req, res, next) => {
-    const { requestId } = res.locals
-    const { username, userRoles } = res.locals.user
+    const { requestId, user } = res.locals
     const { prisonerNumber } = req.params
     const { auditService } = services
 
     await auditService.sendAccessAttempt({
-      userId: username,
-      userRoles,
+      user,
       prisonerNumber,
       page: pageViewAction,
       correlationId: requestId,
