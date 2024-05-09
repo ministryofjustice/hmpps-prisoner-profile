@@ -2,6 +2,7 @@ import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import { RestClientBuilder } from '../data'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import StaffRole from '../data/interfaces/prisonApi/StaffRole'
+import { HmppsUser } from '../interfaces/HmppsUser'
 
 export default class UserService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -10,7 +11,10 @@ export default class UserService {
     return this.prisonApiClientBuilder(token).getUserCaseLoads()
   }
 
-  getStaffRoles(token: string, staffId: number, agencyId: string): Promise<StaffRole[]> {
-    return this.prisonApiClientBuilder(token).getStaffRoles(staffId, agencyId)
+  getStaffRoles(token: string, user: HmppsUser): Promise<StaffRole[]> {
+    if (user.authSource !== 'nomis') {
+      return Promise.resolve([])
+    }
+    return this.prisonApiClientBuilder(token).getStaffRoles(user.staffId, user.activeCaseLoadId)
   }
 }

@@ -24,7 +24,8 @@ export const alertFlagLabels: AlertFlagLabel[] = [
     label: 'PEEP',
     img: '/images/Disability_icon.png',
   },
-  { alertCodes: ['XEL'], classes: 'alert-status alert-status--elist', label: 'E-list' },
+  { alertCodes: ['XEL'], classes: 'alert-status alert-status--security', label: 'E-list' },
+  { alertCodes: ['XELH'], classes: 'alert-status alert-status--security', label: 'E-list heightened' },
   {
     alertCodes: ['XRF'],
     classes: 'alert-status alert-status--security',

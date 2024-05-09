@@ -55,6 +55,19 @@ describe('GetPrisonerDataMiddleware', () => {
     } as Services
   })
 
+  it('should get prisonerNumber from the query if provided', async () => {
+    req = {
+      query: { prisonerNumber: 'G6123VU' },
+      path: 'test/path',
+      middleware: {
+        clientToken: 'CLIENT_TOKEN',
+      },
+    }
+
+    await getPrisonerData(services)(req, res, next)
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+  })
+
   it('should return NotFoundError if prisonerData.prisonerNumber is undefined', async () => {
     prisonerSearchApiClient.getPrisonerDetails = jest.fn(async () => ({
       ...PrisonerMockDataA,
@@ -63,25 +76,25 @@ describe('GetPrisonerDataMiddleware', () => {
 
     await getPrisonerData(services)(req, res, next)
 
-    expect(prisonerSearchApiClient.getPrisonerDetails).toBeCalled()
-    expect(next).toBeCalledWith(new NotFoundError())
-    expect(prisonApiClient.getInmateDetail).not.toBeCalled()
-    expect(prisonApiClient.getAssessments).not.toBeCalled()
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('G6123VU')
+    expect(next).toHaveBeenCalledWith(new NotFoundError())
+    expect(prisonApiClient.getInmateDetail).not.toHaveBeenCalled()
+    expect(prisonApiClient.getAssessments).not.toHaveBeenCalled()
     expect(req.middleware.prisonerData).toBeUndefined()
   })
 
-  it('should prisonerData and inmateDetail in middleware', async () => {
+  it('should populate prisonerData and inmateDetail in middleware', async () => {
     await getPrisonerData(services)(req, res, next)
 
-    expect(prisonerSearchApiClient.getPrisonerDetails).toBeCalled()
-    expect(prisonApiClient.getInmateDetail).toBeCalled()
-    expect(prisonApiClient.getAssessments).toBeCalled()
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalled()
+    expect(prisonApiClient.getInmateDetail).toHaveBeenCalled()
+    expect(prisonApiClient.getAssessments).toHaveBeenCalled()
     expect(req.middleware.prisonerData).toEqual({
       ...PrisonerMockDataA,
       assessments: assessmentsMock,
       csra: assessmentsMock[1].classification,
     })
     expect(req.middleware.inmateDetail).toEqual(inmateDetailMock)
-    expect(next).toBeCalledWith()
+    expect(next).toHaveBeenCalledWith()
   })
 })

@@ -31,7 +31,6 @@ import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfo
 import getPersonalDetails from './utils/overviewController/getPersonalDetails'
 import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
-import StaffRole from '../data/interfaces/prisonApi/StaffRole'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -55,7 +54,7 @@ export default class OverviewController {
 
   public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
     const { clientToken } = req.middleware
-    const { userRoles, staffId, activeCaseLoadId } = res.locals.user
+    const { userRoles } = res.locals.user
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
 
@@ -87,7 +86,7 @@ export default class OverviewController {
       offencesOverview,
       nonAssociationSummary,
     ] = await Promise.all([
-      activeCaseLoadId ? this.userService.getStaffRoles(clientToken, staffId, activeCaseLoadId) : ([] as StaffRole[]),
+      this.userService.getStaffRoles(clientToken, res.locals.user),
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),

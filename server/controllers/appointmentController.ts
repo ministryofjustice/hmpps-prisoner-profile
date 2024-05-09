@@ -34,6 +34,7 @@ import VideoLinkBookingForm from '../data/interfaces/whereaboutsApi/VideoLinkBoo
 import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../services/auditService'
 import config from '../config'
 import logger from '../../logger'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 const { confirmBookingPrisonTemplateId, emails } = config.notifications
@@ -52,16 +53,14 @@ export default class AppointmentController {
   public displayAddAppointment(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { clientToken } = req.middleware
-      const {
-        user: { activeCaseLoadId },
-      } = res.locals
       const { prisonerNumber } = req.params
       const { firstName, lastName, bookingId, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const user = res.locals.user as PrisonUser
 
       const { appointmentTypes, locations } = await this.appointmentService.getAddAppointmentRefData(
         clientToken,
-        activeCaseLoadId,
+        user.activeCaseLoadId,
       )
 
       const now = new Date()
@@ -203,9 +202,7 @@ export default class AppointmentController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
-      const {
-        user: { activeCaseLoadId },
-      } = res.locals
+      const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('appointmentForm')
 
       // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
@@ -215,7 +212,7 @@ export default class AppointmentController {
 
       const { appointmentTypes, locations } = await this.appointmentService.getAddAppointmentRefData(
         clientToken,
-        activeCaseLoadId,
+        user.activeCaseLoadId,
       )
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
@@ -288,9 +285,7 @@ export default class AppointmentController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
-      const {
-        user: { activeCaseLoadId },
-      } = res.locals
+      const user = res.locals.user as PrisonUser
       const appointmentFlash = req.flash('prePostAppointmentDetails')
       // Handle no appointment data in flash, e.g. users coming to confirmation page from a bookmarked link
       if (!appointmentFlash?.length) {
@@ -299,7 +294,7 @@ export default class AppointmentController {
 
       const { courts, locations } = await this.appointmentService.getPrePostAppointmentRefData(
         clientToken,
-        activeCaseLoadId,
+        user.activeCaseLoadId,
       )
       courts.push({ id: 'other', name: 'Other' })
 
@@ -455,9 +450,8 @@ export default class AppointmentController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
-      const {
-        user: { activeCaseLoadId, username },
-      } = res.locals
+      const user = res.locals.user as PrisonUser
+      const { activeCaseLoadId, username } = user
 
       const appointmentFlash = req.flash('prePostAppointmentDetails')
       if (!appointmentFlash?.length) {
@@ -612,16 +606,19 @@ export default class AppointmentController {
   public getOffenderEvents(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { clientToken } = req.middleware
-      const {
-        user: { activeCaseLoadId },
-      } = res.locals
+      const user = res.locals.user as PrisonUser
 
       const isoDate = dateToIsoDate(req.query.date as string)
       const prisonerNumber = req.query.prisonerNumber as string
 
       const [prisonerData, events] = await Promise.all([
         this.prisonerSearchService.getPrisonerDetails(clientToken, prisonerNumber),
-        this.appointmentService.getExistingEventsForOffender(clientToken, activeCaseLoadId, isoDate, prisonerNumber),
+        this.appointmentService.getExistingEventsForOffender(
+          clientToken,
+          user.activeCaseLoadId,
+          isoDate,
+          prisonerNumber,
+        ),
       ])
 
       this.auditService
@@ -646,22 +643,20 @@ export default class AppointmentController {
   public getLocationExistingEvents(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { clientToken } = req.middleware
-      const {
-        user: { activeCaseLoadId },
-      } = res.locals
+      const user = res.locals.user as PrisonUser
 
       const isoDate = dateToIsoDate(req.query.date as string)
       const locationId = +req.query.locationId
 
       const [location, events] = await Promise.all([
         this.appointmentService.getLocation(clientToken, locationId),
-        this.appointmentService.getExistingEventsForLocation(clientToken, activeCaseLoadId, locationId, isoDate),
+        this.appointmentService.getExistingEventsForLocation(clientToken, user.activeCaseLoadId, locationId, isoDate),
       ])
 
       this.auditService
         .sendEvent({
           who: res.locals.user.username,
-          subjectId: activeCaseLoadId,
+          subjectId: user.activeCaseLoadId,
           correlationId: req.id,
           what: `API_${ApiAction.LocationEvents}`,
           details: JSON.stringify({ locationId }),

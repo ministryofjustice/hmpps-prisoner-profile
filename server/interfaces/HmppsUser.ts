@@ -1,4 +1,5 @@
 import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
+import { Role } from '../data/enums/role'
 
 export type AuthSource = 'nomis' | 'delius' | 'external'
 
@@ -8,8 +9,9 @@ export interface BaseUser {
   userId: string
   name: string
   displayName: string
-  userRoles: string[]
+  userRoles: Role[]
   token?: string
+  backLink?: string
 }
 
 export interface PrisonUser extends BaseUser {

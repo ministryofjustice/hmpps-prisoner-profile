@@ -5,8 +5,9 @@ import PrisonerLocationHistoryService from '../services/prisonerLocationHistoryS
 import { extractLocation, formatName, hasLength, sortByDateTime } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocationItem'
-import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 import CellMoveReasonType from '../data/interfaces/prisonApi/CellMoveReasonTypes'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import CaseLoad from '../data/interfaces/prisonApi/CaseLoad'
 
 export default class PrisonerLocationHistoryController {
   constructor(private readonly prisonerLocationHistoryService: PrisonerLocationHistoryService) {}
@@ -15,7 +16,8 @@ export default class PrisonerLocationHistoryController {
     const { clientToken } = req.middleware
     const { agencyId, locationId, fromDate, toDate } = req.query
     const { firstName, lastName, prisonerNumber, bookingId } = prisonerData
-    const userCaseLoadIds = res.locals.user.caseLoads.map((caseLoad: CaseLoad) => caseLoad.caseLoadId)
+    const user = res.locals.user as PrisonUser
+    const userCaseLoadIds = user.caseLoads.map((caseLoad: CaseLoad) => caseLoad.caseLoadId)
 
     const getMovedOutText = (
       currentPrisonerDetails: HistoryForLocationItem,
