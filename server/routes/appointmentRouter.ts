@@ -101,8 +101,6 @@ export default function appointmentRouter(services: Services): Router {
     '/api/get-location-events',
     auditPageAccessAttempt({ services, page: ApiAction.LocationEvents }),
     isCreateIndividualAppointmentRolledOut,
-    getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
     appointmentController.getLocationExistingEvents(),
   )
 
