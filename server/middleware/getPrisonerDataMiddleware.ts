@@ -17,6 +17,10 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         prisonerNumber = req.query.prisonerNumber as string
       }
 
+      if (prisonerNumber === '') {
+        return next(new NotFoundError())
+      }
+
       const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(prisonerNumber)
 
       if (prisonerData.prisonerNumber === undefined) {
