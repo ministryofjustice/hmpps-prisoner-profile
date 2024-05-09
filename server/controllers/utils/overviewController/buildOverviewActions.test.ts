@@ -172,6 +172,7 @@ describe('buildOverviewActions', () => {
       ${[Role.PathfinderStdPrison]}    | ${undefined}           | ${true}
       ${[Role.PathfinderStdProbation]} | ${undefined}           | ${true}
       ${[Role.PathfinderHQ]}           | ${undefined}           | ${true}
+      ${[Role.PathfinderUser]}         | ${undefined}           | ${true}
       ${[]}                            | ${undefined}           | ${false}
       ${[Role.PathfinderHQ]}           | ${pathfinderNominal}   | ${false}
     `('user with roles: $expected, can see: $visible', ({ roles, pathfinderNominalToUse, visible }) => {
