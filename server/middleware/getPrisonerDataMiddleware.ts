@@ -10,7 +10,14 @@ export default function getPrisonerData(services: Services, options: { minimal?:
   return async (req, res, next) => {
     try {
       const prisonerSearchClient = services.dataAccess.prisonerSearchApiClientBuilder(req.middleware.clientToken)
-      const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(req.params.prisonerNumber)
+      let prisonerNumber = ''
+      if (req.params?.prisonerNumber) {
+        prisonerNumber = req.params.prisonerNumber
+      } else if (req.query?.prisonerNumber) {
+        prisonerNumber = req.query.prisonerNumber as string
+      }
+
+      const prisonerData: Prisoner = await prisonerSearchClient.getPrisonerDetails(prisonerNumber)
 
       if (prisonerData.prisonerNumber === undefined) {
         return next(new NotFoundError())
