@@ -315,6 +315,27 @@ context('Overview Page', () => {
     })
   })
 
+  context('Given the user has PF_LOCAL_READER role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        roles: [Role.PrisonUser, Role.PathfinderLocalReader],
+      })
+    })
+
+    context('Prisoner is not currently in Pathfinder', () => {
+      beforeEach(() => {
+        cy.setupOverviewPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
+      })
+
+      it('should not display Refer to Pathfinder link, and not the Pathfinder profile link', () => {
+        const overviewPage = visitOverviewPageAlt()
+        overviewPage.referToPathfinderActionLink().should('not.exist')
+        overviewPage.pathfinderProfileInfoLink().should('not.exist')
+      })
+    })
+  })
+
   context('Given the user has PF_USER role', () => {
     beforeEach(() => {
       cy.task('reset')
