@@ -36,7 +36,11 @@ import { AgenciesEmail, AgencyDetails } from './interfaces/prisonApi/Agency'
 import StaffDetails from './interfaces/prisonApi/StaffDetails'
 import OffenderBooking from './interfaces/prisonApi/OffenderBooking'
 import OffenderCellHistory from './interfaces/prisonApi/OffenderCellHistoryInterface'
-import Alert, { AlertChanges, AlertForm, AlertType } from './interfaces/prisonApi/Alert'
+import PrisonApiAlert, {
+  PrisonApiAlertChanges,
+  PrisonApiAlertType,
+  PrisonApiCreateAlert,
+} from './interfaces/prisonApi/PrisonApiAlert'
 import CsraAssessment, { CsraAssessmentSummary } from './interfaces/prisonApi/CsraAssessment'
 import Transaction from './interfaces/prisonApi/Transaction'
 import { DamageObligationContainer } from './interfaces/prisonApi/DamageObligation'
@@ -170,13 +174,13 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
   }
 
-  async getAlerts(bookingId: number, queryParams?: AlertsListQueryParams): Promise<PagedList<Alert>> {
+  async getAlerts(bookingId: number, queryParams?: AlertsListQueryParams): Promise<PagedList<PrisonApiAlert>> {
     // Set defaults then apply queryParams
     const params: AlertsListQueryParams = {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }
-    return this.restClient.get<PagedList<Alert>>({
+    return this.restClient.get<PagedList<PrisonApiAlert>>({
       path: `/api/bookings/${bookingId}/alerts/v2`,
       query: mapToQueryString(params),
     })
@@ -316,26 +320,26 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getAlertTypes(): Promise<AlertType[]> {
-    return this.restClient.get<AlertType[]>({
+  async getAlertTypes(): Promise<PrisonApiAlertType[]> {
+    return this.restClient.get<PrisonApiAlertType[]>({
       path: `/api/reference-domains/domains/ALERT?withSubCodes=true`,
       headers: { 'page-limit': '1000' },
     })
   }
 
-  async createAlert(bookingId: number, alert: AlertForm): Promise<Alert> {
-    return this.restClient.post<Alert>({
+  async createAlert(bookingId: number, alert: PrisonApiCreateAlert): Promise<PrisonApiAlert> {
+    return this.restClient.post<PrisonApiAlert>({
       path: `/api/bookings/${bookingId}/alert`,
       data: alert,
     })
   }
 
-  async updateAlert(bookingId: number, alertId: number, alertChanges: AlertChanges): Promise<Alert> {
+  async updateAlert(bookingId: number, alertId: string, alertChanges: PrisonApiAlertChanges): Promise<PrisonApiAlert> {
     return (await this.restClient.put({
       path: `/api/bookings/${bookingId}/alert/${alertId}`,
       query: mapToQueryString({ lockTimeout: true }),
       data: alertChanges,
-    })) as Alert
+    })) as PrisonApiAlert
   }
 
   async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
@@ -520,8 +524,8 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getAlertDetails(bookingId: number, alertId: number): Promise<Alert> {
-    return this.restClient.get<Alert>({
+  async getAlertDetails(bookingId: number, alertId: string): Promise<PrisonApiAlert> {
+    return this.restClient.get<PrisonApiAlert>({
       path: `/api/bookings/${bookingId}/alerts/${alertId}`,
     })
   }

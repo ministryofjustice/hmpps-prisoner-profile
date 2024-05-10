@@ -13,7 +13,7 @@ export default class ChangeEndDatePage extends Page {
 
   endDate = (): PageElement => cy.get('[data-qa=end-date]')
 
-  comments = (): PageElement => cy.get('[data-qa=comments-field]')
+  comments = (): PageElement => cy.get('[data-qa=description-field]')
 
   changeEndDateSection = (): PageElement => cy.get('[data-qa=change-end-date-section]')
 
@@ -21,7 +21,7 @@ export default class ChangeEndDatePage extends Page {
 
   removeEndDateRadio = (): PageElement => cy.get('[data-qa=remove-end-date-radio] + label')
 
-  endDateField = (): PageElement => cy.get('#expiryDate')
+  endDateField = (): PageElement => cy.get('#activeTo')
 
   confirmButton = (): PageElement => cy.get('[data-qa=confirm-button]')
 

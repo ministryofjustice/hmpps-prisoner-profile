@@ -7,10 +7,11 @@ import { SortOption } from '../interfaces/SortParams'
 import AlertTypeFilter from './interfaces/alertsService/AlertsMetadata'
 import { formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
 import HmppsError from '../interfaces/HmppsError'
-import Alert, { AlertChanges, AlertForm } from '../data/interfaces/prisonApi/Alert'
+import { AlertForm } from '../data/interfaces/prisonApi/PrisonApiAlert'
 import { RestClientBuilder } from '../data'
 import PagedList, { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
-import AlertView from './interfaces/alertsService/AlertView'
+import { toAlert, toPrisonAlertChanges, toPrisonApiCreateAlert } from './mappers/alertMapper'
+import { Alert, AlertChanges } from '../data/interfaces/alertsApi/Alert'
 
 export default class AlertsService {
   constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
@@ -64,13 +65,11 @@ export default class AlertsService {
    * @param clientToken
    * @param prisonerData
    * @param queryParams
-   * @param canUpdateAlert
    */
   public async get(
     clientToken: string,
     prisonerData: Prisoner,
     queryParams: AlertsListQueryParams,
-    canUpdateAlert: boolean,
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
@@ -115,7 +114,7 @@ export default class AlertsService {
 
     const pagedAlerts =
       !errors.length && (shouldGetActiveAlerts || shouldGetInactiveAlerts)
-        ? await this.getPagedAlerts(prisonApiClient, prisonerData, queryParams, canUpdateAlert)
+        ? await this.getPagedAlerts(prisonApiClient, prisonerData, queryParams)
         : null
 
     // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
@@ -138,60 +137,47 @@ export default class AlertsService {
     prisonApiClient: PrisonApiClient,
     prisonerData: Prisoner,
     queryParams: AlertsListQueryParams,
-    canUpdateAlert: boolean,
-  ): Promise<PagedList<AlertView> | null> {
-    const pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
+  ): Promise<PagedList<Alert> | null> {
+    // TODO if new alerts API enabled use directly, if not use prison API and map results
 
-    const alertContentsForView = pagedAlerts.content.map<AlertView>((alert: Alert) => {
-      const alertUpdatable = canUpdateAlert && alert.active && alert.alertCode !== 'DOCGM'
-      return {
-        ...alert,
-        addMoreDetailsLinkUrl: alertUpdatable
-          ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/add-more-details`
-          : null,
-        closeAlertLinkUrl:
-          alertUpdatable && !alert.dateExpires
-            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/close`
-            : null,
-        changeEndDateLinkUrl:
-          alertUpdatable && alert.dateExpires
-            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertId}/change-end-date`
-            : null,
-        addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
-        expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
-      }
-    })
+    const pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
 
     return {
       ...pagedAlerts,
-      content: alertContentsForView,
+      content: pagedAlerts.content.map(toAlert),
     }
   }
 
-  public async createAlert(token: string, bookingId: number, alert: AlertForm) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  public async createAlert(
+    token: string,
+    { bookingId, prisonerNumber, alertForm }: { bookingId: number; prisonerNumber: string; alertForm: AlertForm },
+  ) {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    return prisonApiClient.createAlert(bookingId, {
-      ...alert,
-      alertDate: formatDateISO(parseDate(alert.alertDate)),
-      expiryDate: alert.expiryDate ? formatDateISO(parseDate(alert.expiryDate)) : null,
-    })
+    // TODO map alertForm to PrisonApiCreateAlert or Alerts API Model
+
+    const alert = await prisonApiClient.createAlert(bookingId, toPrisonApiCreateAlert(alertForm))
+
+    return toAlert(alert)
   }
 
-  public async getAlertDetails(token: string, bookingId: number, alertId: number) {
+  public async getAlertDetails(token: string, bookingId: number, alertId: string) {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     const alert = await prisonApiClient.getAlertDetails(bookingId, alertId)
 
     return {
-      ...alert,
-      addedByFullName: formatName(alert.addedByFirstName, undefined, alert.addedByLastName),
-      expiredByFullName: formatName(alert.expiredByFirstName, undefined, alert.expiredByLastName),
+      ...toAlert(alert),
     }
   }
 
-  public async updateAlert(token: string, bookingId: number, alertId: number, alertChanges: AlertChanges) {
+  public async updateAlert(token: string, bookingId: number, alertId: string, alertChanges: AlertChanges) {
+    // TODO if new alerts API enabled use directly, if not map params for use with prison API
+
     const prisonApiClient = this.prisonApiClientBuilder(token)
-    return prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
+    const prisonApiAlert = await prisonApiClient.updateAlert(bookingId, alertId, toPrisonAlertChanges(alertChanges))
+
+    return toAlert(prisonApiAlert)
   }
 }

@@ -60,7 +60,7 @@ export const inmateDetailMock: InmateDetail = {
   inactiveAlertCount: 1,
   alerts: [
     {
-      alertId: 123,
+      alertId: '123',
       alertType: 'P',
       alertTypeDescription: 'MAPPP Case',
       alertCode: 'P1',
@@ -73,7 +73,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'BILLINGTON',
     },
     {
-      alertId: 118,
+      alertId: '118',
       alertType: 'V',
       alertTypeDescription: 'Vulnerability',
       alertCode: 'VU',
@@ -86,7 +86,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'MIDDLETON',
     },
     {
-      alertId: 119,
+      alertId: '119',
       alertType: 'A',
       alertTypeDescription: 'Social Care',
       alertCode: 'AS',
@@ -99,7 +99,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'MIDDLETON',
     },
     {
-      alertId: 120,
+      alertId: '120',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'SH',
@@ -112,7 +112,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'MIDDLETON',
     },
     {
-      alertId: 115,
+      alertId: '115',
       alertType: 'M',
       alertTypeDescription: 'Medical',
       alertCode: 'MAS',
@@ -123,7 +123,7 @@ export const inmateDetailMock: InmateDetail = {
       active: true,
     },
     {
-      alertId: 116,
+      alertId: '116',
       alertType: 'D',
       alertTypeDescription: 'Security. Do not share with offender',
       alertCode: 'DCDO',
@@ -134,7 +134,7 @@ export const inmateDetailMock: InmateDetail = {
       active: true,
     },
     {
-      alertId: 121,
+      alertId: '121',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HC',
@@ -147,7 +147,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'MIDDLETON',
     },
     {
-      alertId: 91,
+      alertId: '91',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XCI',
@@ -160,7 +160,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'BULL',
     },
     {
-      alertId: 86,
+      alertId: '86',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XCU',
@@ -177,7 +177,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 63,
+      alertId: '63',
       alertType: 'F1',
       alertTypeDescription: 'Ex Armed Forces',
       alertCode: 'F1',
@@ -193,7 +193,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 61,
+      alertId: '61',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XSC',
@@ -206,7 +206,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'KIRK',
     },
     {
-      alertId: 65,
+      alertId: '65',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'HPI',
@@ -222,7 +222,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'ALEKSANDROVA',
     },
     {
-      alertId: 49,
+      alertId: '49',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XGANG',
@@ -235,7 +235,7 @@ export const inmateDetailMock: InmateDetail = {
       addedByLastName: 'KIRK',
     },
     {
-      alertId: 44,
+      alertId: '44',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XC',
@@ -251,7 +251,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 8,
+      alertId: '8',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XVL',
@@ -266,7 +266,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'MIDDLETON',
     },
     {
-      alertId: 7,
+      alertId: '7',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XA',
@@ -280,7 +280,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 122,
+      alertId: '122',
       alertType: 'L',
       alertTypeDescription: 'Care Leaver',
       alertCode: 'LFC21',
@@ -297,7 +297,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BILLINGTON',
     },
     {
-      alertId: 117,
+      alertId: '117',
       alertType: 'T',
       alertTypeDescription: 'Hold Against Transfer',
       alertCode: 'TG',
@@ -314,7 +314,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BILLINGTON',
     },
     {
-      alertId: 114,
+      alertId: '114',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RAIC',
@@ -331,7 +331,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 107,
+      alertId: '107',
       alertType: 'M',
       alertTypeDescription: 'Medical',
       alertCode: 'MSI',
@@ -348,7 +348,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 105,
+      alertId: '105',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RKS',
@@ -365,7 +365,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 98,
+      alertId: '98',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XR',
@@ -382,7 +382,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 99,
+      alertId: '99',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'URS',
@@ -399,7 +399,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 100,
+      alertId: '100',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'URCU',
@@ -416,7 +416,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 101,
+      alertId: '101',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XRF',
@@ -433,7 +433,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 102,
+      alertId: '102',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'USU',
@@ -450,7 +450,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 104,
+      alertId: '104',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XTACT',
@@ -467,7 +467,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 92,
+      alertId: '92',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RCON',
@@ -484,7 +484,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 90,
+      alertId: '90',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XCA',
@@ -501,7 +501,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 97,
+      alertId: '97',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'UPIU',
@@ -518,7 +518,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 96,
+      alertId: '96',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RNO121',
@@ -535,7 +535,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 93,
+      alertId: '93',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XCO',
@@ -552,7 +552,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 94,
+      alertId: '94',
       alertType: 'O',
       alertTypeDescription: 'Other',
       alertCode: 'CSIP',
@@ -569,7 +569,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 95,
+      alertId: '95',
       alertType: 'M',
       alertTypeDescription: 'Medical',
       alertCode: 'PEEP',
@@ -586,7 +586,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 87,
+      alertId: '87',
       alertType: 'T',
       alertTypeDescription: 'Hold Against Transfer',
       alertCode: 'TCPA',
@@ -604,7 +604,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 84,
+      alertId: '84',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XEL',
@@ -621,7 +621,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 83,
+      alertId: '83',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RTP',
@@ -638,7 +638,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 79,
+      alertId: '79',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RLG',
@@ -655,7 +655,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 69,
+      alertId: '69',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RCDR',
@@ -672,7 +672,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 62,
+      alertId: '62',
       alertType: 'D',
       alertTypeDescription: 'Security. Do not share with offender',
       alertCode: 'DOCGM',
@@ -690,7 +690,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 64,
+      alertId: '64',
       alertType: 'P',
       alertTypeDescription: 'MAPPP Case',
       alertCode: 'PC1',
@@ -707,7 +707,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 47,
+      alertId: '47',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XHT',
@@ -724,7 +724,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 89,
+      alertId: '89',
       alertType: 'L',
       alertTypeDescription: 'Care Leaver',
       alertCode: 'LCE',
@@ -741,7 +741,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BILLINGTON',
     },
     {
-      alertId: 108,
+      alertId: '108',
       alertType: 'M',
       alertTypeDescription: 'Medical',
       alertCode: 'MAS',
@@ -758,7 +758,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'NICHOLS',
     },
     {
-      alertId: 103,
+      alertId: '103',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XSA',
@@ -775,7 +775,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 113,
+      alertId: '113',
       alertType: 'A',
       alertTypeDescription: 'Social Care',
       alertCode: 'AS',
@@ -792,7 +792,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 112,
+      alertId: '112',
       alertType: 'P',
       alertTypeDescription: 'MAPPP Case',
       alertCode: 'PVN',
@@ -809,7 +809,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 109,
+      alertId: '109',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -826,7 +826,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 111,
+      alertId: '111',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA2',
@@ -843,7 +843,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 110,
+      alertId: '110',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA1',
@@ -860,7 +860,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 88,
+      alertId: '88',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA1',
@@ -877,7 +877,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 66,
+      alertId: '66',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -895,7 +895,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 106,
+      alertId: '106',
       alertType: 'O',
       alertTypeDescription: 'Other',
       alertCode: 'ONCR',
@@ -912,7 +912,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BILLINGTON',
     },
     {
-      alertId: 85,
+      alertId: '85',
       alertType: 'T',
       alertTypeDescription: 'Hold Against Transfer',
       alertCode: 'TG',
@@ -929,7 +929,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 82,
+      alertId: '82',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA1',
@@ -946,7 +946,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 80,
+      alertId: '80',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XR',
@@ -963,7 +963,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 57,
+      alertId: '57',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XTACT',
@@ -980,7 +980,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 81,
+      alertId: '81',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RPB',
@@ -997,7 +997,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 78,
+      alertId: '78',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RTP',
@@ -1014,7 +1014,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 46,
+      alertId: '46',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XSA',
@@ -1031,7 +1031,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 45,
+      alertId: '45',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XCU',
@@ -1048,7 +1048,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 26,
+      alertId: '26',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RSS',
@@ -1065,7 +1065,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 77,
+      alertId: '77',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RLG',
@@ -1082,7 +1082,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'ALEKSANDROVA',
     },
     {
-      alertId: 59,
+      alertId: '59',
       alertType: 'L',
       alertTypeDescription: 'Care Leaver',
       alertCode: 'LFC21',
@@ -1099,7 +1099,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 76,
+      alertId: '76',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'UPIU',
@@ -1116,7 +1116,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 74,
+      alertId: '74',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'USU',
@@ -1133,7 +1133,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 71,
+      alertId: '71',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'URS',
@@ -1150,7 +1150,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 72,
+      alertId: '72',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'URCU',
@@ -1167,7 +1167,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 75,
+      alertId: '75',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'UPIU',
@@ -1184,7 +1184,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'LEE',
     },
     {
-      alertId: 73,
+      alertId: '73',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'USU',
@@ -1201,7 +1201,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'LEE',
     },
     {
-      alertId: 70,
+      alertId: '70',
       alertType: 'U',
       alertTypeDescription: 'COVID unit management',
       alertCode: 'UPIU',
@@ -1218,7 +1218,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'LEE',
     },
     {
-      alertId: 67,
+      alertId: '67',
       alertType: 'V',
       alertTypeDescription: 'Vulnerability',
       alertCode: 'VJOP',
@@ -1235,7 +1235,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 68,
+      alertId: '68',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XSDEPORT',
@@ -1252,7 +1252,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 48,
+      alertId: '48',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XEL',
@@ -1269,7 +1269,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 10,
+      alertId: '10',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'RDV',
@@ -1284,7 +1284,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 2,
+      alertId: '2',
       alertType: 'O',
       alertTypeDescription: 'Other',
       alertCode: 'OPPO',
@@ -1299,7 +1299,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 60,
+      alertId: '60',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XB',
@@ -1316,7 +1316,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'BULL',
     },
     {
-      alertId: 58,
+      alertId: '58',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA1',
@@ -1333,7 +1333,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 56,
+      alertId: '56',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1350,7 +1350,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 53,
+      alertId: '53',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XCO',
@@ -1367,7 +1367,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 55,
+      alertId: '55',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1384,7 +1384,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 54,
+      alertId: '54',
       alertType: 'V',
       alertTypeDescription: 'Vulnerability',
       alertCode: 'V45',
@@ -1401,7 +1401,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 52,
+      alertId: '52',
       alertType: 'V',
       alertTypeDescription: 'Vulnerability',
       alertCode: 'V45',
@@ -1418,7 +1418,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 51,
+      alertId: '51',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XTACT',
@@ -1435,7 +1435,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 50,
+      alertId: '50',
       alertType: 'R',
       alertTypeDescription: 'Risk',
       alertCode: 'ROP',
@@ -1452,7 +1452,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 43,
+      alertId: '43',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1468,7 +1468,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 29,
+      alertId: '29',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XR',
@@ -1484,7 +1484,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'KIRK',
     },
     {
-      alertId: 42,
+      alertId: '42',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA1',
@@ -1501,7 +1501,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 41,
+      alertId: '41',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1517,7 +1517,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 39,
+      alertId: '39',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XNR',
@@ -1533,7 +1533,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 40,
+      alertId: '40',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1550,7 +1550,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 38,
+      alertId: '38',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1567,7 +1567,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 37,
+      alertId: '37',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1584,7 +1584,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 36,
+      alertId: '36',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1601,7 +1601,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 35,
+      alertId: '35',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1618,7 +1618,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 34,
+      alertId: '34',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1635,7 +1635,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 33,
+      alertId: '33',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1652,7 +1652,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 32,
+      alertId: '32',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1669,7 +1669,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 21,
+      alertId: '21',
       alertType: 'T',
       alertTypeDescription: 'Hold Against Transfer',
       alertCode: 'TM',
@@ -1686,7 +1686,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 31,
+      alertId: '31',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XNR',
@@ -1702,7 +1702,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 30,
+      alertId: '30',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1719,7 +1719,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 28,
+      alertId: '28',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1735,7 +1735,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 27,
+      alertId: '27',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1751,7 +1751,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 25,
+      alertId: '25',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1768,7 +1768,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 24,
+      alertId: '24',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1785,7 +1785,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 23,
+      alertId: '23',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1802,7 +1802,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 22,
+      alertId: '22',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1819,7 +1819,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 20,
+      alertId: '20',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1836,7 +1836,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 19,
+      alertId: '19',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1853,7 +1853,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 18,
+      alertId: '18',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1870,7 +1870,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 17,
+      alertId: '17',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1887,7 +1887,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 16,
+      alertId: '16',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1904,7 +1904,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 15,
+      alertId: '15',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1921,7 +1921,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 14,
+      alertId: '14',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1938,7 +1938,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 13,
+      alertId: '13',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1955,7 +1955,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 12,
+      alertId: '12',
       alertType: 'X',
       alertTypeDescription: 'Security',
       alertCode: 'XNR',
@@ -1971,7 +1971,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 1,
+      alertId: '1',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -1987,7 +1987,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 11,
+      alertId: '11',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -2001,7 +2001,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 9,
+      alertId: '9',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -2016,7 +2016,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 6,
+      alertId: '6',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -2031,7 +2031,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 5,
+      alertId: '5',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -2046,7 +2046,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 4,
+      alertId: '4',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -2060,7 +2060,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 3,
+      alertId: '3',
       alertType: 'H',
       alertTypeDescription: 'Self Harm',
       alertCode: 'HA',
@@ -2074,7 +2074,7 @@ export const inmateDetailMock: InmateDetail = {
       expiredByLastName: 'CNOMIS',
     },
     {
-      alertId: 300,
+      alertId: '300',
       alertType: 'H',
       alertTypeDescription: 'Medical',
       alertCode: 'HID',

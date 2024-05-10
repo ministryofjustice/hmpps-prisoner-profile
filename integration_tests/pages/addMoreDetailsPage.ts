@@ -13,7 +13,7 @@ export default class AddMoreDetailsPage extends Page {
 
   endDate = (): PageElement => cy.get('[data-qa=end-date]')
 
-  comments = (): PageElement => cy.get('[data-qa=comments-field]')
+  comments = (): PageElement => cy.get('[data-qa=description-field]')
 
   updateButton = (): PageElement => cy.get('[data-qa=update-button]')
 

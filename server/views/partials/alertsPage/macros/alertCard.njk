@@ -1,15 +1,15 @@
 {% macro alertCard(alert) %}
 <div class="hmpps-alert-card-list-item" role="listitem">
     <div class="hmpps-alert-card-list-item__content">
-        <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertTypeDescription }}</div>
-        <div class="hmpps-alert-card-list-item__title">{{ alert.alertCodeDescription }}</div>
-        <pre class="hmpps-alert-card-list-item__notes govuk-body">{{ alert.comment }}</pre>
-        <div class="hmpps-alert-card-list-item__metadata"><span>Start date:</span> {{ alert.dateCreated | formatDate }} {% if alert.addedByFullName %} by {{ alert.addedByFullName }} {% endif %}</div>
-        {% if alert.modifiedDateTime %}
-        <div class="hmpps-alert-card-list-item__metadata"><span>Last updated:</span> {{ alert.modifiedDateTime | formatDate }} {% if alert.expiredByFullName %} by {{ alert.expiredByFullName }} {% endif %}</div>
+        <div class="hmpps-alert-card-list-item__sub-title">{{ alert.alertCode.alertTypeDescription }}</div>
+        <div class="hmpps-alert-card-list-item__title">{{ alert.alertCode.description }}</div>
+        <pre class="hmpps-alert-card-list-item__notes govuk-body">{{ alert.description }}</pre>
+        <div class="hmpps-alert-card-list-item__metadata"><span>Start date:</span> {{ alert.activeFrom | formatDate }} {% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }} {% endif %}</div>
+        {% if alert.lastModifiedAt %}
+        <div class="hmpps-alert-card-list-item__metadata"><span>Last updated:</span> {{ alert.lastModifiedAt | formatDate }} {% if alert.lastModifiedByDisplayName %} by {{ alert.lastModifiedByDisplayName }} {% endif %}</div>
         {% endif %}
-        {% if alert.dateExpires %}
-            <div class="hmpps-alert-card-list-item__metadata"><span>End date:</span> {{ alert.dateExpires | formatDate }} {% if alert.expiredByFullName %} by {{ alert.expiredByFullName }} {% endif %}</div>
+        {% if alert.activeTo %}
+            <div class="hmpps-alert-card-list-item__metadata"><span>End date:</span> {{ alert.activeTo | formatDate }} {% if alert.lastModifiedByDisplayName %} by {{ alert.lastModifiedByDisplayName }} {% else %} by {{ alert.createdByDisplayName }} {% endif %}</div>
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">

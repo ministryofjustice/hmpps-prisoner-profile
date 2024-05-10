@@ -7,12 +7,15 @@ import { Role } from '../data/enums/role'
 import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
-import Alert, { AlertCode, AlertForm, AlertType } from '../data/interfaces/prisonApi/Alert'
+import { AlertForm, PrisonApiAlertCode, PrisonApiAlertType } from '../data/interfaces/prisonApi/PrisonApiAlert'
 import ReferenceDataService from '../services/referenceDataService'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import AlertView from '../services/interfaces/alertsService/AlertView'
+import { Alert } from '../data/interfaces/alertsApi/Alert'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -54,7 +57,27 @@ export default class AlertsController {
     }
 
     // Get alerts based on given query params
-    const alertsPageData = await this.alertsService.get(clientToken, prisonerData, queryParams, canUpdateAlert)
+    const { pagedAlerts, ...alertsPageData } = await this.alertsService.get(clientToken, prisonerData, queryParams)
+
+    // Insert correct links into alerts
+    const alertsList = pagedAlerts?.content.map<AlertView>((alert: Alert) => {
+      const alertUpdatable = canUpdateAlert && alert.isActive && alert.alertCode.code !== 'DOCGM'
+      return {
+        ...alert,
+        addMoreDetailsLinkUrl: alertUpdatable
+          ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertUuid}/add-more-details`
+          : null,
+        closeAlertLinkUrl:
+          alertUpdatable && !alert.activeTo
+            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertUuid}/close`
+            : null,
+        changeEndDateLinkUrl:
+          alertUpdatable && alert.activeTo
+            ? `/prisoner/${prisonerData.prisonerNumber}/alerts/${alert.alertUuid}/change-end-date`
+            : null,
+      }
+    })
+
     const showingAll = queryParams.showAll
 
     this.auditService
@@ -73,6 +96,7 @@ export default class AlertsController {
       pageTitle: 'Alerts',
       ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'alerts'),
       ...alertsPageData,
+      alertsList,
       showingAll,
       addAlertLinkUrl,
       activeTab: isActive,
@@ -80,16 +104,17 @@ export default class AlertsController {
   }
 
   public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
-    const types = await this.referenceDataService.getAlertTypes(req.middleware.clientToken)
+    const types = await this.referenceDataService.getAlertTypes(req.middleware.clientToken) // TODO get from alerts service and choose which API ???
 
     // Get data from middleware
     const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId, cellLocation } =
       req.middleware.prisonerData
     const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
+    // TODO filter out of the dropdown rather than allow error
     const existingAlerts = alerts
-      .filter((alert: Alert) => !alert.expired)
-      .map((alert: Alert) => alert.alertCode)
+      .filter((alert: Prisoner['alerts'][0]) => alert.active)
+      .map((alert: Prisoner['alerts'][0]) => alert.alertCode)
       .join(',')
 
     // Initialise form
@@ -102,8 +127,8 @@ export default class AlertsController {
           existingAlerts,
           alertType: null,
           alertCode: null,
-          comment: '',
-          alertDate: formatDate(now.toISOString(), 'short'),
+          description: '',
+          activeFrom: formatDate(now.toISOString(), 'short'),
         }
     const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType)
     const errors = req.flash('errors')
@@ -138,18 +163,18 @@ export default class AlertsController {
   public post(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const { bookingId, existingAlerts, alertType, alertCode, comment, alertDate, expiryDate } = req.body
-      const alert = {
+      const { bookingId, existingAlerts, alertType, alertCode, description, activeFrom, activeTo } = req.body
+      const alertForm = {
         alertType,
         alertCode,
-        comment,
-        alertDate,
-        expiryDate,
+        description,
+        activeFrom,
+        activeTo,
       }
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.createAlert(res.locals.user.token, bookingId, alert)
+          await this.alertsService.createAlert(res.locals.user.token, { bookingId, prisonerNumber, alertForm })
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -158,7 +183,7 @@ export default class AlertsController {
       }
 
       if (errors.length) {
-        req.flash('alert', { ...alert, bookingId, existingAlerts })
+        req.flash('alert', { ...alertForm, bookingId, existingAlerts })
         req.flash('errors', errors)
         return res.redirect(`/prisoner/${prisonerNumber}/add-alert`)
       }
@@ -170,7 +195,7 @@ export default class AlertsController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.Alert,
-          details: {},
+          details: { alertForm },
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -188,10 +213,10 @@ export default class AlertsController {
       const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const alerts: Alert[] = await Promise.all(
-        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)),
+        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, String(alertId))),
       )
       // Sort by created date DESC
-      alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
+      alerts.sort((a, b) => sortByDateTime(b.activeFrom, a.activeFrom))
 
       return res.render('pages/alerts/alertDetailsPage', {
         pageTitle: 'Alerts',
@@ -214,10 +239,10 @@ export default class AlertsController {
       const alertIds = req.query.ids
 
       const alerts: Alert[] = await Promise.all(
-        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)),
+        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, String(alertId))),
       )
       // Sort by created date DESC
-      alerts.sort((a, b) => sortByDateTime(b.dateCreated, a.dateCreated))
+      alerts.sort((a, b) => sortByDateTime(b.activeFrom, a.activeFrom))
 
       return res.render('partials/alerts/alertDetails', {
         alerts,
@@ -235,10 +260,10 @@ export default class AlertsController {
       req.middleware.prisonerData
     const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)
+    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, alertId)
 
     // If alert already closed, redirect
-    if (alert.expired) {
+    if (!alert.isActive) {
       return res.render('pages/alerts/alreadyClosed', {
         pageTitle: 'Alert already closed',
         refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -247,10 +272,10 @@ export default class AlertsController {
 
     // Initialise form
     const alertFlash = req.flash('alert')
-    const { comment } = alertFlash?.length ? (alertFlash[0] as never) : { comment: alert.comment }
+    const { description } = alertFlash?.length ? (alertFlash[0] as never) : { description: alert.description }
     const formValues = {
       bookingId,
-      comment,
+      description,
     }
 
     const errors = req.flash('errors') || []
@@ -282,19 +307,19 @@ export default class AlertsController {
   public postAddMoreDetails(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber, alertId } = req.params
-      const { bookingId, comment } = req.body
+      const { bookingId, description } = req.body
 
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, { comment })
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, { description })
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
         }
       }
 
       if (errors.length) {
-        req.flash('alert', { comment })
+        req.flash('alert', { description })
         req.flash('errors', errors)
         return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/add-more-details`)
       }
@@ -306,7 +331,7 @@ export default class AlertsController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.AlertAddMoreDetails,
-          details: { comment },
+          details: { description },
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -322,10 +347,10 @@ export default class AlertsController {
       req.middleware.prisonerData
     const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)
+    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, alertId)
 
     // If alert already closed, redirect
-    if (alert.expired) {
+    if (!alert.isActive) {
       return res.render('pages/alerts/alreadyClosed', {
         pageTitle: 'Alert already closed',
         refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -334,17 +359,17 @@ export default class AlertsController {
 
     // Initialise form
     const alertFlash = req.flash('alert')
-    const { comment, expiryDate, today } = alertFlash?.length
+    const { description, activeTo, today } = alertFlash?.length
       ? (alertFlash[0] as never)
       : {
-          comment: alert.comment,
-          expiryDate: formatDate(alert.dateExpires, 'short'),
-          today: alert.dateExpires ? 'no' : 'yes',
+          description: alert.description,
+          activeTo: formatDate(alert.activeTo, 'short'),
+          today: alert.activeTo ? 'no' : 'yes',
         }
     const formValues = {
       bookingId,
-      comment,
-      expiryDate,
+      description,
+      activeTo,
       today,
     }
 
@@ -378,13 +403,13 @@ export default class AlertsController {
   public postCloseAlert(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber, alertId } = req.params
-      const { bookingId, comment, expiryDate, today } = req.body
+      const { bookingId, description, activeTo, today } = req.body
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, {
-            comment,
-            expiryDate: today === 'yes' ? formatDateISO(new Date()) : formatDateISO(parseDate(expiryDate)),
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, {
+            description,
+            activeTo: today === 'yes' ? formatDateISO(new Date()) : formatDateISO(parseDate(activeTo)),
           })
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
@@ -392,7 +417,7 @@ export default class AlertsController {
       }
 
       if (errors.length) {
-        req.flash('alert', { comment, expiryDate, today })
+        req.flash('alert', { description, activeTo, today })
         req.flash('errors', errors)
         return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/close`)
       }
@@ -407,7 +432,7 @@ export default class AlertsController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.AlertClose,
-          details: { comment, expiryDate },
+          details: { description, activeTo },
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -423,10 +448,10 @@ export default class AlertsController {
       req.middleware.prisonerData
     const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, +alertId)
+    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, alertId)
 
     // If alert already closed, redirect
-    if (alert.expired) {
+    if (!alert.isActive) {
       return res.render('pages/alerts/alreadyClosed', {
         pageTitle: 'Alert already closed',
         refererUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -435,17 +460,17 @@ export default class AlertsController {
 
     // Initialise form
     const alertFlash = req.flash('alert')
-    const { comment, expiryDate, removeEndDate } = alertFlash?.length
+    const { description, activeTo, removeEndDate } = alertFlash?.length
       ? (alertFlash[0] as never)
       : {
-          comment: alert.comment,
-          expiryDate: formatDate(alert.dateExpires, 'short'),
+          description: alert.description,
+          activeTo: formatDate(alert.activeTo, 'short'),
           removeEndDate: '',
         }
     const formValues = {
       bookingId,
-      comment,
-      expiryDate,
+      description,
+      activeTo,
       removeEndDate,
     }
 
@@ -479,14 +504,13 @@ export default class AlertsController {
   public postChangeEndDate(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber, alertId } = req.params
-      const { bookingId, comment, expiryDate, removeEndDate } = req.body
+      const { bookingId, description, activeTo, removeEndDate } = req.body
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, +alertId, {
-            comment,
-            expiryDate: removeEndDate === 'yes' ? null : formatDateISO(parseDate(expiryDate)),
-            removeExpiryDate: removeEndDate === 'yes',
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, {
+            description,
+            activeTo: removeEndDate === 'yes' ? null : formatDateISO(parseDate(activeTo)),
           })
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
@@ -494,13 +518,13 @@ export default class AlertsController {
       }
 
       if (errors.length) {
-        req.flash('alert', { comment, expiryDate, removeEndDate })
+        req.flash('alert', { description, activeTo, removeEndDate })
         req.flash('errors', errors)
         return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/change-end-date`)
       }
 
       req.flash('flashMessage', {
-        text: removeEndDate === 'no' && isToday(parseDate(expiryDate)) ? 'Alert closed' : 'Alert updated',
+        text: removeEndDate === 'no' && isToday(parseDate(activeTo)) ? 'Alert closed' : 'Alert updated',
         type: FlashMessageType.success,
       })
       this.auditService
@@ -509,7 +533,7 @@ export default class AlertsController {
           prisonerNumber,
           correlationId: req.id,
           action: PostAction.AlertChangeEndDate,
-          details: { comment, expiryDate, removeEndDate },
+          details: { description, activeTo, removeEndDate },
         })
         .catch(error => logger.error(error))
       return res.redirect(`/prisoner/${prisonerNumber}/alerts/active`)
@@ -522,7 +546,7 @@ export default class AlertsController {
    * @param types - list of AlertType
    * @param type - preselected alert type to determine list of codes
    */
-  private mapAlertTypes(types: AlertType[], type?: string) {
+  private mapAlertTypes(types: PrisonApiAlertType[], type?: string) {
     const alertTypes = this.mapActiveSortedAlertTypes(types)
 
     const typeCodeMap: { [key: string]: { value: string; text: string }[] } = types.reduce(
@@ -543,7 +567,9 @@ export default class AlertsController {
     return { alertTypes, alertCodes, typeCodeMap }
   }
 
-  private mapActiveSortedAlertTypes(alertTypes: (AlertType | AlertCode)[]): { text: string; value: string }[] {
+  private mapActiveSortedAlertTypes(
+    alertTypes: (PrisonApiAlertType | PrisonApiAlertCode)[],
+  ): { text: string; value: string }[] {
     return alertTypes
       ?.filter(alertType => alertType.activeFlag === 'Y' && alertType.code !== 'DOCGM') // Exclude 'OCG Nominal - Do not share'
       .map(alertType => ({

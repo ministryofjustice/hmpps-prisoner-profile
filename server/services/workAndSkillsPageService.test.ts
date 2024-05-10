@@ -20,7 +20,7 @@ import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
-import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
+import { pagedActivePrisonApiAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
@@ -32,7 +32,7 @@ describe('WorkAndSkillsService', () => {
 
   const prisonApiClient = prisonApiClientMock()
   prisonApiClient.getAccountBalances = jest.fn(async () => accountBalancesMock)
-  prisonApiClient.getAlerts = jest.fn(async () => pagedActiveAlertsMock)
+  prisonApiClient.getAlerts = jest.fn(async () => pagedActivePrisonApiAlertsMock)
   prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
   prisonApiClient.getEventsScheduledForToday = jest.fn(async () => dummyScheduledEvents)
   prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)

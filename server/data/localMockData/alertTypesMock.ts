@@ -1,6 +1,6 @@
-import { AlertType } from '../interfaces/prisonApi/Alert'
+import { PrisonApiAlertType } from '../interfaces/prisonApi/PrisonApiAlert'
 
-export const alertTypesMock: AlertType[] = [
+export const alertTypesMock: PrisonApiAlertType[] = [
   {
     code: 'A',
     description: 'AAA',

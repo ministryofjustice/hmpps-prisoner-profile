@@ -1,8 +1,8 @@
 import AlertTypeFilter from './AlertsMetadata'
 import HmppsError from '../../../interfaces/HmppsError'
 import ListMetadata from '../../../interfaces/ListMetadata'
-import Alert from '../../../data/interfaces/prisonApi/Alert'
 import PagedList, { AlertsListQueryParams } from '../../../data/interfaces/prisonApi/PagedList'
+import { Alert } from '../../../data/interfaces/alertsApi/Alert'
 
 export default interface AlertsPageData {
   pagedAlerts: PagedList<Alert>

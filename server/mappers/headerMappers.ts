@@ -13,10 +13,10 @@ import config from '../config'
 import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
-import Alert from '../data/interfaces/prisonApi/Alert'
 import AlertFlagLabel from '../interfaces/AlertFlagLabels'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import PrisonApiAlert from '../data/interfaces/prisonApi/PrisonApiAlert'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: HmppsUser) {
   const { userRoles } = user
@@ -90,7 +90,7 @@ export function mapAlerts(inmateDetail: InmateDetail, alertFlags: AlertFlagLabel
   return alertFlags
     .map(flag => {
       const alertIds = inmateDetail.alerts
-        .filter((alert: Alert) => alert.active && !alert.expired && flag.alertCodes.includes(alert.alertCode))
+        .filter((alert: PrisonApiAlert) => alert.active && !alert.expired && flag.alertCodes.includes(alert.alertCode))
         .map(alert => alert.alertId)
       return { ...flag, alertIds } as AlertFlagLabel
     })

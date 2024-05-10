@@ -21,11 +21,11 @@ import { personalCareNeedsMock, xrayCareNeeds } from '../../server/data/localMoc
 import { mockReasonableAdjustments } from '../../server/data/localMockData/reasonableAdjustments'
 import {
   emptyAlertsMock,
-  pagedActiveAlertsMock,
-  pagedActiveAlertsMockFiltered,
-  pagedActiveAlertsMockPage2,
-  pagedActiveAlertsMockSorted,
-  pagedInactiveAlertsMock,
+  pagedActivePrisonApiAlertsMock,
+  pagedActivePrisonApiAlertsMockFiltered,
+  pagedActivePrisonApiAlertsMockPage2,
+  pagedActivePrisonApiAlertsMockSorted,
+  pagedInactivePrisonApiAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
 import { CourtCasesMock, CourtCasesUnsentencedMockA } from '../../server/data/localMockData/courtCaseMock'
 import { OffenceHistoryMock } from '../../server/data/localMockData/offenceHistoryMock'
@@ -73,7 +73,7 @@ import agenciesDetails from '../../server/data/localMockData/agenciesDetails'
 import movementsMock from '../../server/data/localMockData/movementsData'
 import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/offenderAttendanceHistoryMock'
 import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
-import { alertDetailsExpiresMock, alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
+import { alertDetailsExpiresMock, prisonApiAlertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
 
 import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
 import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
@@ -321,7 +321,7 @@ export default {
   stubActiveAlerts: (bookingId: number) => {
     let jsonResp
     if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMock
+      jsonResp = pagedActivePrisonApiAlertsMock
     } else if (bookingId === 1234567) {
       jsonResp = emptyAlertsMock
     }
@@ -343,7 +343,7 @@ export default {
   stubActiveAlertsPage2: (bookingId: number) => {
     let jsonResp
     if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMockPage2
+      jsonResp = pagedActivePrisonApiAlertsMockPage2
     } else if (bookingId === 1234567) {
       jsonResp = emptyAlertsMock
     }
@@ -365,7 +365,7 @@ export default {
   stubActiveAlertsSorted: (bookingId: number) => {
     let jsonResp
     if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMockSorted
+      jsonResp = pagedActivePrisonApiAlertsMockSorted
     } else if (bookingId === 1234567) {
       jsonResp = emptyAlertsMock
     }
@@ -387,7 +387,7 @@ export default {
   stubActiveAlertsFiltered: (bookingId: number) => {
     let jsonResp
     if (bookingId === 1102484) {
-      jsonResp = pagedActiveAlertsMockFiltered
+      jsonResp = pagedActivePrisonApiAlertsMockFiltered
     } else if (bookingId === 1234567) {
       jsonResp = emptyAlertsMock
     }
@@ -417,7 +417,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedInactiveAlertsMock,
+        jsonBody: pagedInactivePrisonApiAlertsMock,
       },
     })
   },
@@ -893,7 +893,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedActiveAlertsMock.content[0],
+        jsonBody: pagedActivePrisonApiAlertsMock.content[0],
       },
     })
   },
@@ -1320,7 +1320,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: alertDetailsMock,
+        jsonBody: prisonApiAlertDetailsMock,
       },
     })
   },
@@ -1431,7 +1431,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedActiveAlertsMock.content[0],
+        jsonBody: pagedActivePrisonApiAlertsMock.content[0],
       },
     })
   },
@@ -1447,7 +1447,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: pagedActiveAlertsMock.content[0],
+        jsonBody: pagedActivePrisonApiAlertsMock.content[0],
       },
     })
   },
