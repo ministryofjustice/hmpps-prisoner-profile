@@ -90,7 +90,13 @@ export default (
 
   if (
     userHasRoles(
-      [Role.PathfinderApproval, Role.PathfinderStdPrison, Role.PathfinderStdProbation, Role.PathfinderHQ],
+      [
+        Role.PathfinderApproval,
+        Role.PathfinderStdPrison,
+        Role.PathfinderStdProbation,
+        Role.PathfinderHQ,
+        Role.PathfinderUser,
+      ],
       user.userRoles,
     ) &&
     !pathfinderNominal
