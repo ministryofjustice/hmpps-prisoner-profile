@@ -2,9 +2,8 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { Role } from '../data/enums/role'
 import { canAddCaseNotes } from '../utils/roleHelpers'
-import { formatLocation, formatName, userHasRoles } from '../utils/utils'
+import { formatLocation, formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
@@ -18,6 +17,7 @@ import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import getUserPermissionsForPrisoner from '../utils/getUserPermissionsForPrisoner'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -47,11 +47,9 @@ export default class CaseNotesController {
       const { prisonerData } = req.middleware
 
       // Set role based permissions
-      const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
-      const canViewSensitiveCaseNotes = userHasRoles(
-        [Role.PomUser, Role.ViewSensitiveCaseNotes, Role.AddSensitiveCaseNotes],
-        res.locals.user.userRoles,
-      )
+      const userPermissions = getUserPermissionsForPrisoner(res.locals.user, prisonerData)
+      const canDeleteSensitiveCaseNotes = userPermissions.caseNotes.sensitive.delete
+      const canViewSensitiveCaseNotes = userPermissions.caseNotes.sensitive.view
 
       const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
         ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
@@ -240,11 +238,9 @@ export default class CaseNotesController {
       const { clientToken } = req.middleware
       const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
-      const canEditSensitiveCaseNotes = userHasRoles(
-        [Role.PomUser, Role.AddSensitiveCaseNotes],
-        res.locals.user.userRoles,
-      )
+      const userPermissions = getUserPermissionsForPrisoner(res.locals.user, req.middleware.prisonerData)
 
+      const canEditSensitiveCaseNotes = userPermissions.caseNotes.sensitive.edit
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
 
       if (currentCaseNote.sensitive && !canEditSensitiveCaseNotes) {
@@ -299,10 +295,8 @@ export default class CaseNotesController {
       const { text, isExternal, currentLength, username } = req.body
       const { clientToken } = req.middleware
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
-      const canEditSensitiveCaseNotes = userHasRoles(
-        [Role.PomUser, Role.AddSensitiveCaseNotes],
-        res.locals.user.userRoles,
-      )
+      const userPermissions = getUserPermissionsForPrisoner(res.locals.user, req.middleware.prisonerData)
+      const canEditSensitiveCaseNotes = userPermissions.caseNotes.sensitive.edit
 
       if (currentCaseNote.sensitive && !canEditSensitiveCaseNotes) {
         logger.info(`User not permitted to edit sensitive case notes`)

@@ -2,8 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { addDays, isToday, subDays } from 'date-fns'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { Role } from '../data/enums/role'
-import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
+import { formatLocation, formatName, sortByDateTime } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
 import Alert, { AlertCode, AlertForm, AlertType } from '../data/interfaces/prisonApi/Alert'
@@ -12,6 +11,7 @@ import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import getUserPermissionsForPrisoner from '../utils/getUserPermissionsForPrisoner'
 
 /**
  * Parse request for alerts page and orchestrate response
@@ -44,8 +44,8 @@ export default class AlertsController {
     }
 
     // Set role based permissions
-    const canUpdateAlert =
-      userHasRoles([Role.UpdateAlert], res.locals.user.userRoles) && userCanEdit(res.locals.user, prisonerData)
+    const userPermissions = getUserPermissionsForPrisoner(res.locals.user, prisonerData)
+    const canUpdateAlert = userPermissions.alerts.edit
 
     let addAlertLinkUrl: string
     if (canUpdateAlert) {

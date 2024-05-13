@@ -63,11 +63,11 @@ export default function editRouter(services: Services): Router {
 
       if (errors.length === 0) {
         return onSuccess(req, res)
-      } else {
-        req.flash('fieldValue', editField)
-        req.flash('errors', errors)
-        return res.redirect(editRoute(prisonerNumber))
       }
+
+      req.flash('fieldValue', editField)
+      req.flash('errors', errors)
+      return res.redirect(editRoute(prisonerNumber))
     }
   }
 
@@ -100,103 +100,64 @@ export default function editRouter(services: Services): Router {
     post: {
       editRoute: prisonerNumber => `/prisoner/${prisonerNumber}/edit/height`,
       validate: (fieldValue, errors) => {
-        const height = parseInt(fieldValue)
+        const height = parseInt(fieldValue, 10)
         if (Number.isNaN(height) || height <= 0) {
           errors.push({ text: 'Enter a number greater than 0' })
         }
       },
       onSuccess: (req, res) => {
         const { prisonerNumber } = req.params
-        console.log('Height edited')
         req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
         return res.redirect(`/prisoner/${prisonerNumber}/personal`)
       },
     },
   })
 
-  get(
-    '/prisoner/:prisonerNumber/edit/weight',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    getField<number>({
+  singleFieldPage<number>('/prisoner/:prisonerNumber/edit/weight', {
+    get: {
       fieldName: 'weight',
       pageTitle: 'Edit weight',
       fieldValue: (prisoner, _inmateDetail) => prisoner.weightKilograms,
       fieldSuffix: 'kg',
-    }),
-  )
-
-  post(
-    '/prisoner/:prisonerNumber/edit/weight',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    async (req, res, next) => {
-      const { prisonerNumber } = req.params
-      const { editField } = req.body
-      const errors: HmppsError[] = []
-
-      const validate = (str: string, errors: HmppsError[]) => {
-        const weight = parseFloat(str)
+    },
+    post: {
+      editRoute: prisonerNumber => `/prisoner/${prisonerNumber}/edit/weight`,
+      validate: (fieldValue, errors) => {
+        const weight = parseInt(fieldValue, 10)
         if (Number.isNaN(weight) || weight <= 0) {
           errors.push({ text: 'Enter a number greater than 0' })
         }
-      }
-
-      validate(editField, errors)
-
-      if (errors.length === 0) {
-        console.log('Weight edited')
+      },
+      onSuccess: (req, res) => {
+        const { prisonerNumber } = req.params
         req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
         return res.redirect(`/prisoner/${prisonerNumber}/personal`)
-      } else {
-        req.flash('fieldValue', editField)
-        req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/edit/weight`)
-      }
+      },
     },
-  )
+  })
 
-  get(
-    '/prisoner/:prisonerNumber/edit/number-of-children',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    getField<string>({
+  singleFieldPage<string>('/prisoner/:prisonerNumber/edit/number-of-children', {
+    get: {
       fieldName: 'number of children',
       pageTitle: 'Edit number of children',
       fieldValue: (_prisoner, inmateDetail) =>
         getProfileInformationValue(ProfileInformationType.NumberOfChildren, inmateDetail.profileInformation),
-    }),
-  )
-
-  post(
-    '/prisoner/:prisonerNumber/edit/number-of-children',
-    getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
-    async (req, res, next) => {
-      const { prisonerNumber } = req.params
-      const { editField } = req.body
-      const errors: HmppsError[] = []
-
-      const validate = (str: string, errors: HmppsError[]) => {
-        const numberOfChildren = parseInt(str)
+    },
+    post: {
+      editRoute: prisonerNumber => `/prisoner/${prisonerNumber}/edit/number-of-children`,
+      validate: (fieldValue, errors) => {
+        const numberOfChildren = parseInt(fieldValue, 10)
         if (Number.isNaN(numberOfChildren) || numberOfChildren < 0) {
           errors.push({ text: 'Enter a number 0 or above' })
         }
-      }
-
-      validate(editField, errors)
-
-      if (errors.length === 0) {
-        console.log('Number of children edited')
+      },
+      onSuccess: (req, res) => {
+        const { prisonerNumber } = req.params
         req.flash('flashMessage', { text: 'Number of children edited', type: FlashMessageType.success })
         return res.redirect(`/prisoner/${prisonerNumber}/personal`)
-      } else {
-        req.flash('fieldValue', editField)
-        req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/edit/number-of-children`)
-      }
+      },
     },
-  )
+  })
 
   return router
 }
