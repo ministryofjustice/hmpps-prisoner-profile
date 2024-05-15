@@ -3,8 +3,6 @@ import config from '../config'
 import IncentivesApiRestClient from './incentivesApiClient'
 import { incentiveReviewsMock } from './localMockData/incentiveReviewsMock'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('caseNotesApiClient', () => {

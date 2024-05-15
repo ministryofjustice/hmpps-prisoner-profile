@@ -16,7 +16,6 @@ import PrisonApiRestClient from './prisonApiClient'
 import PrisonerSearchClient from './prisonerSearchClient'
 
 import { createRedisClient } from './redisClient'
-import TokenStore from './tokenStore'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import ComponentApiRestClient from './componentApiClient'
@@ -30,6 +29,9 @@ import RestrictedPatientApiRestClient from './restrictedPatientApiClient'
 import PrisonRegisterStore from './prisonRegisterStore/prisonRegisterStore'
 import CalculateReleaseDatesApiClient from './calculateReleaseDatesApiClient'
 import PrisonRegisterApiRestClient from './prisonRegisterApiClient'
+import config from '../config'
+import RedisTokenStore from './tokenStore/redisTokenStore'
+import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo())
@@ -48,7 +50,9 @@ export const dataAccess = {
   adjudicationsApiClientBuilder: (token: string) => new AdjudicationsApiRestClient(token),
   prisonApiClientBuilder: (token: string) => new PrisonApiRestClient(token),
   prisonerSearchApiClientBuilder: (token: string) => new PrisonerSearchClient(token),
-  systemToken: systemTokenBuilder(new TokenStore(createRedisClient())),
+  systemToken: systemTokenBuilder(
+    config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
+  ),
   nonAssociationsApiClientBuilder: (token: string) => new NonAssociationsApiRestClient(token),
   componentApiClientBuilder: (token: string) => new ComponentApiRestClient(token),
   whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token),

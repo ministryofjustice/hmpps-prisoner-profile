@@ -1,4 +1,12 @@
-import { setup, defaultClient, TelemetryClient, DistributedTracingModes, Contracts } from 'applicationinsights'
+import {
+  Contracts,
+  defaultClient,
+  DistributedTracingModes,
+  getCorrelationContext,
+  setup,
+  TelemetryClient,
+} from 'applicationinsights'
+import { RequestHandler } from 'express'
 import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 import { ApplicationInfo } from '../applicationInfo'
 
@@ -21,12 +29,13 @@ export function buildAppInsightsClient({ applicationName, buildNumber }: Applica
     defaultClient.context.tags['ai.cloud.role'] = applicationName
     defaultClient.context.tags['ai.application.ver'] = buildNumber
     defaultClient.addTelemetryProcessor(addUserDataToRequests)
+    defaultClient.addTelemetryProcessor(parameterisePaths)
     return defaultClient
   }
   return null
 }
 
-export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObjects: ContextObject) {
+function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObjects: ContextObject) {
   const isRequest = envelope.data.baseType === Contracts.TelemetryTypeString.Request
   if (isRequest) {
     const { username, activeCaseLoadId } = contextObjects?.['http.ServerRequest']?.res?.locals?.user || {}
@@ -41,4 +50,24 @@ export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObject
     }
   }
   return true
+}
+
+function parameterisePaths(envelope: EnvelopeTelemetry, contextObjects: ContextObject) {
+  const operationNameOverride = contextObjects.correlationContext?.customProperties?.getProperty('operationName')
+  if (operationNameOverride) {
+    envelope.tags['ai.operation.name'] = envelope.data.baseData.name = operationNameOverride // eslint-disable-line no-param-reassign,no-multi-assign
+  }
+  return true
+}
+
+export function appInsightsMiddleware(): RequestHandler {
+  return (req, res, next) => {
+    res.prependOnceListener('finish', () => {
+      const context = getCorrelationContext()
+      if (context && req.route) {
+        context.customProperties.setProperty('operationName', `${req.method} ${req.route?.path}`)
+      }
+    })
+    next()
+  }
 }
