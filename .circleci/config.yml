@@ -98,7 +98,7 @@ jobs:
   integration_test:
     executor:
       name: hmpps/node
-      node_tag: << pipeline.parameters.node-version >>
+      tag: << pipeline.parameters.node-version >>
     steps:
       - checkout
       - attach_workspace:

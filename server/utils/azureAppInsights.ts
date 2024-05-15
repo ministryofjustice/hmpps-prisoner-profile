@@ -6,8 +6,8 @@ import {
   setup,
   TelemetryClient,
 } from 'applicationinsights'
-import { RequestHandler } from 'express'
 import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
+import { RequestHandler } from 'express'
 import { ApplicationInfo } from '../applicationInfo'
 
 export type ContextObject = {
