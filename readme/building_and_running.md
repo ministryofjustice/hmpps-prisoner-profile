@@ -9,34 +9,38 @@ First, build the project by running:
 
 `npm install` and then `npm run build`
 
-The Prisoner Profile service pulls data from a large number of sources and 
+The Prisoner Profile service pulls data from a large number of sources and
 therefore has a number of dependencies:
 
 * [redis](https://redis.io/) - session store and token caching
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - for authentication
-* [prison-api](https://github.com/ministryofjustice/prison-api) - the main API for retrieving data from NOMIS 
-* [hmpps-prisoner-search](https://github.com/ministryofjustice/hmpps-prisoner-search) - an OpenSearch backed API for quickly retrieving commonly requested prisoner details
-* [offender-management-allocation-manager](https://github.com/ministryofjustice/offender-management-allocation-manager) - allocation service for associating Prison Offender Managers with Offenders
-* [keyworker-api](https://github.com/ministryofjustice/keyworker-api) - an API providing backend functionality for keyworkers
-* [whereabouts-api](https://github.com/ministryofjustice/whereabouts-api) - an API providing backend functionality for the location of prisoners
-* [offender-case-notes](https://github.com/ministryofjustice/offender-case-notes) - an API managing storage of offender case notes
-* [hmpps-incentives-api](https://github.com/ministryofjustice/hmpps-incentives-api) - an API managing offender incentives data
-* [curious-api](https://github.com/ministryofjustice/curious-API) - Curious is a 3rd party supplied system for Education Delivery Contract Management
+* [prison-api](https://github.com/ministryofjustice/prison-api) - the main API for retrieving data from NOMIS
+* [hmpps-prisoner-search](https://github.com/ministryofjustice/hmpps-prisoner-search) - an OpenSearch backed API for
+  quickly retrieving commonly requested prisoner details
+* [offender-management-allocation-manager](https://github.com/ministryofjustice/offender-management-allocation-manager) -
+  allocation service for associating Prison Offender Managers with Offenders
+* [keyworker-api](https://github.com/ministryofjustice/keyworker-api) - an API providing backend functionality for
+  keyworkers
+* [whereabouts-api](https://github.com/ministryofjustice/whereabouts-api) - an API providing backend functionality for
+  the location of prisoners
+* [offender-case-notes](https://github.com/ministryofjustice/offender-case-notes) - an API managing storage of offender
+  case notes
+* [hmpps-incentives-api](https://github.com/ministryofjustice/hmpps-incentives-api) - an API managing offender
+  incentives data
+* [curious-api](https://github.com/ministryofjustice/curious-API) - Curious is a 3rd party supplied system for Education
+  Delivery Contract Management
 * [pathfinder-api](https://github.com/ministryofjustice/pathfinder-api) - an API for retrieving Pathfinder data
-* [manage-soc-cases-api](https://github.com/ministryofjustice/manage-soc-cases-api) - an API for retrieving SOC case data
+* [manage-soc-cases-api](https://github.com/ministryofjustice/manage-soc-cases-api) - an API for retrieving SOC case
+  data
 
 ### Developing against the development environment
-Development of this application has mainly relied on configuring `hmpps-prisoner-profile` to point at the development 
+
+Development of this application has mainly relied on configuring `hmpps-prisoner-profile` to point at the development
 environment instances of the above dependencies (redis being the exception, a local instance of this was used).
 
 Here's the process.
 
-1/ Run redis locally using Docker:
-```
-docker-compose pull && docker-compose up
-```
-
-2/ Create a .env file with environment variables pointing to the development environment
+1/ Create a .env file with environment variables pointing to the development environment
 <details>
 <summary>Click here for an example of the .env file</summary>
 <br>
@@ -91,31 +95,35 @@ CONTENTFUL_HOST=https://graphql.contentful.com
 CONTENTFUL_SPACE_ID=
 CONTENTFUL_ACCESS_TOKEN=
 ```
+
 </details>
 
-3/ And then, to build the assets and start the app with nodemon:
+2/ And then, to build the assets and start the app with nodemon:
+
 ```
 npm run start:dev
 ```
 
-4/ To access the service, navigate in a web browser to http://localhost:3000/prisoner/XYZ
+3/ To access the service, navigate in a web browser to http://localhost:3000/prisoner/XYZ
 replacing XYZ with the desired offender number in the development environment
 
 ### Developing locally
 
-By using a combination of docker instances of dependencies and wiremock to mock 
+By using a combination of docker instances of dependencies and wiremock to mock
 certain dependencies, we can get the profile working entirely locally, although it is
 obviously not as fully functional.
 
 To do this:
 
 1/ Run dependencies in docker:
+
 ```
 docker-compose -f docker-compose-local-wiremock.yml pull
 docker-compose -f docker-compose-local-wiremock.yml up
 ```
 
 2/ Run the service using the local wiremock env file:
+
 ```
 export $(cat .env-local-wiremock) && npm run start:dev
 ```
@@ -130,11 +138,13 @@ password: `password`
 
 After making code changes eslint can be used to ensure code style is maintained
 (although husky ensures this is run as part of the pre-commit hook too)
+
 ```
 npm run lint
 ```
 
 ## Feature Toggles
+
 Features can be toggled by setting the relevant environment variable.
 
 | Name                                         | Default Value | Type    | Description                                                                                        |
