@@ -30,7 +30,6 @@ export function buildAppInsightsClient({ applicationName, buildNumber }: Applica
     defaultClient.context.tags['ai.application.ver'] = buildNumber
     defaultClient.addTelemetryProcessor(addUserDataToRequests)
     defaultClient.addTelemetryProcessor(parameterisePaths)
-
     return defaultClient
   }
   return null

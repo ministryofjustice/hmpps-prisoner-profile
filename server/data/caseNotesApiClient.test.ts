@@ -7,8 +7,6 @@ import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
 import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('caseNotesApiClient', () => {

@@ -3,8 +3,6 @@ import config from '../config'
 import ManageUsersApiRestClient from './manageUsersApiClient'
 import { ManageUsersApiClient } from './interfaces/manageUsersApi/manageUsersApiClient'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('manageUsersApiClient', () => {

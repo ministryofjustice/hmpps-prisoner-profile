@@ -116,6 +116,7 @@ dist
 .pnp.*
 
 
+
 assets/stylesheets/*.css
 .idea
 .vscode
@@ -126,3 +127,4 @@ integration_tests/videos/
 integration_tests/screenshots/
 */*.iml
 **/Chart.lock
+**/.DS_Store

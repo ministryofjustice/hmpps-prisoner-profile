@@ -1,8 +1,9 @@
-import path from 'path'
 import express from 'express'
 
+import path from 'path'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
+import { appInsightsMiddleware } from './utils/azureAppInsights'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import { metricsMiddleware } from './monitoring/metricsApp'
 
@@ -23,7 +24,6 @@ import flashMessageMiddleware from './middleware/flashMessageMiddleware'
 import setUpEnvironmentName from './middleware/setUpEnvironmentName'
 import apiErrorMiddleware from './middleware/apiErrorMiddleware'
 import bannerMiddleware from './middleware/bannerMiddleware'
-import { appInsightsMiddleware } from './utils/azureAppInsights'
 
 export default function createApp(services: Services): express.Application {
   const app = express()

@@ -6,8 +6,6 @@ import { courtLocationsMock } from './localMockData/courtLocationsMock'
 import { appointmentMock } from './localMockData/appointmentMock'
 import { videoLinkBookingMock } from './localMockData/videoLinkBookingMock'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('whereaboutsClient', () => {

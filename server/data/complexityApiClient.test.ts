@@ -3,8 +3,6 @@ import config from '../config'
 import { complexityOfNeedHighMock } from './localMockData/complexityOfNeedMock'
 import ComplexityApiRestClient from './complexityApiClient'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('complexityApiClient', () => {

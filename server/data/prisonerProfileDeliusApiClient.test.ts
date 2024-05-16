@@ -5,8 +5,6 @@ import { PrisonerProfileDeliusApiClient } from './interfaces/deliusApi/prisonerP
 import { communityManagerMock } from './localMockData/communityManagerMock'
 import probationDocuments from './localMockData/deliusApi/probationDocuments'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('prisonerProfileDeliusApiClient', () => {

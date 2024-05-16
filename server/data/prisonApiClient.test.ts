@@ -55,8 +55,6 @@ import { pagedVisitsMock } from './localMockData/pagedVisitsWithVisitors'
 import { visitPrisonsMock } from './localMockData/visitPrisons'
 import { pagedActivePrisonApiAlertsMock } from './localMockData/pagedAlertsMock'
 
-jest.mock('./tokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('prisonApiClient', () => {
