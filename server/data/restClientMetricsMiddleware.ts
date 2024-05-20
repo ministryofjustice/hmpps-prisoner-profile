@@ -18,8 +18,8 @@ const timeoutCounter = new promClient.Counter({
 
 function restClientMetricsMiddleware(agent: SuperAgentRequest) {
   agent.on('request', ({ req }) => {
-    const { hostname } = new URL(agent.url)
-    const normalizedPath = normalizePath(agent.url)
+    const { hostname, pathname } = new URL(agent.url)
+    const normalizedPath = normalizePath(req.route?.path ?? pathname)
     const startTime = Date.now()
 
     req.on('socket', (socket: Socket) => {
@@ -39,10 +39,9 @@ function restClientMetricsMiddleware(agent: SuperAgentRequest) {
   return agent
 }
 
-function normalizePath(url: string) {
-  const { pathname } = new URL(url)
+function normalizePath(pathname: string) {
   const urlPathReplacement = '#val'
-  const urlValueParser = new UrlValueParser({ extraMasks: [/^[A-Z|0-9]+/] })
+  const urlValueParser = new UrlValueParser({ extraMasks: [/^[A-Z|0-9]+/, /^:[^/]+/] })
   return urlValueParser.replacePathValues(pathname, urlPathReplacement)
 }
 

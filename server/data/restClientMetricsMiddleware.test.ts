@@ -1,9 +1,9 @@
 import superagent from 'superagent'
 import nock from 'nock'
 import {
-  restClientMetricsMiddleware,
   normalizePath,
   requestHistogram,
+  restClientMetricsMiddleware,
   timeoutCounter,
 } from './restClientMetricsMiddleware'
 
@@ -13,20 +13,18 @@ describe('restClientMetricsMiddleware', () => {
   })
 
   describe('normalizePath', () => {
-    it('removes the query params from the URL path', () => {
-      const result = normalizePath('https://httpbin.org/?foo=bar')
-      expect(result).toBe('/')
+    it('normalises parameterised paths', () => {
+      const result = normalizePath('/prisoner/:prisonerNumber/schedule')
+      expect(result).toBe('/prisoner/#val/schedule')
     })
 
-    it('normalises recall ids', () => {
-      const result = normalizePath(
-        'https://manage-recalls-dev.hmpps.service.justice.gov.uk/recalls/15e4cccf-cc7b-4946-aa22-a82086735ec2/view-recall',
-      )
-      expect(result).toBe('/recalls/#val/view-recall')
+    it('normalises uuids', () => {
+      const result = normalizePath('/something/15e4cccf-cc7b-4946-aa22-a82086735ec2/else')
+      expect(result).toBe('/something/#val/else')
     })
 
-    it('normalises nomis ids', () => {
-      const result = normalizePath('https://manage-recalls-dev.hmpps.service.justice.gov.uk/prisoner/A7826DY')
+    it('normalises prisoner numbers', () => {
+      const result = normalizePath('/prisoner/A7826DY')
       expect(result).toBe('/prisoner/#val')
     })
   })
