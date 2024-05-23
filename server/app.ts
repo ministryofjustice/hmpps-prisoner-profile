@@ -5,7 +5,6 @@ import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import { appInsightsMiddleware } from './utils/azureAppInsights'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
-import { metricsMiddleware } from './monitoring/metricsApp'
 
 import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpCsrf from './middleware/setUpCsrf'
@@ -33,7 +32,6 @@ export default function createApp(services: Services): express.Application {
   app.set('port', process.env.PORT || 3000)
 
   app.use(appInsightsMiddleware())
-  app.use(metricsMiddleware)
   app.use(setUpHealthChecks(services.dataAccess.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
