@@ -7,14 +7,13 @@ import { Role } from '../data/enums/role'
 import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
-import { AlertForm, PrisonApiAlertCode, PrisonApiAlertType } from '../data/interfaces/prisonApi/PrisonApiAlert'
-import ReferenceDataService from '../services/referenceDataService'
+import { AlertForm } from '../data/interfaces/prisonApi/PrisonApiAlert'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { AuditService, Page, PostAction, SearchAction } from '../services/auditService'
 import logger from '../../logger'
 import { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import AlertView from '../services/interfaces/alertsService/AlertView'
-import { Alert } from '../data/interfaces/alertsApi/Alert'
+import { Alert, AlertCode, AlertType } from '../data/interfaces/alertsApi/Alert'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 
 /**
@@ -23,7 +22,6 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 export default class AlertsController {
   constructor(
     private readonly alertsService: AlertsService,
-    private readonly referenceDataService: ReferenceDataService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -55,7 +53,6 @@ export default class AlertsController {
     if (canUpdateAlert) {
       addAlertLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/add-alert`
     }
-
     // Get alerts based on given query params
     const { pagedAlerts, ...alertsPageData } = await this.alertsService.get(clientToken, prisonerData, queryParams)
 
@@ -104,14 +101,13 @@ export default class AlertsController {
   }
 
   public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
-    const types = await this.referenceDataService.getAlertTypes(req.middleware.clientToken) // TODO get from alerts service and choose which API ???
+    const types = await this.alertsService.getAlertTypes(req.middleware.clientToken)
 
     // Get data from middleware
     const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId, cellLocation } =
       req.middleware.prisonerData
     const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
-    // TODO filter out of the dropdown rather than allow error
     const existingAlerts = alerts
       .filter((alert: Prisoner['alerts'][0]) => alert.active)
       .map((alert: Prisoner['alerts'][0]) => alert.alertCode)
@@ -130,7 +126,7 @@ export default class AlertsController {
           description: '',
           activeFrom: formatDate(now.toISOString(), 'short'),
         }
-    const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType)
+    const { alertTypes, alertCodes, typeCodeMap } = this.mapAlertTypes(types, formValues.alertType, existingAlerts)
     const errors = req.flash('errors')
 
     this.auditService
@@ -272,10 +268,13 @@ export default class AlertsController {
 
     // Initialise form
     const alertFlash = req.flash('alert')
-    const { description } = alertFlash?.length ? (alertFlash[0] as never) : { description: alert.description }
+    const { description, activeTo } = alertFlash?.length
+      ? (alertFlash[0] as never)
+      : { description: alert.description, activeTo: alert.activeTo }
     const formValues = {
       bookingId,
       description,
+      activeTo,
     }
 
     const errors = req.flash('errors') || []
@@ -307,19 +306,19 @@ export default class AlertsController {
   public postAddMoreDetails(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber, alertId } = req.params
-      const { bookingId, description } = req.body
+      const { bookingId, description, activeTo } = req.body
 
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, { description })
+          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, { description, activeTo })
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
         }
       }
 
       if (errors.length) {
-        req.flash('alert', { description })
+        req.flash('alert', { description, activeTo })
         req.flash('errors', errors)
         return res.redirect(`/prisoner/${prisonerNumber}/alerts/${alertId}/add-more-details`)
       }
@@ -545,14 +544,15 @@ export default class AlertsController {
    *
    * @param types - list of AlertType
    * @param type - preselected alert type to determine list of codes
+   * @param existingAlertCodes
    */
-  private mapAlertTypes(types: PrisonApiAlertType[], type?: string) {
+  private mapAlertTypes(types: AlertType[], type?: string, existingAlertCodes?: string) {
     const alertTypes = this.mapActiveSortedAlertTypes(types)
 
     const typeCodeMap: { [key: string]: { value: string; text: string }[] } = types.reduce(
       (ts, t) => ({
         ...ts,
-        [t.code]: this.mapActiveSortedAlertTypes(t.subCodes),
+        [t.code]: this.mapActiveSortedAlertTypes(t.alertCodes, existingAlertCodes),
       }),
       {},
     )
@@ -561,21 +561,25 @@ export default class AlertsController {
     if (type) {
       const selectedType = types.find(t => t.code === type)
       if (selectedType) {
-        alertCodes = this.mapActiveSortedAlertTypes(selectedType.subCodes)
+        alertCodes = this.mapActiveSortedAlertTypes(selectedType.alertCodes, existingAlertCodes)
       }
     }
     return { alertTypes, alertCodes, typeCodeMap }
   }
 
   private mapActiveSortedAlertTypes(
-    alertTypes: (PrisonApiAlertType | PrisonApiAlertCode)[],
+    alertTypes: (AlertType | AlertCode)[],
+    existingAlertCodes?: string,
   ): { text: string; value: string }[] {
     return alertTypes
-      ?.filter(alertType => alertType.activeFlag === 'Y' && alertType.code !== 'DOCGM') // Exclude 'OCG Nominal - Do not share'
-      .map(alertType => ({
-        value: alertType.code,
-        text: alertType.description,
-      }))
+      ?.filter(alertType => alertType.isActive && alertType.code !== 'DOCGM') // Exclude 'OCG Nominal - Do not share'
+      .map(alertType => {
+        return {
+          value: alertType.code,
+          text: alertType.description,
+          attributes: existingAlertCodes?.split(',').includes(alertType.code) ? { disabled: 'disabled' } : undefined,
+        }
+      })
       .sort((a, b) => a.text.localeCompare(b.text))
   }
 

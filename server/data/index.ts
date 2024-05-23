@@ -32,6 +32,7 @@ import PrisonRegisterApiRestClient from './prisonRegisterApiClient'
 import config from '../config'
 import RedisTokenStore from './tokenStore/redisTokenStore'
 import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
+import AlertsApiRestClient from './alertsApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo())
@@ -64,6 +65,7 @@ export const dataAccess = {
   prisonRegisterApiClientBuilder: (token: string) => new PrisonRegisterApiRestClient(token),
   prisonRegisterStore: new PrisonRegisterStore(createRedisClient()),
   calculateReleaseDatesApiClientBuilder: (token: string) => new CalculateReleaseDatesApiClient(token),
+  alertsApiClientBuilder: (token: string) => new AlertsApiRestClient(token),
 }
 
 export type DataAccess = typeof dataAccess

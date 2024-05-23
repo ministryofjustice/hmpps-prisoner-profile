@@ -1,7 +1,7 @@
 import { PagedListItem } from '../prisonApi/PagedList'
 
 export interface Alert extends PagedListItem {
-  alertUuid: string
+  alertUuid?: string
   prisonNumber?: string
   alertCode: {
     alertTypeCode: string
@@ -29,6 +29,9 @@ export interface Alert extends PagedListItem {
   lastModifiedAt?: string
   lastModifiedBy?: string
   lastModifiedByDisplayName?: string
+  activeToLastSetAt?: string
+  activeToLastSetBy?: string
+  activeToLastSetByDisplayName?: string
 }
 
 export interface AlertChanges {
@@ -37,4 +40,41 @@ export interface AlertChanges {
   activeFrom?: string
   activeTo?: string
   appendComment?: string
+}
+
+export interface AlertCode {
+  alertTypeCode: string
+  code: string
+  description: string
+  listSequence?: number
+  isActive: boolean
+  createdAt?: string
+  createdBy?: string
+  modifiedAt?: string
+  modifiedBy?: string
+  deactivatedAt?: string
+  deactivatedBy?: string
+}
+
+export interface AlertType {
+  code: string
+  description: string
+  listSequence?: number
+  isActive: boolean
+  createdAt?: string
+  createdBy?: string
+  modifiedAt?: string
+  modifiedBy?: string
+  deactivatedAt?: string
+  deactivatedBy?: string
+  alertCodes: AlertCode[]
+}
+
+export interface CreateAlert {
+  prisonNumber: string
+  alertCode: string
+  description: string
+  authorisedBy?: string
+  activeFrom: string
+  activeTo?: string
 }

@@ -89,13 +89,13 @@ describe('buildOverviewActions', () => {
 
   describe('Log an activity application', () => {
     test.each`
-      roles                 | activeCaseLoadId | prisonId | availableServices         | prisonerStatus  | visible
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${true}
-      ${[Role.ActivityHub]} | ${'LEI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'LEI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'something' }]}  | ${'SOMETHING'}  | ${false}
-      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'ACTIVE OUT'} | ${false}
-      ${[]}                 | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities' }]} | ${'SOMETHING'}  | ${false}
+      roles                 | activeCaseLoadId | prisonId | availableServices                           | prisonerStatus  | visible
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities', navEnabled: true }]} | ${'SOMETHING'}  | ${true}
+      ${[Role.ActivityHub]} | ${'LEI'}         | ${'MDI'} | ${[{ id: 'activities', navEnabled: true }]} | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'LEI'} | ${[{ id: 'activities', navEnabled: true }]} | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'something', navEnabled: false }]} | ${'SOMETHING'}  | ${false}
+      ${[Role.ActivityHub]} | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities', navEnabled: true }]} | ${'ACTIVE OUT'} | ${false}
+      ${[]}                 | ${'MDI'}         | ${'MDI'} | ${[{ id: 'activities', navEnabled: true }]} | ${'SOMETHING'}  | ${false}
     `('user can see: $visible', ({ roles, activeCaseLoadId, prisonId, availableServices, prisonerStatus, visible }) => {
       const user = { ...prisonUserMock, userRoles: roles, activeCaseLoadId }
       const prisoner = { ...PrisonerMockDataA, status: prisonerStatus, prisonId }

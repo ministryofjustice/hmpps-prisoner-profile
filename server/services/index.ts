@@ -10,7 +10,6 @@ import PersonalPageService from './personalPageService'
 import PrisonerSearchService from './prisonerSearch'
 import UserService from './userService'
 import WorkAndSkillsPageService from './workAndSkillsPageService'
-import ReferenceDataService from './referenceDataService'
 import CsraService from './csraService'
 import ComponentService from './componentService'
 import MoneyService from './moneyService'
@@ -50,6 +49,7 @@ export const services = () => {
     complexityApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
+    alertsApiClientBuilder,
     prisonRegisterStore,
   } = dataAccess
 
@@ -67,7 +67,7 @@ export const services = () => {
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
-  const alertsService = new AlertsService(prisonApiClientBuilder)
+  const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
@@ -77,7 +77,6 @@ export const services = () => {
     personalLearningPlansService,
   )
   const prisonerLocationDetailsPageService = new LocationDetailsService(prisonApiClientBuilder)
-  const referenceDataService = new ReferenceDataService(prisonApiClientBuilder)
   const componentService = new ComponentService(componentApiClientBuilder)
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
@@ -134,7 +133,6 @@ export const services = () => {
     workAndSkillsPageService,
     personalLearningPlansService,
     offencesPageService,
-    referenceDataService,
     componentService,
     csraService,
     moneyService,

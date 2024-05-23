@@ -252,6 +252,14 @@ export default {
       spaceId: get('CONTENTFUL_SPACE_ID', 'spaceId', requiredInProduction),
       accessToken: get('CONTENTFUL_ACCESS_TOKEN', 'token', requiredInProduction),
     },
+    alertsApi: {
+      url: get('ALERTS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('ALERTS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('ALERTS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('ALERTS_API_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -340,5 +348,6 @@ export default {
     newCourseAndQualificationHistoryEnabled: toBoolean(
       get('NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED', false, requiredInProduction),
     ),
+    alertsApiEnabled: false, // Dynamically set via MFE meta from Alerts API info endpoint
   },
 }
