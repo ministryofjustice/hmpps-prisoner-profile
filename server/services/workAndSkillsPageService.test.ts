@@ -16,7 +16,6 @@ import { OffenderActivitiesMock } from '../data/localMockData/offenderActivities
 import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'
 import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
 import { LearnerProfiles } from '../data/localMockData/learnerProfiles'
-import { learnerEducation } from '../data/localMockData/learnerEducation'
 import { LearnerLatestAssessmentsMock } from '../data/localMockData/learnerLatestAssessmentsMock'
 import aValidLearnerGoals from '../data/localMockData/learnerGoalsMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
@@ -24,8 +23,17 @@ import { pagedActivePrisonApiAlertsMock } from '../data/localMockData/pagedAlert
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
+import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
+import CuriousService from './curiousService'
+import {
+  aFailureInPrisonCourseRecords,
+  anEmptyInPrisonCourseRecords,
+  aPopulatedInPrisonCourseRecords,
+} from '../data/localMockData/inPrisonCourseRecords'
 
 jest.mock('./mappers/curiousGoalsMapper')
+jest.mock('./educationAndWorkPlanApiPersonalLearningPlanService')
+jest.mock('./curiousService')
 
 describe('WorkAndSkillsService', () => {
   const curiousGoalsMapperMock = toCuriousGoals as jest.MockedFunction<typeof toCuriousGoals>
@@ -46,19 +54,21 @@ describe('WorkAndSkillsService', () => {
   const curiousApiClient = {
     getLearnerEmployabilitySkills: jest.fn(async () => learnerEmployabilitySkills),
     getLearnerProfile: jest.fn(async () => LearnerProfiles),
-    getLearnerEducation: jest.fn(async () => learnerEducation),
+    getLearnerEducationPage: jest.fn(),
     getLearnerLatestAssessments: jest.fn(async () => LearnerLatestAssessmentsMock),
     getLearnerGoals: jest.fn(),
     getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
   }
 
-  const personalLearningPlanService = {
-    getPrisonerActionPlan: jest.fn(),
-  }
+  const curiousService = new CuriousService(null, null) as jest.Mocked<CuriousService>
+  const personalLearningPlanService = new EducationAndWorkPlanApiPersonalLearningPlanService(
+    null,
+  ) as jest.Mocked<EducationAndWorkPlanApiPersonalLearningPlanService>
 
   const workAndSkillsPageServiceConstruct = jest.fn(() => {
     return new WorkAndSkillsPageService(
       () => curiousApiClient,
+      curiousService,
       () => prisonApiClient,
       personalLearningPlanService,
     )
@@ -66,6 +76,7 @@ describe('WorkAndSkillsService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    curiousService.getPrisonerInPrisonCourses.mockResolvedValue(aPopulatedInPrisonCourseRecords())
   })
 
   describe('Scenario A', () => {
@@ -90,21 +101,55 @@ describe('WorkAndSkillsService', () => {
           todaysDate,
         )
         expect(res.learnerEducation).toEqual([
-          { key: { text: 'string' }, value: { text: 'Planned end date on 1 March 2023' } },
+          { key: { text: 'GCSE Maths' }, value: { text: 'Planned end date on 31 July 2016' } },
+          { key: { text: 'GCSE English' }, value: { text: 'Planned end date on 1 June 2022' } },
         ])
       })
 
-      it.each(['ABC123', 'DEF321'])(
-        'Gets the courses and qualifications for the prisoner',
-        async (prisonerNumber: string) => {
-          const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-          const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-          expect(curiousApiClient.getLearnerEducation).toHaveBeenCalledWith(prisonerNumber)
-          expect(res.learnerEducation).toEqual([
-            { key: { text: 'string' }, value: { text: 'Planned end date on 1 March 2023' } },
-          ])
-        },
-      )
+      it('should get courses and qualifications given the prisoner has course and qualification data in curious', async () => {
+        // Given
+        const prisonerNumber = 'A1234BC'
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+        curiousService.getPrisonerInPrisonCourses.mockResolvedValue(aPopulatedInPrisonCourseRecords(prisonerNumber))
+
+        // When
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+        // Then
+        expect(res.learnerEducation).toEqual([
+          { key: { text: 'GCSE Maths' }, value: { text: 'Planned end date on 31 July 2016' } },
+          { key: { text: 'GCSE English' }, value: { text: 'Planned end date on 1 June 2022' } },
+        ])
+      })
+
+      it('should get courses and qualifications given the prisoner has no course and qualification data in curious', async () => {
+        // Given
+        const prisonerNumber = 'A1234BC'
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+        curiousService.getPrisonerInPrisonCourses.mockResolvedValue(anEmptyInPrisonCourseRecords(prisonerNumber))
+
+        // When
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+        // Then
+        expect(res.learnerEducation).toEqual([])
+      })
+
+      it('should get courses and qualifications given curious service returns a response indicating a problem calling the API', async () => {
+        // Given
+        const prisonerNumber = 'A1234BC'
+        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
+
+        curiousService.getPrisonerInPrisonCourses.mockResolvedValue(aFailureInPrisonCourseRecords(prisonerNumber))
+
+        // When
+        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
+
+        // Then
+        expect(res.learnerEducation).toEqual([])
+      })
 
       it.each(['ABC123', 'DEF321'])(
         'Gets the employability skills for the prisoner',

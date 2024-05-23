@@ -9,7 +9,7 @@ import { ApiConfig } from '../config'
 
 interface GetRequest {
   path?: string
-  query?: string
+  query?: object | string
   headers?: Record<string, string>
   responseType?: string
   raw?: boolean
@@ -22,7 +22,7 @@ interface PostRequest {
   responseType?: string
   data?: object | string[]
   raw?: boolean
-  query?: string
+  query?: object | string
 }
 
 interface PutRequest {
@@ -31,7 +31,7 @@ interface PutRequest {
   responseType?: string
   data?: object | string[]
   raw?: boolean
-  query?: string
+  query?: object | string
 }
 
 interface StreamRequest {
