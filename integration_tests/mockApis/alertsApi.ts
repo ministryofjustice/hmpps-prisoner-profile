@@ -1,6 +1,5 @@
 import { stubFor } from './wiremock'
 import {
-  emptyAlertsMock,
   pagedActiveAlertsMock,
   pagedActiveAlertsMockFiltered,
   pagedActiveAlertsMockPage2,
@@ -11,17 +10,11 @@ import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
 import { alertDetailsExpiresMock, alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
 
 export default {
-  stubActiveAlerts: (prisonerNumber: string) => {
-    let jsonResp
-    if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedActiveAlertsMock
-    } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyAlertsMock
-    }
+  stubActiveAlerts: (resp = pagedActiveAlertsMock) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/alertsApi/prisoners/${prisonerNumber}/alerts.*`,
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
         queryParameters: {
           sort: {
             matches: '.*',
@@ -39,22 +32,16 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: resp,
       },
     })
   },
 
-  stubActiveAlertsPage2: (prisonerNumber: string) => {
-    let jsonResp
-    if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedActiveAlertsMockPage2
-    } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyAlertsMock
-    }
+  stubActiveAlertsPage2: (resp = pagedActiveAlertsMockPage2) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/alertsApi/prisoners/${prisonerNumber}/alerts.*`,
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
         queryParameters: {
           page: {
             equalTo: '1',
@@ -75,22 +62,16 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: resp,
       },
     })
   },
 
-  stubActiveAlertsSorted: (prisonerNumber: string) => {
-    let jsonResp
-    if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedActiveAlertsMockSorted
-    } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyAlertsMock
-    }
+  stubActiveAlertsSorted: (resp = pagedActiveAlertsMockSorted) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/alertsApi/prisoners/${prisonerNumber}/alerts.*`,
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
         queryParameters: {
           sort: {
             matches: 'activeFrom,ASC',
@@ -108,22 +89,16 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: resp,
       },
     })
   },
 
-  stubActiveAlertsFiltered: (prisonerNumber: string) => {
-    let jsonResp
-    if (prisonerNumber === 'G6123VU') {
-      jsonResp = pagedActiveAlertsMockFiltered
-    } else if (prisonerNumber === 'A1234BC') {
-      jsonResp = emptyAlertsMock
-    }
+  stubActiveAlertsFiltered: (resp = pagedActiveAlertsMockFiltered) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/alertsApi/prisoners/${prisonerNumber}/alerts.*`,
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
         queryParameters: {
           alertType: {
             matches: '.*',
@@ -144,16 +119,16 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: jsonResp,
+        jsonBody: resp,
       },
     })
   },
 
-  stubInactiveAlerts: (prisonerNumber: string) => {
+  stubInactiveAlerts: () => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/alertsApi/prisoners/${prisonerNumber}/alerts.*`,
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
         queryParameters: {
           page: {
             equalTo: '1',

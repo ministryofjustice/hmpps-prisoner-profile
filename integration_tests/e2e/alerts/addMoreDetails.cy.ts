@@ -1,8 +1,8 @@
-import Page from '../pages/page'
-import AlertsPage from '../pages/alertsPage'
-import NotFoundPage from '../pages/notFoundPage'
-import { Role } from '../../server/data/enums/role'
-import AddMoreDetailsPage from '../pages/addMoreDetailsPage'
+import Page from '../../pages/page'
+import AlertsPage from '../../pages/alertsPage'
+import NotFoundPage from '../../pages/notFoundPage'
+import { Role } from '../../../server/data/enums/role'
+import AddMoreDetailsPage from '../../pages/addMoreDetailsPage'
 
 const visitAlertsPage = (): AlertsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/alerts/active' })
@@ -141,6 +141,7 @@ context('Add More Details Page', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubActiveAlerts')
         cy.task('stubGetAlertTypes')
         alertsPage = visitAlertsPage()
       })

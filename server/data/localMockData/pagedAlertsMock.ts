@@ -2958,7 +2958,7 @@ export const pagedInactivePrisonApiAlertsMock: PagedList<PrisonApiAlert> = {
   empty: false,
 }
 
-export const emptyAlertsMock: PagedList<PrisonApiAlert> = {
+export const emptyAlertsMock: PagedList<PrisonApiAlert | Alert> = {
   content: [],
   pageable: {
     sort: {

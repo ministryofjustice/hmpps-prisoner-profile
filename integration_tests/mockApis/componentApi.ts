@@ -1,8 +1,5 @@
 import { stubFor } from './wiremock'
-import {
-  componentsMock,
-  componentsNoServicesMock,
-} from '../../server/data/localMockData/componentApi/componentsMetaMock'
+import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 export default {
   stubComponentsMeta: (resp = componentsNoServicesMock) => {
@@ -16,7 +13,7 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: resp ?? componentsMock,
+        jsonBody: resp,
       },
     })
   },

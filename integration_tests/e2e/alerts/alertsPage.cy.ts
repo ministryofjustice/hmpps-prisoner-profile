@@ -1,8 +1,9 @@
-import Page from '../pages/page'
-import AlertsPage from '../pages/alertsPage'
-import { Role } from '../../server/data/enums/role'
-import { permissionsTests } from './permissionsTests'
-import NotFoundPage from '../pages/notFoundPage'
+import Page from '../../pages/page'
+import AlertsPage from '../../pages/alertsPage'
+import { Role } from '../../../server/data/enums/role'
+import { permissionsTests } from '../permissionsTests'
+import NotFoundPage from '../../pages/notFoundPage'
+import { emptyAlertsMock } from '../../../server/data/localMockData/pagedAlertsMock'
 
 const visitActiveAlertsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/alerts/active' })
@@ -257,6 +258,7 @@ context('Alerts API enabled prison', () => {
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubActiveAlerts')
         visitActiveAlertsPage()
         alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
       })
@@ -303,6 +305,7 @@ context('Alerts API enabled prison', () => {
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubInactiveAlerts')
         visitInactiveAlertsPage()
         alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Inactive alerts')
       })
@@ -335,6 +338,7 @@ context('Alerts API enabled prison', () => {
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
+        cy.task('stubActiveAlerts', emptyAlertsMock)
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
         cy.task('stubInmateDetail', {
           bookingId: 1234567,
@@ -367,6 +371,8 @@ context('Alerts API enabled prison', () => {
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubActiveAlerts')
+        cy.task('stubActiveAlertsPage2')
         visitActiveAlertsPage()
         alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
       })
@@ -390,6 +396,8 @@ context('Alerts API enabled prison', () => {
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubActiveAlerts')
+        cy.task('stubActiveAlertsSorted')
         visitActiveAlertsPage()
         alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
       })
@@ -410,6 +418,8 @@ context('Alerts API enabled prison', () => {
 
       beforeEach(() => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubActiveAlerts')
+        cy.task('stubActiveAlertsFiltered')
         visitActiveAlertsPage()
         alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
       })
@@ -433,6 +443,7 @@ context('Alerts API enabled prison', () => {
         caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+      cy.task('stubActiveAlerts')
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitActiveAlertsPage()
       alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')

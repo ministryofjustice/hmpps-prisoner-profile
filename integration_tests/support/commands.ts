@@ -86,11 +86,7 @@ Cypress.Commands.add('setupPrisonApiAlertsPageStubs', ({ bookingId, prisonerNumb
 Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides = {} }) => {
   cy.task('stubEventsForProfileImage', prisonerNumber)
   cy.task('stubPrisonerData', { prisonerNumber, overrides: prisonerDataOverrides })
-  cy.task('stubActiveAlerts', prisonerNumber)
-  cy.task('stubActiveAlertsPage2', prisonerNumber)
-  cy.task('stubActiveAlertsSorted', prisonerNumber)
-  cy.task('stubActiveAlertsFiltered', prisonerNumber)
-  cy.task('stubInactiveAlerts', prisonerNumber)
+
   if (bookingId === 1234567) {
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 0, inactiveAlertCount: 0 } })
   } else {

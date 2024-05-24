@@ -117,7 +117,7 @@ export default class AlertsController {
     const now = new Date()
     const alertFlash = req.flash('alert')
     const formValues: AlertForm = alertFlash?.length
-      ? (alertFlash[0] as never)
+      ? (alertFlash[0] as unknown as AlertForm)
       : {
           bookingId,
           existingAlerts,
@@ -269,7 +269,7 @@ export default class AlertsController {
     // Initialise form
     const alertFlash = req.flash('alert')
     const { description, activeTo } = alertFlash?.length
-      ? (alertFlash[0] as never)
+      ? (alertFlash[0] as unknown as AlertForm)
       : { description: alert.description, activeTo: alert.activeTo }
     const formValues = {
       bookingId,
@@ -359,7 +359,7 @@ export default class AlertsController {
     // Initialise form
     const alertFlash = req.flash('alert')
     const { description, activeTo, today } = alertFlash?.length
-      ? (alertFlash[0] as never)
+      ? (alertFlash[0] as unknown as AlertForm & { today: string })
       : {
           description: alert.description,
           activeTo: formatDate(alert.activeTo, 'short'),
@@ -460,7 +460,7 @@ export default class AlertsController {
     // Initialise form
     const alertFlash = req.flash('alert')
     const { description, activeTo, removeEndDate } = alertFlash?.length
-      ? (alertFlash[0] as never)
+      ? (alertFlash[0] as unknown as AlertForm & { removeEndDate: string })
       : {
           description: alert.description,
           activeTo: formatDate(alert.activeTo, 'short'),

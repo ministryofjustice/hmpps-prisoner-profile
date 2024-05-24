@@ -62,14 +62,13 @@ export default class AlertsService {
    * @private
    */
   private mapToPrisonApiParams(queryParams: AlertsListQueryParams) {
-    const apiParams = { ...queryParams }
-
-    if (apiParams.from) apiParams.from = formatDateISO(parseDate(apiParams.from))
-    if (apiParams.to) apiParams.to = formatDateISO(parseDate(apiParams.to))
-    if (apiParams.page) apiParams.page = +apiParams.page - 1 // Change page to zero based for API query
-    apiParams.size = queryParams?.showAll ? 9999 : 20
-
-    return apiParams
+    return {
+      ...queryParams,
+      ...(queryParams.from && { from: formatDateISO(parseDate(queryParams.from)) }),
+      ...(queryParams.to && { to: formatDateISO(parseDate(queryParams.to)) }),
+      ...(queryParams.page && { page: Number(queryParams.page) - 1 }), // Change page to zero based for API query
+      size: queryParams.showAll ? 9999 : 20,
+    }
   }
 
   /**
@@ -79,26 +78,17 @@ export default class AlertsService {
    * @private
    */
   private mapToAlertsApiParams(queryParams: AlertsListQueryParams) {
-    const apiParams: {
-      isActive: boolean
-      alertType?: string | string[]
-      alertCode?: string | string[]
-      activeFromStart?: string
-      activeFromEnd?: string
-      search?: string
-      page?: number
-      size: number
-      sort?: string
-    } = { isActive: queryParams.alertStatus === 'ACTIVE', size: queryParams?.showAll ? 9999 : 20 }
-
-    if (queryParams.alertType) apiParams.alertType = queryParams.alertType
-    if (queryParams.from) apiParams.activeFromStart = formatDateISO(parseDate(queryParams.from))
-    if (queryParams.to) apiParams.activeFromEnd = formatDateISO(parseDate(queryParams.to))
-    if (queryParams.page) apiParams.page = +queryParams.page - 1 // Change page to zero based for API query
-    if (queryParams.sort)
-      apiParams.sort = queryParams.sort.replace('dateCreated', 'activeFrom').replace('dateExpires', 'activeTo')
-
-    return apiParams
+    return {
+      ...(queryParams.alertType && { alertType: queryParams.alertType }),
+      ...(queryParams.from && { activeFromStart: formatDateISO(parseDate(queryParams.from)) }),
+      ...(queryParams.to && { activeFromEnd: formatDateISO(parseDate(queryParams.to)) }),
+      ...(queryParams.sort && {
+        sort: queryParams.sort.replace('dateCreated', 'activeFrom').replace('dateExpires', 'activeTo'),
+      }),
+      ...(queryParams.page && { page: Number(queryParams.page) - 1 }), // Change page to zero based for API query
+      isActive: queryParams.alertStatus === 'ACTIVE',
+      size: queryParams?.showAll ? 9999 : 20,
+    }
   }
 
   /**
