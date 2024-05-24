@@ -3,7 +3,7 @@ import CuriousApiClient from '../../server/data/interfaces/curiousApi/curiousApi
 export const curiousApiClientMock = (): CuriousApiClient => ({
   getLearnerEmployabilitySkills: jest.fn(),
   getLearnerProfile: jest.fn(),
-  getLearnerEducation: jest.fn(),
+  getLearnerEducationPage: jest.fn(),
   getLearnerLatestAssessments: jest.fn(),
   getLearnerGoals: jest.fn(),
   getLearnerNeurodivergence: jest.fn(),

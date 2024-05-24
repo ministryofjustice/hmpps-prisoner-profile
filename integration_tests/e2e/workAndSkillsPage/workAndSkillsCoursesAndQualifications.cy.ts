@@ -43,14 +43,14 @@ context('Work and skills page - Courses And Qualification Card', () => {
           workAndSkillsPage.CAQ_courses().contains('Current courses')
         })
 
-        it('The card has a list key should contain "string"', () => {
+        it('The card has a list key should contain "GCSE Maths"', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_listKey().contains('string')
+          workAndSkillsPage.CAQ_listKey().contains('GCSE Maths')
         })
 
-        it('The card has a list value should contain end date 1 March 2023', () => {
+        it('The card has a list value should contain end date 23 December 2016', () => {
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_listValue().contains('Planned end date on 1 March 2023')
+          workAndSkillsPage.CAQ_listValue().contains('Planned end date on 23 December 2016')
         })
 
         it('The card has a CTA link', () => {
