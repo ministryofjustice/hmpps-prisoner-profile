@@ -6,7 +6,6 @@ import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { Role } from '../data/enums/role'
 import AlertsService from '../services/alertsService'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import ReferenceDataService from '../services/referenceDataService'
 import { alertTypesMock } from '../data/localMockData/alertTypesMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
@@ -23,7 +22,6 @@ let controller: AlertsController
 
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/alertsService.ts')
-jest.mock('../services/referenceDataService.ts')
 
 describe('Alerts Controller', () => {
   describe('Alerts page', () => {
@@ -51,7 +49,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
 
     it('should get active alerts', async () => {
@@ -237,7 +235,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -245,7 +243,7 @@ describe('Alerts Controller', () => {
 
     it('should get ref data for alert form', async () => {
       const getAlertTypes = jest
-        .spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes')
+        .spyOn<any, string>(controller['alertsService'], 'getAlertTypes')
         .mockResolvedValue(alertTypesMock)
 
       await controller.displayAddAlert(req, res, next)
@@ -255,14 +253,14 @@ describe('Alerts Controller', () => {
     })
 
     it('should filter out  "OCG Nominal - Do not share" subtype', async () => {
-      jest.spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
+      jest.spyOn<any, string>(controller['alertsService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
       await controller.displayAddAlert(req, res, next)
 
       expect(res.render.mock.calls[0][1].typeCodeMap).toEqual({
-        A: [{ text: 'AAA111', value: 'A1' }],
-        B: [{ text: 'BBB111', value: 'B1' }],
-        C: [{ text: 'CCC111', value: 'C1' }],
+        A: [{ text: 'AAA111', value: 'A1', attributes: undefined }],
+        B: [{ text: 'BBB111', value: 'B1', attributes: undefined }],
+        C: [{ text: 'CCC111', value: 'C1', attributes: undefined }],
       })
     })
 
@@ -272,7 +270,7 @@ describe('Alerts Controller', () => {
       const createAlertsSpy = jest
         .spyOn<any, string>(controller['alertsService'], 'createAlert')
         .mockResolvedValue(pagedActiveAlertsMock.content[0])
-      jest.spyOn<any, string>(controller['referenceDataService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
+      jest.spyOn<any, string>(controller['alertsService'], 'getAlertTypes').mockResolvedValue(alertTypesMock)
 
       await controller.post()(req, res, next)
 
@@ -308,7 +306,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
 
     it('should get one alert', async () => {
@@ -382,7 +380,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
 
     it('should get one alert', async () => {
@@ -446,7 +444,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -574,7 +572,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -678,7 +676,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null), new ReferenceDataService(null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()

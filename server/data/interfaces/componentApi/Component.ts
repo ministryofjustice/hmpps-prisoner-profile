@@ -11,6 +11,7 @@ export interface Service {
   heading: string
   description: string
   href: string
+  navEnabled: boolean
 }
 
 export interface HeaderFooterMeta {

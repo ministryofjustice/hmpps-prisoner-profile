@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express'
 
 import logger from '../../logger'
 import { Services } from '../services'
+import config from '../config'
 
 export default function getFrontendComponents({ componentService }: Services, useLatest: boolean): RequestHandler {
   return async (req, res, next) => {
@@ -21,6 +22,8 @@ export default function getFrontendComponents({ componentService }: Services, us
 
       res.locals.feComponentsMeta = meta
 
+      /* Set feature toggle for using Alerts API */
+      config.featureToggles.alertsApiEnabled = meta?.services?.some(service => service.id === 'alerts')
       next()
     } catch (error) {
       logger.error(error, 'Failed to retrieve front end components')

@@ -1,10 +1,12 @@
 import PrisonApiAlert, {
   AlertForm,
   PrisonApiAlertChanges,
+  PrisonApiAlertCode,
+  PrisonApiAlertType,
   PrisonApiCreateAlert,
 } from '../../data/interfaces/prisonApi/PrisonApiAlert'
-import { Alert, AlertChanges } from '../../data/interfaces/alertsApi/Alert'
-import { formatName } from '../../utils/utils'
+import { Alert, AlertChanges, AlertCode, AlertType, CreateAlert } from '../../data/interfaces/alertsApi/Alert'
+import { formatName, formatNamePart } from '../../utils/utils'
 import { formatDateISO, parseDate } from '../../utils/dateHelpers'
 
 /**
@@ -33,6 +35,23 @@ export const toAlert = (prisonApiAlert: PrisonApiAlert): Alert => {
       prisonApiAlert.expiredByFirstName && prisonApiAlert.expiredByLastName
         ? formatName(prisonApiAlert.expiredByFirstName, undefined, prisonApiAlert.expiredByLastName)
         : undefined,
+    activeToLastSetAt: prisonApiAlert.dateExpires ? prisonApiAlert.modifiedDateTime : undefined,
+    activeToLastSetByDisplayName:
+      prisonApiAlert.dateExpires && prisonApiAlert.expiredByFirstName && prisonApiAlert.expiredByLastName
+        ? formatName(prisonApiAlert.expiredByFirstName, undefined, prisonApiAlert.expiredByLastName)
+        : undefined,
+  }
+}
+
+export const capitaliseAlertDisplayNames = (alert: Alert): Alert => {
+  if (!alert) return null
+
+  return {
+    ...alert,
+    createdByDisplayName: alert.createdByDisplayName.split(' ').map(formatNamePart).join(' '),
+    lastModifiedByDisplayName: alert.lastModifiedByDisplayName
+      ? alert.lastModifiedByDisplayName.split(' ').map(formatNamePart).join(' ')
+      : undefined,
   }
 }
 
@@ -75,5 +94,37 @@ export const toPrisonApiCreateAlert = (alertForm: AlertForm): PrisonApiCreateAle
     comment: alertForm.description,
     alertDate: formatDateISO(parseDate(alertForm.activeFrom)),
     expiryDate: alertForm.activeTo ? formatDateISO(parseDate(alertForm.activeTo)) : null,
+  }
+}
+
+export const toAlertsApiCreateAlert = (alertForm: AlertForm, prisonerNumber: string): CreateAlert => {
+  return {
+    prisonNumber: prisonerNumber,
+    alertCode: alertForm.alertCode,
+    description: alertForm.description,
+    activeFrom: formatDateISO(parseDate(alertForm.activeFrom)),
+    activeTo: alertForm.activeTo ? formatDateISO(parseDate(alertForm.activeTo)) : null,
+  }
+}
+
+export const toAlertCode = (prisonApiAlertCode: PrisonApiAlertCode): AlertCode => {
+  if (!prisonApiAlertCode) return null
+
+  return {
+    code: prisonApiAlertCode.code,
+    description: prisonApiAlertCode.description,
+    isActive: prisonApiAlertCode.activeFlag === 'Y',
+    alertTypeCode: prisonApiAlertCode.parentCode,
+  }
+}
+
+export const toAlertType = (prisonApiAlertType: PrisonApiAlertType): AlertType => {
+  if (!prisonApiAlertType) return null
+
+  return {
+    code: prisonApiAlertType.code,
+    description: prisonApiAlertType.description,
+    isActive: prisonApiAlertType.activeFlag === 'Y',
+    alertCodes: prisonApiAlertType.subCodes?.length ? prisonApiAlertType.subCodes.map(toAlertCode) : [],
   }
 }

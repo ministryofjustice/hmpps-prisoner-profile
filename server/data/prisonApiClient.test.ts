@@ -206,7 +206,7 @@ describe('prisonApiClient', () => {
   describe('getAlerts', () => {
     it('Should return data from the API', async () => {
       const bookingId = 123456
-      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
+      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE', size: 20 }
       mockSuccessfulPrisonApiCall(
         `/api/bookings/${bookingId}/alerts/v2?size=20&alertStatus=ACTIVE`,
         pagedActivePrisonApiAlertsMock,

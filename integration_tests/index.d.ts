@@ -36,6 +36,12 @@ declare global {
         prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
 
+      setupPrisonApiAlertsPageStubs(options: {
+        prisonerNumber: string
+        bookingId: number
+        prisonerDataOverrides?: Partial<Prisoner>
+      }): Chainable<AUTWindow>
+
       setupPersonalPageSubs(options: {
         prisonerNumber: string
         bookingId: number

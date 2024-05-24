@@ -103,7 +103,7 @@ export const arrayToQueryString = (array: string[] | number[] | boolean[], key: 
 export const mapToQueryString = (params: Record<never, never>): string => {
   if (!params) return ''
   return Object.keys(params)
-    .filter(key => params[key])
+    .filter(key => params[key] !== undefined && params[key] !== null)
     .map(key => {
       if (Array.isArray(params[key])) return arrayToQueryString(params[key], key)
       return `${key}=${encodeURIComponent(params[key])}`
@@ -581,6 +581,7 @@ export interface SelectOption {
   selected?: boolean
   attributes?: {
     hidden?: 'hidden'
+    disabled?: 'disabled'
   }
 }
 

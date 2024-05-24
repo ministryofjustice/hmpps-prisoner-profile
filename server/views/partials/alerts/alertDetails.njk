@@ -10,9 +10,6 @@
                         <h2 class="alert-details__title">{{ alert.alertCode.description }}</h2>
                         <pre class="alert-details__notes govuk-body">{{ alert.description }}</pre>
                         <div class="alert-details__metadata"><span>Created:</span> {{ alert.createdAt | formatDate }} {% if alert.createdByDisplayName %} by {{ alert.createdByDisplayName }} {% endif %}</div>
-                        {% if not alert.isActive %}
-                            <div class="alert-details__metadata"><span>Closed:</span> {{ alert.lastModifiedAt | formatDate }} {% if alert.lastModifiedByDisplayName %} by {{ alert.lastModifiedByDisplayName }} {% endif %}</div>
-                        {% endif %}
                     </div>
                     <div class="alert-details__link">
                         {% if alert.addMoreDetailsLinkUrl %}
