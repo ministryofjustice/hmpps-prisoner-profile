@@ -387,3 +387,46 @@ export const addressesMailMock: Address[] = [
     ],
   },
 ]
+
+export const addressesNoStartDateMock: Address[] = [
+  {
+    primary: false,
+    mail: false,
+    noFixedAddress: false,
+    street: '99 sajdhskdfh',
+    town: 'Thjjsdfhshd',
+    county: 'Countyshire',
+    postalCode: 'CS9 1CS',
+    country: 'England',
+    startDate: '2023-11-20',
+    comment: 'Example comment',
+    addressUsages: [
+      {
+        addressUsage: 'RECEP',
+        addressUsageDescription: 'Reception',
+        activeFlag: true,
+      },
+    ],
+    phones: [],
+  },
+  {
+    primary: false,
+    mail: false,
+    noFixedAddress: false,
+    street: '88 ioasndkjhsgd',
+    town: 'Imnksjdfjshdf',
+    county: 'Countyshire',
+    postalCode: 'CS8 1CS',
+    country: 'England',
+    startDate: undefined,
+    comment: 'No start date',
+    addressUsages: [
+      {
+        addressUsage: 'RECEP',
+        addressUsageDescription: 'Reception',
+        activeFlag: true,
+      },
+    ],
+    phones: [],
+  },
+]

@@ -5,7 +5,7 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import AddressController from './addressController'
 import AddressService from '../services/addressService'
-import { addressesPrimaryAndMailMock } from '../data/localMockData/addresses'
+import { addressesNoStartDateMock, addressesPrimaryAndMailMock } from '../data/localMockData/addresses'
 
 let req: any
 let res: any
@@ -43,7 +43,7 @@ describe('Address controller', () => {
     it('should render the addresses page', async () => {
       const getAddresses = jest
         .spyOn<any, string>(controller['addressService'], 'getAddresses')
-        .mockResolvedValue(addressesPrimaryAndMailMock)
+        .mockResolvedValue([...addressesPrimaryAndMailMock, ...addressesNoStartDateMock])
 
       await controller.displayAddresses(req, res)
 
@@ -53,7 +53,7 @@ describe('Address controller', () => {
         primaryAddressLabel: 'Primary and mail address',
         primaryAddress: addressesPrimaryAndMailMock[0],
         mailAddress: undefined,
-        otherAddresses: [],
+        otherAddresses: addressesNoStartDateMock.reverse(),
         prisonerNumber: req.middleware.prisonerData.prisonerNumber,
         prisonerName: 'John Saunders',
         breadcrumbPrisonerName: 'Saunders, John',
