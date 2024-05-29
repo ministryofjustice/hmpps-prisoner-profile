@@ -21,10 +21,9 @@ export default class AddressController {
     const primaryAddressLabel = primaryAddress?.mail ? 'Primary and mail address' : 'Primary address'
 
     const mailAddress = addresses.find(address => address.mail && !address.primary && !address.endDate)
-
     const otherAddresses = addresses
       .filter(address => !address.primary && !address.mail && !address.endDate)
-      .sort((a, b) => b.startDate.localeCompare(a.startDate)) // Sort by ISO date string in reverse order
+      .sort((a, b) => b.startDate?.localeCompare(a.startDate)) // Sort by ISO date string in reverse order
 
     this.auditService
       .sendPageView({
