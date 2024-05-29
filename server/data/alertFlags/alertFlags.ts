@@ -26,6 +26,7 @@ export const alertFlagLabels: AlertFlagLabel[] = [
   },
   { alertCodes: ['XEL'], classes: 'alert-status alert-status--security', label: 'E-list' },
   { alertCodes: ['XELH'], classes: 'alert-status alert-status--security', label: 'E-list heightened' },
+  { alertCodes: ['XER'], classes: 'alert-status alert-status--security', label: 'Escape risk' },
   {
     alertCodes: ['XRF'],
     classes: 'alert-status alert-status--security',
