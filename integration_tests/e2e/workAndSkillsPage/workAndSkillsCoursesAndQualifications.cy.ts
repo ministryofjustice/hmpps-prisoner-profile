@@ -18,44 +18,97 @@ context('Work and skills page - Courses And Qualification Card', () => {
       beforeEach(() => {
         cy.setupBannerStubs({ prisonerNumber })
         cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
-        visitWorkAndSkillsPage()
       })
 
       context('Courses and Qualifications card', () => {
-        it('The card is displayed', () => {
+        it('should display course data given prisoner has at least one course completed in the last 12 months', () => {
+          // Given
+          cy.task('stubGetLearnerEducation', prisonerNumber) // this stub returns several courses, only 1 of which is completed in the last 12 months (City & Guilds Wood Working)
+
+          // When
+          visitWorkAndSkillsPage()
+
+          // Then
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_card().should('exist')
-        })
-        it('The card summary header contains Courses and qualifications', () => {
-          const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_header().contains('Courses and qualifications')
+          workAndSkillsPage.CAQ_card().should('be.visible')
+          workAndSkillsPage.CAQ_course_table().should('be.visible')
+          workAndSkillsPage.CAQ_completed_course_names().should('contain', 'City & Guilds Wood Working')
+          workAndSkillsPage.CAQ_view_all_in_prison_courses_link().should('be.visible')
         })
 
-        it('The card contains information about the card', () => {
+        it('should not display course data given prisoner has completed courses but none are completed in the last 12 months', () => {
+          // Given
+          cy.task('stubGetLearnerEducationForPrisonWithCoursesButNoneCompleteInTheLast12Months', prisonerNumber) // this stub returns courses that have been completed, but none in the last 12 months
+
+          // When
+          visitWorkAndSkillsPage()
+
+          // Then
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage
-            .CAQ_info()
-            .contains('This only includes educational courses. Contact the local education team to find out more.')
+          workAndSkillsPage.CAQ_card().should('be.visible')
+          workAndSkillsPage.CAQ_course_table().should('not.exist')
+          workAndSkillsPage.CAQ_no_completed_in_prison_courses_in_last_12_months_message().should('be.visible')
+          workAndSkillsPage.CAQ_view_all_in_prison_courses_link().should('be.visible')
         })
 
-        it('The card has a heading containing Current courses', () => {
+        it('should not display course data given prisoner has attended courses but none have ever been completed', () => {
+          // Given
+          cy.task('stubGetLearnerEducationForPrisonWithCoursesButNoneComplete', prisonerNumber) // this stub returns several courses, but none are completed
+
+          // When
+          visitWorkAndSkillsPage()
+
+          // Then
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_courses().contains('Current courses')
+          workAndSkillsPage.CAQ_card().should('be.visible')
+          workAndSkillsPage.CAQ_course_table().should('not.exist')
+          workAndSkillsPage.CAQ_no_completed_in_prison_courses_message().should('be.visible')
+          workAndSkillsPage.CAQ_view_all_in_prison_courses_link().should('be.visible')
         })
 
-        it('The card has a list key should contain "GCSE Maths"', () => {
+        it('should not display course data given curious returns response containing no course or qualification data at all', () => {
+          // Given
+          cy.task('stubGetLearnerEducationForPrisonerWithNoCourses', prisonerNumber)
+
+          // When
+          visitWorkAndSkillsPage()
+
+          // Then
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_listKey().contains('GCSE Maths')
+          workAndSkillsPage.CAQ_card().should('be.visible')
+          workAndSkillsPage.CAQ_course_table().should('not.exist')
+          workAndSkillsPage.CAQ_no_in_prison_courses_message().should('be.visible')
+          workAndSkillsPage.CAQ_view_all_in_prison_courses_link().should('not.exist')
         })
 
-        it('The card has a list value should contain end date 23 December 2016', () => {
+        it('should not display course data given curious returns 404 for prisoner indicating no course or qualification data at all', () => {
+          // Given
+          cy.task('stubGetLearnerEducation404Error', prisonerNumber)
+
+          // When
+          visitWorkAndSkillsPage()
+
+          // Then
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_listValue().contains('Planned end date on 23 December 2016')
+          workAndSkillsPage.CAQ_card().should('be.visible')
+          workAndSkillsPage.CAQ_course_table().should('not.exist')
+          workAndSkillsPage.CAQ_no_in_prison_courses_message().should('be.visible')
+          workAndSkillsPage.CAQ_view_all_in_prison_courses_link().should('not.exist')
         })
 
-        it('The card has a CTA link', () => {
+        it('should display curious unavailable message given curious returns error response', () => {
+          // Given
+          cy.task('stubGetLearnerEducation401Error', prisonerNumber)
+
+          // When
+          visitWorkAndSkillsPage()
+
+          // Then
           const workAndSkillsPage = Page.verifyOnPage(WorkAndSkillsPage)
-          workAndSkillsPage.CAQ_viewHistory().contains('View full course history')
+          workAndSkillsPage.CAQ_card().should('be.visible')
+          workAndSkillsPage.CAQ_course_table().should('not.exist')
+          workAndSkillsPage.CAQ_curious_unavailable_message().should('be.visible')
+          workAndSkillsPage.CAQ_view_all_in_prison_courses_link().should('not.exist')
         })
       })
     })

@@ -1,0 +1,70 @@
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{%- call summaryCard({title: "In-prison courses and qualifications", id: "courses-and-qualifications"}) -%}
+
+  {% if not inPrisonCourses.problemRetrievingData %}
+    <p class="govuk-hint">Information from Curious. This only includes educational courses. Contact the local education team to find out more.</p>
+
+    {% if not inPrisonCourses.totalRecords %}
+      {# Prisoner has no In Prison course or qualications at all #}
+      <p class="govuk-body" data-qa="no-in-prison-courses-message">
+        {{ workAndSkillsPrisonerName }} has no courses and qualifications recorded in Curious.
+      </p>
+
+    {% else %}
+      {% if not inPrisonCourses.coursesByStatus.COMPLETED.length %}
+        {# Prisoner has In Prison courses or qualifications, but none that have ever been completed #}
+        <p class="govuk-body" data-qa="no-completed-in-prison-courses-message">
+          {{ workAndSkillsPrisonerName }} has no courses and qualifications completed yet.
+        </p>
+      {% else %}
+
+        {% if not inPrisonCourses.coursesCompletedInLast12Months.length %}
+          {# Prisoner has courses or qualifications, but none that were completed in the last 12 months #}
+          <p class="govuk-body" data-qa="no-completed-in-prison-courses-in-last-12-months-message">
+            {{ workAndSkillsPrisonerName }} has no courses and qualifications completed in last 12 months.
+          </p>
+
+        {% else %}
+          {# Prisoner has courses or qualifications that were completed in the last 12 months #}
+          <table class="govuk-table" id="completed-in-prison-courses-in-last-12-months-table">
+            <caption class="govuk-table__caption">Courses completed in the last 12 months</caption>
+
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Name</th>
+              <th scope="col" class="govuk-table__header">Type</th>
+              <th scope="col" class="govuk-table__header">Location</th>
+              <th scope="col" class="govuk-table__header">Completed on</th>
+              <th scope="col" class="govuk-table__header">Grade or outcome</th>
+            </tr>
+            </thead>
+
+            <tbody class="govuk-table__body">
+            {% for completedCourse in inPrisonCourses.coursesCompletedInLast12Months %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell" data-qa="completed-course-name">{{ completedCourse.courseName }}</td>
+                <td class="govuk-table__cell">{{ "Accredited" if completedCourse.isAccredited else "Non-accredited" }}</td>
+                <td class="govuk-table__cell">{{ completedCourse.prisonName if completedCourse.prisonName else completedCourse.prisonId }}</td>
+                <td class="govuk-table__cell">{{ completedCourse.courseCompletionDate | formatDate }}</td>
+                <td class="govuk-table__cell">{{ completedCourse.grade if completedQualification.grade else 'N/A' }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        {% endif %}
+      {% endif %}
+
+      <p class="govuk-body">
+        <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="{{ fullCourseHistoryLinkUrl }}" data-qa="link-to-view-all-in-prison-courses">
+          View all completed, in progress and withdrawn courses
+        </a>
+      </p>
+    {% endif %}
+
+  {% else %}
+    <h3 class="govuk-heading-s" data-qa="curious-unavailable-message">We cannot show these details from Curious right now</h3>
+    <p class="govuk-body">Reload the page or try again later. Other parts of this service may still be available.</p>
+  {% endif %}
+{%- endcall -%}

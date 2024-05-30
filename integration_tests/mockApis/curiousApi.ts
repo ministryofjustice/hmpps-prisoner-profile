@@ -10,7 +10,12 @@ import {
   OffenderActivitiesEmptyMock,
   OffenderActivitiesMock,
 } from '../../server/data/localMockData/offenderActivitiesMock'
-import { learnerEducationPagedResponse } from '../../server/data/localMockData/learnerEducationPagedResponse'
+import {
+  learnerEducationPagedResponse,
+  learnerEducationPagedResponseContainingCompletedCourseNotInLast12Months,
+  learnerEducationPagedResponseContainingNoCourses,
+  learnerEducationPagedResponsePage1Of1,
+} from '../../server/data/localMockData/learnerEducationPagedResponse'
 
 export default {
   stubGetLearnerEmployabilitySkills: (prisonerNumber: string) => {
@@ -39,10 +44,96 @@ export default {
       },
       response: {
         status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: learnerEducationPagedResponse(prisonerNumber),
+      },
+    })
+  },
+  stubGetLearnerEducationForPrisonWithCoursesButNoneCompleteInTheLast12Months: (prisonerNumber: string, page = 0) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        queryParameters: {
+          page: { equalTo: `${page}` },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: learnerEducationPagedResponseContainingCompletedCourseNotInLast12Months(prisonerNumber),
+      },
+    })
+  },
+  stubGetLearnerEducationForPrisonWithCoursesButNoneComplete: (prisonerNumber: string, page = 0) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        queryParameters: {
+          page: { equalTo: `${page}` },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: learnerEducationPagedResponsePage1Of1(prisonerNumber),
+      },
+    })
+  },
+  stubGetLearnerEducationForPrisonerWithNoCourses: (prisonerNumber: string, page = 0) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        queryParameters: {
+          page: { equalTo: `${page}` },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: learnerEducationPagedResponseContainingNoCourses(),
+      },
+    })
+  },
+  stubGetLearnerEducation404Error: (prisonerNumber: string, page = 0) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        queryParameters: {
+          page: { equalTo: `${page}` },
+        },
+      },
+      response: {
+        status: 404,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          errorCode: 'VC4004',
+          errorMessage: 'Resource not found',
+          httpStatusCode: 404,
+        },
+      },
+    })
+  },
+  stubGetLearnerEducation401Error: (prisonerNumber: string, page = 0) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPathPattern: `/curiousApi/learnerEducation/${prisonerNumber}`,
+        queryParameters: {
+          page: { equalTo: `${page}` },
+        },
+      },
+      response: {
+        status: 401,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          errorCode: 'VC4001',
+          errorMessage: 'Invalid token',
+          httpStatusCode: 401,
+        },
       },
     })
   },

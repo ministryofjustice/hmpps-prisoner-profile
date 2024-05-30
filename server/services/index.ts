@@ -154,6 +154,7 @@ export const services = () => {
     prisonerScheduleService,
     incentivesService,
     contentfulService,
+    curiousService,
   }
 }
 

@@ -27,6 +27,7 @@ import { getRequest } from './routerUtils'
 import probationDocumentsRouter from './probationDocumentsRouter'
 import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
+import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -147,13 +148,21 @@ export default function routes(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     checkPrisonerInCaseload(),
+    // TODO - RR-814 - when this feature toggle is removed the no-op RequestHandler function can be removed, simply leaving the call to the retrieveCuriousInPrisonCourses middleware
+    config.featureToggles.newCourseAndQualificationHistoryEnabled
+      ? retrieveCuriousInPrisonCourses(services.curiousService)
+      : async (req, res, next) => {
+          next()
+        },
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const { workAndSkillsPageService } = services
       const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
 
-      const fullCourseHistoryLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+      const fullCourseHistoryLinkUrl = config.featureToggles.newCourseAndQualificationHistoryEnabled
+        ? `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
+        : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`

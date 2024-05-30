@@ -75,6 +75,7 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
     COURT_CASES_SUMMARY_ENABLED: "true"
+    NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED: "true"
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
