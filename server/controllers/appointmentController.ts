@@ -104,7 +104,7 @@ export default class AppointmentController {
   public post(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const userToken = res.locals.user.token
+      const { clientToken } = req.middleware
 
       const {
         appointmentType,
@@ -168,7 +168,7 @@ export default class AppointmentController {
         }
 
         try {
-          await this.appointmentService.createAppointments(userToken, appointmentsToCreate)
+          await this.appointmentService.createAppointments(clientToken, appointmentsToCreate)
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.data.userMessage })
@@ -348,7 +348,7 @@ export default class AppointmentController {
   public postVideoLinkBooking(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
-      const userToken = res.locals.user.token
+      const { clientToken } = req.middleware
 
       const {
         bookingId,
@@ -406,7 +406,7 @@ export default class AppointmentController {
         }
 
         try {
-          await this.appointmentService.addVideoLinkBooking(userToken, videoLinkBookingForm)
+          await this.appointmentService.addVideoLinkBooking(clientToken, videoLinkBookingForm)
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.data.userMessage })

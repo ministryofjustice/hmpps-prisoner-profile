@@ -62,6 +62,7 @@
         <form method="post" novalidate="novalidate" autocomplete="off">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
+            <input type="hidden" name="activeTo" value="{{ formValues.activeTo }}" />
 
             {{ govukCharacterCount({
                 name: "description",

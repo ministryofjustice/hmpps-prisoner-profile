@@ -7,7 +7,7 @@ import { includesActiveCaseLoad, isActiveCaseLoad, userCanEdit, userHasRoles } f
 import { Role } from '../../../data/enums/role'
 import conf from '../../../config'
 import { HeaderFooterMeta } from '../../../data/interfaces/componentApi/Component'
-import isServiceEnabled from '../../../utils/isServiceEnabled'
+import isServiceNavEnabled from '../../../utils/isServiceEnabled'
 import StaffRole from '../../../data/interfaces/prisonApi/StaffRole'
 import { HmppsUser } from '../../../interfaces/HmppsUser'
 
@@ -76,7 +76,7 @@ export default (
 
   if (
     userHasRoles([Role.ActivityHub], user.userRoles) &&
-    isServiceEnabled('activities', feComponentsMeta) &&
+    isServiceNavEnabled('activities', feComponentsMeta) &&
     isActiveCaseLoad(prisonerData.prisonId, user) &&
     prisonerData.status !== 'ACTIVE OUT'
   ) {

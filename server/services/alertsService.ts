@@ -10,11 +10,23 @@ import HmppsError from '../interfaces/HmppsError'
 import { AlertForm } from '../data/interfaces/prisonApi/PrisonApiAlert'
 import { RestClientBuilder } from '../data'
 import PagedList, { AlertsListQueryParams } from '../data/interfaces/prisonApi/PagedList'
-import { toAlert, toPrisonAlertChanges, toPrisonApiCreateAlert } from './mappers/alertMapper'
+import {
+  capitaliseAlertDisplayNames,
+  toAlert,
+  toAlertsApiCreateAlert,
+  toAlertType,
+  toPrisonAlertChanges,
+  toPrisonApiCreateAlert,
+} from './mappers/alertMapper'
 import { Alert, AlertChanges } from '../data/interfaces/alertsApi/Alert'
+import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
+import config from '../config'
 
 export default class AlertsService {
-  constructor(private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>) {}
+  constructor(
+    private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
+    private readonly alertsApiClientBuilder: RestClientBuilder<AlertsApiClient>,
+  ) {}
 
   /**
    * Validate alert filters and return errors if appropriate
@@ -44,19 +56,39 @@ export default class AlertsService {
   }
 
   /**
-   * Map query params from the browser to values suitable for sending to the API.
+   * Map query params from the browser to values suitable for sending to the Prison API.
    *
    * @param queryParams
    * @private
    */
-  private mapToApiParams(queryParams: AlertsListQueryParams) {
-    const apiParams = { ...queryParams }
+  private mapToPrisonApiParams(queryParams: AlertsListQueryParams) {
+    return {
+      ...queryParams,
+      ...(queryParams.from && { from: formatDateISO(parseDate(queryParams.from)) }),
+      ...(queryParams.to && { to: formatDateISO(parseDate(queryParams.to)) }),
+      ...(queryParams.page && { page: Number(queryParams.page) - 1 }), // Change page to zero based for API query
+      size: queryParams.showAll ? 9999 : 20,
+    }
+  }
 
-    if (apiParams.from) apiParams.from = apiParams.from && formatDateISO(parseDate(apiParams.from))
-    if (apiParams.to) apiParams.to = apiParams.to && formatDateISO(parseDate(apiParams.to))
-    if (apiParams.page) apiParams.page = apiParams.page && +apiParams.page - 1 // Change page to zero based for API query
-
-    return apiParams
+  /**
+   * Map query params from the browser to values suitable for sending to the Alerts API.
+   *
+   * @param queryParams
+   * @private
+   */
+  private mapToAlertsApiParams(queryParams: AlertsListQueryParams) {
+    return {
+      ...(queryParams.alertType && { alertType: queryParams.alertType }),
+      ...(queryParams.from && { activeFromStart: formatDateISO(parseDate(queryParams.from)) }),
+      ...(queryParams.to && { activeFromEnd: formatDateISO(parseDate(queryParams.to)) }),
+      ...(queryParams.sort && {
+        sort: queryParams.sort.replace('dateCreated', 'activeFrom').replace('dateExpires', 'activeTo'),
+      }),
+      ...(queryParams.page && { page: Number(queryParams.page) - 1 }), // Change page to zero based for API query
+      isActive: queryParams.alertStatus === 'ACTIVE',
+      size: queryParams?.showAll ? 9999 : 20,
+    }
   }
 
   /**
@@ -73,6 +105,7 @@ export default class AlertsService {
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
+    const alertsApiClient = this.alertsApiClientBuilder(clientToken)
     const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(
       prisonerData.bookingId,
     )
@@ -114,7 +147,7 @@ export default class AlertsService {
 
     const pagedAlerts =
       !errors.length && (shouldGetActiveAlerts || shouldGetInactiveAlerts)
-        ? await this.getPagedAlerts(prisonApiClient, prisonerData, queryParams)
+        ? await this.getPagedAlerts(prisonApiClient, alertsApiClient, prisonerData, queryParams)
         : null
 
     // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
@@ -135,13 +168,24 @@ export default class AlertsService {
 
   private async getPagedAlerts(
     prisonApiClient: PrisonApiClient,
+    alertsApiClient: AlertsApiClient,
     prisonerData: Prisoner,
     queryParams: AlertsListQueryParams,
   ): Promise<PagedList<Alert> | null> {
-    // TODO if new alerts API enabled use directly, if not use prison API and map results
+    const { alertsApiEnabled } = config.featureToggles
 
-    const pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToApiParams(queryParams))
+    if (alertsApiEnabled) {
+      const pagedAlerts = await alertsApiClient.getAlerts(
+        prisonerData.prisonerNumber,
+        this.mapToAlertsApiParams(queryParams),
+      )
+      return {
+        ...pagedAlerts,
+        content: pagedAlerts.content.map(capitaliseAlertDisplayNames),
+      }
+    }
 
+    const pagedAlerts = await prisonApiClient.getAlerts(prisonerData.bookingId, this.mapToPrisonApiParams(queryParams))
     return {
       ...pagedAlerts,
       content: pagedAlerts.content.map(toAlert),
@@ -153,18 +197,32 @@ export default class AlertsService {
     token: string,
     { bookingId, prisonerNumber, alertForm }: { bookingId: number; prisonerNumber: string; alertForm: AlertForm },
   ) {
+    const { alertsApiEnabled } = config.featureToggles
+
+    if (alertsApiEnabled) {
+      const alertsApiClient = this.alertsApiClientBuilder(token)
+      const alert = await alertsApiClient.createAlert(toAlertsApiCreateAlert(alertForm, prisonerNumber))
+
+      return capitaliseAlertDisplayNames(alert)
+    }
+
     const prisonApiClient = this.prisonApiClientBuilder(token)
-
-    // TODO map alertForm to PrisonApiCreateAlert or Alerts API Model
-
     const alert = await prisonApiClient.createAlert(bookingId, toPrisonApiCreateAlert(alertForm))
 
     return toAlert(alert)
   }
 
   public async getAlertDetails(token: string, bookingId: number, alertId: string) {
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const { alertsApiEnabled } = config.featureToggles
 
+    if (alertsApiEnabled) {
+      const alertsApiClient = this.alertsApiClientBuilder(token)
+      const alert = await alertsApiClient.getAlertDetails(alertId)
+
+      return capitaliseAlertDisplayNames(alert)
+    }
+
+    const prisonApiClient = this.prisonApiClientBuilder(token)
     const alert = await prisonApiClient.getAlertDetails(bookingId, alertId)
 
     return {
@@ -173,11 +231,34 @@ export default class AlertsService {
   }
 
   public async updateAlert(token: string, bookingId: number, alertId: string, alertChanges: AlertChanges) {
-    // TODO if new alerts API enabled use directly, if not map params for use with prison API
+    const { alertsApiEnabled } = config.featureToggles
+
+    if (alertsApiEnabled) {
+      const alertsApiClient = this.alertsApiClientBuilder(token)
+      const alert = await alertsApiClient.updateAlert(alertId, alertChanges)
+
+      return capitaliseAlertDisplayNames(alert)
+    }
 
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const prisonApiAlert = await prisonApiClient.updateAlert(bookingId, alertId, toPrisonAlertChanges(alertChanges))
 
     return toAlert(prisonApiAlert)
+  }
+
+  public async getAlertTypes(token: string) {
+    const { alertsApiEnabled } = config.featureToggles
+
+    if (alertsApiEnabled) {
+      const alertsApiClient = this.alertsApiClientBuilder(token)
+      const alertTypes = await alertsApiClient.getAlertTypes()
+
+      return alertTypes.filter(alertType => alertType.alertCodes?.length) // Exclude alert types with no alert codes as they cannot be selected
+    }
+
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const alertTypes = await prisonApiClient.getAlertTypes()
+
+    return alertTypes.map(toAlertType)
   }
 }

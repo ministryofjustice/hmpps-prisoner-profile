@@ -22,6 +22,8 @@ import restrictedPatientApi from './integration_tests/mockApis/restrictedPatient
 import prisonRegisterApi from './integration_tests/mockApis/prisonRegisterApi'
 import calcluateReleaseDatesApi from './integration_tests/mockApis/calculateReleaseDatesApi'
 import contentful from './integration_tests/mockApis/contentful'
+import alertsApi from './integration_tests/mockApis/alertsApi'
+import componentApi from './integration_tests/mockApis/componentApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -62,6 +64,8 @@ export default defineConfig({
         ...prisonRegisterApi,
         ...calcluateReleaseDatesApi,
         ...contentful,
+        ...alertsApi,
+        ...componentApi,
       })
     },
     baseUrl: 'http://localhost:3007',

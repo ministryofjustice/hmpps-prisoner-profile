@@ -27,7 +27,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20(&page=0)?${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
       },
       response: {
         status: 200,

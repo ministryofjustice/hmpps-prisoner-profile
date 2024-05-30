@@ -25,10 +25,10 @@ export default interface PrisonApiAlert {
 export interface AlertForm {
   bookingId?: number
   existingAlerts?: string
-  alertType: string
-  alertCode: string
+  alertType?: string
+  alertCode?: string
   description?: string
-  activeFrom: string
+  activeFrom?: string
   activeTo?: string
 }
 

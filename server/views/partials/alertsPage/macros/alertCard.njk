@@ -9,7 +9,7 @@
         <div class="hmpps-alert-card-list-item__metadata"><span>Last updated:</span> {{ alert.lastModifiedAt | formatDate }} {% if alert.lastModifiedByDisplayName %} by {{ alert.lastModifiedByDisplayName }} {% endif %}</div>
         {% endif %}
         {% if alert.activeTo %}
-            <div class="hmpps-alert-card-list-item__metadata"><span>End date:</span> {{ alert.activeTo | formatDate }} {% if alert.lastModifiedByDisplayName %} by {{ alert.lastModifiedByDisplayName }} {% else %} by {{ alert.createdByDisplayName }} {% endif %}</div>
+            <div class="hmpps-alert-card-list-item__metadata"><span>End date:</span> {{ alert.activeTo | formatDate }} {% if alert.activeToLastSetByDisplayName %} by {{ alert.activeToLastSetByDisplayName }} {% else %} by {{ alert.createdByDisplayName }} {% endif %}</div>
         {% endif %}
     </div>
     <div class="hmpps-alert-card-list-item__link">

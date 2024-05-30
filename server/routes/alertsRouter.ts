@@ -23,11 +23,7 @@ export default function alertsRouter(services: Services): Router {
   const get = getRequest(router)
   const post = postRequest(router)
 
-  const alertsController = new AlertsController(
-    services.alertsService,
-    services.referenceDataService,
-    services.auditService,
-  )
+  const alertsController = new AlertsController(services.alertsService, services.auditService)
 
   get(
     '/prisoner/:prisonerNumber/alerts',

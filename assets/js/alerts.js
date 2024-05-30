@@ -8,7 +8,9 @@ function initDynamicDropdowns() {
     if (alertTypeElement.value === '') return
 
     typeCodeMap[alertTypeElement.value]?.forEach(alertCode => {
-      alertCodeElement.add(new Option(alertCode.text, alertCode.value))
+      const opt = new Option(alertCode.text, alertCode.value)
+      opt.disabled = alertCode.attributes?.disabled
+      alertCodeElement.add(opt)
     })
   })
 }
