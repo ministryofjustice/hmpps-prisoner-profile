@@ -276,9 +276,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]> {
+  async getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]> {
     return this.restClient.get<OffenderIdentifier[]>({
-      path: `/api/bookings/${bookingId}/identifiers`,
+      path: `/api/offenders/${prisonerNumber}/offender-identifiers?includeAliases=false`,
     })
   }
 

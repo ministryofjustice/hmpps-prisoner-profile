@@ -97,7 +97,7 @@ export interface PrisonApiClient {
   getFullStatus(prisonerNumber: string): Promise<FullStatus>
   getCourtDateResults(offenderNumber: string): Promise<CourtDateResults[]>
   getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
-  getIdentifiers(bookingId: number): Promise<OffenderIdentifier[]>
+  getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]>
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
   getAgencyDetails(agencyId: string): Promise<AgencyDetails>
   getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>

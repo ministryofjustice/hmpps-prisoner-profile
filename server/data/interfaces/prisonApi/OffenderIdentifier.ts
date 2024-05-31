@@ -1,8 +1,14 @@
-export const getOffenderIdentifierValue = (type: OffenderIdentifierType, array: OffenderIdentifier[]): string => {
-  const value = Array.isArray(array) && array.length ? array.find(item => item.type === type) : null
+import { IdentityNumber } from '../../../services/interfaces/personalPageService/PersonalPage'
 
-  return value && value.value
+export const getOffenderIdentifierValue = (
+  type: OffenderIdentifierType,
+  array: OffenderIdentifier[],
+): IdentityNumber[] => {
+  return Array.isArray(array) && array.length
+    ? array.filter(item => item.type === type).map(item => ({ value: item.value, comment: item.issuedAuthorityText }))
+    : []
 }
+
 export default interface OffenderIdentifier {
   type: string
   value: string
@@ -16,7 +22,22 @@ export default interface OffenderIdentifier {
 
 // eslint-disable-next-line no-shadow
 export enum OffenderIdentifierType {
-  HomeOfficeReferenceNumber = 'HOREF',
-  NationalInsuranceNumber = 'NINO',
+  CaseInformationDatabase = 'CID',
+  CroNumber = 'CRO',
+  DidNotEnterPrisonTaggedBailRel = 'TBRI',
   DrivingLicenseNumber = 'DL',
+  HomeOfficeReferenceNumber = 'HOREF',
+  LocalInmateDataSystemNumber = 'LIDS',
+  NationalInsuranceNumber = 'NINO',
+  ParkrunNumber = 'PARK',
+  PassportNumber = 'PASS',
+  PncNumber = 'PNC',
+  PortReferenceNumber = 'PORT REF',
+  PrisonLegacySystemNumber = 'HMPS',
+  ProbationLegacySystemNumber = 'NPD',
+  ScottishPncNumber = 'SPNC',
+  SharedAliasWarning = 'SHARED ALIAS',
+  StaffIdentityCardNumber = 'STAFF',
+  UniqueLearnerNumber = 'ULN',
+  YjafNumber = 'YJAF',
 }

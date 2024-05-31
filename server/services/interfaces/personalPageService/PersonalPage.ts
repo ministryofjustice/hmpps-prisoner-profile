@@ -53,13 +53,31 @@ export interface PersonalDetails {
   typeOfDiet: string
   youthOffender: string
 }
+
+export interface IdentityNumber {
+  value: string
+  comment?: string
+}
+
 export interface IdentityNumbers {
-  croNumber: string
-  drivingLicenceNumber: string
-  homeOfficeReferenceNumber: string
-  nationalInsuranceNumber: string
-  pncNumber: string
+  caseInformationDatabase: IdentityNumber[]
+  croNumber: IdentityNumber[]
+  didNotEnterPrisonTaggedBailRel: IdentityNumber[]
+  drivingLicenceNumber: IdentityNumber[]
+  homeOfficeReferenceNumber: IdentityNumber[]
+  localInmateDataSystemNumber: IdentityNumber[]
+  nationalInsuranceNumber: IdentityNumber[]
+  parkrunNumber: IdentityNumber[]
+  passportNumber: IdentityNumber[]
+  pncNumber: IdentityNumber[]
+  portReferenceNumber: IdentityNumber[]
+  prisonLegacySystemNumber: IdentityNumber[]
   prisonNumber: string
+  probationLegacySystemNumber: IdentityNumber[]
+  scottishPncNumber: IdentityNumber[]
+  staffIdentityCardNumber: IdentityNumber[]
+  uniqueLearnerNumber: IdentityNumber[]
+  yjafNumber: IdentityNumber[]
 }
 
 export interface PropertyItem {
