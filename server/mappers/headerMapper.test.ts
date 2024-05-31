@@ -2,6 +2,7 @@ import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/pris
 import { mapHeaderData, mapHeaderNoBannerData, mapProfileBannerTopLinks } from './headerMappers'
 import { prisonUserMock } from '../data/localMockData/user'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
+import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 describe('HeaderMapping', () => {
   describe('Header data', () => {
@@ -15,11 +16,11 @@ describe('HeaderMapping', () => {
   })
   describe('Category A prisoner', () => {
     it('Photo type should be photoWithheld for security purposes', async () => {
-      const headerData = mapHeaderData(PrisonerMockDataA, inmateDetailMock, prisonUserMock)
+      const headerData = mapHeaderData(PrisonerMockDataA, inmateDetailMock, alertFlagLabels, prisonUserMock)
       expect(headerData.photoType).toBe('photoWithheld')
     })
     it('Photo type should return as placeholder if the category is not A', async () => {
-      const headerData = mapHeaderData(PrisonerMockDataB, inmateDetailMock, prisonUserMock)
+      const headerData = mapHeaderData(PrisonerMockDataB, inmateDetailMock, alertFlagLabels, prisonUserMock)
       expect(headerData.photoType).toBe('placeholder')
     })
   })

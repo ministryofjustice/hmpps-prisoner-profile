@@ -5,6 +5,7 @@ import {
   PrisonerScheduleNextWeekMock,
   PrisonerScheduleThisWeekMock,
 } from '../../server/data/localMockData/prisonerScheduleMock'
+import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 context('Prisoner schedule for this week ', () => {
   const prisonerSchedulePageUrl = () => {
@@ -18,6 +19,7 @@ context('Prisoner schedule for this week ', () => {
     cy.setupUserAuth()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupPrisonerSchedulePageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   it('Prisoner schedule page is displayed', () => {
@@ -50,6 +52,7 @@ context('Prisoner schedule for next week', () => {
     cy.setupUserAuth()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupPrisonerSchedulePageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   it('Prisoner schedule page is displayed', () => {

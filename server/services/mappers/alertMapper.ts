@@ -8,6 +8,7 @@ import PrisonApiAlert, {
 import { Alert, AlertChanges, AlertCode, AlertType, CreateAlert } from '../../data/interfaces/alertsApi/Alert'
 import { formatName, formatNamePart } from '../../utils/utils'
 import { formatDateISO, parseDate } from '../../utils/dateHelpers'
+import AlertFlagLabel from '../../interfaces/AlertFlagLabels'
 
 /**
  * Map from the Prison API type [PrisonApiAlerts]
@@ -127,4 +128,15 @@ export const toAlertType = (prisonApiAlertType: PrisonApiAlertType): AlertType =
     isActive: prisonApiAlertType.activeFlag === 'Y',
     alertCodes: prisonApiAlertType.subCodes?.length ? prisonApiAlertType.subCodes.map(toAlertCode) : [],
   }
+}
+
+export const toAlertFlagLabels = (alerts: Alert[], alertFlags: AlertFlagLabel[]): AlertFlagLabel[] => {
+  return alertFlags
+    .map(flag => {
+      const alertIds = alerts
+        .filter(alert => alert.isActive && flag.alertCodes.includes(alert.alertCode.code))
+        .map(alert => alert.alertUuid)
+      return { ...flag, alertIds } as AlertFlagLabel
+    })
+    .filter(alert => alert.alertIds?.length)
 }

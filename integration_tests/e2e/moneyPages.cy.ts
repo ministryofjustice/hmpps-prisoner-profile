@@ -2,6 +2,7 @@ import Page from '../pages/page'
 import NotFoundPage from '../pages/notFoundPage'
 import { accountBalancesMock } from '../../server/data/localMockData/miniSummaryMock'
 import MoneyPage from '../pages/moneyPage'
+import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitSpendsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/money/spends' })
@@ -20,6 +21,10 @@ const visitDamageObligationsPage = ({ failOnStatusCode = true } = {}) => {
 }
 
 context('Money Pages - Permissions', () => {
+  beforeEach(() => {
+    cy.task('stubComponentsMeta', componentsNoServicesMock)
+  })
+
   context('Spends', () => {
     beforeEach(() => {
       cy.task('reset')

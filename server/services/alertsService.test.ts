@@ -171,6 +171,9 @@ describe('Alerts Service', () => {
     beforeAll(async () => {
       config.featureToggles.alertsApiEnabled = true
     })
+    afterAll(async () => {
+      config.featureToggles.alertsApiEnabled = false
+    })
 
     describe('Get Alerts', () => {
       it('should call Alerts API tp get active alerts when queryParams includes ACTIVE', async () => {

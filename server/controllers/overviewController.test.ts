@@ -29,7 +29,6 @@ import { Role } from '../data/enums/role'
 import { prisonerScheduleServiceMock } from '../../tests/mocks/prisonerScheduleServiceMock'
 import PrisonerScheduleService from '../services/prisonerScheduleService'
 import { assessmentsMock } from '../data/localMockData/miniSummaryMock'
-import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import IncentivesService from '../services/incentivesService'
 import { incentiveServiceMock } from '../../tests/mocks/incentiveServiceMock'
 import { UserService } from '../services'
@@ -139,7 +138,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ spends: 1, savings: 2, cash: 2, damageObligations: 3, currency: 'GBP' })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -157,7 +156,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ spends: 1, savings: 2, cash: 2, damageObligations: 3, currency: 'GBP' })
 
-      await controller.displayOverview(req, resNotInCaseload, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -173,7 +172,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -191,7 +190,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
 
-      await controller.displayOverview(req, resNotInCaseload, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -211,7 +210,7 @@ describe('overviewController', () => {
           .fn()
           .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
 
-        await controller.displayOverview(req, resRole, PrisonerMockDataA, inmateDetailMock)
+        await controller.displayOverview(req, resRole)
         expect(res.render).toHaveBeenCalledWith(
           'pages/overviewPage',
           expect.objectContaining({ adjudicationSummary: { adjudicationCount: 1, activePunishments: 2 } }),
@@ -226,7 +225,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ startDate: '2030-03-02', remainingVo: 2, remainingPvo: 2 })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -244,7 +243,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ startDate: '2030-03-02', remainingVo: 2, remainingPvo: 2 })
 
-      await controller.displayOverview(req, resNotInCaseload, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -260,7 +259,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ morning: [], afternoon: [], evening: [] })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -276,10 +275,14 @@ describe('overviewController', () => {
       const bookingId = 123456
 
       await controller.displayOverview(
-        req,
+        {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
+          },
+        },
         res,
-        { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        inmateDetailMock,
       )
 
       expect(res.render).toHaveBeenCalledWith(
@@ -305,10 +308,14 @@ describe('overviewController', () => {
       const bookingId = 123456
 
       await controller.displayOverview(
-        req,
+        {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
+          },
+        },
         resRole,
-        { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        inmateDetailMock,
       )
 
       expect(res.render).toHaveBeenCalledWith(
@@ -330,10 +337,14 @@ describe('overviewController', () => {
       const bookingId = 123456
 
       await controller.displayOverview(
-        req,
+        {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
+          },
+        },
         res,
-        { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock } as Prisoner,
-        inmateDetailMock,
       )
 
       expect(res.render).toHaveBeenCalledWith(
@@ -354,7 +365,7 @@ describe('overviewController', () => {
         daysOverdue: undefined,
       })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -380,7 +391,7 @@ describe('overviewController', () => {
         daysOverdue: undefined,
       })
 
-      await controller.displayOverview(req, resNotInCaseload, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -401,7 +412,7 @@ describe('overviewController', () => {
         daysOverdue: undefined,
       })
 
-      await controller.displayOverview(req, resRole, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, resRole)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -421,7 +432,13 @@ describe('overviewController', () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
       personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
 
-      await controller.displayOverview(req, res, { ...PrisonerMockDataA, prisonId: 'LII' }, inmateDetailMock)
+      await controller.displayOverview(
+        {
+          ...req,
+          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
+        },
+        res,
+      )
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -439,7 +456,13 @@ describe('overviewController', () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
       personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
 
-      await controller.displayOverview(req, res, { ...PrisonerMockDataA, prisonId: 'LEI' }, inmateDetailMock)
+      await controller.displayOverview(
+        {
+          ...req,
+          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LEI' } },
+        },
+        res,
+      )
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -453,7 +476,13 @@ describe('overviewController', () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
       personalPageService.getLearnerNeurodivergence = jest.fn().mockRejectedValue('ERROR')
 
-      await controller.displayOverview(req, res, { ...PrisonerMockDataA, prisonId: 'LII' }, inmateDetailMock)
+      await controller.displayOverview(
+        {
+          ...req,
+          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LII' } },
+        },
+        res,
+      )
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -471,10 +500,14 @@ describe('overviewController', () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
 
       await controller.displayOverview(
-        req,
+        {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: { ...PrisonerMockDataA, prisonId: 'LII', inOutStatus: 'OUT', status: 'ACTIVE OUT' },
+          },
+        },
         res,
-        { ...PrisonerMockDataA, prisonId: 'LII', inOutStatus: 'OUT', status: 'ACTIVE OUT' },
-        inmateDetailMock,
       )
 
       expect(res.render).toHaveBeenCalledWith(
@@ -489,16 +522,20 @@ describe('overviewController', () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
 
       await controller.displayOverview(
-        req,
-        res,
         {
-          ...PrisonerMockDataA,
-          prisonId: 'LII',
-          inOutStatus: 'OUT',
-          status: 'INACTIVE OUT',
-          locationDescription: 'Outside - released from Moorland (HMP & YOI)',
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: {
+              ...PrisonerMockDataA,
+              prisonId: 'LII',
+              inOutStatus: 'OUT',
+              status: 'INACTIVE OUT',
+              locationDescription: 'Outside - released from Moorland (HMP & YOI)',
+            },
+          },
         },
-        inmateDetailMock,
+        res,
       )
 
       expect(res.render).toHaveBeenCalledWith(
@@ -513,14 +550,18 @@ describe('overviewController', () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
 
       await controller.displayOverview(
-        req,
-        res,
         {
-          ...PrisonerMockDataA,
-          prisonId: 'LII',
-          inOutStatus: 'TRN',
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: {
+              ...PrisonerMockDataA,
+              prisonId: 'LII',
+              inOutStatus: 'TRN',
+            },
+          },
         },
-        inmateDetailMock,
+        res,
       )
 
       expect(res.render).toHaveBeenCalledWith(
@@ -553,7 +594,16 @@ describe('overviewController', () => {
         const profileInformation = [suitableListener, recognisedListener].filter(Boolean)
         offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
 
-        await controller.displayOverview(req, res, PrisonerMockDataA, { ...inmateDetailMock, profileInformation })
+        await controller.displayOverview(
+          {
+            ...req,
+            middleware: {
+              ...req.middleware,
+              inmateDetail: { ...inmateDetailMock, profileInformation },
+            },
+          },
+          res,
+        )
 
         const { statuses } = res.render.mock.calls[0][1]
 
@@ -572,7 +622,7 @@ describe('overviewController', () => {
           offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
           prisonerScheduleService.getScheduledTransfers = jest.fn(async () => scheduledTransfersMock)
 
-          await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+          await controller.displayOverview(req, res)
 
           expect(res.render).toHaveBeenCalledWith(
             'pages/overviewPage',
@@ -588,7 +638,7 @@ describe('overviewController', () => {
           offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
           prisonerScheduleService.getScheduledTransfers = jest.fn(async () => [])
 
-          await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+          await controller.displayOverview(req, res)
           expect(res.render).toHaveBeenCalledWith(
             'pages/overviewPage',
             expect.objectContaining({
@@ -609,16 +659,21 @@ describe('overviewController', () => {
         .mockResolvedValue({ mainOffenceDescription: 'Offence', fullStatus: 'Full Status' })
 
       await controller.displayOverview(
-        req,
-        res,
         {
-          ...PrisonerMockDataA,
-          imprisonmentStatusDescription: 'ISD',
-          confirmedReleaseDate: 'CnRD',
-          conditionalReleaseDate: 'CdRD',
+          ...req,
+          middleware: {
+            ...req.middleware,
+            prisonerData: {
+              ...PrisonerMockDataA,
+              imprisonmentStatusDescription: 'ISD',
+              confirmedReleaseDate: 'CnRD',
+              conditionalReleaseDate: 'CdRD',
+            },
+          },
         },
-        inmateDetailMock,
+        res,
       )
+
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -640,7 +695,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ prisonName: 'A', prisonCount: 1, otherPrisonsCount: 2 })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -660,7 +715,7 @@ describe('overviewController', () => {
         coworkingPrisonOffenderManager: 'CW',
       })
 
-      await controller.displayOverview(req, res, PrisonerMockDataA, inmateDetailMock)
+      await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
