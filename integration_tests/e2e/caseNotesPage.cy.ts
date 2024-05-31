@@ -3,6 +3,7 @@ import CaseNotesPage from '../pages/caseNotesPage'
 import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
+import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -19,6 +20,7 @@ context('Case Notes Page', () => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.task('stubGetCaseNoteTypes')
+    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   context('Case Notes List', () => {

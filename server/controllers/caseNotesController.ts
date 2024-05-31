@@ -33,7 +33,7 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
-      const { clientToken } = req.middleware
+      const { clientToken, prisonerData, inmateDetail, alertFlags } = req.middleware
 
       if (req.query.page) queryParams.page = +req.query.page
       if (req.query.sort) queryParams.sort = req.query.sort as string
@@ -42,9 +42,6 @@ export default class CaseNotesController {
       if (req.query.startDate) queryParams.startDate = req.query.startDate as string
       if (req.query.endDate) queryParams.endDate = req.query.endDate as string
       if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
-
-      // Get prisoner data for banner and for use in alerts generation
-      const { prisonerData } = req.middleware
 
       // Set role based permissions
       const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
@@ -61,7 +58,7 @@ export default class CaseNotesController {
       // Get case notes based on given query params
       // Get inmate detail for header
       const prisonApiClient = this.prisonApiClientBuilder(clientToken)
-      const [caseNotesUsage, caseNotesPageData, inmateDetail] = await Promise.all([
+      const [caseNotesUsage, caseNotesPageData] = await Promise.all([
         prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber),
         this.caseNotesService.get({
           token: clientToken,
@@ -71,7 +68,6 @@ export default class CaseNotesController {
           canDeleteSensitiveCaseNotes,
           currentUserDetails: res.locals.user,
         }),
-        prisonApiClient.getInmateDetail(prisonerData.bookingId),
       ])
 
       const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
@@ -95,7 +91,7 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'case-notes'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'case-notes'),
         ...caseNotesPageData,
         types,
         subTypes,

@@ -4,6 +4,7 @@ import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
 import AddCaseNotePage from '../pages/addCaseNotePage'
 import { formatDate } from '../../server/utils/dateHelpers'
+import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -19,6 +20,7 @@ context('Add Case Note Page', () => {
     cy.task('stubGetCaseNoteTypes')
     cy.task('stubGetCaseNoteTypesForUser')
     cy.task('stubAddCaseNote')
+    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   context('As a user with prisoner in their caseload', () => {

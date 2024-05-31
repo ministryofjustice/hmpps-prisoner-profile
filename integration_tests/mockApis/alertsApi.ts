@@ -230,4 +230,25 @@ export default {
       },
     })
   },
+
+  stubGetAlerts: (resp = pagedActiveAlertsMock) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
+        queryParameters: {
+          size: {
+            equalTo: '1000',
+          },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp,
+      },
+    })
+  },
 }

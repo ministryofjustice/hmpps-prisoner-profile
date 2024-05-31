@@ -7,7 +7,6 @@ import { Role } from '../data/enums/role'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
-import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import buildOverviewActions from './utils/overviewController/buildOverviewActions'
 import { AuditService, Page } from '../services/auditService'
 import logger from '../../logger'
@@ -52,8 +51,8 @@ export default class OverviewController {
     private readonly professionalContactsService: ProfessionalContactsService,
   ) {}
 
-  public async displayOverview(req: Request, res: Response, prisonerData: Prisoner, inmateDetail: InmateDetail) {
-    const { clientToken } = req.middleware
+  public async displayOverview(req: Request, res: Response) {
+    const { clientToken, prisonerData, inmateDetail, alertFlags } = req.middleware
     const { userRoles } = res.locals.user
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
@@ -127,7 +126,7 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, res.locals.user, 'overview'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'overview'),
       moneySummary,
       adjudicationSummary,
       visitsSummary,

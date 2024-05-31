@@ -7,6 +7,7 @@ import { permissionsTests } from './permissionsTests'
 import { formatDate } from '../../server/utils/dateHelpers'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
+import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -47,6 +48,7 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds', 1102484)
       cy.task('stubIdentifiers', 1102484)
       cy.task('stubBeliefHistory')
+      cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
 
@@ -83,6 +85,7 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
 
@@ -367,6 +370,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.task('stubComponentsMeta', componentsNoServicesMock)
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
     })
 
@@ -408,6 +412,7 @@ context('When signed in', () => {
         roles: [Role.GlobalSearch],
       })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
 
