@@ -62,7 +62,7 @@ export default class PersonalPageService {
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
-      prisonApiClient.getIdentifiers(bookingId),
+      prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
     ])
 
@@ -203,15 +203,39 @@ export default class PersonalPageService {
 
   private identityNumbers(prisonerData: Prisoner, identifiers: OffenderIdentifier[]): IdentityNumbers {
     return {
-      croNumber: prisonerData.croNumber || 'Not entered',
+      croNumber: getOffenderIdentifierValue(OffenderIdentifierType.CroNumber, identifiers),
       drivingLicenceNumber: getOffenderIdentifierValue(OffenderIdentifierType.DrivingLicenseNumber, identifiers),
       homeOfficeReferenceNumber: getOffenderIdentifierValue(
         OffenderIdentifierType.HomeOfficeReferenceNumber,
         identifiers,
       ),
       nationalInsuranceNumber: getOffenderIdentifierValue(OffenderIdentifierType.NationalInsuranceNumber, identifiers),
-      pncNumber: prisonerData.pncNumber || 'Not entered',
+      pncNumber: getOffenderIdentifierValue(OffenderIdentifierType.PncNumber, identifiers),
       prisonNumber: prisonerData.prisonerNumber,
+      caseInformationDatabase: getOffenderIdentifierValue(OffenderIdentifierType.CaseInformationDatabase, identifiers),
+      prisonLegacySystemNumber: getOffenderIdentifierValue(
+        OffenderIdentifierType.PrisonLegacySystemNumber,
+        identifiers,
+      ),
+      localInmateDataSystemNumber: getOffenderIdentifierValue(
+        OffenderIdentifierType.LocalInmateDataSystemNumber,
+        identifiers,
+      ),
+      passportNumber: getOffenderIdentifierValue(OffenderIdentifierType.PassportNumber, identifiers),
+      parkrunNumber: getOffenderIdentifierValue(OffenderIdentifierType.ParkrunNumber, identifiers),
+      probationLegacySystemNumber: getOffenderIdentifierValue(
+        OffenderIdentifierType.ProbationLegacySystemNumber,
+        identifiers,
+      ),
+      portReferenceNumber: getOffenderIdentifierValue(OffenderIdentifierType.PortReferenceNumber, identifiers),
+      scottishPncNumber: getOffenderIdentifierValue(OffenderIdentifierType.ScottishPncNumber, identifiers),
+      staffIdentityCardNumber: getOffenderIdentifierValue(OffenderIdentifierType.StaffIdentityCardNumber, identifiers),
+      didNotEnterPrisonTaggedBailRel: getOffenderIdentifierValue(
+        OffenderIdentifierType.DidNotEnterPrisonTaggedBailRel,
+        identifiers,
+      ),
+      uniqueLearnerNumber: getOffenderIdentifierValue(OffenderIdentifierType.UniqueLearnerNumber, identifiers),
+      yjafNumber: getOffenderIdentifierValue(OffenderIdentifierType.YjafNumber, identifiers),
     }
   }
 

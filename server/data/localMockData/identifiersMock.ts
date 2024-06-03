@@ -18,6 +18,14 @@ export const identifiersMock: OffenderIdentifier[] = [
     whenCreated: '2012-02-13T13:48:31.664201',
   },
   {
+    type: 'PNC',
+    value: '8/359381C',
+    offenderNo: 'G6123VU',
+    issuedAuthorityText: 'P/CONS - fixed',
+    caseloadType: 'INST',
+    whenCreated: '2012-02-13T13:48:31.664201',
+  },
+  {
     type: 'MERGED',
     value: 'A0596CL',
     offenderNo: 'G6123VU',

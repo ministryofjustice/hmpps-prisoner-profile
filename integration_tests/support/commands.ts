@@ -174,7 +174,7 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubHealthTreatmentReferenceDomain')
   cy.task('stubReasonableAdjustments', bookingId)
   cy.task('stubPersonalCareNeeds', bookingId)
-  cy.task('stubGetIdentifiers', bookingId)
+  cy.task('stubGetIdentifiers', prisonerNumber)
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
   cy.task('stubBeliefHistory')
 })

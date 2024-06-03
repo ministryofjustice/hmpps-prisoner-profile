@@ -866,11 +866,11 @@ export default {
     })
   },
 
-  stubGetIdentifiers: (bookingId: number) => {
+  stubGetIdentifiers: (prisonerNumber: string) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
+        urlPattern: `/prison/api/offenders/${prisonerNumber}/offender-identifiers.*`,
       },
       response: {
         status: 200,
@@ -1240,22 +1240,6 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: OffenderAttendanceHistoryMock(),
-      },
-    })
-  },
-
-  stubIdentifiers: (bookingId: number) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/identifiers`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: identifiersMock,
       },
     })
   },
