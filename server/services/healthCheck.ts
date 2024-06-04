@@ -53,6 +53,8 @@ const apiChecks = [
         ),
       ]
     : []),
+  service('prisonerSearchApi', `${config.apis.prisonerSearchApi.url}/health/ping`, config.apis.prisonerSearchApi.agent),
+  service('prisonApi', `${config.apis.prisonApi.url}/health/ping`, config.apis.prisonApi.agent),
 ]
 
 export default function healthCheck(
