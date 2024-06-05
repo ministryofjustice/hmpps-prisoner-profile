@@ -3,6 +3,17 @@ import { PrisonerMockDataA, PrisonerOnRemandMockData } from '../../server/data/l
 import Prisoner from '../../server/data/interfaces/prisonerSearchApi/Prisoner'
 
 export default {
+  stubPrisonerSearchPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prisonersearch/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
+
   stubPrisonerData: ({
     prisonerNumber,
     restrictedPatient,

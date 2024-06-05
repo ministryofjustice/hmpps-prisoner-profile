@@ -246,3 +246,10 @@ Cypress.Commands.add('setupVisitsDetailsPageStubs', ({ prisonerNumber, bookingId
   cy.task('stubVisitsWithVisitors', { bookingId, visitsOverrides })
   cy.task('stubVisitPrisons', { bookingId })
 })
+
+Cypress.Commands.add('setupHealthPings', ({ httpStatus }) => {
+  cy.task('stubAuthPing')
+  cy.task('stubTokenVerificationPing', httpStatus)
+  cy.task('stubPrisonApiPing', httpStatus)
+  cy.task('stubPrisonerSearchPing', httpStatus)
+})

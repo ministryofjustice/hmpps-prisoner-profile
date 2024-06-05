@@ -2,8 +2,7 @@ context('Healthcheck', () => {
   context('All healthy', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubAuthPing')
-      cy.task('stubTokenVerificationPing')
+      cy.setupHealthPings({ httpStatus: 200 })
     })
 
     it('Health check page is visible and UP', () => {
@@ -22,8 +21,7 @@ context('Healthcheck', () => {
   context('Some unhealthy', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubAuthPing')
-      cy.task('stubTokenVerificationPing', 500)
+      cy.setupHealthPings({ httpStatus: 500 })
     })
 
     it('Reports correctly when token verification down', () => {

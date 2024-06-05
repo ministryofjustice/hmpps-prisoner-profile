@@ -104,6 +104,17 @@ import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/Pa
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
+  stubPrisonApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prison/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
+
   stubAccountBalances: (bookingId: number) => {
     return stubFor({
       request: {
