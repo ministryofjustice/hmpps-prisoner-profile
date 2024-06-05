@@ -87,6 +87,8 @@ declare global {
         bookingId: number
         visitsOverrides?: VisitWithVisitors[]
       }): Chainable<AUTWindow>
+
+      setupHealthPings(options: { httpStatus: number }): Chainable<AUTWindow>
     }
   }
 }
