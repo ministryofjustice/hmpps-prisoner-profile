@@ -12,7 +12,8 @@ import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import NotFoundError from '../utils/notFoundError'
 import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
-import config from '../config'
+import FeatureToggleService from '../services/featureToggleService'
+import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
@@ -25,6 +26,7 @@ let services: Services
 let prisonApiClient: PrisonApiClient
 let prisonerSearchApiClient: PrisonerSearchClient
 let alertsApiClient: AlertsApiClient
+let featureToggleStoreMock: FeatureToggleStore
 
 describe('GetPrisonerDataMiddleware', () => {
   beforeEach(() => {
@@ -60,6 +62,7 @@ describe('GetPrisonerDataMiddleware', () => {
       updateAlert: jest.fn(async () => null),
       getAlerts: jest.fn(async () => pagedActiveAlertsMock),
     }
+
     services = {
       dataAccess: {
         prisonerSearchApiClientBuilder: jest.fn(() => prisonerSearchApiClient),
@@ -67,6 +70,12 @@ describe('GetPrisonerDataMiddleware', () => {
         alertsApiClientBuilder: jest.fn(() => alertsApiClient),
       } as any,
     } as Services
+
+    featureToggleStoreMock = {
+      getToggle: jest.fn(async () => false),
+      setToggle: jest.fn(),
+    }
+    services.featureToggleService = new FeatureToggleService(featureToggleStoreMock)
   })
 
   it('should get prisonerNumber from the query if provided', async () => {
@@ -114,7 +123,12 @@ describe('GetPrisonerDataMiddleware', () => {
   })
 
   it('should populate prisonerData, inmateDetail and alertFlags in middleware when alerts API enabled', async () => {
-    config.featureToggles.alertsApiEnabled = true
+    featureToggleStoreMock = {
+      getToggle: jest.fn(async () => true),
+      setToggle: jest.fn(),
+    }
+
+    services.featureToggleService = new FeatureToggleService(featureToggleStoreMock)
 
     await getPrisonerData(services)(req, res, next)
 
@@ -129,7 +143,5 @@ describe('GetPrisonerDataMiddleware', () => {
     })
     expect(req.middleware.inmateDetail).toEqual(inmateDetailMock)
     expect(next).toHaveBeenCalledWith()
-
-    config.featureToggles.alertsApiEnabled = false
   })
 })
