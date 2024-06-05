@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
@@ -12,7 +13,6 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
-import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
@@ -29,6 +29,8 @@ import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
 
+export const normalPagePaths = /^(?!\/api|\/save-backlink|^\/$).*/
+
 export default function routes(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
@@ -38,6 +40,12 @@ export default function routes(services: Services): Router {
       ...res.locals,
       currentUrlPath: req.baseUrl + req.path,
     }
+    next()
+  })
+
+  router.get(normalPagePaths, (req, res, next) => {
+    const feComponentsMeta = res.locals.feComponentsMeta as HeaderFooterMeta
+    config.featureToggles.alertsApiEnabled = !!feComponentsMeta?.services?.some(service => service.id === 'alerts')
     next()
   })
 
@@ -76,8 +84,6 @@ export default function routes(services: Services): Router {
     auditPageAccessAttempt({ services, page: ApiAction.Image }),
     services.commonApiRoutes.image,
   )
-
-  get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
   get(
     '/prisoner/:prisonerNumber',

@@ -1,4 +1,5 @@
-import Component, { HeaderFooterMeta } from '../../interfaces/componentApi/Component'
+import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
+import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 export const componentsMetaMock: HeaderFooterMeta = {
   activeCaseLoad: {
