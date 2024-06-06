@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
@@ -28,8 +29,9 @@ import probationDocumentsRouter from './probationDocumentsRouter'
 import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
+import logger from '../../logger'
 
-export const normalPagePaths = /^(?!\/api|\/save-backlink|^\/$).*/
+const normalPagePaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -43,9 +45,25 @@ export default function routes(services: Services): Router {
     next()
   })
 
-  router.get(normalPagePaths, (req, res, next) => {
+  router.get(
+    normalPagePaths,
+    dpsComponents.getPageComponents({
+      logger,
+      includeMeta: true,
+      dpsUrl: config.serviceUrls.digitalPrison,
+    }),
+  )
+
+  router.get(normalPagePaths, async (_req, res, next) => {
+    /* Set feature toggle for using Alerts API */
     const feComponentsMeta = res.locals.feComponentsMeta as HeaderFooterMeta
-    config.featureToggles.alertsApiEnabled = !!feComponentsMeta?.services?.some(service => service.id === 'alerts')
+    if ('activeCaseLoadId' in res.locals.user) {
+      await services.featureToggleService.setFeatureToggle(
+        res.locals.user.activeCaseLoadId,
+        'alertsApiEnabled',
+        feComponentsMeta?.services?.some(service => service.id === 'alerts'),
+      )
+    }
     next()
   })
 
