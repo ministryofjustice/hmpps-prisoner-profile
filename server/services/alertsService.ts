@@ -20,12 +20,13 @@ import {
 } from './mappers/alertMapper'
 import { Alert, AlertChanges } from '../data/interfaces/alertsApi/Alert'
 import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
-import config from '../config'
+import FeatureToggleService from './featureToggleService'
 
 export default class AlertsService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly alertsApiClientBuilder: RestClientBuilder<AlertsApiClient>,
+    private readonly featureToggleService: FeatureToggleService,
   ) {}
 
   /**
@@ -100,6 +101,7 @@ export default class AlertsService {
    */
   public async get(
     clientToken: string,
+    prisonId: string,
     prisonerData: Prisoner,
     queryParams: AlertsListQueryParams,
   ): Promise<AlertsPageData> {
@@ -147,7 +149,7 @@ export default class AlertsService {
 
     const pagedAlerts =
       !errors.length && (shouldGetActiveAlerts || shouldGetInactiveAlerts)
-        ? await this.getPagedAlerts(prisonApiClient, alertsApiClient, prisonerData, queryParams)
+        ? await this.getPagedAlerts(prisonId, prisonApiClient, alertsApiClient, prisonerData, queryParams)
         : null
 
     // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
@@ -167,12 +169,13 @@ export default class AlertsService {
   }
 
   private async getPagedAlerts(
+    prisonId: string,
     prisonApiClient: PrisonApiClient,
     alertsApiClient: AlertsApiClient,
     prisonerData: Prisoner,
     queryParams: AlertsListQueryParams,
   ): Promise<PagedList<Alert> | null> {
-    const { alertsApiEnabled } = config.featureToggles
+    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
       const pagedAlerts = await alertsApiClient.getAlerts(
@@ -195,9 +198,14 @@ export default class AlertsService {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   public async createAlert(
     token: string,
-    { bookingId, prisonerNumber, alertForm }: { bookingId: number; prisonerNumber: string; alertForm: AlertForm },
+    {
+      prisonId,
+      bookingId,
+      prisonerNumber,
+      alertForm,
+    }: { prisonId: string; bookingId: number; prisonerNumber: string; alertForm: AlertForm },
   ) {
-    const { alertsApiEnabled } = config.featureToggles
+    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
       const alertsApiClient = this.alertsApiClientBuilder(token)
@@ -212,8 +220,8 @@ export default class AlertsService {
     return toAlert(alert)
   }
 
-  public async getAlertDetails(token: string, bookingId: number, alertId: string) {
-    const { alertsApiEnabled } = config.featureToggles
+  public async getAlertDetails(token: string, prisonId: string, bookingId: number, alertId: string) {
+    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
       const alertsApiClient = this.alertsApiClientBuilder(token)
@@ -230,8 +238,14 @@ export default class AlertsService {
     }
   }
 
-  public async updateAlert(token: string, bookingId: number, alertId: string, alertChanges: AlertChanges) {
-    const { alertsApiEnabled } = config.featureToggles
+  public async updateAlert(
+    token: string,
+    prisonId: string,
+    bookingId: number,
+    alertId: string,
+    alertChanges: AlertChanges,
+  ) {
+    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
       const alertsApiClient = this.alertsApiClientBuilder(token)
@@ -246,8 +260,8 @@ export default class AlertsService {
     return toAlert(prisonApiAlert)
   }
 
-  public async getAlertTypes(token: string) {
-    const { alertsApiEnabled } = config.featureToggles
+  public async getAlertTypes(token: string, prisonId: string) {
+    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
       const alertsApiClient = this.alertsApiClientBuilder(token)

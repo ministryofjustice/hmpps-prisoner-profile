@@ -51,7 +51,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
 
     it('should get active alerts', async () => {
@@ -62,7 +62,7 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, true)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA, {
+      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
         alertStatus: 'ACTIVE',
         page: 0,
         sort: 'dateCreated,ASC',
@@ -89,7 +89,7 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, false)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA, {
+      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
         alertStatus: 'INACTIVE',
         page: 0,
         sort: 'dateCreated,ASC',
@@ -114,7 +114,7 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, true)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA, {
+      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
         alertStatus: 'ACTIVE',
         page: 0,
         sort: 'dateCreated,ASC',
@@ -134,7 +134,7 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, true)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA, {
+      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
         alertStatus: 'ACTIVE',
         page: 0,
         sort: 'dateCreated,ASC',
@@ -157,6 +157,7 @@ describe('Alerts Controller', () => {
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
+        'MDI',
         { ...PrisonerMockDataA, prisonId: 'XYZ' },
         {
           alertStatus: 'ACTIVE',
@@ -183,6 +184,7 @@ describe('Alerts Controller', () => {
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
+        'MDI',
         { ...PrisonerMockDataA, prisonId: 'OUT' },
         {
           alertStatus: 'ACTIVE',
@@ -209,6 +211,7 @@ describe('Alerts Controller', () => {
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
+        'MDI',
         { ...PrisonerMockDataA, prisonId: 'TRN' },
         {
           alertStatus: 'ACTIVE',
@@ -249,7 +252,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -289,6 +292,7 @@ describe('Alerts Controller', () => {
       await controller.post()(req, res, next)
 
       expect(createAlertsSpy).toHaveBeenCalledWith(res.locals.user.token, {
+        prisonId: 'MDI',
         bookingId: 123456,
         prisonerNumber: req.params.prisonerNumber,
         alertForm: alertFormMock,
@@ -320,7 +324,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
 
     it('should get one alert', async () => {
@@ -333,7 +337,12 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlert()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, '1')
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA.bookingId,
+        '1',
+      )
       expect(res.render).toHaveBeenCalledWith('pages/alerts/alertDetailsPage', {
         pageTitle: 'Alerts',
         miniBannerData: {
@@ -356,8 +365,18 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlert()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, '1')
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, '2')
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA.bookingId,
+        '1',
+      )
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA.bookingId,
+        '2',
+      )
 
       expect(res.render).toHaveBeenCalledWith('pages/alerts/alertDetailsPage', {
         pageTitle: 'Alerts',
@@ -394,7 +413,7 @@ describe('Alerts Controller', () => {
         render: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
 
     it('should get one alert', async () => {
@@ -406,7 +425,12 @@ describe('Alerts Controller', () => {
 
       await controller.getAlertDetails()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, '1')
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA.bookingId,
+        '1',
+      )
       expect(res.render).toHaveBeenCalledWith('partials/alerts/alertDetails', {
         alerts: [alertDetailsMock],
         allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -422,8 +446,18 @@ describe('Alerts Controller', () => {
 
       await controller.getAlertDetails()(req, res, next)
 
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, '1')
-      expect(getAlertDetailsSpy).toHaveBeenCalledWith(req.middleware.clientToken, PrisonerMockDataA.bookingId, '2')
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA.bookingId,
+        '1',
+      )
+      expect(getAlertDetailsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA.bookingId,
+        '2',
+      )
       expect(res.render).toHaveBeenCalledWith('partials/alerts/alertDetails', {
         alerts: [alertDetailsMock, alertDetailsMock],
         allAlertsUrl: `/prisoner/${prisonerNumber}/alerts/active`,
@@ -458,7 +492,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -554,7 +588,9 @@ describe('Alerts Controller', () => {
 
       await controller.postAddMoreDetails()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, '1', { description: 'New comment' })
+      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
+        description: 'New comment',
+      })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
     })
   })
@@ -586,7 +622,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -655,7 +691,7 @@ describe('Alerts Controller', () => {
 
       await controller.postCloseAlert()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
         activeTo: formatDateISO(new Date()),
       })
@@ -690,7 +726,7 @@ describe('Alerts Controller', () => {
         sendStatus: jest.fn(),
       }
       next = jest.fn()
-      controller = new AlertsController(new AlertsService(null, null), auditServiceMock())
+      controller = new AlertsController(new AlertsService(null, null, null), auditServiceMock())
     })
     afterEach(() => {
       jest.restoreAllMocks()
@@ -759,7 +795,7 @@ describe('Alerts Controller', () => {
 
       await controller.postChangeEndDate()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
         activeTo: null,
       })
@@ -776,7 +812,7 @@ describe('Alerts Controller', () => {
 
       await controller.postChangeEndDate()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
         activeTo: '2199-01-01',
       })

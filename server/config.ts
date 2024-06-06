@@ -348,6 +348,5 @@ export default {
     newCourseAndQualificationHistoryEnabled: toBoolean(
       get('NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED', false, requiredInProduction),
     ),
-    alertsApiEnabled: false, // Dynamically set via MFE meta from Alerts API info endpoint
   },
 }

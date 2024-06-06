@@ -18,7 +18,8 @@ import {
   prisonApiAlertDetailsMock,
 } from '../data/localMockData/alertDetailsMock'
 import { alertFormMock } from '../data/localMockData/alertFormMock'
-import config from '../config'
+import FeatureToggleService from './featureToggleService'
+import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
 
 jest.mock('../data/prisonApiClient')
 
@@ -27,6 +28,7 @@ describe('Alerts Service', () => {
   let alertsApiClientSpy: AlertsApiClient
   let prisonerData: Prisoner
   let alertsService: AlertsService
+  let featureToggleStoreMock: FeatureToggleStore
 
   beforeEach(() => {
     prisonerData = { bookingId: 123456, prisonerNumber: 'A1234AB', firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
@@ -45,6 +47,13 @@ describe('Alerts Service', () => {
   })
 
   describe('Caseload not enabled for Alerts API', () => {
+    beforeEach(() => {
+      featureToggleStoreMock = {
+        getToggle: jest.fn(async () => false),
+        setToggle: jest.fn(),
+      }
+    })
+
     describe('Get Alerts', () => {
       it('should call Prison API tp get active alerts when queryParams includes ACTIVE', async () => {
         const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE' }
@@ -59,8 +68,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
 
         expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
         expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, {
@@ -86,8 +96,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
 
         expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
         expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, {
@@ -109,8 +120,10 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
         const alert = await alertsService.createAlert('', {
+          prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: '',
           alertForm: alertFormMock,
@@ -125,8 +138,10 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
         const alert = await alertsService.createAlert('', {
+          prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: '',
           alertForm: { ...alertFormMock, activeTo: null },
@@ -143,8 +158,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertDetails = await alertsService.getAlertDetails('', 123456, '1')
+        const alertDetails = await alertsService.getAlertDetails('', 'MDI', 123456, '1')
 
         expect(prisonApiClientSpy.getAlertDetails).toHaveBeenCalledWith(prisonerData.bookingId, '1')
 
@@ -159,8 +175,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.updateAlert('', 123456, '1', { description: 'Comment' })
+        const alert = await alertsService.updateAlert('', 'MDI', 123456, '1', { description: 'Comment' })
 
         expect(alert).toEqual(alertDetailsCreatedViaMapperMock)
       })
@@ -168,11 +185,11 @@ describe('Alerts Service', () => {
   })
 
   describe('Caseload is enabled for Alerts API', () => {
-    beforeAll(async () => {
-      config.featureToggles.alertsApiEnabled = true
-    })
-    afterAll(async () => {
-      config.featureToggles.alertsApiEnabled = false
+    beforeEach(() => {
+      featureToggleStoreMock = {
+        getToggle: jest.fn(async () => true),
+        setToggle: jest.fn(),
+      }
     })
 
     describe('Get Alerts', () => {
@@ -188,8 +205,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
 
         expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
         expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
@@ -215,8 +233,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
 
         expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
         expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
@@ -238,8 +257,10 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
         const alert = await alertsService.createAlert('', {
+          prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: 'AA1234A',
           alertForm: alertFormMock,
@@ -254,8 +275,10 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
         const alert = await alertsService.createAlert('', {
+          prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: 'AA1234A',
           alertForm: { ...alertFormMock, activeTo: null },
@@ -272,8 +295,14 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertDetails = await alertsService.getAlertDetails('', 123456, 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d')
+        const alertDetails = await alertsService.getAlertDetails(
+          '',
+          'MDI',
+          123456,
+          'c9ba3596-8abf-4fe1-b21c-78170b5ff58d',
+        )
 
         expect(alertsApiClientSpy.getAlertDetails).toHaveBeenCalledWith('c9ba3596-8abf-4fe1-b21c-78170b5ff58d')
 
@@ -288,8 +317,9 @@ describe('Alerts Service', () => {
         alertsService = new AlertsService(
           () => prisonApiClientSpy,
           () => alertsApiClientSpy,
+          new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.updateAlert('', 123456, 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d', {
+        const alert = await alertsService.updateAlert('', 'MDI', 123456, 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d', {
           description: 'Comment',
         })
 

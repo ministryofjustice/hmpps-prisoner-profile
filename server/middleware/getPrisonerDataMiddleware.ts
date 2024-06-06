@@ -5,7 +5,6 @@ import NotFoundError from '../utils/notFoundError'
 import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
-import config from '../config'
 import { toAlert, toAlertFlagLabels } from '../services/mappers/alertMapper'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
@@ -38,7 +37,10 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       // Get Assessment details and Inmate details, and add to prisonerData
       // Needed for CSRA and Category data
       // Need to update prisoner search endpoint to return the data needed, then this can be removed
-      const { alertsApiEnabled } = config.featureToggles
+      const alertsApiEnabled =
+        'activeCaseLoadId' in res.locals.user
+          ? await services.featureToggleService.getFeatureToggle(res.locals.user.activeCaseLoadId, 'alertsApiEnabled')
+          : false
       const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
       const alertsApiClient = services.dataAccess.alertsApiClientBuilder(req.middleware.clientToken)
       const [assessments, inmateDetail, alerts] = await Promise.all([

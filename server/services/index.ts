@@ -31,6 +31,7 @@ import PrisonerScheduleService from './prisonerScheduleService'
 import IncentivesService from './incentivesService'
 import ContentfulService from './contentfulService'
 import CuriousService from './curiousService'
+import FeatureToggleService from './featureToggleService'
 
 export const services = () => {
   const {
@@ -52,6 +53,7 @@ export const services = () => {
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
     prisonRegisterStore,
+    featureToggleStore,
   } = dataAccess
 
   const auditService = AuditService({
@@ -62,13 +64,14 @@ export const services = () => {
     enabled: config.apis.audit.enabled,
   })
 
+  const featureToggleService = new FeatureToggleService(featureToggleStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
-  const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder)
+  const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder, featureToggleService)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
@@ -155,6 +158,7 @@ export const services = () => {
     incentivesService,
     contentfulService,
     curiousService,
+    featureToggleService,
   }
 }
 

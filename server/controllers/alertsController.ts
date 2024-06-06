@@ -54,7 +54,12 @@ export default class AlertsController {
       addAlertLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/add-alert`
     }
     // Get alerts based on given query params
-    const { pagedAlerts, ...alertsPageData } = await this.alertsService.get(clientToken, prisonerData, queryParams)
+    const { pagedAlerts, ...alertsPageData } = await this.alertsService.get(
+      clientToken,
+      'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+      prisonerData,
+      queryParams,
+    )
 
     // Insert correct links into alerts
     const alertsList = pagedAlerts?.content.map<AlertView>((alert: Alert) => {
@@ -101,7 +106,10 @@ export default class AlertsController {
   }
 
   public async displayAddAlert(req: Request, res: Response, next: NextFunction) {
-    const types = await this.alertsService.getAlertTypes(req.middleware.clientToken)
+    const types = await this.alertsService.getAlertTypes(
+      req.middleware.clientToken,
+      'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+    )
 
     // Get data from middleware
     const { firstName, lastName, prisonerNumber, bookingId, alerts, prisonId, cellLocation } =
@@ -170,7 +178,12 @@ export default class AlertsController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.createAlert(res.locals.user.token, { bookingId, prisonerNumber, alertForm })
+          await this.alertsService.createAlert(res.locals.user.token, {
+            prisonId: 'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+            bookingId,
+            prisonerNumber,
+            alertForm,
+          })
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -209,7 +222,16 @@ export default class AlertsController {
       const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const alerts: Alert[] = await Promise.all(
-        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, String(alertId))),
+        [alertIds]
+          .flat()
+          .map(alertId =>
+            this.alertsService.getAlertDetails(
+              clientToken,
+              'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+              bookingId,
+              String(alertId),
+            ),
+          ),
       )
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.activeFrom, a.activeFrom))
@@ -235,7 +257,16 @@ export default class AlertsController {
       const alertIds = req.query.ids
 
       const alerts: Alert[] = await Promise.all(
-        [alertIds].flat().map(alertId => this.alertsService.getAlertDetails(clientToken, bookingId, String(alertId))),
+        [alertIds]
+          .flat()
+          .map(alertId =>
+            this.alertsService.getAlertDetails(
+              clientToken,
+              'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+              bookingId,
+              String(alertId),
+            ),
+          ),
       )
       // Sort by created date DESC
       alerts.sort((a, b) => sortByDateTime(b.activeFrom, a.activeFrom))
@@ -256,7 +287,12 @@ export default class AlertsController {
       req.middleware.prisonerData
     const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, alertId)
+    const alert = await this.alertsService.getAlertDetails(
+      clientToken,
+      'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+      bookingId,
+      alertId,
+    )
 
     // If alert already closed, redirect
     if (!alert.isActive) {
@@ -311,7 +347,13 @@ export default class AlertsController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, { description, activeTo })
+          await this.alertsService.updateAlert(
+            res.locals.user.token,
+            'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+            bookingId,
+            alertId,
+            { description, activeTo },
+          )
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
         }
@@ -346,7 +388,12 @@ export default class AlertsController {
       req.middleware.prisonerData
     const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, alertId)
+    const alert = await this.alertsService.getAlertDetails(
+      clientToken,
+      'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+      bookingId,
+      alertId,
+    )
 
     // If alert already closed, redirect
     if (!alert.isActive) {
@@ -406,10 +453,16 @@ export default class AlertsController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, {
-            description,
-            activeTo: today === 'yes' ? formatDateISO(new Date()) : formatDateISO(parseDate(activeTo)),
-          })
+          await this.alertsService.updateAlert(
+            res.locals.user.token,
+            'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+            bookingId,
+            alertId,
+            {
+              description,
+              activeTo: today === 'yes' ? formatDateISO(new Date()) : formatDateISO(parseDate(activeTo)),
+            },
+          )
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
         }
@@ -447,7 +500,12 @@ export default class AlertsController {
       req.middleware.prisonerData
     const prisonerName = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
 
-    const alert = await this.alertsService.getAlertDetails(clientToken, bookingId, alertId)
+    const alert = await this.alertsService.getAlertDetails(
+      clientToken,
+      'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+      bookingId,
+      alertId,
+    )
 
     // If alert already closed, redirect
     if (!alert.isActive) {
@@ -507,10 +565,16 @@ export default class AlertsController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.updateAlert(res.locals.user.token, bookingId, alertId, {
-            description,
-            activeTo: removeEndDate === 'yes' ? null : formatDateISO(parseDate(activeTo)),
-          })
+          await this.alertsService.updateAlert(
+            res.locals.user.token,
+            'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
+            bookingId,
+            alertId,
+            {
+              description,
+              activeTo: removeEndDate === 'yes' ? null : formatDateISO(parseDate(activeTo)),
+            },
+          )
         } catch (error) {
           errors.push(this.handleUpdateErrors(error))
         }
