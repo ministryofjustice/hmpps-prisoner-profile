@@ -17,7 +17,7 @@ export default class InMemoryFeatureToggleStore implements FeatureToggleStore {
   public async getToggle(prisonId: string, featureToggle: string): Promise<boolean> {
     const key = `featureToggle:${prisonId}:${featureToggle}`
     if (!this.map.has(key) || this.map.get(key).expiry.getTime() < Date.now()) {
-      return Promise.resolve(null)
+      return Promise.resolve(false)
     }
     return Promise.resolve(this.map.get(key).status)
   }
