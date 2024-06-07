@@ -97,7 +97,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertFlags
+      const alertFlags = req.middleware?.alertSummaryData.alertFlags
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -122,7 +122,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertFlags
+      const alertFlags = req.middleware?.alertSummaryData.alertFlags
 
       const { personalPageService } = services
       const personalPageData = await personalPageService.get(req.middleware.clientToken, prisonerData)
@@ -157,7 +157,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertFlags
+      const alertFlags = req.middleware?.alertSummaryData.alertFlags
       const { workAndSkillsPageService } = services
       const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
 
@@ -213,7 +213,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertFlags
+      const alertFlags = req.middleware?.alertSummaryData.alertFlags
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
@@ -265,7 +265,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertFlags
+      const alertFlags = req.middleware?.alertSummaryData.alertFlags
       const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
       const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
 

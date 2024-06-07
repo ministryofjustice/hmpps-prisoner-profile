@@ -33,7 +33,12 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
-      const { clientToken, prisonerData, inmateDetail, alertFlags } = req.middleware
+      const {
+        clientToken,
+        prisonerData,
+        inmateDetail,
+        alertSummaryData: { alertFlags },
+      } = req.middleware
 
       if (req.query.page) queryParams.page = +req.query.page
       if (req.query.sort) queryParams.sort = req.query.sort as string

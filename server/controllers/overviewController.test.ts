@@ -43,6 +43,7 @@ import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodi
 import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 import { OverviewStatus } from './interfaces/OverviewPageData'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
+import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
@@ -87,6 +88,9 @@ describe('overviewController', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
+        alertSummaryData: {
+          alertFlags: alertFlagLabels,
+        },
       },
       originalUrl: 'http://localhost',
       params: { offenderNo },

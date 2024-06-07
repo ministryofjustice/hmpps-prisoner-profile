@@ -5,10 +5,18 @@ import PrisonApiAlert, {
   PrisonApiAlertType,
   PrisonApiCreateAlert,
 } from '../../data/interfaces/prisonApi/PrisonApiAlert'
-import { Alert, AlertChanges, AlertCode, AlertType, CreateAlert } from '../../data/interfaces/alertsApi/Alert'
+import {
+  Alert,
+  AlertChanges,
+  AlertCode,
+  AlertSummaryData,
+  AlertType,
+  CreateAlert,
+} from '../../data/interfaces/alertsApi/Alert'
 import { formatName, formatNamePart } from '../../utils/utils'
 import { formatDateISO, parseDate } from '../../utils/dateHelpers'
 import AlertFlagLabel from '../../interfaces/AlertFlagLabels'
+import AlertTypeFilter from '../interfaces/alertsService/AlertsMetadata'
 
 /**
  * Map from the Prison API type [PrisonApiAlerts]
@@ -130,7 +138,7 @@ export const toAlertType = (prisonApiAlertType: PrisonApiAlertType): AlertType =
   }
 }
 
-export const toAlertFlagLabels = (alerts: Alert[], alertFlags: AlertFlagLabel[]): AlertFlagLabel[] => {
+const toAlertFlagLabels = (alerts: Alert[], alertFlags: AlertFlagLabel[]): AlertFlagLabel[] => {
   return alertFlags
     .map(flag => {
       const alertIds = alerts
@@ -139,4 +147,41 @@ export const toAlertFlagLabels = (alerts: Alert[], alertFlags: AlertFlagLabel[])
       return { ...flag, alertIds } as AlertFlagLabel
     })
     .filter(alert => alert.alertIds?.length)
+}
+
+const toAlertTypesFilters = (alerts: Alert[]) => {
+  const activeAlertTypesFilter: { [key: string]: AlertTypeFilter } = {}
+  const inactiveAlertTypesFilter: { [key: string]: AlertTypeFilter } = {}
+  alerts.forEach(alert => {
+    if (alert.isActive) {
+      activeAlertTypesFilter[alert.alertCode.alertTypeCode] = {
+        code: alert.alertCode.alertTypeCode,
+        description: alert.alertCode.alertTypeDescription,
+        count: activeAlertTypesFilter[alert.alertCode.alertTypeCode]
+          ? activeAlertTypesFilter[alert.alertCode.alertTypeCode].count + 1
+          : 1,
+        checked: false,
+      }
+    } else {
+      inactiveAlertTypesFilter[alert.alertCode.alertTypeCode] = {
+        code: alert.alertCode.alertTypeCode,
+        description: alert.alertCode.alertTypeDescription,
+        count: inactiveAlertTypesFilter[alert.alertCode.alertTypeCode]
+          ? inactiveAlertTypesFilter[alert.alertCode.alertTypeCode].count + 1
+          : 1,
+        checked: false,
+      }
+    }
+  })
+
+  return { activeAlertTypesFilter, inactiveAlertTypesFilter }
+}
+
+export const toAlertSummaryData = (alerts: Alert[], alertFlags: AlertFlagLabel[]): AlertSummaryData => {
+  return {
+    activeAlertCount: alerts.filter(alert => alert.isActive).length,
+    inactiveAlertCount: alerts.filter(alert => !alert.isActive).length,
+    ...toAlertTypesFilters(alerts),
+    alertFlags: toAlertFlagLabels(alerts, alertFlags),
+  }
 }

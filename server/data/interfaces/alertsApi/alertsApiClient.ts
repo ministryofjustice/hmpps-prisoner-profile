@@ -1,8 +1,8 @@
-import PagedList, { AlertsListQueryParams } from '../prisonApi/PagedList'
-import { Alert, AlertChanges, AlertType, CreateAlert } from './Alert'
+import PagedList from '../prisonApi/PagedList'
+import { Alert, AlertChanges, AlertsApiQueryParams, AlertType, CreateAlert } from './Alert'
 
 export interface AlertsApiClient {
-  getAlerts(prisonerNumber: string, queryParams: AlertsListQueryParams): Promise<PagedList<Alert>>
+  getAlerts(prisonerNumber: string, queryParams: AlertsApiQueryParams): Promise<PagedList<Alert>>
   getAlertDetails(alertId: string): Promise<Alert>
   createAlert(alert: CreateAlert): Promise<Alert>
   updateAlert(alertId: string, alertChanges: AlertChanges): Promise<Alert>

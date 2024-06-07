@@ -340,10 +340,7 @@ context('Alerts API enabled prison', () => {
         cy.setupAlertsPageStubs({ prisonerNumber: 'A1234BC', bookingId: 1234567 })
         cy.task('stubActiveAlerts', emptyAlertsMock)
         cy.setupBannerStubs({ prisonerNumber: 'G6123VU', bookingId: 1234567 })
-        cy.task('stubInmateDetail', {
-          bookingId: 1234567,
-          inmateDetail: { activeAlertCount: 0, inactiveAlertCount: 0 },
-        })
+        cy.task('stubGetAlerts', emptyAlertsMock)
         visitEmptyAlertsPage()
         alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Active alerts')
       })

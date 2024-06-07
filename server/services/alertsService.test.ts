@@ -20,6 +20,8 @@ import {
 import { alertFormMock } from '../data/localMockData/alertFormMock'
 import FeatureToggleService from './featureToggleService'
 import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
+import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
+import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 jest.mock('../data/prisonApiClient')
 
@@ -27,11 +29,19 @@ describe('Alerts Service', () => {
   let prisonApiClientSpy: PrisonApiClient
   let alertsApiClientSpy: AlertsApiClient
   let prisonerData: Prisoner
+  let alertSummaryData: AlertSummaryData
   let alertsService: AlertsService
   let featureToggleStoreMock: FeatureToggleStore
 
   beforeEach(() => {
     prisonerData = { bookingId: 123456, prisonerNumber: 'A1234AB', firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
+    alertSummaryData = {
+      activeAlertCount: 80,
+      inactiveAlertCount: 0,
+      activeAlertTypesFilter: {},
+      inactiveAlertTypesFilter: {},
+      alertFlags: alertFlagLabels,
+    }
     prisonApiClientSpy = prisonApiClientMock()
     alertsApiClientSpy = {
       createAlert: jest.fn(),
@@ -70,7 +80,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, alertSummaryData, queryParams)
 
         expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
         expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, {
@@ -98,7 +108,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, alertSummaryData, queryParams)
 
         expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
         expect(prisonApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.bookingId, {
@@ -207,12 +217,13 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, alertSummaryData, queryParams)
 
-        expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
+        expect(prisonApiClientSpy.getInmateDetail).not.toHaveBeenCalled()
         expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
           isActive: true,
           size: 20,
+          sort: ['createdAt,DESC'],
         })
 
         expect(alertsPageData.pagedAlerts).toEqual(pagedActiveAlertsMock)
@@ -222,7 +233,7 @@ describe('Alerts Service', () => {
       })
 
       it('should call Alerts API to get inactive alerts when queryParams includes INACTIVE', async () => {
-        const queryParams: AlertsListQueryParams = { alertStatus: 'INACTIVE' }
+        const queryParams: AlertsListQueryParams = { alertStatus: 'INACTIVE', sort: 'dateExpires,DESC' }
         prisonApiClientSpy.getInmateDetail = jest.fn(async () => ({
           ...inmateDetailMock,
           activeAlertCount: 0,
@@ -235,12 +246,19 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alertsPageData = await alertsService.get('', 'MDI', prisonerData, queryParams)
+        const alertsPageData = await alertsService.get(
+          '',
+          'MDI',
+          prisonerData,
+          { ...alertSummaryData, activeAlertCount: 0, inactiveAlertCount: 80 },
+          queryParams,
+        )
 
-        expect(prisonApiClientSpy.getInmateDetail).toHaveBeenCalledWith(prisonerData.bookingId)
+        expect(prisonApiClientSpy.getInmateDetail).not.toHaveBeenCalled()
         expect(alertsApiClientSpy.getAlerts).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
           isActive: false,
           size: 20,
+          sort: ['activeTo,DESC', 'lastModifiedAt,DESC', 'createdAt,DESC'],
         })
 
         expect(alertsPageData.pagedAlerts).toEqual(pagedInactiveAlertsMock)

@@ -18,7 +18,7 @@ import {
   toPrisonAlertChanges,
   toPrisonApiCreateAlert,
 } from './mappers/alertMapper'
-import { Alert, AlertChanges } from '../data/interfaces/alertsApi/Alert'
+import { Alert, AlertChanges, AlertsApiQueryParams, AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
 import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
 import FeatureToggleService from './featureToggleService'
 
@@ -78,15 +78,27 @@ export default class AlertsService {
    * @param queryParams
    * @private
    */
-  private mapToAlertsApiParams(queryParams: AlertsListQueryParams) {
+  private mapToAlertsApiParams(queryParams: AlertsListQueryParams): AlertsApiQueryParams {
+    /* Add sort param createdAt to all queries and lastModifiedAt to inactive queries so results are ordered in an expected way */
+    const sortParams = [queryParams.sort]
+      .flat()
+      .filter(Boolean)
+      .map(s => {
+        return s.replace('dateCreated', 'activeFrom').replace('dateExpires', 'activeTo')
+      })
+    if (sortParams.some(s => s.includes('activeTo'))) {
+      const direction = sortParams.some(s => s.includes('ASC')) ? 'ASC' : 'DESC'
+      sortParams.push(`lastModifiedAt,${direction}`)
+    }
+    const direction = sortParams.some(s => s.includes('ASC')) ? 'ASC' : 'DESC'
+    sortParams.push(`createdAt,${direction}`)
+
     return {
       ...(queryParams.alertType && { alertType: queryParams.alertType }),
       ...(queryParams.from && { activeFromStart: formatDateISO(parseDate(queryParams.from)) }),
       ...(queryParams.to && { activeFromEnd: formatDateISO(parseDate(queryParams.to)) }),
-      ...(queryParams.sort && {
-        sort: queryParams.sort.replace('dateCreated', 'activeFrom').replace('dateExpires', 'activeTo'),
-      }),
       ...(queryParams.page && { page: Number(queryParams.page) - 1 }), // Change page to zero based for API query
+      sort: sortParams,
       isActive: queryParams.alertStatus === 'ACTIVE',
       size: queryParams?.showAll ? 9999 : 20,
     }
@@ -96,40 +108,38 @@ export default class AlertsService {
    * Handle request for alerts
    *
    * @param clientToken
+   * @param prisonId
    * @param prisonerData
+   * @param alertSummaryData
    * @param queryParams
    */
   public async get(
     clientToken: string,
     prisonId: string,
     prisonerData: Prisoner,
+    alertSummaryData: AlertSummaryData,
     queryParams: AlertsListQueryParams,
   ): Promise<AlertsPageData> {
     const isActiveAlertsQuery = queryParams?.alertStatus === 'ACTIVE'
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
     const alertsApiClient = this.alertsApiClientBuilder(clientToken)
-    const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(
-      prisonerData.bookingId,
-    )
 
-    // Get Filter data and map in query params
-    const alertTypesFilter: { [key: string]: AlertTypeFilter } = {}
-    alerts
-      .filter(alert => alert.active === isActiveAlertsQuery)
-      .forEach(alert => {
-        alertTypesFilter[alert.alertType] = {
-          code: alert.alertType,
-          description: alert.alertTypeDescription,
-          count: alertTypesFilter[alert.alertType] ? alertTypesFilter[alert.alertType].count + 1 : 1,
-          checked: false,
-        }
-      })
-    const alertTypes: AlertTypeFilter[] = Object.keys(alertTypesFilter).map(k => ({
-      ...alertTypesFilter[k],
-      checked: Array.isArray(queryParams.alertType)
-        ? queryParams.alertType?.some(type => type === alertTypesFilter[k].code)
-        : queryParams.alertType === alertTypesFilter[k].code,
-    }))
+    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
+
+    const { activeAlertCount, inactiveAlertCount, activeAlertTypesFilter, inactiveAlertTypesFilter } = alertsApiEnabled
+      ? alertSummaryData
+      : await this.getPrisonApiAlertSummaryData(prisonApiClient, prisonerData.bookingId)
+
+    const alertTypesFilter = isActiveAlertsQuery ? activeAlertTypesFilter : inactiveAlertTypesFilter
+
+    const alertTypes: AlertTypeFilter[] = Object.keys(alertTypesFilter)
+      .map(k => ({
+        ...alertTypesFilter[k],
+        checked: Array.isArray(queryParams.alertType)
+          ? queryParams.alertType?.some(type => type === alertTypesFilter[k].code)
+          : queryParams.alertType === alertTypesFilter[k].code,
+      }))
+      .sort((a, b) => a.description.localeCompare(b.description))
 
     // Determine sort options
     const sortOptions: SortOption[] = [
@@ -149,7 +159,7 @@ export default class AlertsService {
 
     const pagedAlerts =
       !errors.length && (shouldGetActiveAlerts || shouldGetInactiveAlerts)
-        ? await this.getPagedAlerts(prisonId, prisonApiClient, alertsApiClient, prisonerData, queryParams)
+        ? await this.getPagedAlerts(prisonApiClient, alertsApiClient, prisonerData, queryParams, alertsApiEnabled)
         : null
 
     // Remove page and alertStatus params before generating metadata as these values come from API and path respectively
@@ -169,14 +179,12 @@ export default class AlertsService {
   }
 
   private async getPagedAlerts(
-    prisonId: string,
     prisonApiClient: PrisonApiClient,
     alertsApiClient: AlertsApiClient,
     prisonerData: Prisoner,
     queryParams: AlertsListQueryParams,
+    alertsApiEnabled: boolean,
   ): Promise<PagedList<Alert> | null> {
-    const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
-
     if (alertsApiEnabled) {
       const pagedAlerts = await alertsApiClient.getAlerts(
         prisonerData.prisonerNumber,
@@ -193,6 +201,32 @@ export default class AlertsService {
       ...pagedAlerts,
       content: pagedAlerts.content.map(toAlert),
     }
+  }
+
+  private async getPrisonApiAlertSummaryData(prisonApiClient: PrisonApiClient, bookingId: number) {
+    const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(bookingId)
+    const activeAlertTypesFilter: { [key: string]: AlertTypeFilter } = {}
+    const inactiveAlertTypesFilter: { [key: string]: AlertTypeFilter } = {}
+
+    alerts.forEach(alert => {
+      if (alert.active) {
+        activeAlertTypesFilter[alert.alertType] = {
+          code: alert.alertType,
+          description: alert.alertTypeDescription,
+          count: activeAlertTypesFilter[alert.alertType] ? activeAlertTypesFilter[alert.alertType].count + 1 : 1,
+          checked: false,
+        }
+      } else {
+        inactiveAlertTypesFilter[alert.alertType] = {
+          code: alert.alertType,
+          description: alert.alertTypeDescription,
+          count: inactiveAlertTypesFilter[alert.alertType] ? inactiveAlertTypesFilter[alert.alertType].count + 1 : 1,
+          checked: false,
+        }
+      }
+    })
+
+    return { activeAlertCount, inactiveAlertCount, activeAlertTypesFilter, inactiveAlertTypesFilter }
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
