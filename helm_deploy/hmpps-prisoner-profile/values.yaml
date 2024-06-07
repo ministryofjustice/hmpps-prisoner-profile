@@ -35,7 +35,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
-    NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED: "false"
+    NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED: "true"
     CONTENTFUL_HOST: "https://graphql.contentful.com"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
