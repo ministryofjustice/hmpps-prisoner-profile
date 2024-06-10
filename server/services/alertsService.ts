@@ -15,6 +15,7 @@ import {
   toAlert,
   toAlertsApiCreateAlert,
   toAlertType,
+  toAlertTypesFilters,
   toPrisonAlertChanges,
   toPrisonApiCreateAlert,
 } from './mappers/alertMapper'
@@ -205,28 +206,8 @@ export default class AlertsService {
 
   private async getPrisonApiAlertSummaryData(prisonApiClient: PrisonApiClient, bookingId: number) {
     const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(bookingId)
-    const activeAlertTypesFilter: { [key: string]: AlertTypeFilter } = {}
-    const inactiveAlertTypesFilter: { [key: string]: AlertTypeFilter } = {}
 
-    alerts.forEach(alert => {
-      if (alert.active) {
-        activeAlertTypesFilter[alert.alertType] = {
-          code: alert.alertType,
-          description: alert.alertTypeDescription,
-          count: activeAlertTypesFilter[alert.alertType] ? activeAlertTypesFilter[alert.alertType].count + 1 : 1,
-          checked: false,
-        }
-      } else {
-        inactiveAlertTypesFilter[alert.alertType] = {
-          code: alert.alertType,
-          description: alert.alertTypeDescription,
-          count: inactiveAlertTypesFilter[alert.alertType] ? inactiveAlertTypesFilter[alert.alertType].count + 1 : 1,
-          checked: false,
-        }
-      }
-    })
-
-    return { activeAlertCount, inactiveAlertCount, activeAlertTypesFilter, inactiveAlertTypesFilter }
+    return { activeAlertCount, inactiveAlertCount, ...toAlertTypesFilters(alerts.map(toAlert)) }
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
