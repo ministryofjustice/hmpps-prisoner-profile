@@ -6,7 +6,6 @@ import {
   componentsMock,
   componentsNoServicesMock,
 } from '../../server/data/localMockData/componentApi/componentsMetaMock'
-import { pagedActiveAlertsMock } from '../../server/data/localMockData/pagedAlertsMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -96,7 +95,7 @@ Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, priso
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
   }
   cy.task('stubComponentsMeta', componentsMock)
-  cy.task('stubGetAlerts', pagedActiveAlertsMock)
+  cy.task('stubGetAlerts')
 })
 
 Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStates = false }) => {
@@ -111,7 +110,7 @@ Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStat
   cy.task('stubAttendanceHistory', prisonerNumber)
   cy.task('stubGetPlpActionPlan', prisonerNumber)
   cy.task('stubGetAllPrisons')
-  cy.task('stubGetAlerts', prisonerNumber)
+  cy.task('stubGetAlerts')
 })
 
 Cypress.Commands.add('getDataQa', id => {
