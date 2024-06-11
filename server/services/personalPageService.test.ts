@@ -23,10 +23,12 @@ import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodi
 import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
+import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
+  let prisonPersonApiClient: PrisonPersonApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -47,6 +49,13 @@ describe('PersonalPageService', () => {
     curiousApiClient = curiousApiClientMock()
 
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
+
+    prisonPersonApiClient = {
+      getPrisonPerson: jest.fn(async () => ({
+        prisonerNumber: 'abc123',
+        physicalAttributes: { height: 100, weight: 100 },
+      })),
+    }
   })
 
   const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
@@ -64,6 +73,7 @@ describe('PersonalPageService', () => {
     new PersonalPageService(
       () => prisonApiClient,
       () => curiousApiClient,
+      () => prisonPersonApiClient,
     )
 
   describe('Getting information from the Prison API', () => {
@@ -789,6 +799,14 @@ describe('PersonalPageService', () => {
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
       const data = await constructService().get('token', PrisonerMockDataA)
       expect(data.learnerNeurodivergence).toBe(LearnerNeurodivergenceMock)
+    })
+  })
+
+  describe('Prison Person API Enabled', () => {
+    it('Sets the height and weight on the prison person API', async () => {
+      const data = await constructService().get('token', PrisonerMockDataA, true)
+      expect(data.physicalCharacteristics.height).toBe('100')
+      expect(data.physicalCharacteristics.weight).toBe('100')
     })
   })
 })

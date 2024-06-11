@@ -28,6 +28,7 @@ import probationDocumentsRouter from './probationDocumentsRouter'
 import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
+import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -123,9 +124,18 @@ export default function routes(services: Services): Router {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
       const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const user = res.locals.user as PrisonUser
+      const { activeCaseLoadId } = user
 
       const { personalPageService } = services
-      const personalPageData = await personalPageService.get(req.middleware.clientToken, prisonerData)
+      const enablePrisonPerson =
+        config.featureToggles.prisonPersonApiEnabled &&
+        config.featureToggles.prisonPersonApiEnabledPrisons.includes(activeCaseLoadId)
+      const personalPageData = await personalPageService.get(
+        req.middleware.clientToken,
+        prisonerData,
+        enablePrisonPerson,
+      )
 
       await services.auditService.sendPageView({
         user: res.locals.user,
