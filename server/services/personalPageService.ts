@@ -31,14 +31,24 @@ import ReasonableAdjustment from '../data/interfaces/prisonApi/ReasonableAdjustm
 import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
+import { PrisonPerson, PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
   ) {}
 
-  public async get(token: string, prisonerData: Prisoner): Promise<PersonalPage> {
+  async getPrisonPerson(token: string, prisonerNumber: string, enablePrisonPerson: boolean) {
+    if (enablePrisonPerson) {
+      const apiClient = this.prisonPersonApiClientBuilder(token)
+      return apiClient.getPrisonPerson(prisonerNumber)
+    }
+    return null
+  }
+
+  public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     const { bookingId, prisonerNumber } = prisonerData
@@ -53,6 +63,7 @@ export default class PersonalPageService {
       healthTreatmentReferenceCodes,
       identifiers,
       beliefs,
+      prisonPerson,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -64,6 +75,7 @@ export default class PersonalPageService {
       prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
+      this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -81,7 +93,7 @@ export default class PersonalPageService {
       addresses,
       addressSummary: this.addressSummary(addresses),
       nextOfKin: await this.nextOfKin(contacts, prisonApiClient),
-      physicalCharacteristics: this.physicalCharacteristics(prisonerData, inmateDetail),
+      physicalCharacteristics: this.physicalCharacteristics(prisonerData, inmateDetail, prisonPerson),
       security: {
         interestToImmigration: getProfileInformationValue(
           ProfileInformationType.InterestToImmigration,
@@ -313,7 +325,21 @@ export default class PersonalPageService {
     return { personId, addresses }
   }
 
-  private physicalCharacteristics(prisonerData: Prisoner, inmateDetail: InmateDetail): PhysicalCharacteristics {
+  private physicalCharacteristics(
+    prisonerData: Prisoner,
+    inmateDetail: InmateDetail,
+    prisonPerson: PrisonPerson,
+  ): PhysicalCharacteristics {
+    let height = prisonerData.heightCentimetres
+      ? `${(prisonerData.heightCentimetres / 100).toString()}m`
+      : 'Not entered'
+    let weight = prisonerData.weightKilograms ? `${prisonerData.weightKilograms}kg` : 'Not entered'
+
+    if (prisonPerson) {
+      height = prisonPerson.physicalAttributes.height.toString()
+      weight = prisonPerson.physicalAttributes.weight.toString()
+    }
+
     return {
       build: prisonerData.build || 'Not entered',
       distinguishingMarks:
@@ -327,7 +353,7 @@ export default class PersonalPageService {
         })) || [],
       facialHair: prisonerData.facialHair || 'Not entered',
       hairColour: prisonerData.hairColour || 'Not entered',
-      height: prisonerData.heightCentimetres ? `${(prisonerData.heightCentimetres / 100).toString()}m` : 'Not entered',
+      height,
       leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
       rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
       shapeOfFace: prisonerData.shapeOfFace || 'Not entered',
@@ -340,7 +366,7 @@ export default class PersonalPageService {
           ProfileInformationType.WarnedNotToChangeAppearance,
           inmateDetail.profileInformation,
         ) || 'Needs to be warned',
-      weight: prisonerData.weightKilograms ? `${prisonerData.weightKilograms}kg` : 'Not entered',
+      weight,
     }
   }
 

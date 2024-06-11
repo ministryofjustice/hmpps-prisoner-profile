@@ -260,6 +260,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('ALERTS_API_TIMEOUT_DEADLINE', 10000))),
     },
+    prisonPersonApi: {
+      url: get('PRISON_PERSON_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PRISON_PERSON_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -348,5 +356,7 @@ export default {
     newCourseAndQualificationHistoryEnabled: toBoolean(
       get('NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED', false, requiredInProduction),
     ),
+    prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
+    prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),
   },
 }

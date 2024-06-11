@@ -52,6 +52,7 @@ export const services = () => {
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
+    prisonPersonApiClientBuilder,
     prisonRegisterStore,
     featureToggleStore,
   } = dataAccess
@@ -74,7 +75,11 @@ export const services = () => {
   const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder, featureToggleService)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
-  const personalPageService = new PersonalPageService(prisonApiClientBuilder, curiousApiClientBuilder)
+  const personalPageService = new PersonalPageService(
+    prisonApiClientBuilder,
+    curiousApiClientBuilder,
+    prisonPersonApiClientBuilder,
+  )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
