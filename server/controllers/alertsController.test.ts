@@ -35,7 +35,7 @@ describe('Alerts Controller', () => {
           clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
-          alertFlags: alertFlagLabels,
+          alertSummaryData: { alertFlags: alertFlagLabels },
         },
       }
       res = {
@@ -62,14 +62,20 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, true)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      })
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA,
+        req.middleware.alertSummaryData,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+      )
       expect(mapSpy).toHaveBeenCalledWith(
         PrisonerMockDataA,
         inmateDetailMock,
@@ -89,14 +95,20 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, false)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
-        alertStatus: 'INACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      })
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA,
+        req.middleware.alertSummaryData,
+        {
+          alertStatus: 'INACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+      )
       expect(mapSpy).toHaveBeenCalledWith(
         PrisonerMockDataA,
         inmateDetailMock,
@@ -114,14 +126,20 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, true)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      })
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA,
+        req.middleware.alertSummaryData,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+      )
     })
 
     it('should set canUpdateAlert to false if user does not have role', async () => {
@@ -134,14 +152,20 @@ describe('Alerts Controller', () => {
 
       await controller.displayAlerts(req, res, next, true)
 
-      expect(getAlertsSpy).toHaveBeenCalledWith(req.middleware.clientToken, 'MDI', PrisonerMockDataA, {
-        alertStatus: 'ACTIVE',
-        page: 0,
-        sort: 'dateCreated,ASC',
-        alertType: 'R',
-        from: '01/01/2023',
-        to: '02/02/2023',
-      })
+      expect(getAlertsSpy).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        'MDI',
+        PrisonerMockDataA,
+        req.middleware.alertSummaryData,
+        {
+          alertStatus: 'ACTIVE',
+          page: 0,
+          sort: 'dateCreated,ASC',
+          alertType: 'R',
+          from: '01/01/2023',
+          to: '02/02/2023',
+        },
+      )
     })
 
     it('should set canUpdateAlert to false if user does not have caseload', async () => {
@@ -159,6 +183,7 @@ describe('Alerts Controller', () => {
         req.middleware.clientToken,
         'MDI',
         { ...PrisonerMockDataA, prisonId: 'XYZ' },
+        req.middleware.alertSummaryData,
         {
           alertStatus: 'ACTIVE',
           page: 0,
@@ -186,6 +211,7 @@ describe('Alerts Controller', () => {
         req.middleware.clientToken,
         'MDI',
         { ...PrisonerMockDataA, prisonId: 'OUT' },
+        req.middleware.alertSummaryData,
         {
           alertStatus: 'ACTIVE',
           page: 0,
@@ -213,6 +239,7 @@ describe('Alerts Controller', () => {
         req.middleware.clientToken,
         'MDI',
         { ...PrisonerMockDataA, prisonId: 'TRN' },
+        req.middleware.alertSummaryData,
         {
           alertStatus: 'ACTIVE',
           page: 0,

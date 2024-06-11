@@ -5,6 +5,7 @@ import {
   pagedActiveAlertsMockPage2,
   pagedActiveAlertsMockSorted,
   pagedInactiveAlertsMock,
+  unpagedAllAlertsMock,
 } from '../../server/data/localMockData/pagedAlertsMock'
 import { alertTypesMock } from '../../server/data/localMockData/alertTypesMock'
 import { alertDetailsExpiresMock, alertDetailsMock } from '../../server/data/localMockData/alertDetailsMock'
@@ -231,7 +232,7 @@ export default {
     })
   },
 
-  stubGetAlerts: (resp = pagedActiveAlertsMock) => {
+  stubGetAlerts: (resp = unpagedAllAlertsMock) => {
     return stubFor({
       request: {
         method: 'GET',

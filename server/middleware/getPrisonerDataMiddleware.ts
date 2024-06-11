@@ -5,7 +5,7 @@ import NotFoundError from '../utils/notFoundError'
 import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
-import { toAlert, toAlertFlagLabels } from '../services/mappers/alertMapper'
+import { toAlert, toAlertSummaryData } from '../services/mappers/alertMapper'
 import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
@@ -37,6 +37,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       // Get Assessment details and Inmate details, and add to prisonerData
       // Needed for CSRA and Category data
       // Need to update prisoner search endpoint to return the data needed, then this can be removed
+      // Inmate Details also needed for Alert Flags until Alerts API is live in all prisons
       const alertsApiEnabled =
         'activeCaseLoadId' in res.locals.user
           ? await services.featureToggleService.getFeatureToggle(res.locals.user.activeCaseLoadId, 'alertsApiEnabled')
@@ -50,7 +51,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       ])
 
       const mappedAlerts = alerts?.content ?? inmateDetail.alerts.map(toAlert)
-      const alertFlags = toAlertFlagLabels(mappedAlerts, alertFlagLabels)
+      const alertSummaryData = toAlertSummaryData(mappedAlerts, alertFlagLabels)
 
       if (assessments && Array.isArray(assessments)) {
         prisonerData.assessments = assessments.sort(
@@ -66,7 +67,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
         ...req.middleware,
         prisonerData,
         inmateDetail,
-        alertFlags,
+        alertSummaryData,
       }
     } catch (error) {
       logger.error(error, `Failed to retrieve get prisoner data: ${error.endpoint}`)
