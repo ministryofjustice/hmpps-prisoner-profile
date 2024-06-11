@@ -261,7 +261,7 @@ export default {
       agent: new AgentConfig(Number(get('ALERTS_API_TIMEOUT_DEADLINE', 10000))),
     },
     prisonPersonApi: {
-      url: get('PRISON_PERSON_API', 'http://localhost:8082', requiredInProduction),
+      url: get('PRISON_PERSON_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('PRISON_PERSON_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000)),

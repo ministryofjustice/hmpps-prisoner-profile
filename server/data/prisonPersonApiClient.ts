@@ -6,7 +6,7 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   private readonly restClient: RestClient
 
   constructor(token: string) {
-    this.restClient = new RestClient('Prison Register API', config.apis.prisonPersonApi, token)
+    this.restClient = new RestClient('Prison Person API', config.apis.prisonPersonApi, token)
   }
 
   async getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson> {
