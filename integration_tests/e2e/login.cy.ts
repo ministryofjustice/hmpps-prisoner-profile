@@ -22,13 +22,6 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
   })
 
-  it('User name visible in header', () => {
-    cy.signIn()
-    cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.headerUserName().should('contain.text', 'J. Smith')
-  })
-
   it('User with prison role has access', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
 
@@ -55,8 +48,8 @@ context('SignIn', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.signOut().click()
+    Page.verifyOnPage(IndexPage)
+    cy.visit('/sign-out')
     Page.verifyOnPage(AuthSignInPage)
   })
 
@@ -75,7 +68,7 @@ context('SignIn', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
     cy.visit('/prisoner/G6123VU')
-    const indexPage = Page.verifyOnPage(IndexPage)
+    Page.verifyOnPage(IndexPage)
 
     cy.task('stubVerifyToken', false)
 
@@ -86,7 +79,7 @@ context('SignIn', () => {
     cy.setupUserAuth({ name: 'bobby brown', roles: ['ROLE_PRISON'] })
     cy.signIn()
 
-    indexPage.headerUserName().contains('B. Brown')
+    Page.verifyOnPage(IndexPage)
   })
 
   it('Root URL redirects to DPS home page', () => {

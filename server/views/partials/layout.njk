@@ -39,28 +39,20 @@
     crossorigin
   />
 
-  {% if feComponents.jsIncludes %}
-    {% for js in feComponents.jsIncludes %}
-      <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
-    {% endfor %}
-  {% endif %}
+  {% for js in feComponents.jsIncludes %}
+    <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+  {% endfor %}
 
-  {% if feComponents.cssIncludes %}
-    {% for css in feComponents.cssIncludes %}
-      <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
-    {% endfor %}
-  {% endif %}
+  {% for css in feComponents.cssIncludes %}
+    <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+  {% endfor %}
 
 {% endblock %}
 
 {% block pageTitle %}{{ pageTitle + ' - ' + applicationName if pageTitle else applicationName }}{% endblock %}
 
 {% block header %}
-  {% if feComponents.header %}
-    {{ feComponents.header | safe }}
-  {% else %}
-    {% include "./header.njk" %}
-  {% endif %}
+  {{ feComponents.header | safe }}
 {% endblock %}
 
 {% block beforeContent %}
@@ -132,9 +124,5 @@
 {% endblock %}
 
 {% block footer %}
-  {% if feComponents.footer %}
     {{ feComponents.footer | safe }}
-  {% else %}
-    {% include "./footer.njk" %}
-  {% endif %}
 {% endblock %}
