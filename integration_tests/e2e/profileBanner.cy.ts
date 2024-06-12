@@ -2,6 +2,7 @@ import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
 import { Role } from '../../server/data/enums/role'
+import { componentsMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -131,31 +132,66 @@ context('Profile banner', () => {
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
 
-    it('Shows clickable alert flags', () => {
-      visitOverviewPage()
-      const overviewPage = new OverviewPage()
-      overviewPage.alertFlags().children().should('have.length', '7')
-      overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
-      overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
-      overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
-      overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Controlled unlock')
-      overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
-      overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Hidden disability')
-      overviewPage.alertFlags().find(':nth-child(7)').should('contain', 'Veteran')
+    context('Non-Alerts API enabled prison', () => {
+      it('Shows clickable alert flags', () => {
+        visitOverviewPage()
+        const overviewPage = new OverviewPage()
+        overviewPage.alertFlags().children().should('have.length', '7')
+        overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
+        overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
+        overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
+        overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Controlled unlock')
+        overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
+        overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Hidden disability')
+        overviewPage.alertFlags().find(':nth-child(7)').should('contain', 'Veteran')
+      })
+
+      it('Shows modal when clicking alert flag', () => {
+        visitOverviewPage()
+        const overviewPage = new OverviewPage()
+        overviewPage.alertModal().should('not.be.visible')
+        overviewPage.alertFlags().children().eq(1).click()
+        overviewPage.alertModal().should('not.have.a.property', 'hidden')
+        overviewPage.alertModal().should('not.have.css', 'display', 'none')
+        overviewPage.alertModal().should('be.visible')
+        overviewPage.alertModalBody().contains('h2', 'Arsonist')
+        overviewPage.alertModalClose().eq(1).click()
+        overviewPage.alertModal().should('have.css', 'display', 'none')
+        overviewPage.alertModal().should('not.be.visible')
+      })
     })
 
-    it('Shows modal when clicking alert flag', () => {
-      visitOverviewPage()
-      const overviewPage = new OverviewPage()
-      overviewPage.alertModal().should('not.be.visible')
-      overviewPage.alertFlags().children().eq(1).click()
-      overviewPage.alertModal().should('not.have.a.property', 'hidden')
-      overviewPage.alertModal().should('not.have.css', 'display', 'none')
-      overviewPage.alertModal().should('be.visible')
-      overviewPage.alertModalBody().contains('h2', 'Arsonist')
-      overviewPage.alertModalClose().eq(1).click()
-      overviewPage.alertModal().should('have.css', 'display', 'none')
-      overviewPage.alertModal().should('not.be.visible')
+    context('Alerts API enabled prison', () => {
+      beforeEach(() => {
+        cy.task('stubComponentsMeta', componentsMock)
+      })
+
+      it('Shows clickable alert flags', () => {
+        visitOverviewPage()
+        const overviewPage = new OverviewPage()
+        overviewPage.alertFlags().children().should('have.length', '7')
+        overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
+        overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
+        overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
+        overviewPage.alertFlags().find(':nth-child(4)').should('contain', 'Controlled unlock')
+        overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
+        overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Hidden disability')
+        overviewPage.alertFlags().find(':nth-child(7)').should('contain', 'Veteran')
+      })
+
+      it('Shows modal when clicking alert flag', () => {
+        visitOverviewPage()
+        const overviewPage = new OverviewPage()
+        overviewPage.alertModal().should('not.be.visible')
+        overviewPage.alertFlags().children().eq(1).click()
+        overviewPage.alertModal().should('not.have.a.property', 'hidden')
+        overviewPage.alertModal().should('not.have.css', 'display', 'none')
+        overviewPage.alertModal().should('be.visible')
+        overviewPage.alertModalBody().contains('h2', 'Arsonist')
+        overviewPage.alertModalClose().eq(1).click()
+        overviewPage.alertModal().should('have.css', 'display', 'none')
+        overviewPage.alertModal().should('not.be.visible')
+      })
     })
   })
 })

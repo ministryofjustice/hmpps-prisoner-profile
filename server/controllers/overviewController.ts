@@ -52,7 +52,12 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
-    const { clientToken, prisonerData, inmateDetail, alertFlags } = req.middleware
+    const {
+      clientToken,
+      prisonerData,
+      inmateDetail,
+      alertSummaryData: { alertFlags },
+    } = req.middleware
     const { userRoles } = res.locals.user
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles

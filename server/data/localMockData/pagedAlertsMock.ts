@@ -2,6 +2,120 @@ import PrisonApiAlert from '../interfaces/prisonApi/PrisonApiAlert'
 import PagedList from '../interfaces/prisonApi/PagedList'
 import { Alert } from '../interfaces/alertsApi/Alert'
 
+const exampleActiveAlert: Alert = {
+  activeFrom: '2022-10-24',
+  activeTo: undefined,
+  alertCode: {
+    alertTypeCode: 'X',
+    alertTypeDescription: 'Security',
+    code: 'XA',
+    description: 'Arsonist',
+  },
+  alertUuid: '2113',
+  createdAt: '2022-10-24',
+  createdByDisplayName: 'James T Kirk',
+  description: 'test',
+  isActive: true,
+  lastModifiedAt: undefined,
+  lastModifiedByDisplayName: undefined,
+  activeToLastSetAt: undefined,
+  activeToLastSetByDisplayName: undefined,
+}
+
+const exampleInactiveAlert: Alert = {
+  activeFrom: '2022-10-24',
+  activeTo: '2022-10-25',
+  alertCode: {
+    alertTypeCode: 'A',
+    alertTypeDescription: 'Social Care',
+    code: 'AS',
+    description: 'Social Care',
+  },
+  alertUuid: '2113',
+  createdAt: '2022-10-24',
+  createdByDisplayName: 'James T Kirk',
+  description: 'test',
+  isActive: false,
+  lastModifiedAt: '2022-10-25',
+  lastModifiedByDisplayName: 'Saul Goodman',
+  activeToLastSetAt: '2022-10-25',
+  activeToLastSetByDisplayName: 'Saul Goodman',
+}
+
+export const unpagedAllAlertsMock: PagedList<Alert> = {
+  content: [
+    ...[
+      {
+        alertCode: {
+          alertTypeCode: 'X',
+          alertTypeDescription: 'Security',
+          code: 'XCI',
+          description: 'Concerted indiscipline',
+        },
+      },
+      {
+        alertCode: {
+          alertTypeCode: 'X',
+          alertTypeDescription: 'Security',
+          code: 'XCU',
+          description: 'Controlled unlock',
+        },
+      },
+      {
+        alertCode: {
+          alertTypeCode: 'X',
+          alertTypeDescription: 'Security',
+          code: 'XGANG',
+          description: 'Gang member',
+        },
+      },
+      {
+        alertCode: {
+          alertTypeCode: 'H',
+          alertTypeDescription: 'Medical',
+          code: 'HID',
+          description: 'Hidden disability',
+        },
+      },
+      {
+        alertCode: {
+          alertTypeCode: 'F1',
+          alertTypeDescription: 'Ex Armed Forces',
+          code: 'F1',
+          description: 'Armed Forces Veteran',
+        },
+      },
+    ].map(a => ({ ...exampleActiveAlert, ...a })),
+    ...Array.from({ length: 75 }, () => ({ ...exampleActiveAlert })),
+    ...Array.from({ length: 80 }, () => ({ ...exampleInactiveAlert })),
+  ],
+  pageable: {
+    sort: {
+      empty: false,
+      sorted: true,
+      unsorted: false,
+    },
+    offset: 0,
+    pageSize: 1000,
+    pageNumber: 0,
+    paged: true,
+    unpaged: false,
+  },
+  totalPages: 1,
+  last: true,
+  totalElements: 160,
+  size: 160,
+  number: 0,
+  sort: {
+    empty: false,
+    sorted: true,
+    unsorted: false,
+  },
+  first: true,
+  numberOfElements: 160,
+  empty: false,
+}
+
 export const pagedActiveAlertsMock: PagedList<Alert> = {
   content: [
     {

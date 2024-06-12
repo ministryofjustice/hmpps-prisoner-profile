@@ -27,7 +27,7 @@ export default class AlertsController {
 
   public async displayAlerts(req: Request, res: Response, next: NextFunction, isActive: boolean) {
     // Get data from middleware
-    const { prisonerData, inmateDetail, alertFlags } = req.middleware
+    const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
 
     // Parse query params for paging, sorting and filtering data
     const { clientToken } = req.middleware
@@ -58,6 +58,7 @@ export default class AlertsController {
       clientToken,
       'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
       prisonerData,
+      alertSummaryData,
       queryParams,
     )
 
@@ -96,7 +97,7 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alerts/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'alerts'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData.alertFlags, res.locals.user, 'alerts'),
       ...alertsPageData,
       alertsList,
       showingAll,

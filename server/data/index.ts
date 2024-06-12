@@ -34,6 +34,7 @@ import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 import AlertsApiRestClient from './alertsApiClient'
 import RedisFeatureToggleStore from './featureToggleStore/redisFeatureToggleStore'
 import InMemoryFeatureToggleStore from './featureToggleStore/inMemoryFeatureToggleStore'
+import PrisonPersonApiRestClient from './prisonPersonApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo())
@@ -69,6 +70,7 @@ export const dataAccess = {
   featureToggleStore: config.redis.enabled
     ? new RedisFeatureToggleStore(createRedisClient())
     : new InMemoryFeatureToggleStore(),
+  prisonPersonApiClientBuilder: (token: string) => new PrisonPersonApiRestClient(token),
 }
 
 export type DataAccess = typeof dataAccess

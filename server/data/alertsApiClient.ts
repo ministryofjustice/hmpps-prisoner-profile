@@ -1,8 +1,8 @@
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
-import PagedList, { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
+import PagedList from './interfaces/prisonApi/PagedList'
 import { AlertsApiClient } from './interfaces/alertsApi/alertsApiClient'
-import { Alert, AlertChanges, AlertType, CreateAlert } from './interfaces/alertsApi/Alert'
+import { Alert, AlertChanges, AlertsApiQueryParams, AlertType, CreateAlert } from './interfaces/alertsApi/Alert'
 import config from '../config'
 
 export default class AlertsApiRestClient implements AlertsApiClient {
@@ -12,9 +12,9 @@ export default class AlertsApiRestClient implements AlertsApiClient {
     this.restClient = new RestClient('Alerts API', config.apis.alertsApi, token)
   }
 
-  async getAlerts(prisonerNumber: string, queryParams: AlertsListQueryParams): Promise<PagedList<Alert>> {
+  async getAlerts(prisonerNumber: string, queryParams: AlertsApiQueryParams): Promise<PagedList<Alert>> {
     // Set defaults then apply queryParams
-    const params: AlertsListQueryParams = {
+    const params: AlertsApiQueryParams = {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }

@@ -65,6 +65,7 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"
+    PRISON_PERSON_API_URL: "https://prison-person-api-dev.prison.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -75,7 +76,8 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "CKI,FYI,WNI,WYI"
     COURT_CASES_SUMMARY_ENABLED: "true"
-    NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED: "true"
+    PRISON_PERSON_API_ENABLED: "false"
+    PRISON_PERSON_API_ENABLED_PRISONS: "LEI"
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod

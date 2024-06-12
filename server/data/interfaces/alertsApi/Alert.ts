@@ -1,4 +1,6 @@
 import { PagedListItem } from '../prisonApi/PagedList'
+import AlertFlagLabel from '../../../interfaces/AlertFlagLabels'
+import AlertTypeFilter from '../../../services/interfaces/alertsService/AlertsMetadata'
 
 export interface Alert extends PagedListItem {
   alertUuid?: string
@@ -77,4 +79,23 @@ export interface CreateAlert {
   authorisedBy?: string
   activeFrom: string
   activeTo?: string
+}
+
+export interface AlertsApiQueryParams {
+  isActive?: boolean
+  size: number
+  page?: number
+  sort?: string[]
+  activeFromEnd?: string
+  activeFromStart?: string
+  alertType?: string | string[]
+  showAll?: boolean
+}
+
+export interface AlertSummaryData {
+  activeAlertCount: number
+  inactiveAlertCount: number
+  activeAlertTypesFilter: { [key: string]: AlertTypeFilter }
+  inactiveAlertTypesFilter: { [key: string]: AlertTypeFilter }
+  alertFlags: AlertFlagLabel[]
 }

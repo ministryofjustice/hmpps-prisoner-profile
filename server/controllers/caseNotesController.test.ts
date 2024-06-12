@@ -58,7 +58,9 @@ describe('Case Notes Controller', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
-        alertFlags: alertFlagLabels,
+        alertSummaryData: {
+          alertFlags: alertFlagLabels,
+        },
       },
       path: 'case-notes',
       flash: jest.fn(),
