@@ -44,6 +44,15 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthErrorPage)
   })
 
+  it('User can log out', () => {
+    cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+    cy.signIn()
+    cy.visit('/prisoner/G6123VU')
+    Page.verifyOnPage(IndexPage)
+    cy.visit('/sign-out')
+    Page.verifyOnPage(AuthSignInPage)
+  })
+
   it('Token verification failure takes user to sign in page', () => {
     cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
     cy.signIn()
