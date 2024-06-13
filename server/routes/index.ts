@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
@@ -12,6 +11,7 @@ import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
+import getFrontendComponents from '../middleware/frontEndComponents'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
 import appointmentRouter from './appointmentRouter'
@@ -30,8 +30,6 @@ import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPriso
 import CareNeedsController from '../controllers/careNeedsController'
 import { PrisonUser } from '../interfaces/HmppsUser'
 
-export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
-
 export default function routes(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
@@ -42,23 +40,6 @@ export default function routes(services: Services): Router {
       currentUrlPath: req.baseUrl + req.path,
     }
     next()
-  })
-
-  router.get(standardGetPaths, async (_req, res, next) => {
-    /* Set feature toggle for using Alerts API */
-    const feComponentsMeta = res.locals.feComponentsMeta as HeaderFooterMeta
-    if (!feComponentsMeta?.services || !('activeCaseLoadId' in res.locals.user)) return next()
-
-    try {
-      await services.featureToggleService.setFeatureToggle(
-        res.locals.user.activeCaseLoadId,
-        'alertsApiEnabled',
-        feComponentsMeta.services.some(service => service.id === 'alerts'),
-      )
-      return next()
-    } catch (_error) {
-      return next()
-    }
   })
 
   const overviewController = new OverviewController(
@@ -97,6 +78,8 @@ export default function routes(services: Services): Router {
     auditPageAccessAttempt({ services, page: ApiAction.Image }),
     services.commonApiRoutes.image,
   )
+
+  get('/prisoner/*', getFrontendComponents(services, config.apis.frontendComponents.latest))
 
   get(
     '/prisoner/:prisonerNumber',

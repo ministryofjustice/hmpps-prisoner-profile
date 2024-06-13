@@ -18,6 +18,7 @@ import PrisonerSearchClient from './prisonerSearchClient'
 import { createRedisClient } from './redisClient'
 import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
+import ComponentApiRestClient from './componentApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
 import ManageUsersApiRestClient from './manageUsersApiClient'
@@ -57,6 +58,7 @@ export const dataAccess = {
     config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
   ),
   nonAssociationsApiClientBuilder: (token: string) => new NonAssociationsApiRestClient(token),
+  componentApiClientBuilder: (token: string) => new ComponentApiRestClient(token),
   whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token),
   prisonerProfileDeliusApiClientBuilder: (token: string) => new PrisonerProfileDeliusApiRestClient(token),
   manageUsersApiClientBuilder: (token: string) => new ManageUsersApiRestClient(token),

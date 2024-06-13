@@ -1,9 +1,9 @@
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import { Role } from '../../../data/enums/role'
 import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
 import config from '../../../config'
+import { HeaderFooterMeta } from '../../../data/interfaces/componentApi/Component'
 import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
 
 const pathfinderNominal = { id: 1 }

@@ -1,7 +1,6 @@
 import express from 'express'
 
 import path from 'path'
-import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import { appInsightsMiddleware } from './utils/azureAppInsights'
@@ -16,7 +15,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
-import routes, { standardGetPaths } from './routes'
+import routes from './routes'
 import type { Services } from './services'
 import populateClientToken from './middleware/populateClientToken'
 import setUpPageNotFound from './middleware/setUpPageNotFound'
@@ -24,8 +23,6 @@ import flashMessageMiddleware from './middleware/flashMessageMiddleware'
 import setUpEnvironmentName from './middleware/setUpEnvironmentName'
 import apiErrorMiddleware from './middleware/apiErrorMiddleware'
 import bannerMiddleware from './middleware/bannerMiddleware'
-import logger from '../logger'
-import config from './config'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -51,14 +48,6 @@ export default function createApp(services: Services): express.Application {
   app.use(apiErrorMiddleware())
   app.use(bannerMiddleware(services))
 
-  app.get(
-    standardGetPaths,
-    dpsComponents.getPageComponents({
-      logger,
-      includeMeta: true,
-      dpsUrl: config.serviceUrls.digitalPrison,
-    }),
-  )
   app.use(routes(services))
 
   app.use(setUpPageNotFound)
