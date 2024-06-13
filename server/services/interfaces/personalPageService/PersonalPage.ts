@@ -11,7 +11,6 @@ export default interface PersonalPage {
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
-  careNeeds: CareNeeds
   learnerNeurodivergence: LearnerNeurodivergence[]
   hasCurrentBelief: boolean
 }
@@ -132,25 +131,4 @@ export interface PhysicalCharacteristics {
 export interface Security {
   interestToImmigration: string
   travelRestrictions: string
-  xrays: { total: number; since?: string }
-}
-
-export interface CareNeed {
-  type: string
-  description: string
-  comment: string
-  startDate: string
-  reasonableAdjustments: ReasonableAdjustment[]
-}
-
-export interface ReasonableAdjustment {
-  type: string
-  description: string
-  comment: string
-  startDate: string
-  agency: string
-}
-
-export interface CareNeeds {
-  personalCareNeeds: CareNeed[]
 }

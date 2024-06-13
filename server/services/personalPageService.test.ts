@@ -1,4 +1,3 @@
-import { addDays, startOfYear } from 'date-fns'
 import PersonalPageService from './personalPageService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
@@ -11,16 +10,11 @@ import { propertyMock } from '../data/localMockData/property'
 import { mockAddresses } from '../data/localMockData/addresses'
 import { mockOffenderContacts } from '../data/localMockData/offenderContacts'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { PersonalCareNeed } from '../data/interfaces/prisonApi/PersonalCareNeeds'
-import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
-import { mockReasonableAdjustments } from '../data/localMockData/reasonableAdjustments'
-import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
 import { formatDate } from '../utils/dateHelpers'
 import { identifiersMock } from '../data/localMockData/identifiersMock'
 import { addressSummaryMock } from '../data/localMockData/addressSummary'
 import { curiousApiClientMock } from '../../tests/mocks/curiousApiClientMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
-import { mockReferenceDomains } from '../data/localMockData/referenceDomains'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
@@ -39,11 +33,6 @@ describe('PersonalPageService', () => {
     prisonApiClient.getAddresses = jest.fn(async () => mockAddresses)
     prisonApiClient.getAddressesForPerson = jest.fn(async () => mockAddresses)
     prisonApiClient.getOffenderContacts = jest.fn(async () => mockOffenderContacts)
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async (domain: ReferenceCodeDomain) =>
-      mockReferenceDomains(domain),
-    )
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => personalCareNeedsMock)
-    prisonApiClient.getReasonableAdjustments = jest.fn(async () => mockReasonableAdjustments)
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
 
     curiousApiClient = curiousApiClientMock()
@@ -57,17 +46,6 @@ describe('PersonalPageService', () => {
       })),
     }
   })
-
-  const setPersonalCareNeeds = (careNeeds: PersonalCareNeed[]) => {
-    prisonApiClient.getPersonalCareNeeds = jest.fn(async () => ({
-      offenderNo: 'AB1234',
-      personalCareNeeds: careNeeds,
-    }))
-  }
-
-  const setCodeReferences = (referenceCodes: ReferenceCode[]) => {
-    prisonApiClient.getReferenceCodesByDomain = jest.fn(async () => referenceCodes)
-  }
 
   const constructService = () =>
     new PersonalPageService(
@@ -478,311 +456,6 @@ describe('PersonalPageService', () => {
       const { security } = await constructService().get('token', PrisonerMockDataA)
       expect(security.interestToImmigration).toEqual('Yes')
       expect(security.travelRestrictions).toEqual('some travel restrictions')
-    })
-
-    describe('X-ray information', () => {
-      const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
-        personalCareNeedId: 1,
-        commentText: '',
-        problemCode: 'BSC5.5',
-        problemDescription: 'Body scan',
-        problemStatus: 'ON',
-        problemType: 'BSCAN',
-        startDate: addDays(startOfYear(new Date()), daysAfterStartOfYear).toISOString(),
-      })
-
-      beforeEach(() => {
-        setCodeReferences([
-          {
-            description: 'X-ray body scan',
-            code: 'BSCAN',
-            activeFlag: 'Y',
-            domain: 'HEALTH',
-          },
-        ])
-      })
-
-      describe('Given no x-ray care needs', () => {
-        it('Returns no xray security information', async () => {
-          setPersonalCareNeeds([])
-          const {
-            security: { xrays },
-          } = await constructService().get('token', PrisonerMockDataA)
-          expect(xrays.total).toEqual(0)
-          expect(xrays.since).toBeUndefined()
-        })
-      })
-
-      describe('Given x-rays for this year', () => {
-        it('Returns the correct number of x-rays and the start date', async () => {
-          setPersonalCareNeeds([xrayNeed(0), xrayNeed(10), xrayNeed(20), xrayNeed(40)])
-          const {
-            security: { xrays },
-          } = await constructService().get('token', PrisonerMockDataA)
-          expect(xrays.total).toEqual(4)
-          expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
-        })
-      })
-
-      describe('Given x-rays over multiple years', () => {
-        it('Returns the correct number of x-rays for this year and the start date', async () => {
-          setPersonalCareNeeds([
-            xrayNeed(-10),
-            xrayNeed(-20),
-            xrayNeed(-40),
-            xrayNeed(0),
-            xrayNeed(10),
-            xrayNeed(20),
-            xrayNeed(40),
-          ])
-          const {
-            security: { xrays },
-          } = await constructService().get('token', PrisonerMockDataA)
-          expect(xrays.total).toEqual(4)
-          expect(xrays.since).toBe(startOfYear(new Date()).toISOString())
-        })
-      })
-    })
-  })
-
-  describe('Care needs', () => {
-    it('Handles empty personal care needs', async () => {
-      setPersonalCareNeeds([])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Only maps care needs with problem status ON', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-        {
-          personalCareNeedId: 2,
-          problemCode: 'code',
-          problemStatus: 'OFF',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(1)
-    })
-
-    it('Doesnt map care needs without matching health codes', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'A',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Doesnt map care needs with problem code NR', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'NR',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Doesnt map care needs with problem type BSCAN', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'BSC5.5',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'BSCAN',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'BSCAN',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(0)
-    })
-
-    it('Maps the personal care needs', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      const { careNeeds } = await constructService().get('token', PrisonerMockDataA)
-      expect(careNeeds.personalCareNeeds.length).toEqual(1)
-      expect(careNeeds.personalCareNeeds[0].description).toEqual('problem description')
-      expect(careNeeds.personalCareNeeds[0].startDate).toEqual('start date')
-      expect(careNeeds.personalCareNeeds[0].type).toEqual('Code reference description')
-      expect(careNeeds.personalCareNeeds[0].comment).toEqual('Comment text')
-    })
-
-    it('Gets the reasonable adjustments for the domain types', async () => {
-      prisonApiClient.getReferenceCodesByDomain = jest.fn(
-        async () =>
-          [
-            {
-              domain: 'HEALTH_TREAT',
-              code: 'AC',
-              description: 'Accessible Cell',
-              activeFlag: 'Y',
-              listSeq: 99,
-              systemDataFlag: 'N',
-              subCodes: [],
-            },
-            {
-              domain: 'HEALTH_TREAT',
-              code: 'AMP TEL',
-              description: 'Amplified telephone',
-              activeFlag: 'Y',
-              listSeq: 99,
-              systemDataFlag: 'N',
-              subCodes: [],
-            },
-          ] as ReferenceCode[],
-      )
-      await constructService().get('token', PrisonerMockDataA)
-      expect(prisonApiClient.getReasonableAdjustments).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, [
-        'AC',
-        'AMP TEL',
-      ])
-    })
-
-    it('Maps the reasonable adjustments to the matching care needs', async () => {
-      setPersonalCareNeeds([
-        {
-          personalCareNeedId: 1,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-        {
-          personalCareNeedId: 2,
-          problemCode: 'code',
-          problemStatus: 'ON',
-          commentText: 'Comment text',
-          problemType: 'TYPE',
-          startDate: 'start date',
-          problemDescription: 'problem description',
-        },
-      ])
-
-      setCodeReferences([
-        {
-          description: 'Code reference description',
-          code: 'TYPE',
-          activeFlag: 'Y',
-          domain: 'HEALTH',
-        },
-      ])
-
-      prisonApiClient.getReasonableAdjustments = jest.fn(async () => ({
-        reasonableAdjustments: [
-          {
-            personalCareNeedId: 1,
-            treatmentCode: 'BEH/BODY LAN',
-            commentText: 'psych care type adjustment comment goes here',
-            startDate: '1999-06-09',
-            agencyId: 'MDI',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            treatmentDescription: 'Behavioural responses/Body language',
-          },
-        ],
-      }))
-
-      const {
-        careNeeds: { personalCareNeeds },
-      } = await constructService().get('token', PrisonerMockDataA)
-
-      const { reasonableAdjustments } = personalCareNeeds[0]
-      expect(personalCareNeeds[1].reasonableAdjustments.length).toEqual(0)
-      expect(reasonableAdjustments.length).toEqual(1)
-      expect(reasonableAdjustments[0].description).toEqual('Behavioural responses/Body language')
-      expect(reasonableAdjustments[0].comment).toEqual('psych care type adjustment comment goes here')
-      expect(reasonableAdjustments[0].startDate).toEqual('1999-06-09')
-      expect(reasonableAdjustments[0].agency).toEqual('Moorland (HMP & YOI)')
     })
   })
 
