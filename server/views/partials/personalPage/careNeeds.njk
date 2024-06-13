@@ -4,13 +4,7 @@
 {% macro careNeed(info) %}
   <p class="govuk-body" data-qa="description">{{ info.description }}</p>
   <p class="govuk-body" data-qa="comment">{{ info.comment }}</p>
-  {% if info.agency %}
-    <p class="govuk-body-s hmpps-secondary-text" data-qa="added-on">
-      Added on {{ info.startDate | formatDate }} at {{ info.agency }}
-    </p>
-  {% else %}
-    <p class="govuk-body-s hmpps-secondary-text" data-qa="added-on">Added on {{ info.startDate | formatDate }}</p>
-  {% endif %}
+  <p class="govuk-body-s hmpps-secondary-text" data-qa="added-on">Added on {{ info.startDate | formatDate }}</p>
 
   {% if info.reasonableAdjustments.length > 0 %}
     <details class="govuk-details" data-module="govuk-details" data-qa="reasonable-adjustments-list">
@@ -37,12 +31,15 @@
 {%- call summaryCard({title: "Care needs", id: "care-needs"}) -%}
   <div class="govuk-grid-row" data-qa="care-needs">
     <div class="govuk-grid-column-full">
-      {% if careNeeds.personalCareNeeds.length or careNeeds.reasonableAdjustments.length %}
-        <dl class="govuk-summary-list" data-qa="care-needs-list">
-          {% for need in careNeeds.personalCareNeeds %}
+      {% if careNeeds.length %}
+        <dl class="govuk-summary-list {{ 'govuk-summary-list--bottom-border' if hasPastCareNeeds }}" data-qa="care-needs-list">
+          {% for need in careNeeds %}
             {{ summaryListRow(need.type, careNeed(need), "care-need") }}
           {% endfor %}
         </dl>
+        {% if hasPastCareNeeds %}
+        <p><a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/past-care-needs" data-qa="past-care-needs-link">Past care needs</a></p>
+        {% endif %}
       {% else %}
         <p>No care needs have been entered.</p>
       {% endif %}

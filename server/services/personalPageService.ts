@@ -1,14 +1,11 @@
-import { isSameYear, startOfYear } from 'date-fns'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   Addresses,
-  CareNeeds,
   IdentityNumbers,
   NextOfKin,
   PersonalDetails,
   PhysicalCharacteristics,
   PropertyItem,
-  ReasonableAdjustment as PersonalPageReasonableAdjustment,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { addressToLines, calculateAge, formatName } from '../utils/utils'
@@ -22,12 +19,9 @@ import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import PrisonerDetail from '../data/interfaces/prisonApi/PrisonerDetail'
 import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
-import ReferenceCode, { ReferenceCodeDomain } from '../data/interfaces/prisonApi/ReferenceCode'
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
-import { HealthDomainReferenceCode, PersonalCareNeed } from '../data/interfaces/prisonApi/PersonalCareNeeds'
-import ReasonableAdjustment from '../data/interfaces/prisonApi/ReasonableAdjustment'
 import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
@@ -59,8 +53,6 @@ export default class PersonalPageService {
       property,
       addressList,
       contacts,
-      healthReferenceCodes,
-      healthTreatmentReferenceCodes,
       identifiers,
       beliefs,
       prisonPerson,
@@ -71,20 +63,12 @@ export default class PersonalPageService {
       prisonApiClient.getProperty(bookingId),
       prisonApiClient.getAddresses(prisonerNumber),
       prisonApiClient.getOffenderContacts(prisonerNumber),
-      prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.Health),
-      prisonApiClient.getReferenceCodesByDomain(ReferenceCodeDomain.HealthTreatments),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
-    const healthCodes = healthReferenceCodes.map(code => code.code)
-    const treatmentCodes = healthTreatmentReferenceCodes.map(code => code.code)
-    const [{ personalCareNeeds }, { reasonableAdjustments }] = await Promise.all([
-      prisonApiClient.getPersonalCareNeeds(inmateDetail.bookingId, healthCodes),
-      prisonApiClient.getReasonableAdjustments(inmateDetail.bookingId, treatmentCodes),
-    ])
 
     return {
       personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages),
@@ -103,9 +87,7 @@ export default class PersonalPageService {
           ProfileInformationType.TravelRestrictions,
           inmateDetail.profileInformation,
         ),
-        xrays: this.xrays(personalCareNeeds),
       },
-      careNeeds: await this.careNeeds(healthReferenceCodes, personalCareNeeds, reasonableAdjustments),
       learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
     }
@@ -367,64 +349,6 @@ export default class PersonalPageService {
           inmateDetail.profileInformation,
         ) || 'Needs to be warned',
       weight,
-    }
-  }
-
-  private async careNeeds(
-    healthReferenceCodes: ReferenceCode[],
-    personalCareNeeds: PersonalCareNeed[],
-    reasonableAdjustments: ReasonableAdjustment[],
-  ): Promise<CareNeeds> {
-    const careNeedType = (problemType: string) => {
-      return healthReferenceCodes.find(code => code.code === problemType)?.description || problemType
-    }
-
-    function mapReasonableAdjustmentToCareNeed(careNeedId?: number): PersonalPageReasonableAdjustment[] {
-      if (careNeedId) {
-        return reasonableAdjustments
-          .filter(adjustment => adjustment.personalCareNeedId === careNeedId)
-          .map(adjustment => ({
-            type: 'Support needed',
-            description: adjustment.treatmentDescription,
-            startDate: adjustment.startDate,
-            comment: adjustment.commentText,
-            agency: adjustment.agencyDescription,
-          }))
-      }
-      return []
-    }
-
-    const healthCodes = healthReferenceCodes.map(code => code.code)
-    const excludedProblemCodes = ['NR']
-    const excludedProblemTypes = [HealthDomainReferenceCode.XRayBodyScan.toString()]
-
-    return {
-      personalCareNeeds: personalCareNeeds
-        ?.filter(
-          careNeed =>
-            careNeed.problemStatus === 'ON' &&
-            healthCodes.includes(careNeed.problemType) &&
-            !excludedProblemCodes.includes(careNeed.problemCode) &&
-            !excludedProblemTypes.includes(careNeed.problemType),
-        )
-        .map(careNeed => ({
-          comment: careNeed.commentText,
-          startDate: careNeed.startDate,
-          type: careNeedType(careNeed.problemType),
-          description: careNeed.problemDescription,
-          reasonableAdjustments: mapReasonableAdjustmentToCareNeed(careNeed.personalCareNeedId),
-        })),
-    }
-  }
-
-  private xrays(personalCareNeeds: PersonalCareNeed[]): { total: number; since?: string } {
-    const yearStart = startOfYear(new Date())
-    const xrayNeeds = personalCareNeeds
-      .filter(need => need.problemType === HealthDomainReferenceCode.XRayBodyScan)
-      .filter(need => isSameYear(new Date(need.startDate), yearStart))
-    return {
-      total: xrayNeeds.length,
-      since: xrayNeeds.length > 0 ? yearStart.toISOString() : undefined,
     }
   }
 

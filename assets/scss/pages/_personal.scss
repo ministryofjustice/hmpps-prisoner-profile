@@ -45,5 +45,11 @@
       border-bottom: 1px solid $govuk-border-colour;
     }
   }
+
+  .govuk-summary-list.govuk-summary-list--bottom-border {
+    .govuk-summary-list__row:last-of-type {
+      border-bottom: 1px solid $govuk-border-colour;
+    }
+  }
 }
 

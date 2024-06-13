@@ -2,7 +2,7 @@
 {%
   set breadCrumbs = [
   { text: 'Digital Prison Services', href: '/' },
-  { text: prisonerName, href: "/prisoner/" + prisonerNumber },
+  { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
   { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal"}
   ]
 %}
@@ -11,8 +11,8 @@
   {%
     set scanRows = (scanRows.push(
     [
-    { text: scan.startDate | formatDate, classes: 'govuk-!-width-one-quarter' },
-    { text: scan.commentText, classes: 'govuk-!-width-three-quarters' }
+    { text: scan.scanDate | formatDate, classes: 'govuk-!-width-one-quarter' },
+    { text: scan.comment, classes: 'govuk-!-width-three-quarters' }
     ]
     ), scanRows)
   %}
@@ -21,7 +21,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">{{ prisonerDisplayName | apostrophe }} X-ray body scans</h1>
+      <h1 class="govuk-heading-xl">{{ prisonerName | apostrophe }} X-ray body scans</h1>
       {% if bodyScans.length > 0 %}
         {{
           govukTable({
