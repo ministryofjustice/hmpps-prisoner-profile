@@ -363,7 +363,7 @@ context('When signed in', () => {
 
       it('Displays the back to top link after scrolling down', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        cy.get('.connect-dps-common-footer').scrollTo('bottom', { ensureScrollable: false })
+        cy.get('.govuk-footer').scrollTo('bottom', { ensureScrollable: false })
         page.backToTopLink().should('be.visible')
       })
     })
