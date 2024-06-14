@@ -73,6 +73,32 @@ export const pastCareNeedsMock: PersonalCareNeeds = {
   ],
 }
 
+export const onlyPastCareNeedsMock: PersonalCareNeeds = {
+  offenderNo: 'G6123VU',
+  personalCareNeeds: [
+    {
+      personalCareNeedId: 1,
+      problemType: 'PHY',
+      problemCode: 'FALS',
+      problemStatus: 'I',
+      problemDescription: 'False Limbs',
+      commentText: 'Peg leg',
+      startDate: '2023-05-19',
+      endDate: null,
+    },
+    {
+      personalCareNeedId: 2,
+      problemType: 'SC',
+      problemCode: 'BAC',
+      problemStatus: 'I',
+      problemDescription: 'Being Appropriately Clothed',
+      commentText: 'Double denim',
+      startDate: '2020-06-09',
+      endDate: null,
+    },
+  ],
+}
+
 const xrayNeed = (daysAfterStartOfYear: number): PersonalCareNeed => ({
   personalCareNeedId: 1,
   commentText: 'There was a body scan',

@@ -37,11 +37,14 @@
             {{ summaryListRow(need.type, careNeed(need), "care-need") }}
           {% endfor %}
         </dl>
-        {% if hasPastCareNeeds %}
+      {% endif %}
+      {% if not careNeeds.length and not hasPastCareNeeds %}
+        <p data-qa="no-care-needs-message">No care needs have been entered.</p>
+      {% elseif not careNeeds.length and hasPastCareNeeds %}
+        <p data-qa="no-care-needs-message">This person does not have any current care needs.</p>
+      {% endif %}
+      {% if hasPastCareNeeds %}
         <p><a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/past-care-needs" data-qa="past-care-needs-link">Past care needs</a></p>
-        {% endif %}
-      {% else %}
-        <p>No care needs have been entered.</p>
       {% endif %}
     </div>
   </div>
