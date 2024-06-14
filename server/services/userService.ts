@@ -12,7 +12,7 @@ export default class UserService {
   }
 
   getStaffRoles(token: string, user: HmppsUser): Promise<StaffRole[]> {
-    if (user.authSource !== 'nomis') {
+    if (user.authSource !== 'nomis' || !user.activeCaseLoadId) {
       return Promise.resolve([])
     }
     return this.prisonApiClientBuilder(token).getStaffRoles(user.staffId, user.activeCaseLoadId)

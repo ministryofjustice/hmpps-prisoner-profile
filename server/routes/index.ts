@@ -2,11 +2,10 @@ import { Router } from 'express'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
-import { formatName, sortArrayOfObjectsByDate, SortType, userHasRoles } from '../utils/utils'
+import { userHasRoles } from '../utils/utils'
 import { Role } from '../data/enums/role'
 import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import caseNotesRouter from './caseNotesRouter'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
@@ -28,6 +27,7 @@ import probationDocumentsRouter from './probationDocumentsRouter'
 import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
+import CareNeedsController from '../controllers/careNeedsController'
 import { PrisonUser } from '../interfaces/HmppsUser'
 
 export default function routes(services: Services): Router {
@@ -63,6 +63,7 @@ export default function routes(services: Services): Router {
     services.auditService,
   )
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
+  const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
 
   get(
     '/api/prisoner/:prisonerNumber/image',
@@ -121,21 +122,27 @@ export default function routes(services: Services): Router {
     getPrisonerData(services),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const {
+        prisonerData,
+        inmateDetail,
+        alertSummaryData: { alertFlags },
+        clientToken,
+      } = req.middleware
+      const { bookingId } = prisonerData
       const user = res.locals.user as PrisonUser
       const { activeCaseLoadId } = user
 
-      const { personalPageService } = services
+      const { personalPageService, careNeedsService } = services
+
       const enablePrisonPerson =
         config.featureToggles.prisonPersonApiEnabled &&
         config.featureToggles.prisonPersonApiEnabledPrisons.includes(activeCaseLoadId)
-      const personalPageData = await personalPageService.get(
-        req.middleware.clientToken,
-        prisonerData,
-        enablePrisonPerson,
-      )
+
+      const [personalPageData, careNeeds, xrays] = await Promise.all([
+        personalPageService.get(clientToken, prisonerData, enablePrisonPerson),
+        careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
+        careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
+      ])
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -149,6 +156,9 @@ export default function routes(services: Services): Router {
         pageTitle: 'Personal',
         ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'personal'),
         ...personalPageData,
+        careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
+        security: { ...personalPageData.security, xrays },
+        hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
       })
     },
   )
@@ -270,31 +280,10 @@ export default function routes(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/x-ray-body-scans',
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     checkPrisonerInCaseload(),
     async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
-      const { personalCareNeeds } = await prisonApiClient.getPersonalCareNeeds(prisonerData.bookingId, ['BSCAN'])
-
-      await services.auditService.sendPageView({
-        user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.XRayBodyScans,
-      })
-
-      res.render('pages/xrayBodyScans', {
-        pageTitle: 'X-ray body scans',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'x-ray-body-scans', true),
-        prisonerDisplayName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
-          style: NameFormatStyle.firstLast,
-        }),
-        bodyScans: sortArrayOfObjectsByDate(personalCareNeeds, 'startDate', SortType.DESC),
-      })
+      return careNeedsController.displayXrayBodyScans(req, res)
     },
   )
 
@@ -325,6 +314,16 @@ export default function routes(services: Services): Router {
     checkPrisonerInCaseload(),
     async (req, res, next) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
+    },
+  )
+
+  get(
+    '/prisoner/:prisonerNumber/past-care-needs',
+    auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
+    getPrisonerData(services, { minimal: true }),
+    checkPrisonerInCaseload(),
+    async (req, res, next) => {
+      return careNeedsController.displayPastCareNeeds(req, res)
     },
   )
 

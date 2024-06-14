@@ -47,6 +47,7 @@ export enum Page {
   XRayBodyScans = 'XRAY_BODY_SCANS',
   ProbationDocuments = 'PROBATION_DOCUMENTS',
   VisitDetails = 'VISIT_DETAILS',
+  PastCareNeeds = 'PAST_CARE_NEEDS',
 }
 
 // eslint-disable-next-line no-shadow

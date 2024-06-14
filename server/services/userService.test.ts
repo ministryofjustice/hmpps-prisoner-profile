@@ -36,9 +36,19 @@ describe('HmppsUser service', () => {
 
     describe('when the user is not a prison user', () => {
       it.each(['delius', 'external'])('should return an empty list', async authSource => {
-        prisonApiClient.getStaffRoles = jest.fn(async () => [{ role: 'role1' }, { role: 'role2' }])
-
         const result = await userService.getStaffRoles(token, { authSource } as HmppsUser)
+
+        expect(result).toEqual([])
+      })
+    })
+
+    describe('when the user does not have an active caseload', () => {
+      it('should return an empty list', async () => {
+        const result = await userService.getStaffRoles(token, {
+          authSource: 'nomis',
+          staffId: 1,
+          activeCaseLoadId: undefined,
+        } as HmppsUser)
 
         expect(result).toEqual([])
       })
