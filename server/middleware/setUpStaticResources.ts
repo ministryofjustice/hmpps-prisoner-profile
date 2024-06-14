@@ -11,7 +11,7 @@ export default function setUpStaticResources(): Router {
   router.use(compression())
 
   //  Static Resources Configuration
-  const cacheControl = { maxAge: config.staticResourceCacheDuration }
+  const cacheControl = { maxAge: config.staticResourceCacheDuration * 1000 }
 
   Array.of(
     '/assets',
