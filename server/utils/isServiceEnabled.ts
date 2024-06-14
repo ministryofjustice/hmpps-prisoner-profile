@@ -1,4 +1,4 @@
-import { HeaderFooterMeta } from '../data/interfaces/componentApi/Component'
+import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 export const isServiceEnabledForNavigation = (
   serviceId: string,
