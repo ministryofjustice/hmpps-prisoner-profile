@@ -12,14 +12,15 @@ $govuk-page-width: $moj-page-width;
 @import "node_modules/govuk-frontend/dist/govuk/overrides";
 @import 'moj/all';
 
+@import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
+@import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/header-bar';
+
 @import './components/actions-block';
 @import './components/alerts';
 @import './components/contact';
 @import './components/courtCasesAndOffences';
 @import './components/date-picker';
 @import './components/flash-message';
-@import './components/footer';
-@import './components/header-bar';
 @import './components/hmpps-action-button';
 @import './components/hmpps-back-to-top';
 @import './components/hmpps-side-filter';
