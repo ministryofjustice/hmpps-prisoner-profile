@@ -184,6 +184,8 @@ export default class PersonalPage extends Page {
         comment: () => reasonableAdjustmentValue(row).findDataQa('comment'),
         addedOn: () => reasonableAdjustmentValue(row).findDataQa('added-on'),
       }),
+      pastCareNeedsLink: () => cy.getDataQa('past-care-needs-link'),
+      noCareNeedsMessage: () => cy.getDataQa('no-care-needs-message'),
     }
   }
 

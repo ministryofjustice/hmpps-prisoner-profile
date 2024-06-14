@@ -8,6 +8,7 @@ import { formatDate } from '../../server/utils/dateHelpers'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
 import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
+import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../server/data/localMockData/personalCareNeedsMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -20,6 +21,8 @@ context('When signed in', () => {
   context('Permissions', () => {
     const visitPage = prisonerDataOverrides => {
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId, prisonerDataOverrides })
+      cy.task('stubPersonalCareNeeds')
+
       visitPersonalDetailsPage({ failOnStatusCode: false })
     }
 
@@ -45,7 +48,7 @@ context('When signed in', () => {
       cy.task('stubHealthReferenceDomain')
       cy.task('stubHealthTreatmentReferenceDomain')
       cy.task('stubReasonableAdjustments', 1102484)
-      cy.task('stubPersonalCareNeeds', 1102484)
+      cy.task('stubPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
       cy.task('stubComponentsMeta', componentsNoServicesMock)
@@ -85,6 +88,7 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
       cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
@@ -311,8 +315,32 @@ context('When signed in', () => {
       })
     })
 
-    context('Care needs', () => {
+    context('Back to top', () => {
+      it('Does not display the back to top link initially', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.backToTopLinkHidden().should('exist')
+      })
+
+      it('Displays the back to top link after scrolling down', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        cy.get('.connect-dps-common-footer').scrollTo('bottom', { ensureScrollable: false })
+        page.backToTopLink().should('be.visible')
+      })
+    })
+  })
+
+  context('Care needs', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+    })
+
+    context('Prisoner has current care needs and no past care needs', () => {
       it('Displays the care needs', () => {
+        cy.task('stubPersonalCareNeeds')
+        visitPersonalDetailsPage()
         const page = Page.verifyOnPage(PersonalPage)
         page.careNeeds().personalCareNeeds(0).type().should('include.text', 'Maternity Status')
         page.careNeeds().personalCareNeeds(0).description().should('include.text', 'Preg, acc under 9mths')
@@ -353,18 +381,44 @@ context('When signed in', () => {
           .should('include.text', 'Moorland (HMP & YOI)')
         page.careNeeds().personalCareNeeds(0).reasonableAdjustments(1).addedOn().should('include.text', '9 June 2020')
       })
+
+      it('Does not display the past care needs link', () => {
+        const page = new PersonalPage()
+        page.careNeeds().pastCareNeedsLink().should('not.exist')
+        page.careNeeds().noCareNeedsMessage().should('not.exist')
+      })
     })
 
-    context('Back to top', () => {
-      it('Does not display the back to top link initially', () => {
-        const page = Page.verifyOnPage(PersonalPage)
-        page.backToTopLinkHidden().should('exist')
+    context('Prisoner has current care needs and past care needs', () => {
+      it('Displays the past care needs link', () => {
+        cy.task('stubPersonalCareNeeds', pastCareNeedsMock)
+        visitPersonalDetailsPage()
+        const page = new PersonalPage()
+        page.careNeeds().pastCareNeedsLink().should('exist')
+        page.careNeeds().noCareNeedsMessage().should('not.exist')
       })
+    })
 
-      it('Displays the back to top link after scrolling down', () => {
-        const page = Page.verifyOnPage(PersonalPage)
-        cy.get('.connect-dps-common-footer').scrollTo('bottom', { ensureScrollable: false })
-        page.backToTopLink().should('be.visible')
+    context('Prisoner has no current care needs but does have past care needs', () => {
+      it('Displays the past care needs link', () => {
+        cy.task('stubPersonalCareNeeds', onlyPastCareNeedsMock)
+        visitPersonalDetailsPage()
+        const page = new PersonalPage()
+        page.careNeeds().pastCareNeedsLink().should('exist')
+        page
+          .careNeeds()
+          .noCareNeedsMessage()
+          .should('contain.text', 'This person does not have any current care needs.')
+      })
+    })
+
+    context('Prisoner has no current care needs or past care needs', () => {
+      it('Displays the past care needs link', () => {
+        cy.task('stubPersonalCareNeeds', { offenderNo: 'G6123VU', personalCareNeeds: [] })
+        visitPersonalDetailsPage()
+        const page = new PersonalPage()
+        page.careNeeds().pastCareNeedsLink().should('not.exist')
+        page.careNeeds().noCareNeedsMessage().should('contain.text', 'No care needs have been entered.')
       })
     })
   })
@@ -375,6 +429,7 @@ context('When signed in', () => {
       cy.setupUserAuth()
       cy.task('stubComponentsMeta', componentsNoServicesMock)
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
     })
 
     context('With less than the limit', () => {
@@ -415,6 +470,7 @@ context('When signed in', () => {
         roles: [Role.GlobalSearch],
       })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
       cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })

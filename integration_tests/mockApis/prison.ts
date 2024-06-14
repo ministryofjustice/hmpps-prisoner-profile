@@ -597,18 +597,18 @@ export default {
     })
   },
 
-  stubPersonalCareNeeds: (bookingId: number) => {
+  stubPersonalCareNeeds: (resp = personalCareNeedsMock) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/${bookingId}/personal-care-needs\\?type=(.*)`,
+        urlPattern: `/prison/api/bookings/\\d*/personal-care-needs\\?type=(.*)`,
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: personalCareNeedsMock,
+        jsonBody: resp,
       },
     })
   },
