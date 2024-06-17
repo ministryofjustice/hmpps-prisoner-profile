@@ -98,12 +98,12 @@ export default class OverviewController {
       showCourtCaseSummary ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber) : null,
       prisonerInCaseLoad ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
       prisonerInCaseLoad || isPomOrReceptionUser
-        ? await this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId)
+        ? this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId)
         : null,
-      prisonerInCaseLoad ? await this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
-      await this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
+      prisonerInCaseLoad ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
+      this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
       prisonerInCaseLoad || isGlobalSearchUser
-        ? await this.incentivesService.getIncentiveOverview(clientToken, bookingId)
+        ? this.incentivesService.getIncentiveOverview(clientToken, bookingId)
         : null,
       Result.wrap(this.getLearnerNeurodivergence(clientToken, prisonId, prisonerNumber), res.locals.apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
