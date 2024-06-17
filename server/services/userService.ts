@@ -11,10 +11,11 @@ export default class UserService {
     return this.prisonApiClientBuilder(token).getUserCaseLoads()
   }
 
-  getStaffRoles(token: string, user: HmppsUser): Promise<StaffRole[]> {
+  async getStaffRoles(token: string, user: HmppsUser): Promise<StaffRole[]> {
     if (user.authSource !== 'nomis' || !user.activeCaseLoadId) {
       return Promise.resolve([])
     }
-    return this.prisonApiClientBuilder(token).getStaffRoles(user.staffId, user.activeCaseLoadId)
+    const roles = await this.prisonApiClientBuilder(token).getStaffRoles(user.staffId, user.activeCaseLoadId)
+    return roles ?? []
   }
 }
