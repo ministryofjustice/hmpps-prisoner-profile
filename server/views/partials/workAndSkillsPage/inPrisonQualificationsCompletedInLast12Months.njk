@@ -47,7 +47,7 @@
                 <td class="govuk-table__cell">{{ "Accredited" if completedCourse.isAccredited else "Non-accredited" }}</td>
                 <td class="govuk-table__cell">{{ completedCourse.prisonName if completedCourse.prisonName else completedCourse.prisonId }}</td>
                 <td class="govuk-table__cell">{{ completedCourse.courseCompletionDate | formatDate }}</td>
-                <td class="govuk-table__cell">{{ completedCourse.grade if completedQualification.grade else 'N/A' }}</td>
+                <td class="govuk-table__cell">{{ completedCourse.grade }}</td>
               </tr>
             {% endfor %}
             </tbody>
