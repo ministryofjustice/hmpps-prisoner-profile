@@ -92,5 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialise on form load
   getEventsForOffender()
+  getEventsForLocation()
   getAppointmentEndDate()
+  showHideRecurring()
 })
