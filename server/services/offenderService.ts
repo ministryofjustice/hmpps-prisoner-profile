@@ -23,26 +23,39 @@ export default class OffenderService {
     return this.prisonClientBuilder(token).getPrisoner(prisonerNumber)
   }
 
-  async getPrisonerNonAssociationOverview(clientToken: string, prisonerNumber: string): Promise<NonAssociationSummary> {
+  async getPrisonerNonAssociationOverview(
+    clientToken: string,
+    prisonerNumber: string,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<NonAssociationSummary> {
     const nonAssociationsApiClient = this.nonAssociationsApiClientBuilder(clientToken)
-    const prisonerNonAssociations = await nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, {
-      includeOtherPrisons: 'true',
-    })
+    try {
+      const prisonerNonAssociations = await nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, {
+        includeOtherPrisons: 'true',
+      })
+      const prisonCount = prisonerNonAssociations.nonAssociations.filter(
+        na => na.otherPrisonerDetails.prisonId === prisonerNonAssociations.prisonId,
+      ).length
 
-    const prisonCount = prisonerNonAssociations.nonAssociations.filter(
-      na => na.otherPrisonerDetails.prisonId === prisonerNonAssociations.prisonId,
-    ).length
+      const otherPrisonsCount = prisonerNonAssociations.nonAssociations.filter(
+        na =>
+          na.otherPrisonerDetails.prisonId !== prisonerNonAssociations.prisonId &&
+          !['TRN', 'OUT'].includes(na.otherPrisonerDetails.prisonId),
+      ).length
 
-    const otherPrisonsCount = prisonerNonAssociations.nonAssociations.filter(
-      na =>
-        na.otherPrisonerDetails.prisonId !== prisonerNonAssociations.prisonId &&
-        !['TRN', 'OUT'].includes(na.otherPrisonerDetails.prisonId),
-    ).length
-
-    return {
-      prisonName: prisonerNonAssociations.prisonName,
-      prisonCount,
-      otherPrisonsCount,
+      return {
+        prisonName: prisonerNonAssociations.prisonName,
+        prisonCount,
+        otherPrisonsCount,
+      }
+    } catch (error) {
+      apiErrorCallback(error)
+      return {
+        prisonName: null,
+        prisonCount: 0,
+        otherPrisonsCount: 0,
+        apiError: true,
+      }
     }
   }
 }
