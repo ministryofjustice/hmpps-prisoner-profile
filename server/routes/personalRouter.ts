@@ -29,42 +29,45 @@ export default function personalRouter(services: Services): Router {
   )
 
   // TODO: Disable these routes via a feature toggle
+  const enableEditRoutes = false
   // Edit routes
 
-  // Height - Metric
-  get(
-    `${basePath}/edit/height`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    personalController.height().metric.edit,
-  )
+  if (enableEditRoutes) {
+    // Height - Metric
+    get(
+      `${basePath}/edit/height`,
+      // TODO: Add role check here
+      getPrisonerData(services),
+      checkPrisonerInCaseload(),
+      personalController.height().metric.edit,
+    )
 
-  post(
-    `${basePath}/edit/height`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    personalController.height().metric.submit,
-  )
+    post(
+      `${basePath}/edit/height`,
+      // TODO: Add role check here
+      getPrisonerData(services),
+      checkPrisonerInCaseload(),
+      personalController.height().metric.submit,
+    )
 
-  // Height - Imperial
+    // Height - Imperial
 
-  get(
-    `${basePath}/edit/height/imperial`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    personalController.height().imperial.edit,
-  )
+    get(
+      `${basePath}/edit/height/imperial`,
+      // TODO: Add role check here
+      getPrisonerData(services),
+      checkPrisonerInCaseload(),
+      personalController.height().imperial.edit,
+    )
 
-  post(
-    `${basePath}/edit/height/imperial`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    checkPrisonerInCaseload(),
-    personalController.height().imperial.submit,
-  )
+    post(
+      `${basePath}/edit/height/imperial`,
+      // TODO: Add role check here
+      getPrisonerData(services),
+      checkPrisonerInCaseload(),
+      personalController.height().imperial.submit,
+    )
+  }
 
   return router
 }
