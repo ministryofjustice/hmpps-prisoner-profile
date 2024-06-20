@@ -42,14 +42,9 @@ describe('offenderService', () => {
         () => nonAssociationsApi,
       )
 
-      const result = await offenderService.getPrisonerNonAssociationOverview('token', 'prisonerNumber')
-
-      expect(result).toEqual({
-        prisonName: null,
-        prisonCount: 0,
-        otherPrisonsCount: 0,
-        apiError: true,
-      })
+      await expect(offenderService.getPrisonerNonAssociationOverview('token', 'prisonerNumber')).rejects.toThrow(
+        'Server Error',
+      )
     })
   })
 })
