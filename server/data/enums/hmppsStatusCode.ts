@@ -5,4 +5,5 @@ export enum HmppsStatusCode {
   RESTRICTED_PATIENT,
   PRISONER_IS_RELEASED,
   PRISONER_IS_TRANSFERRING,
+  OK,
 }

@@ -31,8 +31,6 @@ import PrisonerScheduleService from '../services/prisonerScheduleService'
 import { assessmentsMock } from '../data/localMockData/miniSummaryMock'
 import IncentivesService from '../services/incentivesService'
 import { incentiveServiceMock } from '../../tests/mocks/incentiveServiceMock'
-import { UserService } from '../services'
-import { userServiceMock } from '../../tests/mocks/userServiceMock'
 import PersonalPageService from '../services/personalPageService'
 import { personalPageServiceMock } from '../../tests/mocks/personalPageServiceMock'
 import OffenderService from '../services/offenderService'
@@ -77,7 +75,6 @@ describe('overviewController', () => {
   let visitsService: VisitsService
   let prisonerScheduleService: PrisonerScheduleService
   let incentiveService: IncentivesService
-  let userService: UserService
   let personalPageService: PersonalPageService
   let offenderService: OffenderService
   let professionalContactsService: ProfessionalContactsService
@@ -90,6 +87,13 @@ describe('overviewController', () => {
         inmateDetail: inmateDetailMock,
         alertSummaryData: {
           alertFlags: alertFlagLabels,
+        },
+        permissions: {
+          money: { view: true },
+          adjudications: { view: true },
+          visits: { view: true, edit: true },
+          category: { view: true },
+          incentives: { view: true },
         },
       },
       originalUrl: 'http://localhost',
@@ -112,7 +116,6 @@ describe('overviewController', () => {
     visitsService = visitsServiceMock() as VisitsService
     prisonerScheduleService = prisonerScheduleServiceMock() as PrisonerScheduleService
     incentiveService = incentiveServiceMock() as IncentivesService
-    userService = userServiceMock() as UserService
     personalPageService = personalPageServiceMock() as PersonalPageService
     offenderService = offenderServiceMock() as OffenderService
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
@@ -127,7 +130,6 @@ describe('overviewController', () => {
       visitsService,
       prisonerScheduleService,
       incentiveService,
-      userService,
       personalPageService,
       offenderService,
       professionalContactsService,
@@ -151,16 +153,20 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call moneyService.getMoneySummary if prisoner is not in caseload', async () => {
+    it('should not call moneyService.getMoneySummary if user doesnt have money.view permission', async () => {
       const resNotInCaseload = {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
+      }
+      const reqNoMoney = {
+        ...req,
+        middleware: { ...req.middleware, permissions: { money: { view: false } } },
       }
       moneyService.getAccountBalances = jest
         .fn()
         .mockResolvedValue({ spends: 1, savings: 2, cash: 2, damageObligations: 3, currency: 'GBP' })
 
-      await controller.displayOverview(req, resNotInCaseload)
+      await controller.displayOverview(reqNoMoney, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -185,16 +191,20 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call adjudicationsService.getAdjudicationsOverview if prisoner is not in caseload', async () => {
+    it('should not call adjudicationsService.getAdjudicationsOverview if user doesnt have adjudications.view permission', async () => {
       const resNotInCaseload = {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
+      }
+      const reqNoAdj = {
+        ...req,
+        middleware: { ...req.middleware, permissions: { adjudications: { view: false } } },
       }
       adjudicationsService.getAdjudicationsOverview = jest
         .fn()
         .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
 
-      await controller.displayOverview(req, resNotInCaseload)
+      await controller.displayOverview(reqNoAdj, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -243,11 +253,15 @@ describe('overviewController', () => {
         ...res,
         locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
       }
+      const reqNoVisits = {
+        ...req,
+        middleware: { ...req.middleware, permissions: { visits: { view: false } } },
+      }
       visitsService.getVisitsOverview = jest
         .fn()
         .mockResolvedValue({ startDate: '2030-03-02', remainingVo: 2, remainingPvo: 2 })
 
-      await controller.displayOverview(req, resNotInCaseload)
+      await controller.displayOverview(reqNoVisits, resNotInCaseload)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
@@ -297,30 +311,19 @@ describe('overviewController', () => {
       )
     })
 
-    it.each([
-      Role.CreateRecategorisation,
-      Role.ApproveCategorisation,
-      Role.CreateRecategorisation,
-      Role.CategorisationSecurity,
-    ])('should set userCanManage to true when user has a specific role', async role => {
-      const resRole = {
-        ...res,
-        locals: getResLocals({ userRoles: [role] }),
-      }
-
+    it('should set userCanManage to true when user has category.edit permission', async () => {
       const prisonerNumber = 'A1234BC'
       const bookingId = 123456
-
-      await controller.displayOverview(
-        {
-          ...req,
-          middleware: {
-            ...req.middleware,
-            prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
-          },
+      const reqEditCategory = {
+        ...req,
+        middleware: {
+          ...req.middleware,
+          permissions: { category: { edit: true } },
+          prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
         },
-        resRole,
-      )
+      }
+
+      await controller.displayOverview(reqEditCategory, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
@@ -383,10 +386,10 @@ describe('overviewController', () => {
       )
     })
 
-    it('should not call incentiveService.getIncentiveOverview if prisoner is not in caseload', async () => {
-      const resNotInCaseload = {
-        ...res,
-        locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
+    it('should not call incentiveService.getIncentiveOverview if user does not have incentives.view permission', async () => {
+      const reqNoIncentives = {
+        ...req,
+        middleware: { ...req.middleware, permissions: { incentives: { view: false } } },
       }
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,
@@ -395,7 +398,7 @@ describe('overviewController', () => {
         daysOverdue: undefined,
       })
 
-      await controller.displayOverview(req, resNotInCaseload)
+      await controller.displayOverview(reqNoIncentives, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
