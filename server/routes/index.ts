@@ -27,9 +27,8 @@ import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
 import CareNeedsController from '../controllers/careNeedsController'
-import { PrisonUser } from '../interfaces/HmppsUser'
 import permissionsGuard from '../middleware/permissionsGuard'
-import PersonalController from '../controllers/personalController'
+import personalRouter from './personalRouter'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -84,8 +83,6 @@ export default function routes(services: Services): Router {
   const beliefHistoryController = new BeliefHistoryController(services.beliefService, services.auditService)
   const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
 
-  const personalController = new PersonalController(services.personalPageService, services.auditService)
-
   get(
     '/api/prisoner/:prisonerNumber/image',
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
@@ -133,14 +130,6 @@ export default function routes(services: Services): Router {
         ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user),
       })
     },
-  )
-
-  get(
-    '/prisoner/:prisonerNumber/personal',
-    auditPageAccessAttempt({ services, page: Page.Personal }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    personalController.getPersonalPage(),
   )
 
   get(
@@ -245,6 +234,7 @@ export default function routes(services: Services): Router {
   router.use(probationDocumentsRouter(services))
   router.use(visitsRouter(services))
   router.use(addressRouter(services))
+  router.use(personalRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/schedule',

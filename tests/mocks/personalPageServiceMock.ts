@@ -5,4 +5,5 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   get: jest.fn(),
   getLearnerNeurodivergence: jest.fn(),
   getPrisonPerson: jest.fn(),
+  updatePhysicalAttributes: jest.fn(),
 })
