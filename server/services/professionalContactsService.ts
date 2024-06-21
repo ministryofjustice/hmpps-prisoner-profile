@@ -241,7 +241,7 @@ export default class ProfessionalContactsService {
     const allocationManagerApiClient = this.allocationApiClientBuilder(clientToken)
 
     const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions] = await Promise.all([
-      prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber),
+      Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
       allocationManagerApiClient.getPomByOffenderNo(prisonerNumber),
       Result.wrap(this.getKeyWorkerName(clientToken, prisonerNumber, prisonId), apiErrorCallback),
       prisonApi.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
@@ -266,7 +266,7 @@ export default class ProfessionalContactsService {
       coworkingPrisonOffenderManager:
         coworkingPrisonOffenderManager && `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`,
 
-      communityOffenderManager: formatCommunityManager(communityManager),
+      communityOffenderManager: communityManager.map(com => formatCommunityManager(com)).toPromiseSettledResult(),
     }
   }
 

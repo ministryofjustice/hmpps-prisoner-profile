@@ -2,7 +2,7 @@ export default interface StaffContacts {
   keyWorker: PromiseSettledResult<KeyWorkerSummary>
   prisonOffenderManager: string
   coworkingPrisonOffenderManager: string
-  communityOffenderManager: string
+  communityOffenderManager: PromiseSettledResult<string>
 }
 
 export interface YouthStaffContacts {

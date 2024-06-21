@@ -21,6 +21,12 @@
         </p>
       {% endset %}
 
+      {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
+        {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
+      {% else %}
+        {% set communityOffenderManager = standardApiErrorText() %}
+      {% endif %}
+
       {{ govukSummaryList({
           classes: 'govuk-summary-list--no-border',
           rows: [
@@ -53,7 +59,7 @@
                 text: "Community Offender Manager"
               },
               value: {
-                text: staffContacts.communityOffenderManager
+                text: communityOffenderManager
               }
             }
           ] | summaryListOneHalfWidth

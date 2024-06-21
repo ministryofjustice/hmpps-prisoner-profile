@@ -105,34 +105,19 @@
 
 {% block content %}
   <h1 class="govuk-heading-l">Documents held by probation</h1>
-  <article class="govuk-!-width-two-thirds">
-  {% if probationDetails %}
-    {{
-      govukDetails({
-      summaryText: "What to do if these details look incorrect",
-      html: incorrectDetails(probationDetails)
-      })
-    }}
-  {% else %}
-    {{
-      govukDetails({
-      summaryText: "How to find probation documents",
-      text: "If you think something is missing, ask a probation practitioner to update the record in the probation system."
-      })
-    }}
-  {% endif %}
-  </article>
+  {% if probationDocuments.status === 'fulfilled' %}
+    {% set probationDetails = probationDocuments.value.probationDetails %}
+    {% set documents = probationDocuments.value.documents %}
 
-  {% if probationDocumentsNotFound %}
-    {{
-      govukErrorSummary({
-      titleText: "There is a problem",
-      errorList: [{text: "We are unable to display documents for this prisoner because we cannot find the record in the probation system."}],
-      attributes: { 'data-qa-errors': true },
-      classes: 'govuk-!-width-two-thirds'
-      })
-    }}
-  {% else %}
+    <article class="govuk-!-width-two-thirds">
+      {{
+        govukDetails({
+        summaryText: "What to do if these details look incorrect",
+        html: incorrectDetails(probationDetails)
+        })
+      }}
+    </article>
+
     {% if documents.offenderDocuments.length > 0 %}
       {{ documentTable(documents.offenderDocuments, "General documents for " + probationDetails.name, prisonerNumber) }}
     {% endif %}
@@ -142,20 +127,49 @@
       {%
         set convictionItems = (convictionItems.push(
         {
-        heading: { text: summaryTitle(conviction) },
-        summary: { html: summary(conviction) },
-        content: { html: convictionDocuments(conviction, prisonerNumber) }
+          heading: { text: summaryTitle(conviction) },
+          summary: { html: summary(conviction) },
+          content: { html: convictionDocuments(conviction, prisonerNumber) }
         }
-        ), convictionItems)
+      ), convictionItems)
       %}
     {% endfor %}
 
     <h3 class="govuk-heading-m govuk-!-margin-top-9 govuk-!-margin-bottom-0">Documents related to each sentence</h3>
     {{
-      govukAccordion({
+    govukAccordion({
       id: "accordion-default",
       items: convictionItems
+    })
+    }}
+
+  {% else %}
+
+    {% if probationDocuments.reason.status === 404 %}
+      {% set msg = 'We are unable to display documents for this prisoner because we cannot find the record in the probation system.' %}
+
+      <article class="govuk-!-width-two-thirds">
+        {{
+        govukDetails({
+          summaryText: "How to find probation documents",
+          text: "If you think something is missing, ask a probation practitioner to update the record in the probation system."
+        })
+        }}
+      </article>
+
+    {% else %}
+      {% set msg = 'We cannot show these details right now. Try again later.' %}
+    {% endif %}
+
+    {{
+      govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [{text: msg}],
+      attributes: { 'data-qa-errors': true },
+      classes: 'govuk-!-width-two-thirds'
       })
     }}
+
   {% endif %}
+
 {% endblock %}
