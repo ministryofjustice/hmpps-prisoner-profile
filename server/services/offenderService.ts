@@ -28,7 +28,6 @@ export default class OffenderService {
     const prisonerNonAssociations = await nonAssociationsApiClient.getPrisonerNonAssociations(prisonerNumber, {
       includeOtherPrisons: 'true',
     })
-
     const prisonCount = prisonerNonAssociations.nonAssociations.filter(
       na => na.otherPrisonerDetails.prisonId === prisonerNonAssociations.prisonId,
     ).length

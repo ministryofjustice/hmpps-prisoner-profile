@@ -694,17 +694,36 @@ describe('overviewController', () => {
   })
 
   describe('Non-associations summary', () => {
-    it('Returns the staff role codes from the prison API', async () => {
-      offenderService.getPrisonerNonAssociationOverview = jest
-        .fn()
-        .mockResolvedValue({ prisonName: 'A', prisonCount: 1, otherPrisonsCount: 2 })
+    it('Returns the non-association summary from the prison API', async () => {
+      const nonAssociationSummary = { prisonName: 'A', prisonCount: 1, otherPrisonsCount: 2 }
+
+      offenderService.getPrisonerNonAssociationOverview = jest.fn().mockResolvedValue(nonAssociationSummary)
 
       await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          nonAssociationSummary: { prisonName: 'A', prisonCount: 1, otherPrisonsCount: 2 },
+          nonAssociationSummary: expect.objectContaining({
+            status: 'fulfilled',
+            value: nonAssociationSummary,
+          }),
+        }),
+      )
+    })
+
+    it('Returns rejected Result if the prison API errors', async () => {
+      offenderService.getPrisonerNonAssociationOverview = jest.fn().mockRejectedValue('Server Error')
+
+      await controller.displayOverview(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/overviewPage',
+        expect.objectContaining({
+          nonAssociationSummary: expect.objectContaining({
+            status: 'rejected',
+            reason: 'Server Error',
+          }),
         }),
       )
     })

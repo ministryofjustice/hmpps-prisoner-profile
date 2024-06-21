@@ -67,6 +67,7 @@
 
     &__body {
       height: calc(100% - 60px);
+      min-height: 7rem;
 
       &:has(.hmpps-summary-card__no-header) {
         height: calc(100% - 10px);
@@ -80,7 +81,18 @@
           display: flex;
           flex-direction: column;
           height: 100%;
-        }
+      }
+    }
+
+    &__unavailable-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: calc(100% - 23px);
+    }
+
+    &__unavailable-message {
+      margin: auto;
     }
   }
 

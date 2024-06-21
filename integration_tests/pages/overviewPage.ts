@@ -188,6 +188,7 @@ export default class OverviewPage extends Page {
     prisonCount: (): PageElement => cy.get('[data-qa=overview-na-prison-count]'),
     otherPrisonsCount: (): PageElement => cy.get('[data-qa=overview-na-other-prisons-count]'),
     nonAssociationsLink: (): PageElement => cy.get('[data-qa=overview-non-associations-link] a'),
+    error: (): PageElement => cy.get('[data-qa=non-association-summary-unavailable]'),
   })
 
   courtCasesAndReleaseDates = () => ({
