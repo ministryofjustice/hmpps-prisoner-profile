@@ -3,6 +3,7 @@ import { nonAssociationsApiClientMock } from '../../tests/mocks/nonAssociationsA
 import { prisonerNonAssociationsMock } from '../data/localMockData/prisonerNonAssociationsMock'
 import OffenderService from './offenderService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import ServerError from '../utils/serverError'
 
 describe('offenderService', () => {
   let nonAssociationsApi: NonAssociationsApiClient
@@ -31,6 +32,19 @@ describe('offenderService', () => {
         prisonCount: 1,
         otherPrisonsCount: 1,
       })
+    })
+
+    it('should get return error flag if API call fails', async () => {
+      nonAssociationsApi.getPrisonerNonAssociations = jest.fn().mockRejectedValue(new ServerError())
+
+      const offenderService = new OffenderService(
+        () => prisonApi,
+        () => nonAssociationsApi,
+      )
+
+      await expect(offenderService.getPrisonerNonAssociationOverview('token', 'prisonerNumber')).rejects.toThrow(
+        'Server Error',
+      )
     })
   })
 })

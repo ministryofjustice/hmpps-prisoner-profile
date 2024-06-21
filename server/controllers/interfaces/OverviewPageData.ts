@@ -9,6 +9,7 @@ import IncentiveSummary from '../../services/interfaces/incentivesService/Incent
 import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonApi/StaffContacts'
 import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
+import { Result } from '../../utils/result/result'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -37,7 +38,7 @@ export default interface OverviewPageData {
     conditionalReleaseDate: string
     confirmedReleaseDate: string
   }
-  nonAssociationSummary: NonAssociationSummary
+  nonAssociationSummary: Result<NonAssociationSummary>
   options: {
     showCourtCaseSummary: boolean
   }

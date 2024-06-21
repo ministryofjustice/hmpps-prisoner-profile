@@ -105,7 +105,10 @@ export default class OverviewController {
         res.locals.apiErrorCallback,
       ),
       this.offencesService.getOffencesOverview(clientToken, bookingId, prisonerNumber),
-      this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
+      Result.wrap(
+        this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
+        res.locals.apiErrorCallback,
+      ),
     ])
 
     const overviewActions = buildOverviewActions(

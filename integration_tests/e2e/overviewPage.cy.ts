@@ -729,6 +729,30 @@ context('Overview Page', () => {
         .should('contain.text', 'We cannot show these details right now. Try again later.')
     })
   })
+
+  context('Given API call to get non-associations fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubNonAssociationsError', 'G6123VU')
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the status list', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage.nonAssociationSummary().error().should('exist')
+      overviewPage
+        .nonAssociationSummary()
+        .error()
+        .should('contain.text', 'We cannot show these details right now. Try again later.')
+      overviewPage.nonAssociationSummary().error().find('a').should('contain.text', 'Non-associations')
+    })
+  })
 })
 
 context('Overview Page - Prisoner not found', () => {
