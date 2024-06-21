@@ -67,7 +67,7 @@ export default class PersonalController {
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          res.render('pages/edit/singleField', {
+          res.render('pages/edit/heightMetric', {
             pageTitle: 'Edit Height',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
@@ -108,7 +108,7 @@ export default class PersonalController {
 
           req.flash('fieldValue', editField)
           req.flash('errors', errors)
-          return res.redirect(`/prisoner/${prisonerNumber}/edit/height`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
         },
       },
 
@@ -170,7 +170,7 @@ export default class PersonalController {
           req.flash('feetValue', feet)
           req.flash('inchesValue', inches)
           req.flash('errors', errors)
-          return res.redirect(`/prisoner/${prisonerNumber}/edit/height/imperial`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
         },
       },
     }

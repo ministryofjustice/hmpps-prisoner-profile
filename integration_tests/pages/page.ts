@@ -28,4 +28,6 @@ export default abstract class Page {
   manageDetails = (): PageElement => cy.get('[data-qa=manageDetails]')
 
   apiErrorBanner = (): PageElement => cy.get('.hmpps-api-error-banner')
+
+  flashMessage = (): PageElement => cy.get('.hmpps-flash-message')
 }

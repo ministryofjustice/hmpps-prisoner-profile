@@ -52,7 +52,7 @@ describe('PersonalController', () => {
           await action(req, res)
 
           expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
-          expect(res.render).toHaveBeenCalledWith('pages/edit/singleField', {
+          expect(res.render).toHaveBeenCalledWith('pages/edit/heightMetric', {
             pageTitle: expect.anything(),
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
@@ -137,7 +137,7 @@ describe('PersonalController', () => {
           await action(validRequest, mockResponse)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/edit/height')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
 
         it.each([
@@ -153,7 +153,7 @@ describe('PersonalController', () => {
           await action(req, mockResponse)
 
           expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/edit/height')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
       })
     })
@@ -261,7 +261,7 @@ describe('PersonalController', () => {
           await action(validRequest, mockResponse)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/edit/height/imperial')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
 
         it.each([
@@ -277,7 +277,7 @@ describe('PersonalController', () => {
           await action(req, mockResponse)
 
           expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/edit/height/imperial')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
       })
     })

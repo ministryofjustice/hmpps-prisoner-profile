@@ -4,6 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% set hideBackLink = true %}
 {%
   set breadCrumbs = [
@@ -33,29 +34,48 @@
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <div class="govuk-form-group">
-          {{
-            govukInput({
-              label: {
-                text: "Feet"
-              },
-              id: "feet",
-              name: "feet",
-              value: feetValue
-            })
-          }}
-
-          {{
-            govukInput({
-              label: {
-                text: "Inches"
-              },
-              id: "inches",
-              name: "inches",
-              value: inchesValue
-            })
-          }}
-        </div>
+        {%
+          call govukFieldset({
+            legend: {
+              text: "Edit height",
+              classes: "govuk-fieldset__legend--l",
+              isPageHeading: true
+            }
+          })
+        %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half">
+              <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-quarter">
+                  {{
+                    govukInput({
+                      label: {
+                        text: "Feet"
+                      },
+                      id: "feet",
+                      name: "feet",
+                      value: feetValue,
+                      classes: "govuk-input--width-3"
+                    })
+                  }}
+                </div>
+                <div class="govuk-grid-column-one-quarter">
+                  {{
+                    govukInput({
+                      label: {
+                        text: "Inches"
+                      },
+                      id: "inches",
+                      name: "inches",
+                      value: inchesValue,
+                      classes: "govuk-input--width-3"
+                    })
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endcall %}
         <div class="govuk-button-group">
           {{
             govukButton({
