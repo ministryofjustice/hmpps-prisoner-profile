@@ -747,7 +747,6 @@ describe('utils', () => {
         'Probation Team (COM not yet allocated)',
       ],
       ['404', null, 'Not assigned'],
-      ['Error', undefined, 'We cannot show these details right now'],
     ])('%s: formatCommunityManager(%s, %s, %s)', (_: string, communityManager: CommunityManager, expected: string) => {
       expect(formatCommunityManager(communityManager)).toEqual(expected)
     })

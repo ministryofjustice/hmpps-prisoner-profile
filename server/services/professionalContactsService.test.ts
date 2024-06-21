@@ -456,7 +456,7 @@ describe('professionalContactsService', () => {
         }).toPromiseSettledResult(),
         prisonOffenderManager: 'John Smith',
         coworkingPrisonOffenderManager: 'Jane Jones',
-        communityOffenderManager: 'Terry Scott',
+        communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
       })
     })
 
@@ -491,7 +491,7 @@ describe('professionalContactsService', () => {
         }).toPromiseSettledResult(),
         prisonOffenderManager: 'John Smith',
         coworkingPrisonOffenderManager: 'Jane Jones',
-        communityOffenderManager: 'Terry Scott',
+        communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
       })
     })
 
@@ -503,7 +503,7 @@ describe('professionalContactsService', () => {
         keyWorker: { status: 'rejected', reason: 'Some error' },
         prisonOffenderManager: 'John Smith',
         coworkingPrisonOffenderManager: 'Jane Jones',
-        communityOffenderManager: 'Terry Scott',
+        communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
       })
     })
   })
