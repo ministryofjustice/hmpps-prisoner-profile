@@ -15,6 +15,8 @@ import GovSummaryItem from '../interfaces/GovSummaryItem'
 import Address from '../data/interfaces/prisonApi/Address'
 import { Addresses } from '../services/interfaces/personalPageService/PersonalPage'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import Pom from '../data/interfaces/allocationManagerApi/Pom'
+import logger from '../../logger'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -604,6 +606,30 @@ export const formatCommunityManager = (communityManager: CommunityManager): stri
   if (communityManager.unallocated) return `${communityManager.team.description} (COM not yet allocated)`
 
   return formatName(communityManager.name.forename, null, communityManager.name.surname)
+}
+
+export const formatPomName = (pomName: string): string => {
+  if (!pomName) return null
+
+  if (!pomName.includes(', ')) {
+    logger.warn(`Incorrect format supplied for pomName, ${pomName}`)
+    return pomName
+  }
+
+  return formatName(pomName.split(', ')[1], null, pomName.split(', ')[0])
+}
+
+export const formatPrisonOffenderManagerNames = (
+  pom: Pom,
+): { prisonOffenderManagerName: string; coworkingPrisonOffenderManagerName: string } => {
+  return {
+    prisonOffenderManagerName: pom.primary_pom?.name
+      ? formatName(pom.primary_pom.name.split(', ')[1], null, pom.primary_pom.name.split(', ')[0])
+      : undefined,
+    coworkingPrisonOffenderManagerName: pom.secondary_pom?.name
+      ? formatName(pom.secondary_pom.name.split(', ')[1], null, pom.secondary_pom.name.split(', ')[0])
+      : undefined,
+  }
 }
 
 export const putLastNameFirst = (firstName: string, lastName: string): string => {

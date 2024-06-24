@@ -27,6 +27,18 @@
         {% set communityOffenderManager = standardApiErrorText() %}
       {% endif %}
 
+      {% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
+        {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
+      {% else %}
+        {% set prisonOffenderManager = standardApiErrorText() %}
+      {% endif %}
+
+      {% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
+        {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
+      {% else %}
+        {% set coworkingPrisonOffenderManager = standardApiErrorText() %}
+      {% endif %}
+
       {{ govukSummaryList({
           classes: 'govuk-summary-list--no-border',
           rows: [
@@ -43,7 +55,10 @@
                 text: "Prison Offender Manager"
               },
               value: {
-                text: staffContacts.prisonOffenderManager or "Not assigned"
+                text: prisonOffenderManager,
+                attributes: {
+                    "data-qa": "primary-pom-name"
+                }
               }
             },
             {
@@ -51,7 +66,10 @@
                 text: "Co-working Prison Offender Manager"
               },
               value: {
-                text: staffContacts.coworkingPrisonOffenderManager or "Not assigned"
+                text: coworkingPrisonOffenderManager,
+                attributes: {
+                    "data-qa": "secondary-pom-name"
+                }
               }
             },
             {

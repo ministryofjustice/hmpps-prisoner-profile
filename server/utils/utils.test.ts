@@ -16,6 +16,7 @@ import {
   formatMoney,
   formatName,
   formatNamePart,
+  formatPomName,
   formatScheduleItem,
   getNamesFromString,
   groupBy,
@@ -872,5 +873,15 @@ describe('utils', () => {
         expect(addDefaultSelectedValue(items, text, setHidden)).toEqual(expected)
       },
     )
+  })
+
+  describe('formatPomName', () => {
+    it.each([
+      ['Valid name', 'SMITH, JOHN', 'John Smith'],
+      ['Invalid name', 'BILLY JONES', 'BILLY JONES'],
+      ['No POM supplied', null, null],
+    ])('%s: formatPomName(%s)', (_: string, pomName: string, expected: string) => {
+      expect(formatPomName(pomName)).toEqual(expected)
+    })
   })
 })
