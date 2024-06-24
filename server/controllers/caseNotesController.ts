@@ -2,9 +2,8 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { Role } from '../data/enums/role'
 import { canAddCaseNotes } from '../utils/roleHelpers'
-import { formatLocation, formatName, userHasRoles } from '../utils/utils'
+import { formatLocation, formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate } from '../utils/dateHelpers'
@@ -38,6 +37,7 @@ export default class CaseNotesController {
         prisonerData,
         inmateDetail,
         alertSummaryData: { alertFlags },
+        permissions,
       } = req.middleware
 
       if (req.query.page) queryParams.page = +req.query.page
@@ -47,13 +47,6 @@ export default class CaseNotesController {
       if (req.query.startDate) queryParams.startDate = req.query.startDate as string
       if (req.query.endDate) queryParams.endDate = req.query.endDate as string
       if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
-
-      // Set role based permissions
-      const canDeleteSensitiveCaseNotes = userHasRoles([Role.DeleteSensitiveCaseNotes], res.locals.user.userRoles)
-      const canViewSensitiveCaseNotes = userHasRoles(
-        [Role.PomUser, Role.ViewSensitiveCaseNotes, Role.AddSensitiveCaseNotes],
-        res.locals.user.userRoles,
-      )
 
       const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
         ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
@@ -69,8 +62,8 @@ export default class CaseNotesController {
           token: clientToken,
           prisonerData,
           queryParams,
-          canViewSensitiveCaseNotes,
-          canDeleteSensitiveCaseNotes,
+          canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
+          canDeleteSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.delete,
           currentUserDetails: res.locals.user,
         }),
       ])
@@ -229,17 +222,13 @@ export default class CaseNotesController {
   public displayUpdateCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { caseNoteId } = req.params
-      const { clientToken } = req.middleware
+      const { clientToken, permissions } = req.middleware
       const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
-      const canEditSensitiveCaseNotes = userHasRoles(
-        [Role.PomUser, Role.AddSensitiveCaseNotes],
-        res.locals.user.userRoles,
-      )
 
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
 
-      if (currentCaseNote.sensitive && !canEditSensitiveCaseNotes) {
+      if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
         logger.info(`User not permitted to edit sensitive case note: ${caseNoteId}`)
         return next()
       }
@@ -287,14 +276,10 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, caseNoteId } = req.params
       const { text, isExternal, currentLength, username } = req.body
-      const { clientToken } = req.middleware
+      const { clientToken, permissions } = req.middleware
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
-      const canEditSensitiveCaseNotes = userHasRoles(
-        [Role.PomUser, Role.AddSensitiveCaseNotes],
-        res.locals.user.userRoles,
-      )
 
-      if (currentCaseNote.sensitive && !canEditSensitiveCaseNotes) {
+      if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
         logger.info(`User not permitted to edit sensitive case notes`)
         return next()
       }

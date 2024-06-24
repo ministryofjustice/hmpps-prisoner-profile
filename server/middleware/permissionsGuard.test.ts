@@ -1,6 +1,5 @@
 import permissionsGuard from './permissionsGuard'
 import { permissionsServiceMock } from '../../tests/mocks/permissionsServiceMock'
-import PermissionsService from '../services/permissionsService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { prisonUserMock } from '../data/localMockData/user'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
@@ -22,7 +21,7 @@ describe('permissionsGuard', () => {
     const res: any = {}
     const permissionService = permissionsServiceMock()
 
-    await permissionsGuard(permissionService as PermissionsService, 'getOverviewPermissions')(req, res, next)
+    await permissionsGuard(permissionService.getOverviewPermissions)(req, res, next)
 
     expect(next).toHaveBeenCalledWith(new Error('No PrisonerData found in middleware'))
   })
@@ -34,7 +33,7 @@ describe('permissionsGuard', () => {
     const permissionService = permissionsServiceMock()
     permissionService.getOverviewPermissions = jest.fn().mockResolvedValue({ accessCode: HmppsStatusCode.OK })
 
-    await permissionsGuard(permissionService as PermissionsService, 'getOverviewPermissions')(req, res, next)
+    await permissionsGuard(permissionService.getOverviewPermissions)(req, res, next)
 
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith()
@@ -52,7 +51,7 @@ describe('permissionsGuard', () => {
     const permissionService = permissionsServiceMock()
     permissionService.getOverviewPermissions = jest.fn().mockResolvedValue({ accessCode: status })
 
-    await permissionsGuard(permissionService as PermissionsService, 'getOverviewPermissions')(req, res, next)
+    await permissionsGuard(permissionService.getOverviewPermissions)(req, res, next)
 
     expect(next).toHaveBeenCalledTimes(1)
     expect(next).toHaveBeenCalledWith([req, next, new NotFoundError(message, status)])
