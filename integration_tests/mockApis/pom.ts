@@ -17,4 +17,23 @@ export default {
       },
     })
   },
+
+  stubPomDataError: (prisonerNumber: string) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/allocation/api/allocation/${prisonerNumber}`,
+      },
+      response: {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          errorMessage: 'Service unavailable',
+          httpStatusCode: 500,
+        },
+      },
+    })
+  },
 }

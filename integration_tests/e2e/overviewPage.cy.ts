@@ -753,6 +753,26 @@ context('Overview Page', () => {
       overviewPage.nonAssociationSummary().error().find('a').should('contain.text', 'Non-associations')
     })
   })
+
+  context('Given API call to get POMs fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubPomDataError', 'G6123VU')
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the card', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage.primaryPomName().should('contain.text', 'We cannot show these details right now. Try again later.')
+      overviewPage.secondaryPomName().should('contain.text', 'We cannot show these details right now. Try again later.')
+    })
+  })
 })
 
 context('Overview Page - Prisoner not found', () => {

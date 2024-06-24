@@ -450,12 +450,15 @@ describe('professionalContactsService', () => {
       const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
 
       expect(result).toEqual({
-        keyWorker: Result.fulfilled({
-          name: 'Dave Stevens',
-          lastSession: '',
-        }).toPromiseSettledResult(),
-        prisonOffenderManager: 'John Smith',
-        coworkingPrisonOffenderManager: 'Jane Jones',
+        keyWorker: {
+          status: 'fulfilled',
+          value: {
+            name: 'Dave Stevens',
+            lastSession: '',
+          },
+        },
+        prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
+        coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
       })
     })
@@ -485,12 +488,15 @@ describe('professionalContactsService', () => {
       })
 
       expect(result).toEqual({
-        keyWorker: Result.fulfilled({
-          name: 'None - high complexity of need',
-          lastSession: '',
-        }).toPromiseSettledResult(),
-        prisonOffenderManager: 'John Smith',
-        coworkingPrisonOffenderManager: 'Jane Jones',
+        keyWorker: {
+          status: 'fulfilled',
+          value: {
+            name: 'None - high complexity of need',
+            lastSession: '',
+          },
+        },
+        prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
+        coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
       })
     })
@@ -501,9 +507,45 @@ describe('professionalContactsService', () => {
 
       expect(result).toEqual({
         keyWorker: { status: 'rejected', reason: 'Some error' },
-        prisonOffenderManager: 'John Smith',
-        coworkingPrisonOffenderManager: 'Jane Jones',
+        prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
+        coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
         communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
+      })
+    })
+
+    it('should handle error getting pom names', async () => {
+      allocationManagerApiClient.getPomByOffenderNo = jest.fn().mockRejectedValue('API error')
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
+
+      expect(result).toEqual({
+        keyWorker: {
+          status: 'fulfilled',
+          value: {
+            name: 'Dave Stevens',
+            lastSession: '',
+          },
+        },
+        prisonOffenderManager: { status: 'rejected', reason: 'API error' },
+        coworkingPrisonOffenderManager: { status: 'rejected', reason: 'API error' },
+        communityOffenderManager: { status: 'fulfilled', value: 'Terry Scott' },
+      })
+    })
+
+    it('should handle error getting com name', async () => {
+      professionalContactsClient.getCommunityManager = jest.fn().mockRejectedValue('API error')
+      const result = await professionalContactsService.getProfessionalContactsOverview('token', PrisonerMockDataA)
+
+      expect(result).toEqual({
+        keyWorker: {
+          status: 'fulfilled',
+          value: {
+            name: 'Dave Stevens',
+            lastSession: '',
+          },
+        },
+        prisonOffenderManager: { status: 'fulfilled', value: 'John Smith' },
+        coworkingPrisonOffenderManager: { status: 'fulfilled', value: 'Jane Jones' },
+        communityOffenderManager: { status: 'rejected', reason: 'API error' },
       })
     })
   })
