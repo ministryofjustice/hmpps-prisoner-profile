@@ -4,6 +4,7 @@ import {
   convertToTitleCase,
   formatCommunityManager,
   formatName,
+  formatPomName,
   getNamesFromString,
   sortArrayOfObjectsByDate,
   sortByDateTime,
@@ -242,16 +243,10 @@ export default class ProfessionalContactsService {
 
     const [communityManager, allocationManager, keyWorkerName, keyWorkerSessions] = await Promise.all([
       Result.wrap(prisonerProfileDeliusApiClient.getCommunityManager(prisonerNumber), apiErrorCallback),
-      allocationManagerApiClient.getPomByOffenderNo(prisonerNumber),
+      Result.wrap(allocationManagerApiClient.getPomByOffenderNo(prisonerNumber), apiErrorCallback),
       Result.wrap(this.getKeyWorkerName(clientToken, prisonerNumber, prisonId), apiErrorCallback),
       prisonApi.getCaseNoteSummaryByTypes({ type: 'KA', subType: 'KS', numMonths: 38, bookingId }),
     ])
-
-    const prisonOffenderManager =
-      allocationManager?.primary_pom?.name && getNamesFromString(allocationManager.primary_pom.name)
-
-    const coworkingPrisonOffenderManager =
-      allocationManager?.secondary_pom?.name && getNamesFromString(allocationManager.secondary_pom.name)
 
     return {
       keyWorker: keyWorkerName
@@ -261,12 +256,13 @@ export default class ProfessionalContactsService {
             keyWorkerSessions?.[0] !== undefined ? formatDate(keyWorkerSessions[0].latestCaseNote, 'short') : '',
         }))
         .toPromiseSettledResult(),
-      prisonOffenderManager: prisonOffenderManager && `${prisonOffenderManager[0]} ${prisonOffenderManager[1]}`,
-
-      coworkingPrisonOffenderManager:
-        coworkingPrisonOffenderManager && `${coworkingPrisonOffenderManager[0]} ${coworkingPrisonOffenderManager[1]}`,
-
-      communityOffenderManager: communityManager.map(com => formatCommunityManager(com)).toPromiseSettledResult(),
+      prisonOffenderManager: allocationManager
+        .map(pom => formatPomName(pom?.primary_pom?.name))
+        .toPromiseSettledResult(),
+      coworkingPrisonOffenderManager: allocationManager
+        .map(pom => formatPomName(pom?.secondary_pom?.name))
+        .toPromiseSettledResult(),
+      communityOffenderManager: communityManager.map(formatCommunityManager).toPromiseSettledResult(),
     }
   }
 

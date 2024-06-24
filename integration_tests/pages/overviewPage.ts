@@ -82,6 +82,10 @@ export default class OverviewPage extends Page {
 
   staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
 
+  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(2) dd')
+
+  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(3) dd')
+
   schedule = () => ({
     morning: () => ({
       column: (): PageElement => cy.get('[data-qa=morning-schedule]'),
