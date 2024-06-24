@@ -9,26 +9,21 @@ export default function getOverviewAccessStatusCode(user: HmppsUser, prisoner: P
   const pomUser = userHasRoles([Role.PomUser], userRoles)
   const inactiveBookingsUser = userHasRoles([Role.InactiveBookings], userRoles)
   const globalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
-  const prisonerIsOutOrTransferring = prisoner.prisonId === 'OUT' || prisoner.prisonId === 'TRN'
+  const inUsersCaseLoad = isInUsersCaseLoad(prisoner.prisonId, user)
 
-  const canViewRestrictedPatient =
-    (pomUser && isInUsersCaseLoad(prisoner.supportingPrisonId, user)) || inactiveBookingsUser
-
-  if (prisoner.restrictedPatient && !canViewRestrictedPatient) {
-    return HmppsStatusCode.RESTRICTED_PATIENT
+  if (prisoner.restrictedPatient) {
+    return (pomUser && isInUsersCaseLoad(prisoner.supportingPrisonId, user)) || inactiveBookingsUser
+      ? HmppsStatusCode.OK
+      : HmppsStatusCode.RESTRICTED_PATIENT
   }
 
-  if (prisoner.prisonId === 'OUT' && !inactiveBookingsUser) {
-    return HmppsStatusCode.PRISONER_IS_RELEASED
+  if (prisoner.prisonId === 'OUT') {
+    return inactiveBookingsUser ? HmppsStatusCode.OK : HmppsStatusCode.PRISONER_IS_RELEASED
   }
 
-  if (prisoner.prisonId === 'TRN' && !(globalSearchUser || inactiveBookingsUser)) {
-    return HmppsStatusCode.PRISONER_IS_TRANSFERRING
+  if (prisoner.prisonId === 'TRN') {
+    return globalSearchUser || inactiveBookingsUser ? HmppsStatusCode.OK : HmppsStatusCode.PRISONER_IS_TRANSFERRING
   }
 
-  if (!isInUsersCaseLoad(prisoner.prisonId, user) && !globalSearchUser && !pomUser && !prisonerIsOutOrTransferring) {
-    return HmppsStatusCode.NOT_IN_CASELOAD
-  }
-
-  return HmppsStatusCode.OK
+  return inUsersCaseLoad || globalSearchUser || pomUser ? HmppsStatusCode.OK : HmppsStatusCode.NOT_IN_CASELOAD
 }

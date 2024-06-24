@@ -1,15 +1,28 @@
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { isActiveCaseLoad, isInUsersCaseLoad, userCanEdit, userHasAllRoles, userHasRoles } from '../utils/utils'
-import { Role } from '../data/enums/role'
-import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { HmppsUser } from '../interfaces/HmppsUser'
+import type Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
+import { type HmppsUser } from '../interfaces/HmppsUser'
 import UserService from './userService'
 import getOverviewAccessStatusCode from './utils/permissions/getOverviewAccessStatusCode'
-
-interface PermissionItem {
-  view: boolean
-  edit?: boolean
-}
+import getMoneyAccessStatusCode from './utils/permissions/getMoneyAccessStatusCode'
+import getCaseNotesAccessStatusCode from './utils/permissions/getCaseNotesAccessStatusCode'
+import getSensitiveCaseNotesPermissions from './utils/permissions/getSensitiveCaseNotesPermissions'
+import type PermissionItem from './interfaces/permissionsService/PermissionItem'
+import getProbationDocumentsPermissions from './utils/permissions/getProbationDocumentsPermissions'
+import getOffenderCategorisationPermissions from './utils/permissions/getOffenderCategorisationPermissions'
+import getSocPermissions from './utils/permissions/getSocPermissions'
+import getPathfinderPermissions from './utils/permissions/getPathfinderPermissions'
+import getActivityPermissions from './utils/permissions/getActivityPermissions'
+import getAppointmentPermissions from './utils/permissions/getAppointmentPermissions'
+import getKeyWorkerPermissions from './utils/permissions/getKeyworkerPermissions'
+import getCaseNotesPermissions from './utils/permissions/getCaseNotesPermissions'
+import getCalculateReleaseDatesPermissions from './utils/permissions/getCalculateReleaseDatesPermissions'
+import getCategoryPermissions from './utils/permissions/getCategoryPermissions'
+import getIncentivesPermissions from './utils/permissions/getIncentivesPermissions'
+import getVisitsPermissions from './utils/permissions/getVisitsPermissions'
+import getMoneyPermissions from './utils/permissions/getMoneyPermissions'
+import getAdjudicationsPermissions from './utils/permissions/getAdjudicationsPermissions'
+import getCourtCasesPermissions from './utils/permissions/getCourtCasesPermissions'
+import getUseOfForcePermissions from './utils/permissions/getUseOfForcePermissions'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -29,138 +42,52 @@ export interface Permissions {
   soc?: PermissionItem
   offenderCategorisation?: PermissionItem
   probationDocuments?: PermissionItem
+  sensitiveCaseNotes?: PermissionItem
 }
 
 export default class PermissionsService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {
+    this.getOverviewPermissions = this.getOverviewPermissions.bind(this)
+  }
 
   public async getOverviewPermissions(user: HmppsUser, prisoner: Prisoner, clientToken?: string): Promise<Permissions> {
-    const { userRoles } = user
-
     const accessCode = getOverviewAccessStatusCode(user, prisoner)
     if (accessCode !== HmppsStatusCode.OK) return { accessCode }
-
-    const isPrisonerInCaseLoad = isInUsersCaseLoad(prisoner.prisonId, user)
 
     const staffRoles = await this.userService.getStaffRoles(clientToken, user)
 
     return {
       accessCode,
-      courtCases: {
-        view: userHasRoles([Role.ReleaseDatesCalculator], userRoles),
-        edit: userHasRoles([Role.AdjustmentsMaintainer], userRoles),
-      },
-      money: {
-        view: isPrisonerInCaseLoad,
-      },
-      adjudications: {
-        view: isPrisonerInCaseLoad || userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles),
-      },
-      visits: {
-        view: isPrisonerInCaseLoad || userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles),
-      },
-      incentives: {
-        view: isPrisonerInCaseLoad || userHasRoles([Role.GlobalSearch], userRoles),
-      },
-      category: {
-        view: false,
-        edit: userHasRoles(
-          [
-            Role.CreateRecategorisation,
-            Role.ApproveCategorisation,
-            Role.CreateRecategorisation,
-            Role.CategorisationSecurity,
-          ],
-          userRoles,
-        ),
-      },
-      calculateReleaseDates: {
-        view: false,
-        edit: userHasRoles([Role.ReleaseDatesCalculator], user.userRoles),
-      },
-      caseNotes: {
-        view: false,
-        edit: userHasAllRoles([Role.GlobalSearch, Role.PomUser], user.userRoles) || userCanEdit(user, prisoner),
-      },
-      keyWorker: {
-        view: false,
-        edit: !!staffRoles?.find(({ role }) => role === 'KW'),
-      },
-      appointment: {
-        view: false,
-        edit: isActiveCaseLoad(prisoner.prisonId, user) && !prisoner.restrictedPatient,
-      },
-      useOfForce: {
-        view: false,
-        edit: userCanEdit(user, prisoner) && !prisoner.restrictedPatient,
-      },
-      activity: {
-        view: false,
-        edit:
-          userHasRoles([Role.ActivityHub], user.userRoles) &&
-          isActiveCaseLoad(prisoner.prisonId, user) &&
-          prisoner.status !== 'ACTIVE OUT',
-      },
-      pathfinder: {
-        view: userHasRoles(
-          [
-            Role.PathfinderApproval,
-            Role.PathfinderStdPrison,
-            Role.PathfinderStdProbation,
-            Role.PathfinderHQ,
-            Role.PathfinderUser,
-            Role.PathfinderLocalReader,
-            Role.PathfinderNationalReader,
-            Role.PathfinderPolice,
-            Role.PathfinderPsychologist,
-          ],
-          user.userRoles,
-        ),
-        edit: userHasRoles(
-          [
-            Role.PathfinderApproval,
-            Role.PathfinderStdPrison,
-            Role.PathfinderStdProbation,
-            Role.PathfinderHQ,
-            Role.PathfinderUser,
-          ],
-          user.userRoles,
-        ),
-      },
-      soc: {
-        view: userHasRoles([Role.SocCommunity, Role.SocCustody], user.userRoles),
-        edit: userHasRoles(
-          [Role.SocCustody, Role.SocCommunity, Role.SocDataAnalyst, Role.SocDataManager],
-          user.userRoles,
-        ),
-      },
-      offenderCategorisation: {
-        view: false,
-        edit: userHasRoles(
-          [
-            Role.CreateCategorisation,
-            Role.ApproveCategorisation,
-            Role.CreateRecategorisation,
-            Role.CategorisationSecurity,
-          ],
-          user.userRoles,
-        ),
-      },
-      probationDocuments: {
-        view:
-          userHasRoles([Role.PomUser, Role.ViewProbationDocuments], user.userRoles) &&
-          (isInUsersCaseLoad(prisoner.prisonId, user) || ['OUT', 'TRN'].includes(prisoner.prisonId)),
-      },
+      courtCases: getCourtCasesPermissions(user),
+      money: getMoneyPermissions(user, prisoner),
+      adjudications: getAdjudicationsPermissions(user, prisoner),
+      visits: getVisitsPermissions(user, prisoner),
+      incentives: getIncentivesPermissions(user, prisoner),
+      category: getCategoryPermissions(user),
+      calculateReleaseDates: getCalculateReleaseDatesPermissions(user),
+      caseNotes: getCaseNotesPermissions(user, prisoner),
+      keyWorker: getKeyWorkerPermissions(staffRoles),
+      appointment: getAppointmentPermissions(user, prisoner),
+      useOfForce: getUseOfForcePermissions(user, prisoner),
+      activity: getActivityPermissions(user, prisoner),
+      pathfinder: getPathfinderPermissions(user),
+      soc: getSocPermissions(user),
+      offenderCategorisation: getOffenderCategorisationPermissions(user),
+      probationDocuments: getProbationDocumentsPermissions(user, prisoner),
     }
   }
 
   public getMoneyPermissions(user: HmppsUser, prisoner: Prisoner, _clientToken?: string): Permissions {
-    if (prisoner.prisonId === 'OUT') return { accessCode: HmppsStatusCode.PRISONER_IS_RELEASED }
-    if (prisoner.prisonId === 'TRN') return { accessCode: HmppsStatusCode.PRISONER_IS_TRANSFERRING }
-    if (!isInUsersCaseLoad(prisoner.prisonId, user)) return { accessCode: HmppsStatusCode.NOT_IN_CASELOAD }
+    return { accessCode: getMoneyAccessStatusCode(user, prisoner) }
+  }
+
+  public getCaseNotesPermissions(user: HmppsUser, prisoner: Prisoner, _clientToken?: string): Permissions {
+    const accessCode = getCaseNotesAccessStatusCode(user, prisoner)
+    if (accessCode !== HmppsStatusCode.OK) return { accessCode }
 
     return {
-      accessCode: getOverviewAccessStatusCode(user, prisoner),
+      accessCode,
+      sensitiveCaseNotes: getSensitiveCaseNotesPermissions(user),
     }
   }
 }

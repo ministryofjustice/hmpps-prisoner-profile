@@ -154,10 +154,6 @@ describe('overviewController', () => {
     })
 
     it('should not call moneyService.getMoneySummary if user doesnt have money.view permission', async () => {
-      const resNotInCaseload = {
-        ...res,
-        locals: getResLocals({ caseLoads: CaseLoadsDummyDataB }),
-      }
       const reqNoMoney = {
         ...req,
         middleware: { ...req.middleware, permissions: { money: { view: false } } },
@@ -166,7 +162,7 @@ describe('overviewController', () => {
         .fn()
         .mockResolvedValue({ spends: 1, savings: 2, cash: 2, damageObligations: 3, currency: 'GBP' })
 
-      await controller.displayOverview(reqNoMoney, resNotInCaseload)
+      await controller.displayOverview(reqNoMoney, res)
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
