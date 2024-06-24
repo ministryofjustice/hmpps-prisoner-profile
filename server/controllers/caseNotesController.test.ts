@@ -61,6 +61,13 @@ describe('Case Notes Controller', () => {
         alertSummaryData: {
           alertFlags: alertFlagLabels,
         },
+        permissions: {
+          sensitiveCaseNotes: {
+            view: false,
+            edit: false,
+            delete: false,
+          },
+        },
       },
       path: 'case-notes',
       flash: jest.fn(),
@@ -105,7 +112,7 @@ describe('Case Notes Controller', () => {
           endDate: '02/02/2023',
         },
         canViewSensitiveCaseNotes: false,
-        canDeleteSensitiveCaseNotes: true,
+        canDeleteSensitiveCaseNotes: false,
         currentUserDetails: user,
       })
       expect(mapSpy).toHaveBeenCalledWith(
@@ -117,39 +124,48 @@ describe('Case Notes Controller', () => {
       )
     })
 
-    it.each([Role.PomUser, Role.ViewSensitiveCaseNotes, Role.AddSensitiveCaseNotes])(
-      'should include sensitive case notes if user has appropriate role',
-      async value => {
-        const getCaseNotesSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockResolvedValue({
-          pagedCaseNotes: pagedCaseNotesMock,
-          listMetadata: null,
-          caseNoteTypes: caseNoteTypesMock,
-          fullName: 'John Middle Names Saunders',
-        })
-        jest.spyOn(headerMappers, 'mapHeaderData')
-        prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
+    it('should allow view of sensitive case notes if user has the appropriate permission', async () => {
+      const getCaseNotesSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockResolvedValue({
+        pagedCaseNotes: pagedCaseNotesMock,
+        listMetadata: null,
+        caseNoteTypes: caseNoteTypesMock,
+        fullName: 'John Middle Names Saunders',
+      })
+      jest.spyOn(headerMappers, 'mapHeaderData')
+      prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
 
-        res.locals.user.userRoles = [value]
-
-        await controller.displayCaseNotes()(req, res)
-
-        expect(getCaseNotesSpy).toHaveBeenCalledWith({
-          token: req.middleware.clientToken,
-          prisonerData: PrisonerMockDataA,
-          queryParams: {
-            page: 0,
-            sort: 'dateCreated,ASC',
-            type: 'ACP',
-            subType: 'ASSESSMENT',
-            startDate: '01/01/2023',
-            endDate: '02/02/2023',
+      const reqWithPermission = {
+        ...req,
+        middleware: {
+          ...req.middleware,
+          permissions: {
+            sensitiveCaseNotes: {
+              view: true,
+              edit: false,
+              delete: false,
+            },
           },
-          canViewSensitiveCaseNotes: true,
-          canDeleteSensitiveCaseNotes: false,
-          currentUserDetails: user,
-        })
-      },
-    )
+        },
+      }
+
+      await controller.displayCaseNotes()(reqWithPermission, res)
+
+      expect(getCaseNotesSpy).toHaveBeenCalledWith({
+        token: req.middleware.clientToken,
+        prisonerData: PrisonerMockDataA,
+        queryParams: {
+          page: 0,
+          sort: 'dateCreated,ASC',
+          type: 'ACP',
+          subType: 'ASSESSMENT',
+          startDate: '01/01/2023',
+          endDate: '02/02/2023',
+        },
+        canViewSensitiveCaseNotes: true,
+        canDeleteSensitiveCaseNotes: false,
+        currentUserDetails: user,
+      })
+    })
   })
 
   it('should display add case note page', async () => {
@@ -318,19 +334,28 @@ describe('Case Notes Controller', () => {
       })
     })
 
-    it.each([Role.PomUser, Role.AddSensitiveCaseNotes])(
-      'should display update page for a sensitive case note for the appropriate roles',
-      async value => {
-        res.locals.user.userRoles = [value]
-        const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
+    it('should display update page for a sensitive case note for the appropriate permissions', async () => {
+      const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
+      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
 
-        jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      const reqWithPermission = {
+        ...req,
+        middleware: {
+          ...req.middleware,
+          permissions: {
+            sensitiveCaseNotes: {
+              view: false,
+              edit: true,
+              delete: false,
+            },
+          },
+        },
+      }
 
-        await controller.displayUpdateCaseNote()(req, res, next)
+      await controller.displayUpdateCaseNote()(reqWithPermission, res, next)
 
-        expect(res.render).toHaveBeenCalled()
-      },
-    )
+      expect(res.render).toHaveBeenCalled()
+    })
 
     it('should not display update page for a sensitive case note when user is not permitted', async () => {
       res.locals.user.userRoles = []
@@ -385,33 +410,39 @@ describe('Case Notes Controller', () => {
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/case-notes`)
     })
 
-    it.each([Role.PomUser, Role.AddSensitiveCaseNotes])(
-      'should permit update of a sensitive case note for the appropriate roles',
-      async value => {
-        res.locals.user.userRoles = [value]
-        const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
-        req = {
-          ...req,
-          params: {
-            prisonerNumber: PrisonerMockDataA.prisonerNumber,
+    it('should permit update of a sensitive case note for the appropriate permissions', async () => {
+      const currentCaseNote = { ...pagedCaseNotesMock.content[0], sensitive: true }
+      const reqWithPermission = {
+        ...req,
+        params: {
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        },
+        body: {
+          text: 'Note text',
+          isExternal: false,
+          username: 'AB123456',
+          currentLength: 100,
+          refererUrl: 'http://referer',
+        },
+        middleware: {
+          ...req.middleware,
+          permissions: {
+            sensitiveCaseNotes: {
+              view: false,
+              edit: true,
+              delete: false,
+            },
           },
-          body: {
-            text: 'Note text',
-            isExternal: false,
-            username: 'AB123456',
-            currentLength: 100,
-            refererUrl: 'http://referer',
-          },
-        }
+        },
+      }
 
-        const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
-        jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
+      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
+      jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
 
-        await controller.postUpdate()(req, res, next)
+      await controller.postUpdate()(reqWithPermission, res, next)
 
-        expect(updateCaseNoteSpy).toHaveBeenCalled()
-      },
-    )
+      expect(updateCaseNoteSpy).toHaveBeenCalled()
+    })
 
     it('should not permit update of sensitive case note when user is not permitted', async () => {
       res.locals.user.userRoles = []

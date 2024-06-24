@@ -9,7 +9,6 @@ import { saveBackLink } from '../controllers/backLinkController'
 import { Services } from '../services'
 import caseNotesRouter from './caseNotesRouter'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import csraRouter from './csraRouter'
@@ -29,6 +28,7 @@ import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
 import CareNeedsController from '../controllers/careNeedsController'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -71,7 +71,6 @@ export default function routes(services: Services): Router {
     services.visitsService,
     services.prisonerScheduleService,
     services.incentivesService,
-    services.userService,
     services.personalPageService,
     services.offenderService,
     services.professionalContactsService,
@@ -88,7 +87,7 @@ export default function routes(services: Services): Router {
     '/api/prisoner/:prisonerNumber/image',
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     services.commonApiRoutes.prisonerImage,
   )
 
@@ -102,7 +101,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber',
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return overviewController.displayOverview(req, res)
     },
@@ -112,7 +111,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/image',
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -137,7 +136,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/personal',
     auditPageAccessAttempt({ services, page: Page.Personal }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const {
         prisonerData,
@@ -184,7 +183,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/work-and-skills',
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     // TODO - RR-814 - when this feature toggle is removed the no-op RequestHandler function can be removed, simply leaving the call to the retrieveCuriousInPrisonCourses middleware
     config.featureToggles.newCourseAndQualificationHistoryEnabled
       ? retrieveCuriousInPrisonCourses(services.curiousService)
@@ -246,7 +245,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/offences',
     auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -287,7 +286,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/schedule',
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerScheduleController.displayPrisonerSchedule(req, res, prisonerData)
@@ -298,7 +297,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/x-ray-body-scans',
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return careNeedsController.displayXrayBodyScans(req, res)
     },
@@ -307,7 +306,7 @@ export default function routes(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/location-history',
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(
@@ -320,7 +319,7 @@ export default function routes(services: Services): Router {
   router.use(
     '/prisoner/:prisonerNumber/money',
     getPrisonerData(services),
-    checkPrisonerInCaseload({ allowGlobal: false, allowInactive: false }),
+    permissionsGuard(services.permissionsService.getMoneyPermissions),
     moneyRouter(services),
   )
 
@@ -328,7 +327,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/religion-belief-history',
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return beliefHistoryController.displayBeliefHistory(req, res)
     },
@@ -338,7 +337,7 @@ export default function routes(services: Services): Router {
     '/prisoner/:prisonerNumber/past-care-needs',
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return careNeedsController.displayPastCareNeeds(req, res)
     },

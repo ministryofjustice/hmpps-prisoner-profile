@@ -2,8 +2,7 @@ import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { formatName, isInUsersCaseLoad, neurodiversityEnabled, userHasRoles } from '../utils/utils'
-import { Role } from '../data/enums/role'
+import { formatName, isInUsersCaseLoad, neurodiversityEnabled } from '../utils/utils'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
@@ -18,7 +17,6 @@ import AdjudicationsService from '../services/adjudicationsService'
 import { VisitsService } from '../services/visitsService'
 import PrisonerScheduleService from '../services/prisonerScheduleService'
 import IncentivesService from '../services/incentivesService'
-import { UserService } from '../services'
 import PersonalPageService from '../services/personalPageService'
 import { Result } from '../utils/result/result'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
@@ -45,7 +43,6 @@ export default class OverviewController {
     private readonly visitsService: VisitsService,
     private readonly prisonerScheduleService: PrisonerScheduleService,
     private readonly incentivesService: IncentivesService,
-    private readonly userService: UserService,
     private readonly personalPageService: PersonalPageService,
     private readonly offenderService: OffenderService,
     private readonly professionalContactsService: ProfessionalContactsService,
@@ -57,22 +54,19 @@ export default class OverviewController {
       prisonerData,
       inmateDetail,
       alertSummaryData: { alertFlags },
+      permissions,
     } = req.middleware
-    const { userRoles } = res.locals.user
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
 
     const prisonerInCaseLoad = isInUsersCaseLoad(prisonId, res.locals.user)
-    const isPomOrReceptionUser = userHasRoles([Role.PomUser, Role.ReceptionUser], userRoles)
-    const isGlobalSearchUser = userHasRoles([Role.GlobalSearch], userRoles)
     const isYouthPrisoner = youthEstatePrisons.includes(prisonId)
 
     const pathfinderApiClient = this.pathfinderApiClientBuilder(clientToken)
     const manageSocCasesApiClient = this.manageSocCasesApiClientBuilder(clientToken)
-    const showCourtCaseSummary = courCasesSummaryEnabled && userHasRoles([Role.ReleaseDatesCalculator], userRoles)
+    const showCourtCaseSummary = courCasesSummaryEnabled && permissions.courtCases?.view
 
     const [
-      staffRoles,
       pathfinderNominal,
       socNominal,
       nextCourtAppearance,
@@ -90,21 +84,18 @@ export default class OverviewController {
       offencesOverview,
       nonAssociationSummary,
     ] = await Promise.all([
-      this.userService.getStaffRoles(clientToken, res.locals.user),
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
       this.offencesService.getNextCourtHearingSummary(clientToken, bookingId),
       this.offencesService.getActiveCourtCasesCount(clientToken, bookingId),
       showCourtCaseSummary ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber) : null,
-      prisonerInCaseLoad ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
-      prisonerInCaseLoad || isPomOrReceptionUser
+      permissions.money?.view ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
+      permissions.adjudications?.view
         ? this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId)
         : null,
-      prisonerInCaseLoad ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
+      permissions.visits?.view ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
-      prisonerInCaseLoad || isGlobalSearchUser
-        ? this.incentivesService.getIncentiveOverview(clientToken, bookingId)
-        : null,
+      permissions.incentives?.view ? this.incentivesService.getIncentiveOverview(clientToken, bookingId) : null,
       Result.wrap(this.getLearnerNeurodivergence(clientToken, prisonId, prisonerNumber), res.locals.apiErrorCallback),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.offenderService.getPrisoner(clientToken, prisonerNumber),
@@ -125,9 +116,9 @@ export default class OverviewController {
       pathfinderNominal,
       socNominal,
       res.locals.user,
-      staffRoles,
       config,
       res.locals.feComponentsMeta,
+      permissions,
     )
 
     this.auditOverviewPageView(req, res, prisonerData)
@@ -138,17 +129,17 @@ export default class OverviewController {
       moneySummary,
       adjudicationSummary,
       visitsSummary,
-      categorySummary: getCategorySummary(prisonerData, inmateDetail, userRoles),
+      categorySummary: getCategorySummary(prisonerData, inmateDetail, permissions.category?.edit),
       csraSummary: getCsraSummary(prisonerData),
       schedule,
       incentiveSummary,
       overviewActions,
-      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, res.locals.user),
+      overviewInfoLinks: buildOverviewInfoLinks(prisonerData, pathfinderNominal, socNominal, permissions),
       courtCaseSummary: mapCourtCaseSummary(
         nextCourtAppearance,
         activeCourtCasesCount,
         latestReleaseDate,
-        userRoles,
+        permissions.courtCases?.edit,
         prisonerData.prisonerNumber,
       ),
       statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),

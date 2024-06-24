@@ -32,6 +32,7 @@ import ContentfulService from './contentfulService'
 import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
+import PermissionsService from './permissionsService'
 
 export const services = () => {
   const {
@@ -115,6 +116,7 @@ export const services = () => {
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
+  const permissionsService = new PermissionsService(userService)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -163,6 +165,7 @@ export const services = () => {
     curiousService,
     featureToggleService,
     careNeedsService,
+    permissionsService,
   }
 }
 

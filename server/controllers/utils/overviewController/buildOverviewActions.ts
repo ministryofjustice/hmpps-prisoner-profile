@@ -1,31 +1,29 @@
 import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
-import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
 import HmppsAction from '../../interfaces/HmppsAction'
-import { canAddCaseNotes, canViewCalculateReleaseDates } from '../../../utils/roleHelpers'
 import { Icon } from '../../../data/enums/icon'
-import { includesActiveCaseLoad, isActiveCaseLoad, userCanEdit, userHasRoles } from '../../../utils/utils'
-import { Role } from '../../../data/enums/role'
+import { includesActiveCaseLoad } from '../../../utils/utils'
 import conf from '../../../config'
 import isServiceNavEnabled from '../../../utils/isServiceEnabled'
-import StaffRole from '../../../data/interfaces/prisonApi/StaffRole'
 import { HmppsUser } from '../../../interfaces/HmppsUser'
+import { Permissions } from '../../../services/permissionsService'
+import Nominal from '../../../data/interfaces/manageSocCasesApi/Nominal'
 
 export default (
   prisonerData: Prisoner,
   pathfinderNominal: Nominal | null,
   socNominal: Nominal | null,
   user: HmppsUser,
-  staffRoles: StaffRole[],
   config: typeof conf,
   feComponentsMeta: HeaderFooterMeta | undefined,
+  permissions: Permissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
   const addAppointmentUrl = config.featureToggles.profileAddAppointmentEnabled
     ? `/prisoner/${prisonerData.prisonerNumber}/add-appointment`
     : `${config.serviceUrls.digitalPrison}/offenders/${prisonerData.prisonerNumber}/add-appointment`
 
-  if (canViewCalculateReleaseDates(user)) {
+  if (!config.featureToggles.courCasesSummaryEnabled && permissions.calculateReleaseDates?.edit) {
     actions.push({
       text: 'Calculate release dates',
       icon: Icon.CalculateReleaseDates,
@@ -34,7 +32,7 @@ export default (
     })
   }
 
-  if (canAddCaseNotes(user, prisonerData)) {
+  if (permissions.caseNotes?.edit) {
     actions.push({
       text: 'Add case note',
       icon: Icon.AddCaseNote,
@@ -43,7 +41,7 @@ export default (
     })
   }
 
-  if (staffRoles?.find(({ role }) => role === 'KW')) {
+  if (permissions.keyWorker?.edit) {
     actions.push({
       text: 'Add key worker session',
       icon: Icon.AddKeyWorkerSession,
@@ -52,7 +50,7 @@ export default (
     })
   }
 
-  if (isActiveCaseLoad(prisonerData.prisonId, user) && !prisonerData.restrictedPatient) {
+  if (permissions.appointment?.edit) {
     actions.push({
       text: 'Add appointment',
       icon: Icon.AddAppointment,
@@ -61,11 +59,7 @@ export default (
     })
   }
 
-  if (
-    userCanEdit(user, prisonerData) &&
-    !prisonerData.restrictedPatient &&
-    !includesActiveCaseLoad(config.featureToggles.useOfForceDisabledPrisons, user)
-  ) {
+  if (permissions.useOfForce?.edit && !includesActiveCaseLoad(config.featureToggles.useOfForceDisabledPrisons, user)) {
     actions.push({
       text: 'Report use of force',
       icon: Icon.ReportUseOfForce,
@@ -74,12 +68,7 @@ export default (
     })
   }
 
-  if (
-    userHasRoles([Role.ActivityHub], user.userRoles) &&
-    isServiceNavEnabled('activities', feComponentsMeta) &&
-    isActiveCaseLoad(prisonerData.prisonId, user) &&
-    prisonerData.status !== 'ACTIVE OUT'
-  ) {
+  if (permissions.activity?.edit && isServiceNavEnabled('activities', feComponentsMeta)) {
     actions.push({
       text: 'Log an activity application',
       icon: Icon.LogActivityApplication,
@@ -88,19 +77,7 @@ export default (
     })
   }
 
-  if (
-    userHasRoles(
-      [
-        Role.PathfinderApproval,
-        Role.PathfinderStdPrison,
-        Role.PathfinderStdProbation,
-        Role.PathfinderHQ,
-        Role.PathfinderUser,
-      ],
-      user.userRoles,
-    ) &&
-    !pathfinderNominal
-  ) {
+  if (permissions.pathfinder?.edit && !pathfinderNominal) {
     actions.push({
       text: 'Refer to Pathfinder',
       icon: Icon.ReferToPathfinder,
@@ -109,10 +86,7 @@ export default (
     })
   }
 
-  if (
-    userHasRoles([Role.SocCustody, Role.SocCommunity, Role.SocDataAnalyst, Role.SocDataManager], user.userRoles) &&
-    !socNominal
-  ) {
+  if (permissions.soc?.edit && !socNominal) {
     actions.push({
       text: 'Add to SOC',
       icon: Icon.AddToSOC,
@@ -121,12 +95,7 @@ export default (
     })
   }
 
-  if (
-    userHasRoles(
-      [Role.CreateCategorisation, Role.ApproveCategorisation, Role.CreateRecategorisation, Role.CategorisationSecurity],
-      user.userRoles,
-    )
-  ) {
+  if (permissions.offenderCategorisation?.edit) {
     actions.push({
       text: 'Manage category',
       icon: Icon.ManageCategory,
