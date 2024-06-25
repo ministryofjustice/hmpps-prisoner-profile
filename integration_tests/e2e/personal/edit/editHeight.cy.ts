@@ -4,20 +4,33 @@ import EditHeight from '../../../pages/editPages/heightImperial'
 import NotFoundPage from '../../../pages/notFoundPage'
 import Page from '../../../pages/page'
 
+interface EditPageInputs {
+  textInputs?: { [key: string]: string }
+}
+
 function editPageTests<TPage extends EditPage>(options: {
   editUrl: string
   prisonerNumber: string
   bookingId: number
   testSetup: () => void
-  validInputs: (page: TPage) => void
   editPage?: new () => TPage
   editPageWithTitle?: new (title: string) => TPage
   editPageTitle?: string
   successfulFlashMessage: string
+  validInputs: EditPageInputs
+  invalidResponses: {
+    inputs: EditPageInputs
+    errorMessages: string[]
+  }[]
 }) {
   const { editUrl, testSetup, validInputs, editPage, editPageWithTitle, editPageTitle, successfulFlashMessage } =
     options
+
   let page: TPage
+
+  const fillWithInputs = (inputs: EditPageInputs) => {
+    if (inputs.textInputs) page.fillInTextFields(inputs.textInputs)
+  }
 
   context('Edit page tests', () => {
     beforeEach(() => {
@@ -74,11 +87,13 @@ function editPageTests<TPage extends EditPage>(options: {
 
         it('Can submit a valid response', () => {
           page = getPage()
-          validInputs(page)
+          fillWithInputs(validInputs)
           page.submit()
           page.flashMessage().should('include.text', successfulFlashMessage)
         })
       })
+
+      context('Invalid responses', () => {})
     })
   })
 }
@@ -111,9 +126,8 @@ context('Edit height (metric)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height`,
-    validInputs: page => {
-      page.fillInTextFields({ editField: '125' })
-    },
+    validInputs: { textInputs: { editField: '125' } },
+    invalidResponses: [],
     editPageWithTitle: EditHeight,
     editPageTitle: 'Edit Height',
     successfulFlashMessage: 'Height edited',
@@ -148,9 +162,8 @@ context('Edit height (Imperial)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height/imperial`,
-    validInputs: page => {
-      page.fillInTextFields({ feet: '5', inches: '3' })
-    },
+    validInputs: { textInputs: { feet: '5', inches: '3' } },
+    invalidResponses: [],
     editPageWithTitle: EditHeight,
     editPageTitle: 'Edit height',
     successfulFlashMessage: 'Height edited',
