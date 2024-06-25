@@ -40,7 +40,7 @@ Cypress.Commands.add(
     cy.task('stubVisitBalances', prisonerNumber)
     cy.task('stubAssessments', bookingId)
     cy.task('stubEventsForToday', bookingId)
-    cy.task('stubPomData', { prisonerNumber })
+    cy.task('stubPomData')
     cy.task('stubKeyWorkerData', { prisonerNumber })
     cy.task('stubKeyWorkerSessions', { type: 'KA', subType: 'KS', numMonths: 38, bookingId })
     cy.task('stubGetOffenderContacts')

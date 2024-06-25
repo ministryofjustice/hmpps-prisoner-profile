@@ -268,6 +268,104 @@ describe('professionalContactsService', () => {
       ])
     })
 
+    it('should handle allocation manager API error', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [PrisonerContactBuilder()],
+      }
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      allocationManagerApiClient.getPomByOffenderNo = jest.fn(async () => Promise.reject(Error('some error!')))
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+        () => complexityApiClient,
+      )
+
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+        contact.toPromiseSettledResult(),
+      )
+
+      expect(response).toEqual([
+        ...expectedKeyWorkerResponse,
+        ...[
+          Result.rejected({
+            relationship: 'POM',
+            relationshipDescription: 'Prison Offender Manager',
+          }).toPromiseSettledResult(),
+          Result.rejected({
+            relationship: 'POM',
+            relationshipDescription: 'Co-working Prison Offender Manager',
+          }).toPromiseSettledResult(),
+        ],
+        ...expectedComResponse,
+        Result.fulfilled({
+          address: {
+            label: 'Main address',
+            noFixedAddress: false,
+            premise: 'Address',
+            primary: true,
+            mail: false,
+          },
+          emails: ['e@mail.com'],
+          firstName: 'John',
+          lastName: 'Smith',
+          phones: ['077111111'],
+          relationshipDescription: 'Probation Officer',
+          relationship: 'PROBATION',
+        }).toPromiseSettledResult(),
+      ])
+    })
+
+    it('should handle delius API error', async () => {
+      const mockPrisonerContacts: ContactDetail = {
+        bookingId: 1,
+        nextOfKin: [],
+        otherContacts: [PrisonerContactBuilder()],
+      }
+      prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
+      professionalContactsClient.getCommunityManager = jest.fn(async () => Promise.reject(Error('some error!')))
+
+      const service = new ProfessionalContactsService(
+        () => prisonApiClient,
+        () => allocationManagerApiClient,
+        () => professionalContactsClient,
+        () => keyWorkerApiClient,
+        () => complexityApiClient,
+      )
+
+      const response = (await service.getContacts('token', 'A1234AA', 1, false)).map(contact =>
+        contact.toPromiseSettledResult(),
+      )
+
+      expect(response).toEqual([
+        ...expectedKeyWorkerResponse,
+        ...expectedPomResponse,
+        Result.rejected({
+          relationship: 'COM',
+          relationshipDescription: 'Community Offender Manager',
+        }).toPromiseSettledResult(),
+        Result.fulfilled({
+          address: {
+            label: 'Main address',
+            noFixedAddress: false,
+            premise: 'Address',
+            primary: true,
+            mail: false,
+          },
+          emails: ['e@mail.com'],
+          firstName: 'John',
+          lastName: 'Smith',
+          phones: ['077111111'],
+          relationshipDescription: 'Probation Officer',
+          relationship: 'PROBATION',
+        }).toPromiseSettledResult(),
+      ])
+    })
+
     it('should remove contacts with address with past the enddate', async () => {
       const mockPrisonerContacts: ContactDetail = {
         bookingId: 1,
