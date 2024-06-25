@@ -1,5 +1,5 @@
-import { HmppsStatusCode } from '../../../data/enums/hmppsStatusCode'
-import { Role } from '../../../data/enums/role'
+import { HmppsStatusCode } from '../../../../data/enums/hmppsStatusCode'
+import { Role } from '../../../../data/enums/role'
 import {
   prisonerMDI,
   prisonerOUT,
@@ -7,7 +7,7 @@ import {
   restrictedPrisonerMDI,
   userLEI,
   userMDI,
-} from '../../../../tests/mocks/userMocks'
+} from '../../../../../tests/mocks/userMocks'
 import getCaseNotesAccessStatusCode from './getCaseNotesAccessStatusCode'
 
 describe('getCaseNotesAccessStatusCode.ts', () => {
@@ -30,7 +30,7 @@ describe('getCaseNotesAccessStatusCode.ts', () => {
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.PomUser]}                    | ${HmppsStatusCode.NOT_IN_CASELOAD}
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.PomUser, Role.GlobalSearch]} | ${HmppsStatusCode.OK}
     ${userMDI} | ${prisonerMDI}                                             | ${[]}                                | ${HmppsStatusCode.OK}
-  `('some name', ({ user, prisoner, roles, expected }) => {
+  `(' User should receive correct access code', ({ user, prisoner, roles, expected }) => {
     const accessCode = getCaseNotesAccessStatusCode({ ...user, userRoles: [...roles] }, prisoner)
 
     expect(accessCode).toEqual(expected)

@@ -16,7 +16,7 @@ const caseLoadListWithMdi = [
 
 describe('getCaseNotesPermissions', () => {
   test.each`
-    user                                              | prisoner                 | roles                                | editVisible
+    user                                              | prisoner                 | roles                                | editPermitted
     ${userMDI}                                        | ${prisonerMDI}           | ${[]}                                | ${true}
     ${userLEI}                                        | ${prisonerMDI}           | ${[]}                                | ${false}
     ${{ ...userLEI, caseLoads: caseLoadListWithMdi }} | ${prisonerMDI}           | ${[]}                                | ${true}
@@ -29,9 +29,9 @@ describe('getCaseNotesPermissions', () => {
     ${userLEI}                                        | ${prisonerMDI}           | ${[Role.GlobalSearch, Role.PomUser]} | ${true}
     ${userLEI}                                        | ${prisonerMDI}           | ${[Role.GlobalSearch]}               | ${false}
     ${userLEI}                                        | ${prisonerMDI}           | ${[Role.PomUser]}                    | ${false}
-  `('roles: $roles; view: $editVisible', async ({ user, prisoner, roles, editVisible }) => {
+  `('roles: $roles; view: $editPermitted', async ({ user, prisoner, roles, editPermitted }) => {
     const permissions = getCaseNotesPermissions({ ...user, userRoles: [...roles] }, prisoner)
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

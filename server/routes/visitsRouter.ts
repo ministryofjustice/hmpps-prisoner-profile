@@ -4,8 +4,8 @@ import { getRequest } from './routerUtils'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import { VisitsController } from '../controllers/visitsController'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function visitsRouter(services: Services): Router {
   const router = Router()
@@ -16,7 +16,7 @@ export default function visitsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/visits-details',
     auditPageAccessAttempt({ services, page: Page.VisitDetails }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getStandardAccessPermission),
     visitsController.visitsDetails(),
   )
 

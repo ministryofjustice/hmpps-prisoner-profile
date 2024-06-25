@@ -4,22 +4,22 @@ import getCourtCasesPermissions from './getCourtCasesPermissions'
 
 describe('getCourtCasesPermissions', () => {
   test.each`
-    roles                            | viewVisible
+    roles                            | viewPermitted
     ${[]}                            | ${false}
     ${[Role.ReleaseDatesCalculator]} | ${true}
-  `('roles: $roles; view: $viewVisible', async ({ roles, viewVisible }) => {
+  `('roles: $roles; view: $viewPermitted', async ({ roles, viewPermitted }) => {
     const permissions = getCourtCasesPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.view).toEqual(viewVisible)
+    expect(permissions.view).toEqual(viewPermitted)
   })
 
   test.each`
-    roles                           | editVisible
+    roles                           | editPermitted
     ${[]}                           | ${false}
     ${[Role.AdjustmentsMaintainer]} | ${true}
-  `('roles: $roles; edit: editVisible', async ({ roles, editVisible }) => {
+  `('roles: $roles; edit: editPermitted', async ({ roles, editPermitted }) => {
     const permissions = getCourtCasesPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

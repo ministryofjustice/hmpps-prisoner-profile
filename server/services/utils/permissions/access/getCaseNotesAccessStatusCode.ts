@@ -1,9 +1,9 @@
-import { isInUsersCaseLoad, userHasAllRoles } from '../../../utils/utils'
-import { HmppsStatusCode } from '../../../data/enums/hmppsStatusCode'
+import { isInUsersCaseLoad, userHasAllRoles } from '../../../../utils/utils'
+import { HmppsStatusCode } from '../../../../data/enums/hmppsStatusCode'
 import getOverviewAccessStatusCode from './getOverviewAccessStatusCode'
-import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
-import { HmppsUser } from '../../../interfaces/HmppsUser'
-import { Role } from '../../../data/enums/role'
+import Prisoner from '../../../../data/interfaces/prisonerSearchApi/Prisoner'
+import { HmppsUser } from '../../../../interfaces/HmppsUser'
+import { Role } from '../../../../data/enums/role'
 
 export default function getCaseNotesAccessStatusCode(user: HmppsUser, prisoner: Prisoner): HmppsStatusCode {
   const { restrictedPatient } = prisoner

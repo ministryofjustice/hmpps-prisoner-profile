@@ -29,6 +29,7 @@ describe('Prisoner Location Details', () => {
         clientToken: 'CLIENT_TOKEN',
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
+        permissions: { cellMove: { edit: true } },
       },
       originalUrl: 'http://localhost',
       params: { offenderNo },
@@ -79,9 +80,20 @@ describe('Prisoner Location Details', () => {
     })
 
     describe('should provide "Change cell" and "Move to reception" functionality', () => {
-      it('should not display the "Move to reception" or "Change cell" buttons when user does not have the CELL_MOVE role', async () => {
+      it('should not display the "Move to reception" or "Change cell" buttons when user does not have cellMove.edit permissions', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [] } } }
-        await controller.displayLocationDetails(req, res, PrisonerMockDataA)
+        const reqNoPermission = {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            permissions: {
+              cellMove: {
+                edit: false,
+              },
+            },
+          },
+        }
+        await controller.displayLocationDetails(reqNoPermission, res, PrisonerMockDataA)
 
         expect(locationDetailsService.isReceptionFull).not.toHaveBeenCalled()
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
@@ -136,31 +148,26 @@ describe('Prisoner Location Details', () => {
         })
       })
 
-      it('should not display the "Current location" section or action buttons for TRN prisoners', async () => {
+      it('should not display the "Current location" section or action buttons for users without cellMove.edit permission', async () => {
         res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
+        const reqNoPermission = {
+          ...req,
+          middleware: {
+            ...req.middleware,
+            permissions: {
+              cellMove: {
+                edit: false,
+              },
+            },
+          },
+        }
 
-        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
+        await controller.displayLocationDetails(reqNoPermission, res, { ...PrisonerMockDataA, prisonId: 'TRN' })
 
         expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
           ...locationDetailsPageData,
           prisonId: 'TRN',
           isTransfer: true,
-          canViewCellMoveButton: false,
-          canViewMoveToReceptionButton: false,
-          currentLocation: null,
-          occupants: [],
-        })
-      })
-
-      it('should not display the "Current location" section or action buttons for OUT prisoners', async () => {
-        res = { ...res, locals: { ...res.locals, user: { ...res.locals.user, userRoles: [Role.InactiveBookings] } } }
-
-        await controller.displayLocationDetails(req, res, { ...PrisonerMockDataA, prisonId: 'OUT' })
-
-        expect(res.render).toHaveBeenCalledWith('pages/locationDetails', {
-          ...locationDetailsPageData,
-          prisonId: 'OUT',
-          isReleased: true,
           canViewCellMoveButton: false,
           canViewMoveToReceptionButton: false,
           currentLocation: null,

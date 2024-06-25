@@ -4,12 +4,12 @@ import getCalculateReleaseDatesPermissions from './getCalculateReleaseDatesPermi
 
 describe('getCalculateReleaseDatesPermission', () => {
   test.each`
-    roles                            | editVisible
+    roles                            | editPermitted
     ${[]}                            | ${false}
     ${[Role.ReleaseDatesCalculator]} | ${true}
-  `('roles: $roles; edit: editVisible', async ({ roles, editVisible }) => {
+  `('roles: $roles; edit: editPermitted', async ({ roles, editPermitted }) => {
     const permissions = getCalculateReleaseDatesPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

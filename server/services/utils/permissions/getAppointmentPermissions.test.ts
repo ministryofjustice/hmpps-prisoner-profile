@@ -3,13 +3,13 @@ import getAppointmentPermissions from './getAppointmentPermissions'
 
 describe('getAppointmentPermissions', () => {
   test.each`
-    user       | prisoner                 | roles | editVisible
+    user       | prisoner                 | roles | editPermitted
     ${userMDI} | ${prisonerMDI}           | ${[]} | ${true}
     ${userMDI} | ${restrictedPrisonerMDI} | ${[]} | ${false}
     ${userLEI} | ${prisonerMDI}           | ${[]} | ${false}
-  `('roles: $roles; view: $editVisible', async ({ user, prisoner, roles, editVisible }) => {
+  `('roles: $roles; view: $editPermitted', async ({ user, prisoner, roles, editPermitted }) => {
     const permissions = getAppointmentPermissions({ ...user, userRoles: [...roles] }, prisoner)
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

@@ -2,11 +2,6 @@ import { Router } from 'express'
 import { Services } from '../services'
 import AlertsController from '../controllers/alertsController'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
-import checkHasSomeRoles from '../middleware/checkHasSomeRolesMiddleware'
-import { Role } from '../data/enums/role'
-import guardMiddleware, { GuardOperator } from '../middleware/guardMiddleware'
-import checkUserCanEdit from '../middleware/checkUserCanEditMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
 import {
   AlertAddMoreDetailsValidator,
@@ -17,6 +12,7 @@ import {
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest, postRequest } from './routerUtils'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function alertsRouter(services: Services): Router {
   const router = Router()
@@ -37,7 +33,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/active',
     auditPageAccessAttempt({ services, page: Page.ActiveAlerts }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getAlertsPermissions),
     (req, res, next) => {
       alertsController.displayAlerts(req, res, next, true)
     },
@@ -47,7 +43,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/inactive',
     auditPageAccessAttempt({ services, page: Page.InactiveAlerts }),
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getAlertsPermissions),
     (req, res, next) => {
       alertsController.displayAlerts(req, res, next, false)
     },
@@ -57,7 +53,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/add-alert',
     auditPageAccessAttempt({ services, page: Page.AddAlert }),
     getPrisonerData(services),
-    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    permissionsGuard(services.permissionsService.getEditAlertsPermissions),
     (req, res, next) => {
       alertsController.displayAddAlert(req, res, next)
     },
@@ -73,7 +69,7 @@ export default function alertsRouter(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/alerts/detail',
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getStandardAccessPermission),
     alertsController.displayAlert(),
   )
 
@@ -81,7 +77,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/:alertId/add-more-details',
     auditPageAccessAttempt({ services, page: Page.AlertAddMoreDetails }),
     getPrisonerData(services),
-    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    permissionsGuard(services.permissionsService.getEditAlertsPermissions),
     (req, res, next) => {
       alertsController.displayAddMoreDetails(req, res, next)
     },
@@ -98,7 +94,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/:alertId/close',
     auditPageAccessAttempt({ services, page: Page.AlertClose }),
     getPrisonerData(services),
-    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    permissionsGuard(services.permissionsService.getEditAlertsPermissions),
     (req, res, next) => {
       alertsController.displayCloseAlert(req, res, next)
     },
@@ -115,7 +111,7 @@ export default function alertsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/alerts/:alertId/change-end-date',
     auditPageAccessAttempt({ services, page: Page.AlertClose }),
     getPrisonerData(services),
-    guardMiddleware(GuardOperator.OR, checkHasSomeRoles([Role.UpdateAlert]), checkUserCanEdit()),
+    permissionsGuard(services.permissionsService.getEditAlertsPermissions),
     (req, res, next) => {
       alertsController.displayChangeEndDate(req, res, next)
     },
@@ -134,7 +130,7 @@ export default function alertsRouter(services: Services): Router {
   get(
     '/api/prisoner/:prisonerNumber/get-alert-details',
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getStandardAccessPermission),
     alertsController.getAlertDetails(),
   )
 
