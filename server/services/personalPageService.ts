@@ -42,6 +42,15 @@ export default class PersonalPageService {
     return null
   }
 
+  async updatePhysicalAttributes(
+    token: string,
+    prisonerNumber: string,
+    physicalAttributes: { height: number; weight: number },
+  ) {
+    const apiClient = this.prisonPersonApiClientBuilder(token)
+    return apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+  }
+
   public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 

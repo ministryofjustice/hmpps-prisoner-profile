@@ -27,8 +27,8 @@ import visitsRouter from './visitsRouter'
 import addressRouter from './addressRouter'
 import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPrisonCourses'
 import CareNeedsController from '../controllers/careNeedsController'
-import { PrisonUser } from '../interfaces/HmppsUser'
 import permissionsGuard from '../middleware/permissionsGuard'
+import personalRouter from './personalRouter'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -128,53 +128,6 @@ export default function routes(services: Services): Router {
       res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
         ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user),
-      })
-    },
-  )
-
-  get(
-    '/prisoner/:prisonerNumber/personal',
-    auditPageAccessAttempt({ services, page: Page.Personal }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    async (req, res, next) => {
-      const {
-        prisonerData,
-        inmateDetail,
-        alertSummaryData: { alertFlags },
-        clientToken,
-      } = req.middleware
-      const { bookingId } = prisonerData
-      const user = res.locals.user as PrisonUser
-      const { activeCaseLoadId } = user
-
-      const { personalPageService, careNeedsService } = services
-
-      const enablePrisonPerson =
-        config.featureToggles.prisonPersonApiEnabled &&
-        config.featureToggles.prisonPersonApiEnabledPrisons.includes(activeCaseLoadId)
-
-      const [personalPageData, careNeeds, xrays] = await Promise.all([
-        personalPageService.get(clientToken, prisonerData, enablePrisonPerson),
-        careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
-        careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
-      ])
-
-      await services.auditService.sendPageView({
-        user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.Personal,
-      })
-
-      res.render('pages/personalPage', {
-        pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'personal'),
-        ...personalPageData,
-        careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
-        security: { ...personalPageData.security, xrays },
-        hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
       })
     },
   )
@@ -281,6 +234,7 @@ export default function routes(services: Services): Router {
   router.use(probationDocumentsRouter(services))
   router.use(visitsRouter(services))
   router.use(addressRouter(services))
+  router.use(personalRouter(services))
 
   get(
     '/prisoner/:prisonerNumber/schedule',

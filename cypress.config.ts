@@ -24,6 +24,7 @@ import calcluateReleaseDatesApi from './integration_tests/mockApis/calculateRele
 import contentful from './integration_tests/mockApis/contentful'
 import alertsApi from './integration_tests/mockApis/alertsApi'
 import componentApi from './integration_tests/mockApis/componentApi'
+import prisonPersonApi from './integration_tests/mockApis/prisonPerson'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -66,6 +67,7 @@ export default defineConfig({
         ...contentful,
         ...alertsApi,
         ...componentApi,
+        ...prisonPersonApi,
       })
     },
     baseUrl: 'http://localhost:3007',

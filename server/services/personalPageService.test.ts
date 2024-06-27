@@ -44,6 +44,7 @@ describe('PersonalPageService', () => {
         prisonerNumber: 'abc123',
         physicalAttributes: { height: 100, weight: 100 },
       })),
+      updatePhysicalAttributes: jest.fn(),
     }
   })
 
