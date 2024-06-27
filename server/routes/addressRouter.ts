@@ -5,7 +5,7 @@ import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest } from './routerUtils'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function addressRouter(services: Services): Router {
   const router = Router()
@@ -17,7 +17,7 @@ export default function addressRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/addresses',
     auditPageAccessAttempt({ services, page: Page.Addresses }),
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getStandardAccessPermission),
     (req, res, next) => addressController.displayAddresses(req, res),
   )
 

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { mapHeaderNoBannerData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { formatName, userHasRoles } from '../utils/utils'
+import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { AuditService, Page } from '../services/auditService'
@@ -24,7 +24,7 @@ export default class LocationDetailsController {
     const { prisonerNumber, bookingId, firstName, middleNames, lastName, prisonId } = prisonerData
     const name = formatName(firstName, middleNames, lastName, { style: NameFormatStyle.firstLast })
     const profileUrl = `/prisoner/${prisonerNumber}`
-    const { clientToken } = req.middleware
+    const { clientToken, permissions } = req.middleware
 
     const isTransfer = prisonId === 'TRN'
     const isReleased = prisonId === 'OUT'
@@ -39,7 +39,7 @@ export default class LocationDetailsController {
     const currentLocation = !isInactiveBooking && locationDetailsLatestFirst[0]
     const previousLocations = isInactiveBooking ? locationDetailsLatestFirst : locationDetailsLatestFirst.slice(1)
 
-    const canViewCellMoveButton = userHasRoles(['CELL_MOVE'], res.locals.user.userRoles)
+    const canViewCellMoveButton = permissions.cellMove?.edit
     const canViewMoveToReceptionButton = canViewCellMoveButton && currentLocation?.location !== 'Reception'
     const receptionIsFull =
       canViewMoveToReceptionButton && (await this.locationDetailsService.isReceptionFull(clientToken, prisonId))

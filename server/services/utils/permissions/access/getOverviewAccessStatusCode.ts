@@ -1,8 +1,8 @@
-import { isInUsersCaseLoad, userHasRoles } from '../../../utils/utils'
-import { Role } from '../../../data/enums/role'
-import { HmppsStatusCode } from '../../../data/enums/hmppsStatusCode'
-import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
-import { HmppsUser } from '../../../interfaces/HmppsUser'
+import { isInUsersCaseLoad, userHasRoles } from '../../../../utils/utils'
+import { Role } from '../../../../data/enums/role'
+import { HmppsStatusCode } from '../../../../data/enums/hmppsStatusCode'
+import Prisoner from '../../../../data/interfaces/prisonerSearchApi/Prisoner'
+import { HmppsUser } from '../../../../interfaces/HmppsUser'
 
 export default function getOverviewAccessStatusCode(user: HmppsUser, prisoner: Prisoner): HmppsStatusCode {
   const { userRoles } = user

@@ -1,8 +1,8 @@
-import { isInUsersCaseLoad } from '../../../utils/utils'
-import { HmppsStatusCode } from '../../../data/enums/hmppsStatusCode'
+import { isInUsersCaseLoad } from '../../../../utils/utils'
+import { HmppsStatusCode } from '../../../../data/enums/hmppsStatusCode'
 import getOverviewAccessStatusCode from './getOverviewAccessStatusCode'
-import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
-import { HmppsUser } from '../../../interfaces/HmppsUser'
+import Prisoner from '../../../../data/interfaces/prisonerSearchApi/Prisoner'
+import { HmppsUser } from '../../../../interfaces/HmppsUser'
 
 export default function getMoneyAccessStatusCode(user: HmppsUser, prisoner: Prisoner): HmppsStatusCode {
   if (prisoner.prisonId === 'OUT') return HmppsStatusCode.PRISONER_IS_RELEASED

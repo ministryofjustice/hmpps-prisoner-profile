@@ -36,6 +36,7 @@ describe('Alerts Controller', () => {
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
           alertSummaryData: { alertFlags: alertFlagLabels },
+          permissions: { alerts: { edit: false } },
         },
       }
       res = {
@@ -230,15 +231,20 @@ describe('Alerts Controller', () => {
         .mockResolvedValue({ pagedAlerts: pagedActiveAlertsMock })
       jest.spyOn(headerMappers, 'mapHeaderData')
 
-      req.middleware.prisonerData = { ...PrisonerMockDataA, prisonId: 'TRN' }
-      req.middleware.inmateDetail = inmateDetailMock
+      const reqWithEditPerms = {
+        ...req,
+        middleware: {
+          ...req.middleware,
+          permissions: { alerts: { edit: true } },
+        },
+      }
 
-      await controller.displayAlerts(req, res, next, true)
+      await controller.displayAlerts(reqWithEditPerms, res, next, true)
 
       expect(getAlertsSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
         'MDI',
-        { ...PrisonerMockDataA, prisonId: 'TRN' },
+        PrisonerMockDataA,
         req.middleware.alertSummaryData,
         {
           alertStatus: 'ACTIVE',

@@ -4,14 +4,14 @@ import { Role } from '../../../data/enums/role'
 
 describe('getActivityPermissions.ts', () => {
   test.each`
-    user       | prisoner                                    | roles                 | editVisible
+    user       | prisoner                                    | roles                 | editPermitted
     ${userMDI} | ${prisonerMDI}                              | ${[]}                 | ${false}
     ${userMDI} | ${prisonerMDI}                              | ${[Role.ActivityHub]} | ${true}
     ${userLEI} | ${prisonerMDI}                              | ${[Role.ActivityHub]} | ${false}
     ${userMDI} | ${{ ...prisonerMDI, status: 'ACTIVE OUT' }} | ${[Role.ActivityHub]} | ${false}
-  `('roles: $roles; edit: editVisible', async ({ user, prisoner, roles, editVisible }) => {
+  `('roles: $roles; edit: editPermitted', async ({ user, prisoner, roles, editPermitted }) => {
     const permissions = getActivityPermissions({ ...user, userRoles: [...roles] }, prisoner)
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

@@ -16,7 +16,7 @@ const caseLoadListWithLei = [
 
 describe('getUseOfForcePermissions', () => {
   test.each`
-    user                                              | prisoner                 | roles                      | editVisible
+    user                                              | prisoner                 | roles                      | editPermitted
     ${userMDI}                                        | ${prisonerMDI}           | ${[]}                      | ${true}
     ${userMDI}                                        | ${restrictedPrisonerMDI} | ${[]}                      | ${false}
     ${userLEI}                                        | ${prisonerMDI}           | ${[]}                      | ${false}
@@ -27,9 +27,9 @@ describe('getUseOfForcePermissions', () => {
     ${userLEI}                                        | ${prisonerTRN}           | ${[Role.InactiveBookings]} | ${true}
     ${userLEI}                                        | ${restrictedPrisonerMDI} | ${[Role.InactiveBookings]} | ${false}
     ${userLEI}                                        | ${restrictedPrisonerMDI} | ${[Role.PomUser]}          | ${false}
-  `('roles: $roles; view: $editVisible', async ({ user, prisoner, roles, editVisible }) => {
+  `('roles: $roles; edit: $editPermitted', async ({ user, prisoner, roles, editPermitted }) => {
     const permissions = getUseOfForcePermissions({ ...user, userRoles: [...roles] }, prisoner)
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

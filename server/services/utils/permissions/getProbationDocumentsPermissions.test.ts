@@ -4,7 +4,7 @@ import { Role } from '../../../data/enums/role'
 
 describe('getProbationDocumentsPermissions.ts', () => {
   test.each`
-    user       | prisoner       | roles                                          | viewVisible
+    user       | prisoner       | roles                                          | viewPermitted
     ${userMDI} | ${prisonerMDI} | ${[]}                                          | ${false}
     ${userMDI} | ${prisonerMDI} | ${[Role.PomUser]}                              | ${true}
     ${userMDI} | ${prisonerMDI} | ${[Role.ViewProbationDocuments]}               | ${true}
@@ -14,9 +14,9 @@ describe('getProbationDocumentsPermissions.ts', () => {
     ${userLEI} | ${prisonerOUT} | ${[]}                                          | ${false}
     ${userLEI} | ${prisonerTRN} | ${[Role.ViewProbationDocuments]}               | ${true}
     ${userLEI} | ${prisonerTRN} | ${[]}                                          | ${false}
-  `('roles: $roles; view: $viewVisible', async ({ user, prisoner, roles, viewVisible }) => {
+  `('roles: $roles; view: $viewPermitted', async ({ user, prisoner, roles, viewPermitted }) => {
     const permissions = getProbationDocumentsPermissions({ ...user, userRoles: [...roles] }, prisoner)
 
-    expect(permissions.view).toEqual(viewVisible)
+    expect(permissions.view).toEqual(viewPermitted)
   })
 })

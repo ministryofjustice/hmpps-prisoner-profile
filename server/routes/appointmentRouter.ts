@@ -2,7 +2,6 @@ import { NextFunction, Request, Response, Router } from 'express'
 import { Services } from '../services'
 import AppointmentController from '../controllers/appointmentController'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { AppointmentValidator } from '../validators/appointmentValidator'
 import { PrePostAppointmentValidator } from '../validators/prePostAppointmentValidator'
@@ -12,6 +11,7 @@ import { ApiAction, Page } from '../services/auditService'
 import { notifyClient } from '../utils/notifyClient'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import { getRequest, postRequest } from './routerUtils'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
@@ -39,7 +39,7 @@ export default function appointmentRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.AddAppointment }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.displayAddAppointment(),
   )
   post(
@@ -52,7 +52,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/appointment-confirmation',
     auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.displayAppointmentConfirmation(),
   )
 
@@ -60,7 +60,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/prepost-appointments',
     auditPageAccessAttempt({ services, page: Page.PrePostAppointments }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.displayPrePostAppointments(),
   )
   post(
@@ -73,7 +73,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/prepost-appointment-confirmation',
     auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.displayPrePostAppointmentConfirmation(),
   )
 
@@ -81,7 +81,7 @@ export default function appointmentRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/movement-slips',
     auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.displayPrisonerMovementSlips(),
   )
 
@@ -93,7 +93,7 @@ export default function appointmentRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: ApiAction.OffenderEvents }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload({ activeCaseloadOnly: true }),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.getOffenderEvents(),
   )
 
