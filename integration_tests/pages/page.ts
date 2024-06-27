@@ -30,4 +30,6 @@ export default abstract class Page {
   apiErrorBanner = (): PageElement => cy.get('.hmpps-api-error-banner')
 
   flashMessage = (): PageElement => cy.get('.hmpps-flash-message')
+
+  errorMessage = (): PageElement => cy.get('.govuk-error-summary')
 }

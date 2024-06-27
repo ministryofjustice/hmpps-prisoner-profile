@@ -8,7 +8,9 @@ export default class EditPage extends Page {
   fillInTextFields = (fields: { [key: string]: string }) => {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`input[name='${key}']`).clear()
-      cy.get(`input[name='${key}']`).type(value)
+      if (value) {
+        cy.get(`input[name='${key}']`).type(value)
+      }
     })
   }
 
