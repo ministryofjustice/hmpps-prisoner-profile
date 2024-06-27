@@ -75,7 +75,7 @@ export default class PersonalController {
             }),
             errors: hasLength(errors) ? errors : [],
             fieldName: 'Height',
-            fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson.physicalAttributes.height,
+            fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalAttributes.height,
             fieldSuffix: 'cm',
           })
         },
@@ -96,7 +96,7 @@ export default class PersonalController {
             try {
               await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
                 height,
-                weight: prisonPerson.physicalAttributes.weight ?? null,
+                weight: prisonPerson?.physicalAttributes.weight ?? null,
               })
 
               req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
@@ -119,7 +119,7 @@ export default class PersonalController {
           const prisonerData: Prisoner = req.middleware?.prisonerData
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const { feet, inches } = centimetresToFeetAndInches(prisonPerson.physicalAttributes.height)
+          const { feet, inches } = centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
 
           const feetValueFlash = req.flash('feetValue')
           const inchesValueFlash = req.flash('inchesValue')
@@ -157,7 +157,7 @@ export default class PersonalController {
               const height = feetAndInchesToCentimetres(feet, inches)
               await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
                 height,
-                weight: prisonPerson.physicalAttributes.weight,
+                weight: prisonPerson?.physicalAttributes.weight,
               })
 
               req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
