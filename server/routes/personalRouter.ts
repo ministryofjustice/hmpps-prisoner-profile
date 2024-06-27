@@ -4,7 +4,6 @@ import PersonalController from '../controllers/personalController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import { Services } from '../services'
 import permissionsGuard from '../middleware/permissionsGuard'
 import { userHasRoles } from '../utils/utils'
@@ -49,7 +48,7 @@ export default function personalRouter(services: Services): Router {
     `${basePath}/edit/height`,
     // TODO: Add role check here
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     editRouteChecks(),
     personalController.height().metric.edit,
   )
@@ -58,7 +57,7 @@ export default function personalRouter(services: Services): Router {
     `${basePath}/edit/height`,
     // TODO: Add role check here
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     editRouteChecks(),
     personalController.height().metric.submit,
   )
@@ -68,7 +67,7 @@ export default function personalRouter(services: Services): Router {
     `${basePath}/edit/height/imperial`,
     // TODO: Add role check here
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     editRouteChecks(),
     personalController.height().imperial.edit,
   )
@@ -77,7 +76,7 @@ export default function personalRouter(services: Services): Router {
     `${basePath}/edit/height/imperial`,
     // TODO: Add role check here
     getPrisonerData(services),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
     editRouteChecks(),
     personalController.height().imperial.submit,
   )
