@@ -17,6 +17,7 @@ export default function appointmentRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
   const post = postRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const appointmentController = new AppointmentController(
     services.appointmentService,
@@ -35,7 +36,7 @@ export default function appointmentRouter(services: Services): Router {
   }
 
   get(
-    '/prisoner/:prisonerNumber/add-appointment',
+    `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.AddAppointment }),
     isCreateIndividualAppointmentRolledOut,
     getPrisonerData(services),
@@ -43,13 +44,13 @@ export default function appointmentRouter(services: Services): Router {
     appointmentController.displayAddAppointment(),
   )
   post(
-    '/prisoner/:prisonerNumber/add-appointment',
+    `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
     validationMiddleware(AppointmentValidator),
     appointmentController.post(),
   )
   get(
-    '/prisoner/:prisonerNumber/appointment-confirmation',
+    `${basePath}/appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.AppointmentConfirmation }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getAppointmentPermissions),
@@ -57,20 +58,20 @@ export default function appointmentRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/prepost-appointments',
+    `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointments }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getAppointmentPermissions),
     appointmentController.displayPrePostAppointments(),
   )
   post(
-    '/prisoner/:prisonerNumber/prepost-appointments',
+    `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PostPrePostAppointments }),
     validationMiddleware(PrePostAppointmentValidator),
     appointmentController.postVideoLinkBooking(),
   )
   get(
-    '/prisoner/:prisonerNumber/prepost-appointment-confirmation',
+    `${basePath}/prepost-appointment-confirmation`,
     auditPageAccessAttempt({ services, page: Page.PrePostAppointmentConfirmation }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getAppointmentPermissions),
@@ -78,7 +79,7 @@ export default function appointmentRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/movement-slips',
+    `${basePath}/movement-slips`,
     auditPageAccessAttempt({ services, page: Page.AppointmentMovementSlips }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getAppointmentPermissions),

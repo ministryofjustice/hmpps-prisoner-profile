@@ -13,7 +13,7 @@ import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
-  const basePath = '/prisoner/:prisonerNumber/personal'
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})/personal'
   const get = getRequest(router)
   const post = postRequest(router)
 

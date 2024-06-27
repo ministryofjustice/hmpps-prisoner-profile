@@ -10,6 +10,7 @@ import permissionsGuard from '../middleware/permissionsGuard'
 export default function locationDetailsRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const prisonerLocationDetailsController = new LocationDetailsController(
     services.prisonerLocationDetailsPageService,
@@ -17,7 +18,7 @@ export default function locationDetailsRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/location-details',
+    `${basePath}/location-details`,
     auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getLocationPermissions),

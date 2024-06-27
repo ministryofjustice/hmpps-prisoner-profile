@@ -10,6 +10,7 @@ import permissionsGuard from '../middleware/permissionsGuard'
 export default function probationDocumentsRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const probationDocumentsController = new ProbationDocumentsController(
     services.probationDocumentsService,
@@ -17,7 +18,7 @@ export default function probationDocumentsRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/probation-documents',
+    `${basePath}/probation-documents`,
     auditPageAccessAttempt({ services, page: Page.ProbationDocuments }),
     getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getProbationDocumentsPermissions),

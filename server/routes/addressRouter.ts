@@ -10,11 +10,12 @@ import permissionsGuard from '../middleware/permissionsGuard'
 export default function addressRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const addressController = new AddressController(services.addressService, services.auditService)
 
   get(
-    '/prisoner/:prisonerNumber/addresses',
+    `${basePath}/addresses`,
     auditPageAccessAttempt({ services, page: Page.Addresses }),
     getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getStandardAccessPermission),

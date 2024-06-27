@@ -10,11 +10,12 @@ import checkCsraAccess from '../middleware/checkCsraAccessMiddleware'
 export default function alertsRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const csraController = new CsraController(services.csraService, services.auditService)
 
   get(
-    '/prisoner/:prisonerNumber/csra-history',
+    `${basePath}/csra-history`,
     auditPageAccessAttempt({ services, page: Page.CsraHistory }),
     getPrisonerData(services, { minimal: true }),
     checkCsraAccess(),
@@ -22,7 +23,7 @@ export default function alertsRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/csra-review',
+    `${basePath}/csra-review`,
     auditPageAccessAttempt({ services, page: Page.CsraReview }),
     getPrisonerData(services, { minimal: true }),
     checkCsraAccess(),
