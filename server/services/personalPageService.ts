@@ -327,8 +327,8 @@ export default class PersonalPageService {
     let weight = prisonerData.weightKilograms ? `${prisonerData.weightKilograms}kg` : 'Not entered'
 
     if (prisonPerson) {
-      height = prisonPerson.physicalAttributes.height.toString()
-      weight = prisonPerson.physicalAttributes.weight.toString()
+      height = prisonPerson?.physicalAttributes?.height?.toString()
+      weight = prisonPerson?.physicalAttributes?.weight?.toString()
     }
 
     return {

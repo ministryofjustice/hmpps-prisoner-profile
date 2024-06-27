@@ -14,7 +14,7 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   }
 
   async getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson> {
-    return this.restClient.get<PrisonPerson>({ path: `/prisoners/${prisonerNumber}` })
+    return this.restClient.get<PrisonPerson>({ path: `/prisoners/${prisonerNumber}`, ignore404: true })
   }
 
   // PUT endpoints
