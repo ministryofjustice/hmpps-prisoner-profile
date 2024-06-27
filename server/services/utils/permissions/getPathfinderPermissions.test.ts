@@ -4,7 +4,7 @@ import getPathfinderPermissions from './getPathfinderPermissions'
 
 describe('getSocPermission', () => {
   test.each`
-    roles                              | viewVisible
+    roles                              | viewPermitted
     ${[]}                              | ${false}
     ${[Role.PathfinderApproval]}       | ${true}
     ${[Role.PathfinderStdPrison]}      | ${true}
@@ -15,14 +15,14 @@ describe('getSocPermission', () => {
     ${[Role.PathfinderNationalReader]} | ${true}
     ${[Role.PathfinderPolice]}         | ${true}
     ${[Role.PathfinderPsychologist]}   | ${true}
-  `('roles: $roles; view: $viewVisible', async ({ roles, viewVisible }) => {
+  `('roles: $roles; view: $viewPermitted', async ({ roles, viewPermitted }) => {
     const permissions = getPathfinderPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.view).toEqual(viewVisible)
+    expect(permissions.view).toEqual(viewPermitted)
   })
 
   test.each`
-    roles                              | editVisible
+    roles                              | editPermitted
     ${[]}                              | ${false}
     ${[Role.PathfinderApproval]}       | ${true}
     ${[Role.PathfinderStdPrison]}      | ${true}
@@ -33,9 +33,9 @@ describe('getSocPermission', () => {
     ${[Role.PathfinderNationalReader]} | ${false}
     ${[Role.PathfinderPolice]}         | ${false}
     ${[Role.PathfinderPsychologist]}   | ${false}
-  `('roles: $roles; edit: editVisible', async ({ roles, editVisible }) => {
+  `('roles: $roles; edit: editPermitted', async ({ roles, editPermitted }) => {
     const permissions = getPathfinderPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })

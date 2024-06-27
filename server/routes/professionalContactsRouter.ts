@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import ProfessionalContactsController from '../controllers/professionalContactsController'
 import { getRequest } from './routerUtils'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function professionalContactsRouter(services: Services): Router {
   const router = Router()
@@ -14,7 +14,7 @@ export default function professionalContactsRouter(services: Services): Router {
   get(
     '/prisoner/:prisonerNumber/professional-contacts',
     getPrisonerData(services, { minimal: true }),
-    checkPrisonerInCaseload(),
+    permissionsGuard(services.permissionsService.getStandardAccessPermission),
     (req, res, next) => professionalContactsController.displayProfessionalContacts(req, res),
   )
 

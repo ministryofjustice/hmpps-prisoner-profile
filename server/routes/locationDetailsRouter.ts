@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
-import checkPrisonerInCaseload from '../middleware/checkPrisonerInCaseloadMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { Page } from '../services/auditService'
 import { getRequest } from './routerUtils'
 import LocationDetailsController from '../controllers/locationDetailsController'
+import permissionsGuard from '../middleware/permissionsGuard'
 
 export default function locationDetailsRouter(services: Services): Router {
   const router = Router()
@@ -20,7 +20,7 @@ export default function locationDetailsRouter(services: Services): Router {
     '/prisoner/:prisonerNumber/location-details',
     auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
     getPrisonerData(services),
-    checkPrisonerInCaseload({ allowInactive: true }),
+    permissionsGuard(services.permissionsService.getLocationPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       return prisonerLocationDetailsController.displayLocationDetails(req, res, prisonerData)

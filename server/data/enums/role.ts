@@ -5,6 +5,7 @@ export enum Role {
   AdjustmentsMaintainer = 'ROLE_ADJUSTMENTS_MAINTAINER',
   ApproveCategorisation = 'ROLE_APPROVE_CATEGORISATION',
   CategorisationSecurity = 'ROLE_CATEGORISATION_SECURITY',
+  CellMove = 'ROLE_CELL_MOVE',
   CreateCategorisation = 'ROLE_CREATE_CATEGORISATION',
   CreateRecategorisation = 'ROLE_CREATE_RECATEGORISATION',
   DeleteSensitiveCaseNotes = 'ROLE_DELETE_SENSITIVE_CASE_NOTES',

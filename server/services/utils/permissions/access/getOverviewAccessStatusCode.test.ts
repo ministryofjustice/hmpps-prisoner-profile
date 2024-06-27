@@ -1,5 +1,5 @@
-import { HmppsStatusCode } from '../../../data/enums/hmppsStatusCode'
-import { Role } from '../../../data/enums/role'
+import { HmppsStatusCode } from '../../../../data/enums/hmppsStatusCode'
+import { Role } from '../../../../data/enums/role'
 import getOverviewAccessStatusCode from './getOverviewAccessStatusCode'
 import {
   prisonerMDI,
@@ -8,7 +8,7 @@ import {
   restrictedPrisonerMDI,
   userLEI,
   userMDI,
-} from '../../../../tests/mocks/userMocks'
+} from '../../../../../tests/mocks/userMocks'
 
 describe('getOverviewAccessStatusCode.ts', () => {
   test.each`
@@ -29,7 +29,7 @@ describe('getOverviewAccessStatusCode.ts', () => {
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.GlobalSearch]}     | ${HmppsStatusCode.OK}
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.PomUser]}          | ${HmppsStatusCode.OK}
     ${userMDI} | ${prisonerMDI}                                             | ${[]}                      | ${HmppsStatusCode.OK}
-  `('some name', async ({ user, prisoner, roles, expected }) => {
+  `(' User should receive correct access code', async ({ user, prisoner, roles, expected }) => {
     const accessCode = await getOverviewAccessStatusCode({ ...user, userRoles: [...roles] }, prisoner)
 
     expect(accessCode).toEqual(expected)

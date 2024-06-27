@@ -3,8 +3,7 @@ import { addDays, isToday, subDays } from 'date-fns'
 import { HttpError } from 'http-errors'
 import AlertsService from '../services/alertsService'
 import { mapHeaderData } from '../mappers/headerMappers'
-import { Role } from '../data/enums/role'
-import { formatLocation, formatName, sortByDateTime, userCanEdit, userHasRoles } from '../utils/utils'
+import { formatLocation, formatName, sortByDateTime } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO, parseDate } from '../utils/dateHelpers'
 import { AlertForm } from '../data/interfaces/prisonApi/PrisonApiAlert'
@@ -45,14 +44,9 @@ export default class AlertsController {
       queryParams.sort = 'dateCreated,DESC'
     }
 
-    // Set role based permissions
-    const canUpdateAlert =
-      userHasRoles([Role.UpdateAlert], res.locals.user.userRoles) && userCanEdit(res.locals.user, prisonerData)
+    const canUpdateAlert = req.middleware.permissions.alerts?.edit
+    const addAlertLinkUrl = canUpdateAlert ? `/prisoner/${prisonerData.prisonerNumber}/add-alert` : undefined
 
-    let addAlertLinkUrl: string
-    if (canUpdateAlert) {
-      addAlertLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/add-alert`
-    }
     // Get alerts based on given query params
     const { pagedAlerts, ...alertsPageData } = await this.alertsService.get(
       clientToken,

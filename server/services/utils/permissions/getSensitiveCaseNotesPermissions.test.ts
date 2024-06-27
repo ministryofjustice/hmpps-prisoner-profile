@@ -4,40 +4,40 @@ import getSensitiveCaseNotesPermissions from './getSensitiveCaseNotesPermissions
 
 describe('getOverviewAccessStatusCode.ts', () => {
   test.each`
-    roles                            | viewVisible
+    roles                            | viewPermitted
     ${[]}                            | ${false}
     ${[Role.PomUser]}                | ${true}
     ${[Role.ViewSensitiveCaseNotes]} | ${true}
     ${[Role.AddSensitiveCaseNotes]}  | ${true}
-  `('roles: $roles; view: $viewVisible', async ({ roles, viewVisible }) => {
+  `('roles: $roles; view: $viewPermitted', async ({ roles, viewPermitted }) => {
     const permissions = getSensitiveCaseNotesPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.view).toEqual(viewVisible)
+    expect(permissions.view).toEqual(viewPermitted)
   })
 
   test.each`
-    roles                              | deleteVisible
+    roles                              | deletePermitted
     ${[]}                              | ${false}
     ${[Role.PomUser]}                  | ${false}
     ${[Role.ViewSensitiveCaseNotes]}   | ${false}
     ${[Role.AddSensitiveCaseNotes]}    | ${false}
     ${[Role.DeleteSensitiveCaseNotes]} | ${true}
-  `('roles: $roles; delete: deleteVisible', async ({ roles, deleteVisible }) => {
+  `('roles: $roles; delete: deletePermitted', async ({ roles, deletePermitted }) => {
     const permissions = getSensitiveCaseNotesPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.delete).toEqual(deleteVisible)
+    expect(permissions.delete).toEqual(deletePermitted)
   })
 
   test.each`
-    roles                              | editVisible
+    roles                              | editPermitted
     ${[]}                              | ${false}
     ${[Role.PomUser]}                  | ${true}
     ${[Role.ViewSensitiveCaseNotes]}   | ${false}
     ${[Role.AddSensitiveCaseNotes]}    | ${true}
     ${[Role.DeleteSensitiveCaseNotes]} | ${false}
-  `('roles: $roles; edit: $viewVisible', async ({ roles, editVisible }) => {
+  `('roles: $roles; edit: $viewPermitted', async ({ roles, editPermitted }) => {
     const permissions = getSensitiveCaseNotesPermissions({ ...userMDI, userRoles: [...roles] })
 
-    expect(permissions.edit).toEqual(editVisible)
+    expect(permissions.edit).toEqual(editPermitted)
   })
 })
