@@ -28,8 +28,8 @@ export default class AlertsApiRestClient implements AlertsApiClient {
     return this.restClient.get<Alert>({ path: `/alerts/${alertId}` })
   }
 
-  async createAlert(alert: CreateAlert): Promise<Alert> {
-    return this.restClient.post<Alert>({ path: `/alerts`, data: alert })
+  async createAlert(prisonerNumber: string, alert: CreateAlert): Promise<Alert> {
+    return this.restClient.post<Alert>({ path: `/prisoners/${prisonerNumber}/alerts`, data: alert })
   }
 
   async updateAlert(alertId: string, alertChanges: AlertChanges): Promise<Alert> {

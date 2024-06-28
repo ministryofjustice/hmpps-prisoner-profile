@@ -4,7 +4,7 @@ import { Alert, AlertChanges, AlertsApiQueryParams, AlertType, CreateAlert } fro
 export interface AlertsApiClient {
   getAlerts(prisonerNumber: string, queryParams: AlertsApiQueryParams): Promise<PagedList<Alert>>
   getAlertDetails(alertId: string): Promise<Alert>
-  createAlert(alert: CreateAlert): Promise<Alert>
+  createAlert(prisonerNumber: string, alert: CreateAlert): Promise<Alert>
   updateAlert(alertId: string, alertChanges: AlertChanges): Promise<Alert>
   getAlertTypes(): Promise<AlertType[]>
 }
