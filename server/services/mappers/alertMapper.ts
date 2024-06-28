@@ -106,9 +106,8 @@ export const toPrisonApiCreateAlert = (alertForm: AlertForm): PrisonApiCreateAle
   }
 }
 
-export const toAlertsApiCreateAlert = (alertForm: AlertForm, prisonerNumber: string): CreateAlert => {
+export const toAlertsApiCreateAlert = (alertForm: AlertForm): CreateAlert => {
   return {
-    prisonNumber: prisonerNumber,
     alertCode: alertForm.alertCode,
     description: alertForm.description,
     activeFrom: formatDateISO(parseDate(alertForm.activeFrom)),

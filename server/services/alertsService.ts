@@ -224,7 +224,7 @@ export default class AlertsService {
 
     if (alertsApiEnabled) {
       const alertsApiClient = this.alertsApiClientBuilder(token)
-      const alert = await alertsApiClient.createAlert(prisonerNumber, toAlertsApiCreateAlert(alertForm, prisonerNumber))
+      const alert = await alertsApiClient.createAlert(prisonerNumber, toAlertsApiCreateAlert(alertForm))
 
       return capitaliseAlertDisplayNames(alert)
     }
