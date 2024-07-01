@@ -204,7 +204,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `/alertsApi/alerts`,
+        urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts`,
       },
       response: {
         status: 200,

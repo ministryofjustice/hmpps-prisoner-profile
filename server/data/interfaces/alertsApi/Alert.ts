@@ -73,7 +73,6 @@ export interface AlertType {
 }
 
 export interface CreateAlert {
-  prisonNumber: string
   alertCode: string
   description: string
   authorisedBy?: string
