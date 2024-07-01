@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express'
+import { NextFunction, Request, RequestHandler, Response, Router } from 'express'
 import { getRequest, postRequest } from './routerUtils'
 import PersonalController from '../controllers/personalController'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
@@ -43,43 +43,55 @@ export default function personalRouter(services: Services): Router {
     )
   }
 
-  // Height - Metric
-  get(
-    `${basePath}/edit/height`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.height().metric.edit,
-  )
+  const editRoute = ({
+    url,
+    getMethod,
+    submitMethod,
+  }: {
+    url: string
+    getMethod: RequestHandler
+    submitMethod: RequestHandler
+  }) => {
+    get(
+      url,
+      getPrisonerData(services),
+      permissionsGuard(services.permissionsService.getOverviewPermissions),
+      editRouteChecks(),
+      getMethod,
+    )
 
-  post(
-    `${basePath}/edit/height`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.height().metric.submit,
-  )
+    post(
+      url,
+      getPrisonerData(services),
+      permissionsGuard(services.permissionsService.getOverviewPermissions),
+      editRouteChecks(),
+      submitMethod,
+    )
+  }
 
-  // Height - Imperial
-  get(
-    `${basePath}/edit/height/imperial`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.height().imperial.edit,
-  )
+  editRoute({
+    url: `${basePath}/edit/height`,
+    getMethod: personalController.height().metric.edit,
+    submitMethod: personalController.height().metric.submit,
+  })
 
-  post(
-    `${basePath}/edit/height/imperial`,
-    // TODO: Add role check here
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.height().imperial.submit,
-  )
+  editRoute({
+    url: `${basePath}/edit/height/imperial`,
+    getMethod: personalController.height().imperial.edit,
+    submitMethod: personalController.height().imperial.submit,
+  })
+
+  editRoute({
+    url: `${basePath}/edit/weight`,
+    getMethod: personalController.weight().metric.edit,
+    submitMethod: personalController.weight().metric.submit,
+  })
+
+  editRoute({
+    url: `${basePath}/edit/weight/imperial`,
+    getMethod: personalController.weight().imperial.edit,
+    submitMethod: personalController.weight().imperial.submit,
+  })
 
   return router
 }
