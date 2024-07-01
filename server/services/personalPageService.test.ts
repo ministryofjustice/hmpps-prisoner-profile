@@ -479,8 +479,8 @@ describe('PersonalPageService', () => {
   describe('Prison Person API Enabled', () => {
     it('Sets the height and weight on the prison person API', async () => {
       const data = await constructService().get('token', PrisonerMockDataA, true)
-      expect(data.physicalCharacteristics.height).toBe('100')
-      expect(data.physicalCharacteristics.weight).toBe('100')
+      expect(data.physicalCharacteristics.height).toBe('1m')
+      expect(data.physicalCharacteristics.weight).toBe('100kg')
     })
   })
 })
