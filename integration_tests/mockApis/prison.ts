@@ -845,7 +845,7 @@ export default {
 
   stubGetFullStatus: (prisonerNumber: string) => {
     let jsonResp: FullStatus
-    if (prisonerNumber === 'ONREMAND') {
+    if (prisonerNumber === 'X9999XX') {
       jsonResp = fullStatusRemandMock
     } else {
       jsonResp = fullStatusMock

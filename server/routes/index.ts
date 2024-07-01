@@ -35,6 +35,7 @@ export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 export default function routes(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   router.use(async (req, res, next) => {
     res.locals = {
@@ -84,7 +85,7 @@ export default function routes(services: Services): Router {
   const careNeedsController = new CareNeedsController(services.careNeedsService, services.auditService)
 
   get(
-    '/api/prisoner/:prisonerNumber/image',
+    `/api${basePath}/image`,
     auditPageAccessAttempt({ services, page: ApiAction.PrisonerImage }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -98,7 +99,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber',
+    `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -108,7 +109,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/image',
+    `${basePath}/image`,
     auditPageAccessAttempt({ services, page: Page.Photo }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -133,7 +134,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/work-and-skills',
+    `${basePath}/work-and-skills`,
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -195,7 +196,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/offences',
+    `${basePath}/offences`,
     auditPageAccessAttempt({ services, page: Page.Offences }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -237,7 +238,7 @@ export default function routes(services: Services): Router {
   router.use(personalRouter(services))
 
   get(
-    '/prisoner/:prisonerNumber/schedule',
+    `${basePath}/schedule`,
     auditPageAccessAttempt({ services, page: Page.Schedule }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -248,7 +249,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/x-ray-body-scans',
+    `${basePath}/x-ray-body-scans`,
     auditPageAccessAttempt({ services, page: Page.XRayBodyScans }),
     getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -258,7 +259,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/location-history',
+    `${basePath}/location-history`,
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
@@ -271,14 +272,14 @@ export default function routes(services: Services): Router {
   )
 
   router.use(
-    '/prisoner/:prisonerNumber/money',
+    `${basePath}/money`,
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getMoneyPermissions),
     moneyRouter(services),
   )
 
   get(
-    '/prisoner/:prisonerNumber/religion-belief-history',
+    `${basePath}/religion-belief-history`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -288,7 +289,7 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/past-care-needs',
+    `${basePath}/past-care-needs`,
     auditPageAccessAttempt({ services, page: Page.ReligionBeliefHistory }),
     getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
