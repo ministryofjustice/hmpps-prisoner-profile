@@ -19,7 +19,7 @@ const visitOverviewPageAlt = (): OverviewPage => {
 }
 
 const visitOverviewPageOnRemand = (): OverviewPage => {
-  cy.signIn({ redirectPath: '/prisoner/ONREMAND' })
+  cy.signIn({ redirectPath: '/prisoner/X9999XX' })
   return Page.verifyOnPage(OverviewPage)
 }
 
@@ -595,7 +595,7 @@ context('Overview Page', () => {
       cy.setupUserAuth({
         roles: ['ROLE_GLOBAL_SEARCH'],
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'ONREMAND', bookingId: 1234568 })
+      cy.setupOverviewPageStubs({ prisonerNumber: 'X9999XX', bookingId: 1234568 })
     })
 
     context('Main offence overview', () => {

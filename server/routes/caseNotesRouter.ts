@@ -14,6 +14,7 @@ export default function caseNotesRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
   const post = postRequest(router)
+  const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const caseNotesController = new CaseNotesController(
     services.dataAccess.prisonApiClientBuilder,
@@ -22,7 +23,7 @@ export default function caseNotesRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/case-notes',
+    `${basePath}/case-notes`,
     auditPageAccessAttempt({ services, page: Page.CaseNotes }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),
@@ -30,7 +31,7 @@ export default function caseNotesRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/add-case-note',
+    `${basePath}/add-case-note`,
     auditPageAccessAttempt({ services, page: Page.AddCaseNote }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),
@@ -38,7 +39,7 @@ export default function caseNotesRouter(services: Services): Router {
   )
 
   post(
-    '/prisoner/:prisonerNumber/add-case-note',
+    `${basePath}/add-case-note`,
     auditPageAccessAttempt({ services, page: Page.PostAddCaseNote }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),
@@ -47,7 +48,7 @@ export default function caseNotesRouter(services: Services): Router {
   )
 
   get(
-    '/prisoner/:prisonerNumber/update-case-note/:caseNoteId',
+    `${basePath}/update-case-note/:caseNoteId`,
     auditPageAccessAttempt({ services, page: Page.UpdateCaseNote }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),
@@ -55,7 +56,7 @@ export default function caseNotesRouter(services: Services): Router {
   )
 
   post(
-    '/prisoner/:prisonerNumber/update-case-note/:caseNoteId',
+    `${basePath}/update-case-note/:caseNoteId`,
     auditPageAccessAttempt({ services, page: Page.PostUpdateCaseNote }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),

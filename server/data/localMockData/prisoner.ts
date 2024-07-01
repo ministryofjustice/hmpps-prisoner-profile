@@ -212,7 +212,7 @@ export const PrisonerMockDataB: Prisoner = {
 }
 
 export const PrisonerOnRemandMockData: Prisoner = {
-  prisonerNumber: 'ONREMAND',
+  prisonerNumber: 'X9999XX',
   pncNumber: '08/359381C',
   pncNumberCanonicalShort: '08/359381C',
   pncNumberCanonicalLong: '2008/359381C',
