@@ -84,7 +84,6 @@ export const services = () => {
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
-    curiousService,
     prisonApiClientBuilder,
     personalLearningPlansService,
   )

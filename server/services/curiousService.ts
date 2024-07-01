@@ -1,4 +1,4 @@
-import { startOfDay, subMonths } from 'date-fns'
+import { startOfDay, startOfToday, subMonths } from 'date-fns'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import logger from '../../logger'
 import PrisonService from './prisonService'
@@ -50,7 +50,7 @@ export default class CuriousService {
       )
 
       const coursesCompletedInLast12Months = [...completedCourses].filter(inPrisonCourse => {
-        const twelveMonthsAgo = startOfDay(subMonths(new Date(), 12))
+        const twelveMonthsAgo = startOfDay(subMonths(startOfToday(), 12))
         return inPrisonCourse.courseCompletionDate >= twelveMonthsAgo
       })
 

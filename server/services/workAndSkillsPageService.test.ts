@@ -1,4 +1,3 @@
-import { format, startOfDay, subMonths } from 'date-fns'
 import dummyScheduledEvents from '../data/localMockData/eventsForToday'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
@@ -24,12 +23,6 @@ import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
-import CuriousService from './curiousService'
-import {
-  aFailureInPrisonCourseRecords,
-  anEmptyInPrisonCourseRecords,
-  aPopulatedInPrisonCourseRecords,
-} from '../data/localMockData/inPrisonCourseRecords'
 
 jest.mock('./mappers/curiousGoalsMapper')
 jest.mock('./educationAndWorkPlanApiPersonalLearningPlanService')
@@ -60,7 +53,6 @@ describe('WorkAndSkillsService', () => {
     getLearnerNeurodivergence: jest.fn(async () => LearnerNeurodivergenceMock),
   }
 
-  const curiousService = new CuriousService(null, null) as jest.Mocked<CuriousService>
   const personalLearningPlanService = new EducationAndWorkPlanApiPersonalLearningPlanService(
     null,
   ) as jest.Mocked<EducationAndWorkPlanApiPersonalLearningPlanService>
@@ -68,7 +60,6 @@ describe('WorkAndSkillsService', () => {
   const workAndSkillsPageServiceConstruct = jest.fn(() => {
     return new WorkAndSkillsPageService(
       () => curiousApiClient,
-      curiousService,
       () => prisonApiClient,
       personalLearningPlanService,
     )
@@ -76,7 +67,6 @@ describe('WorkAndSkillsService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    curiousService.getPrisonerInPrisonCourses.mockResolvedValue(aPopulatedInPrisonCourseRecords())
   })
 
   describe('Scenario A', () => {
@@ -88,67 +78,6 @@ describe('WorkAndSkillsService', () => {
       it.each(['ABC123', 'DEF321'])('Gets the activities history for the prisoner', async (prisonerNumber: string) => {
         const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
         await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-      })
-
-      it.each(['ABC123', 'DEF321'])('Gets the attendance history for the prisoner', async (prisonerNumber: string) => {
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-        const todaysDate = format(startOfDay(new Date()), 'yyyy-MM-dd')
-        const sixMonthsAgo = format(subMonths(startOfDay(new Date()), 6), 'yyyy-MM-dd')
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-        expect(prisonApiClient.getOffenderAttendanceHistory).toHaveBeenCalledWith(
-          prisonerNumber,
-          sixMonthsAgo,
-          todaysDate,
-        )
-        expect(res.learnerEducation).toEqual([
-          { key: { text: 'GCSE Maths' }, value: { text: 'Planned end date on 31 July 2016' } },
-          { key: { text: 'GCSE English' }, value: { text: 'Planned end date on 1 June 2022' } },
-        ])
-      })
-
-      it('should get courses and qualifications given the prisoner has course and qualification data in curious', async () => {
-        // Given
-        const prisonerNumber = 'A1234BC'
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-
-        curiousService.getPrisonerInPrisonCourses.mockResolvedValue(aPopulatedInPrisonCourseRecords(prisonerNumber))
-
-        // When
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-
-        // Then
-        expect(res.learnerEducation).toEqual([
-          { key: { text: 'GCSE Maths' }, value: { text: 'Planned end date on 31 July 2016' } },
-          { key: { text: 'GCSE English' }, value: { text: 'Planned end date on 1 June 2022' } },
-        ])
-      })
-
-      it('should get courses and qualifications given the prisoner has no course and qualification data in curious', async () => {
-        // Given
-        const prisonerNumber = 'A1234BC'
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-
-        curiousService.getPrisonerInPrisonCourses.mockResolvedValue(anEmptyInPrisonCourseRecords(prisonerNumber))
-
-        // When
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-
-        // Then
-        expect(res.learnerEducation).toEqual([])
-      })
-
-      it('should get courses and qualifications given curious service returns a response indicating a problem calling the API', async () => {
-        // Given
-        const prisonerNumber = 'A1234BC'
-        const workAndSkillsPageService = workAndSkillsPageServiceConstruct()
-
-        curiousService.getPrisonerInPrisonCourses.mockResolvedValue(aFailureInPrisonCourseRecords(prisonerNumber))
-
-        // When
-        const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
-
-        // Then
-        expect(res.learnerEducation).toEqual([])
       })
 
       it.each(['ABC123', 'DEF321'])(

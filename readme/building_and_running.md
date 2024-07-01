@@ -150,4 +150,3 @@ Features can be toggled by setting the relevant environment variable.
 | Name                                         | Default Value | Type    | Description                                                                                        |
 |----------------------------------------------|---------------|---------|----------------------------------------------------------------------------------------------------|
 | SOME_TOGGLE_ENABLED                          | false         | Boolean | Example feature toggle, for demonstration purposes.                                                |
-| NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED | false         | Boolean | Set to true to show the new In-prison courses and qualifications history on the Work & Skills tab. |

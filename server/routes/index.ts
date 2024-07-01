@@ -138,12 +138,7 @@ export default function routes(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.WorkAndSkills }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
-    // TODO - RR-814 - when this feature toggle is removed the no-op RequestHandler function can be removed, simply leaving the call to the retrieveCuriousInPrisonCourses middleware
-    config.featureToggles.newCourseAndQualificationHistoryEnabled
-      ? retrieveCuriousInPrisonCourses(services.curiousService)
-      : async (req, res, next) => {
-          next()
-        },
+    retrieveCuriousInPrisonCourses(services.curiousService),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
@@ -151,9 +146,7 @@ export default function routes(services: Services): Router {
       const { workAndSkillsPageService } = services
       const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
 
-      const fullCourseHistoryLinkUrl = config.featureToggles.newCourseAndQualificationHistoryEnabled
-        ? `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
-        : `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/courses-qualifications`
+      const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`

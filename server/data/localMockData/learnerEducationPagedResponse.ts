@@ -1,4 +1,4 @@
-import { format, subMonths } from 'date-fns'
+import { format, startOfToday, subMonths } from 'date-fns'
 import { LearnerEductionPagedResponse } from '../interfaces/curiousApi/LearnerEducation'
 import {
   aValidEnglishLearnerEducation,
@@ -14,7 +14,7 @@ const learnerEducationPagedResponse = (prisonNumber = 'A1234BC'): LearnerEductio
   const completedWoodworkCourseInLast12Months = aValidWoodWorkingLearnerEducation(prisonNumber)
   completedWoodworkCourseInLast12Months.completionStatus =
     'The learner has completed the learning activities leading to the learning aim'
-  completedWoodworkCourseInLast12Months.learningActualEndDate = format(subMonths(new Date(), 3), 'yyyy-MM-dd')
+  completedWoodworkCourseInLast12Months.learningActualEndDate = format(subMonths(startOfToday(), 3), 'yyyy-MM-dd')
   const inProgressEnglishCourse = aValidEnglishLearnerEducation(prisonNumber)
   const withdrawnMathsCourse = aValidMathsLearnerEducation(prisonNumber)
   const temporarilyWithdrawnMathsCourse = aValidMathsLearnerEducation(prisonNumber)

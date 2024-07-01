@@ -353,9 +353,6 @@ export default {
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
-    newCourseAndQualificationHistoryEnabled: toBoolean(
-      get('NEW_COURSE_AND_QUALIFICATION_HISTORY_ENABLED', false, requiredInProduction),
-    ),
     prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
     prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),
   },
