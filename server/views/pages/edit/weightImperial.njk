@@ -1,0 +1,97 @@
+{% extends "../index.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+  {
+  text: 'Digital Prison Services',
+  href:  "/" | prependBaseUrl
+  },
+  {
+  text: breadcrumbPrisonerName,
+  href: "/prisoner/" + prisonerNumber
+  }
+  ]
+%}
+{% block body %}
+
+  {% if errors.length > 0 %}
+    {{
+      govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errors,
+          attributes: { 'data-qa-errors': true }
+      })
+    }}
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form method="post" novalidate="novalidate" autocomplete="off">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        {%
+          call govukFieldset({
+            legend: {
+              text: "Edit weight",
+              classes: "govuk-fieldset__legend--l",
+              isPageHeading: true
+            }
+          })
+        %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half">
+              <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-quarter">
+                  {{
+                    govukInput({
+                      label: {
+                        text: "Stone"
+                      },
+                      id: "stones",
+                      name: "stones",
+                      value: stonesValue,
+                      classes: "govuk-input--width-3"
+                    })
+                  }}
+                </div>
+                <div class="govuk-grid-column-one-quarter">
+                  {{
+                    govukInput({
+                      label: {
+                        text: "Pounds"
+                      },
+                      id: "pounds",
+                      name: "pounds",
+                      value: poundsValue,
+                      classes: "govuk-input--width-3"
+                    })
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endcall %}
+        <p class="govuk-body">
+          <a class="govuk-link" data-qa="switch-units" href="/prisoner/{{ prisonerNumber }}/personal/edit/weight">
+            Switch to kilograms
+          </a>
+        </p>
+        <div class="govuk-button-group">
+          {{
+            govukButton({
+            text: "Save",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "edit-submit-button" }
+            })
+          }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
