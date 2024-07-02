@@ -261,6 +261,8 @@ describe('PersonalController', () => {
           await action(validRequest, mockResponse)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+          expect(validRequest.flash).toHaveBeenCalledWith('feetValue', 5)
+          expect(validRequest.flash).toHaveBeenCalledWith('inchesValue', 10)
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
 
@@ -385,6 +387,7 @@ describe('PersonalController', () => {
           await action(validRequest, mockResponse)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+          expect(validRequest.flash).toHaveBeenCalledWith('fieldValue', '80')
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
         })
 
@@ -510,6 +513,8 @@ describe('PersonalController', () => {
           await action(validRequest, mockResponse)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+          expect(validRequest.flash).toHaveBeenCalledWith('stonesValue', 10)
+          expect(validRequest.flash).toHaveBeenCalledWith('poundsValue', 12)
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
         })
 
