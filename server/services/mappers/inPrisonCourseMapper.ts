@@ -1,3 +1,4 @@
+import { parseISO, startOfDay } from 'date-fns'
 import { LearnerEducation } from '../../data/interfaces/curiousApi/LearnerEducation'
 import { InPrisonCourse } from '../interfaces/curiousService/CuriousInPrisonCourses'
 
@@ -7,13 +8,13 @@ const toInPrisonCourse = (apiLearnerEducation: LearnerEducation): InPrisonCourse
     prisonName: apiLearnerEducation.establishmentName,
     courseCode: apiLearnerEducation.courseCode,
     courseName: apiLearnerEducation.courseName,
-    courseStartDate: new Date(apiLearnerEducation.learningStartDate),
+    courseStartDate: startOfDay(parseISO(apiLearnerEducation.learningStartDate)),
     courseStatus: toCourseStatus(apiLearnerEducation.completionStatus),
     courseCompletionDate: apiLearnerEducation.learningActualEndDate
-      ? new Date(apiLearnerEducation.learningActualEndDate)
+      ? startOfDay(parseISO(apiLearnerEducation.learningActualEndDate))
       : null,
     coursePlannedEndDate: apiLearnerEducation.learningPlannedEndDate
-      ? new Date(apiLearnerEducation.learningPlannedEndDate)
+      ? startOfDay(parseISO(apiLearnerEducation.learningPlannedEndDate))
       : null,
     isAccredited: apiLearnerEducation.isAccredited,
     grade: apiLearnerEducation.outcomeGrade || apiLearnerEducation.outcome || null,

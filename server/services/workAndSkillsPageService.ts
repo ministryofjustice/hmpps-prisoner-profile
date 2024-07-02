@@ -18,14 +18,10 @@ import LearnerProfile from '../data/interfaces/curiousApi/LearnerProfile'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
-import CuriousService from './curiousService'
-import { InPrisonCourse, InPrisonCourseRecords } from './interfaces/curiousService/CuriousInPrisonCourses'
-import config from '../config'
 
 interface WorkAndSkillsData {
   learnerEmployabilitySkills: LearnerEmployabilitySkills
   learnerProfiles: Array<LearnerProfile>
-  learnerEducation: Array<GovSummaryItem>
   learnerLatestAssessments: Array<Array<GovSummaryGroup>>
   curiousGoals: CuriousGoals
   learnerNeurodivergence: Array<LearnerNeurodivergence>
@@ -47,7 +43,6 @@ interface UnacceptableAttendanceData {
 export default class WorkAndSkillsPageService {
   constructor(
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
-    private readonly curiousService: CuriousService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly personalLearningPlanService: PersonalLearningPlanService,
   ) {}
@@ -61,7 +56,6 @@ export default class WorkAndSkillsPageService {
     const [
       learnerEmployabilitySkills,
       learnerProfiles,
-      learnerEducation,
       learnerLatestAssessments,
       curiousGoals,
       learnerNeurodivergence,
@@ -71,13 +65,6 @@ export default class WorkAndSkillsPageService {
     ] = await Promise.all([
       this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient),
       this.getLearnerProfiles(prisonerNumber, curiousApiClient),
-
-      // TODO - RR-814 - when this feature toggle is removed course info will be retrieved via the `retrieveCuriousInPrisonCourses` middleware
-      // At that time the function getLearnerEducation can be removed along with the property it sets in the returned object
-      !config.featureToggles.newCourseAndQualificationHistoryEnabled
-        ? this.getLearnerEducation(prisonerNumber, token)
-        : undefined,
-
       this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient),
       this.getCuriousGoals(prisonerNumber, curiousApiClient),
       this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
@@ -89,7 +76,6 @@ export default class WorkAndSkillsPageService {
     return {
       learnerEmployabilitySkills,
       learnerProfiles,
-      learnerEducation,
       learnerLatestAssessments,
       curiousGoals,
       learnerNeurodivergence,
@@ -168,25 +154,6 @@ export default class WorkAndSkillsPageService {
   ): Promise<LearnerProfile[]> {
     const learnerProfiles: LearnerProfile[] = await curiousApiClient.getLearnerProfile(prisonerNumber)
     return learnerProfiles
-  }
-
-  private async getLearnerEducation(prisonerNumber: string, token: string): Promise<GovSummaryItem[]> {
-    const inPrisonCourseRecords: InPrisonCourseRecords = await this.curiousService.getPrisonerInPrisonCourses(
-      prisonerNumber,
-      token,
-    )
-
-    const allCourses: InPrisonCourse[] = [
-      ...(inPrisonCourseRecords.coursesByStatus?.COMPLETED || []),
-      ...(inPrisonCourseRecords.coursesByStatus?.IN_PROGRESS || []),
-      ...(inPrisonCourseRecords.coursesByStatus?.WITHDRAWN || []),
-      ...(inPrisonCourseRecords.coursesByStatus?.TEMPORARILY_WITHDRAWN || []),
-    ]
-
-    return allCourses.map(course => ({
-      key: { text: course.courseName },
-      value: { text: `Planned end date on ${formatDate(course.coursePlannedEndDate?.toISOString(), 'long')}` },
-    }))
   }
 
   private async getLearnerLatestAssessments(
