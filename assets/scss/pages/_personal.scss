@@ -53,3 +53,26 @@
   }
 }
 
+/* Edit personal data */
+.dps-edit-container {
+  .hmpps-mini-banner {
+    margin: 30px 0;
+  }
+}
+
+@keyframes greenToTransparent {
+  0% {
+    background-color: govuk-tint(govuk-colour("green"), 80%);
+  }
+  80% {
+    background-color: govuk-tint(govuk-colour("green"), 80%);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.row-updated {
+  background-color: transparent;
+  animation: greenToTransparent 3s;
+}

@@ -68,7 +68,7 @@
   {% endif %}
 
   {% if flashMessage %}
-    <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}">
+    <div class="{{ 'hmpps-flash-message hmpps-flash-message--'+flashMessage.type if flashMessage.type }}{{ ' hmpps-flash-message--at-anchor' if flashMessage.fieldName }}">
       <p role="alert">{{ flashMessage.text }}</p>
     </div>
   {% endif %}

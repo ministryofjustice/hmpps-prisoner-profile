@@ -43,8 +43,15 @@ describe('PersonalPageService', () => {
       getPrisonPerson: jest.fn(async () => ({
         prisonerNumber: 'abc123',
         physicalAttributes: { height: 100, weight: 100 },
+        physicalCharacteristics: {
+          hair: { code: '', description: '' },
+          facialHair: { code: '', description: '' },
+          faceShape: { code: '', description: '' },
+          build: { code: '', description: '' },
+        },
       })),
       updatePhysicalAttributes: jest.fn(),
+      updatePhysicalCharacteristics: jest.fn(),
     }
   })
 

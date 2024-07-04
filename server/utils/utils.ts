@@ -594,10 +594,16 @@ export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[]
   }))
 }
 
-export const objectToSelectOptions = (array: object[], id: string, description: string): SelectOption[] => {
+export const objectToSelectOptions = (
+  array: object[],
+  id: string,
+  description: string,
+  selected?: string,
+): SelectOption[] => {
   return array.map(obj => ({
     text: obj[description],
     value: obj[id],
+    ...(selected && obj[id] === selected && { checked: true }),
   }))
 }
 

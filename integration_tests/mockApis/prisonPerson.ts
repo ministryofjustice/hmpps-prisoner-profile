@@ -10,6 +10,12 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
     height: 150,
     weight: 65,
   },
+  physicalCharacteristics: {
+    hair: { code: '', description: '' },
+    facialHair: { code: '', description: '' },
+    faceShape: { code: '', description: '' },
+    build: { code: '', description: '' },
+  },
 })
 
 const baseUrl = '/prisonPerson/'

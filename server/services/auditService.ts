@@ -17,6 +17,10 @@ export enum Page {
   Alerts = 'ALERTS',
   AppointmentConfirmation = 'APPOINTMENT_CONFIRMATION',
   AppointmentMovementSlips = 'APPOINTMENT_MOVEMENT_SLIPS',
+  EditHairTypeOrColour = 'EDIT_HAIR_TYPE_OR_COLOUR',
+  EditFacialHair = 'EDIT_FACIAL_HAIR',
+  EditFaceShape = 'EDIT_FACE_SHAPE',
+  EditBuild = 'EDIT_BUILD',
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
@@ -33,6 +37,10 @@ export enum Page {
   PostAddAlert = 'POST_ADD_ALERT',
   PostAddAppointment = 'POST_ADD_APPOINTMENT',
   PostAddCaseNote = 'POST_ADD_CASE_NOTE',
+  PostEditHairTypeOrColour = 'POST_EDIT_HAIR_TYPE_OR_COLOUR',
+  PostEditFacialHair = 'POST_EDIT_FACIAL_HAIR',
+  PostEditFaceShape = 'POST_EDIT_FACE_SHAPE',
+  PostEditBuild = 'POST_EDIT_BUILD',
   PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
   PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
   PostAlertAddMoreDetails = 'POST_ALERT_ADD_MORE_DETAILS',
@@ -66,6 +74,7 @@ export enum PostAction {
   AlertClose = 'ALERT_CLOSE',
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
+  EditPhysicalCharacteristics = 'EDIT_PHYSICAL_CHARACTERISTICS',
 }
 
 // eslint-disable-next-line no-shadow

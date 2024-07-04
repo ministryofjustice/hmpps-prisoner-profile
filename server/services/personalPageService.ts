@@ -25,7 +25,13 @@ import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
-import { PrisonPerson, PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import {
+  PrisonPerson,
+  PrisonPersonApiClient,
+  PrisonPersonPhysicalAttributes,
+  PrisonPersonPhysicalCharacteristics,
+} from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { physicalCharacteristicsMock } from '../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 
 export default class PersonalPageService {
   constructor(
@@ -45,10 +51,21 @@ export default class PersonalPageService {
   async updatePhysicalAttributes(
     token: string,
     prisonerNumber: string,
-    physicalAttributes: { height: number; weight: number },
+    physicalAttributes: Partial<PrisonPersonPhysicalAttributes>,
   ) {
     const apiClient = this.prisonPersonApiClientBuilder(token)
     return apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+  }
+
+  async updatePhysicalCharacteristics(
+    token: string,
+    prisonerNumber: string,
+    physicalCharacteristics: Partial<PrisonPersonPhysicalCharacteristics>,
+  ): Promise<PrisonPersonPhysicalCharacteristics> {
+    const apiClient = this.prisonPersonApiClientBuilder(token)
+    return null
+    // TODO plug in API call when available
+    return apiClient.updatePhysicalCharacteristics(prisonerNumber, physicalCharacteristics)
   }
 
   public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
@@ -368,5 +385,10 @@ export default class PersonalPageService {
   getLearnerNeurodivergence(clientToken: string, prisonerNumber: string) {
     const curiousApiClient = this.curiousApiClientBuilder(clientToken)
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
+  }
+
+  async getPhysicalCharacteristics(clientToken: string, type: string) {
+    // TODO call prisonPersonApi to get this ref data and map certain values from old to new
+    return physicalCharacteristicsMock[type]
   }
 }

@@ -1,7 +1,28 @@
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .hmpps-flash-message {
   position: absolute;
-  margin-top: -15px;
+  top: 75px;
   left: 50%;
+  visibility: hidden;
+  opacity: 0;
+  animation: fadeOut 3s;
+
+  &--at-anchor {
+    position: fixed;
+    top: 20px;
+  }
 
   p {
     position: relative;

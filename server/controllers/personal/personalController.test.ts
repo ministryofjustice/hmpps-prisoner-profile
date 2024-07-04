@@ -1,11 +1,14 @@
-import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { careNeedsServiceMock } from '../../tests/mocks/careNeedsServiceMock'
-import { personalPageServiceMock } from '../../tests/mocks/personalPageServiceMock'
-import { FlashMessageType } from '../data/enums/flashMessageType'
-import { AuditService } from '../services/auditService'
-import CareNeedsService from '../services/careNeedsService'
-import PersonalPageService from '../services/personalPageService'
+import { auditServiceMock } from '../../../tests/mocks/auditServiceMock'
+import { careNeedsServiceMock } from '../../../tests/mocks/careNeedsServiceMock'
+import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
+import { FlashMessageType } from '../../data/enums/flashMessageType'
+import { AuditService, Page } from '../../services/auditService'
+import CareNeedsService from '../../services/careNeedsService'
+import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
+import { FieldData } from './fieldData'
+import { prisonUserMock } from '../../data/localMockData/user'
+import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -15,7 +18,11 @@ describe('PersonalController', () => {
 
   const defaultMiddleware = {
     clientToken: 'token',
-    prisonerData: { firstName: 'First', lastName: 'Last' },
+    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001' },
+  }
+
+  const defaultLocals = {
+    user: prisonUserMock,
   }
 
   beforeEach(() => {
@@ -23,7 +30,14 @@ describe('PersonalController', () => {
     personalPageService.getPrisonPerson = jest.fn(async () => ({
       prisonerNumber: 'ABC123',
       physicalAttributes: { height: 102, weight: 60 },
+      physicalCharacteristics: {
+        hair: { code: '', description: '' },
+        facialHair: { code: '', description: '' },
+        faceShape: { code: '', description: '' },
+        build: { code: '', description: '' },
+      },
     }))
+    personalPageService.getPhysicalCharacteristics = jest.fn(async () => physicalCharacteristicsMock.field)
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
 
@@ -534,6 +548,148 @@ describe('PersonalController', () => {
           expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
         })
+      })
+    })
+  })
+
+  /**
+   * Tests for the generic radios edit pages - covers editing Hair type or colour, Facial hair, Face shape and Build
+   */
+  describe('radios', () => {
+    const fieldData: FieldData = {
+      pageTitle: 'Characteristic',
+      fieldName: 'characteristic',
+      auditPage: 'PAGE' as Page,
+      url: 'characteristic-url',
+      hintText: 'Hint text',
+    }
+
+    describe('edit', () => {
+      const action = async (req: any, res: any) => controller.radios(fieldData).edit(req, res, () => {})
+      const res = { locals: defaultLocals, render: jest.fn() } as any
+
+      it('Renders the radios edit page with the field data config supplied', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+
+        await action(req, res)
+
+        expect(personalPageService.getPhysicalCharacteristics).toHaveBeenCalledWith('token', 'characteristic')
+        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radios', {
+          pageTitle: 'Characteristic',
+          prisonerNumber: 'A1234BC',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          hintText: 'Hint text',
+          options: [
+            {
+              text: 'Characteristic One',
+              value: 'CODE1',
+            },
+            {
+              text: 'Characteristic Two',
+              value: 'CODE2',
+            },
+            {
+              text: 'Characteristic Three',
+              value: 'CODE3',
+            },
+          ],
+          miniBannerData: {
+            prisonerName: 'Last, First',
+            prisonerNumber: 'A1234BC',
+            cellLocation: '2-3-001',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Selects the correct radio using field value from the flash', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (key: string): any => {
+            if (key === 'fieldValue') return ['CODE2']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
+          }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, res: any) => controller.radios(fieldData).submit(req, res, () => {})
+      const res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { radioField: 'CODE3' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the physical characteristic', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updatePhysicalCharacteristics).toHaveBeenCalledWith('token', 'A1234BC', {
+          characteristic: 'CODE3',
+        })
+      })
+
+      it('Redirects to the personal page #appearance on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Characteristic updated',
+          type: FlashMessageType.success,
+          fieldName: 'characteristic',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updatePhysicalCharacteristics = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/characteristic-url')
       })
     })
   })

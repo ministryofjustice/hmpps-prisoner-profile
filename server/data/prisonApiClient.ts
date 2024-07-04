@@ -228,7 +228,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]> {
+  async getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]> {
     return this.restClient.get<ReferenceCode[]>({
       path: `/api/reference-domains/domains/${domain}`,
       headers: { 'page-limit': '1000' },

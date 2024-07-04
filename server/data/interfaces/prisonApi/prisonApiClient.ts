@@ -83,7 +83,7 @@ export interface PrisonApiClient {
   getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
   getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable>
   getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable>
-  getReferenceCodesByDomain(domain: ReferenceCodeDomain): Promise<ReferenceCode[]>
+  getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]>
   getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments>
   getCaseNotesUsage(offenderNumber: string): Promise<CaseNoteUsage[]>
   getCaseNoteCount(

@@ -1,19 +1,22 @@
 import { NextFunction, Request, Response } from 'express'
-import { PrisonUser } from '../interfaces/HmppsUser'
-import { mapHeaderData } from '../mappers/headerMappers'
-import { AuditService, Page } from '../services/auditService'
-import PersonalPageService from '../services/personalPageService'
-import { formatName, hasLength } from '../utils/utils'
-import { NameFormatStyle } from '../data/enums/nameFormatStyle'
-import { FlashMessageType } from '../data/enums/flashMessageType'
-import CareNeedsService from '../services/careNeedsService'
-import { enablePrisonPerson } from '../utils/featureToggles'
+import { PrisonUser } from '../../interfaces/HmppsUser'
+import PersonalPageService from '../../services/personalPageService'
+import CareNeedsService from '../../services/careNeedsService'
 import {
   centimetresToFeetAndInches,
   feetAndInchesToCentimetres,
   kilogramsToStoneAndPounds,
   stonesAndPoundsToKilograms,
-} from '../utils/unitConversions'
+} from '../../utils/unitConversions'
+import { mapHeaderData } from '../../mappers/headerMappers'
+import { AuditService, Page, PostAction } from '../../services/auditService'
+import { formatLocation, formatName, hasLength, objectToSelectOptions } from '../../utils/utils'
+import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
+import { FlashMessageType } from '../../data/enums/flashMessageType'
+import HmppsError from '../../interfaces/HmppsError'
+import { enablePrisonPerson } from '../../utils/featureToggles'
+import { FieldData } from './fieldData'
+import logger from '../../../logger'
 
 export default class PersonalController {
   constructor(
@@ -33,9 +36,10 @@ export default class PersonalController {
       const { bookingId } = prisonerData
       const user = res.locals.user as PrisonUser
       const { activeCaseLoadId } = user
+      const prisonPersonEnabled = enablePrisonPerson(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
-        this.personalPageService.get(clientToken, prisonerData, enablePrisonPerson(activeCaseLoadId)),
+        this.personalPageService.get(clientToken, prisonerData, prisonPersonEnabled),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
@@ -55,6 +59,7 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
+        showChangeLinks: prisonPersonEnabled,
       })
     }
   }
@@ -279,6 +284,102 @@ export default class PersonalController {
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
           }
         },
+      },
+    }
+  }
+
+  /**
+   * Handler for editing single-value radio fields.
+   *
+   * @param fieldData - config for which physical characteristic to edit
+   *
+   * Handles editing:
+   *   Hair type or colour
+   *   Facial hair
+   *   Face shape
+   *   Build
+   */
+  radios(fieldData: FieldData) {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { pageTitle, fieldName, hintText, auditPage } = fieldData
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const fieldValueFlash = req.flash('fieldValue')
+        const errors = req.flash('errors')
+
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+        const characteristics = await this.personalPageService.getPhysicalCharacteristics(clientToken, fieldName)
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        // TODO remove when API returns value
+        if (prisonPerson) {
+          prisonPerson.physicalCharacteristics = {
+            hair: { code: '', description: '' },
+            facialHair: { code: '', description: '' },
+            faceShape: { code: '', description: '' },
+            build: { code: '', description: '' },
+          }
+        }
+
+        const fieldValue =
+          fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalCharacteristics[fieldName]
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+
+        res.render('pages/edit/radios', {
+          pageTitle,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors: hasLength(errors) ? errors : [],
+          hintText,
+          options: objectToSelectOptions(characteristics, 'code', 'description', fieldValue),
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { pageTitle, fieldName, url } = fieldData
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const { radioField } = req.body
+        const errors: HmppsError[] = []
+
+        try {
+          await this.personalPageService.updatePhysicalCharacteristics(clientToken, prisonerNumber, {
+            [fieldName]: radioField,
+          })
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle, fieldName, radioField, url },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          errors.push({ text: 'There was an error please try again' })
+        }
+
+        req.flash('fieldValue', radioField)
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
   }

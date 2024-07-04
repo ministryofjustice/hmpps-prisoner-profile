@@ -21,7 +21,16 @@ describe('prisonerSearchClient', () => {
 
   describe('getPrisonerDetails', () => {
     it('should return data from api', async () => {
-      const prisonPerson: PrisonPerson = { prisonerNumber: 'A8469DY', physicalAttributes: { height: 100, weight: 100 } }
+      const prisonPerson: PrisonPerson = {
+        prisonerNumber: 'A8469DY',
+        physicalAttributes: { height: 100, weight: 100 },
+        physicalCharacteristics: {
+          hair: { code: '', description: '' },
+          facialHair: { code: '', description: '' },
+          faceShape: { code: '', description: '' },
+          build: { code: '', description: '' },
+        },
+      }
       fakePrisonerSearchApi
         .get('/prisoners/A8469DY')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
