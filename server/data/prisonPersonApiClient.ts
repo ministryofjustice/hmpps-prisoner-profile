@@ -3,6 +3,7 @@ import {
   PrisonPerson,
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributes,
+  PrisonPersonPhysicalCharacteristics,
 } from './interfaces/prisonPersonApi/prisonPersonApiClient'
 import RestClient from './restClient'
 
@@ -26,6 +27,16 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
     return this.restClient.put<PrisonPersonPhysicalAttributes>({
       path: `/prisoners/${prisonerNumber}/physical-attributes`,
       data: physicalAttributes,
+    })
+  }
+
+  async updatePhysicalCharacteristics(
+    prisonerNumber: string,
+    physicalCharacteristics: Partial<PrisonPersonPhysicalCharacteristics>,
+  ): Promise<PrisonPersonPhysicalCharacteristics> {
+    return this.restClient.put<PrisonPersonPhysicalCharacteristics>({
+      path: `/prisoners/${prisonerNumber}/physical-characteristics`,
+      data: physicalCharacteristics,
     })
   }
 }
