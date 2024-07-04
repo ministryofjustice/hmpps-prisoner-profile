@@ -1,13 +1,13 @@
 import { Role } from '../../../../server/data/enums/role'
-import { radiosTests } from './radiosTests'
 import EditPage from '../../../pages/editPages/editPage'
+import { editPageTests } from './editPageTests'
 
 context('Edit facial hair', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
-  radiosTests({
+  editPageTests({
     prisonerNumber,
     prisonerName,
     bookingId,
@@ -34,6 +34,6 @@ context('Edit facial hair', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Facial hair',
     successfulFlashMessage: 'Facial hair updated',
-    radioCode: 'FULL_BEARD',
+    validInputs: { radioInput: 'FULL_BEARD' },
   })
 })

@@ -4,10 +4,12 @@ import { editPageTests } from './editPageTests'
 
 context('Edit height (metric)', () => {
   const prisonerNumber = 'G6123VU'
+  const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
   editPageTests<EditWeight>({
     prisonerNumber,
+    prisonerName,
     bookingId,
     testSetup: () => {
       cy.task('reset')
@@ -56,10 +58,12 @@ context('Edit height (metric)', () => {
 
 context('Edit weight (Imperial)', () => {
   const prisonerNumber = 'G6123VU'
+  const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
   editPageTests<EditWeight>({
     prisonerNumber,
+    prisonerName,
     bookingId,
     testSetup: () => {
       cy.task('reset')

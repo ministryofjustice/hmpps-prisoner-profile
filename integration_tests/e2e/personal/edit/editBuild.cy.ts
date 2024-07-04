@@ -1,13 +1,13 @@
 import { Role } from '../../../../server/data/enums/role'
-import { radiosTests } from './radiosTests'
 import EditPage from '../../../pages/editPages/editPage'
+import { editPageTests } from './editPageTests'
 
 context('Edit build', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
-  radiosTests({
+  editPageTests({
     prisonerNumber,
     prisonerName,
     bookingId,
@@ -34,6 +34,6 @@ context('Edit build', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Build',
     successfulFlashMessage: 'Build updated',
-    radioCode: 'PROPORTIONAL',
+    validInputs: { radioInput: 'PROPORTIONAL' },
   })
 })

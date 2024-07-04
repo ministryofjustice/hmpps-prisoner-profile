@@ -6,11 +6,13 @@ import Page from '../../../pages/page'
 
 export interface EditPageInputs {
   textInputs?: { [key: string]: string }
+  radioInput?: string
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
   editUrl: string
   prisonerNumber: string
+  prisonerName: string
   bookingId: number
   testSetup: () => void
   editPage?: new () => TPage
@@ -18,7 +20,7 @@ export function editPageTests<TPage extends EditPage>(options: {
   editPageTitle?: string
   successfulFlashMessage: string
   validInputs: EditPageInputs
-  invalidResponses: {
+  invalidResponses?: {
     testDescription: string
     inputs: EditPageInputs
     errorMessages: string[]
@@ -26,6 +28,9 @@ export function editPageTests<TPage extends EditPage>(options: {
 }) {
   const {
     editUrl,
+    // TODO uncomment when used below
+    // prisonerNumber,
+    // prisonerName,
     testSetup,
     validInputs,
     editPage,
@@ -39,6 +44,7 @@ export function editPageTests<TPage extends EditPage>(options: {
 
   const fillWithInputs = (inputs: EditPageInputs) => {
     if (inputs.textInputs) page.fillInTextFields(inputs.textInputs)
+    if (inputs.radioInput) page.selectRadio(inputs.radioInput)
   }
 
   context('Edit page tests', () => {
@@ -91,13 +97,22 @@ export function editPageTests<TPage extends EditPage>(options: {
         })
 
         it('Can load the edit page', () => {
-          getPage()
+          page = getPage()
+          // TODO uncomment when height/weight are updated to contain mini banner
+          // page.miniBanner().card().should('be.visible')
+          // page.miniBanner().name().should('contain.text', prisonerName)
+          // page.miniBanner().name().should('contain.text', prisonerNumber)
         })
 
         it('Can submit a valid response', () => {
           page = getPage()
           fillWithInputs(validInputs)
           page.submit()
+
+          cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
+          // TODO uncomment when height/weight are updated to return to #appearance anchor
+          // cy.location('hash').should('eq', '#appearance')
+
           page.flashMessage().should('include.text', successfulFlashMessage)
         })
       })

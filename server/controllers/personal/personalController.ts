@@ -10,7 +10,7 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, hasLength, objectToSelectOptions } from '../../utils/utils'
+import { formatLocation, formatName, hasLength, objectToSelectOptions, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import HmppsError from '../../interfaces/HmppsError'
@@ -35,7 +35,7 @@ export default class PersonalController {
       } = req.middleware
       const { bookingId } = prisonerData
       const user = res.locals.user as PrisonUser
-      const { activeCaseLoadId } = user
+      const { activeCaseLoadId, userRoles } = user
       const prisonPersonEnabled = enablePrisonPerson(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
@@ -59,7 +59,7 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        showChangeLinks: prisonPersonEnabled,
+        showChangeLinks: prisonPersonEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
       })
     }
   }
