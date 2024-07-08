@@ -121,8 +121,8 @@ export default class PersonalController {
               weight: prisonPerson?.physicalAttributes.weight ?? null,
             })
 
-            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('fieldValue', editField)
             req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -178,7 +178,11 @@ export default class PersonalController {
             },
             {
               isInvalid: () =>
-                feetString === '' || feetString === undefined || Number.isNaN(feet) || Number.isNaN(inches),
+                feetString === '' ||
+                feetString === undefined ||
+                Number.isNaN(feet) ||
+                Number.isNaN(inches) ||
+                (feet >= 1 && feet <= 9 && inches < 0),
               message: 'Feet must be between 1 and 9. Inches must be between 0 and 11',
             },
           ]
@@ -201,8 +205,8 @@ export default class PersonalController {
               weight: prisonPerson?.physicalAttributes.weight,
             })
 
-            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('feetValue', feet)
             req.flash('inchesValue', inches)
@@ -256,7 +260,7 @@ export default class PersonalController {
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('fieldValue', editField)
             req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -313,7 +317,7 @@ export default class PersonalController {
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('stonesValue', stones)
             req.flash('poundsValue', pounds)

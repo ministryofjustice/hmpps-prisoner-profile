@@ -136,7 +136,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
@@ -145,6 +145,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
             type: FlashMessageType.success,
+            fieldName: 'height',
           })
         })
 
@@ -271,7 +272,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
@@ -280,6 +281,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
             type: FlashMessageType.success,
+            fieldName: 'height',
           })
         })
 
@@ -301,7 +303,7 @@ describe('PersonalController', () => {
           { feet: '3', inches: '' },
         ])('Valid request: %s', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it.each([
@@ -312,6 +314,8 @@ describe('PersonalController', () => {
           [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
           [{ feet: 'example', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
           [{ feet: '5', inches: 'example' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+          [{ feet: '-5', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '1', inches: '-5' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
         ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {
           const req = {
             middleware: defaultMiddleware,
@@ -409,7 +413,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
@@ -535,7 +539,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {

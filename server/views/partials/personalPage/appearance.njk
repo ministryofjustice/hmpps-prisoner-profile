@@ -49,7 +49,7 @@
         govukSummaryList({
         classes: listClasses,
         rows: [
-        "Height" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.height, "personal/edit/height", { changeLinkEnabled: editEnabled, rowUpdated: false } ),
+        "Height" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.height, "personal/edit/height", { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'height' } ),
         {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
         "Hair type or colour" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.build, "personal/edit/hair",
