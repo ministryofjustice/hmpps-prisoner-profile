@@ -52,7 +52,7 @@
         "Height" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.height, "personal/edit/height", { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'height' } ),
         {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
         "Hair type or colour" | summaryListRowWithOptionalChangeLink(
-          physicalCharacteristics.build, "personal/edit/hair",
+          physicalCharacteristics.hairColour, "personal/edit/hair",
           { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' } 
         ),
         {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
