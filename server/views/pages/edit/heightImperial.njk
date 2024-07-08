@@ -5,17 +5,12 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set hideBackLink = true %}
 {%
   set breadCrumbs = [
-  {
-  text: 'Digital Prison Services',
-  href:  "/" | prependBaseUrl
-  },
-  {
-  text: breadcrumbPrisonerName,
-  href: "/prisoner/" + prisonerNumber
-  }
+    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber }
   ]
 %}
 {% block body %}
@@ -31,13 +26,17 @@
   {% endif %}
 
   <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
+
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
         {%
           call govukFieldset({
             legend: {
-              text: "Edit height",
+              text: "Height",
               classes: "govuk-fieldset__legend--l",
               isPageHeading: true
             }

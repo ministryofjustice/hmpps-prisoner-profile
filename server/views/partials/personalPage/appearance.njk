@@ -2,47 +2,46 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% macro mark(info) %}
-    {% if info.bodyPart %}
-        <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-body-part">
-            {{ info.bodyPart }}
-        </p>
-    {% endif %}
+  {% if info.bodyPart %}
+    <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-body-part">{{ info.bodyPart }}</p>
+  {% endif %}
 
-    {% if info.side or info.orientation or info.comment or info.imageId %}
-        <details class="govuk-details" data-module="govuk-details" data-qa="distinguishing-mark">
-            <summary class="govuk-details__summary govuk-!-display-none-print">
-              <span class="govuk-details__summary-text">View details</span>
-            </summary>
-            <div class="govuk-details__text">
-              {% if info.side %}
-                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
-                  <span class="govuk-!-font-weight-bold">Side</span><br />
-                  {{ info.side }}
-                </p>
-              {% endif %}
-              {% if info.orientation %}
-                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
-                  <span class="govuk-!-font-weight-bold">Orientation</span><br />
-                  {{ info.orientation }}
-                </p>
-              {% endif %}
-              {% if info.comment %}
-                <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
-                  <span class="govuk-!-font-weight-bold">Comment</span><br />
-                  {{ info.comment }}
-                </p>
-              {% endif %}
-              {% if info.imageId %}
-                <p class="govuk-body">
-                  <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
-                </p>
-              {% endif %}
-            </div>
-        </details>
-    {% endif %}
+  {% if info.side or info.orientation or info.comment or info.imageId %}
+    <details class="govuk-details" data-module="govuk-details" data-qa="distinguishing-mark">
+      <summary class="govuk-details__summary govuk-!-display-none-print">
+        <span class="govuk-details__summary-text">View details</span>
+      </summary>
+      <div class="govuk-details__text">
+        {% if info.side %}
+          <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-side">
+            <span class="govuk-!-font-weight-bold">Side</span><br />
+            {{ info.side }}
+          </p>
+        {% endif %}
+        {% if info.orientation %}
+          <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-orientation">
+            <span class="govuk-!-font-weight-bold">Orientation</span><br />
+            {{ info.orientation }}
+          </p>
+        {% endif %}
+        {% if info.comment %}
+          <p class="govuk-body govuk-!-margin-bottom-1" data-qa="mark-comment">
+            <span class="govuk-!-font-weight-bold">Comment</span><br />
+            {{ info.comment }}
+          </p>
+        {% endif %}
+        {% if info.imageId %}
+          <p class="govuk-body">
+            <img src="/api/image/{{ info.imageId }}" alt="Image of {{ info.type }}" data-qa="mark-image" />
+          </p>
+        {% endif %}
+      </div>
+    </details>
+  {% endif %}
 {% endmacro %}
+
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
-{% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length %}
+  {% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length %}
   <div class="govuk-grid-row" data-qa="appearance">
     <div class="govuk-grid-column-full" data-qa="physical-characteristics">
       <h3 class="govuk-heading-m">Physical characteristics</h3>
@@ -50,58 +49,26 @@
         govukSummaryList({
         classes: listClasses,
         rows: [
-        {key: { text: "Height"}, value: { text: physicalCharacteristics.height } },
+        "Height" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.height, "personal/edit/height", { changeLinkEnabled: editEnabled, rowUpdated: false } ),
         {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
-        {key: { text: "Hair type or colour"}, value: { text: physicalCharacteristics.hairColour },
-            classes: 'row-updated' if flashMessage.fieldName === 'hair',
-            actions: {
-            items: [] if not showChangeLinks else [
-                {
-                    href: "personal/edit/hair",
-                    text: "Change",
-                    visuallyHiddenText: "hair type or colour",
-                    classes: "govuk-link--no-visited-state"
-                }
-            ]
-        } },
+        "Hair type or colour" | summaryListRowWithOptionalChangeLink(
+          physicalCharacteristics.build, "personal/edit/hair",
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' } 
+        ),
         {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
         {key: { text: "Right eye colour"}, value: { text: physicalCharacteristics.rightEyeColour } },
-        {key: { text: "Facial hair"}, value: { text: physicalCharacteristics.facialHair },
-            classes: 'row-updated' if flashMessage.fieldName === 'facialHair',
-            actions: {
-            items: [] if not showChangeLinks else [
-                {
-                    href: "personal/edit/facial-hair",
-                    text: "Change",
-                    visuallyHiddenText: "facial hair type",
-                    classes: "govuk-link--no-visited-state"
-                }
-            ]
-        } },
-        {key: { text: "Shape of face"}, value: { text: physicalCharacteristics.shapeOfFace },
-            classes: 'row-updated' if flashMessage.fieldName === 'faceShape',
-            actions: {
-            items: [] if not showChangeLinks else [
-                {
-                    href: "personal/edit/face-shape",
-                    text: "Change",
-                    visuallyHiddenText: "face shape",
-                    classes: "govuk-link--no-visited-state"
-                }
-            ]
-        } },
-        {key: { text: "Build"}, value: { text: physicalCharacteristics.build },
-            classes: 'row-updated' if flashMessage.fieldName === 'build',
-            actions: {
-            items: [] if not showChangeLinks else [
-                {
-                    href: "personal/edit/build",
-                    text: "Change",
-                    visuallyHiddenText: "build",
-                    classes: "govuk-link--no-visited-state"
-                }
-            ]
-        } },
+        "Facial hair" | summaryListRowWithOptionalChangeLink(
+          physicalCharacteristics.facialHair, "personal/edit/facial-hair",
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: 'facial hair type' } 
+        ),
+        "Shape of face" | summaryListRowWithOptionalChangeLink(
+          physicalCharacteristics.shapeOfFace, "personal/edit/face-shape",
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: 'face shape' } 
+        ),
+        "Build" | summaryListRowWithOptionalChangeLink(
+          physicalCharacteristics.build, "personal/edit/build",
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' } 
+        ),
         {key: { text: "Shoe size"}, value: { text: physicalCharacteristics.shoeSize } },
         {key: { text: "Warned about tattooing"}, value: { text: physicalCharacteristics.warnedAboutTattooing } },
         {key: { text: "Warned not to change appearance"}, value: { text: physicalCharacteristics.warnedNotToChangeAppearance } }

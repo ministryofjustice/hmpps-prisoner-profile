@@ -17,6 +17,7 @@ import HmppsError from '../../interfaces/HmppsError'
 import { enablePrisonPerson } from '../../utils/featureToggles'
 import { FieldData } from './fieldData'
 import logger from '../../../logger'
+import miniBannerData from '../utils/miniBannerData'
 
 export default class PersonalController {
   constructor(
@@ -59,7 +60,7 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        showChangeLinks: prisonPersonEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
       })
     }
   }
@@ -70,20 +71,18 @@ export default class PersonalController {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
+          const { firstName, lastName } = prisonerData
           const fieldValueFlash = req.flash('fieldValue')
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
           res.render('pages/edit/heightMetric', {
-            pageTitle: 'Edit Height',
+            pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
-            breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-              style: NameFormatStyle.lastCommaFirst,
-            }),
+            breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
             errors: hasLength(errors) ? errors : [],
-            fieldName: 'Height',
             fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalAttributes.height,
-            fieldSuffix: 'cm',
+            miniBannerData: miniBannerData(prisonerData),
           })
         },
 
@@ -93,10 +92,26 @@ export default class PersonalController {
           const { editField } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const height = parseInt(editField, 10)
-          if (Number.isNaN(height) || height <= 0) {
+          const height = editField ? parseInt(editField, 10) : 0
+
+          const validations = [
+            {
+              validation: () => editField === '' || editField === undefined || !Number.isNaN(height),
+              message: "Enter this person's height",
+            },
+            {
+              validation: () => height >= 50 && height <= 280,
+              message: 'Height must be between 50 centimetres and 280 centimetres',
+            },
+          ]
+
+          const errors = validations.find(({ validation }) => {
+            return !validation()
+          })
+
+          if (errors) {
             req.flash('fieldValue', editField)
-            req.flash('errors', [{ text: 'Enter a number greater than 0' }])
+            req.flash('errors', [{ text: errors.message }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
           }
 
@@ -138,6 +153,7 @@ export default class PersonalController {
             errors: hasLength(errors) ? errors : [],
             feetValue: hasLength(feetValueFlash) ? feetValueFlash[0] : feet,
             inchesValue: hasLength(inchesValueFlash) ? inchesValueFlash[0] : inches,
+            miniBannerData: miniBannerData(prisonerData),
           })
         },
 
@@ -150,10 +166,31 @@ export default class PersonalController {
           const feet = parseInt(feetString, 10)
           const inches = parseInt(inchesString, 10)
 
-          if (Number.isNaN(feet) || feet <= 0 || Number.isNaN(inches) || inches <= 0) {
+          const validations = [
+            {
+              isInvalid: () =>
+                ((feetString === '' || feetString === undefined) &&
+                  (inchesString === '' || inchesString === undefined)) ||
+                feet < 1 ||
+                feet > 9 ||
+                (feet === 9 && inches > 0),
+              message: 'Height must be between 1 feet and 9 feet',
+            },
+            {
+              isInvalid: () =>
+                feetString === '' || feetString === undefined || Number.isNaN(feet) || Number.isNaN(inches),
+              message: 'Feet must be between 1 and 9. Inches must be between 0 and 11',
+            },
+          ]
+
+          const errors = validations.find(({ isInvalid }) => {
+            return isInvalid()
+          })
+
+          if (errors) {
             req.flash('feetValue', feet)
             req.flash('inchesValue', inches)
-            req.flash('errors', [{ text: 'Enter a number greater than 0' }])
+            req.flash('errors', [{ text: errors.message }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
           }
 

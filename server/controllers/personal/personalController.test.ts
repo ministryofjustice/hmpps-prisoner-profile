@@ -18,7 +18,7 @@ describe('PersonalController', () => {
 
   const defaultMiddleware = {
     clientToken: 'token',
-    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001' },
+    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001', prisonerNumber: 'ABC123' },
   }
 
   const defaultLocals = {
@@ -54,7 +54,7 @@ describe('PersonalController', () => {
       describe('edit', () => {
         const action = async (req: any, res: any) => controller.height().metric.edit(req, res, () => {})
 
-        it('Renders the deefault edit page with the correct data from the prison person API', async () => {
+        it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (): any => {
@@ -71,9 +71,14 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            fieldName: expect.anything(),
             fieldValue: 102,
-            fieldSuffix: expect.anything(),
+            miniBannerData: {
+              miniBannerData: {
+                cellLocation: '2-3-001',
+                prisonerName: 'Last, First',
+                prisonerNumber: 'ABC123',
+              },
+            },
           })
         })
 
@@ -155,8 +160,12 @@ describe('PersonalController', () => {
         })
 
         it.each([
-          ['-1', 'Enter a number greater than 0'],
-          ['Example', 'Enter a number greater than 0'],
+          ['-1', 'Height must be between 50 centimetres and 280 centimetres'],
+          ['49', 'Height must be between 50 centimetres and 280 centimetres'],
+          ['281', 'Height must be between 50 centimetres and 280 centimetres'],
+          [undefined, 'Height must be between 50 centimetres and 280 centimetres'],
+          ['', 'Height must be between 50 centimetres and 280 centimetres'],
+          ['Example', "Enter this person's height"],
         ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
           const req = {
             middleware: defaultMiddleware,
@@ -194,6 +203,13 @@ describe('PersonalController', () => {
             errors: [],
             feetValue: 3,
             inchesValue: 4,
+            miniBannerData: {
+              miniBannerData: {
+                cellLocation: '2-3-001',
+                prisonerName: 'Last, First',
+                prisonerNumber: 'ABC123',
+              },
+            },
           })
         })
 
@@ -280,15 +296,27 @@ describe('PersonalController', () => {
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
 
-        // TODO: Update these
         it.each([
-          ['-1', 'Enter a number greater than 0'],
-          ['Example', 'Enter a number greater than 0'],
-        ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
+          { feet: '5', inches: '2' },
+          { feet: '3', inches: '' },
+        ])('Valid request: %s', async () => {
+          await action(validRequest, mockResponse)
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+        })
+
+        it.each([
+          [{ feet: '', inches: '' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '0', inches: '11' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '9', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+          [{ feet: 'example', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+          [{ feet: '5', inches: 'example' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+        ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {
           const req = {
             middleware: defaultMiddleware,
             params: { prisonerNumber: 'ABC123' },
-            body: { editField: value },
+            body: { feet, inches },
             flash: jest.fn(),
           } as any
           await action(req, mockResponse)
@@ -305,7 +333,7 @@ describe('PersonalController', () => {
       describe('edit', () => {
         const action = async (req: any, res: any) => controller.weight().metric.edit(req, res, () => {})
 
-        it('Renders the deefault edit page with the correct data from the prison person API', async () => {
+        it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (): any => {
