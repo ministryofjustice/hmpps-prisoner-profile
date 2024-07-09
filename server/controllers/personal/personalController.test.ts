@@ -159,11 +159,23 @@ describe('PersonalController', () => {
         })
 
         it.each([
+          { editField: '', updateRequest: { height: null } },
+          { editField: '100', updateRequest: { height: 100 } },
+        ])('Valid request: %s', async ({ editField, updateRequest }) => {
+          const request = { ...validRequest, body: { editField } }
+          await action(request, mockResponse)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+        })
+
+        it.each([
           ['-1', 'Height must be between 50 centimetres and 280 centimetres'],
           ['49', 'Height must be between 50 centimetres and 280 centimetres'],
           ['281', 'Height must be between 50 centimetres and 280 centimetres'],
-          [undefined, 'Height must be between 50 centimetres and 280 centimetres'],
-          ['', 'Height must be between 50 centimetres and 280 centimetres'],
           ['Example', "Enter this person's height"],
         ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
           const req = {
@@ -295,15 +307,21 @@ describe('PersonalController', () => {
         })
 
         it.each([
-          { feet: '5', inches: '2' },
-          { feet: '3', inches: '' },
-        ])('Valid request: %s', async () => {
-          await action(validRequest, mockResponse)
+          { feet: '', inches: '', updateRequest: { height: null } },
+          { feet: '5', inches: '2', updateRequest: { height: 157 } },
+          { feet: '3', inches: '', updateRequest: { height: 91 } },
+        ])('Valid request: %s', async ({ feet, inches, updateRequest }) => {
+          const request = { ...validRequest, body: { feet, inches } }
+          await action(request, mockResponse)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it.each([
-          [{ feet: '', inches: '' }, 'Height must be between 1 feet and 9 feet'],
           [{ feet: '0', inches: '11' }, 'Height must be between 1 feet and 9 feet'],
           [{ feet: '9', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
           [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],

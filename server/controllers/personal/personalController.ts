@@ -95,12 +95,19 @@ export default class PersonalController {
           const height = editField ? parseInt(editField, 10) : 0
 
           const validatedInput = (): { valid: boolean; errorMessage?: string } => {
+            // Empty input is allowed
+            if (editField === '') {
+              return { valid: true }
+            }
+
             if (Number.isNaN(height)) {
               return { valid: false, errorMessage: "Enter this person's height" }
             }
+
             if (height < 50 || height > 280) {
               return { valid: false, errorMessage: 'Height must be between 50 centimetres and 280 centimetres' }
             }
+
             return { valid: true }
           }
 
@@ -114,7 +121,7 @@ export default class PersonalController {
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
-              height,
+              height: editField ? height : null,
               weight: prisonPerson?.physicalAttributes.weight ?? null,
             })
 
@@ -160,16 +167,21 @@ export default class PersonalController {
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const feet = parseInt(feetString, 10)
-          const inches = parseInt(inchesString, 10)
+          const feet = feetString ? parseInt(feetString, 10) : 0
+          const inches = inchesString ? parseInt(inchesString, 10) : 0
 
           const validatedInput = () => {
-            if ((!feetString && !inchesString) || feet < 1 || feet > 9 || (feet === 9 && inches > 0)) {
-              return { valid: false, errorMessage: 'Height must be between 1 feet and 9 feet' }
+            // Empty input is allowed for both or inches only
+            if ((!feetString && !inchesString) || (feetString && !inchesString)) {
+              return { valid: true }
             }
 
             if (!feetString || Number.isNaN(feet) || Number.isNaN(inches) || (feet >= 1 && feet <= 9 && inches < 0)) {
               return { valid: false, errorMessage: 'Feet must be between 1 and 9. Inches must be between 0 and 11' }
+            }
+
+            if (feet < 1 || feet > 9 || (feet === 9 && inches > 0)) {
+              return { valid: false, errorMessage: 'Height must be between 1 feet and 9 feet' }
             }
 
             return { valid: true }
@@ -187,7 +199,7 @@ export default class PersonalController {
           try {
             const height = feetAndInchesToCentimetres(feet, inches)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
-              height,
+              height: !feetString && !inchesString ? null : height,
               weight: prisonPerson?.physicalAttributes.weight,
             })
 

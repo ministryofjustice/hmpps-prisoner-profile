@@ -35,11 +35,6 @@ context('Edit height (metric)', () => {
     validInputs: { textInputs: { editField: '125' } },
     invalidResponses: [
       {
-        testDescription: 'Empty',
-        inputs: { textInputs: { editField: '' } },
-        errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
-      },
-      {
         testDescription: 'Negative number',
         inputs: { textInputs: { editField: '-10' } },
         errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
@@ -112,11 +107,6 @@ context('Edit height (Imperial)', () => {
         testDescription: 'Inches: Negative number',
         inputs: { textInputs: { feet: '5', inches: '-1' } },
         errorMessages: ['Feet must be between 1 and 9. Inches must be between 0 and 11'],
-      },
-      {
-        testDescription: 'No input',
-        inputs: { textInputs: { feet: '', inches: '' } },
-        errorMessages: ['Height must be between 1 feet and 9 feet'],
       },
     ],
     editPageWithTitle: EditHeight,
