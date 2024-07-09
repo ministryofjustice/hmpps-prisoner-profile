@@ -326,8 +326,8 @@ describe('PersonalController', () => {
           [{ feet: '9', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
           [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
           [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
-          [{ feet: 'example', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
-          [{ feet: '5', inches: 'example' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+          [{ feet: 'example', inches: '1' }, "Enter this person's height"],
+          [{ feet: '5', inches: 'example' }, "Enter this person's height"],
           [{ feet: '-5', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
           [{ feet: '1', inches: '-5' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
         ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {
@@ -339,6 +339,8 @@ describe('PersonalController', () => {
           } as any
           await action(req, mockResponse)
 
+          expect(req.flash).toHaveBeenCalledWith('feetValue', feet)
+          expect(req.flash).toHaveBeenCalledWith('inchesValue', inches)
           expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#feet' }])
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })

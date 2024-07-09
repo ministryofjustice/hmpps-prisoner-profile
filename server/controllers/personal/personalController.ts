@@ -176,7 +176,11 @@ export default class PersonalController {
               return { valid: true }
             }
 
-            if (!feetString || Number.isNaN(feet) || Number.isNaN(inches) || (feet >= 1 && feet <= 9 && inches < 0)) {
+            if (Number.isNaN(feet) || Number.isNaN(inches)) {
+              return { valid: false, errorMessage: "Enter this person's height" }
+            }
+
+            if (!feetString || (feet >= 1 && feet <= 9 && inches < 0)) {
               return { valid: false, errorMessage: 'Feet must be between 1 and 9. Inches must be between 0 and 11' }
             }
 
@@ -190,8 +194,8 @@ export default class PersonalController {
           const { valid, errorMessage } = validatedInput()
 
           if (!valid) {
-            req.flash('feetValue', feet)
-            req.flash('inchesValue', inches)
+            req.flash('feetValue', feetString)
+            req.flash('inchesValue', inchesString)
             req.flash('errors', [{ text: errorMessage, href: '#feet' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
           }
