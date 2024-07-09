@@ -28,9 +28,8 @@ export function editPageTests<TPage extends EditPage>(options: {
 }) {
   const {
     editUrl,
-    // TODO uncomment when used below
-    // prisonerNumber,
-    // prisonerName,
+    prisonerNumber,
+    prisonerName,
     testSetup,
     validInputs,
     editPage,
@@ -98,10 +97,9 @@ export function editPageTests<TPage extends EditPage>(options: {
 
         it('Can load the edit page', () => {
           page = getPage()
-          // TODO uncomment when height/weight are updated to contain mini banner
-          // page.miniBanner().card().should('be.visible')
-          // page.miniBanner().name().should('contain.text', prisonerName)
-          // page.miniBanner().name().should('contain.text', prisonerNumber)
+          page.miniBanner().card().should('be.visible')
+          page.miniBanner().name().should('contain.text', prisonerName)
+          page.miniBanner().name().should('contain.text', prisonerNumber)
         })
 
         it('Can submit a valid response', () => {
@@ -110,8 +108,7 @@ export function editPageTests<TPage extends EditPage>(options: {
           page.submit()
 
           cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
-          // TODO uncomment when height/weight are updated to return to #appearance anchor
-          // cy.location('hash').should('eq', '#appearance')
+          cy.location('hash').should('eq', '#appearance')
 
           page.flashMessage().should('include.text', successfulFlashMessage)
         })

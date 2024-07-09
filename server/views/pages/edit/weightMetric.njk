@@ -4,56 +4,66 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set hideBackLink = true %}
 {%
   set breadCrumbs = [
-  {
-  text: 'Digital Prison Services',
-  href:  "/" | prependBaseUrl
-  },
-  {
-  text: breadcrumbPrisonerName,
-  href: "/prisoner/" + prisonerNumber
-  }
+    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
   ]
 %}
 {% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if errors.length > 0 %}
+        {{
+          govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true }
+          })
+        }}
+      {% endif %}
+    </div>
+  </div>
 
-  {% if errors.length > 0 %}
-    {{
-      govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: errors,
-          attributes: { 'data-qa-errors': true }
-      })
-    }}
-  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
+
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1>Weight</h1>
+    </div>
+  </div>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <div class="govuk-form-group">
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
           {{
             govukInput({
               label: {
-                text: "Edit " + fieldName,
-                classes: "govuk-label--l",
-                isPageHeading: true
-              },
-              hint: {
                 text: "Kilograms"
               },
-              id: "edit-field",
-              name: "editField",
+              id: "kilograms",
+              name: "kilograms",
               value: fieldValue,
-              classes: "govuk-input--width-3"
+              classes: "govuk-input--width-3",
+              errorMessage: { text: errors[0].text } if errors.length > 0
             })
           }}
         </div>
         <p class="govuk-body">
-          <a class="govuk-link" data-qa="switch-units" href="/prisoner/{{ prisonerNumber }}/personal/edit/height/imperial">
-            Switch to stones and pounds
+          <a
+            class="govuk-link"
+            data-qa="switch-units"
+            href="/prisoner/{{ prisonerNumber }}/personal/edit/weight/imperial"
+          >
+            Switch to stone and pounds
           </a>
         </p>
         <div class="govuk-button-group">
@@ -65,6 +75,12 @@
             attributes: { "data-qa": "edit-submit-button" }
             })
           }}
+          <a
+            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button"
+            >Cancel</a
+          >
         </div>
       </form>
     </div>
