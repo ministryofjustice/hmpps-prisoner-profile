@@ -9,19 +9,24 @@
 {%
   set breadCrumbs = [
     { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber }
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
   ]
 %}
 {% block body %}
 
   {% if errors.length > 0 %}
-    {{
-      govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: errors,
-          attributes: { 'data-qa-errors': true }
-      })
-    }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{
+        govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors,
+            attributes: { 'data-qa-errors': true }
+        })
+      }}
+    </div>
+  </div>
   {% endif %}
 
   <div class="govuk-grid-row">
@@ -38,16 +43,17 @@
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <div class="govuk-form-group">
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
           {{
             govukInput({
               label: {
                 text: "Centimetres"
               },
-              id: "edit-field",
+              id: "height",
               name: "editField",
               value: fieldValue,
-              classes: "govuk-input--width-3"
+              classes: "govuk-input--width-3",
+              errorMessage: { text: errors[0].text } if errors.length > 0
             })
           }}
         </div>
@@ -69,6 +75,7 @@
             attributes: { "data-qa": "edit-submit-button" }
             })
           }}
+          <a href="/prisoner/{{ prisonerNumber }}/personal#appearance" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
         </div>
       </form>
     </div>

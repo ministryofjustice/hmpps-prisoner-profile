@@ -73,11 +73,9 @@ describe('PersonalController', () => {
             errors: [],
             fieldValue: 102,
             miniBannerData: {
-              miniBannerData: {
-                cellLocation: '2-3-001',
-                prisonerName: 'Last, First',
-                prisonerNumber: 'ABC123',
-              },
+              cellLocation: '2-3-001',
+              prisonerName: 'Last, First',
+              prisonerNumber: 'ABC123',
             },
           })
         })
@@ -176,7 +174,7 @@ describe('PersonalController', () => {
           } as any
           await action(req, mockResponse)
 
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
+          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#height' }])
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
       })
@@ -205,11 +203,9 @@ describe('PersonalController', () => {
             feetValue: 3,
             inchesValue: 4,
             miniBannerData: {
-              miniBannerData: {
-                cellLocation: '2-3-001',
-                prisonerName: 'Last, First',
-                prisonerNumber: 'ABC123',
-              },
+              cellLocation: '2-3-001',
+              prisonerName: 'Last, First',
+              prisonerNumber: 'ABC123',
             },
           })
         })
@@ -325,7 +321,7 @@ describe('PersonalController', () => {
           } as any
           await action(req, mockResponse)
 
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
+          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#feet' }])
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
       })

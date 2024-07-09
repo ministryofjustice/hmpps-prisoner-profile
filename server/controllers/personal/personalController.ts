@@ -94,24 +94,21 @@ export default class PersonalController {
 
           const height = editField ? parseInt(editField, 10) : 0
 
-          const validations = [
-            {
-              validation: () => editField === '' || editField === undefined || !Number.isNaN(height),
-              message: "Enter this person's height",
-            },
-            {
-              validation: () => height >= 50 && height <= 280,
-              message: 'Height must be between 50 centimetres and 280 centimetres',
-            },
-          ]
+          const validatedInput = (): { valid: boolean; errorMessage?: string } => {
+            if (Number.isNaN(height)) {
+              return { valid: false, errorMessage: "Enter this person's height" }
+            }
+            if (height < 50 || height > 280) {
+              return { valid: false, errorMessage: 'Height must be between 50 centimetres and 280 centimetres' }
+            }
+            return { valid: true }
+          }
 
-          const errors = validations.find(({ validation }) => {
-            return !validation()
-          })
+          const { valid, errorMessage } = validatedInput()
 
-          if (errors) {
+          if (!valid) {
             req.flash('fieldValue', editField)
-            req.flash('errors', [{ text: errors.message }])
+            req.flash('errors', [{ text: errorMessage, href: '#height' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
           }
 
@@ -166,35 +163,24 @@ export default class PersonalController {
           const feet = parseInt(feetString, 10)
           const inches = parseInt(inchesString, 10)
 
-          const validations = [
-            {
-              isInvalid: () =>
-                ((feetString === '' || feetString === undefined) &&
-                  (inchesString === '' || inchesString === undefined)) ||
-                feet < 1 ||
-                feet > 9 ||
-                (feet === 9 && inches > 0),
-              message: 'Height must be between 1 feet and 9 feet',
-            },
-            {
-              isInvalid: () =>
-                feetString === '' ||
-                feetString === undefined ||
-                Number.isNaN(feet) ||
-                Number.isNaN(inches) ||
-                (feet >= 1 && feet <= 9 && inches < 0),
-              message: 'Feet must be between 1 and 9. Inches must be between 0 and 11',
-            },
-          ]
+          const validatedInput = () => {
+            if ((!feetString && !inchesString) || feet < 1 || feet > 9 || (feet === 9 && inches > 0)) {
+              return { valid: false, errorMessage: 'Height must be between 1 feet and 9 feet' }
+            }
 
-          const errors = validations.find(({ isInvalid }) => {
-            return isInvalid()
-          })
+            if (!feetString || Number.isNaN(feet) || Number.isNaN(inches) || (feet >= 1 && feet <= 9 && inches < 0)) {
+              return { valid: false, errorMessage: 'Feet must be between 1 and 9. Inches must be between 0 and 11' }
+            }
 
-          if (errors) {
+            return { valid: true }
+          }
+
+          const { valid, errorMessage } = validatedInput()
+
+          if (!valid) {
             req.flash('feetValue', feet)
             req.flash('inchesValue', inches)
-            req.flash('errors', [{ text: errors.message }])
+            req.flash('errors', [{ text: errorMessage, href: '#feet' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
           }
 

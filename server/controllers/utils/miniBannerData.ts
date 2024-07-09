@@ -7,10 +7,8 @@ export default (prisonerData: Prisoner) => {
   const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
   return {
-    miniBannerData: {
-      prisonerName: prisonerBannerName,
-      prisonerNumber,
-      cellLocation: formatLocation(cellLocation),
-    },
+    prisonerName: prisonerBannerName,
+    prisonerNumber,
+    cellLocation: formatLocation(cellLocation),
   }
 }
