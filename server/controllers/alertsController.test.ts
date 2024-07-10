@@ -324,7 +324,7 @@ describe('Alerts Controller', () => {
 
       await controller.post()(req, res, next)
 
-      expect(createAlertsSpy).toHaveBeenCalledWith(res.locals.user.token, {
+      expect(createAlertsSpy).toHaveBeenCalledWith('CLIENT_TOKEN', res.locals.user.token, {
         prisonId: 'MDI',
         bookingId: 123456,
         prisonerNumber: req.params.prisonerNumber,
@@ -621,7 +621,7 @@ describe('Alerts Controller', () => {
 
       await controller.postAddMoreDetails()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith('CLIENT_TOKEN', res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${req.params.prisonerNumber}/alerts/active`)
@@ -724,7 +724,7 @@ describe('Alerts Controller', () => {
 
       await controller.postCloseAlert()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith('CLIENT_TOKEN', res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
         activeTo: formatDateISO(new Date()),
       })
@@ -828,7 +828,7 @@ describe('Alerts Controller', () => {
 
       await controller.postChangeEndDate()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith('CLIENT_TOKEN', res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
         activeTo: null,
       })
@@ -845,7 +845,7 @@ describe('Alerts Controller', () => {
 
       await controller.postChangeEndDate()(req, res, next)
 
-      expect(updateAlert).toHaveBeenCalledWith(res.locals.user.token, 'MDI', 123456, '1', {
+      expect(updateAlert).toHaveBeenCalledWith('CLIENT_TOKEN', res.locals.user.token, 'MDI', 123456, '1', {
         description: 'New comment',
         activeTo: '2199-01-01',
       })

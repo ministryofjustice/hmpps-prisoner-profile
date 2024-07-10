@@ -173,7 +173,7 @@ export default class AlertsController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.alertsService.createAlert(res.locals.user.token, {
+          await this.alertsService.createAlert(req.middleware.clientToken, res.locals.user.token, {
             prisonId: 'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
             bookingId,
             prisonerNumber,
@@ -343,6 +343,7 @@ export default class AlertsController {
       if (!errors.length) {
         try {
           await this.alertsService.updateAlert(
+            req.middleware.clientToken,
             res.locals.user.token,
             'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
             bookingId,
@@ -449,6 +450,7 @@ export default class AlertsController {
       if (!errors.length) {
         try {
           await this.alertsService.updateAlert(
+            req.middleware.clientToken,
             res.locals.user.token,
             'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
             bookingId,
@@ -561,6 +563,7 @@ export default class AlertsController {
       if (!errors.length) {
         try {
           await this.alertsService.updateAlert(
+            req.middleware.clientToken,
             res.locals.user.token,
             'activeCaseLoadId' in res.locals.user ? res.locals.user.activeCaseLoadId : undefined,
             bookingId,
