@@ -6,7 +6,7 @@ import {
   centimetresToFeetAndInches,
   feetAndInchesToCentimetres,
   kilogramsToStoneAndPounds,
-  stonesAndPoundsToKilograms,
+  stoneAndPoundsToKilograms,
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
@@ -76,6 +76,14 @@ export default class PersonalController {
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.EditHeight,
+          })
+
           res.render('pages/edit/heightMetric', {
             pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
@@ -126,6 +134,17 @@ export default class PersonalController {
             })
 
             req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
+
+            this.auditService
+              .sendPostSuccess({
+                user: res.locals.user,
+                prisonerNumber,
+                correlationId: req.id,
+                action: PostAction.EditPhysicalCharacteristics,
+                details: { pageTitle: 'Height' },
+              })
+              .catch(error => logger.error(error))
+
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('fieldValue', editField)
@@ -147,7 +166,14 @@ export default class PersonalController {
           const inchesValueFlash = req.flash('inchesValue')
           const errors = req.flash('errors')
 
-          // Imperial is two fields so we can't use single field
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.EditHeight,
+          })
+
           res.render('pages/edit/heightImperial', {
             pageTitle: 'Edit Height',
             prisonerNumber,
@@ -208,6 +234,17 @@ export default class PersonalController {
             })
 
             req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
+
+            this.auditService
+              .sendPostSuccess({
+                user: res.locals.user,
+                prisonerNumber,
+                correlationId: req.id,
+                action: PostAction.EditPhysicalCharacteristics,
+                details: { pageTitle: 'Height' },
+              })
+              .catch(error => logger.error(error))
+
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('feetValue', feet)
@@ -230,6 +267,14 @@ export default class PersonalController {
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.EditWeight,
+          })
+
           res.render('pages/edit/weightMetric', {
             pageTitle: 'Edit weight',
             prisonerNumber,
@@ -239,32 +284,52 @@ export default class PersonalController {
             errors: hasLength(errors) ? errors : [],
             fieldName: 'weight',
             fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalAttributes.weight,
+            miniBannerData: miniBannerData(prisonerData),
           })
         },
 
         submit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
-          const { editField } = req.body
+          const { kilograms } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const weight = parseInt(editField, 10)
-          if (Number.isNaN(weight) || weight <= 0) {
-            req.flash('fieldValue', editField)
-            req.flash('errors', [{ text: 'Enter a number greater than 0' }])
+          const weight = parseInt(kilograms, 10)
+          const validatedInput = (): { valid: boolean; errorMessage?: string } => {
+            // Empty input is allowed
+            if (kilograms === '') {
+              return { valid: true }
+            }
+
+            if (Number.isNaN(weight)) {
+              return { valid: false, errorMessage: "Enter this person's weight" }
+            }
+
+            if (weight < 12 || weight > 640) {
+              return { valid: false, errorMessage: 'Weight must be between 12 kilograms and 640 kilograms' }
+            }
+
+            return { valid: true }
+          }
+
+          const { valid, errorMessage } = validatedInput()
+
+          if (!valid) {
+            req.flash('kilogramsValue', kilograms)
+            req.flash('errors', [{ text: errorMessage, href: '#kilograms' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight`)
           }
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
-              weight,
+              weight: kilograms ? weight : null,
               height: prisonPerson?.physicalAttributes.height ?? null,
             })
 
-            req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
+            req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
-            req.flash('fieldValue', editField)
+            req.flash('kilogramsValue', kilograms)
             req.flash('errors', [{ text: 'There was an error please try again' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight`)
           }
@@ -277,11 +342,29 @@ export default class PersonalController {
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const { stones, pounds } = kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
+          const { stone, pounds } = kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
 
-          const stonesValueFlash = req.flash('stonesValue')
+          const stoneValueFlash = req.flash('stoneValue')
           const poundsValueFlash = req.flash('poundsValue')
           const errors = req.flash('errors')
+
+          await this.auditService.sendPageView({
+            user: res.locals.user,
+            prisonerNumber: prisonerData.prisonerNumber,
+            prisonId: prisonerData.prisonId,
+            correlationId: req.id,
+            page: Page.EditWeight,
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle: 'Weight' },
+            })
+            .catch(error => logger.error(error))
 
           res.render('pages/edit/weightImperial', {
             pageTitle: 'Edit weight',
@@ -290,38 +373,72 @@ export default class PersonalController {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors: hasLength(errors) ? errors : [],
-            stonesValue: hasLength(stonesValueFlash) ? stonesValueFlash[0] : stones,
+            stoneValue: hasLength(stoneValueFlash) ? stoneValueFlash[0] : stone,
             poundsValue: hasLength(poundsValueFlash) ? poundsValueFlash[0] : pounds,
+            miniBannerData: miniBannerData(prisonerData),
           })
         },
 
         submit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
-          const { stones: stonesString, pounds: poundsString }: { stones: string; pounds: string } = req.body
+          const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const stones = parseInt(stonesString, 10)
-          const pounds = parseInt(poundsString, 10)
+          const stone = stoneString ? parseInt(stoneString, 10) : 0
+          const pounds = poundsString ? parseInt(poundsString, 10) : 0
 
-          if (Number.isNaN(stones) || stones <= 0 || Number.isNaN(pounds) || pounds <= 0) {
-            req.flash('stonesValue', stones)
-            req.flash('poundsValue', pounds)
-            req.flash('errors', [{ text: 'Enter a number greater than 0' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
+          const validatedInput = () => {
+            // Empty input is allowed for both or pounds only
+            if ((!stoneString && !poundsString) || (stoneString && !poundsString)) {
+              return { valid: true }
+            }
+
+            if (Number.isNaN(stone) || Number.isNaN(pounds)) {
+              return { valid: false, errorMessage: "Enter this person's weight" }
+            }
+
+            if (!stoneString || (stone >= 2 && stone <= 100 && (pounds < 0 || pounds > 13))) {
+              return { valid: false, errorMessage: 'Stone must be between 2 and 100. Pounds must be between 0 and 13' }
+            }
+
+            if (stone < 2 || stone > 100 || (stone === 100 && pounds > 0)) {
+              return { valid: false, errorMessage: 'Weight must be between 2 stone and 100 stone' }
+            }
+
+            return { valid: true }
           }
 
+          const { valid, errorMessage } = validatedInput()
+
+          if (!valid) {
+            req.flash('stoneValue', stoneString)
+            req.flash('poundsValue', poundsString)
+            req.flash('errors', [{ text: errorMessage, href: '#stone' }])
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
+          }
           try {
-            const weight = stonesAndPoundsToKilograms(stones, pounds)
+            const weight = stoneAndPoundsToKilograms(stone, pounds)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
-              weight,
+              weight: !stoneString && !poundsString ? null : weight,
               height: prisonPerson?.physicalAttributes.height,
             })
 
-            req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
+            req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
+
+            this.auditService
+              .sendPostSuccess({
+                user: res.locals.user,
+                prisonerNumber,
+                correlationId: req.id,
+                action: PostAction.EditPhysicalCharacteristics,
+                details: { pageTitle: 'Weight' },
+              })
+              .catch(error => logger.error(error))
+
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
-            req.flash('stonesValue', stones)
+            req.flash('stoneValue', stone)
             req.flash('poundsValue', pounds)
             req.flash('errors', [{ text: 'There was an error please try again' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)

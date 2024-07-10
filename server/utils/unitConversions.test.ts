@@ -2,7 +2,7 @@ import {
   centimetresToFeetAndInches,
   feetAndInchesToCentimetres,
   kilogramsToStoneAndPounds,
-  stonesAndPoundsToKilograms,
+  stoneAndPoundsToKilograms,
 } from './unitConversions'
 
 describe('Unit conversions', () => {
@@ -37,27 +37,27 @@ describe('Unit conversions', () => {
   })
 
   describe('KG/Stone', () => {
-    describe('Kilograms to stones and pounds', () => {
+    describe('Kilograms to stone and pounds', () => {
       it.each([
-        [null, { stones: 0, pounds: 0 }],
-        [60, { stones: 9, pounds: 6 }],
-        [63, { stones: 9, pounds: 13 }],
-        [63.4, { stones: 10, pounds: 0 }],
-        [63.5, { stones: 10, pounds: 0 }],
-        [64, { stones: 10, pounds: 1 }],
-      ])('%s kg -> %s', (kilograms: number, expectedResult: { stones: number; pounds: number }) => {
+        [null, { stone: 0, pounds: 0 }],
+        [60, { stone: 9, pounds: 6 }],
+        [63, { stone: 9, pounds: 13 }],
+        [63.4, { stone: 10, pounds: 0 }],
+        [63.5, { stone: 10, pounds: 0 }],
+        [64, { stone: 10, pounds: 1 }],
+      ])('%s kg -> %s', (kilograms: number, expectedResult: { stone: number; pounds: number }) => {
         expect(kilogramsToStoneAndPounds(kilograms)).toEqual(expectedResult)
       })
     })
 
-    describe('Stones and pounds to Kilograms', () => {
+    describe('stone and pounds to Kilograms', () => {
       it.each([
-        [{ stones: 0, pounds: 0 }, 0],
-        [{ stones: 9, pounds: 6 }, 60],
-        [{ stones: 9, pounds: 13 }, 63],
-        [{ stones: 10, pounds: 0 }, 64],
-      ])('%s -> %s kg', ({ stones, pounds }: { stones: number; pounds: number }, expectedResult) => {
-        expect(stonesAndPoundsToKilograms(stones, pounds)).toEqual(expectedResult)
+        [{ stone: 0, pounds: 0 }, 0],
+        [{ stone: 9, pounds: 6 }, 60],
+        [{ stone: 9, pounds: 13 }, 63],
+        [{ stone: 10, pounds: 0 }, 64],
+      ])('%s -> %s kg', ({ stone, pounds }: { stone: number; pounds: number }, expectedResult) => {
+        expect(stoneAndPoundsToKilograms(stone, pounds)).toEqual(expectedResult)
       })
     })
   })
