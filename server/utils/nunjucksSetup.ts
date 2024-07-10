@@ -36,6 +36,7 @@ import visitsSummaryToMiniSummary from '../views/dataUtils/visitsSummaryToMiniSu
 import csraSummaryToMiniSummary from '../views/dataUtils/csraSummaryToMiniSummary'
 import categorySummaryToMiniSummary from '../views/dataUtils/categorySummaryToMiniSummary'
 import incentiveSummaryToMiniSummary from '../views/dataUtils/incentiveSummaryToMiniSummary'
+import summaryListRowWithOptionalChangeLink from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -155,4 +156,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
+  njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
 }

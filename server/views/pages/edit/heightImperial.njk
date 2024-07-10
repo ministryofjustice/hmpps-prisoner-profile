@@ -5,77 +5,88 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set hideBackLink = true %}
 {%
   set breadCrumbs = [
-  {
-  text: 'Digital Prison Services',
-  href:  "/" | prependBaseUrl
-  },
-  {
-  text: breadcrumbPrisonerName,
-  href: "/prisoner/" + prisonerNumber
-  }
+    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
   ]
 %}
 {% block body %}
 
   {% if errors.length > 0 %}
-    {{
-      govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: errors,
-          attributes: { 'data-qa-errors': true }
-      })
-    }}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{
+          govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true }
+          })
+        }}
+      </div>
+    </div>
   {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        {%
-          call govukFieldset({
-            legend: {
-              text: "Edit height",
-              classes: "govuk-fieldset__legend--l",
-              isPageHeading: true
-            }
-          })
-        %}
-          <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-              <div class="govuk-grid-row">
-                <div class="govuk-grid-column-one-quarter">
-                  {{
-                    govukInput({
-                      label: {
-                        text: "Feet"
-                      },
-                      id: "feet",
-                      name: "feet",
-                      value: feetValue,
-                      classes: "govuk-input--width-3"
-                    })
-                  }}
-                </div>
-                <div class="govuk-grid-column-one-quarter">
-                  {{
-                    govukInput({
-                      label: {
-                        text: "Inches"
-                      },
-                      id: "inches",
-                      name: "inches",
-                      value: inchesValue,
-                      classes: "govuk-input--width-3"
-                    })
-                  }}
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+          {%
+            call govukFieldset({
+              legend: {
+                text: "Height",
+                classes: "govuk-fieldset__legend--l",
+                isPageHeading: true
+              }
+            })
+          %}
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-one-half">
+                {% if errors.length > 0 %}
+                  <p id="height-error" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span> {{ errors[0].text }}
+                  </p>
+                {% endif %}
+                <div class="govuk-grid-row">
+                  <div class="govuk-grid-column-one-quarter">
+                    {{
+                      govukInput({
+                        label: {
+                          text: "Feet"
+                        },
+                        id: "feet",
+                        name: "feet",
+                        value: feetValue,
+                        classes: "govuk-input--width-3"
+                      })
+                    }}
+                  </div>
+                  <div class="govuk-grid-column-one-quarter">
+                    {{
+                      govukInput({
+                        label: {
+                          text: "Inches"
+                        },
+                        id: "inches",
+                        name: "inches",
+                        value: inchesValue,
+                        classes: "govuk-input--width-3"
+                      })
+                    }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        {% endcall %}
+          {% endcall %}
+        </div>
         <p class="govuk-body">
           <a class="govuk-link" data-qa="switch-units" href="/prisoner/{{ prisonerNumber }}/personal/edit/height">
             Switch to centimetres
@@ -90,6 +101,7 @@
             attributes: { "data-qa": "edit-submit-button" }
             })
           }}
+          <a href="/prisoner/{{ prisonerNumber }}/personal#appearance" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
         </div>
       </form>
     </div>

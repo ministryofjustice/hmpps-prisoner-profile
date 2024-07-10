@@ -17,6 +17,7 @@ import HmppsError from '../../interfaces/HmppsError'
 import { enablePrisonPerson } from '../../utils/featureToggles'
 import { FieldData } from './fieldData'
 import logger from '../../../logger'
+import miniBannerData from '../utils/miniBannerData'
 
 export default class PersonalController {
   constructor(
@@ -59,7 +60,7 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        showChangeLinks: prisonPersonEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
       })
     }
   }
@@ -70,20 +71,18 @@ export default class PersonalController {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
+          const { firstName, lastName } = prisonerData
           const fieldValueFlash = req.flash('fieldValue')
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
           res.render('pages/edit/heightMetric', {
-            pageTitle: 'Edit Height',
+            pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
-            breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
-              style: NameFormatStyle.lastCommaFirst,
-            }),
+            breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
             errors: hasLength(errors) ? errors : [],
-            fieldName: 'Height',
             fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalAttributes.height,
-            fieldSuffix: 'cm',
+            miniBannerData: miniBannerData(prisonerData),
           })
         },
 
@@ -93,21 +92,41 @@ export default class PersonalController {
           const { editField } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const height = parseInt(editField, 10)
-          if (Number.isNaN(height) || height <= 0) {
+          const height = editField ? parseInt(editField, 10) : 0
+
+          const validatedInput = (): { valid: boolean; errorMessage?: string } => {
+            // Empty input is allowed
+            if (editField === '') {
+              return { valid: true }
+            }
+
+            if (Number.isNaN(height)) {
+              return { valid: false, errorMessage: "Enter this person's height" }
+            }
+
+            if (height < 50 || height > 280) {
+              return { valid: false, errorMessage: 'Height must be between 50 centimetres and 280 centimetres' }
+            }
+
+            return { valid: true }
+          }
+
+          const { valid, errorMessage } = validatedInput()
+
+          if (!valid) {
             req.flash('fieldValue', editField)
-            req.flash('errors', [{ text: 'Enter a number greater than 0' }])
+            req.flash('errors', [{ text: errorMessage, href: '#height' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
           }
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
-              height,
+              height: editField ? height : null,
               weight: prisonPerson?.physicalAttributes.weight ?? null,
             })
 
-            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('fieldValue', editField)
             req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -138,6 +157,7 @@ export default class PersonalController {
             errors: hasLength(errors) ? errors : [],
             feetValue: hasLength(feetValueFlash) ? feetValueFlash[0] : feet,
             inchesValue: hasLength(inchesValueFlash) ? inchesValueFlash[0] : inches,
+            miniBannerData: miniBannerData(prisonerData),
           })
         },
 
@@ -147,25 +167,48 @@ export default class PersonalController {
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-          const feet = parseInt(feetString, 10)
-          const inches = parseInt(inchesString, 10)
+          const feet = feetString ? parseInt(feetString, 10) : 0
+          const inches = inchesString ? parseInt(inchesString, 10) : 0
 
-          if (Number.isNaN(feet) || feet <= 0 || Number.isNaN(inches) || inches <= 0) {
-            req.flash('feetValue', feet)
-            req.flash('inchesValue', inches)
-            req.flash('errors', [{ text: 'Enter a number greater than 0' }])
+          const validatedInput = () => {
+            // Empty input is allowed for both or inches only
+            if ((!feetString && !inchesString) || (feetString && !inchesString)) {
+              return { valid: true }
+            }
+
+            if (Number.isNaN(feet) || Number.isNaN(inches)) {
+              return { valid: false, errorMessage: "Enter this person's height" }
+            }
+
+            if (!feetString || (feet >= 1 && feet <= 9 && inches < 0)) {
+              return { valid: false, errorMessage: 'Feet must be between 1 and 9. Inches must be between 0 and 11' }
+            }
+
+            if (feet < 1 || feet > 9 || (feet === 9 && inches > 0)) {
+              return { valid: false, errorMessage: 'Height must be between 1 feet and 9 feet' }
+            }
+
+            return { valid: true }
+          }
+
+          const { valid, errorMessage } = validatedInput()
+
+          if (!valid) {
+            req.flash('feetValue', feetString)
+            req.flash('inchesValue', inchesString)
+            req.flash('errors', [{ text: errorMessage, href: '#feet' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
           }
 
           try {
             const height = feetAndInchesToCentimetres(feet, inches)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
-              height,
+              height: !feetString && !inchesString ? null : height,
               weight: prisonPerson?.physicalAttributes.weight,
             })
 
-            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('feetValue', feet)
             req.flash('inchesValue', inches)
@@ -219,7 +262,7 @@ export default class PersonalController {
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('fieldValue', editField)
             req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -276,7 +319,7 @@ export default class PersonalController {
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success })
-            return res.redirect(`/prisoner/${prisonerNumber}/personal`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('stonesValue', stones)
             req.flash('poundsValue', pounds)

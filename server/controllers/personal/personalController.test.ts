@@ -18,7 +18,7 @@ describe('PersonalController', () => {
 
   const defaultMiddleware = {
     clientToken: 'token',
-    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001' },
+    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001', prisonerNumber: 'ABC123' },
   }
 
   const defaultLocals = {
@@ -54,7 +54,7 @@ describe('PersonalController', () => {
       describe('edit', () => {
         const action = async (req: any, res: any) => controller.height().metric.edit(req, res, () => {})
 
-        it('Renders the deefault edit page with the correct data from the prison person API', async () => {
+        it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (): any => {
@@ -71,9 +71,12 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            fieldName: expect.anything(),
             fieldValue: 102,
-            fieldSuffix: expect.anything(),
+            miniBannerData: {
+              cellLocation: '2-3-001',
+              prisonerName: 'Last, First',
+              prisonerNumber: 'ABC123',
+            },
           })
         })
 
@@ -131,7 +134,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
@@ -140,6 +143,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
             type: FlashMessageType.success,
+            fieldName: 'height',
           })
         })
 
@@ -155,8 +159,24 @@ describe('PersonalController', () => {
         })
 
         it.each([
-          ['-1', 'Enter a number greater than 0'],
-          ['Example', 'Enter a number greater than 0'],
+          { editField: '', updateRequest: { height: null } },
+          { editField: '100', updateRequest: { height: 100 } },
+        ])('Valid request: %s', async ({ editField, updateRequest }) => {
+          const request = { ...validRequest, body: { editField } }
+          await action(request, mockResponse)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+        })
+
+        it.each([
+          ['-1', 'Height must be between 50 centimetres and 280 centimetres'],
+          ['49', 'Height must be between 50 centimetres and 280 centimetres'],
+          ['281', 'Height must be between 50 centimetres and 280 centimetres'],
+          ['Example', "Enter this person's height"],
         ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
           const req = {
             middleware: defaultMiddleware,
@@ -166,7 +186,7 @@ describe('PersonalController', () => {
           } as any
           await action(req, mockResponse)
 
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
+          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#height' }])
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
       })
@@ -194,6 +214,11 @@ describe('PersonalController', () => {
             errors: [],
             feetValue: 3,
             inchesValue: 4,
+            miniBannerData: {
+              cellLocation: '2-3-001',
+              prisonerName: 'Last, First',
+              prisonerNumber: 'ABC123',
+            },
           })
         })
 
@@ -255,7 +280,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
@@ -264,6 +289,7 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
             type: FlashMessageType.success,
+            fieldName: 'height',
           })
         })
 
@@ -280,20 +306,42 @@ describe('PersonalController', () => {
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
 
-        // TODO: Update these
         it.each([
-          ['-1', 'Enter a number greater than 0'],
-          ['Example', 'Enter a number greater than 0'],
-        ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
+          { feet: '', inches: '', updateRequest: { height: null } },
+          { feet: '5', inches: '2', updateRequest: { height: 157 } },
+          { feet: '3', inches: '', updateRequest: { height: 91 } },
+        ])('Valid request: %s', async ({ feet, inches, updateRequest }) => {
+          const request = { ...validRequest, body: { feet, inches } }
+          await action(request, mockResponse)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+        })
+
+        it.each([
+          [{ feet: '0', inches: '11' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '9', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+          [{ feet: 'example', inches: '1' }, "Enter this person's height"],
+          [{ feet: '5', inches: 'example' }, "Enter this person's height"],
+          [{ feet: '-5', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
+          [{ feet: '1', inches: '-5' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
+        ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {
           const req = {
             middleware: defaultMiddleware,
             params: { prisonerNumber: 'ABC123' },
-            body: { editField: value },
+            body: { feet, inches },
             flash: jest.fn(),
           } as any
           await action(req, mockResponse)
 
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
+          expect(req.flash).toHaveBeenCalledWith('feetValue', feet)
+          expect(req.flash).toHaveBeenCalledWith('inchesValue', inches)
+          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#feet' }])
           expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
       })
@@ -305,7 +353,7 @@ describe('PersonalController', () => {
       describe('edit', () => {
         const action = async (req: any, res: any) => controller.weight().metric.edit(req, res, () => {})
 
-        it('Renders the deefault edit page with the correct data from the prison person API', async () => {
+        it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (): any => {
@@ -381,7 +429,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
@@ -507,7 +555,7 @@ describe('PersonalController', () => {
 
         it('Redirects to the personal page on success', async () => {
           await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal')
+          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {

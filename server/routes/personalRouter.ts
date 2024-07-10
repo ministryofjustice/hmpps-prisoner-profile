@@ -50,137 +50,140 @@ export default function personalRouter(services: Services): Router {
 
   const editRoute = ({
     url,
-    getMethod,
-    submitMethod,
+    edit,
+    submit,
   }: {
     url: string
-    getMethod: RequestHandler
-    submitMethod: RequestHandler
+    edit: {
+      method: RequestHandler
+      audit: Page
+    }
+    submit: {
+      method: RequestHandler
+      audit: Page
+    }
   }) => {
     get(
       url,
+      auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
       editRouteChecks(),
-      getMethod,
+      edit.method,
     )
 
     post(
       url,
+      auditPageAccessAttempt({ services, page: submit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
       editRouteChecks(),
-      submitMethod,
+      submit.method,
     )
   }
 
   editRoute({
     url: `${basePath}/edit/height`,
-    getMethod: personalController.height().metric.edit,
-    submitMethod: personalController.height().metric.submit,
+    edit: {
+      method: personalController.height().metric.edit,
+      // TODO Fix
+      audit: Page.Offences,
+    },
+    submit: {
+      method: personalController.height().metric.submit,
+      // TODO Fix
+      audit: Page.Offences,
+    },
   })
 
   editRoute({
     url: `${basePath}/edit/height/imperial`,
-    getMethod: personalController.height().imperial.edit,
-    submitMethod: personalController.height().imperial.submit,
+    // TODO Fix
+    edit: {
+      audit: Page.Offences,
+      method: personalController.height().imperial.edit,
+    },
+    submit: {
+      audit: Page.Offences,
+      method: personalController.height().imperial.submit,
+    },
   })
 
   editRoute({
     url: `${basePath}/edit/weight`,
-    getMethod: personalController.weight().metric.edit,
-    submitMethod: personalController.weight().metric.submit,
+    edit: {
+      audit: Page.Offences,
+      method: personalController.weight().metric.edit,
+    },
+    submit: {
+      audit: Page.Offences,
+      method: personalController.weight().metric.submit,
+    },
   })
 
   editRoute({
     url: `${basePath}/edit/weight/imperial`,
-    getMethod: personalController.weight().imperial.edit,
-    submitMethod: personalController.weight().imperial.submit,
+    edit: {
+      audit: Page.Offences,
+      method: personalController.weight().imperial.edit,
+    },
+    submit: {
+      audit: Page.Offences,
+      method: personalController.weight().imperial.submit,
+    },
   })
 
   // Hair type or colour
-  get(
-    `${basePath}/edit/hair`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.EditHairTypeOrColour }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(hairFieldData).edit,
-  )
-
-  post(
-    `${basePath}/edit/hair`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.PostEditHairTypeOrColour }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(hairFieldData).submit,
-  )
+  editRoute({
+    url: `${basePath}/edit/hair`,
+    edit: {
+      audit: Page.EditHairTypeOrColour,
+      method: personalController.radios(hairFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditHairTypeOrColour,
+      method: personalController.radios(hairFieldData).submit,
+    },
+  })
 
   // Facial hair
-  get(
-    `${basePath}/edit/facial-hair`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.EditFacialHair }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(facialHairFieldData).edit,
-  )
-
-  post(
-    `${basePath}/edit/facial-hair`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.PostEditFacialHair }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(facialHairFieldData).submit,
-  )
+  editRoute({
+    url: `${basePath}/edit/facial-hair`,
+    edit: {
+      audit: Page.EditFacialHair,
+      method: personalController.radios(facialHairFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditFacialHair,
+      method: personalController.radios(facialHairFieldData).submit,
+    },
+  })
 
   // Face shape
-  get(
-    `${basePath}/edit/face-shape`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.EditFaceShape }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(faceShapeFieldData).edit,
-  )
-
-  post(
-    `${basePath}/edit/face-shape`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.PostEditFaceShape }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(faceShapeFieldData).submit,
-  )
+  editRoute({
+    url: `${basePath}/edit/face-shape`,
+    edit: {
+      audit: Page.EditFaceShape,
+      method: personalController.radios(faceShapeFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditFaceShape,
+      method: personalController.radios(faceShapeFieldData).submit,
+    },
+  })
 
   // Build
-  get(
-    `${basePath}/edit/build`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.EditBuild }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(buildFieldData).edit,
-  )
-
-  post(
-    `${basePath}/edit/build`,
-    // TODO: Add role check here
-    auditPageAccessAttempt({ services, page: Page.PostEditBuild }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    personalController.radios(buildFieldData).submit,
-  )
+  editRoute({
+    url: `${basePath}/edit/build`,
+    edit: {
+      audit: Page.EditBuild,
+      method: personalController.radios(buildFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditBuild,
+      method: personalController.radios(buildFieldData).submit,
+    },
+  })
 
   return router
 }

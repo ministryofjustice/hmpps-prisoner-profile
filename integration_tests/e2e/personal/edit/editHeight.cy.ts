@@ -35,23 +35,33 @@ context('Edit height (metric)', () => {
     validInputs: { textInputs: { editField: '125' } },
     invalidResponses: [
       {
-        testDescription: 'Empty',
-        inputs: { textInputs: { editField: '' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
         testDescription: 'Negative number',
         inputs: { textInputs: { editField: '-10' } },
-        errorMessages: ['Enter a number greater than 0'],
+        errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
       },
       {
         testDescription: 'Zero',
         inputs: { textInputs: { editField: '0' } },
-        errorMessages: ['Enter a number greater than 0'],
+        errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
+      },
+      {
+        testDescription: 'Non-number',
+        inputs: { textInputs: { editField: 'Example' } },
+        errorMessages: ["Enter this person's height"],
+      },
+      {
+        testDescription: 'Lower bound',
+        inputs: { textInputs: { editField: '49' } },
+        errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
+      },
+      {
+        testDescription: 'Upper bound',
+        inputs: { textInputs: { editField: '281' } },
+        errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
       },
     ],
     editPageWithTitle: EditHeight,
-    editPageTitle: 'Edit Height',
+    editPageTitle: 'Height',
     successfulFlashMessage: 'Height edited',
   })
 })
@@ -91,41 +101,16 @@ context('Edit height (Imperial)', () => {
       {
         testDescription: 'Feet: Empty',
         inputs: { textInputs: { feet: '', inches: '5' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
-        testDescription: 'Feet: Negative number',
-        inputs: { textInputs: { feet: '-1', inches: '5' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
-        testDescription: 'Feet: Zero',
-        inputs: { textInputs: { feet: '0', inches: '5' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
-        testDescription: 'Inches: Empty',
-        inputs: { textInputs: { feet: '5', inches: '' } },
-        errorMessages: ['Enter a number greater than 0'],
+        errorMessages: ['Feet must be between 1 and 9. Inches must be between 0 and 11'],
       },
       {
         testDescription: 'Inches: Negative number',
         inputs: { textInputs: { feet: '5', inches: '-1' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
-        testDescription: 'Inches: Zero',
-        inputs: { textInputs: { feet: '5', inches: '0' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
-        testDescription: 'No input',
-        inputs: { textInputs: { feet: '', inches: '' } },
-        errorMessages: ['Enter a number greater than 0'],
+        errorMessages: ['Feet must be between 1 and 9. Inches must be between 0 and 11'],
       },
     ],
     editPageWithTitle: EditHeight,
-    editPageTitle: 'Edit height',
+    editPageTitle: 'Height',
     successfulFlashMessage: 'Height edited',
   })
 })
