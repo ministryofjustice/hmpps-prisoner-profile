@@ -84,41 +84,40 @@ export default function personalRouter(services: Services): Router {
     )
   }
 
+  // Height
   editRoute({
     url: `${basePath}/edit/height`,
     edit: {
       method: personalController.height().metric.edit,
-      // TODO Fix
-      audit: Page.Offences,
+      audit: Page.EditHeight,
     },
     submit: {
       method: personalController.height().metric.submit,
-      // TODO Fix
-      audit: Page.Offences,
+      audit: Page.PostEditHeight,
     },
   })
 
   editRoute({
     url: `${basePath}/edit/height/imperial`,
-    // TODO Fix
     edit: {
-      audit: Page.Offences,
+      audit: Page.EditHeight,
       method: personalController.height().imperial.edit,
     },
     submit: {
-      audit: Page.Offences,
+      audit: Page.PostEditHeight,
       method: personalController.height().imperial.submit,
     },
   })
 
+  // Weight
   editRoute({
     url: `${basePath}/edit/weight`,
     edit: {
-      audit: Page.Offences,
+      audit: Page.EditWeight,
       method: personalController.weight().metric.edit,
     },
     submit: {
-      audit: Page.Offences,
+      audit: Page.PostEditWeight,
       method: personalController.weight().metric.submit,
     },
   })
@@ -126,11 +125,11 @@ export default function personalRouter(services: Services): Router {
   editRoute({
     url: `${basePath}/edit/weight/imperial`,
     edit: {
-      audit: Page.Offences,
+      audit: Page.EditWeight,
       method: personalController.weight().imperial.edit,
     },
     submit: {
-      audit: Page.Offences,
+      audit: Page.PostEditWeight,
       method: personalController.weight().imperial.submit,
     },
   })

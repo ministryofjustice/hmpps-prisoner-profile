@@ -4,6 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set hideBackLink = true %}
 {%
@@ -16,17 +17,17 @@
 {% block body %}
 
   {% if errors.length > 0 %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      {{
-        govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: errors,
-            attributes: { 'data-qa-errors': true }
-        })
-      }}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{
+          govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true }
+          })
+        }}
+      </div>
     </div>
-  </div>
   {% endif %}
 
   <div class="govuk-grid-row">
@@ -34,28 +35,32 @@
   </div>
 
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <h1>Height</h1>
-    </div>
-  </div>
-
-  <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
         <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
-          {{
-            govukInput({
-              label: {
-                text: "Centimetres"
-              },
-              id: "height",
-              name: "editField",
-              value: fieldValue,
-              classes: "govuk-input--width-3",
-              errorMessage: { text: errors[0].text } if errors.length > 0
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+          {%
+            call govukFieldset({
+              legend: {
+                text: "Height",
+                classes: "govuk-fieldset__legend--l",
+                isPageHeading: true
+              }
             })
-          }}
+          %}
+            {{
+              govukInput({
+                label: {
+                  text: "Centimetres"
+                },
+                id: "height",
+                name: "editField",
+                value: fieldValue,
+                classes: "govuk-input--width-3",
+                errorMessage: { text: errors[0].text } if errors.length > 0
+              })
+            }}
+          {% endcall %}
         </div>
         <p class="govuk-body">
           <a
@@ -75,7 +80,12 @@
             attributes: { "data-qa": "edit-submit-button" }
             })
           }}
-          <a href="/prisoner/{{ prisonerNumber }}/personal#appearance" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
+          <a
+            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button"
+            >Cancel</a
+          >
         </div>
       </form>
     </div>

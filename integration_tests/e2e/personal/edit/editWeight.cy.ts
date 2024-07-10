@@ -32,26 +32,26 @@ context('Edit height (metric)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/weight`,
-    validInputs: { textInputs: { editField: '65' } },
+    validInputs: { textInputs: { kilograms: '65' } },
     invalidResponses: [
       {
-        testDescription: 'Empty',
-        inputs: { textInputs: { editField: '' } },
-        errorMessages: ['Enter a number greater than 0'],
-      },
-      {
         testDescription: 'Negative number',
-        inputs: { textInputs: { editField: '-10' } },
-        errorMessages: ['Enter a number greater than 0'],
+        inputs: { textInputs: { kilograms: '-10' } },
+        errorMessages: ['Weight must be between 12 kilograms and 640 kilograms'],
       },
       {
         testDescription: 'Zero',
-        inputs: { textInputs: { editField: '0' } },
-        errorMessages: ['Enter a number greater than 0'],
+        inputs: { textInputs: { kilograms: '0' } },
+        errorMessages: ['Weight must be between 12 kilograms and 640 kilograms'],
+      },
+      {
+        testDescription: 'Invalid',
+        inputs: { textInputs: { kilograms: 'Example' } },
+        errorMessages: ["Enter this person's weight"],
       },
     ],
     editPageWithTitle: EditWeight,
-    editPageTitle: 'Edit weight',
+    editPageTitle: 'Weight',
     successfulFlashMessage: 'Weight edited',
   })
 })
@@ -86,46 +86,21 @@ context('Edit weight (Imperial)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/weight/imperial`,
-    validInputs: { textInputs: { stones: '5', pounds: '3' } },
+    validInputs: { textInputs: { stone: '5', pounds: '3' } },
     invalidResponses: [
-      // {
-      //   testDescription: 'Feet: Empty',
-      //   inputs: { textInputs: { feet: '', inches: '5' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
-      // {
-      //   testDescription: 'Feet: Negative number',
-      //   inputs: { textInputs: { feet: '-1', inches: '5' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
-      // {
-      //   testDescription: 'Feet: Zero',
-      //   inputs: { textInputs: { feet: '0', inches: '5' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
-      // {
-      //   testDescription: 'Inches: Empty',
-      //   inputs: { textInputs: { feet: '5', inches: '' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
-      // {
-      //   testDescription: 'Inches: Negative number',
-      //   inputs: { textInputs: { feet: '5', inches: '-1' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
-      // {
-      //   testDescription: 'Inches: Zero',
-      //   inputs: { textInputs: { feet: '5', inches: '0' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
-      // {
-      //   testDescription: 'No input',
-      //   inputs: { textInputs: { feet: '', inches: '' } },
-      //   errorMessages: ['Enter a number greater than 0'],
-      // },
+      {
+        testDescription: 'Invalid',
+        inputs: { textInputs: { stone: 'Example', pounds: '5' } },
+        errorMessages: ["Enter this person's weight"],
+      },
+      {
+        testDescription: 'Invalid',
+        inputs: { textInputs: { stone: '5', pounds: 'Example' } },
+        errorMessages: ["Enter this person's weight"],
+      },
     ],
     editPageWithTitle: EditWeight,
-    editPageTitle: 'Edit weight',
+    editPageTitle: 'Weight',
     successfulFlashMessage: 'Weight edited',
   })
 })

@@ -50,24 +50,24 @@
         classes: listClasses,
         rows: [
         "Height" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.height, "personal/edit/height", { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'height' } ),
-        {key: { text: "Weight"}, value: { text: physicalCharacteristics.weight } },
+        "Weight" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.weight, "personal/edit/weight/imperial", { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'weight' } ),
         "Hair type or colour" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.hairColour, "personal/edit/hair",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' } 
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' }
         ),
         {key: { text: "Left eye colour"}, value: { text: physicalCharacteristics.leftEyeColour } },
         {key: { text: "Right eye colour"}, value: { text: physicalCharacteristics.rightEyeColour } },
         "Facial hair" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.facialHair, "personal/edit/facial-hair",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: 'facial hair type' } 
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: 'facial hair type' }
         ),
         "Shape of face" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.shapeOfFace, "personal/edit/face-shape",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: 'face shape' } 
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: 'face shape' }
         ),
         "Build" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.build, "personal/edit/build",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' } 
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' }
         ),
         {key: { text: "Shoe size"}, value: { text: physicalCharacteristics.shoeSize } },
         {key: { text: "Warned about tattooing"}, value: { text: physicalCharacteristics.warnedAboutTattooing } },
