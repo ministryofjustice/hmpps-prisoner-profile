@@ -1,0 +1,42 @@
+{% extends "../../index.njk" %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+    {
+      text: 'Digital Prison Services',
+      href:  "/" | prependBaseUrl
+    },
+    {
+      text: breadcrumbPrisonerName,
+      href: "/prisoner/" + prisonerNumber
+    }
+  ]
+%}
+{% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+{#    multer requires the csrf middleware to be called after the multer middleware #}
+{#    adding token as query param gets round this but we would have to find better method for real solution #}
+      <form method="post" action="?_csrf={{ csrfToken }}" enctype="multipart/form-data" >
+        {{ govukFileUpload({
+          id: "photoUpload",
+          name: "photoUpload",
+          label: {
+            text: "Upload a recent photograph of " + prisonerName,
+            isPageHeading: true,
+            classes: "govuk-label--l"
+          },
+          hint: { text: "Images can be JPEG or PNG and must be less than 10MB in size." }
+        }) }}
+
+        {{ govukButton({
+          text: "Save and continue",
+          type: "submit"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -33,6 +33,7 @@ import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
+import DocumentService from './documentService'
 
 export const services = () => {
   const {
@@ -55,6 +56,7 @@ export const services = () => {
     prisonPersonApiClientBuilder,
     prisonRegisterStore,
     featureToggleStore,
+    documentsApiClientBuilder,
   } = dataAccess
 
   const auditService = AuditService({
@@ -116,6 +118,7 @@ export const services = () => {
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
+  const documentService = new DocumentService(documentsApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -165,6 +168,7 @@ export const services = () => {
     featureToggleService,
     careNeedsService,
     permissionsService,
+    documentService,
   }
 }
 

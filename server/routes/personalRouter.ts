@@ -17,6 +17,8 @@ import {
   facialHairFieldData,
   hairFieldData,
 } from '../controllers/personal/fieldData'
+import photographRouter from './photographRouter'
+import config from '../config'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -184,6 +186,10 @@ export default function personalRouter(services: Services): Router {
       method: personalController.radios(buildFieldData).submit,
     },
   })
+
+  if (config.featureToggles.usePhotoRoutes) {
+    router.use(`${basePath}/edit/photo`, photographRouter(services))
+  }
 
   return router
 }
