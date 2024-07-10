@@ -1,3 +1,4 @@
+import { Response } from 'express'
 import { auditServiceMock } from '../../../tests/mocks/auditServiceMock'
 import { careNeedsServiceMock } from '../../../tests/mocks/careNeedsServiceMock'
 import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
@@ -15,6 +16,7 @@ describe('PersonalController', () => {
   let auditService: AuditService
   let careNeedsService: CareNeedsService
   let controller: PersonalController
+  let res: Response
 
   const defaultMiddleware = {
     clientToken: 'token',
@@ -42,6 +44,7 @@ describe('PersonalController', () => {
     careNeedsService = careNeedsServiceMock() as CareNeedsService
 
     controller = new PersonalController(personalPageService, careNeedsService, auditService)
+    res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
   })
 
   describe('displayPersonalPage', () => {
@@ -52,7 +55,7 @@ describe('PersonalController', () => {
   describe('height', () => {
     describe('metric', () => {
       describe('edit', () => {
-        const action = async (req: any, res: any) => controller.height().metric.edit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.height().metric.edit(req, response, () => {})
 
         it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
@@ -62,7 +65,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
 
           expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
@@ -89,7 +91,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
@@ -103,7 +104,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
         })
@@ -111,8 +111,7 @@ describe('PersonalController', () => {
 
       describe('submit', () => {
         let validRequest: any
-        let mockResponse: any
-        const action = async (req: any, res: any) => controller.height().metric.submit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.height().metric.submit(req, response, () => {})
 
         beforeEach(() => {
           validRequest = {
@@ -121,11 +120,10 @@ describe('PersonalController', () => {
             body: { editField: '123' },
             flash: jest.fn(),
           } as any
-          mockResponse = { redirect: jest.fn() } as any
         })
 
         it('Updates the physical attributes', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
             height: 123,
             weight: 60,
@@ -133,12 +131,12 @@ describe('PersonalController', () => {
         })
 
         it('Redirects to the personal page on success', async () => {
-          await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          await action(validRequest, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
@@ -152,10 +150,10 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
 
         it.each([
@@ -163,13 +161,13 @@ describe('PersonalController', () => {
           { editField: '100', updateRequest: { height: 100 } },
         ])('Valid request: %s', async ({ editField, updateRequest }) => {
           const request = { ...validRequest, body: { editField } }
-          await action(request, mockResponse)
+          await action(request, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it.each([
@@ -184,17 +182,17 @@ describe('PersonalController', () => {
             body: { editField: value },
             flash: jest.fn(),
           } as any
-          await action(req, mockResponse)
+          await action(req, res)
 
           expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#height' }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
       })
     })
 
     describe('imperial', () => {
       describe('edit', () => {
-        const action = async (req: any, res: any) => controller.height().imperial.edit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.height().imperial.edit(req, response, () => {})
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
@@ -204,7 +202,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightImperial', {
@@ -231,7 +228,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
@@ -246,7 +242,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
@@ -257,8 +252,7 @@ describe('PersonalController', () => {
 
       describe('submit', () => {
         let validRequest: any
-        let mockResponse: any
-        const action = async (req: any, res: any) => controller.height().imperial.submit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.height().imperial.submit(req, response, () => {})
 
         beforeEach(() => {
           validRequest = {
@@ -267,11 +261,10 @@ describe('PersonalController', () => {
             body: { feet: '5', inches: '10' },
             flash: jest.fn(),
           } as any
-          mockResponse = { redirect: jest.fn() } as any
         })
 
         it('Updates the physical attributes', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
             height: 178,
             weight: 60,
@@ -279,12 +272,12 @@ describe('PersonalController', () => {
         })
 
         it('Redirects to the personal page on success', async () => {
-          await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          await action(validRequest, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
@@ -298,12 +291,12 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('feetValue', 5)
           expect(validRequest.flash).toHaveBeenCalledWith('inchesValue', 10)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
 
         it.each([
@@ -312,13 +305,13 @@ describe('PersonalController', () => {
           { feet: '3', inches: '', updateRequest: { height: 91 } },
         ])('Valid request: %s', async ({ feet, inches, updateRequest }) => {
           const request = { ...validRequest, body: { feet, inches } }
-          await action(request, mockResponse)
+          await action(request, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it.each([
@@ -337,12 +330,12 @@ describe('PersonalController', () => {
             body: { feet, inches },
             flash: jest.fn(),
           } as any
-          await action(req, mockResponse)
+          await action(req, res)
 
           expect(req.flash).toHaveBeenCalledWith('feetValue', feet)
           expect(req.flash).toHaveBeenCalledWith('inchesValue', inches)
           expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#feet' }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
       })
     })
@@ -351,7 +344,7 @@ describe('PersonalController', () => {
   describe('weight', () => {
     describe('metric', () => {
       describe('edit', () => {
-        const action = async (req: any, res: any) => controller.weight().metric.edit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.weight().metric.edit(req, response, () => {})
 
         it('Renders the default edit page with the correct data from the prison person API', async () => {
           const req = {
@@ -361,7 +354,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
 
           expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
@@ -372,6 +364,11 @@ describe('PersonalController', () => {
             errors: [],
             fieldName: expect.anything(),
             fieldValue: 60,
+            miniBannerData: {
+              prisonerNumber: 'ABC123',
+              prisonerName: 'Last, First',
+              cellLocation: '2-3-001',
+            },
           })
         })
 
@@ -384,7 +381,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
@@ -398,7 +394,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
         })
@@ -406,21 +401,20 @@ describe('PersonalController', () => {
 
       describe('submit', () => {
         let validRequest: any
-        let mockResponse: any
-        const action = async (req: any, res: any) => controller.weight().metric.submit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.weight().metric.submit(req, response, () => {})
 
         beforeEach(() => {
           validRequest = {
             middleware: defaultMiddleware,
             params: { prisonerNumber: 'ABC123' },
-            body: { editField: '80' },
+            body: { kilograms: '80' },
             flash: jest.fn(),
           } as any
-          mockResponse = { redirect: jest.fn() } as any
+          res = { redirect: jest.fn() } as any
         })
 
         it('Updates the physical attributes', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
             height: 102,
             weight: 80,
@@ -428,16 +422,17 @@ describe('PersonalController', () => {
         })
 
         it('Redirects to the personal page on success', async () => {
-          await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          await action(validRequest, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight edited',
             type: FlashMessageType.success,
+            fieldName: 'weight',
           })
         })
 
@@ -446,34 +441,53 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(validRequest.flash).toHaveBeenCalledWith('fieldValue', '80')
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
+          expect(validRequest.flash).toHaveBeenCalledWith('kilogramsValue', '80')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
         })
 
         it.each([
-          ['-1', 'Enter a number greater than 0'],
-          ['Example', 'Enter a number greater than 0'],
-        ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
+          { kilograms: '', updateRequest: { weight: null } },
+          { kilograms: '50', updateRequest: { weight: 50 } },
+          { kilograms: '12', updateRequest: { weight: 12 } },
+          { kilograms: '640', updateRequest: { weight: 640 } },
+        ])('Valid request: %s', async ({ kilograms, updateRequest }) => {
+          const request = { ...validRequest, body: { kilograms } }
+          await action(request, res)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+        })
+
+        it.each([
+          [{ kilograms: '0' }, 'Weight must be between 12 kilograms and 640 kilograms'],
+          [{ kilograms: '11' }, 'Weight must be between 12 kilograms and 640 kilograms'],
+          [{ kilograms: '651' }, 'Weight must be between 12 kilograms and 640 kilograms'],
+          [{ kilograms: 'Example' }, "Enter this person's weight"],
+        ])('Validations: %s: %s', async ({ kilograms }: { kilograms: string }, errorMessage: string) => {
           const req = {
             middleware: defaultMiddleware,
             params: { prisonerNumber: 'ABC123' },
-            body: { editField: value },
+            body: { kilograms },
             flash: jest.fn(),
           } as any
-          await action(req, mockResponse)
+          await action(req, res)
 
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
+          expect(req.flash).toHaveBeenCalledWith('kilogramsValue', kilograms)
+          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#kilograms' }])
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
         })
       })
     })
 
     describe('imperial', () => {
       describe('edit', () => {
-        const action = async (req: any, res: any) => controller.weight().imperial.edit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.weight().imperial.edit(req, response, () => {})
 
         it('Renders the default edit page with the correct data', async () => {
           const req = {
@@ -483,7 +497,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
 
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightImperial', {
@@ -491,8 +504,13 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            stonesValue: 9,
+            stoneValue: 9,
             poundsValue: 6,
+            miniBannerData: {
+              prisonerNumber: 'ABC123',
+              prisonerName: 'Last, First',
+              cellLocation: '2-3-001',
+            },
           })
         })
 
@@ -505,7 +523,6 @@ describe('PersonalController', () => {
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
         })
@@ -514,56 +531,53 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'stonesValue') return ['5']
+              if (key === 'stoneValue') return ['5']
               if (key === 'poundsValue') return ['10']
               return []
             },
             middleware: defaultMiddleware,
           } as any
-          const res = { render: jest.fn() } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
-            expect.objectContaining({ stonesValue: '5', poundsValue: '10' }),
+            expect.objectContaining({ stoneValue: '5', poundsValue: '10' }),
           )
         })
       })
 
       describe('submit', () => {
         let validRequest: any
-        let mockResponse: any
-        const action = async (req: any, res: any) => controller.weight().imperial.submit(req, res, () => {})
+        const action = async (req: any, response: any) => controller.weight().imperial.submit(req, response, () => {})
 
         beforeEach(() => {
           validRequest = {
             middleware: defaultMiddleware,
             params: { prisonerNumber: 'ABC123' },
-            body: { stones: '10', pounds: '12' },
+            body: { stone: '10', pounds: '12' },
             flash: jest.fn(),
           } as any
-          mockResponse = { redirect: jest.fn() } as any
         })
 
         it('Updates the physical attributes', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
             height: 102,
-            // TODO - conversions
             weight: 69,
           })
         })
 
         it('Redirects to the personal page on success', async () => {
-          await action(validRequest, mockResponse)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+          await action(validRequest, res)
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
 
         it('Adds the success message to the flash', async () => {
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight edited',
             type: FlashMessageType.success,
+            fieldName: 'weight',
           })
         })
 
@@ -572,30 +586,61 @@ describe('PersonalController', () => {
             throw new Error()
           }
 
-          await action(validRequest, mockResponse)
+          await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(validRequest.flash).toHaveBeenCalledWith('stonesValue', 10)
+          expect(validRequest.flash).toHaveBeenCalledWith('stoneValue', 10)
           expect(validRequest.flash).toHaveBeenCalledWith('poundsValue', 12)
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
         })
 
-        // TODO: Update these
         it.each([
-          ['-1', 'Enter a number greater than 0'],
-          ['Example', 'Enter a number greater than 0'],
-        ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
-          const req = {
-            middleware: defaultMiddleware,
-            params: { prisonerNumber: 'ABC123' },
-            body: { editField: value },
-            flash: jest.fn(),
-          } as any
-          await action(req, mockResponse)
-
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage }])
-          expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
+          { stone: '', pounds: '', updateRequest: { weight: null } },
+          { stone: '5', pounds: '2', updateRequest: { weight: 33 } },
+          { stone: '3', pounds: '', updateRequest: { weight: 19 } },
+        ])('Valid request: %s', async ({ stone, pounds, updateRequest }) => {
+          const request = { ...validRequest, body: { stone, pounds } }
+          await action(request, res)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         })
+
+        it.each([
+          // Invalid input
+          [{ stone: 'example', pounds: '1' }, "Enter this person's weight"],
+          [{ stone: '10', pounds: 'example' }, "Enter this person's weight"],
+
+          // Stone limits
+          [{ stone: '1', pounds: '5' }, 'Weight must be between 2 stone and 100 stone'],
+          [{ stone: '101', pounds: '5' }, 'Weight must be between 2 stone and 100 stone'],
+
+          // Pounds limits
+          [{ stone: '25', pounds: '-1' }, 'Stone must be between 2 and 100. Pounds must be between 0 and 13'],
+          [{ stone: '25', pounds: '14' }, 'Stone must be between 2 and 100. Pounds must be between 0 and 13'],
+
+          // Empty stone
+          [{ stone: '', pounds: '1' }, 'Stone must be between 2 and 100. Pounds must be between 0 and 13'],
+        ])(
+          'Validations: %s: %s',
+          async ({ stone, pounds }: { stone: string; pounds: string }, errorMessage: string) => {
+            const req = {
+              middleware: defaultMiddleware,
+              params: { prisonerNumber: 'ABC123' },
+              body: { stone, pounds },
+              flash: jest.fn(),
+            } as any
+            await action(req, res)
+
+            expect(req.flash).toHaveBeenCalledWith('stoneValue', stone)
+            expect(req.flash).toHaveBeenCalledWith('poundsValue', pounds)
+            expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#stone' }])
+            expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
+          },
+        )
       })
     })
   })
@@ -613,8 +658,7 @@ describe('PersonalController', () => {
     }
 
     describe('edit', () => {
-      const action = async (req: any, res: any) => controller.radios(fieldData).edit(req, res, () => {})
-      const res = { locals: defaultLocals, render: jest.fn() } as any
+      const action = async (req: any, response: any) => controller.radios(fieldData).edit(req, response, () => {})
 
       it('Renders the radios edit page with the field data config supplied', async () => {
         const req = {
@@ -694,8 +738,7 @@ describe('PersonalController', () => {
 
     describe('submit', () => {
       let validRequest: any
-      const action = async (req: any, res: any) => controller.radios(fieldData).submit(req, res, () => {})
-      const res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
+      const action = async (req: any, response: any) => controller.radios(fieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
