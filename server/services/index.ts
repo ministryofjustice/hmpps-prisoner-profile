@@ -38,6 +38,7 @@ import MetricsService from './metrics/metricsService'
 import DistinguishingMarksService from './distinguishingMarksService'
 import CsipService from './csipService'
 import ReferenceDataService from './referenceDataService'
+import DocumentService from './documentService'
 
 export const services = () => {
   const {
@@ -67,6 +68,7 @@ export const services = () => {
     referenceDataStore,
     featureToggleStore,
     telemetryClient,
+    documentsApiClientBuilder,
   } = dataAccess
 
   const auditService = AuditService({
@@ -144,6 +146,7 @@ export const services = () => {
   const distinguishingMarksService = new DistinguishingMarksService(prisonPersonApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, prisonPersonService)
   const csipService = new CsipService(csipApiClientBuilder)
+  const documentService = new DocumentService(documentsApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -196,6 +199,7 @@ export const services = () => {
     prisonPersonService,
     distinguishingMarksService,
     csipService,
+    documentService,
   }
 }
 

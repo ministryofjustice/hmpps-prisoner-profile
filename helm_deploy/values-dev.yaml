@@ -73,6 +73,7 @@ generic-service:
     PERSON_INTEGRATION_API_URL: "https://person-integration-api-dev.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api-dev.hmpps.service.justice.gov.uk"
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-dev.hmpps.service.justice.gov.uk"
+    DOCUMENTS_SERVICE_API: "https://document-api-dev.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -88,6 +89,7 @@ generic-service:
     PRISON_PERSON_API_ENABLED: "true"
     PRISON_PERSON_API_ENABLED_PRISONS: "KMI"
     MILITARY_HISTORY_ENABLED: "true"
+    PHOTO_ROUTES_ENABLED: "true"
 
   scheduledDowntime:
     enabled: true

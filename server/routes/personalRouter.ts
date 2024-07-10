@@ -28,6 +28,8 @@ import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
 import { Role } from '../data/enums/role'
+import photographRouter from './photographRouter'
+import config from '../config'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -415,6 +417,10 @@ export default function personalRouter(services: Services): Router {
       },
     },
   })
+
+  if (config.featureToggles.usePhotoRoutes) {
+    router.use(`${basePath}/edit/photo`, photographRouter(services))
+  }
 
   return router
 }

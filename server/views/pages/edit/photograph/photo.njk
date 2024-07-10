@@ -1,0 +1,55 @@
+{% extends "../../index.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set hideBackLink = true %}
+{%
+    set breadCrumbs = [
+        {
+            text: 'Digital Prison Services',
+            href:  "/" | prependBaseUrl
+        },
+        {
+            text: breadcrumbPrisonerName,
+            href: "/prisoner/" + prisonerNumber
+        },
+        {
+            text: "Photograph upload",
+            href: "/prisoner/" + prisonerNumber + "/personal/edit/photo/upload"
+        }
+    ]
+%}
+{% block body %}
+<div class="govuk-grid-row">
+    <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">Crop image=---=</h1>
+    <section class="govuk-grid-column-two-thirds">
+        <form method='post' enctype='multipart/form-data' action="/prisoner/{{ prisonerNumber }}/personal/edit/photo/submit?_csrf={{ csrfToken }}">
+            <p class="govuk-body govuk-!-margin-bottom-7 app-no-js">The image you selected needs to be cropped to the correct size.</p>
+
+            <div class="govuk-body govuk-!-margin-bottom-7 app-js-only">
+                <p>You do not have to crop your image. Select the 'Save and continue' button if you do not need to crop your image.</p>
+                <p>If you need to crop your image, use your cursor or the arrow keys and “<kbd>+</kbd>” and “<kbd>-</kbd>” to select a part of the image. The part you select will be resized for GOV.UK. The shape is fixed.</p>
+            </div>
+
+            <div class='app-c-image-cropper' tabindex='0' data-module="image-cropper" aria-live='polite'>
+                <input type='file' class='js-cropped-image-input' name='editedFile' hidden>
+                <div class='app-c-image-cropper__container'>
+                    <img src='{{ imgSrc }}' class='app-c-image-cropper__image' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}'>
+                </div>
+            </div>
+
+            {{ govukButton({
+                text: "Save and continue",
+                type: "submit"
+            }) }}
+
+        </form>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/cropper.js"></script>
+    <script src="/assets/js/imageCropper.js"></script>
+{% endblock %}

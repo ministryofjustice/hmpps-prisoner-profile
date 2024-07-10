@@ -28,6 +28,7 @@ import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
 import getCSIPPermissions from './utils/permissions/getCSIPPermissions'
+import getEditProfileAccessStatusCode from './utils/permissions/access/getEditProfileAccessStatusCode'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -137,5 +138,9 @@ export default class PermissionsService {
 
   public getProbationDocumentsPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
     return { accessCode: getProbationDocumentsAccessStatusCode(user, prisoner) }
+  }
+
+  public getEditProfileAccessStatusCode(user: HmppsUser): Permissions {
+    return { accessCode: getEditProfileAccessStatusCode(user) }
   }
 }
