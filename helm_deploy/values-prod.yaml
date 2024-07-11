@@ -68,6 +68,7 @@ generic-service:
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api.hmpps.service.justice.gov.uk"
     PRISON_PERSON_API_URL: "https://prison-person-api.prison.service.justice.gov.uk"
+    DOCUMENTS_SERVICE_API: "https://document-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"

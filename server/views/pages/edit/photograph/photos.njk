@@ -1,0 +1,86 @@
+{% extends "../../index.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set hideBackLink = true %}
+{%
+    set breadCrumbs = [
+        {
+            text: 'Digital Prison Services',
+            href:  "/" | prependBaseUrl
+        },
+        {
+            text: breadcrumbPrisonerName,
+            href: "/prisoner/" + prisonerNumber
+        },
+        {
+            text: "Photograph upload",
+            href: "/prisoner/" + prisonerNumber + "/personal/edit/photo/upload"
+        }
+    ]
+%}
+{% block body %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+    <h1 class="govuk-!-margin-top-1 govuk-!-margin-bottom-7">All photographs for {{ prisonerName }}</h1>
+    {% for photo in photos %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third">
+                <img src='http://localhost:3000/prisoner/G4244UD/personal/edit/photo/view/{{ photo.documentUuid }}' alt='Photograph of {{ prisonerName }}' height='350px'>
+            </div>
+            <div class="govuk-grid-column-two-thirds">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Photograph type
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ photo.documentType }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Photograph file type
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ photo.mimeType }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Photograph file size
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ photo.fileSize }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Uploaded by
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ photo.createdByUsername }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Uploaded date
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ photo.createdTime | formatDateTime }}
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Uploaded from service
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ photo.createdByServiceName }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

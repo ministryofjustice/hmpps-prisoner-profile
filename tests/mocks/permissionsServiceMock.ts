@@ -11,4 +11,5 @@ export const permissionsServiceMock = (): Interface<PermissionsService> => ({
   getAlertsPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
   getEditAlertsPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
   getLocationPermissions: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
+  getEditProfileAccessStatusCode: jest.fn().mockResolvedValue({ accessCode: 'OK' }),
 })

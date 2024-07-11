@@ -268,6 +268,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000))),
     },
+    documentsServiceApi: {
+      url: get('DOCUMENTS_SERVICE_API', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('DOCUMENTS_SERVICE_API_RESPONSE', 10000)),
+        deadline: Number(get('DOCUMENTS_SERVICE_API_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('DOCUMENTS_SERVICE_API_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -355,5 +363,6 @@ export default {
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
     prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),
+    usePhotoRoutes: get('PHOTO_ROUTES_ENABLED', false),
   },
 }
