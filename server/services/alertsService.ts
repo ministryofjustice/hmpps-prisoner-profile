@@ -212,7 +212,8 @@ export default class AlertsService {
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
   public async createAlert(
-    token: string,
+    clientToken: string,
+    userToken: string,
     {
       prisonId,
       bookingId,
@@ -223,13 +224,13 @@ export default class AlertsService {
     const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
-      const alertsApiClient = this.alertsApiClientBuilder(token)
+      const alertsApiClient = this.alertsApiClientBuilder(clientToken)
       const alert = await alertsApiClient.createAlert(prisonerNumber, toAlertsApiCreateAlert(alertForm))
 
       return capitaliseAlertDisplayNames(alert)
     }
 
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(userToken)
     const alert = await prisonApiClient.createAlert(bookingId, toPrisonApiCreateAlert(alertForm))
 
     return toAlert(alert)
@@ -254,7 +255,8 @@ export default class AlertsService {
   }
 
   public async updateAlert(
-    token: string,
+    clientToken: string,
+    userToken: string,
     prisonId: string,
     bookingId: number,
     alertId: string,
@@ -263,13 +265,13 @@ export default class AlertsService {
     const alertsApiEnabled = await this.featureToggleService.getFeatureToggle(prisonId, 'alertsApiEnabled')
 
     if (alertsApiEnabled) {
-      const alertsApiClient = this.alertsApiClientBuilder(token)
+      const alertsApiClient = this.alertsApiClientBuilder(clientToken)
       const alert = await alertsApiClient.updateAlert(alertId, alertChanges)
 
       return capitaliseAlertDisplayNames(alert)
     }
 
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(userToken)
     const prisonApiAlert = await prisonApiClient.updateAlert(bookingId, alertId, toPrisonAlertChanges(alertChanges))
 
     return toAlert(prisonApiAlert)

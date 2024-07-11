@@ -132,7 +132,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.createAlert('', {
+        const alert = await alertsService.createAlert('', '', {
           prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: '',
@@ -150,7 +150,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.createAlert('', {
+        const alert = await alertsService.createAlert('', '', {
           prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: '',
@@ -187,7 +187,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.updateAlert('', 'MDI', 123456, '1', { description: 'Comment' })
+        const alert = await alertsService.updateAlert('', '', 'MDI', 123456, '1', { description: 'Comment' })
 
         expect(alert).toEqual(alertDetailsCreatedViaMapperMock)
       })
@@ -277,7 +277,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.createAlert('', {
+        const alert = await alertsService.createAlert('', '', {
           prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: 'AA1234A',
@@ -295,7 +295,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.createAlert('', {
+        const alert = await alertsService.createAlert('', '', {
           prisonId: 'MDI',
           bookingId: 123456,
           prisonerNumber: 'AA1234A',
@@ -337,7 +337,7 @@ describe('Alerts Service', () => {
           () => alertsApiClientSpy,
           new FeatureToggleService(featureToggleStoreMock),
         )
-        const alert = await alertsService.updateAlert('', 'MDI', 123456, 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d', {
+        const alert = await alertsService.updateAlert('', '', 'MDI', 123456, 'c9ba3596-8abf-4fe1-b21c-78170b5ff58d', {
           description: 'Comment',
         })
 
