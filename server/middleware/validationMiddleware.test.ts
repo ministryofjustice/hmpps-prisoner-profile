@@ -12,7 +12,16 @@ describe('Validation middleware', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     res = { redirect: jest.fn() } as any
-    req = { flash: jest.fn() } as any
+    req = {
+      body: { example: 'text' },
+      header: (key: string) => {
+        if (key === 'Referer') {
+          return '/path/to/referer'
+        }
+        return '/'
+      },
+      flash: jest.fn(),
+    } as any
   })
 
   it('should add errors to request object when any are present', async () => {
@@ -57,11 +66,12 @@ describe('Validation middleware', () => {
     expect(next).toHaveBeenCalled()
   })
 
-  it('Calls on error if provided', async () => {
+  it('Redirects with data in the flash if redirectBackOnError', async () => {
     const alwaysFailsValidator: Validator = () => Promise.resolve([error])
-    const onError = jest.fn()
 
-    await validationMiddleware([alwaysFailsValidator], onError)(req, res, next)
-    expect(onError).toHaveBeenCalled()
+    await validationMiddleware([alwaysFailsValidator], { redirectBackOnError: true })(req, res, next)
+    expect(res.redirect).toHaveBeenCalledWith('/path/to/referer')
+    expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
+    expect(req.flash).toHaveBeenCalledWith('errors', [error])
   })
 })

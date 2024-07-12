@@ -66,7 +66,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page
       validation?: {
         validators: Validator[]
-        onError?: (req: Request, res: Response) => void
+        redirectBackOnError?: boolean
       }
     }
   }) => {
@@ -86,7 +86,9 @@ export default function personalRouter(services: Services): Router {
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
         editRouteChecks(),
-        validationMiddleware(submit.validation.validators, submit.validation.onError),
+        validationMiddleware(submit.validation.validators, {
+          redirectBackOnError: submit.validation.redirectBackOnError || false,
+        }),
         submit.method,
       )
     } else {
@@ -113,11 +115,7 @@ export default function personalRouter(services: Services): Router {
       audit: Page.PostEditHeight,
       validation: {
         validators: [heightMetricValidator],
-        onError: (req, res) => {
-          const { editField } = req.body
-          req.flash('fieldValue', editField)
-          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/height`)
-        },
+        redirectBackOnError: true,
       },
     },
   })
@@ -133,12 +131,7 @@ export default function personalRouter(services: Services): Router {
       method: personalController.height().imperial.submit,
       validation: {
         validators: [heightImperialValidator],
-        onError: (req, res) => {
-          const { feet, inches } = req.body
-          req.flash('feetValue', feet)
-          req.flash('inchesValue', inches)
-          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/height/imperial`)
-        },
+        redirectBackOnError: true,
       },
     },
   })
@@ -155,11 +148,7 @@ export default function personalRouter(services: Services): Router {
       method: personalController.weight().metric.submit,
       validation: {
         validators: [weightMetricValidator],
-        onError: (req, res) => {
-          const { kilograms } = req.body
-          req.flash('kilogramsValue', kilograms)
-          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/weight`)
-        },
+        redirectBackOnError: true,
       },
     },
   })
@@ -175,12 +164,7 @@ export default function personalRouter(services: Services): Router {
       method: personalController.weight().imperial.submit,
       validation: {
         validators: [weightImperialValidator],
-        onError: (req, res) => {
-          const { stone, pounds } = req.body
-          req.flash('stoneValue', stone)
-          req.flash('poundsValue', pounds)
-          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/weight/imperial`)
-        },
+        redirectBackOnError: true,
       },
     },
   })

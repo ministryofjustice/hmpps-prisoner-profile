@@ -18,6 +18,7 @@ import { enablePrisonPerson } from '../../utils/featureToggles'
 import { FieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
+import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 
 export default class PersonalController {
   constructor(
@@ -72,7 +73,7 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const { firstName, lastName } = prisonerData
-          const fieldValueFlash = req.flash('fieldValue')
+          const requestBodyFlash = requestBodyFromFlash<{ editField: string }>(req)
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
@@ -89,7 +90,7 @@ export default class PersonalController {
             prisonerNumber,
             breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
             errors: hasLength(errors) ? errors : [],
-            fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalAttributes.height,
+            fieldValue: requestBodyFlash ? requestBodyFlash.editField : prisonPerson?.physicalAttributes.height,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -122,7 +123,7 @@ export default class PersonalController {
 
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
-            req.flash('fieldValue', editField)
+            req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
           }
@@ -137,8 +138,7 @@ export default class PersonalController {
 
           const { feet, inches } = centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
 
-          const feetValueFlash = req.flash('feetValue')
-          const inchesValueFlash = req.flash('inchesValue')
+          const requestBodyFlash = requestBodyFromFlash<{ feet: string; inches: string }>(req)
           const errors = req.flash('errors')
 
           await this.auditService.sendPageView({
@@ -156,8 +156,8 @@ export default class PersonalController {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors: hasLength(errors) ? errors : [],
-            feetValue: hasLength(feetValueFlash) ? feetValueFlash[0] : feet,
-            inchesValue: hasLength(inchesValueFlash) ? inchesValueFlash[0] : inches,
+            feetValue: requestBodyFlash ? requestBodyFlash.feet : feet,
+            inchesValue: requestBodyFlash ? requestBodyFlash.inches : inches,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -192,8 +192,7 @@ export default class PersonalController {
 
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
-            req.flash('feetValue', feet)
-            req.flash('inchesValue', inches)
+            req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
           }
@@ -208,7 +207,7 @@ export default class PersonalController {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
-          const fieldValueFlash = req.flash('fieldValue')
+          const requestBodyFlash = requestBodyFromFlash<{ kilograms: string }>(req)
           const errors = req.flash('errors')
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
@@ -228,7 +227,7 @@ export default class PersonalController {
             }),
             errors: hasLength(errors) ? errors : [],
             fieldName: 'weight',
-            fieldValue: fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalAttributes.weight,
+            fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes.weight,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -249,7 +248,7 @@ export default class PersonalController {
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
-            req.flash('kilogramsValue', kilograms)
+            req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight`)
           }
@@ -264,8 +263,7 @@ export default class PersonalController {
 
           const { stone, pounds } = kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
 
-          const stoneValueFlash = req.flash('stoneValue')
-          const poundsValueFlash = req.flash('poundsValue')
+          const requestBodyFlash = requestBodyFromFlash<{ stone: string; pounds: string }>(req)
           const errors = req.flash('errors')
 
           await this.auditService.sendPageView({
@@ -293,8 +291,8 @@ export default class PersonalController {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors: hasLength(errors) ? errors : [],
-            stoneValue: hasLength(stoneValueFlash) ? stoneValueFlash[0] : stone,
-            poundsValue: hasLength(poundsValueFlash) ? poundsValueFlash[0] : pounds,
+            stoneValue: requestBodyFlash ? requestBodyFlash.stone : stone,
+            poundsValue: requestBodyFlash ? requestBodyFlash.pounds : pounds,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -329,8 +327,7 @@ export default class PersonalController {
 
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
-            req.flash('stoneValue', stone)
-            req.flash('poundsValue', pounds)
+            req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
           }

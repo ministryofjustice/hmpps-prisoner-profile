@@ -121,9 +121,21 @@ export function editPageTests<TPage extends EditPage>(options: {
               cy.signIn({ redirectPath: editUrl })
               page = getPage()
               fillWithInputs(inputs)
-              page.submit()
-              errorMessages.forEach(message => {
-                page.errorMessage().should('include.text', message)
+              cy.url().then(url => {
+                cy.intercept('POST', url, req => {
+                  req.headers.Referrer = url
+                })
+                page.submit()
+                errorMessages.forEach(message => {
+                  page.errorMessage().should('include.text', message)
+                })
+
+                // Ensure inputted values are persisted across errors
+                if (inputs.textInputs) {
+                  Object.entries(inputs.textInputs).forEach(([key, value]) => {
+                    cy.get(`input[name='${key}']`).should('have.value', value)
+                  })
+                }
               })
             })
           })

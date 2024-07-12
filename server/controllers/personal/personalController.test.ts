@@ -99,7 +99,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'fieldValue') return ['1234']
+              if (key === 'requestBody') return [JSON.stringify({ editField: '1234' })]
               return []
             },
             middleware: defaultMiddleware,
@@ -200,8 +200,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'feetValue') return ['5']
-              if (key === 'inchesValue') return ['10']
+              if (key === 'requestBody') return [JSON.stringify({ feet: '5', inches: '10' })]
               return []
             },
             middleware: defaultMiddleware,
@@ -255,8 +254,7 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(validRequest.flash).toHaveBeenCalledWith('feetValue', 5)
-          expect(validRequest.flash).toHaveBeenCalledWith('inchesValue', 10)
+          expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
       })
@@ -311,7 +309,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'fieldValue') return ['1234']
+              if (key === 'requestBody') return [JSON.stringify({ kilograms: '1234' })]
               return []
             },
             middleware: defaultMiddleware,
@@ -364,7 +362,7 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(validRequest.flash).toHaveBeenCalledWith('kilogramsValue', '80')
+          expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
         })
       })
@@ -416,8 +414,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'stoneValue') return ['5']
-              if (key === 'poundsValue') return ['10']
+              if (key === 'requestBody') return [JSON.stringify({ stone: '5', pounds: '10' })]
               return []
             },
             middleware: defaultMiddleware,
@@ -471,8 +468,7 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(validRequest.flash).toHaveBeenCalledWith('stoneValue', 10)
-          expect(validRequest.flash).toHaveBeenCalledWith('poundsValue', 12)
+          expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
         })
       })
