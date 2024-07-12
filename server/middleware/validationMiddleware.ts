@@ -1,24 +1,20 @@
-import { Request, RequestHandler } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import HmppsError from '../interfaces/HmppsError'
+import { hasLength } from '../utils/utils'
 
 export type Validator = (body: Record<string, string>) => HmppsError[] | Promise<HmppsError[]>
 
 export default function validationMiddleware(
   validators: Validator[],
-  options: {
-    redirectOnError: boolean
-    redirectPath?: string
-    onError?: (req: Request) => void
-  } = { redirectOnError: false },
+  onError?: (req: Request, res: Response) => void,
 ): RequestHandler {
   return async (req, res, next) => {
     const validationResults = await Promise.all(validators.map(validator => validator(req.body)))
     const errors = validationResults.flat()
 
-    if (options.redirectOnError) {
-      if (options.onError) options.onError(req)
+    if (hasLength(errors) && onError) {
       req.flash('errors', errors)
-      res.redirect(options.redirectPath)
+      return onError(req, res)
     }
 
     if (errors.length) {

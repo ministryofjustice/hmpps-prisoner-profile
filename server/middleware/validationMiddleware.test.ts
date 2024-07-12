@@ -57,38 +57,11 @@ describe('Validation middleware', () => {
     expect(next).toHaveBeenCalled()
   })
 
-  describe('With options', () => {
+  it('Calls on error if provided', async () => {
     const alwaysFailsValidator: Validator = () => Promise.resolve([error])
+    const onError = jest.fn()
 
-    it('Redirects to the given path when redirectOnFail is true', async () => {
-      await validationMiddleware([alwaysFailsValidator], { redirectOnError: true, redirectPath: 'path' })(
-        req,
-        res,
-        next,
-      )
-
-      expect(res.redirect).toHaveBeenCalledWith('path')
-    })
-
-    it('Puts the errors into the flash for the redirect', async () => {
-      await validationMiddleware([alwaysFailsValidator], { redirectOnError: true, redirectPath: 'path' })(
-        req,
-        res,
-        next,
-      )
-
-      expect(req.flash).toHaveBeenCalledWith('errors', [error])
-    })
-
-    it('Calls on error if provided', async () => {
-      const options = {
-        redirectOnError: true,
-        redirectPath: 'path',
-        onError: jest.fn(),
-      }
-
-      await validationMiddleware([alwaysFailsValidator], options)(req, res, next)
-      expect(options.onError).toHaveBeenCalled()
-    })
+    await validationMiddleware([alwaysFailsValidator], onError)(req, res, next)
+    expect(onError).toHaveBeenCalled()
   })
 })

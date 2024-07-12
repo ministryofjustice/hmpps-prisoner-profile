@@ -102,31 +102,6 @@ export default class PersonalController {
 
           const height = editField ? parseInt(editField, 10) : 0
 
-          const validatedInput = (): { valid: boolean; errorMessage?: string } => {
-            // Empty input is allowed
-            if (editField === '') {
-              return { valid: true }
-            }
-
-            if (Number.isNaN(height)) {
-              return { valid: false, errorMessage: "Enter this person's height" }
-            }
-
-            if (height < 50 || height > 280) {
-              return { valid: false, errorMessage: 'Height must be between 50 centimetres and 280 centimetres' }
-            }
-
-            return { valid: true }
-          }
-
-          const { valid, errorMessage } = validatedInput()
-
-          if (!valid) {
-            req.flash('fieldValue', editField)
-            req.flash('errors', [{ text: errorMessage, href: '#height' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
-          }
-
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
               height: editField ? height : null,
@@ -196,36 +171,6 @@ export default class PersonalController {
           const feet = feetString ? parseInt(feetString, 10) : 0
           const inches = inchesString ? parseInt(inchesString, 10) : 0
 
-          const validatedInput = () => {
-            // Empty input is allowed for both or inches only
-            if ((!feetString && !inchesString) || (feetString && !inchesString)) {
-              return { valid: true }
-            }
-
-            if (Number.isNaN(feet) || Number.isNaN(inches)) {
-              return { valid: false, errorMessage: "Enter this person's height" }
-            }
-
-            if (!feetString || (feet >= 1 && feet <= 9 && inches < 0)) {
-              return { valid: false, errorMessage: 'Feet must be between 1 and 9. Inches must be between 0 and 11' }
-            }
-
-            if (feet < 1 || feet > 9 || (feet === 9 && inches > 0)) {
-              return { valid: false, errorMessage: 'Height must be between 1 feet and 9 feet' }
-            }
-
-            return { valid: true }
-          }
-
-          const { valid, errorMessage } = validatedInput()
-
-          if (!valid) {
-            req.flash('feetValue', feetString)
-            req.flash('inchesValue', inchesString)
-            req.flash('errors', [{ text: errorMessage, href: '#feet' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
-          }
-
           try {
             const height = feetAndInchesToCentimetres(feet, inches)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
@@ -293,32 +238,7 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const { kilograms } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-
           const weight = parseInt(kilograms, 10)
-          const validatedInput = (): { valid: boolean; errorMessage?: string } => {
-            // Empty input is allowed
-            if (kilograms === '') {
-              return { valid: true }
-            }
-
-            if (Number.isNaN(weight)) {
-              return { valid: false, errorMessage: "Enter this person's weight" }
-            }
-
-            if (weight < 12 || weight > 640) {
-              return { valid: false, errorMessage: 'Weight must be between 12 kilograms and 640 kilograms' }
-            }
-
-            return { valid: true }
-          }
-
-          const { valid, errorMessage } = validatedInput()
-
-          if (!valid) {
-            req.flash('kilogramsValue', kilograms)
-            req.flash('errors', [{ text: errorMessage, href: '#kilograms' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight`)
-          }
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
@@ -388,35 +308,6 @@ export default class PersonalController {
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
 
-          const validatedInput = () => {
-            // Empty input is allowed for both or pounds only
-            if ((!stoneString && !poundsString) || (stoneString && !poundsString)) {
-              return { valid: true }
-            }
-
-            if (Number.isNaN(stone) || Number.isNaN(pounds)) {
-              return { valid: false, errorMessage: "Enter this person's weight" }
-            }
-
-            if (!stoneString || (stone >= 2 && stone <= 100 && (pounds < 0 || pounds > 13))) {
-              return { valid: false, errorMessage: 'Stone must be between 2 and 100. Pounds must be between 0 and 13' }
-            }
-
-            if (stone < 2 || stone > 100 || (stone === 100 && pounds > 0)) {
-              return { valid: false, errorMessage: 'Weight must be between 2 stone and 100 stone' }
-            }
-
-            return { valid: true }
-          }
-
-          const { valid, errorMessage } = validatedInput()
-
-          if (!valid) {
-            req.flash('stoneValue', stoneString)
-            req.flash('poundsValue', poundsString)
-            req.flash('errors', [{ text: errorMessage, href: '#stone' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
-          }
           try {
             const weight = stoneAndPoundsToKilograms(stone, pounds)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {

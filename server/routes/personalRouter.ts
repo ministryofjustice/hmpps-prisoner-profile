@@ -17,6 +17,9 @@ import {
   facialHairFieldData,
   hairFieldData,
 } from '../controllers/personal/fieldData'
+import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
+import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
+import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -61,6 +64,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       method: RequestHandler
       audit: Page
+      validation?: {
+        validators: Validator[]
+        onError?: (req: Request, res: Response) => void
+      }
     }
   }) => {
     get(
@@ -72,14 +79,26 @@ export default function personalRouter(services: Services): Router {
       edit.method,
     )
 
-    post(
-      url,
-      auditPageAccessAttempt({ services, page: submit.audit }),
-      getPrisonerData(services),
-      permissionsGuard(services.permissionsService.getOverviewPermissions),
-      editRouteChecks(),
-      submit.method,
-    )
+    if (submit.validation) {
+      post(
+        url,
+        auditPageAccessAttempt({ services, page: submit.audit }),
+        getPrisonerData(services),
+        permissionsGuard(services.permissionsService.getOverviewPermissions),
+        editRouteChecks(),
+        validationMiddleware(submit.validation.validators, submit.validation.onError),
+        submit.method,
+      )
+    } else {
+      post(
+        url,
+        auditPageAccessAttempt({ services, page: submit.audit }),
+        getPrisonerData(services),
+        permissionsGuard(services.permissionsService.getOverviewPermissions),
+        editRouteChecks(),
+        submit.method,
+      )
+    }
   }
 
   // Height
@@ -92,6 +111,14 @@ export default function personalRouter(services: Services): Router {
     submit: {
       method: personalController.height().metric.submit,
       audit: Page.PostEditHeight,
+      validation: {
+        validators: [heightMetricValidator],
+        onError: (req, res) => {
+          const { editField } = req.body
+          req.flash('fieldValue', editField)
+          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/height`)
+        },
+      },
     },
   })
 
@@ -104,6 +131,15 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditHeight,
       method: personalController.height().imperial.submit,
+      validation: {
+        validators: [heightImperialValidator],
+        onError: (req, res) => {
+          const { feet, inches } = req.body
+          req.flash('feetValue', feet)
+          req.flash('inchesValue', inches)
+          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/height/imperial`)
+        },
+      },
     },
   })
 
@@ -117,6 +153,14 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditWeight,
       method: personalController.weight().metric.submit,
+      validation: {
+        validators: [weightMetricValidator],
+        onError: (req, res) => {
+          const { kilograms } = req.body
+          req.flash('kilogramsValue', kilograms)
+          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/weight`)
+        },
+      },
     },
   })
 
@@ -129,6 +173,15 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditWeight,
       method: personalController.weight().imperial.submit,
+      validation: {
+        validators: [weightImperialValidator],
+        onError: (req, res) => {
+          const { stone, pounds } = req.body
+          req.flash('stoneValue', stone)
+          req.flash('poundsValue', pounds)
+          return res.redirect(`/prisoner/${req.params.prisonerNumber}/personal/edit/weight/imperial`)
+        },
+      },
     },
   })
 

@@ -122,22 +122,18 @@ describe('PersonalController', () => {
           } as any
         })
 
-        it('Updates the physical attributes', async () => {
-          await action(validRequest, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
-            height: 123,
-            weight: 60,
-          })
-        })
-
-        it('Redirects to the personal page on success', async () => {
-          await action(validRequest, res)
+        it.each([
+          { editField: '', updateRequest: { height: null } },
+          { editField: '100', updateRequest: { height: 100 } },
+        ])('Valid request: %s', async ({ editField, updateRequest }) => {
+          const request = { ...validRequest, body: { editField } }
+          await action(request, res)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
-
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
             type: FlashMessageType.success,
@@ -153,38 +149,6 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
-        })
-
-        it.each([
-          { editField: '', updateRequest: { height: null } },
-          { editField: '100', updateRequest: { height: 100 } },
-        ])('Valid request: %s', async ({ editField, updateRequest }) => {
-          const request = { ...validRequest, body: { editField } }
-          await action(request, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.anything(),
-            expect.objectContaining(updateRequest),
-          )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it.each([
-          ['-1', 'Height must be between 50 centimetres and 280 centimetres'],
-          ['49', 'Height must be between 50 centimetres and 280 centimetres'],
-          ['281', 'Height must be between 50 centimetres and 280 centimetres'],
-          ['Example', "Enter this person's height"],
-        ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
-          const req = {
-            middleware: defaultMiddleware,
-            params: { prisonerNumber: 'ABC123' },
-            body: { editField: value },
-            flash: jest.fn(),
-          } as any
-          await action(req, res)
-
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#height' }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
         })
       })
@@ -263,22 +227,19 @@ describe('PersonalController', () => {
           } as any
         })
 
-        it('Updates the physical attributes', async () => {
-          await action(validRequest, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
-            height: 178,
-            weight: 60,
-          })
-        })
-
-        it('Redirects to the personal page on success', async () => {
-          await action(validRequest, res)
+        it.each([
+          { feet: '', inches: '', updateRequest: { height: null } },
+          { feet: '5', inches: '2', updateRequest: { height: 157 } },
+          { feet: '3', inches: '', updateRequest: { height: 91 } },
+        ])('Valid request updates physical attributes: %s', async ({ feet, inches, updateRequest }) => {
+          const request = { ...validRequest, body: { feet, inches } }
+          await action(request, res)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
-
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Height edited',
             type: FlashMessageType.success,
@@ -296,45 +257,6 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('feetValue', 5)
           expect(validRequest.flash).toHaveBeenCalledWith('inchesValue', 10)
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
-        })
-
-        it.each([
-          { feet: '', inches: '', updateRequest: { height: null } },
-          { feet: '5', inches: '2', updateRequest: { height: 157 } },
-          { feet: '3', inches: '', updateRequest: { height: 91 } },
-        ])('Valid request: %s', async ({ feet, inches, updateRequest }) => {
-          const request = { ...validRequest, body: { feet, inches } }
-          await action(request, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.anything(),
-            expect.objectContaining(updateRequest),
-          )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it.each([
-          [{ feet: '0', inches: '11' }, 'Height must be between 1 feet and 9 feet'],
-          [{ feet: '9', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
-          [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
-          [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
-          [{ feet: 'example', inches: '1' }, "Enter this person's height"],
-          [{ feet: '5', inches: 'example' }, "Enter this person's height"],
-          [{ feet: '-5', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
-          [{ feet: '1', inches: '-5' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
-        ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {
-          const req = {
-            middleware: defaultMiddleware,
-            params: { prisonerNumber: 'ABC123' },
-            body: { feet, inches },
-            flash: jest.fn(),
-          } as any
-          await action(req, res)
-
-          expect(req.flash).toHaveBeenCalledWith('feetValue', feet)
-          expect(req.flash).toHaveBeenCalledWith('inchesValue', inches)
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#feet' }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
         })
       })
@@ -413,22 +335,20 @@ describe('PersonalController', () => {
           res = { redirect: jest.fn() } as any
         })
 
-        it('Updates the physical attributes', async () => {
-          await action(validRequest, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
-            height: 102,
-            weight: 80,
-          })
-        })
-
-        it('Redirects to the personal page on success', async () => {
-          await action(validRequest, res)
+        it.each([
+          { kilograms: '', updateRequest: { weight: null } },
+          { kilograms: '50', updateRequest: { weight: 50 } },
+          { kilograms: '12', updateRequest: { weight: 12 } },
+          { kilograms: '640', updateRequest: { weight: 640 } },
+        ])('Valid request: %s', async ({ kilograms, updateRequest }) => {
+          const request = { ...validRequest, body: { kilograms } }
+          await action(request, res)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
-
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight edited',
             type: FlashMessageType.success,
@@ -445,41 +365,6 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('kilogramsValue', '80')
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
-        })
-
-        it.each([
-          { kilograms: '', updateRequest: { weight: null } },
-          { kilograms: '50', updateRequest: { weight: 50 } },
-          { kilograms: '12', updateRequest: { weight: 12 } },
-          { kilograms: '640', updateRequest: { weight: 640 } },
-        ])('Valid request: %s', async ({ kilograms, updateRequest }) => {
-          const request = { ...validRequest, body: { kilograms } }
-          await action(request, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.anything(),
-            expect.objectContaining(updateRequest),
-          )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it.each([
-          [{ kilograms: '0' }, 'Weight must be between 12 kilograms and 640 kilograms'],
-          [{ kilograms: '11' }, 'Weight must be between 12 kilograms and 640 kilograms'],
-          [{ kilograms: '651' }, 'Weight must be between 12 kilograms and 640 kilograms'],
-          [{ kilograms: 'Example' }, "Enter this person's weight"],
-        ])('Validations: %s: %s', async ({ kilograms }: { kilograms: string }, errorMessage: string) => {
-          const req = {
-            middleware: defaultMiddleware,
-            params: { prisonerNumber: 'ABC123' },
-            body: { kilograms },
-            flash: jest.fn(),
-          } as any
-          await action(req, res)
-
-          expect(req.flash).toHaveBeenCalledWith('kilogramsValue', kilograms)
-          expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#kilograms' }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
         })
       })
@@ -558,22 +443,19 @@ describe('PersonalController', () => {
           } as any
         })
 
-        it('Updates the physical attributes', async () => {
-          await action(validRequest, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123', {
-            height: 102,
-            weight: 69,
-          })
-        })
-
-        it('Redirects to the personal page on success', async () => {
-          await action(validRequest, res)
+        it.each([
+          { stone: '', pounds: '', updateRequest: { weight: null } },
+          { stone: '5', pounds: '2', updateRequest: { weight: 33 } },
+          { stone: '3', pounds: '', updateRequest: { weight: 19 } },
+        ])('Valid request: %s', async ({ stone, pounds, updateRequest }) => {
+          const request = { ...validRequest, body: { stone, pounds } }
+          await action(request, res)
+          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.anything(),
+            expect.objectContaining(updateRequest),
+          )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it('Adds the success message to the flash', async () => {
-          await action(validRequest, res)
-
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
             text: 'Weight edited',
             type: FlashMessageType.success,
@@ -593,54 +475,6 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('poundsValue', 12)
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
         })
-
-        it.each([
-          { stone: '', pounds: '', updateRequest: { weight: null } },
-          { stone: '5', pounds: '2', updateRequest: { weight: 33 } },
-          { stone: '3', pounds: '', updateRequest: { weight: 19 } },
-        ])('Valid request: %s', async ({ stone, pounds, updateRequest }) => {
-          const request = { ...validRequest, body: { stone, pounds } }
-          await action(request, res)
-          expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.anything(),
-            expect.objectContaining(updateRequest),
-          )
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
-        })
-
-        it.each([
-          // Invalid input
-          [{ stone: 'example', pounds: '1' }, "Enter this person's weight"],
-          [{ stone: '10', pounds: 'example' }, "Enter this person's weight"],
-
-          // Stone limits
-          [{ stone: '1', pounds: '5' }, 'Weight must be between 2 stone and 100 stone'],
-          [{ stone: '101', pounds: '5' }, 'Weight must be between 2 stone and 100 stone'],
-
-          // Pounds limits
-          [{ stone: '25', pounds: '-1' }, 'Stone must be between 2 and 100. Pounds must be between 0 and 13'],
-          [{ stone: '25', pounds: '14' }, 'Stone must be between 2 and 100. Pounds must be between 0 and 13'],
-
-          // Empty stone
-          [{ stone: '', pounds: '1' }, 'Stone must be between 2 and 100. Pounds must be between 0 and 13'],
-        ])(
-          'Validations: %s: %s',
-          async ({ stone, pounds }: { stone: string; pounds: string }, errorMessage: string) => {
-            const req = {
-              middleware: defaultMiddleware,
-              params: { prisonerNumber: 'ABC123' },
-              body: { stone, pounds },
-              flash: jest.fn(),
-            } as any
-            await action(req, res)
-
-            expect(req.flash).toHaveBeenCalledWith('stoneValue', stone)
-            expect(req.flash).toHaveBeenCalledWith('poundsValue', pounds)
-            expect(req.flash).toHaveBeenCalledWith('errors', [{ text: errorMessage, href: '#stone' }])
-            expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
-          },
-        )
       })
     })
   })
