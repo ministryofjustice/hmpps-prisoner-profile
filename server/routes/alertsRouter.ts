@@ -59,7 +59,7 @@ export default function alertsRouter(services: Services): Router {
   post(
     `${basePath}/add-alert`,
     auditPageAccessAttempt({ services, page: Page.PostAddAlert }),
-    validationMiddleware(AlertValidator),
+    validationMiddleware([AlertValidator]),
     alertsController.post(),
   )
 
@@ -83,7 +83,7 @@ export default function alertsRouter(services: Services): Router {
   post(
     `${basePath}/alerts/:alertId/add-more-details`,
     auditPageAccessAttempt({ services, page: Page.PostAlertAddMoreDetails }),
-    validationMiddleware(AlertAddMoreDetailsValidator),
+    validationMiddleware([AlertAddMoreDetailsValidator]),
     alertsController.postAddMoreDetails(),
   )
 
@@ -100,7 +100,7 @@ export default function alertsRouter(services: Services): Router {
   post(
     `${basePath}/alerts/:alertId/close`,
     auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
-    validationMiddleware(AlertCloseValidator),
+    validationMiddleware([AlertCloseValidator]),
     alertsController.postCloseAlert(),
   )
 
@@ -117,7 +117,7 @@ export default function alertsRouter(services: Services): Router {
   post(
     `${basePath}/alerts/:alertId/change-end-date`,
     auditPageAccessAttempt({ services, page: Page.PostAlertClose }),
-    validationMiddleware(AlertChangeEndDateValidator),
+    validationMiddleware([AlertChangeEndDateValidator]),
     alertsController.postChangeEndDate(),
   )
 

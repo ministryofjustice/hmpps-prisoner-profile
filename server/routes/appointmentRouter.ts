@@ -46,7 +46,7 @@ export default function appointmentRouter(services: Services): Router {
   post(
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
-    validationMiddleware(AppointmentValidator),
+    validationMiddleware([AppointmentValidator]),
     appointmentController.post(),
   )
   get(
@@ -67,7 +67,7 @@ export default function appointmentRouter(services: Services): Router {
   post(
     `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PostPrePostAppointments }),
-    validationMiddleware(PrePostAppointmentValidator),
+    validationMiddleware([PrePostAppointmentValidator]),
     appointmentController.postVideoLinkBooking(),
   )
   get(

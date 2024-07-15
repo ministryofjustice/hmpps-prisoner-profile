@@ -17,6 +17,9 @@ import {
   facialHairFieldData,
   hairFieldData,
 } from '../controllers/personal/fieldData'
+import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
+import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
+import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -61,6 +64,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       method: RequestHandler
       audit: Page
+      validation?: {
+        validators: Validator[]
+        redirectBackOnError?: boolean
+      }
     }
   }) => {
     get(
@@ -72,14 +79,28 @@ export default function personalRouter(services: Services): Router {
       edit.method,
     )
 
-    post(
-      url,
-      auditPageAccessAttempt({ services, page: submit.audit }),
-      getPrisonerData(services),
-      permissionsGuard(services.permissionsService.getOverviewPermissions),
-      editRouteChecks(),
-      submit.method,
-    )
+    if (submit.validation) {
+      post(
+        url,
+        auditPageAccessAttempt({ services, page: submit.audit }),
+        getPrisonerData(services),
+        permissionsGuard(services.permissionsService.getOverviewPermissions),
+        editRouteChecks(),
+        validationMiddleware(submit.validation.validators, {
+          redirectBackOnError: submit.validation.redirectBackOnError || false,
+        }),
+        submit.method,
+      )
+    } else {
+      post(
+        url,
+        auditPageAccessAttempt({ services, page: submit.audit }),
+        getPrisonerData(services),
+        permissionsGuard(services.permissionsService.getOverviewPermissions),
+        editRouteChecks(),
+        submit.method,
+      )
+    }
   }
 
   // Height
@@ -92,6 +113,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       method: personalController.height().metric.submit,
       audit: Page.PostEditHeight,
+      validation: {
+        validators: [heightMetricValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 
@@ -104,6 +129,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditHeight,
       method: personalController.height().imperial.submit,
+      validation: {
+        validators: [heightImperialValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 
@@ -117,6 +146,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditWeight,
       method: personalController.weight().metric.submit,
+      validation: {
+        validators: [weightMetricValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 
@@ -129,6 +162,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditWeight,
       method: personalController.weight().imperial.submit,
+      validation: {
+        validators: [weightImperialValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 

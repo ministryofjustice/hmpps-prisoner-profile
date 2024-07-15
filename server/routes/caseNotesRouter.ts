@@ -43,7 +43,7 @@ export default function caseNotesRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.PostAddCaseNote }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),
-    validationMiddleware(CaseNoteValidator),
+    validationMiddleware([CaseNoteValidator]),
     caseNotesController.post(),
   )
 
@@ -60,7 +60,7 @@ export default function caseNotesRouter(services: Services): Router {
     auditPageAccessAttempt({ services, page: Page.PostUpdateCaseNote }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getCaseNotesPermissions),
-    validationMiddleware(UpdateCaseNoteValidator),
+    validationMiddleware([UpdateCaseNoteValidator]),
     caseNotesController.postUpdate(),
   )
 
