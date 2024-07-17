@@ -27,18 +27,20 @@ describe('PersonalController', () => {
     user: prisonUserMock,
   }
 
+  const defaultPrisonPerson = {
+    prisonerNumber: 'ABC123',
+    physicalAttributes: { height: 102, weight: 60 },
+    physicalCharacteristics: {
+      hair: { code: '', description: '' },
+      facialHair: { code: '', description: '' },
+      faceShape: { code: '', description: '' },
+      build: { code: '', description: '' },
+    },
+  }
+
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getPrisonPerson = jest.fn(async () => ({
-      prisonerNumber: 'ABC123',
-      physicalAttributes: { height: 102, weight: 60 },
-      physicalCharacteristics: {
-        hair: { code: '', description: '' },
-        facialHair: { code: '', description: '' },
-        faceShape: { code: '', description: '' },
-        build: { code: '', description: '' },
-      },
-    }))
+    personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
     personalPageService.getPhysicalCharacteristics = jest.fn(async () => physicalCharacteristicsMock.field)
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
@@ -209,6 +211,25 @@ describe('PersonalController', () => {
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ feetValue: '5', inchesValue: '10' }),
+          )
+        })
+
+        it('Keeps the inputs empty when no height exists', async () => {
+          personalPageService.getPrisonPerson = jest.fn(async () => ({
+            ...defaultPrisonPerson,
+            physicalAttributes: { height: undefined, weight: undefined },
+          }))
+          const req = {
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
+          expect(res.render).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({ feetValue: undefined, inchesValue: undefined }),
           )
         })
       })
@@ -423,6 +444,25 @@ describe('PersonalController', () => {
           expect(res.render).toHaveBeenCalledWith(
             expect.anything(),
             expect.objectContaining({ stoneValue: '5', poundsValue: '10' }),
+          )
+        })
+
+        it('Keeps the inputs empty when no weight exists', async () => {
+          personalPageService.getPrisonPerson = jest.fn(async () => ({
+            ...defaultPrisonPerson,
+            physicalAttributes: { height: undefined, weight: undefined },
+          }))
+          const req = {
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          await action(req, res)
+          expect(res.render).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({ stoneValue: undefined, poundsValue: undefined }),
           )
         })
       })

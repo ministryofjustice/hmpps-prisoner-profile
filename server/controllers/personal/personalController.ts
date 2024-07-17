@@ -135,8 +135,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const prisonPersonHeight = prisonPerson?.physicalAttributes.height
 
-          const { feet, inches } = centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
+          const { feet, inches } =
+            prisonPersonHeight === undefined || prisonPersonHeight === null
+              ? { feet: undefined, inches: undefined }
+              : centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
 
           const requestBodyFlash = requestBodyFromFlash<{ feet: string; inches: string }>(req)
           const errors = req.flash('errors')
@@ -150,7 +154,7 @@ export default class PersonalController {
           })
 
           res.render('pages/edit/heightImperial', {
-            pageTitle: 'Edit Height',
+            pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
@@ -220,7 +224,7 @@ export default class PersonalController {
           })
 
           res.render('pages/edit/weightMetric', {
-            pageTitle: 'Edit weight',
+            pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
@@ -260,8 +264,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const prisonPersonWeight = prisonPerson?.physicalAttributes.weight
 
-          const { stone, pounds } = kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
+          const { stone, pounds } =
+            prisonPersonWeight === undefined || prisonPersonWeight === null
+              ? { stone: undefined, pounds: undefined }
+              : kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
 
           const requestBodyFlash = requestBodyFromFlash<{ stone: string; pounds: string }>(req)
           const errors = req.flash('errors')
@@ -285,7 +293,7 @@ export default class PersonalController {
             .catch(error => logger.error(error))
 
           res.render('pages/edit/weightImperial', {
-            pageTitle: 'Edit weight',
+            pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
