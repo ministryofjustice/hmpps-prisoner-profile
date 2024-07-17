@@ -545,7 +545,7 @@ describe('PersonalController', () => {
         expect(personalPageService.getPhysicalCharacteristics).toHaveBeenCalledWith('token', 'characteristic')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/radios', {
-          pageTitle: 'Characteristic',
+          pageTitle: 'Characteristic - Prisoner personal details',
           prisonerNumber: 'A1234BC',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],

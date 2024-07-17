@@ -9,7 +9,7 @@ export interface FieldData {
 }
 
 export const hairFieldData: FieldData = {
-  pageTitle: 'Hair type or colour - Prisoner personal details',
+  pageTitle: 'Hair type or colour',
   fieldName: 'hair',
   hintText: 'Select the most prominent hair type or colour',
   url: 'hair',
@@ -17,7 +17,7 @@ export const hairFieldData: FieldData = {
 }
 
 export const facialHairFieldData: FieldData = {
-  pageTitle: 'Facial hair - Prisoner personal details',
+  pageTitle: 'Facial hair',
   fieldName: 'facialHair',
   hintText: 'Select the most prominent type of facial hair',
   url: 'facial-hair',
@@ -25,14 +25,14 @@ export const facialHairFieldData: FieldData = {
 }
 
 export const faceShapeFieldData: FieldData = {
-  pageTitle: 'Face shape - Prisoner personal details',
+  pageTitle: 'Face shape',
   fieldName: 'faceShape',
   url: 'face-shape',
   auditPage: Page.EditFaceShape,
 }
 
 export const buildFieldData: FieldData = {
-  pageTitle: 'Build - Prisoner personal details',
+  pageTitle: 'Build',
   fieldName: 'build',
   url: 'build',
   auditPage: Page.EditBuild,

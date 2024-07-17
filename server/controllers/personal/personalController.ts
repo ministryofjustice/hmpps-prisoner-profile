@@ -391,7 +391,7 @@ export default class PersonalController {
         })
 
         res.render('pages/edit/radios', {
-          pageTitle,
+          pageTitle: `${pageTitle} - Prisoner personal details`,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors: hasLength(errors) ? errors : [],
