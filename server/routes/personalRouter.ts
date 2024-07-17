@@ -90,7 +90,7 @@ export default function personalRouter(services: Services): Router {
         editRouteChecks(),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
-          redirectTo: path,
+          redirectTo: `personal/${path}`,
         }),
         submit.method,
       )
