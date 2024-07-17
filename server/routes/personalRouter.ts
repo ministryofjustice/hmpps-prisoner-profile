@@ -52,11 +52,11 @@ export default function personalRouter(services: Services): Router {
   }
 
   const editRoute = ({
-    url,
+    path,
     edit,
     submit,
   }: {
-    url: string
+    path: string
     edit: {
       method: RequestHandler
       audit: Page
@@ -70,8 +70,10 @@ export default function personalRouter(services: Services): Router {
       }
     }
   }) => {
+    const routePath = `${basePath}/${path}`
+
     get(
-      url,
+      routePath,
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -81,19 +83,20 @@ export default function personalRouter(services: Services): Router {
 
     if (submit.validation) {
       post(
-        url,
+        routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
         editRouteChecks(),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
+          redirectTo: path,
         }),
         submit.method,
       )
     } else {
       post(
-        url,
+        routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -105,7 +108,7 @@ export default function personalRouter(services: Services): Router {
 
   // Height
   editRoute({
-    url: `${basePath}/edit/height`,
+    path: `edit/height`,
     edit: {
       method: personalController.height().metric.edit,
       audit: Page.EditHeight,
@@ -121,7 +124,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    url: `${basePath}/edit/height/imperial`,
+    path: 'edit/height/imperial',
     edit: {
       audit: Page.EditHeight,
       method: personalController.height().imperial.edit,
@@ -138,7 +141,7 @@ export default function personalRouter(services: Services): Router {
 
   // Weight
   editRoute({
-    url: `${basePath}/edit/weight`,
+    path: 'edit/weight',
     edit: {
       audit: Page.EditWeight,
       method: personalController.weight().metric.edit,
@@ -154,7 +157,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    url: `${basePath}/edit/weight/imperial`,
+    path: 'edit/weight/imperial',
     edit: {
       audit: Page.EditWeight,
       method: personalController.weight().imperial.edit,
@@ -171,7 +174,7 @@ export default function personalRouter(services: Services): Router {
 
   // Hair type or colour
   editRoute({
-    url: `${basePath}/edit/hair`,
+    path: 'edit/hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
       method: personalController.radios(hairFieldData).edit,
@@ -184,7 +187,7 @@ export default function personalRouter(services: Services): Router {
 
   // Facial hair
   editRoute({
-    url: `${basePath}/edit/facial-hair`,
+    path: 'edit/facial-hair',
     edit: {
       audit: Page.EditFacialHair,
       method: personalController.radios(facialHairFieldData).edit,
@@ -197,7 +200,7 @@ export default function personalRouter(services: Services): Router {
 
   // Face shape
   editRoute({
-    url: `${basePath}/edit/face-shape`,
+    path: 'edit/face-shape',
     edit: {
       audit: Page.EditFaceShape,
       method: personalController.radios(faceShapeFieldData).edit,
@@ -210,7 +213,7 @@ export default function personalRouter(services: Services): Router {
 
   // Build
   editRoute({
-    url: `${basePath}/edit/build`,
+    path: 'edit/build',
     edit: {
       audit: Page.EditBuild,
       method: personalController.radios(buildFieldData).edit,
