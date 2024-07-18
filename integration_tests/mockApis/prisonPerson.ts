@@ -1,6 +1,8 @@
 import {
   PrisonPerson,
   PrisonPersonPhysicalAttributes,
+  ReferenceDataCode,
+  ReferenceDataDomain,
 } from '../../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { stubGetWithBody, stubPutWithResponse } from './utils'
 
@@ -50,5 +52,30 @@ export default {
         ...mockPrisonPerson(prisonerNumber).physicalAttributes,
         ...overrides,
       },
+    }),
+
+  // Reference data
+  stubGetReferenceDataDomains: (resp: ReferenceDataDomain[]) =>
+    stubGetWithBody({
+      path: `${baseUrl}reference-data/domains\\?includeInactive=false`,
+      body: resp,
+    }),
+
+  stubGetReferenceDataDomain: (resp: ReferenceDataDomain) =>
+    stubGetWithBody({
+      path: `${baseUrl}reference-data/domains/[^/]*`,
+      body: resp,
+    }),
+
+  stubGetReferenceDataCodes: (resp: ReferenceDataCode[]) =>
+    stubGetWithBody({
+      path: `${baseUrl}reference-data/domains/[^/]*/codes\\?includeInactive=false`,
+      body: resp,
+    }),
+
+  stubGetReferenceDataCode: (resp: ReferenceDataCode) =>
+    stubGetWithBody({
+      path: `${baseUrl}reference-data/domains/[^/]*/codes/[^/]*`,
+      body: resp,
     }),
 }

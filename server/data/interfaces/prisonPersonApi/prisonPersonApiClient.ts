@@ -27,10 +27,12 @@ export interface ReferenceDataDomain {
   listSequence: number
   createdAt: string
   createdBy: string
+  isActive: boolean
   lastModifiedAt?: string
   lastModifiedBy?: string
   deactivatedAt?: string
   deactivatedBy?: string
+  referenceDataCodes?: ReferenceDataCode[]
 }
 
 export interface ReferenceDataCode {
@@ -40,6 +42,7 @@ export interface ReferenceDataCode {
   listSequence: number
   createdAt: string
   createdBy: string
+  isActive: boolean
   lastModifiedAt?: string
   lastModifiedBy?: string
   deactivatedAt?: string

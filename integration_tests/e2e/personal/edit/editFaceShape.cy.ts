@@ -1,6 +1,11 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
+import {
+  faceCodesMock,
+  referenceDataDomainMock,
+  referenceDataDomainsMock,
+} from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 
 context('Edit face shape', () => {
   const prisonerNumber = 'G6123VU'
@@ -29,6 +34,12 @@ context('Edit face shape', () => {
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.setupPersonRefDataStubs({
+        domainsResp: referenceDataDomainsMock,
+        domainResp: referenceDataDomainMock,
+        codesResp: faceCodesMock,
+        codeResp: faceCodesMock[0],
+      })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/face-shape`,
     editPageWithTitle: EditPage,
