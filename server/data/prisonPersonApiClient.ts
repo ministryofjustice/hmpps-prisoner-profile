@@ -4,8 +4,11 @@ import {
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributes,
   PrisonPersonPhysicalCharacteristics,
+  ReferenceDataCode,
+  ReferenceDataDomain,
 } from './interfaces/prisonPersonApi/prisonPersonApiClient'
 import RestClient from './restClient'
+import { mapToQueryString } from '../utils/utils'
 
 export default class PrisonPersonApiRestClient implements PrisonPersonApiClient {
   private readonly restClient: RestClient
@@ -38,5 +41,28 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
       path: `/prisoners/${prisonerNumber}/physical-characteristics`,
       data: physicalCharacteristics,
     })
+  }
+
+  /* Reference Data Domain and Code endpoints */
+  async getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]> {
+    return this.restClient.get<ReferenceDataDomain[]>({
+      path: `/reference-data/domains`,
+      query: mapToQueryString({ includeInactive }),
+    })
+  }
+
+  async getReferenceDataDomain(domain: string): Promise<ReferenceDataDomain> {
+    return this.restClient.get<ReferenceDataDomain>({ path: `/reference-data/domains/${domain}` })
+  }
+
+  async getReferenceDataCodes(domain: string, includeInactive = false): Promise<ReferenceDataCode[]> {
+    return this.restClient.get<ReferenceDataCode[]>({
+      path: `/reference-data/domains/${domain}/codes`,
+      query: mapToQueryString({ includeInactive }),
+    })
+  }
+
+  async getReferenceDataCode(domain: string, code: string): Promise<ReferenceDataCode> {
+    return this.restClient.get<ReferenceDataCode>({ path: `/reference-data/domains/${domain}/codes/${code}` })
   }
 }

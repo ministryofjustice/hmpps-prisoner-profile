@@ -8,7 +8,7 @@ import PersonalPage, {
   PropertyItem,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { addressToLines, calculateAge, formatName } from '../utils/utils'
+import { addressToLines, calculateAge, camelToSnakeCase, formatName } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
   getOffenderIdentifierValue,
@@ -31,7 +31,6 @@ import {
   PrisonPersonPhysicalAttributes,
   PrisonPersonPhysicalCharacteristics,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import { physicalCharacteristicsMock } from '../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 
 export default class PersonalPageService {
   constructor(
@@ -387,8 +386,8 @@ export default class PersonalPageService {
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
 
-  async getPhysicalCharacteristics(clientToken: string, type: string) {
-    // TODO call prisonPersonApi to get this ref data and map certain values from old to new
-    return physicalCharacteristicsMock[type]
+  async getReferenceDataCodes(clientToken: string, domain: string) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 }

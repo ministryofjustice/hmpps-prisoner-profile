@@ -707,3 +707,7 @@ export const addDefaultSelectedValue = (
     ...items,
   ]
 }
+
+export const camelToSnakeCase = (str: string): string => str?.replace(/([A-Z])/g, '_$1').toUpperCase()
+
+export const snakeToCamelCase = (str: string): string => str?.toLowerCase().replace(/(_\w)/g, m => m[1].toUpperCase())

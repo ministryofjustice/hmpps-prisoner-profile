@@ -27,7 +27,7 @@ export const physicalCharacteristicsMock = {
     { code: 'MOUSTACHE', description: 'Moustache' },
     { code: 'SIDEBURNS', description: 'Sideburns' },
   ],
-  faceShape: [
+  face: [
     { code: 'ANGULAR', description: 'Angular' },
     { code: 'LONG', description: 'Long' },
     { code: 'OVAL', description: 'Oval' },

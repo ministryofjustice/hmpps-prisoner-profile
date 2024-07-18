@@ -59,11 +59,11 @@
         {key: { text: "Right eye colour"}, value: { text: physicalCharacteristics.rightEyeColour } },
         "Facial hair" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.facialHair, "personal/edit/facial-hair",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: 'facial hair type' }
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facial hair', hiddenText: 'facial hair type' }
         ),
         "Shape of face" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.shapeOfFace, "personal/edit/face-shape",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: 'face shape' }
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'face shape', hiddenText: 'face shape' }
         ),
         "Build" | summaryListRowWithOptionalChangeLink(
           physicalCharacteristics.build, "personal/edit/build",

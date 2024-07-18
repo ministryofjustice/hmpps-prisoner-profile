@@ -13,7 +13,7 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   physicalCharacteristics: {
     hair: { code: '', description: '' },
     facialHair: { code: '', description: '' },
-    faceShape: { code: '', description: '' },
+    face: { code: '', description: '' },
     build: { code: '', description: '' },
   },
 })

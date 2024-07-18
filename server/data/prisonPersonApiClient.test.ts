@@ -5,7 +5,7 @@ import { PrisonPerson } from './interfaces/prisonPersonApi/prisonPersonApiClient
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
-describe('prisonerSearchClient', () => {
+describe('prisonPersonApiClient', () => {
   let fakePrisonerSearchApi: nock.Scope
   let prisonPersonApiClient: PrisonPersonApiRestClient
 
@@ -19,16 +19,16 @@ describe('prisonerSearchClient', () => {
     nock.cleanAll()
   })
 
-  describe('getPrisonerDetails', () => {
+  describe('getPrisonPerson', () => {
     it('should return data from api', async () => {
       const prisonPerson: PrisonPerson = {
         prisonerNumber: 'A8469DY',
         physicalAttributes: { height: 100, weight: 100 },
         physicalCharacteristics: {
-          hair: { code: '', description: '' },
-          facialHair: { code: '', description: '' },
-          faceShape: { code: '', description: '' },
-          build: { code: '', description: '' },
+          hair: { code: 'BLONDE', description: 'Blonde' },
+          facialHair: { code: 'MOUSTACHE', description: 'Moustache' },
+          face: { code: 'OVAL', description: 'Oval' },
+          build: { code: 'THIN', description: 'Thin' },
         },
       }
       fakePrisonerSearchApi

@@ -10,10 +10,9 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, hasLength, objectToSelectOptions, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import HmppsError from '../../interfaces/HmppsError'
 import { enablePrisonPerson } from '../../utils/featureToggles'
 import { FieldData } from './fieldData'
 import logger from '../../../logger'
@@ -89,7 +88,7 @@ export default class PersonalController {
             pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             fieldValue: requestBodyFlash ? requestBodyFlash.editField : prisonPerson?.physicalAttributes.height,
             miniBannerData: miniBannerData(prisonerData),
           })
@@ -155,7 +154,7 @@ export default class PersonalController {
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             feetValue: requestBodyFlash ? requestBodyFlash.feet : feet,
             inchesValue: requestBodyFlash ? requestBodyFlash.inches : inches,
             miniBannerData: miniBannerData(prisonerData),
@@ -225,7 +224,7 @@ export default class PersonalController {
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             fieldName: 'weight',
             fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes.weight,
             miniBannerData: miniBannerData(prisonerData),
@@ -290,7 +289,7 @@ export default class PersonalController {
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             stoneValue: requestBodyFlash ? requestBodyFlash.stone : stone,
             poundsValue: requestBodyFlash ? requestBodyFlash.pounds : pounds,
             miniBannerData: miniBannerData(prisonerData),
@@ -350,7 +349,7 @@ export default class PersonalController {
   radios(fieldData: FieldData) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, hintText, auditPage } = fieldData
+        const { pageTitle, code, hintText, auditPage } = fieldData
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
@@ -359,20 +358,22 @@ export default class PersonalController {
 
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
-        const characteristics = await this.personalPageService.getPhysicalCharacteristics(clientToken, fieldName)
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const [characteristics, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
         // TODO remove when API returns value
         if (prisonPerson) {
           prisonPerson.physicalCharacteristics = {
             hair: { code: '', description: '' },
-            facialHair: { code: '', description: '' },
-            faceShape: { code: '', description: '' },
+            facialHair: { code: 'MOUSTACHE', description: 'Moustache' },
+            face: { code: '', description: '' },
             build: { code: '', description: '' },
           }
         }
 
         const fieldValue =
-          fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalCharacteristics[fieldName]
+          fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalCharacteristics[code]?.code
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -386,7 +387,7 @@ export default class PersonalController {
           pageTitle,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
-          errors: hasLength(errors) ? errors : [],
+          errors,
           hintText,
           options: objectToSelectOptions(characteristics, 'code', 'description', fieldValue),
           miniBannerData: {
@@ -398,15 +399,14 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, url } = fieldData
+        const { pageTitle, code, fieldName, url } = fieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const { radioField } = req.body
-        const errors: HmppsError[] = []
 
         try {
           await this.personalPageService.updatePhysicalCharacteristics(clientToken, prisonerNumber, {
-            [fieldName]: radioField,
+            [code]: radioField,
           })
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
@@ -416,17 +416,16 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, fieldName, radioField, url },
+              details: { pageTitle, code, fieldName, radioField, url },
             })
             .catch(error => logger.error(error))
 
           return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
         } catch (e) {
-          errors.push({ text: 'There was an error please try again' })
+          req.flash('errors', [{ text: 'There was an error please try again' }])
         }
 
         req.flash('fieldValue', radioField)
-        req.flash('errors', errors)
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
