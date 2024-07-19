@@ -10,6 +10,7 @@ import PersonalController from './personalController'
 import { FieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
+import { ReferenceDataCode } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -33,7 +34,7 @@ describe('PersonalController', () => {
     physicalCharacteristics: {
       hair: { code: '', description: '' },
       facialHair: { code: '', description: '' },
-      faceShape: { code: '', description: '' },
+      face: { code: '', description: '' },
       build: { code: '', description: '' },
     },
   }
@@ -41,7 +42,9 @@ describe('PersonalController', () => {
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
-    personalPageService.getPhysicalCharacteristics = jest.fn(async () => physicalCharacteristicsMock.field)
+    personalPageService.getReferenceDataCodes = jest.fn(
+      async () => physicalCharacteristicsMock.field as ReferenceDataCode[],
+    )
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
 
@@ -522,6 +525,7 @@ describe('PersonalController', () => {
     const fieldData: FieldData = {
       pageTitle: 'Characteristic',
       fieldName: 'characteristic',
+      code: 'characteristic',
       auditPage: 'PAGE' as Page,
       url: 'characteristic-url',
       hintText: 'Hint text',
@@ -542,7 +546,7 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getPhysicalCharacteristics).toHaveBeenCalledWith('token', 'characteristic')
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'characteristic')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/radios', {
           pageTitle: 'Characteristic - Prisoner personal details',

@@ -252,3 +252,10 @@ Cypress.Commands.add('setupHealthPings', ({ httpStatus }) => {
   cy.task('stubPrisonApiPing', httpStatus)
   cy.task('stubPrisonerSearchPing', httpStatus)
 })
+
+Cypress.Commands.add('setupPersonRefDataStubs', ({ domainsResp, domainResp, codesResp, codeResp }) => {
+  cy.task('stubGetReferenceDataDomains', domainsResp)
+  cy.task('stubGetReferenceDataDomain', domainResp)
+  cy.task('stubGetReferenceDataCodes', codesResp)
+  cy.task('stubGetReferenceDataCode', codeResp)
+})

@@ -46,12 +46,16 @@ describe('PersonalPageService', () => {
         physicalCharacteristics: {
           hair: { code: '', description: '' },
           facialHair: { code: '', description: '' },
-          faceShape: { code: '', description: '' },
+          face: { code: '', description: '' },
           build: { code: '', description: '' },
         },
       })),
       updatePhysicalAttributes: jest.fn(),
       updatePhysicalCharacteristics: jest.fn(),
+      getReferenceDataDomains: jest.fn(),
+      getReferenceDataDomain: jest.fn(),
+      getReferenceDataCodes: jest.fn(),
+      getReferenceDataCode: jest.fn(),
     }
   })
 
