@@ -2,6 +2,7 @@
 import * as pathModule from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
+import AlertFlagLabel from '@ministryofjustice/hmpps-connect-dps-shared-items/dist/alertFlags/types/AlertFlagLabel'
 import {
   addDefaultSelectedValue,
   addressToLines,
@@ -67,6 +68,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
       'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/',
+      'node_modules/@ministryofjustice/hmpps-connect-dps-shared-items/dist/assets/',
     ],
     {
       autoescape: true,

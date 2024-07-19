@@ -17,7 +17,6 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
 import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 let req: any
 let res: any
@@ -59,7 +58,7 @@ describe('Case Notes Controller', () => {
         prisonerData: PrisonerMockDataA,
         inmateDetail: inmateDetailMock,
         alertSummaryData: {
-          alertFlags: alertFlagLabels,
+          alertFlags: [],
         },
         permissions: {
           sensitiveCaseNotes: {
@@ -115,13 +114,7 @@ describe('Case Notes Controller', () => {
         canDeleteSensitiveCaseNotes: false,
         currentUserDetails: user,
       })
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        alertFlagLabels,
-        res.locals.user,
-        'case-notes',
-      )
+      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, [], res.locals.user, 'case-notes')
     })
 
     it('should allow view of sensitive case notes if user has the appropriate permission', async () => {

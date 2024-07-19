@@ -1,44 +1,44 @@
-%status-style {
-  @media screen {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 3px solid;
-    padding: 5px 10px;
-    margin-left: 0;
-    margin-right: 15px;
-    margin-bottom: 5px;
-    font-size: 16px;
-    font-weight: 300;
-    text-align: center;
-    line-height: 1;
-  }
-
-  @media print {
-    padding: 5px 10px;
-    margin-bottom: 0 !important;
-    font-size: 12px;
-    border: 3px solid;
-    background: none !important;
-    min-width: auto;
-    line-height: 1;
-  }
-}
-
-@mixin alertType($colour) {
-  border-color: $colour;
-
-  &:hover, &:focus {
-    text-decoration: none;
-    background-color: $colour;
-    color: govuk-colour('white');
-  }
-
-  &:focus {
-    box-shadow: 0 0 0 3px $govuk-focus-colour;
-  }
-}
-
+//%status-style {
+//  @media screen {
+//    display: inline-flex;
+//    align-items: center;
+//    justify-content: center;
+//    border: 3px solid;
+//    padding: 5px 10px;
+//    margin-left: 0;
+//    margin-right: 15px;
+//    margin-bottom: 5px;
+//    font-size: 16px;
+//    font-weight: 300;
+//    text-align: center;
+//    line-height: 1;
+//  }
+//
+//  @media print {
+//    padding: 5px 10px;
+//    margin-bottom: 0 !important;
+//    font-size: 12px;
+//    border: 3px solid;
+//    background: none !important;
+//    min-width: auto;
+//    line-height: 1;
+//  }
+//}
+//
+//@mixin alertType($colour) {
+//  border-color: $colour;
+//
+//  &:hover, &:focus {
+//    text-decoration: none;
+//    background-color: $colour;
+//    color: govuk-colour('white');
+//  }
+//
+//  &:focus {
+//    box-shadow: 0 0 0 3px $govuk-focus-colour;
+//  }
+//}
+//
 .alerts-list {
 
   min-height: 50px;
@@ -57,178 +57,172 @@
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-
-  li a {
-    padding: 0 10px;
-    margin-bottom: 0;
-    border-radius: 5px;
-  }
 }
 
 .alerts-list-no-flex {
   @extend %govuk-list;
   margin-bottom: 0;
 }
-
-.alert-status {
-  @extend %status-style;
-  margin-right: 0;
-
-  height: 26px;
-  color: govuk-colour('black');
-  background-color: govuk-colour('white');
-
-  &--care-leaver {
-    @include alertType(#00703c);
-  }
-
-  &--ex-armed-forces {
-    @include alertType(#85994b);
-  }
-
-  &--medical {
-    @include alertType(#5694ca);
-  }
-
-  &--other {
-    @include alertType(#d53880);
-  }
-
-  &--MAPPP-case {
-    @include alertType(#28a197);
-  }
-
-  &--security {
-    @include alertType(#003078);
-  }
-
-  &--risk {
-    @include alertType(#d4351c);
-  }
-
-  &--self-harm {
-    @include alertType(#f47738);
-  }
-
-
-  
-  &--acct {
-    @include alertType(#d34700);
-  }
-
-  &--assault {
-    @include alertType(#4c2c92);
-  }
-
-  &--disability {
-    @include alertType(#2b88c8);
-  }
-
-  &--arsonist {
-    @include alertType(#df3034);
-  }
-
-  &--elist {
-    @include alertType(#28a197);
-  }
-
-  &--risk-females {
-    @include alertType(#6f71af);
-  }
-
-  &--tact {
-    @include alertType(#d53880);
-  }
-
-  &--corruptor {
-    @include alertType(#b10e1e);
-  }
-
-  &--chemical-attacker {
-    @include alertType(#69831e);
-  }
-
-  &--concerted-indiscipline {
-    @include alertType(#444);
-  }
-
-  &--racist {
-    @include alertType(#8f5f11);
-  }
-
-  &--risk-lgbt {
-    @include alertType(#912b88);
-  }
-
-  &--hostage-taker {
-    @include alertType(#c6545f);
-  }
-
-  &--controlled-unlock {
-    @include alertType(#2e358b);
-  }
-
-  &--gang-member {
-    @include alertType(#005f9e);
-  }
-
-  &--csip {
-    @include alertType(#4c2c92);
-  }
-
-  &--veteran {
-    @include alertType(#006435);
-  }
-
-  &--care-experienced {
-    @include alertType(#3f90ae);
-  }
-
-  &--acct-post-closure {
-    border: 3px dashed;
-    @include alertType(#f47738);
-  }
-
-  &--conflict {
-    @include alertType(#800000);
-  }
-
-  &--no-one-to-one {
-    @include alertType(#903);
-  }
-
-  &--quarantined {
-    @include alertType(#330);
-  }
-
-  &--reverse-cohorting-unit {
-    @include alertType(mix(white, #00703c, 20%));
-  }
-
-  &--protective-isolation-unit {
-    @include alertType(#006637);
-  }
-
-  &--shielding-unit {
-    @include alertType(#004424);
-  }
-
-  &--refusing-to-shield {
-    @include alertType(#b58840);
-  }
-
-  &--risk-to-known-adults {
-    @include alertType(#003078);
-  }
-
-  &--isolated-prisoner {
-    @include alertType(#00753f);
-  }
-
-  &--visor {
-    @include alertType(#003078);
-  }
-}
+//
+//.alert-status {
+//  @extend %status-style;
+//  margin-right: 0;
+//
+//  height: 26px;
+//  color: govuk-colour('black');
+//  background-color: govuk-colour('white');
+//
+//  &--care-leaver {
+//    @include alertType(#00703c);
+//  }
+//
+//  &--ex-armed-forces {
+//    @include alertType(#85994b);
+//  }
+//
+//  &--medical {
+//    @include alertType(#5694ca);
+//  }
+//
+//  &--other {
+//    @include alertType(#d53880);
+//  }
+//
+//  &--MAPPP-case {
+//    @include alertType(#28a197);
+//  }
+//
+//  &--security {
+//    @include alertType(#003078);
+//  }
+//
+//  &--risk {
+//    @include alertType(#d4351c);
+//  }
+//
+//  &--self-harm {
+//    @include alertType(#f47738);
+//  }
+//
+//
+//
+//  &--acct {
+//    @include alertType(#d34700);
+//  }
+//
+//  &--assault {
+//    @include alertType(#4c2c92);
+//  }
+//
+//  &--disability {
+//    @include alertType(#2b88c8);
+//  }
+//
+//  &--arsonist {
+//    @include alertType(#df3034);
+//  }
+//
+//  &--elist {
+//    @include alertType(#28a197);
+//  }
+//
+//  &--risk-females {
+//    @include alertType(#6f71af);
+//  }
+//
+//  &--tact {
+//    @include alertType(#d53880);
+//  }
+//
+//  &--corruptor {
+//    @include alertType(#b10e1e);
+//  }
+//
+//  &--chemical-attacker {
+//    @include alertType(#69831e);
+//  }
+//
+//  &--concerted-indiscipline {
+//    @include alertType(#444);
+//  }
+//
+//  &--racist {
+//    @include alertType(#8f5f11);
+//  }
+//
+//  &--risk-lgbt {
+//    @include alertType(#912b88);
+//  }
+//
+//  &--hostage-taker {
+//    @include alertType(#c6545f);
+//  }
+//
+//  &--controlled-unlock {
+//    @include alertType(#2e358b);
+//  }
+//
+//  &--gang-member {
+//    @include alertType(#005f9e);
+//  }
+//
+//  &--csip {
+//    @include alertType(#4c2c92);
+//  }
+//
+//  &--veteran {
+//    @include alertType(#006435);
+//  }
+//
+//  &--care-experienced {
+//    @include alertType(#3f90ae);
+//  }
+//
+//  &--acct-post-closure {
+//    border: 3px dashed;
+//    @include alertType(#f47738);
+//  }
+//
+//  &--conflict {
+//    @include alertType(#800000);
+//  }
+//
+//  &--no-one-to-one {
+//    @include alertType(#903);
+//  }
+//
+//  &--quarantined {
+//    @include alertType(#330);
+//  }
+//
+//  &--reverse-cohorting-unit {
+//    @include alertType(mix(white, #00703c, 20%));
+//  }
+//
+//  &--protective-isolation-unit {
+//    @include alertType(#006637);
+//  }
+//
+//  &--shielding-unit {
+//    @include alertType(#004424);
+//  }
+//
+//  &--refusing-to-shield {
+//    @include alertType(#b58840);
+//  }
+//
+//  &--risk-to-known-adults {
+//    @include alertType(#003078);
+//  }
+//
+//  &--isolated-prisoner {
+//    @include alertType(#00753f);
+//  }
+//
+//  &--visor {
+//    @include alertType(#003078);
+//  }
+//}
 
 .cat-a-status {
   @extend %status-style;
