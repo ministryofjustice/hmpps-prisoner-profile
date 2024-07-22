@@ -23,7 +23,7 @@ describe('prisonPersonApiClient', () => {
     it('should return data from api', async () => {
       const prisonPerson: PrisonPerson = {
         prisonerNumber: 'A8469DY',
-        physicalAttributes: { height: 100, weight: 100 },
+        physicalAttributes: { height: 100, weight: 100, shoeSize: '7.5' },
         physicalCharacteristics: {
           hair: { code: 'BLONDE', description: 'Blonde' },
           facialHair: { code: 'MOUSTACHE', description: 'Moustache' },

@@ -10,7 +10,7 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, hasLength, objectToSelectOptions, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
@@ -18,6 +18,7 @@ import { FieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
+import { PrisonPersonPhysicalAttributes } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalController {
   constructor(
@@ -339,6 +340,101 @@ export default class PersonalController {
             return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
           }
         },
+      },
+    }
+  }
+
+  shoeSize() {
+    const {
+      pageTitle,
+      fieldName,
+      hintText,
+      auditPage,
+      url,
+    }: {
+      pageTitle: string
+      hintText?: string
+      auditPage: Page
+      fieldName: keyof PrisonPersonPhysicalAttributes
+      url: string
+    } = {
+      pageTitle: 'Shoe size',
+      fieldName: 'shoeSize',
+      hintText: '',
+      auditPage: Page.EditShoeSize,
+      url: 'shoe-size',
+    }
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ [fieldName]: string }>(req)
+        const errors = req.flash('errors')
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+        // TODO remove when API returns value
+        if (prisonPerson) {
+          prisonPerson.physicalAttributes.shoeSize = '7'
+        }
+
+        const fieldValue = requestBodyFlash ? requestBodyFlash[fieldName] : prisonPerson?.physicalAttributes[fieldName]
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+
+        res.render('pages/edit/singleField', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors: hasLength(errors) ? errors : [],
+          hintText,
+          fieldValue,
+          miniBannerData: miniBannerData(prisonerData),
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const fieldValue = req.body[fieldName] || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+        try {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            ...prisonPerson.physicalAttributes,
+            [fieldName]: fieldValue,
+          })
+
+          req.flash('flashMessage', {
+            text: `${pageTitle} edited`,
+            type: FlashMessageType.success,
+            fieldName,
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          req.flash('requestBody', JSON.stringify(req.body))
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        }
       },
     }
   }
