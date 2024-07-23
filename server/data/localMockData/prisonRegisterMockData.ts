@@ -3975,15 +3975,15 @@ const prisonsKeyedByPrisonId: Record<string, PrisonDto> = {
   },
   CKI: {
     prisonId: 'CKI',
-    prisonName: 'Cookham Wood (HMYOI)',
+    prisonName: 'Cookham Wood (HMP)',
     active: true,
     male: true,
     female: false,
     contracted: false,
     types: [
       {
-        code: 'YCS',
-        description: 'Youth Custody Service',
+        code: 'HMP',
+        description: 'His Majesty’s Prison',
       },
     ],
     categories: [],
