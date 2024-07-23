@@ -3975,7 +3975,7 @@ const prisonsKeyedByPrisonId: Record<string, PrisonDto> = {
   },
   CKI: {
     prisonId: 'CKI',
-    prisonName: 'Cookham Wood (HMYOI)',
+    prisonName: 'Cookham Wood (HMP)',
     active: true,
     male: true,
     female: false,
