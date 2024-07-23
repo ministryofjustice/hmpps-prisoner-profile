@@ -14,11 +14,10 @@ import { formatLocation, formatName, hasLength, objectToSelectOptions, userHasRo
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { FieldData } from './fieldData'
+import { RadioFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
-import { PrisonPersonPhysicalAttributes } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalController {
   constructor(
@@ -344,33 +343,15 @@ export default class PersonalController {
     }
   }
 
-  shoeSize() {
-    const {
-      pageTitle,
-      fieldName,
-      hintText,
-      auditPage,
-      url,
-    }: {
-      pageTitle: string
-      hintText?: string
-      auditPage: Page
-      fieldName: keyof PrisonPersonPhysicalAttributes
-      url: string
-    } = {
-      pageTitle: 'Shoe size',
-      fieldName: 'shoeSize',
-      hintText: '',
-      auditPage: Page.EditShoeSize,
-      url: 'shoe-size',
-    }
+  textInput(fieldData: TextFieldData) {
+    const { pageTitle, hintText, auditPage, fieldName, url } = fieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
-        const requestBodyFlash = requestBodyFromFlash<{ [fieldName]: string }>(req)
+        const requestBodyFlash = requestBodyFromFlash<{ [fieldName: string]: string }>(req)
         const errors = req.flash('errors')
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
         const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
@@ -450,7 +431,7 @@ export default class PersonalController {
    *   Face shape
    *   Build
    */
-  radios(fieldData: FieldData) {
+  radios(fieldData: RadioFieldData) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { pageTitle, code, hintText, auditPage } = fieldData

@@ -7,7 +7,7 @@ import { AuditService, Page } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import { FieldData } from './fieldData'
+import { RadioFieldData, shoeSizeFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import { ReferenceDataCode } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
@@ -522,10 +522,10 @@ describe('PersonalController', () => {
    * Tests for the generic radios edit pages - covers editing Hair type or colour, Facial hair, Face shape and Build
    */
   describe('radios', () => {
-    const fieldData: FieldData = {
+    const fieldData: RadioFieldData = {
       pageTitle: 'Characteristic',
       fieldName: 'characteristic',
-      code: 'characteristic',
+      code: 'build',
       auditPage: 'PAGE' as Page,
       url: 'characteristic-url',
       hintText: 'Hint text',
@@ -546,7 +546,7 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'characteristic')
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'build')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/radios', {
           pageTitle: 'Characteristic - Prisoner personal details',
@@ -627,7 +627,7 @@ describe('PersonalController', () => {
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
         expect(personalPageService.updatePhysicalCharacteristics).toHaveBeenCalledWith('token', 'A1234BC', {
-          characteristic: 'CODE3',
+          build: 'CODE3',
         })
       })
 
@@ -659,9 +659,10 @@ describe('PersonalController', () => {
     })
   })
 
-  describe('Shoe size', () => {
+  describe('Text input', () => {
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.shoeSize().edit(req, response, () => {})
+      const action = async (req: any, response: any) =>
+        controller.textInput(shoeSizeFieldData).edit(req, response, () => {})
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
@@ -718,7 +719,8 @@ describe('PersonalController', () => {
 
     describe('submit', () => {
       let validRequest: any
-      const action = async (req: any, response: any) => controller.shoeSize().submit(req, response, () => {})
+      const action = async (req: any, response: any) =>
+        controller.textInput(shoeSizeFieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {

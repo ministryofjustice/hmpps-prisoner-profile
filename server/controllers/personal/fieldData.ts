@@ -1,15 +1,34 @@
+import {
+  PrisonPersonPhysicalAttributes,
+  PrisonPersonPhysicalCharacteristics,
+} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Page } from '../../services/auditService'
 
 export interface FieldData {
   pageTitle: string
-  fieldName: string
-  code?: string
-  hintText?: string
-  url: string
   auditPage: Page
+  url: string
 }
 
-export const hairFieldData: FieldData = {
+export interface TextFieldData extends FieldData {
+  fieldName: keyof PrisonPersonPhysicalAttributes
+  hintText?: string
+}
+export interface RadioFieldData extends FieldData {
+  fieldName: string
+  code?: keyof PrisonPersonPhysicalCharacteristics
+  hintText?: string
+}
+
+export const shoeSizeFieldData: TextFieldData = {
+  pageTitle: 'Shoe size',
+  fieldName: 'shoeSize',
+  hintText: '',
+  auditPage: Page.EditShoeSize,
+  url: 'shoe-size',
+}
+
+export const hairFieldData: RadioFieldData = {
   pageTitle: 'Hair type or colour',
   fieldName: 'hair',
   code: 'hair',
@@ -18,7 +37,7 @@ export const hairFieldData: FieldData = {
   auditPage: Page.EditHairTypeOrColour,
 }
 
-export const facialHairFieldData: FieldData = {
+export const facialHairFieldData: RadioFieldData = {
   pageTitle: 'Facial hair',
   fieldName: 'facial hair',
   code: 'facialHair',
@@ -27,7 +46,7 @@ export const facialHairFieldData: FieldData = {
   auditPage: Page.EditFacialHair,
 }
 
-export const faceShapeFieldData: FieldData = {
+export const faceShapeFieldData: RadioFieldData = {
   pageTitle: 'Face shape',
   fieldName: 'face shape',
   code: 'face',
@@ -35,7 +54,7 @@ export const faceShapeFieldData: FieldData = {
   auditPage: Page.EditFaceShape,
 }
 
-export const buildFieldData: FieldData = {
+export const buildFieldData: RadioFieldData = {
   pageTitle: 'Build',
   fieldName: 'build',
   code: 'build',
