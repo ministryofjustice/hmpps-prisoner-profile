@@ -69,7 +69,10 @@
           physicalCharacteristics.build, "personal/edit/build",
           { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' }
         ),
-        {key: { text: "Shoe size"}, value: { text: physicalCharacteristics.shoeSize } },
+        "Shoe size" | summaryListRowWithOptionalChangeLink(
+          physicalCharacteristics.shoeSize, "personal/edit/shoe-size",
+          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'shoeSize' }
+        ),
         {key: { text: "Warned about tattooing"}, value: { text: physicalCharacteristics.warnedAboutTattooing } },
         {key: { text: "Warned not to change appearance"}, value: { text: physicalCharacteristics.warnedNotToChangeAppearance } }
         ]

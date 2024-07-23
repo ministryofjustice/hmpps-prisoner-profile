@@ -7,7 +7,7 @@ import { AuditService, Page } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import { FieldData } from './fieldData'
+import { RadioFieldData, shoeSizeFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import { ReferenceDataCode } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
@@ -30,7 +30,7 @@ describe('PersonalController', () => {
 
   const defaultPrisonPerson = {
     prisonerNumber: 'ABC123',
-    physicalAttributes: { height: 102, weight: 60 },
+    physicalAttributes: { height: 102, weight: 60, shoeSize: '7' },
     physicalCharacteristics: {
       hair: { code: '', description: '' },
       facialHair: { code: '', description: '' },
@@ -220,7 +220,7 @@ describe('PersonalController', () => {
         it('Keeps the inputs empty when no height exists', async () => {
           personalPageService.getPrisonPerson = jest.fn(async () => ({
             ...defaultPrisonPerson,
-            physicalAttributes: { height: undefined, weight: undefined },
+            physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
           }))
           const req = {
             params: { prisonerNumber: 'ABC123' },
@@ -453,7 +453,7 @@ describe('PersonalController', () => {
         it('Keeps the inputs empty when no weight exists', async () => {
           personalPageService.getPrisonPerson = jest.fn(async () => ({
             ...defaultPrisonPerson,
-            physicalAttributes: { height: undefined, weight: undefined },
+            physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
           }))
           const req = {
             params: { prisonerNumber: 'ABC123' },
@@ -522,10 +522,10 @@ describe('PersonalController', () => {
    * Tests for the generic radios edit pages - covers editing Hair type or colour, Facial hair, Face shape and Build
    */
   describe('radios', () => {
-    const fieldData: FieldData = {
+    const fieldData: RadioFieldData = {
       pageTitle: 'Characteristic',
       fieldName: 'characteristic',
-      code: 'characteristic',
+      code: 'build',
       auditPage: 'PAGE' as Page,
       url: 'characteristic-url',
       hintText: 'Hint text',
@@ -546,7 +546,7 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'characteristic')
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'build')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/radios', {
           pageTitle: 'Characteristic - Prisoner personal details',
@@ -627,7 +627,7 @@ describe('PersonalController', () => {
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
         expect(personalPageService.updatePhysicalCharacteristics).toHaveBeenCalledWith('token', 'A1234BC', {
-          characteristic: 'CODE3',
+          build: 'CODE3',
         })
       })
 
@@ -655,6 +655,113 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/characteristic-url')
+      })
+    })
+  })
+
+  describe('Text input', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) =>
+        controller.textInput(shoeSizeFieldData).edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
+        expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
+          pageTitle: 'Shoe size - Prisoner personal details',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          hintText: shoeSizeFieldData.hintText,
+          inputClasses: shoeSizeFieldData.inputClasses,
+          fieldName: shoeSizeFieldData.fieldName,
+          fieldValue: '7',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'requestBody') return [JSON.stringify({ shoeSize: '1234' })]
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) =>
+        controller.textInput(shoeSizeFieldData).submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'ABC123' },
+          body: { shoeSize: '10' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it.each([
+        { shoeSize: '', updateRequest: { shoeSize: null } },
+        { shoeSize: '10', updateRequest: { shoeSize: '10' } },
+        { shoeSize: '7.5', updateRequest: { shoeSize: '7.5' } },
+      ])('Valid request: %s', async ({ shoeSize, updateRequest }) => {
+        const request = { ...validRequest, body: { shoeSize } }
+        await action(request, res)
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.anything(),
+          expect.objectContaining(updateRequest),
+        )
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Shoe size updated',
+          type: FlashMessageType.success,
+          fieldName: 'shoeSize',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updatePhysicalAttributes = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/shoe-size')
       })
     })
   })

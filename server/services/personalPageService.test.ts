@@ -42,7 +42,7 @@ describe('PersonalPageService', () => {
     prisonPersonApiClient = {
       getPrisonPerson: jest.fn(async () => ({
         prisonerNumber: 'abc123',
-        physicalAttributes: { height: 100, weight: 100 },
+        physicalAttributes: { height: 100, weight: 100, shoeSize: '7.5' },
         physicalCharacteristics: {
           hair: { code: '', description: '' },
           facialHair: { code: '', description: '' },

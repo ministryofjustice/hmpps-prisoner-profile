@@ -14,7 +14,7 @@ import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from 
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { FieldData } from './fieldData'
+import { RadioFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -343,6 +343,85 @@ export default class PersonalController {
     }
   }
 
+  textInput(fieldData: TextFieldData) {
+    const { pageTitle, hintText, auditPage, fieldName, url, inputClasses } = fieldData
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ [fieldName: string]: string }>(req)
+        const errors = req.flash('errors')
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+        // TODO remove when API returns value
+        if (prisonPerson) {
+          prisonPerson.physicalAttributes.shoeSize = '7'
+        }
+
+        const fieldValue = requestBodyFlash ? requestBodyFlash[fieldName] : prisonPerson?.physicalAttributes[fieldName]
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+
+        res.render('pages/edit/textField', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          hintText,
+          fieldName,
+          fieldValue,
+          inputClasses,
+          miniBannerData: miniBannerData(prisonerData),
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const fieldValue = req.body[fieldName] || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+        try {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            ...prisonPerson.physicalAttributes,
+            [fieldName]: fieldValue,
+          })
+
+          req.flash('flashMessage', {
+            text: `${pageTitle} updated`,
+            type: FlashMessageType.success,
+            fieldName,
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          req.flash('requestBody', JSON.stringify(req.body))
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        }
+      },
+    }
+  }
+
   /**
    * Handler for editing single-value radio fields.
    *
@@ -354,7 +433,7 @@ export default class PersonalController {
    *   Face shape
    *   Build
    */
-  radios(fieldData: FieldData) {
+  radios(fieldData: RadioFieldData) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { pageTitle, code, hintText, auditPage } = fieldData

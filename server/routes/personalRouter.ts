@@ -16,10 +16,12 @@ import {
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
+  shoeSizeFieldData,
 } from '../controllers/personal/fieldData'
 import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
+import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -167,6 +169,22 @@ export default function personalRouter(services: Services): Router {
       method: personalController.weight().imperial.submit,
       validation: {
         validators: [weightImperialValidator],
+        redirectBackOnError: true,
+      },
+    },
+  })
+
+  editRoute({
+    path: 'edit/shoe-size',
+    edit: {
+      audit: Page.EditShoeSize,
+      method: personalController.textInput(shoeSizeFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditShoeSize,
+      method: personalController.textInput(shoeSizeFieldData).submit,
+      validation: {
+        validators: [shoeSizeValidator],
         redirectBackOnError: true,
       },
     },

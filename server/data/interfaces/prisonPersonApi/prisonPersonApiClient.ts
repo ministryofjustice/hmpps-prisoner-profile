@@ -1,6 +1,7 @@
 export interface PrisonPersonPhysicalAttributes {
   height: number
   weight: number
+  shoeSize: string
 }
 
 export interface PrisonPersonCharacteristic {

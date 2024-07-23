@@ -11,6 +11,7 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   physicalAttributes: {
     height: 150,
     weight: 65,
+    shoeSize: '7.5',
   },
   physicalCharacteristics: {
     hair: { code: '', description: '' },
