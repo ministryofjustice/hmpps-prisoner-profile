@@ -3982,8 +3982,8 @@ const prisonsKeyedByPrisonId: Record<string, PrisonDto> = {
     contracted: false,
     types: [
       {
-        code: 'YCS',
-        description: 'Youth Custody Service',
+        code: 'HMP',
+        description: 'His Majesty’s Prison',
       },
     ],
     categories: [],
