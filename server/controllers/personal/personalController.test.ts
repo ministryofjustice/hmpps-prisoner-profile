@@ -680,7 +680,9 @@ describe('PersonalController', () => {
           prisonerNumber: 'ABC123',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
-          hintText: '',
+          hintText: shoeSizeFieldData.hintText,
+          inputClasses: shoeSizeFieldData.inputClasses,
+          fieldName: shoeSizeFieldData.fieldName,
           fieldValue: '7',
           miniBannerData: {
             cellLocation: '2-3-001',
@@ -745,7 +747,7 @@ describe('PersonalController', () => {
         )
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Shoe size edited',
+          text: 'Shoe size updated',
           type: FlashMessageType.success,
           fieldName: 'shoeSize',
         })

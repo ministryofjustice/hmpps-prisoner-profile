@@ -344,7 +344,7 @@ export default class PersonalController {
   }
 
   textInput(fieldData: TextFieldData) {
-    const { pageTitle, hintText, auditPage, fieldName, url } = fieldData
+    const { pageTitle, hintText, auditPage, fieldName, url, inputClasses } = fieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -377,7 +377,9 @@ export default class PersonalController {
           breadcrumbPrisonerName: prisonerBannerName,
           errors: hasLength(errors) ? errors : [],
           hintText,
+          fieldName,
           fieldValue,
+          inputClasses,
           miniBannerData: miniBannerData(prisonerData),
         })
       },
@@ -395,7 +397,7 @@ export default class PersonalController {
           })
 
           req.flash('flashMessage', {
-            text: `${pageTitle} edited`,
+            text: `${pageTitle} updated`,
             type: FlashMessageType.success,
             fieldName,
           })

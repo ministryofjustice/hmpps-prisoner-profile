@@ -13,6 +13,7 @@ export interface FieldData {
 export interface TextFieldData extends FieldData {
   fieldName: keyof PrisonPersonPhysicalAttributes
   hintText?: string
+  inputClasses?: string
 }
 export interface RadioFieldData extends FieldData {
   fieldName: string
@@ -23,9 +24,10 @@ export interface RadioFieldData extends FieldData {
 export const shoeSizeFieldData: TextFieldData = {
   pageTitle: 'Shoe size',
   fieldName: 'shoeSize',
-  hintText: '',
+  hintText: 'Enter a UK shoe size, for example 7.5 or 11.',
   auditPage: Page.EditShoeSize,
   url: 'shoe-size',
+  inputClasses: 'govuk-input--width-5',
 }
 
 export const hairFieldData: RadioFieldData = {

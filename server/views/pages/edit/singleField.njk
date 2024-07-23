@@ -45,9 +45,13 @@
                 classes: "govuk-label--l",
                 isPageHeading: true
               },
-              id: "edit-field",
+              id: fieldName,
               name: fieldName,
               value: fieldValue,
+              hint: {
+                text: hintText if hintText
+              },
+              classes: inputClasses if inputClasses,
               errorMessage: { text: errors[0].text } if errors.length > 0
             })
           }}
