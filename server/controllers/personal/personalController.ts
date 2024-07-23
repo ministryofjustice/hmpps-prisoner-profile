@@ -10,7 +10,7 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, hasLength, objectToSelectOptions, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
@@ -371,11 +371,11 @@ export default class PersonalController {
           page: auditPage,
         })
 
-        res.render('pages/edit/singleField', {
+        res.render('pages/edit/textField', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
-          errors: hasLength(errors) ? errors : [],
+          errors,
           hintText,
           fieldName,
           fieldValue,
