@@ -34,7 +34,7 @@ export const hairFieldData: RadioFieldData = {
   pageTitle: 'Hair type or colour',
   fieldName: 'hair',
   code: 'hair',
-  hintText: 'Select the most prominent hair type or colour',
+  hintText: 'Select the most prominent hair type or colour.',
   url: 'hair',
   auditPage: Page.EditHairTypeOrColour,
 }
@@ -43,7 +43,7 @@ export const facialHairFieldData: RadioFieldData = {
   pageTitle: 'Facial hair',
   fieldName: 'facial hair',
   code: 'facialHair',
-  hintText: 'Select the most prominent type of facial hair',
+  hintText: 'Select the most prominent type of facial hair.',
   url: 'facial-hair',
   auditPage: Page.EditFacialHair,
 }
