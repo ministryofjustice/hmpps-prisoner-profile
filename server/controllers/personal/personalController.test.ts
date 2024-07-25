@@ -677,6 +677,7 @@ describe('PersonalController', () => {
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'Shoe size - Prisoner personal details',
+          formTitle: 'Shoe size',
           prisonerNumber: 'ABC123',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
