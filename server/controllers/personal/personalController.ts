@@ -373,6 +373,7 @@ export default class PersonalController {
 
         res.render('pages/edit/textField', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,

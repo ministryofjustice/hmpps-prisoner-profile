@@ -41,7 +41,7 @@
           {{
             govukInput({
               label: {
-                text: pageTitle,
+                text: formTitle,
                 classes: "govuk-label--l",
                 isPageHeading: true
               },
@@ -65,13 +65,13 @@
             attributes: { "data-qa": "edit-submit-button" }
             })
           }}
+          <a
+            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button"
+            >Cancel</a
+          >
         </div>
-        <a
-          href="/prisoner/{{ prisonerNumber }}/personal#appearance"
-          class="govuk-link govuk-link--no-visited-state"
-          data-qa="edit-cancel-button"
-          >Cancel</a
-        >
       </form>
     </div>
   </div>
