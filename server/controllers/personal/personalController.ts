@@ -473,6 +473,7 @@ export default class PersonalController {
 
         res.render('pages/edit/radios', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
