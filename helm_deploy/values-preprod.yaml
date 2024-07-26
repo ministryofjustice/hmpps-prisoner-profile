@@ -75,8 +75,8 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
     COURT_CASES_SUMMARY_ENABLED: "true"
-    PRISON_PERSON_API_ENABLED: "false"
-    PRISON_PERSON_API_ENABLED_PRISONS: ""
+    PRISON_PERSON_API_ENABLED: "true"
+    PRISON_PERSON_API_ENABLED_PRISONS: "KMI"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
@@ -85,9 +85,9 @@ generic-service:
     sscl-newcastle: 62.172.79.105/32
     sscl-newport: 217.38.237.212/32
     groups:
-    - internal
-    - prisons
-    - private_prisons
+      - internal
+      - prisons
+      - private_prisons
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
