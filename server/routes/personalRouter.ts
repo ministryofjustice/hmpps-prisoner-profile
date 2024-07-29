@@ -195,11 +195,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
-      method: personalController.radios(hairFieldData).edit,
+      method: personalController.radioField(hairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditHairTypeOrColour,
-      method: personalController.radios(hairFieldData).submit,
+      method: personalController.radioField(hairFieldData).submit,
     },
   })
 
@@ -208,11 +208,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/facial-hair',
     edit: {
       audit: Page.EditFacialHair,
-      method: personalController.radios(facialHairFieldData).edit,
+      method: personalController.radioField(facialHairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFacialHair,
-      method: personalController.radios(facialHairFieldData).submit,
+      method: personalController.radioField(facialHairFieldData).submit,
     },
   })
 
@@ -221,11 +221,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/face-shape',
     edit: {
       audit: Page.EditFaceShape,
-      method: personalController.radios(faceShapeFieldData).edit,
+      method: personalController.radioField(faceShapeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFaceShape,
-      method: personalController.radios(faceShapeFieldData).submit,
+      method: personalController.radioField(faceShapeFieldData).submit,
     },
   })
 
@@ -234,11 +234,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/build',
     edit: {
       audit: Page.EditBuild,
-      method: personalController.radios(buildFieldData).edit,
+      method: personalController.radioField(buildFieldData).edit,
     },
     submit: {
       audit: Page.PostEditBuild,
-      method: personalController.radios(buildFieldData).submit,
+      method: personalController.radioField(buildFieldData).submit,
     },
   })
 

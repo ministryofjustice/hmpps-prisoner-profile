@@ -4,7 +4,7 @@ import {
   ReferenceDataCode,
   ReferenceDataDomain,
 } from '../../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import { stubGetWithBody, stubPutWithResponse } from './utils'
+import { stubGetWithBody, stubPatchWithResponse } from './utils'
 
 const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   prisonerNumber,
@@ -12,12 +12,10 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
     height: 150,
     weight: 65,
     shoeSize: '7.5',
-  },
-  physicalCharacteristics: {
-    hair: { code: '', description: '' },
-    facialHair: { code: '', description: '' },
-    face: { code: '', description: '' },
-    build: { code: '', description: '' },
+    hair: { id: '', description: '' },
+    facialHair: { id: '', description: '' },
+    face: { id: '', description: '' },
+    build: { id: '', description: '' },
   },
 })
 
@@ -39,7 +37,7 @@ export default {
       },
     }),
 
-  // PUT routes
+  // PATCH routes
   stubPrisonPersonUpdatePhysicalAttributes: ({
     prisonerNumber,
     overrides = {},
@@ -47,7 +45,7 @@ export default {
     prisonerNumber: string
     overrides: Partial<PrisonPersonPhysicalAttributes>
   }) =>
-    stubPutWithResponse<PrisonPersonPhysicalAttributes>({
+    stubPatchWithResponse<PrisonPersonPhysicalAttributes>({
       path: `${baseUrl}prisoners/${prisonerNumber}/physical-attributes`,
       responseBody: {
         ...mockPrisonPerson(prisonerNumber).physicalAttributes,

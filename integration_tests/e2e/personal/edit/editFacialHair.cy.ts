@@ -45,6 +45,6 @@ context('Edit facial hair', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Facial hair',
     successfulFlashMessage: 'Facial hair updated',
-    validInputs: { radioInput: 'BEARDED' },
+    validInputs: { radioInput: 'FACIAL_HAIR_BEARDED' },
   })
 })
