@@ -29,7 +29,7 @@ export default function getOverviewAccessStatusCode(
     return globalSearchUser || inactiveBookingsUser ? HmppsStatusCode.OK : HmppsStatusCode.PRISONER_IS_TRANSFERRING
   }
 
-  if (globalSearchUser && !options.allowGlobal) {
+  if (globalSearchUser && !options.allowGlobal && !inUsersCaseLoad) {
     return HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED
   }
 

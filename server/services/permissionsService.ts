@@ -27,7 +27,6 @@ import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/ge
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
-import { isInUsersCaseLoad } from '../utils/utils'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -126,9 +125,6 @@ export default class PermissionsService {
   public getLocationPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
     const accessCode = getOverviewAccessStatusCode(user, prisoner, { allowGlobal: false })
     if (accessCode !== HmppsStatusCode.OK) return { accessCode }
-
-    // Global is not allowed for locations
-    if (!isInUsersCaseLoad(prisoner.prisonId, user)) return { accessCode: HmppsStatusCode.NOT_IN_CASELOAD }
 
     return {
       accessCode,
