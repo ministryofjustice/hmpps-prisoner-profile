@@ -45,6 +45,6 @@ context('Edit hair', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Hair type or colour',
     successfulFlashMessage: 'Hair type or colour updated',
-    validInputs: { radioInput: 'BROWN' },
+    validInputs: { radioInput: 'HAIR_BROWN' },
   })
 })

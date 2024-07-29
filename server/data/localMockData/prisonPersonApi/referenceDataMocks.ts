@@ -14,6 +14,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     deactivatedBy: null,
     referenceDataCodes: [
       {
+        id: 'BUILD_FRAIL',
         domain: 'BUILD',
         code: 'FRAIL',
         description: 'Frail',
@@ -27,6 +28,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_HEAVY',
         domain: 'BUILD',
         code: 'HEAVY',
         description: 'Heavy',
@@ -40,6 +42,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_MEDIUM',
         domain: 'BUILD',
         code: 'MEDIUM',
         description: 'Medium',
@@ -53,6 +56,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_MUSC',
         domain: 'BUILD',
         code: 'MUSC',
         description: 'Muscular',
@@ -66,6 +70,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_OBESE',
         domain: 'BUILD',
         code: 'OBESE',
         description: 'Obese',
@@ -79,6 +84,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_PROP',
         domain: 'BUILD',
         code: 'PROP',
         description: 'Proportional',
@@ -92,6 +98,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_SLIGHT',
         domain: 'BUILD',
         code: 'SLIGHT',
         description: 'Slight',
@@ -105,6 +112,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_SMALL',
         domain: 'BUILD',
         code: 'SMALL',
         description: 'Small',
@@ -118,6 +126,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_STOCKY',
         domain: 'BUILD',
         code: 'STOCKY',
         description: 'Stocky',
@@ -131,6 +140,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_STOOPED',
         domain: 'BUILD',
         code: 'STOOPED',
         description: 'Stooped',
@@ -144,6 +154,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'BUILD_THIN',
         domain: 'BUILD',
         code: 'THIN',
         description: 'Thin',
@@ -171,6 +182,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     deactivatedBy: null,
     referenceDataCodes: [
       {
+        id: 'EYE_BLUE',
         domain: 'EYE',
         code: 'BLUE',
         description: 'Blue',
@@ -184,6 +196,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_BROWN',
         domain: 'EYE',
         code: 'BROWN',
         description: 'Brown',
@@ -197,6 +210,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_CLOUDED',
         domain: 'EYE',
         code: 'CLOUDED',
         description: 'Clouded',
@@ -210,6 +224,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_GREEN',
         domain: 'EYE',
         code: 'GREEN',
         description: 'Green',
@@ -223,6 +238,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_GREY',
         domain: 'EYE',
         code: 'GREY',
         description: 'Grey',
@@ -236,6 +252,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_HAZEL',
         domain: 'EYE',
         code: 'HAZEL',
         description: 'Hazel',
@@ -249,6 +266,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_MISSING',
         domain: 'EYE',
         code: 'MISSING',
         description: 'Missing',
@@ -262,6 +280,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_PINK',
         domain: 'EYE',
         code: 'PINK',
         description: 'Pink',
@@ -289,6 +308,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     deactivatedBy: null,
     referenceDataCodes: [
       {
+        id: 'FACE_ANGULAR',
         domain: 'FACE',
         code: 'ANGULAR',
         description: 'Angular',
@@ -302,6 +322,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACE_BULLET',
         domain: 'FACE',
         code: 'BULLET',
         description: 'Long',
@@ -315,6 +336,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACE_OVAL',
         domain: 'FACE',
         code: 'OVAL',
         description: 'Oval',
@@ -328,6 +350,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACE_ROUND',
         domain: 'FACE',
         code: 'ROUND',
         description: 'Round',
@@ -341,6 +364,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACE_SQUARE',
         domain: 'FACE',
         code: 'SQUARE',
         description: 'Square',
@@ -354,6 +378,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACE_TRIANGULAR',
         domain: 'FACE',
         code: 'TRIANGULAR',
         description: 'Triangle',
@@ -381,6 +406,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     deactivatedBy: null,
     referenceDataCodes: [
       {
+        id: 'FACIAL_HAIR_BEARDED',
         domain: 'FACIAL_HAIR',
         code: 'BEARDED',
         description: 'Full Beard',
@@ -394,6 +420,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACIAL_HAIR_CLEAN SHAVEN',
         domain: 'FACIAL_HAIR',
         code: 'CLEAN SHAVEN',
         description: 'No facial hair',
@@ -407,6 +434,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACIAL_HAIR_GOATEE',
         domain: 'FACIAL_HAIR',
         code: 'GOATEE',
         description: 'Goatee Beard',
@@ -420,6 +448,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACIAL_HAIR_MOUSTACHE',
         domain: 'FACIAL_HAIR',
         code: 'MOUSTACHE',
         description: 'Moustache',
@@ -433,6 +462,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACIAL_HAIR_NA',
         domain: 'FACIAL_HAIR',
         code: 'NA',
         description: 'Not Asked',
@@ -446,6 +476,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'FACIAL_HAIR_SIDEBURNS',
         domain: 'FACIAL_HAIR',
         code: 'SIDEBURNS',
         description: 'Sideburns',
@@ -473,6 +504,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     deactivatedBy: null,
     referenceDataCodes: [
       {
+        id: 'HAIR_BALD',
         domain: 'HAIR',
         code: 'BALD',
         description: 'Bald',
@@ -486,6 +518,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_BALDING',
         domain: 'HAIR',
         code: 'BALDING',
         description: 'Balding',
@@ -499,6 +532,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_BLACK',
         domain: 'HAIR',
         code: 'BLACK',
         description: 'Black',
@@ -512,6 +546,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_BLONDE',
         domain: 'HAIR',
         code: 'BLONDE',
         description: 'Blonde',
@@ -525,6 +560,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_BROWN',
         domain: 'EYE',
         code: 'BROWN',
         description: 'Brown',
@@ -538,6 +574,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_BRUNETTE',
         domain: 'HAIR',
         code: 'BRUNETTE',
         description: 'Brunette',
@@ -551,6 +588,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_DARK',
         domain: 'HAIR',
         code: 'DARK',
         description: 'Dark',
@@ -564,6 +602,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_DYED',
         domain: 'HAIR',
         code: 'DYED',
         description: 'Dyed',
@@ -577,6 +616,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_GINGER',
         domain: 'HAIR',
         code: 'GINGER',
         description: 'Ginger',
@@ -590,6 +630,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'EYE_GREY',
         domain: 'EYE',
         code: 'GREY',
         description: 'Grey',
@@ -603,6 +644,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_LIGHT',
         domain: 'HAIR',
         code: 'LIGHT',
         description: 'Light',
@@ -616,6 +658,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_MOUSE',
         domain: 'HAIR',
         code: 'MOUSE',
         description: 'Mousy',
@@ -629,6 +672,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_RED',
         domain: 'HAIR',
         code: 'RED',
         description: 'Red',
@@ -642,6 +686,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
         deactivatedBy: null,
       },
       {
+        id: 'HAIR_WHITE',
         domain: 'HAIR',
         code: 'WHITE',
         description: 'White',
@@ -671,6 +716,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
   deactivatedBy: null,
   referenceDataCodes: [
     {
+      id: 'HAIR_BALD',
       domain: 'HAIR',
       code: 'BALD',
       description: 'Bald',
@@ -684,6 +730,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_BALDING',
       domain: 'HAIR',
       code: 'BALDING',
       description: 'Balding',
@@ -697,6 +744,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_BLACK',
       domain: 'HAIR',
       code: 'BLACK',
       description: 'Black',
@@ -710,6 +758,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_BLONDE',
       domain: 'HAIR',
       code: 'BLONDE',
       description: 'Blonde',
@@ -723,6 +772,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_BROWN',
       domain: 'HAIR',
       code: 'BROWN',
       description: 'Brown',
@@ -736,6 +786,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_BRUNETTE',
       domain: 'HAIR',
       code: 'BRUNETTE',
       description: 'Brunette',
@@ -749,6 +800,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_DARK',
       domain: 'HAIR',
       code: 'DARK',
       description: 'Dark',
@@ -762,6 +814,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_DYED',
       domain: 'HAIR',
       code: 'DYED',
       description: 'Dyed',
@@ -775,6 +828,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_GINGER',
       domain: 'HAIR',
       code: 'GINGER',
       description: 'Ginger',
@@ -788,6 +842,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_GREY',
       domain: 'HAIR',
       code: 'GREY',
       description: 'Grey',
@@ -801,6 +856,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_LIGHT',
       domain: 'HAIR',
       code: 'LIGHT',
       description: 'Light',
@@ -814,6 +870,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_MOUSE',
       domain: 'HAIR',
       code: 'MOUSE',
       description: 'Mousy',
@@ -827,6 +884,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_RED',
       domain: 'HAIR',
       code: 'RED',
       description: 'Red',
@@ -840,6 +898,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
       deactivatedBy: null,
     },
     {
+      id: 'HAIR_WHITE',
       domain: 'HAIR',
       code: 'WHITE',
       description: 'White',
@@ -857,6 +916,7 @@ export const referenceDataDomainMock: ReferenceDataDomain = {
 
 export const hairCodesMock: ReferenceDataCode[] = [
   {
+    id: 'HAIR_BALD',
     domain: 'HAIR',
     code: 'BALD',
     description: 'Bald',
@@ -870,6 +930,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_BALDING',
     domain: 'HAIR',
     code: 'BALDING',
     description: 'Balding',
@@ -883,6 +944,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_BLACK',
     domain: 'HAIR',
     code: 'BLACK',
     description: 'Black',
@@ -896,6 +958,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_BLONDE',
     domain: 'HAIR',
     code: 'BLONDE',
     description: 'Blonde',
@@ -909,6 +972,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_BROWN',
     domain: 'HAIR',
     code: 'BROWN',
     description: 'Brown',
@@ -922,6 +986,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_BRUNETTE',
     domain: 'HAIR',
     code: 'BRUNETTE',
     description: 'Brunette',
@@ -935,6 +1000,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_DARK',
     domain: 'HAIR',
     code: 'DARK',
     description: 'Dark',
@@ -948,6 +1014,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_DYED',
     domain: 'HAIR',
     code: 'DYED',
     description: 'Dyed',
@@ -961,6 +1028,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_GINGER',
     domain: 'HAIR',
     code: 'GINGER',
     description: 'Ginger',
@@ -974,6 +1042,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_GREY',
     domain: 'HAIR',
     code: 'GREY',
     description: 'Grey',
@@ -987,6 +1056,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_LIGHT',
     domain: 'HAIR',
     code: 'LIGHT',
     description: 'Light',
@@ -1000,6 +1070,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_MOUSE',
     domain: 'HAIR',
     code: 'MOUSE',
     description: 'Mousy',
@@ -1013,6 +1084,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_RED',
     domain: 'HAIR',
     code: 'RED',
     description: 'Red',
@@ -1026,6 +1098,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'HAIR_WHITE',
     domain: 'HAIR',
     code: 'WHITE',
     description: 'White',
@@ -1042,6 +1115,7 @@ export const hairCodesMock: ReferenceDataCode[] = [
 
 export const facialHairCodesMock: ReferenceDataCode[] = [
   {
+    id: 'FACIAL_HAIR_CLEAN SHAVEN',
     domain: 'FACIAL_HAIR',
     code: 'CLEAN SHAVEN',
     description: 'No facial hair',
@@ -1055,6 +1129,7 @@ export const facialHairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACIAL_HAIR_BEARDED',
     domain: 'FACIAL_HAIR',
     code: 'BEARDED',
     description: 'Full Beard',
@@ -1068,6 +1143,7 @@ export const facialHairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACIAL_HAIR_GOATEE',
     domain: 'FACIAL_HAIR',
     code: 'GOATEE',
     description: 'Goatee Beard',
@@ -1081,6 +1157,7 @@ export const facialHairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACIAL_HAIR_MOUSTACHE',
     domain: 'FACIAL_HAIR',
     code: 'MOUSTACHE',
     description: 'Moustache',
@@ -1094,6 +1171,7 @@ export const facialHairCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACIAL_HAIR_SIDEBURNS',
     domain: 'FACIAL_HAIR',
     code: 'SIDEBURNS',
     description: 'Sideburns',
@@ -1110,6 +1188,7 @@ export const facialHairCodesMock: ReferenceDataCode[] = [
 
 export const faceCodesMock: ReferenceDataCode[] = [
   {
+    id: 'FACE_ANGULAR',
     domain: 'FACE',
     code: 'ANGULAR',
     description: 'Angular',
@@ -1123,6 +1202,7 @@ export const faceCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACE_BULLET',
     domain: 'FACE',
     code: 'BULLET',
     description: 'Long',
@@ -1136,6 +1216,7 @@ export const faceCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACE_OVAL',
     domain: 'FACE',
     code: 'OVAL',
     description: 'Oval',
@@ -1149,6 +1230,7 @@ export const faceCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACE_ROUND',
     domain: 'FACE',
     code: 'ROUND',
     description: 'Round',
@@ -1162,6 +1244,7 @@ export const faceCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACE_SQUARE',
     domain: 'FACE',
     code: 'SQUARE',
     description: 'Square',
@@ -1175,6 +1258,7 @@ export const faceCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'FACE_TRIANGULAR',
     domain: 'FACE',
     code: 'TRIANGULAR',
     description: 'Triangle',
@@ -1191,6 +1275,7 @@ export const faceCodesMock: ReferenceDataCode[] = [
 
 export const buildCodesMock: ReferenceDataCode[] = [
   {
+    id: 'BUILD_FRAIL',
     domain: 'BUILD',
     code: 'FRAIL',
     description: 'Frail',
@@ -1204,6 +1289,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_HEAVY',
     domain: 'BUILD',
     code: 'HEAVY',
     description: 'Heavy',
@@ -1217,6 +1303,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_MEDIUM',
     domain: 'BUILD',
     code: 'MEDIUM',
     description: 'Medium',
@@ -1230,6 +1317,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_MUSC',
     domain: 'BUILD',
     code: 'MUSC',
     description: 'Muscular',
@@ -1243,6 +1331,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_OBESE',
     domain: 'BUILD',
     code: 'OBESE',
     description: 'Obese',
@@ -1256,6 +1345,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_PROP',
     domain: 'BUILD',
     code: 'PROP',
     description: 'Proportional',
@@ -1269,6 +1359,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_SLIGHT',
     domain: 'BUILD',
     code: 'SLIGHT',
     description: 'Slight',
@@ -1282,6 +1373,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_SMALL',
     domain: 'BUILD',
     code: 'SMALL',
     description: 'Small',
@@ -1295,6 +1387,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_STOCKY',
     domain: 'BUILD',
     code: 'STOCKY',
     description: 'Stocky',
@@ -1308,6 +1401,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_STOOPED',
     domain: 'BUILD',
     code: 'STOOPED',
     description: 'Stooped',
@@ -1321,6 +1415,7 @@ export const buildCodesMock: ReferenceDataCode[] = [
     deactivatedBy: null,
   },
   {
+    id: 'BUILD_THIN',
     domain: 'BUILD',
     code: 'THIN',
     description: 'Thin',

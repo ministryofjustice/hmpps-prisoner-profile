@@ -23,12 +23,14 @@ describe('prisonPersonApiClient', () => {
     it('should return data from api', async () => {
       const prisonPerson: PrisonPerson = {
         prisonerNumber: 'A8469DY',
-        physicalAttributes: { height: 100, weight: 100, shoeSize: '7.5' },
-        physicalCharacteristics: {
-          hair: { code: 'BLONDE', description: 'Blonde' },
-          facialHair: { code: 'MOUSTACHE', description: 'Moustache' },
-          face: { code: 'OVAL', description: 'Oval' },
-          build: { code: 'THIN', description: 'Thin' },
+        physicalAttributes: {
+          height: 100,
+          weight: 100,
+          shoeSize: '7.5',
+          hair: { id: 'BLONDE', description: 'Blonde' },
+          facialHair: { id: 'MOUSTACHE', description: 'Moustache' },
+          face: { id: 'OVAL', description: 'Oval' },
+          build: { id: 'THIN', description: 'Thin' },
         },
       }
       fakePrisonerSearchApi

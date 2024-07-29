@@ -30,12 +30,14 @@ describe('PersonalController', () => {
 
   const defaultPrisonPerson = {
     prisonerNumber: 'ABC123',
-    physicalAttributes: { height: 102, weight: 60, shoeSize: '7' },
-    physicalCharacteristics: {
-      hair: { code: '', description: '' },
-      facialHair: { code: '', description: '' },
-      face: { code: '', description: '' },
-      build: { code: '', description: '' },
+    physicalAttributes: {
+      height: 102,
+      weight: 60,
+      shoeSize: '7',
+      hair: { id: '', description: '' },
+      facialHair: { id: '', description: '' },
+      face: { id: '', description: '' },
+      build: { id: '', description: '' },
     },
   }
 
@@ -521,18 +523,18 @@ describe('PersonalController', () => {
   /**
    * Tests for the generic radios edit pages - covers editing Hair type or colour, Facial hair, Face shape and Build
    */
-  describe('radios', () => {
+  describe('radioField', () => {
     const fieldData: RadioFieldData = {
-      pageTitle: 'Characteristic',
-      fieldName: 'characteristic',
+      pageTitle: 'Build',
+      fieldName: 'build',
       code: 'build',
       auditPage: 'PAGE' as Page,
-      url: 'characteristic-url',
+      url: 'build',
       hintText: 'Hint text',
     }
 
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.radios(fieldData).edit(req, response, () => {})
+      const action = async (req: any, response: any) => controller.radioField(fieldData).edit(req, response, () => {})
 
       it('Renders the radios edit page with the field data config supplied', async () => {
         const req = {
@@ -548,9 +550,9 @@ describe('PersonalController', () => {
 
         expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'build')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
-        expect(res.render).toHaveBeenCalledWith('pages/edit/radios', {
-          pageTitle: 'Characteristic - Prisoner personal details',
-          formTitle: 'Characteristic',
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Build - Prisoner personal details',
+          formTitle: 'Build',
           prisonerNumber: 'A1234BC',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
@@ -596,7 +598,7 @@ describe('PersonalController', () => {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
           flash: (key: string): any => {
-            if (key === 'fieldValue') return ['CODE2']
+            if (key === 'requestBody') return [JSON.stringify({ radioField: 'CODE2' })]
             return []
           },
           middleware: defaultMiddleware,
@@ -613,7 +615,7 @@ describe('PersonalController', () => {
 
     describe('submit', () => {
       let validRequest: any
-      const action = async (req: any, response: any) => controller.radios(fieldData).submit(req, response, () => {})
+      const action = async (req: any, response: any) => controller.radioField(fieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
@@ -627,7 +629,7 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updatePhysicalCharacteristics).toHaveBeenCalledWith('token', 'A1234BC', {
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC', {
           build: 'CODE3',
         })
       })
@@ -641,21 +643,21 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Characteristic updated',
+          text: 'Build updated',
           type: FlashMessageType.success,
-          fieldName: 'characteristic',
+          fieldName: 'build',
         })
       })
 
       it('Handles API errors', async () => {
-        personalPageService.updatePhysicalCharacteristics = async () => {
+        personalPageService.updatePhysicalAttributes = async () => {
           throw new Error()
         }
 
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/characteristic-url')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/build')
       })
     })
   })
