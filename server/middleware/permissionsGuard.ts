@@ -30,6 +30,7 @@ export default function permissionsGuard(
       [HmppsStatusCode.PRISONER_IS_RELEASED]: `Prisoner is inactive [${prisoner.prisonId}]`,
       [HmppsStatusCode.PRISONER_IS_TRANSFERRING]: `Prisoner is inactive [${prisoner.prisonId}]`,
       [HmppsStatusCode.NOT_IN_CASELOAD]: 'Prisoner not in case loads',
+      [HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED]: 'Page is not allowed to be viewed by global users',
     }
 
     return next(
