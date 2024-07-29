@@ -1,7 +1,4 @@
-import {
-  PrisonPersonPhysicalAttributes,
-  PrisonPersonPhysicalCharacteristics,
-} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { PrisonPersonPhysicalAttributes } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Page } from '../../services/auditService'
 
 export interface FieldData {
@@ -17,7 +14,7 @@ export interface TextFieldData extends FieldData {
 }
 export interface RadioFieldData extends FieldData {
   fieldName: string
-  code?: keyof PrisonPersonPhysicalCharacteristics
+  code?: keyof PrisonPersonPhysicalAttributes
   hintText?: string
 }
 

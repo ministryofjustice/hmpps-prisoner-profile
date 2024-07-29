@@ -165,6 +165,39 @@ export default class RestClient {
     }
   }
 
+  async patch<T>({
+    path = null,
+    query = '',
+    headers = {},
+    responseType = '',
+    data = {},
+    raw = false,
+  }: PutRequest = {}): Promise<T> {
+    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
+    const endpoint = `${this.apiUrl()}${path}`
+    try {
+      const result = await superagent
+        .patch(endpoint)
+        .send(data)
+        .agent(this.agent)
+        .query(query)
+        .retry(2, (err, res) => {
+          if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+          return undefined // retry handler only for logging retries, not to influence retry logic
+        })
+        .auth(this.token, { type: 'bearer' })
+        .set(headers)
+        .responseType(responseType)
+        .timeout(this.timeoutConfig())
+
+      return raw ? result : result.body
+    } catch (error) {
+      const sanitisedError = sanitiseError(error, endpoint)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'PATCH'`)
+      throw sanitisedError
+    }
+  }
+
   async stream({ path = null, headers = {} }: StreamRequest = {}): Promise<Readable> {
     logger.info(`Get using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
