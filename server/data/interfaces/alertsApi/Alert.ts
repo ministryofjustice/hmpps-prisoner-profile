@@ -1,5 +1,5 @@
+import AlertFlagLabel from '@ministryofjustice/hmpps-connect-dps-shared-items/dist/alertFlags/types/AlertFlagLabel'
 import { PagedListItem } from '../prisonApi/PagedList'
-import AlertFlagLabel from '../../../interfaces/AlertFlagLabels'
 import AlertTypeFilter from '../../../services/interfaces/alertsService/AlertsMetadata'
 
 export interface Alert extends PagedListItem {

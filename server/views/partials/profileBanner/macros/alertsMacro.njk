@@ -1,5 +1,6 @@
 {% from "components/catAPrisonerTag/catAPrisonerTag.njk" import catAPrisonerTag %}
 {% from 'components/modal/modal.njk' import modal %}
+{% from "dps/components/alert-flag/macro.njk" import alertFlag %}
 
 {% macro alertsMacro(alerts, prisonerNumber, categoryLabel) %}
     <ul class="alerts-list" data-qa="alert-flags">
@@ -8,7 +9,15 @@
         {% endif %}
 
         {% for alert in alerts %}
-            <li><a href="/prisoner/{{ prisonerNumber }}/alerts/detail?ids={{ alert.alertIds | join('&ids=') }}" data-prisoner-number="{{ prisonerNumber }}" class="govuk-link govuk-link--no-underline govuk-link--text-colour {{ alert.classes }}">{{ alert.label }}</a></li>
+            <li>
+                {{ alertFlag({
+                    alert: alert,
+                    href: "/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids='),
+                    attributes: {
+                        'data-prisoner-number': prisonerNumber
+                    }
+                }) }}
+            </li>
         {% endfor %}
     </ul>
 

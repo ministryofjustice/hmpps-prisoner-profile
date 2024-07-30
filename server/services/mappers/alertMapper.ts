@@ -1,3 +1,4 @@
+import dpsShared from '@ministryofjustice/hmpps-connect-dps-shared-items'
 import PrisonApiAlert, {
   AlertForm,
   PrisonApiAlertChanges,
@@ -15,7 +16,6 @@ import {
 } from '../../data/interfaces/alertsApi/Alert'
 import { formatName, formatNamePart } from '../../utils/utils'
 import { formatDateISO, parseDate } from '../../utils/dateHelpers'
-import AlertFlagLabel from '../../interfaces/AlertFlagLabels'
 import AlertTypeFilter from '../interfaces/alertsService/AlertsMetadata'
 
 /**
@@ -137,17 +137,6 @@ export const toAlertType = (prisonApiAlertType: PrisonApiAlertType): AlertType =
   }
 }
 
-const toAlertFlagLabels = (alerts: Alert[], alertFlags: AlertFlagLabel[]): AlertFlagLabel[] => {
-  return alertFlags
-    .map(flag => {
-      const alertIds = alerts
-        .filter(alert => alert.isActive && flag.alertCodes.includes(alert.alertCode.code))
-        .map(alert => alert.alertUuid)
-      return { ...flag, alertIds } as AlertFlagLabel
-    })
-    .filter(alert => alert.alertIds?.length)
-}
-
 export const toAlertTypesFilters = (alerts: Alert[]) => {
   const createAlertTypeFilter = (filter: { [key: string]: AlertTypeFilter }, alert: Alert) => ({
     ...filter,
@@ -173,7 +162,7 @@ export const toAlertTypesFilters = (alerts: Alert[]) => {
 }
 
 /* eslint-disable no-shadow, no-plusplus */
-export const toAlertSummaryData = (alerts: Alert[], alertFlags: AlertFlagLabel[]): AlertSummaryData => {
+export const toAlertSummaryData = (alerts: Alert[]): AlertSummaryData => {
   const toAlertCounts = (alerts: Alert[]) => {
     return alerts.reduce(
       (acc, alert) => {
@@ -191,6 +180,6 @@ export const toAlertSummaryData = (alerts: Alert[], alertFlags: AlertFlagLabel[]
   return {
     ...toAlertCounts(alerts),
     ...toAlertTypesFilters(alerts),
-    alertFlags: toAlertFlagLabels(alerts, alertFlags),
+    alertFlags: dpsShared.alertFlags.getAlertFlagLabelsForAlerts(alerts),
   }
 }
