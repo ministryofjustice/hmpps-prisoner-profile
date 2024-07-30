@@ -360,6 +360,7 @@ describe('permissionsService', () => {
       HmppsStatusCode.NOT_IN_CASELOAD,
       HmppsStatusCode.PRISONER_IS_TRANSFERRING,
       HmppsStatusCode.PRISONER_IS_RELEASED,
+      HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED,
     ])('should return just the access code if it is %s', statusCode => {
       ;(getOverviewAccessStatusCode as jest.Mock).mockReturnValue(statusCode)
 
