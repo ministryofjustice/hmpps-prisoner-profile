@@ -8,7 +8,7 @@ import PersonalPage, {
   PropertyItem,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { addressToLines, calculateAge, formatName } from '../utils/utils'
+import { addressToLines, calculateAge, camelToSnakeCase, formatName } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
   getOffenderIdentifierValue,
@@ -29,9 +29,7 @@ import {
   PrisonPerson,
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributes,
-  PrisonPersonPhysicalCharacteristics,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import { physicalCharacteristicsMock } from '../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 
 export default class PersonalPageService {
   constructor(
@@ -55,17 +53,6 @@ export default class PersonalPageService {
   ) {
     const apiClient = this.prisonPersonApiClientBuilder(token)
     return apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
-  }
-
-  async updatePhysicalCharacteristics(
-    token: string,
-    prisonerNumber: string,
-    physicalCharacteristics: Partial<PrisonPersonPhysicalCharacteristics>,
-  ): Promise<PrisonPersonPhysicalCharacteristics> {
-    const apiClient = this.prisonPersonApiClientBuilder(token)
-    return null
-    // TODO plug in API call when available
-    return apiClient.updatePhysicalCharacteristics(prisonerNumber, physicalCharacteristics)
   }
 
   public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
@@ -353,7 +340,7 @@ export default class PersonalPageService {
     }
 
     return {
-      build: prisonerData.build || 'Not entered',
+      build: prisonPerson?.physicalAttributes?.build?.description || prisonerData.build || 'Not entered',
       distinguishingMarks:
         inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
           bodyPart,
@@ -363,12 +350,12 @@ export default class PersonalPageService {
           orientation: orentiation,
           type,
         })) || [],
-      facialHair: prisonerData.facialHair || 'Not entered',
-      hairColour: prisonerData.hairColour || 'Not entered',
+      facialHair: prisonPerson?.physicalAttributes?.facialHair?.description || prisonerData.facialHair || 'Not entered',
+      hairColour: prisonPerson?.physicalAttributes?.hair?.description || prisonerData.hairColour || 'Not entered',
       height,
       leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
       rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
-      shapeOfFace: prisonerData.shapeOfFace || 'Not entered',
+      shapeOfFace: prisonPerson?.physicalAttributes?.face?.description || prisonerData.shapeOfFace || 'Not entered',
       shoeSize: prisonerData.shoeSize ? prisonerData.shoeSize.toString() : 'Not entered',
       warnedAboutTattooing:
         getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
@@ -387,8 +374,8 @@ export default class PersonalPageService {
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
 
-  async getPhysicalCharacteristics(clientToken: string, type: string) {
-    // TODO call prisonPersonApi to get this ref data and map certain values from old to new
-    return physicalCharacteristicsMock[type]
+  async getReferenceDataCodes(clientToken: string, domain: string) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 }

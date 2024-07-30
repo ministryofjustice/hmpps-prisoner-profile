@@ -123,7 +123,7 @@ export default class PermissionsService {
   }
 
   public getLocationPermissions(user: HmppsUser, prisoner: Prisoner): Permissions {
-    const accessCode = getOverviewAccessStatusCode(user, prisoner)
+    const accessCode = getOverviewAccessStatusCode(user, prisoner, { allowGlobal: false })
     if (accessCode !== HmppsStatusCode.OK) return { accessCode }
 
     return {

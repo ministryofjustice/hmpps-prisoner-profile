@@ -254,7 +254,7 @@ export default function routes(services: Services): Router {
   get(
     `${basePath}/location-history`,
     getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    permissionsGuard(services.permissionsService.getLocationPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const prisonerLocationHistoryController = new PrisonerLocationHistoryController(

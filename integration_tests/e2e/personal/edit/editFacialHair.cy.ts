@@ -1,6 +1,11 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
+import {
+  facialHairCodesMock,
+  referenceDataDomainMock,
+  referenceDataDomainsMock,
+} from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 
 context('Edit facial hair', () => {
   const prisonerNumber = 'G6123VU'
@@ -29,11 +34,17 @@ context('Edit facial hair', () => {
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.setupPersonRefDataStubs({
+        domainsResp: referenceDataDomainsMock,
+        domainResp: referenceDataDomainMock,
+        codesResp: facialHairCodesMock,
+        codeResp: facialHairCodesMock[0],
+      })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/facial-hair`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Facial hair',
     successfulFlashMessage: 'Facial hair updated',
-    validInputs: { radioInput: 'FULL_BEARD' },
+    validInputs: { radioInput: 'FACIAL_HAIR_BEARDED' },
   })
 })

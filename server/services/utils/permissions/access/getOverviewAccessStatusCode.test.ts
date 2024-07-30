@@ -34,4 +34,12 @@ describe('getOverviewAccessStatusCode.ts', () => {
 
     expect(accessCode).toEqual(expected)
   })
+
+  it('Respects the allowGlobal flag', async () => {
+    const accessCode = await getOverviewAccessStatusCode({ ...userLEI, userRoles: [Role.GlobalSearch] }, prisonerMDI, {
+      allowGlobal: false,
+    })
+
+    expect(accessCode).toEqual(HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED)
+  })
 })

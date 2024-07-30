@@ -16,10 +16,12 @@ import {
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
+  shoeSizeFieldData,
 } from '../controllers/personal/fieldData'
 import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
+import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -52,11 +54,11 @@ export default function personalRouter(services: Services): Router {
   }
 
   const editRoute = ({
-    url,
+    path,
     edit,
     submit,
   }: {
-    url: string
+    path: string
     edit: {
       method: RequestHandler
       audit: Page
@@ -70,8 +72,10 @@ export default function personalRouter(services: Services): Router {
       }
     }
   }) => {
+    const routePath = `${basePath}/${path}`
+
     get(
-      url,
+      routePath,
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -81,19 +85,20 @@ export default function personalRouter(services: Services): Router {
 
     if (submit.validation) {
       post(
-        url,
+        routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
         editRouteChecks(),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
+          redirectTo: `personal/${path}`,
         }),
         submit.method,
       )
     } else {
       post(
-        url,
+        routePath,
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
@@ -105,7 +110,7 @@ export default function personalRouter(services: Services): Router {
 
   // Height
   editRoute({
-    url: `${basePath}/edit/height`,
+    path: `edit/height`,
     edit: {
       method: personalController.height().metric.edit,
       audit: Page.EditHeight,
@@ -121,7 +126,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    url: `${basePath}/edit/height/imperial`,
+    path: 'edit/height/imperial',
     edit: {
       audit: Page.EditHeight,
       method: personalController.height().imperial.edit,
@@ -138,7 +143,7 @@ export default function personalRouter(services: Services): Router {
 
   // Weight
   editRoute({
-    url: `${basePath}/edit/weight`,
+    path: 'edit/weight',
     edit: {
       audit: Page.EditWeight,
       method: personalController.weight().metric.edit,
@@ -154,7 +159,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    url: `${basePath}/edit/weight/imperial`,
+    path: 'edit/weight/imperial',
     edit: {
       audit: Page.EditWeight,
       method: personalController.weight().imperial.edit,
@@ -169,55 +174,71 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
+  editRoute({
+    path: 'edit/shoe-size',
+    edit: {
+      audit: Page.EditShoeSize,
+      method: personalController.textInput(shoeSizeFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditShoeSize,
+      method: personalController.textInput(shoeSizeFieldData).submit,
+      validation: {
+        validators: [shoeSizeValidator],
+        redirectBackOnError: true,
+      },
+    },
+  })
+
   // Hair type or colour
   editRoute({
-    url: `${basePath}/edit/hair`,
+    path: 'edit/hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
-      method: personalController.radios(hairFieldData).edit,
+      method: personalController.radioField(hairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditHairTypeOrColour,
-      method: personalController.radios(hairFieldData).submit,
+      method: personalController.radioField(hairFieldData).submit,
     },
   })
 
   // Facial hair
   editRoute({
-    url: `${basePath}/edit/facial-hair`,
+    path: 'edit/facial-hair',
     edit: {
       audit: Page.EditFacialHair,
-      method: personalController.radios(facialHairFieldData).edit,
+      method: personalController.radioField(facialHairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFacialHair,
-      method: personalController.radios(facialHairFieldData).submit,
+      method: personalController.radioField(facialHairFieldData).submit,
     },
   })
 
   // Face shape
   editRoute({
-    url: `${basePath}/edit/face-shape`,
+    path: 'edit/face-shape',
     edit: {
       audit: Page.EditFaceShape,
-      method: personalController.radios(faceShapeFieldData).edit,
+      method: personalController.radioField(faceShapeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFaceShape,
-      method: personalController.radios(faceShapeFieldData).submit,
+      method: personalController.radioField(faceShapeFieldData).submit,
     },
   })
 
   // Build
   editRoute({
-    url: `${basePath}/edit/build`,
+    path: 'edit/build',
     edit: {
       audit: Page.EditBuild,
-      method: personalController.radios(buildFieldData).edit,
+      method: personalController.radioField(buildFieldData).edit,
     },
     submit: {
       audit: Page.PostEditBuild,
-      method: personalController.radios(buildFieldData).submit,
+      method: personalController.radioField(buildFieldData).submit,
     },
   })
 

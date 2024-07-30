@@ -6,7 +6,9 @@ export type Validator = (body: Record<string, string>) => HmppsError[] | Promise
 
 export default function validationMiddleware(
   validators: Validator[],
-  options: { redirectBackOnError: boolean } = { redirectBackOnError: false },
+  options: { redirectBackOnError: boolean; redirectTo?: string } = {
+    redirectBackOnError: false,
+  },
 ): RequestHandler {
   return async (req, res, next) => {
     const validationResults = await Promise.all(validators.map(validator => validator(req.body)))
@@ -15,6 +17,9 @@ export default function validationMiddleware(
     if (hasLength(errors) && options.redirectBackOnError) {
       req.flash('requestBody', JSON.stringify(req.body))
       req.flash('errors', errors)
+      if (options.redirectTo) {
+        return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectTo}`)
+      }
       return res.redirect(req.header('Referer'))
     }
 

@@ -44,6 +44,7 @@ describe('permissionsGuard', () => {
     [HmppsStatusCode.PRISONER_IS_RELEASED, 'Prisoner is inactive [MDI]'],
     [HmppsStatusCode.PRISONER_IS_RELEASED, 'Prisoner is inactive [MDI]'],
     [HmppsStatusCode.NOT_IN_CASELOAD, 'Prisoner not in case loads'],
+    [HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED, 'Page is not allowed to be viewed by global users'],
   ])('For %s status code it should throw error with message %s', async (status: HmppsStatusCode, message: string) => {
     const req: any = { middleware: { prisonerData: PrisonerMockDataA, clientToken: 'token' } }
     const res: any = { locals: { user: prisonUserMock } }

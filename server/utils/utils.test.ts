@@ -5,6 +5,7 @@ import {
   apostrophe,
   arrayToQueryString,
   calculateAge,
+  camelToSnakeCase,
   convertNameCommaToHuman,
   convertToTitleCase,
   extractLocation,
@@ -35,6 +36,7 @@ import {
   properCaseName,
   refDataToSelectOptions,
   SelectOption,
+  snakeToCamelCase,
   sortArrayOfObjectsByDate,
   SortType,
   summaryListOneHalfWidth,
@@ -882,6 +884,30 @@ describe('utils', () => {
       ['No POM supplied', null, null],
     ])('%s: formatPomName(%s)', (_: string, pomName: string, expected: string) => {
       expect(formatPomName(pomName)).toEqual(expected)
+    })
+  })
+
+  describe('snakeToCamelCase', () => {
+    it.each([
+      ['FACIAL_HAIR', 'facialHair'],
+      ['BUILD', 'build'],
+      ['MULTI_WORD_PARAM_NAME', 'multiWordParamName'],
+      ['', ''],
+      [undefined, undefined],
+    ])('%s: snakeToCamelCase(%s)', (str: string, expected: string) => {
+      expect(snakeToCamelCase(str)).toEqual(expected)
+    })
+  })
+
+  describe('camelToSnakeCase', () => {
+    it.each([
+      ['facialHair', 'FACIAL_HAIR'],
+      ['build', 'BUILD'],
+      ['multiWordParamName', 'MULTI_WORD_PARAM_NAME'],
+      ['', ''],
+      [undefined, undefined],
+    ])('%s: camelToSnakeCase(%s)', (str: string, expected: string) => {
+      expect(camelToSnakeCase(str)).toEqual(expected)
     })
   })
 })

@@ -10,15 +10,15 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, hasLength, objectToSelectOptions, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import HmppsError from '../../interfaces/HmppsError'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { FieldData } from './fieldData'
+import { RadioFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
+import { PrisonPersonCharacteristic } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalController {
   constructor(
@@ -89,7 +89,7 @@ export default class PersonalController {
             pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             fieldValue: requestBodyFlash ? requestBodyFlash.editField : prisonPerson?.physicalAttributes.height,
             miniBannerData: miniBannerData(prisonerData),
           })
@@ -99,14 +99,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const { editField } = req.body
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
           const height = editField ? parseInt(editField, 10) : 0
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
               height: editField ? height : null,
-              weight: prisonPerson?.physicalAttributes.weight ?? null,
             })
 
             req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
@@ -135,8 +133,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const prisonPersonHeight = prisonPerson?.physicalAttributes.height
 
-          const { feet, inches } = centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
+          const { feet, inches } =
+            prisonPersonHeight === undefined || prisonPersonHeight === null
+              ? { feet: undefined, inches: undefined }
+              : centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
 
           const requestBodyFlash = requestBodyFromFlash<{ feet: string; inches: string }>(req)
           const errors = req.flash('errors')
@@ -150,12 +152,12 @@ export default class PersonalController {
           })
 
           res.render('pages/edit/heightImperial', {
-            pageTitle: 'Edit Height',
+            pageTitle: 'Height - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             feetValue: requestBodyFlash ? requestBodyFlash.feet : feet,
             inchesValue: requestBodyFlash ? requestBodyFlash.inches : inches,
             miniBannerData: miniBannerData(prisonerData),
@@ -166,7 +168,6 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
           const feet = feetString ? parseInt(feetString, 10) : 0
           const inches = inchesString ? parseInt(inchesString, 10) : 0
@@ -175,7 +176,6 @@ export default class PersonalController {
             const height = feetAndInchesToCentimetres(feet, inches)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
               height: !feetString && !inchesString ? null : height,
-              weight: prisonPerson?.physicalAttributes.weight,
             })
 
             req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
@@ -220,12 +220,12 @@ export default class PersonalController {
           })
 
           res.render('pages/edit/weightMetric', {
-            pageTitle: 'Edit weight',
+            pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             fieldName: 'weight',
             fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes.weight,
             miniBannerData: miniBannerData(prisonerData),
@@ -236,13 +236,11 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const { kilograms } = req.body
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
           const weight = parseInt(kilograms, 10)
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
               weight: kilograms ? weight : null,
-              height: prisonPerson?.physicalAttributes.height ?? null,
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
@@ -260,8 +258,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const prisonPersonWeight = prisonPerson?.physicalAttributes.weight
 
-          const { stone, pounds } = kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
+          const { stone, pounds } =
+            prisonPersonWeight === undefined || prisonPersonWeight === null
+              ? { stone: undefined, pounds: undefined }
+              : kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
 
           const requestBodyFlash = requestBodyFromFlash<{ stone: string; pounds: string }>(req)
           const errors = req.flash('errors')
@@ -285,12 +287,12 @@ export default class PersonalController {
             .catch(error => logger.error(error))
 
           res.render('pages/edit/weightImperial', {
-            pageTitle: 'Edit weight',
+            pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
-            errors: hasLength(errors) ? errors : [],
+            errors,
             stoneValue: requestBodyFlash ? requestBodyFlash.stone : stone,
             poundsValue: requestBodyFlash ? requestBodyFlash.pounds : pounds,
             miniBannerData: miniBannerData(prisonerData),
@@ -301,7 +303,6 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
@@ -310,7 +311,6 @@ export default class PersonalController {
             const weight = stoneAndPoundsToKilograms(stone, pounds)
             await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
               weight: !stoneString && !poundsString ? null : weight,
-              height: prisonPerson?.physicalAttributes.height,
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
@@ -336,6 +336,84 @@ export default class PersonalController {
     }
   }
 
+  textInput(fieldData: TextFieldData) {
+    const { pageTitle, hintText, auditPage, fieldName, url, inputClasses } = fieldData
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ [fieldName: string]: string }>(req)
+        const errors = req.flash('errors')
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+        // TODO remove when API returns value
+        if (prisonPerson) {
+          prisonPerson.physicalAttributes.shoeSize = '7'
+        }
+
+        const fieldValue = requestBodyFlash ? requestBodyFlash[fieldName] : prisonPerson?.physicalAttributes[fieldName]
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+
+        res.render('pages/edit/textField', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          hintText,
+          fieldName,
+          fieldValue,
+          inputClasses,
+          miniBannerData: miniBannerData(prisonerData),
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const fieldValue = req.body[fieldName] || null
+
+        try {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            [fieldName]: fieldValue,
+          })
+
+          req.flash('flashMessage', {
+            text: `${pageTitle} updated`,
+            type: FlashMessageType.success,
+            fieldName,
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          req.flash('requestBody', JSON.stringify(req.body))
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        }
+      },
+    }
+  }
+
   /**
    * Handler for editing single-value radio fields.
    *
@@ -347,32 +425,24 @@ export default class PersonalController {
    *   Face shape
    *   Build
    */
-  radios(fieldData: FieldData) {
+  radioField(fieldData: RadioFieldData) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, hintText, auditPage } = fieldData
+        const { pageTitle, code, hintText, auditPage } = fieldData
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
-        const fieldValueFlash = req.flash('fieldValue')
+        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const errors = req.flash('errors')
 
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
-        const characteristics = await this.personalPageService.getPhysicalCharacteristics(clientToken, fieldName)
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        // TODO remove when API returns value
-        if (prisonPerson) {
-          prisonPerson.physicalCharacteristics = {
-            hair: { code: '', description: '' },
-            facialHair: { code: '', description: '' },
-            faceShape: { code: '', description: '' },
-            build: { code: '', description: '' },
-          }
-        }
-
+        const [characteristics, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
         const fieldValue =
-          fieldValueFlash.length > 0 ? fieldValueFlash[0] : prisonPerson?.physicalCharacteristics[fieldName]
+          requestBodyFlash?.radioField || (prisonPerson?.physicalAttributes[code] as PrisonPersonCharacteristic)?.id
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -382,13 +452,14 @@ export default class PersonalController {
           page: auditPage,
         })
 
-        res.render('pages/edit/radios', {
-          pageTitle,
+        res.render('pages/edit/radioField', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
-          errors: hasLength(errors) ? errors : [],
+          errors,
           hintText,
-          options: objectToSelectOptions(characteristics, 'code', 'description', fieldValue),
+          options: objectToSelectOptions(characteristics, 'id', 'description', fieldValue),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,
@@ -398,15 +469,14 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, url } = fieldData
+        const { pageTitle, code, fieldName, url } = fieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
-        const { radioField } = req.body
-        const errors: HmppsError[] = []
+        const radioField = req.body.radioField || null
 
         try {
-          await this.personalPageService.updatePhysicalCharacteristics(clientToken, prisonerNumber, {
-            [fieldName]: radioField,
+          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            [code]: radioField,
           })
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
@@ -416,17 +486,15 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, fieldName, radioField, url },
+              details: { pageTitle, code, fieldName, radioField, url },
             })
             .catch(error => logger.error(error))
 
           return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
         } catch (e) {
-          errors.push({ text: 'There was an error please try again' })
+          req.flash('errors', [{ text: 'There was an error please try again' }])
         }
-
-        req.flash('fieldValue', radioField)
-        req.flash('errors', errors)
+        req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
