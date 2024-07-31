@@ -52,40 +52,83 @@ import PagedList, { AlertsListQueryParams, VisitsListQueryParams } from './Paged
 import VisitWithVisitors from './VisitWithVisitors'
 import PrisonDetails from './PrisonDetails'
 import CourtEvent from './CourtEvent'
+import { QueryParams } from '../../../interfaces/QueryParams'
+
+export interface CaseNoteSummaryByTypesParams extends QueryParams {
+  type: string
+  subType: string
+  numMonths: number
+  bookingId: number
+}
+
+export interface TransactionHistoryParams extends QueryParams {
+  account_code: string
+  from_date?: string
+  to_date?: string
+  transaction_type?: string
+}
 
 export interface PrisonApiClient {
   getUserCaseLoads(): Promise<CaseLoad[]>
+
   getAccountBalances(bookingId: number): Promise<AccountBalances>
+
   getVisitSummary(bookingId: number): Promise<VisitSummary>
+
   getVisitBalances(prisonerNumber: string): Promise<VisitBalances | null>
+
   getAssessments(bookingId: number): Promise<Assessment[]>
+
   getBookingContacts(bookingId: number): Promise<ContactDetail>
-  getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]>
+
+  getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]>
+
   getEventsScheduledForToday(bookingId: number): Promise<ScheduledEvent[]>
+
   getPrisoner(prisonerNumber: string): Promise<PrisonerDetail>
+
   getInmateDetail(bookingId: number): Promise<InmateDetail>
+
   getPersonalCareNeeds(bookingId: number, types?: string[]): Promise<PersonalCareNeeds>
+
   getOffenderActivitiesHistory(prisonerNumber: string, earliestEndDate: string): Promise<OffenderActivitiesHistory>
+
   getOffenderAttendanceHistory(
     prisonerNumber: string,
     fromDate: string,
     toDate: string,
   ): Promise<OffenderAttendanceHistory>
+
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
+
   getAlerts(bookingId: number, queryParams: AlertsListQueryParams): Promise<PagedList<PrisonApiAlert>>
+
   getProperty(bookingId: number): Promise<PropertyContainer[]>
+
   getCourtCases(bookingId: number): Promise<CourtCase[]>
+
   getOffenceHistory(prisonerNumber: string): Promise<OffenceHistoryDetail[]>
+
   getSentenceTerms(bookingId: number): Promise<OffenderSentenceTerms[]>
+
   getPrisonerSentenceDetails(prisonerNumber: string): Promise<PrisonerSentenceDetails>
+
   getAddresses(prisonerNumber: string): Promise<Address[]>
+
   getAddressesForPerson(personId: number): Promise<Address[]>
+
   getOffenderContacts(prisonerNumber: string): Promise<OffenderContacts>
+
   getPrisonerImage(offenderNumber: string, fullSizeImage: boolean): Promise<Readable>
+
   getImage(imageId: string, getFullSizedImage: boolean): Promise<Readable>
+
   getReferenceCodesByDomain(domain: ReferenceCodeDomain | string): Promise<ReferenceCode[]>
+
   getReasonableAdjustments(bookingId: number, treatmentCodes: string[]): Promise<ReasonableAdjustments>
+
   getCaseNotesUsage(offenderNumber: string): Promise<CaseNoteUsage[]>
+
   getCaseNoteCount(
     bookingId: number,
     type: string,
@@ -93,52 +136,84 @@ export interface PrisonApiClient {
     fromDate: string,
     toDate: string,
   ): Promise<CaseNoteCount>
+
   getMainOffence(bookingId: number): Promise<MainOffence[]>
+
   getFullStatus(prisonerNumber: string): Promise<FullStatus>
+
   getCourtDateResults(offenderNumber: string): Promise<CourtDateResults[]>
+
   getSentenceSummary(prisonerNumber: string): Promise<SentenceSummary>
+
   getIdentifiers(prisonerNumber: string): Promise<OffenderIdentifier[]>
+
   getStaffRoles(staffId: number, agencyId: string): Promise<StaffRole[]>
+
   getAgencyDetails(agencyId: string): Promise<AgencyDetails>
-  getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory>
+
+  getOffenderCellHistory(bookingId: number, params: { page?: number; size?: number }): Promise<OffenderCellHistory>
+
   getReceptionsWithCapacity(agencyId: string, attribute?: string): Promise<Reception[]>
+
   getStaffDetails(username: string): Promise<StaffDetails>
+
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
+
   getAlertTypes(): Promise<PrisonApiAlertType[]>
+
   createAlert(bookingId: number, alert: PrisonApiCreateAlert): Promise<PrisonApiAlert>
+
   updateAlert(bookingId: number, alertId: string, alertChanges: PrisonApiAlertChanges): Promise<PrisonApiAlert>
+
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
+
   getScheduledEventsForNextWeek(bookingId: number): Promise<ScheduledEvent[]>
+
   getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment>
+
   getCsraAssessmentsForPrisoner(prisonerNumber: string): Promise<CsraAssessmentSummary[]>
-  getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]>
+
+  getTransactionHistory(prisonerNumber: string, params: TransactionHistoryParams): Promise<Transaction[]>
+
   getDamageObligations(prisonerNumber: string, status?: string): Promise<DamageObligationContainer>
+
   getMovements(prisonerNumbers: string[], movementTypes: MovementType[], latestOnly?: boolean): Promise<Movement[]>
+
   getLocationsForAppointments(agencyId: string): Promise<Location[]>
+
   getAppointmentTypes(): Promise<ReferenceCode[]>
+
   getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]>
+
   getCourtEvents(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
+
   getVisits(offenderNumbers: string[], agencyId: string, date: string, timeSlot?: TimeSlot): Promise<PrisonerSchedule[]>
+
   getAppointments(
     offenderNumbers: string[],
     agencyId: string,
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
+
   getActivities(
     offenderNumbers: string[],
     agencyId: string,
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
+
   getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
+
   getLocation(locationId: number): Promise<Location>
+
   getActivitiesAtLocation(
     locationId: number,
     date: string,
     timeSlot?: TimeSlot,
     includeSuspended?: boolean,
   ): Promise<PrisonerSchedule[]>
+
   getActivityList(
     agencyId: string,
     locationId: number,
@@ -146,20 +221,33 @@ export interface PrisonApiClient {
     date: string,
     timeSlot?: TimeSlot,
   ): Promise<PrisonerSchedule[]>
+
   getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details>
+
   getAttributesForLocation(locationId: string): Promise<AttributesForLocation>
+
   getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]>
+
   getCellMoveReasonTypes(): Promise<CellMoveReasonType[]>
+
   getPersonEmails(personId: number): Promise<AgenciesEmail[]>
+
   getPersonPhones(personId: number): Promise<Telephone[]>
+
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
+
   getAlertDetails(bookingId: number, alertId: string): Promise<PrisonApiAlert>
+
   getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
+
   getVisitsForBookingWithVisitors(
     bookingId: number,
     params: VisitsListQueryParams,
   ): Promise<PagedList<VisitWithVisitors>>
+
   getVisitsPrisons(bookingId: number): Promise<PrisonDetails[]>
+
   getNextCourtEvent(bookingId: number): Promise<CourtEvent>
+
   getActiveCourtCasesCount(bookingId: number): Promise<number>
 }

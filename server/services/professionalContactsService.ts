@@ -209,7 +209,7 @@ export default class ProfessionalContactsService {
     }
 
     // Return the most recently created record for each of the YOI contact relationships if available
-    sortArrayOfObjectsByDate<Contact>(contacts.otherContacts, 'createdDateTime', SortType.ASC).forEach(c => {
+    sortArrayOfObjectsByDate<Contact>(contacts.otherContacts, 'createDateTime', SortType.ASC).forEach(c => {
       switch (c.relationship) {
         case ContactRelationship.CuspOfficer:
           youthStaffContacts.cuspOfficer = formatName(c.firstName, null, c.lastName)

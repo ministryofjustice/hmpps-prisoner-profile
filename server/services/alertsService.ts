@@ -204,7 +204,10 @@ export default class AlertsService {
     }
   }
 
-  private async getPrisonApiAlertSummaryData(prisonApiClient: PrisonApiClient, bookingId: number) {
+  private async getPrisonApiAlertSummaryData(
+    prisonApiClient: PrisonApiClient,
+    bookingId: number,
+  ): Promise<Partial<AlertSummaryData>> {
     const { activeAlertCount, inactiveAlertCount, alerts } = await prisonApiClient.getInmateDetail(bookingId)
 
     return { activeAlertCount, inactiveAlertCount, ...toAlertTypesFilters(alerts.map(toAlert)) }

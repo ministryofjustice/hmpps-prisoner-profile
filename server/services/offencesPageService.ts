@@ -301,7 +301,7 @@ export default class OffencesPageService {
     const releaseDates = await prisonApiClient.getPrisonerSentenceDetails(prisonerNumber)
 
     const sentenceDetails = releaseDates.sentenceDetail
-    const dates = {
+    const dates: Record<string, string> = {
       actualParoleDate: sentenceDetails.actualParoleDate,
       confirmedReleaseDate: sentenceDetails.confirmedReleaseDate,
       automaticReleaseDate: sentenceDetails.automaticReleaseOverrideDate || sentenceDetails.automaticReleaseDate,

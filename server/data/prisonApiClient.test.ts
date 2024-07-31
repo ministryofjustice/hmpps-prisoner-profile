@@ -163,7 +163,7 @@ describe('prisonApiClient', () => {
 
   describe('getCaseNoteSummaryByTypes', () => {
     it('Should return data from the API', async () => {
-      const params = { type: 'KA', subType: 'KS', numMonths: 38, bookingId: '1102484' }
+      const params = { type: 'KA', subType: 'KS', numMonths: 38, bookingId: 1102484 }
       fakePrisonApi
         .get(`/api/case-notes/summary?${mapToQueryString(params)}`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
@@ -361,10 +361,8 @@ describe('prisonApiClient', () => {
   describe('getInmatesAtLocation', () => {
     it('Should return data from the API', async () => {
       const locationId = 123456
-      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates?${mapToQueryString({})}`, [
-        mockInmateAtLocation,
-      ])
-      const output = await prisonApiClient.getInmatesAtLocation(locationId, {})
+      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates`, [mockInmateAtLocation])
+      const output = await prisonApiClient.getInmatesAtLocation(locationId)
       expect(output).toEqual([mockInmateAtLocation])
     })
   })

@@ -1,6 +1,7 @@
 import AlertFlagLabel from '@ministryofjustice/hmpps-connect-dps-shared-items/dist/alertFlags/types/AlertFlagLabel'
 import { PagedListItem } from '../prisonApi/PagedList'
 import AlertTypeFilter from '../../../services/interfaces/alertsService/AlertsMetadata'
+import { QueryParams } from '../../../interfaces/QueryParams'
 
 export interface Alert extends PagedListItem {
   alertUuid?: string
@@ -80,7 +81,7 @@ export interface CreateAlert {
   activeTo?: string
 }
 
-export interface AlertsApiQueryParams {
+export interface AlertsApiQueryParams extends QueryParams {
   isActive?: boolean
   size: number
   page?: number

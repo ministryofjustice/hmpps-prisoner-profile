@@ -722,7 +722,7 @@ describe('utils', () => {
 
   describe('objectToSelectOptions', () => {
     it('should map objects to select options', () => {
-      const data: object[] = [
+      const data: { id: string; desc: string; random: string }[] = [
         {
           id: 'id1',
           desc: 'desc1',
@@ -777,7 +777,7 @@ describe('utils', () => {
 
     it('groupBy list that does not contain the grouping key should return an empty list', () => {
       // unexpected behaviour....
-      expect(groupBy([group1Item1], 'notthere')).toEqual({ undefined: [group1Item1] })
+      expect(groupBy([group1Item1], 'notthere' as keyof typeof group1Item1)).toEqual({ undefined: [group1Item1] })
     })
 
     it('groupBy single item', () => {
