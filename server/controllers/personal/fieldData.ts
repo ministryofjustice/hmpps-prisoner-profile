@@ -63,11 +63,3 @@ export const buildFieldData: RadioFieldData = {
   url: 'build',
   auditPage: Page.EditBuild,
 }
-
-export const eyeColourFieldData: RadioFieldData = {
-  pageTitle: 'Eye colour',
-  fieldName: 'eyeColour',
-  code: PrisonPersonCharacteristicCode.eye,
-  url: 'eye-colour',
-  auditPage: Page.EditEyeColour,
-}

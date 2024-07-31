@@ -21,6 +21,7 @@ import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import {
   PrisonPersonCharacteristic,
   PrisonPersonCharacteristicCode,
+  PrisonPersonPhysicalAttributes,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalController {
@@ -450,7 +451,9 @@ export default class PersonalController {
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
         const fieldValue =
-          requestBodyFlash?.radioField || (prisonPerson?.physicalAttributes[code] as PrisonPersonCharacteristic)?.id
+          requestBodyFlash?.radioField ||
+          (prisonPerson?.physicalAttributes[code as keyof PrisonPersonPhysicalAttributes] as PrisonPersonCharacteristic)
+            ?.id
 
         await this.auditService.sendPageView({
           user: res.locals.user,
