@@ -378,4 +378,9 @@ export default class PersonalPageService {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
+
+  async updateSmokerOrVaper(clientToken: string, prisonerNumber: string, value: string) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    return prisonPersonApiClient.updateSmokerOrVaper(prisonerNumber, value)
+  }
 }

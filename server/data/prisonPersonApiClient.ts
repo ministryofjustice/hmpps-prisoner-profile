@@ -53,4 +53,9 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   async getReferenceDataCode(domain: string, code: string): Promise<ReferenceDataCode> {
     return this.restClient.get<ReferenceDataCode>({ path: `/reference-data/domains/${domain}/codes/${code}` })
   }
+
+  async updateSmokerOrVaper(_prisonerNumber: string, _value: string): Promise<PrisonPerson> {
+    // TODO: Implement this in the future when the API exists
+    return null
+  }
 }

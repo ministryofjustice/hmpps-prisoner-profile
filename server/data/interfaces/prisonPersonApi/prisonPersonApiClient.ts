@@ -53,6 +53,7 @@ export interface PrisonPersonApiClient {
     prisonerNumber: string,
     physicalAttributes: Partial<PrisonPersonPhysicalAttributes>,
   ): Promise<PrisonPersonPhysicalAttributes>
+  updateSmokerOrVaper(prisonerNumber: string, value: string): Promise<PrisonPerson>
   getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]>
   getReferenceDataDomain(domain: string): Promise<ReferenceDataDomain>
   getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>

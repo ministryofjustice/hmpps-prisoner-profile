@@ -195,11 +195,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
-      method: personalController.radioField(hairFieldData).edit,
+      method: personalController.physicalCharacteristicRadioField(hairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditHairTypeOrColour,
-      method: personalController.radioField(hairFieldData).submit,
+      method: personalController.physicalCharacteristicRadioField(hairFieldData).submit,
     },
   })
 
@@ -208,11 +208,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/facial-hair',
     edit: {
       audit: Page.EditFacialHair,
-      method: personalController.radioField(facialHairFieldData).edit,
+      method: personalController.physicalCharacteristicRadioField(facialHairFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFacialHair,
-      method: personalController.radioField(facialHairFieldData).submit,
+      method: personalController.physicalCharacteristicRadioField(facialHairFieldData).submit,
     },
   })
 
@@ -221,11 +221,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/face-shape',
     edit: {
       audit: Page.EditFaceShape,
-      method: personalController.radioField(faceShapeFieldData).edit,
+      method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditFaceShape,
-      method: personalController.radioField(faceShapeFieldData).submit,
+      method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).submit,
     },
   })
 
@@ -234,11 +234,26 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/build',
     edit: {
       audit: Page.EditBuild,
-      method: personalController.radioField(buildFieldData).edit,
+      method: personalController.physicalCharacteristicRadioField(buildFieldData).edit,
     },
     submit: {
       audit: Page.PostEditBuild,
-      method: personalController.radioField(buildFieldData).submit,
+      method: personalController.physicalCharacteristicRadioField(buildFieldData).submit,
+    },
+  })
+
+  // Smoker/Vaper
+  editRoute({
+    path: 'edit/smoker-or-vaper',
+    edit: {
+      // TODO
+      audit: Page.EditBuild,
+      method: personalController.physicalCharacteristicRadioField(buildFieldData).edit,
+    },
+    submit: {
+      // TODO
+      audit: Page.PostEditBuild,
+      method: personalController.physicalCharacteristicRadioField(buildFieldData).submit,
     },
   })
 

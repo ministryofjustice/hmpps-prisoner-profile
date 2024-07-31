@@ -24,6 +24,7 @@ export enum Page {
   EditFaceShape = 'EDIT_FACE_SHAPE',
   EditBuild = 'EDIT_BUILD',
   EditShoeSize = 'EDIT_SHOE_SIZE',
+  EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
@@ -47,6 +48,7 @@ export enum Page {
   PostEditFaceShape = 'POST_EDIT_FACE_SHAPE',
   PostEditBuild = 'POST_EDIT_BUILD',
   PostEditShoeSize = 'POST_EDIT_SHOE_SIZE',
+  PostEditSmokerOrVaper = 'POST_EDIT_SMOKER_OR_VAPER',
   PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
   PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
   PostAlertAddMoreDetails = 'POST_ALERT_ADD_MORE_DETAILS',
@@ -81,6 +83,7 @@ export enum PostAction {
   Appointment = 'ADD_APPOINTMENT',
   CaseNote = 'ADD_CASE_NOTE',
   EditPhysicalCharacteristics = 'EDIT_PHYSICAL_CHARACTERISTICS',
+  EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
 }
 
 // eslint-disable-next-line no-shadow

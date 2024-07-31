@@ -57,6 +57,7 @@ describe('PersonalPageService', () => {
       getReferenceDataDomain: jest.fn(),
       getReferenceDataCodes: jest.fn(),
       getReferenceDataCode: jest.fn(),
+      updateSmokerOrVaper: jest.fn(),
     }
   })
 
@@ -493,6 +494,13 @@ describe('PersonalPageService', () => {
       const data = await constructService().get('token', PrisonerMockDataA, true)
       expect(data.physicalCharacteristics.height).toBe('1m')
       expect(data.physicalCharacteristics.weight).toBe('100kg')
+    })
+  })
+
+  describe('Update Smoker or Vaper', () => {
+    it('Updates the smoker or vaper on the API', async () => {
+      await constructService().updateSmokerOrVaper('token', 'abc123', 'Yes')
+      expect(prisonPersonApiClient.updateSmokerOrVaper).toHaveBeenCalledWith('abc123', 'Yes')
     })
   })
 })

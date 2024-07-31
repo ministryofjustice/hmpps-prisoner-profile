@@ -10,7 +10,7 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, objectToSelectOptions, SelectOption, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
@@ -19,6 +19,7 @@ import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import { PrisonPersonCharacteristic } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { getProfileInformationValue, ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
 
 export default class PersonalController {
   constructor(
@@ -414,6 +415,109 @@ export default class PersonalController {
     }
   }
 
+  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: SelectOption[]) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { pageTitle, hintText, auditPage } = fieldData
+      const { prisonerNumber } = req.params
+      const { prisonerData } = req.middleware
+      const { firstName, lastName, cellLocation } = prisonerData
+      const errors = req.flash('errors')
+
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: auditPage,
+      })
+
+      res.render('pages/edit/radioField', {
+        pageTitle: `${pageTitle} - Prisoner personal details`,
+        formTitle,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerBannerName,
+        errors,
+        hintText,
+        options,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  smokerOrVaper() {
+    const fieldData: RadioFieldData = {
+      auditPage: Page.EditSmokerOrVaper,
+      fieldName: 'smokerOrVaper',
+      pageTitle: 'Smoker or vaper',
+      url: 'smoker-or-vaper',
+    }
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { inmateDetail, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
+        const fieldValue =
+          requestBodyFlash?.radioField ||
+          getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
+
+        // Placeholder for now
+        const options: SelectOption[] = [
+          {
+            text: 'Yes',
+            value: 'Yes',
+            selected: fieldValue === 'Yes',
+          },
+          {
+            text: 'No',
+            value: 'No',
+            selected: fieldValue === 'No',
+          },
+        ]
+
+        return this.editRadioFields(
+          `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,
+          fieldData,
+          options,
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { pageTitle, code, fieldName, url } = fieldData
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const radioField = req.body.radioField || null
+
+        try {
+          await this.personalPageService.updateSmokerOrVaper(clientToken, prisonerNumber, radioField)
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle, code, fieldName, radioField, url },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
+
   /**
    * Handler for editing single-value radio fields.
    *
@@ -425,47 +529,22 @@ export default class PersonalController {
    *   Face shape
    *   Build
    */
-  radioField(fieldData: RadioFieldData) {
+  physicalCharacteristicRadioField(fieldData: RadioFieldData) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, code, hintText, auditPage } = fieldData
+        const { clientToken } = req.middleware
         const { prisonerNumber } = req.params
-        const { clientToken, prisonerData } = req.middleware
-        const { firstName, lastName, cellLocation } = prisonerData
+        const { pageTitle, code } = fieldData
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const errors = req.flash('errors')
-
-        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-
         const [characteristics, prisonPerson] = await Promise.all([
           this.personalPageService.getReferenceDataCodes(clientToken, code),
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
         const fieldValue =
           requestBodyFlash?.radioField || (prisonPerson?.physicalAttributes[code] as PrisonPersonCharacteristic)?.id
+        const options = objectToSelectOptions(characteristics, 'id', 'description', fieldValue)
 
-        await this.auditService.sendPageView({
-          user: res.locals.user,
-          prisonerNumber: prisonerData.prisonerNumber,
-          prisonId: prisonerData.prisonId,
-          correlationId: req.id,
-          page: auditPage,
-        })
-
-        res.render('pages/edit/radioField', {
-          pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle: pageTitle,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerBannerName,
-          errors,
-          hintText,
-          options: objectToSelectOptions(characteristics, 'id', 'description', fieldValue),
-          miniBannerData: {
-            prisonerName: prisonerBannerName,
-            prisonerNumber,
-            cellLocation: formatLocation(cellLocation),
-          },
-        })
+        return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {

@@ -11,6 +11,8 @@ import { RadioFieldData, shoeSizeFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import { ReferenceDataCode } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
+import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -22,6 +24,11 @@ describe('PersonalController', () => {
   const defaultMiddleware = {
     clientToken: 'token',
     prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001', prisonerNumber: 'ABC123' },
+    inmateDetail: {
+      profileInformation: [
+        { question: 'Smoker of Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
+      ],
+    } as InmateDetail,
   }
 
   const defaultLocals = {
@@ -47,6 +54,7 @@ describe('PersonalController', () => {
     personalPageService.getReferenceDataCodes = jest.fn(
       async () => physicalCharacteristicsMock.field as ReferenceDataCode[],
     )
+    personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
 
@@ -523,7 +531,7 @@ describe('PersonalController', () => {
   /**
    * Tests for the generic radios edit pages - covers editing Hair type or colour, Facial hair, Face shape and Build
    */
-  describe('radioField', () => {
+  describe('physical characteristics radio field', () => {
     const fieldData: RadioFieldData = {
       pageTitle: 'Build',
       fieldName: 'build',
@@ -534,7 +542,8 @@ describe('PersonalController', () => {
     }
 
     describe('edit', () => {
-      const action = async (req: any, response: any) => controller.radioField(fieldData).edit(req, response, () => {})
+      const action = async (req: any, response: any) =>
+        controller.physicalCharacteristicRadioField(fieldData).edit(req, response, () => {})
 
       it('Renders the radios edit page with the field data config supplied', async () => {
         const req = {
@@ -615,7 +624,8 @@ describe('PersonalController', () => {
 
     describe('submit', () => {
       let validRequest: any
-      const action = async (req: any, response: any) => controller.radioField(fieldData).submit(req, response, () => {})
+      const action = async (req: any, response: any) =>
+        controller.physicalCharacteristicRadioField(fieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
@@ -658,6 +668,118 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/build')
+      })
+    })
+  })
+
+  describe('Smoker or vaper', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.smokerOrVaper().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Smoker or vaper - Prisoner personal details',
+          formTitle: 'Does First Last smoke or vape?',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          hintText: undefined,
+          errors: [],
+          options: expect.arrayContaining([
+            expect.objectContaining({ value: 'Yes', selected: true }),
+            expect.objectContaining({ value: 'No', selected: false }),
+          ]),
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'requestBody') return [JSON.stringify({ radioField: 'No' })]
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([expect.objectContaining({ value: 'No', selected: true })]),
+          }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.smokerOrVaper().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { radioField: 'Yes' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the smoker or vaper', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith('token', 'A1234BC', 'Yes')
+      })
+
+      it('Redirects to the personal page #appearance on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Smoker or vaper updated',
+          type: FlashMessageType.success,
+          fieldName: 'smokerOrVaper',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateSmokerOrVaper = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/smoker-or-vaper')
       })
     })
   })
