@@ -14,7 +14,6 @@ import { formatLocation, formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
 import { pagedActiveAlertsMock, pagedInactiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
-import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 let req: any
 let res: any
@@ -35,7 +34,7 @@ describe('Alerts Controller', () => {
           clientToken: 'CLIENT_TOKEN',
           prisonerData: PrisonerMockDataA,
           inmateDetail: inmateDetailMock,
-          alertSummaryData: { alertFlags: alertFlagLabels },
+          alertSummaryData: { alertFlags: [] },
           permissions: { alerts: { edit: false } },
         },
       }
@@ -77,13 +76,7 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        alertFlagLabels,
-        res.locals.user,
-        'alerts',
-      )
+      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, [], res.locals.user, 'alerts')
     })
 
     it('should get inactive alerts', async () => {
@@ -110,13 +103,7 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        alertFlagLabels,
-        res.locals.user,
-        'alerts',
-      )
+      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, [], res.locals.user, 'alerts')
     })
 
     it('should set canUpdateAlert to true if user has role and caseload', async () => {

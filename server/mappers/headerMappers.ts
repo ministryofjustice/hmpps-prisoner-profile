@@ -1,3 +1,4 @@
+import AlertFlagLabel from '@ministryofjustice/hmpps-connect-dps-shared-items/dist/alertFlags/types/AlertFlagLabel'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import {
@@ -14,7 +15,6 @@ import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import AlertFlagLabel from '../interfaces/AlertFlagLabels'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: HmppsUser) {
   const { userRoles } = user
