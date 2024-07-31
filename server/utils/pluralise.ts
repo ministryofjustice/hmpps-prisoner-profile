@@ -1,4 +1,4 @@
-const notStandardPlurals = {
+const notStandardPlurals: Record<string, string> = {
   person: 'people',
   man: 'men',
   woman: 'women',

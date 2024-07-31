@@ -15,7 +15,7 @@ parameters:
 
   node-version:
     type: string
-    default: 20.12-browsers
+    default: 20.16-browsers
 
 jobs:
   build:
@@ -206,6 +206,7 @@ workflows:
           context:
             - veracode-credentials
             - hmpps-common-vars
+
   security-weekly:
     triggers:
       - schedule:

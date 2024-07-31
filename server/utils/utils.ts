@@ -17,6 +17,7 @@ import { Addresses } from '../services/interfaces/personalPageService/PersonalPa
 import { HmppsUser } from '../interfaces/HmppsUser'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import logger from '../../logger'
+import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -99,10 +100,10 @@ export const formatMoney = (
   return ((val || 0) / (usePence ? 100 : 1)).toLocaleString('en-GB', { style: 'currency', currency })
 }
 
-export const arrayToQueryString = (array: string[] | number[] | boolean[], key: string): string =>
+export const arrayToQueryString = (array: QueryParamValue[], key: string): string =>
   array && array.map(item => `${key}=${encodeURIComponent(item)}`).join('&')
 
-export const mapToQueryString = (params: Record<never, never>): string => {
+export const mapToQueryString = (params: QueryParams): string => {
   if (!params) return ''
   return Object.keys(params)
     .filter(key => params[key] !== undefined && params[key] !== null)
@@ -484,10 +485,14 @@ export enum SortType {
   DESC = 'DESC',
 }
 
-export const sortArrayOfObjectsByDate = <T>(arrayOfObjects: T[], dateKey: string, sortType: SortType): T[] => {
+export const sortArrayOfObjectsByDate = <T>(
+  arrayOfObjects: T[],
+  dateKey: keyof (typeof arrayOfObjects)[number],
+  sortType: SortType,
+): T[] => {
   return arrayOfObjects.sort((a, b) => {
-    const dateA = new Date(a[dateKey]).getTime()
-    const dateB = new Date(b[dateKey]).getTime()
+    const dateA = new Date(a[dateKey] as string | number | Date).getTime()
+    const dateB = new Date(b[dateKey] as string | number | Date).getTime()
     if (sortType === SortType.DESC) {
       return dateA < dateB ? 1 : -1
     }
@@ -538,11 +543,11 @@ export const extractLocation = (location: string, agencyId: string): string => {
   return formatLocation(withoutAgency)
 }
 
-export const groupBy = <T>(array: T[], key: string): Record<string, T[]> =>
+export const groupBy = <T>(array: T[], key: keyof (typeof array)[number]): Record<string, T[]> =>
   array &&
   array.length &&
   array.reduce((acc, currentItem) => {
-    const groupKey = currentItem[key]
+    const groupKey = currentItem[key] as keyof typeof acc
     const existingGroupedItems = acc[groupKey] || []
 
     return { ...acc, [groupKey]: [...existingGroupedItems, currentItem] }
@@ -594,16 +599,16 @@ export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[]
   }))
 }
 
-export const objectToSelectOptions = (
-  array: object[],
-  id: string,
-  description: string,
+export const objectToSelectOptions = <T>(
+  array: T[],
+  id: keyof (typeof array)[number],
+  description: keyof (typeof array)[number],
   selected?: string,
 ): SelectOption[] => {
   return array.map(obj => ({
-    text: obj[description],
-    value: obj[id],
-    ...(selected && obj[id] === selected && { checked: true }),
+    text: obj[description] as string,
+    value: obj[id] as string | number,
+    ...(selected && obj[id as keyof typeof obj] === selected && { checked: true }),
   }))
 }
 
