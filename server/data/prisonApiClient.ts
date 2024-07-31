@@ -2,7 +2,11 @@ import { Readable } from 'stream'
 import config from '../config'
 import RestClient from './restClient'
 import CaseLoad from './interfaces/prisonApi/CaseLoad'
-import { PrisonApiClient } from './interfaces/prisonApi/prisonApiClient'
+import {
+  CaseNoteSummaryByTypesParams,
+  PrisonApiClient,
+  TransactionHistoryParams,
+} from './interfaces/prisonApi/prisonApiClient'
 import AccountBalances from './interfaces/prisonApi/AccountBalances'
 import VisitSummary from './interfaces/prisonApi/VisitSummary'
 import VisitBalances from './interfaces/prisonApi/VisitBalances'
@@ -137,7 +141,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return prisoner
   }
 
-  async getCaseNoteSummaryByTypes(params: object): Promise<CaseNote[]> {
+  async getCaseNoteSummaryByTypes(params: CaseNoteSummaryByTypesParams): Promise<CaseNote[]> {
     try {
       return await this.restClient.get<CaseNote[]>({ path: `/api/case-notes/summary?${mapToQueryString(params)}` })
     } catch (error) {
@@ -299,7 +303,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getOffenderCellHistory(bookingId: number, params: object): Promise<OffenderCellHistory> {
+  async getOffenderCellHistory(
+    bookingId: number,
+    params: { page?: number; size?: number },
+  ): Promise<OffenderCellHistory> {
     return this.restClient.get<OffenderCellHistory>({
       path: `/api/bookings/${bookingId}/cell-history?${mapToQueryString(params)}`,
     })
@@ -309,9 +316,9 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<StaffDetails>({ path: `/api/users/${username}`, ignore404: true })
   }
 
-  async getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]> {
+  async getInmatesAtLocation(locationId: number): Promise<OffenderBooking[]> {
     return this.restClient.get<OffenderBooking[]>({
-      path: `/api/locations/${locationId}/inmates?${mapToQueryString(params)}`,
+      path: `/api/locations/${locationId}/inmates`,
     })
   }
 
@@ -349,7 +356,7 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getTransactionHistory(prisonerNumber: string, params: object): Promise<Transaction[]> {
+  async getTransactionHistory(prisonerNumber: string, params: TransactionHistoryParams): Promise<Transaction[]> {
     return this.restClient.get<Transaction[]>({
       path: `/api/offenders/${prisonerNumber}/transaction-history`,
       query: mapToQueryString(params),

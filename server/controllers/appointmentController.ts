@@ -543,8 +543,8 @@ export default class AppointmentController {
             reference: null,
           })
 
-          if (emails[activeCaseLoadId] && emails[activeCaseLoadId].omu) {
-            await this.notifyClient.sendEmail(confirmBookingPrisonTemplateId, emails[activeCaseLoadId].omu, {
+          if (getOmuEmailFor(activeCaseLoadId)) {
+            await this.notifyClient.sendEmail(confirmBookingPrisonTemplateId, getOmuEmailFor(activeCaseLoadId), {
               personalisation,
               reference: null,
             })
@@ -683,4 +683,9 @@ export default class AppointmentController {
       return res.send(formatDate(endDate, 'full'))
     }
   }
+}
+
+function getOmuEmailFor(establishment: string) {
+  const establishmentEmails = emails[establishment as keyof typeof emails]
+  return establishmentEmails && establishmentEmails.omu
 }

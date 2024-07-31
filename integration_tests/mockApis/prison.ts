@@ -104,6 +104,7 @@ import { mockPagedVisits, pagedVisitsMock } from '../../server/data/localMockDat
 import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
 import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
+import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/prisonApi/prisonApiClient'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -194,7 +195,7 @@ export default {
       },
     })
   },
-  stubKeyWorkerSessions: (params: object) => {
+  stubKeyWorkerSessions: (params: CaseNoteSummaryByTypesParams) => {
     return stubFor({
       request: {
         method: 'GET',
