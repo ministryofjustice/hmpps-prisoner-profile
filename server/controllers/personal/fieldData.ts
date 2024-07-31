@@ -1,4 +1,7 @@
-import { PrisonPersonPhysicalAttributes } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import {
+  PrisonPersonCharacteristicCode,
+  PrisonPersonPhysicalAttributes,
+} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Page } from '../../services/auditService'
 
 export interface FieldData {
@@ -14,7 +17,7 @@ export interface TextFieldData extends FieldData {
 }
 export interface RadioFieldData extends FieldData {
   fieldName: string
-  code?: keyof PrisonPersonPhysicalAttributes
+  code?: PrisonPersonCharacteristicCode
   hintText?: string
 }
 
@@ -30,7 +33,7 @@ export const shoeSizeFieldData: TextFieldData = {
 export const hairFieldData: RadioFieldData = {
   pageTitle: 'Hair type or colour',
   fieldName: 'hair',
-  code: 'hair',
+  code: PrisonPersonCharacteristicCode.hair,
   hintText: 'Select the most prominent hair type or colour.',
   url: 'hair',
   auditPage: Page.EditHairTypeOrColour,
@@ -38,8 +41,8 @@ export const hairFieldData: RadioFieldData = {
 
 export const facialHairFieldData: RadioFieldData = {
   pageTitle: 'Facial hair',
-  fieldName: 'facial hair',
-  code: 'facialHair',
+  fieldName: 'facialHair',
+  code: PrisonPersonCharacteristicCode.facialHair,
   hintText: 'Select the most prominent type of facial hair.',
   url: 'facial-hair',
   auditPage: Page.EditFacialHair,
@@ -47,8 +50,8 @@ export const facialHairFieldData: RadioFieldData = {
 
 export const faceShapeFieldData: RadioFieldData = {
   pageTitle: 'Face shape',
-  fieldName: 'face shape',
-  code: 'face',
+  fieldName: 'faceShape',
+  code: PrisonPersonCharacteristicCode.face,
   url: 'face-shape',
   auditPage: Page.EditFaceShape,
 }
@@ -56,7 +59,15 @@ export const faceShapeFieldData: RadioFieldData = {
 export const buildFieldData: RadioFieldData = {
   pageTitle: 'Build',
   fieldName: 'build',
-  code: 'build',
+  code: PrisonPersonCharacteristicCode.build,
   url: 'build',
   auditPage: Page.EditBuild,
+}
+
+export const eyeColourFieldData: RadioFieldData = {
+  pageTitle: 'Eye colour',
+  fieldName: 'eyeColour',
+  code: PrisonPersonCharacteristicCode.eye,
+  url: 'eye-colour',
+  auditPage: Page.EditEyeColour,
 }

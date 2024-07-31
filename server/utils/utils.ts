@@ -711,3 +711,11 @@ export const addDefaultSelectedValue = (
 export const camelToSnakeCase = (str: string): string => str?.replace(/([A-Z])/g, '_$1').toUpperCase()
 
 export const snakeToCamelCase = (str: string): string => str?.toLowerCase().replace(/(_\w)/g, m => m[1].toUpperCase())
+
+export const formatHeight = (height: number): string => {
+  return height || height === 0 ? `${(height / 100).toString()}m` : 'Not entered'
+}
+
+export const formatWeight = (weight: number): string => {
+  return weight || weight === 0 ? `${weight}kg` : 'Not entered'
+}

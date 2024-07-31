@@ -18,7 +18,10 @@ import { RadioFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
-import { PrisonPersonCharacteristic } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import {
+  PrisonPersonCharacteristic,
+  PrisonPersonCharacteristicCode,
+} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalController {
   constructor(
@@ -58,6 +61,11 @@ export default class PersonalController {
         pageTitle: 'Personal',
         ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'personal'),
         ...personalPageData,
+        changeEyeColourUrl:
+          personalPageData.physicalCharacteristics.leftEyeColour ===
+          personalPageData.physicalCharacteristics.rightEyeColour
+            ? 'personal/edit/eye-colour'
+            : 'personal/edit/eye-colour-individual',
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
@@ -487,6 +495,185 @@ export default class PersonalController {
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
               details: { pageTitle, code, fieldName, radioField, url },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
+
+  /**
+   * Handler for editing eye colour.
+   */
+  eyeColour() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Eye colour'
+        const code = PrisonPersonCharacteristicCode.eye
+        const auditPage = Page.EditEyeColour
+
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ eyeColour: string }>(req)
+        const errors = req.flash('errors')
+
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+        const [characteristics, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
+
+        /* Set radio to correct eye colour if both left and right values are the same, otherwise leave unselected. */
+        const eyeColour =
+          prisonPerson?.physicalAttributes.leftEyeColour?.id === prisonPerson?.physicalAttributes.rightEyeColour?.id
+            ? prisonPerson?.physicalAttributes.leftEyeColour?.id
+            : undefined
+
+        const fieldValue = requestBodyFlash?.eyeColour || eyeColour
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+
+        res.render('pages/edit/eyeColour', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          options: objectToSelectOptions(characteristics, 'id', 'description', fieldValue),
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Eye colour'
+        const fieldName = 'eyeColour'
+        const url = 'eye-colour'
+
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const eyeColour = req.body.eyeColour || null
+
+        try {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            leftEyeColour: eyeColour,
+            rightEyeColour: eyeColour,
+          })
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle, fieldName, eyeColour, url },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
+
+  /**
+   * Handler for editing left and right eye colour individually.
+   */
+  eyeColourIndividual() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Left and right eye colours'
+        const code = PrisonPersonCharacteristicCode.eye
+        const auditPage = Page.EditEyeColour
+
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ leftEyeColour: string; rightEyeColour: string }>(req)
+        const errors = req.flash('errors')
+
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+        const [characteristics, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
+        const leftEyeColour = requestBodyFlash?.leftEyeColour || prisonPerson?.physicalAttributes.leftEyeColour?.id
+        const rightEyeColour = requestBodyFlash?.rightEyeColour || prisonPerson?.physicalAttributes.rightEyeColour?.id
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditPage,
+        })
+
+        res.render('pages/edit/eyeColourIndividual', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          leftOptions: objectToSelectOptions(characteristics, 'id', 'description', leftEyeColour),
+          rightOptions: objectToSelectOptions(characteristics, 'id', 'description', rightEyeColour),
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Left and right eye colours'
+        const url = 'eye-colour-individual'
+
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const leftEyeColour = req.body.leftEyeColour || null
+        const rightEyeColour = req.body.rightEyeColour || null
+
+        try {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            leftEyeColour,
+            rightEyeColour,
+          })
+          req.flash('flashMessage', {
+            text: `Eye colour updated`,
+            type: FlashMessageType.success,
+            fieldName: 'eyeColour',
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle, leftEyeColour, rightEyeColour, url },
             })
             .catch(error => logger.error(error))
 

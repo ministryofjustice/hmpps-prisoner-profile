@@ -6,7 +6,7 @@ import Page from '../../../pages/page'
 
 export interface EditPageInputs {
   textInputs?: { [key: string]: string }
-  radioInput?: string
+  radioInputs?: { [key: string]: string }
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
@@ -43,7 +43,7 @@ export function editPageTests<TPage extends EditPage>(options: {
 
   const fillWithInputs = (inputs: EditPageInputs) => {
     if (inputs.textInputs) page.fillInTextFields(inputs.textInputs)
-    if (inputs.radioInput) page.selectRadio(inputs.radioInput)
+    if (inputs.radioInputs) page.selectRadios(inputs.radioInputs)
   }
 
   context('Edit page tests', () => {

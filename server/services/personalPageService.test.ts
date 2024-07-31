@@ -50,6 +50,8 @@ describe('PersonalPageService', () => {
           facialHair: { id: '', description: '' },
           face: { id: '', description: '' },
           build: { id: '', description: '' },
+          leftEyeColour: { id: '', description: '' },
+          rightEyeColour: { id: '', description: '' },
         },
       })),
       updatePhysicalAttributes: jest.fn(),
