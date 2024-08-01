@@ -16,6 +16,8 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
     facialHair: { id: '', description: '' },
     face: { id: '', description: '' },
     build: { id: '', description: '' },
+    leftEyeColour: { id: '', description: '' },
+    rightEyeColour: { id: '', description: '' },
   },
 })
 

@@ -40,8 +40,8 @@ const labels: Record<keyof ReleaseDates, string> = {
 export default (releaseDates: ReleaseDates): SummaryRow[] => {
   return Object.keys(releaseDates)
     .map(dateName => ({
-      key: { text: labels[dateName] },
-      value: { text: formatDate(releaseDates[dateName], 'long') },
+      key: { text: labels[dateName as keyof ReleaseDates] },
+      value: { text: formatDate(releaseDates[dateName as keyof ReleaseDates], 'long') },
     }))
     .sort((a, b) => {
       if (a.key.text === 'Confirmed release date') return -1

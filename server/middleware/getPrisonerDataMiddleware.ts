@@ -6,7 +6,6 @@ import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
 import { toAlert, toAlertSummaryData } from '../services/mappers/alertMapper'
-import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
@@ -51,7 +50,7 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       ])
 
       const mappedAlerts = alerts?.content ?? inmateDetail.alerts.map(toAlert)
-      const alertSummaryData = toAlertSummaryData(mappedAlerts, alertFlagLabels)
+      const alertSummaryData = toAlertSummaryData(mappedAlerts)
 
       if (assessments && Array.isArray(assessments)) {
         prisonerData.assessments = assessments.sort(

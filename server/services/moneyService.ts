@@ -1,6 +1,6 @@
 import { endOfMonth, isFuture, isSameMonth } from 'date-fns'
 import { RestClientBuilder } from '../data'
-import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
+import { PrisonApiClient, TransactionHistoryParams } from '../data/interfaces/prisonApi/prisonApiClient'
 import { AccountCode } from '../data/enums/accountCode'
 import Transaction from '../data/interfaces/prisonApi/Transaction'
 import { formatDateISO } from '../utils/dateHelpers'
@@ -30,7 +30,7 @@ export default class MoneyService {
     year?: number,
     type?: TransactionType,
   ): Promise<Transaction[]> {
-    let params: object = {
+    let params: TransactionHistoryParams = {
       account_code: accountCode,
     }
 

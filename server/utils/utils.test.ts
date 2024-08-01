@@ -13,12 +13,14 @@ import {
   formatCategoryALabel,
   formatCategoryCodeDescription,
   formatCommunityManager,
+  formatHeight,
   formatLocation,
   formatMoney,
   formatName,
   formatNamePart,
   formatPomName,
   formatScheduleItem,
+  formatWeight,
   getNamesFromString,
   groupBy,
   includesActiveCaseLoad,
@@ -720,7 +722,7 @@ describe('utils', () => {
 
   describe('objectToSelectOptions', () => {
     it('should map objects to select options', () => {
-      const data: object[] = [
+      const data: { id: string; desc: string; random: string }[] = [
         {
           id: 'id1',
           desc: 'desc1',
@@ -775,7 +777,7 @@ describe('utils', () => {
 
     it('groupBy list that does not contain the grouping key should return an empty list', () => {
       // unexpected behaviour....
-      expect(groupBy([group1Item1], 'notthere')).toEqual({ undefined: [group1Item1] })
+      expect(groupBy([group1Item1], 'notthere' as keyof typeof group1Item1)).toEqual({ undefined: [group1Item1] })
     })
 
     it('groupBy single item', () => {
@@ -908,6 +910,31 @@ describe('utils', () => {
       [undefined, undefined],
     ])('%s: camelToSnakeCase(%s)', (str: string, expected: string) => {
       expect(camelToSnakeCase(str)).toEqual(expected)
+    })
+  })
+
+  describe('formatHeight', () => {
+    it.each([
+      [0, '0m'],
+      [10, '0.1m'],
+      [15, '0.15m'],
+      [200, '2m'],
+      [210, '2.1m'],
+      [211, '2.11m'],
+      [null, 'Not entered'],
+    ])('%s: formatHeight(%s)', (height: number, expected: string) => {
+      expect(formatHeight(height)).toEqual(expected)
+    })
+  })
+
+  describe('formatWeight', () => {
+    it.each([
+      [0, '0kg'],
+      [50, '50kg'],
+      [123, '123kg'],
+      [null, 'Not entered'],
+    ])('%s: formatWeight(%s)', (weight: number, expected: string) => {
+      expect(formatWeight(weight)).toEqual(expected)
     })
   })
 })

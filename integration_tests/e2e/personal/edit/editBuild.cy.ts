@@ -45,7 +45,7 @@ context('Edit build', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Build',
     successfulFlashMessage: 'Build updated',
-    validInputs: { radioInput: 'BUILD_PROP' },
+    validInputs: { radioInputs: { radioField: 'BUILD_PROP' } },
     redirectAnchor: 'appearance',
   })
 })

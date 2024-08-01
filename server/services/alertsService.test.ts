@@ -21,7 +21,6 @@ import { alertFormMock } from '../data/localMockData/alertFormMock'
 import FeatureToggleService from './featureToggleService'
 import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
-import { alertFlagLabels } from '../data/alertFlags/alertFlags'
 
 jest.mock('../data/prisonApiClient')
 
@@ -40,7 +39,7 @@ describe('Alerts Service', () => {
       inactiveAlertCount: 0,
       activeAlertTypesFilter: {},
       inactiveAlertTypesFilter: {},
-      alertFlags: alertFlagLabels,
+      alertFlags: [],
     }
     prisonApiClientSpy = prisonApiClientMock()
     alertsApiClientSpy = {

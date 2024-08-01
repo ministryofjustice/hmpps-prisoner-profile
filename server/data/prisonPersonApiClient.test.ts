@@ -31,6 +31,8 @@ describe('prisonPersonApiClient', () => {
           facialHair: { id: 'MOUSTACHE', description: 'Moustache' },
           face: { id: 'OVAL', description: 'Oval' },
           build: { id: 'THIN', description: 'Thin' },
+          leftEyeColour: { id: 'BLUE', description: 'Blue' },
+          rightEyeColour: { id: 'GREEN', description: 'Green' },
         },
       }
       fakePrisonerSearchApi

@@ -45,7 +45,7 @@ context('Edit face shape', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Face shape',
     successfulFlashMessage: 'Face shape updated',
-    validInputs: { radioInput: 'FACE_ANGULAR' },
+    validInputs: { radioInputs: { radioField: 'FACE_ANGULAR' } },
     redirectAnchor: 'appearance',
   })
 })

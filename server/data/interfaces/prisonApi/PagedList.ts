@@ -1,4 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+import { QueryParams } from '../../../interfaces/QueryParams'
+
 export interface PagedListItem {
   // Extended by:
   // Alert
@@ -34,7 +36,7 @@ export default interface PagedList<TPagedListItem extends PagedListItem> {
   empty: boolean
 }
 
-export interface PagedListQueryParams {
+export interface PagedListQueryParams extends QueryParams {
   page?: number
   size?: number
   sort?: string
