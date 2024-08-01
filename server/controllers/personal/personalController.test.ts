@@ -756,9 +756,9 @@ describe('PersonalController', () => {
         expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith('token', 'A1234BC', 'Yes')
       })
 
-      it('Redirects to the personal page #appearance on success', async () => {
+      it('Redirects to the personal page #personal-details on success', async () => {
         await action(validRequest, res)
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
       })
 
       it('Adds the success message to the flash', async () => {

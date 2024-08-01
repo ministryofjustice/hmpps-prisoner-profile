@@ -246,14 +246,12 @@ export default function personalRouter(services: Services): Router {
   editRoute({
     path: 'edit/smoker-or-vaper',
     edit: {
-      // TODO
-      audit: Page.EditBuild,
-      method: personalController.physicalCharacteristicRadioField(buildFieldData).edit,
+      audit: Page.EditSmokerOrVaper,
+      method: personalController.smokerOrVaper().edit,
     },
     submit: {
-      // TODO
-      audit: Page.PostEditBuild,
-      method: personalController.physicalCharacteristicRadioField(buildFieldData).submit,
+      audit: Page.PostEditSmokerOrVaper,
+      method: personalController.smokerOrVaper().submit,
     },
   })
 

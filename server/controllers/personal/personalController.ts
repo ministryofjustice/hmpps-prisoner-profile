@@ -508,7 +508,7 @@ export default class PersonalController {
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }

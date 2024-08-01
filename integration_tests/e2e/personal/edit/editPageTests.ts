@@ -25,6 +25,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     inputs: EditPageInputs
     errorMessages: string[]
   }[]
+  redirectAnchor: string
 }) {
   const {
     editUrl,
@@ -37,6 +38,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     editPageTitle,
     successfulFlashMessage,
     invalidResponses,
+    redirectAnchor,
   } = options
 
   let page: TPage
@@ -108,7 +110,7 @@ export function editPageTests<TPage extends EditPage>(options: {
           page.submit()
 
           cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
-          cy.location('hash').should('eq', '#appearance')
+          cy.location('hash').should('eq', `#${redirectAnchor}`)
 
           page.flashMessage().should('include.text', successfulFlashMessage)
         })
