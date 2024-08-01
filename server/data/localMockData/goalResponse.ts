@@ -1,22 +1,5 @@
-import { ActionPlanResponse } from '../interfaces/educationAndWorkPlanApi/actionPlanResponse'
 import GoalResponse from '../interfaces/educationAndWorkPlanApi/GoalResponse'
 import StepResponse from '../interfaces/educationAndWorkPlanApi/StepResponse'
-
-const aValidActionPlanResponse = (options?: {
-  reference?: string
-  prisonNumber?: string
-  goals?: Array<GoalResponse>
-}): ActionPlanResponse => {
-  return {
-    reference: options?.reference || 'a20912ab-4dae-4aa4-8bc5-32319da8fceb',
-    prisonNumber: options?.prisonNumber || 'A1234BC',
-    goals: options?.goals || [aValidGoalResponse()],
-  }
-}
-
-const aValidActionPlanResponseWithOneGoal = (): ActionPlanResponse => {
-  return aValidActionPlanResponse({ goals: [aValidGoalResponse()] })
-}
 
 const aValidGoalResponse = (options?: {
   reference?: string
@@ -27,6 +10,7 @@ const aValidGoalResponse = (options?: {
   updatedAt?: string
   updatedBy?: string
   updatedByDisplayName?: string
+  targetCompletionDate?: string
 }): GoalResponse => {
   return {
     goalReference: options?.reference || 'd38a6c41-13d1-1d05-13c2-24619966119b',
@@ -41,7 +25,7 @@ const aValidGoalResponse = (options?: {
     updatedByDisplayName: options?.updatedByDisplayName || 'Alex Smith',
     updatedAt: options?.updatedAt || '2023-09-23T14:43:02.094Z',
     updatedAtPrison: 'MDI',
-    targetCompletionDate: '2024-02-29',
+    targetCompletionDate: options?.targetCompletionDate || '2024-02-29',
     notes: 'Prisoner is not good at listening',
   }
 }
@@ -64,4 +48,4 @@ const aValidSecondStepResponse = (): StepResponse => {
   }
 }
 
-export { aValidActionPlanResponse, aValidActionPlanResponseWithOneGoal, aValidGoalResponse }
+export default aValidGoalResponse

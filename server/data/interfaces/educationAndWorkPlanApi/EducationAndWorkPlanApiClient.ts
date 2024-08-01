@@ -1,8 +1,8 @@
-import { ActionPlanResponse } from './actionPlanResponse'
+import GetGoalsResponse from './GetGoalsResponse'
 
 /**
  * Interface defining the REST API operations of the Education And Work Plan API (aka. the PLP API)
  */
 export default interface EducationAndWorkPlanApiClient {
-  getPrisonerActionPlan(prisonerNumber: string): Promise<ActionPlanResponse>
+  getActiveGoals(prisonerNumber: string): Promise<GetGoalsResponse>
 }

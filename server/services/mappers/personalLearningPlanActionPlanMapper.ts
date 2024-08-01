@@ -3,25 +3,24 @@ import {
   PersonalLearningPlanActionPlan,
   PersonalLearningPlanGoal,
 } from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
-import { ActionPlanResponse } from '../../data/interfaces/educationAndWorkPlanApi/actionPlanResponse'
 import GoalResponse from '../../data/interfaces/educationAndWorkPlanApi/GoalResponse'
 import dateComparator from '../../utils/dateComparator'
+import GetGoalsResponse from '../../data/interfaces/educationAndWorkPlanApi/GetGoalsResponse'
 
 /**
  * Simple mapper function to map from the Education And Work Plan (PLP) API type [ActionPlanResponse]
  * into the view model type [PersonalLearningPlanActionPlan]
  */
 const toPersonalLearningPlanActionPlan = (
-  apiActionPlanResponse: ActionPlanResponse,
+  prisonerNumber: string,
+  apiGetGoalsResponse: GetGoalsResponse,
 ): PersonalLearningPlanActionPlan => {
-  const goalReferencesInCreationDateOrder = goalReferencesSortedByCreationDate(apiActionPlanResponse.goals)
   return {
-    prisonerNumber: apiActionPlanResponse.prisonNumber,
-    goals: apiActionPlanResponse.goals.map((goal: GoalResponse) => {
-      const goalSequenceNumber = goalReferencesInCreationDateOrder.indexOf(goal.goalReference) + 1
-      return toPersonalLearningPlanGoal(goal, goalSequenceNumber)
+    prisonerNumber,
+    goals: apiGetGoalsResponse.goals.map((goal: GoalResponse) => {
+      return toPersonalLearningPlanGoal(goal)
     }),
-    ...getLastUpdatedAuditFields(apiActionPlanResponse.goals),
+    ...getLastUpdatedAuditFields(apiGetGoalsResponse.goals),
     problemRetrievingData: false,
   }
 }
@@ -48,10 +47,7 @@ const getLastUpdatedAuditFields = (
   }
 }
 
-const toPersonalLearningPlanGoal = (
-  apiGoalResponse: GoalResponse,
-  goalSequenceNumber: number,
-): PersonalLearningPlanGoal => {
+const toPersonalLearningPlanGoal = (apiGoalResponse: GoalResponse): PersonalLearningPlanGoal => {
   return {
     reference: apiGoalResponse.goalReference,
     title: apiGoalResponse.title,
@@ -61,20 +57,8 @@ const toPersonalLearningPlanGoal = (
     updatedAt: parseISO(apiGoalResponse.updatedAt),
     updatedBy: apiGoalResponse.updatedBy,
     updatedByDisplayName: apiGoalResponse.updatedByDisplayName,
-    sequenceNumber: goalSequenceNumber,
+    targetCompletionDate: parseISO(apiGoalResponse.targetCompletionDate),
   }
-}
-
-/**
- * Sorts the goals by creation date descending in a non-destructive manner (function arg is pass by reference) and
- * returns an array of the goal reference numbers.
- */
-const goalReferencesSortedByCreationDate = (goals: Array<GoalResponse>): Array<string> => {
-  return [...goals]
-    .sort((left: GoalResponse, right: GoalResponse) =>
-      dateComparator(parseISO(left.createdAt), parseISO(right.createdAt), 'ASC'),
-    )
-    .map(goal => goal.goalReference)
 }
 
 export default toPersonalLearningPlanActionPlan
