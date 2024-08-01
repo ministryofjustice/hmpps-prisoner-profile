@@ -55,6 +55,7 @@ context('Edit eye colour - both eyes the same colour', () => {
     editPageTitle: 'Eye colour',
     successfulFlashMessage: 'Eye colour updated',
     validInputs: { radioInputs: { eyeColour: 'EYE_BLUE' } },
+    redirectAnchor: 'appearance',
   })
 })
 
@@ -105,6 +106,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
     editPageTitle: 'Left and right eye colour',
     successfulFlashMessage: 'Eye colour updated',
     validInputs: { radioInputs: { leftEyeColour: 'EYE_BROWN', rightEyeColour: 'EYE_HAZEL' } },
+    redirectAnchor: 'appearance',
   })
 })
 
