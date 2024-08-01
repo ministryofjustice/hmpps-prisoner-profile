@@ -13,12 +13,14 @@ import {
   formatCategoryALabel,
   formatCategoryCodeDescription,
   formatCommunityManager,
+  formatHeight,
   formatLocation,
   formatMoney,
   formatName,
   formatNamePart,
   formatPomName,
   formatScheduleItem,
+  formatWeight,
   getNamesFromString,
   groupBy,
   includesActiveCaseLoad,
@@ -908,6 +910,31 @@ describe('utils', () => {
       [undefined, undefined],
     ])('%s: camelToSnakeCase(%s)', (str: string, expected: string) => {
       expect(camelToSnakeCase(str)).toEqual(expected)
+    })
+  })
+
+  describe('formatHeight', () => {
+    it.each([
+      [0, '0m'],
+      [10, '0.1m'],
+      [15, '0.15m'],
+      [200, '2m'],
+      [210, '2.1m'],
+      [211, '2.11m'],
+      [null, 'Not entered'],
+    ])('%s: formatHeight(%s)', (height: number, expected: string) => {
+      expect(formatHeight(height)).toEqual(expected)
+    })
+  })
+
+  describe('formatWeight', () => {
+    it.each([
+      [0, '0kg'],
+      [50, '50kg'],
+      [123, '123kg'],
+      [null, 'Not entered'],
+    ])('%s: formatWeight(%s)', (weight: number, expected: string) => {
+      expect(formatWeight(weight)).toEqual(expected)
     })
   })
 })

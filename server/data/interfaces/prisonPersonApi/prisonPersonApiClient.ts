@@ -6,6 +6,17 @@ export interface PrisonPersonPhysicalAttributes {
   facialHair: PrisonPersonCharacteristic
   face: PrisonPersonCharacteristic
   build: PrisonPersonCharacteristic
+  leftEyeColour: PrisonPersonCharacteristic
+  rightEyeColour: PrisonPersonCharacteristic
+}
+
+// eslint-disable-next-line no-shadow
+export enum PrisonPersonCharacteristicCode {
+  hair = 'hair',
+  facialHair = 'facialHair',
+  face = 'face',
+  build = 'build',
+  eye = 'eye',
 }
 
 export interface PrisonPersonCharacteristic {

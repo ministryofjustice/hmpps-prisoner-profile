@@ -8,7 +8,7 @@ import PersonalPage, {
   PropertyItem,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { addressToLines, calculateAge, camelToSnakeCase, formatName } from '../utils/utils'
+import { addressToLines, calculateAge, camelToSnakeCase, formatHeight, formatName, formatWeight } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
   getOffenderIdentifierValue,
@@ -325,22 +325,12 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     prisonPerson: PrisonPerson,
   ): PhysicalCharacteristics {
-    let height = prisonerData.heightCentimetres
-      ? `${(prisonerData.heightCentimetres / 100).toString()}m`
-      : 'Not entered'
-    let weight = prisonerData.weightKilograms ? `${prisonerData.weightKilograms}kg` : 'Not entered'
-
-    if (prisonPerson) {
-      height = prisonPerson?.physicalAttributes?.height
-        ? `${(prisonPerson.physicalAttributes.height / 100).toString()}m`
-        : 'Not entered'
-      weight = prisonPerson?.physicalAttributes?.weight
-        ? `${prisonPerson.physicalAttributes.weight.toString()}kg`
-        : 'Not entered'
-    }
-
     return {
-      build: prisonPerson?.physicalAttributes?.build?.description || prisonerData.build || 'Not entered',
+      height: formatHeight(prisonPerson ? prisonPerson.physicalAttributes?.height : prisonerData.heightCentimetres),
+      weight: formatWeight(prisonPerson ? prisonPerson.physicalAttributes?.weight : prisonerData.weightKilograms),
+      build: prisonPerson
+        ? prisonPerson.physicalAttributes?.build?.description || 'Not entered'
+        : prisonerData.build || 'Not entered',
       distinguishingMarks:
         inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
           bodyPart,
@@ -350,12 +340,21 @@ export default class PersonalPageService {
           orientation: orentiation,
           type,
         })) || [],
-      facialHair: prisonPerson?.physicalAttributes?.facialHair?.description || prisonerData.facialHair || 'Not entered',
-      hairColour: prisonPerson?.physicalAttributes?.hair?.description || prisonerData.hairColour || 'Not entered',
-      height,
-      leftEyeColour: prisonerData.leftEyeColour || 'Not entered',
-      rightEyeColour: prisonerData.rightEyeColour || 'Not entered',
-      shapeOfFace: prisonPerson?.physicalAttributes?.face?.description || prisonerData.shapeOfFace || 'Not entered',
+      facialHair: prisonPerson
+        ? prisonPerson.physicalAttributes?.facialHair?.description || 'Not entered'
+        : prisonerData.facialHair || 'Not entered',
+      hairColour: prisonPerson
+        ? prisonPerson.physicalAttributes?.hair?.description || 'Not entered'
+        : prisonerData.hairColour || 'Not entered',
+      leftEyeColour: prisonPerson
+        ? prisonPerson.physicalAttributes?.leftEyeColour?.description || 'Not entered'
+        : prisonerData.leftEyeColour || 'Not entered',
+      rightEyeColour: prisonPerson
+        ? prisonPerson.physicalAttributes?.rightEyeColour?.description || 'Not entered'
+        : prisonerData.rightEyeColour || 'Not entered',
+      shapeOfFace: prisonPerson
+        ? prisonPerson.physicalAttributes?.face?.description || 'Not entered'
+        : prisonerData.shapeOfFace || 'Not entered',
       shoeSize: prisonerData.shoeSize ? prisonerData.shoeSize.toString() : 'Not entered',
       warnedAboutTattooing:
         getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
@@ -365,7 +364,6 @@ export default class PersonalPageService {
           ProfileInformationType.WarnedNotToChangeAppearance,
           inmateDetail.profileInformation,
         ) || 'Needs to be warned',
-      weight,
     }
   }
 

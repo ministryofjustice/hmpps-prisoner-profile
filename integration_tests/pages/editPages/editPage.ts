@@ -19,8 +19,10 @@ export default class EditPage extends Page {
     })
   }
 
-  selectRadio = (code: string) => {
-    cy.get(`input[name=radioField][value=${code}]`).click()
+  selectRadios = (fields: { [key: string]: string }) => {
+    Object.entries(fields).forEach(([key, value]) => {
+      cy.get(`input[name=${key}][value=${value}]`).click()
+    })
   }
 
   submit = () => {

@@ -242,5 +242,30 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
+  // Eye colour
+  editRoute({
+    path: 'edit/eye-colour',
+    edit: {
+      audit: Page.EditEyeColour,
+      method: personalController.eyeColour().edit,
+    },
+    submit: {
+      audit: Page.PostEditEyeColour,
+      method: personalController.eyeColour().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/eye-colour-individual',
+    edit: {
+      audit: Page.EditEyeColour,
+      method: personalController.eyeColourIndividual().edit,
+    },
+    submit: {
+      audit: Page.PostEditEyeColour,
+      method: personalController.eyeColourIndividual().submit,
+    },
+  })
+
   return router
 }

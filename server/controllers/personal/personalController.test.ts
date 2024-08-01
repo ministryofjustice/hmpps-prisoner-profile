@@ -10,7 +10,10 @@ import PersonalController from './personalController'
 import { RadioFieldData, shoeSizeFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
-import { ReferenceDataCode } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import {
+  PrisonPersonCharacteristicCode,
+  ReferenceDataCode,
+} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -38,6 +41,8 @@ describe('PersonalController', () => {
       facialHair: { id: '', description: '' },
       face: { id: '', description: '' },
       build: { id: '', description: '' },
+      leftEyeColour: { id: '', description: '' },
+      rightEyeColour: { id: '', description: '' },
     },
   }
 
@@ -527,7 +532,7 @@ describe('PersonalController', () => {
     const fieldData: RadioFieldData = {
       pageTitle: 'Build',
       fieldName: 'build',
-      code: 'build',
+      code: PrisonPersonCharacteristicCode.build,
       auditPage: 'PAGE' as Page,
       url: 'build',
       hintText: 'Hint text',
@@ -766,6 +771,287 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/shoe-size')
+      })
+    })
+  })
+
+  /**
+   * Tests for the eye colour edit page - where both eyes are the same colour
+   */
+  describe('eyeColour', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) => controller.eyeColour().edit(req, response, () => {})
+
+      it('Renders the eye colour edit page', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+
+        await action(req, res)
+
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'eye')
+        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
+        expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColour', {
+          pageTitle: 'Eye colour - Prisoner personal details',
+          formTitle: 'Eye colour',
+          prisonerNumber: 'A1234BC',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          options: [
+            {
+              text: 'Characteristic One',
+              value: 'CODE1',
+            },
+            {
+              text: 'Characteristic Two',
+              value: 'CODE2',
+            },
+            {
+              text: 'Characteristic Three',
+              value: 'CODE3',
+            },
+          ],
+          miniBannerData: {
+            prisonerName: 'Last, First',
+            prisonerNumber: 'A1234BC',
+            cellLocation: '2-3-001',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Selects the correct radio using field value from the flash', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (key: string): any => {
+            if (key === 'requestBody') return [JSON.stringify({ eyeColour: 'CODE2' })]
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
+          }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.eyeColour().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { eyeColour: 'CODE3' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the physical characteristic', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC', {
+          leftEyeColour: 'CODE3',
+          rightEyeColour: 'CODE3',
+        })
+      })
+
+      it('Redirects to the personal page #appearance on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Eye colour updated',
+          type: FlashMessageType.success,
+          fieldName: 'eyeColour',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updatePhysicalAttributes = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour')
+      })
+    })
+  })
+
+  /**
+   * Tests for the eye colour edit page - where left and right eyes are different colours
+   */
+  describe('eyeColourIndividual', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) => controller.eyeColourIndividual().edit(req, response, () => {})
+
+      it('Renders the eye colour edit page', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+
+        await action(req, res)
+
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'eye')
+        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
+        expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColourIndividual', {
+          pageTitle: 'Left and right eye colours - Prisoner personal details',
+          formTitle: 'Left and right eye colours',
+          prisonerNumber: 'A1234BC',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          leftOptions: [
+            {
+              text: 'Characteristic One',
+              value: 'CODE1',
+            },
+            {
+              text: 'Characteristic Two',
+              value: 'CODE2',
+            },
+            {
+              text: 'Characteristic Three',
+              value: 'CODE3',
+            },
+          ],
+          rightOptions: [
+            {
+              text: 'Characteristic One',
+              value: 'CODE1',
+            },
+            {
+              text: 'Characteristic Two',
+              value: 'CODE2',
+            },
+            {
+              text: 'Characteristic Three',
+              value: 'CODE3',
+            },
+          ],
+          miniBannerData: {
+            prisonerName: 'Last, First',
+            prisonerNumber: 'A1234BC',
+            cellLocation: '2-3-001',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Selects the correct radio using field value from the flash', async () => {
+        const req = {
+          id: '1',
+          params: { prisonerNumber: 'A1234BC' },
+          flash: (key: string): any => {
+            if (key === 'requestBody') return [JSON.stringify({ leftEyeColour: 'CODE2', rightEyeColour: 'CODE3' })]
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            leftOptions: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
+            rightOptions: expect.arrayContaining([{ checked: true, text: 'Characteristic Three', value: 'CODE3' }]),
+          }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.eyeColourIndividual().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the physical characteristic', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC', {
+          leftEyeColour: 'CODE3',
+          rightEyeColour: 'CODE1',
+        })
+      })
+
+      it('Redirects to the personal page #appearance on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#appearance')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Eye colour updated',
+          type: FlashMessageType.success,
+          fieldName: 'eyeColour',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updatePhysicalAttributes = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour-individual')
       })
     })
   })
