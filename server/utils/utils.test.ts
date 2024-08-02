@@ -734,11 +734,11 @@ describe('utils', () => {
           random: 'random2',
         },
       ]
-      const selectOptions = objectToSelectOptions(data, 'id', 'desc')
+      const selectOptions = objectToSelectOptions(data, 'id', 'desc', 'id2')
 
       expect(selectOptions).toEqual([
         { value: 'id1', text: 'desc1' },
-        { value: 'id2', text: 'desc2' },
+        { value: 'id2', text: 'desc2', selected: true },
       ])
     })
   })

@@ -10,11 +10,11 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, objectToSelectOptions, SelectOption, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, objectToRadioOptions, RadioOption, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { RadioFieldData, TextFieldData } from './fieldData'
+import { RadioFieldData, smokerOrVaperFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -424,7 +424,7 @@ export default class PersonalController {
     }
   }
 
-  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: SelectOption[]) {
+  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: RadioOption[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { pageTitle, hintText, auditPage } = fieldData
       const { prisonerNumber } = req.params
@@ -460,13 +460,6 @@ export default class PersonalController {
   }
 
   smokerOrVaper() {
-    const fieldData: RadioFieldData = {
-      auditPage: Page.EditSmokerOrVaper,
-      fieldName: 'smokerOrVaper',
-      pageTitle: 'Smoker or vaper',
-      url: 'smoker-or-vaper',
-    }
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { inmateDetail, prisonerData } = req.middleware
@@ -477,28 +470,28 @@ export default class PersonalController {
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
 
         // Placeholder for now
-        const options: SelectOption[] = [
+        const options: RadioOption[] = [
           {
             text: 'Yes',
             value: 'Yes',
-            selected: fieldValue === 'Yes',
+            checked: fieldValue === 'Yes',
           },
           {
             text: 'No',
             value: 'No',
-            selected: fieldValue === 'No',
+            checked: fieldValue === 'No',
           },
         ]
 
         return this.editRadioFields(
           `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,
-          fieldData,
+          smokerOrVaperFieldData,
           options,
         )(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, code, fieldName, url } = fieldData
+        const { pageTitle, code, fieldName, url } = smokerOrVaperFieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const radioField = req.body.radioField || null
@@ -553,7 +546,7 @@ export default class PersonalController {
           requestBodyFlash?.radioField ||
           (prisonPerson?.physicalAttributes[code as keyof PrisonPersonPhysicalAttributes] as PrisonPersonCharacteristic)
             ?.id
-        const options = objectToSelectOptions(characteristics, 'id', 'description', fieldValue)
+        const options = objectToRadioOptions(characteristics, 'id', 'description', fieldValue)
 
         return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
       },
@@ -635,7 +628,7 @@ export default class PersonalController {
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
-          options: objectToSelectOptions(characteristics, 'id', 'description', fieldValue),
+          options: objectToRadioOptions(characteristics, 'id', 'description', fieldValue),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,
@@ -719,8 +712,8 @@ export default class PersonalController {
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
-          leftOptions: objectToSelectOptions(characteristics, 'id', 'description', leftEyeColour),
-          rightOptions: objectToSelectOptions(characteristics, 'id', 'description', rightEyeColour),
+          leftOptions: objectToRadioOptions(characteristics, 'id', 'description', leftEyeColour),
+          rightOptions: objectToRadioOptions(characteristics, 'id', 'description', rightEyeColour),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,

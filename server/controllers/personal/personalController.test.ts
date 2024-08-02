@@ -699,8 +699,8 @@ describe('PersonalController', () => {
           hintText: undefined,
           errors: [],
           options: expect.arrayContaining([
-            expect.objectContaining({ value: 'Yes', selected: true }),
-            expect.objectContaining({ value: 'No', selected: false }),
+            expect.objectContaining({ value: 'Yes', checked: true }),
+            expect.objectContaining({ value: 'No', checked: false }),
           ]),
           miniBannerData: {
             cellLocation: '2-3-001',
@@ -736,7 +736,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([expect.objectContaining({ value: 'No', selected: true })]),
+            options: expect.arrayContaining([expect.objectContaining({ value: 'No', checked: true })]),
           }),
         )
       })
