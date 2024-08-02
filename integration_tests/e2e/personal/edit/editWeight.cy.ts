@@ -53,6 +53,7 @@ context('Edit height (metric)', () => {
     editPageWithTitle: EditWeight,
     editPageTitle: 'Weight',
     successfulFlashMessage: 'Weight edited',
+    redirectAnchor: 'appearance',
   })
 })
 
@@ -102,5 +103,6 @@ context('Edit weight (Imperial)', () => {
     editPageWithTitle: EditWeight,
     editPageTitle: 'Weight',
     successfulFlashMessage: 'Weight edited',
+    redirectAnchor: 'appearance',
   })
 })

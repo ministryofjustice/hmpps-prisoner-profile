@@ -1,18 +1,13 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import {
-  facialHairCodesMock,
-  referenceDataDomainMock,
-  referenceDataDomainsMock,
-} from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 
-context('Edit facial hair', () => {
+context('Edit smoker or vaper', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
 
-  editPageTests({
+  editPageTests<EditPage>({
     prisonerNumber,
     prisonerName,
     bookingId,
@@ -34,18 +29,12 @@ context('Edit facial hair', () => {
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.setupPersonRefDataStubs({
-        domainsResp: referenceDataDomainsMock,
-        domainResp: referenceDataDomainMock,
-        codesResp: facialHairCodesMock,
-        codeResp: facialHairCodesMock[0],
-      })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/facial-hair`,
+    editUrl: `prisoner/${prisonerNumber}/personal/edit/smoker-or-vaper`,
     editPageWithTitle: EditPage,
-    editPageTitle: 'Facial hair',
-    successfulFlashMessage: 'Facial hair updated',
-    validInputs: { radioInputs: { radioField: 'FACIAL_HAIR_BEARDED' } },
-    redirectAnchor: 'appearance',
+    editPageTitle: 'Does John Saunders smoke or vape?',
+    successfulFlashMessage: 'Smoker or vaper updated',
+    validInputs: { radioInput: 'Yes' },
+    redirectAnchor: 'personal-details',
   })
 })

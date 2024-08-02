@@ -46,5 +46,6 @@ context('Edit hair', () => {
     editPageTitle: 'Hair type or colour',
     successfulFlashMessage: 'Hair type or colour updated',
     validInputs: { radioInputs: { radioField: 'HAIR_BROWN' } },
+    redirectAnchor: 'appearance',
   })
 })

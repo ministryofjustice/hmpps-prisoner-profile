@@ -10,14 +10,15 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, objectToSelectOptions, userHasRoles } from '../../utils/utils'
+import { formatLocation, formatName, objectToRadioOptions, RadioOption, userHasRoles } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { RadioFieldData, TextFieldData } from './fieldData'
+import { RadioFieldData, smokerOrVaperFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
+import { getProfileInformationValue, ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
 import {
   PrisonPersonCharacteristic,
   PrisonPersonCharacteristicCode,
@@ -423,6 +424,102 @@ export default class PersonalController {
     }
   }
 
+  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: RadioOption[]) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { pageTitle, hintText, auditPage } = fieldData
+      const { prisonerNumber } = req.params
+      const { prisonerData } = req.middleware
+      const { firstName, lastName, cellLocation } = prisonerData
+      const errors = req.flash('errors')
+
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: auditPage,
+      })
+
+      res.render('pages/edit/radioField', {
+        pageTitle: `${pageTitle} - Prisoner personal details`,
+        formTitle,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerBannerName,
+        errors,
+        hintText,
+        options,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  smokerOrVaper() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { inmateDetail, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
+        const fieldValue =
+          requestBodyFlash?.radioField ||
+          getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
+
+        // Placeholder for now
+        const options: RadioOption[] = [
+          {
+            text: 'Yes',
+            value: 'Yes',
+            checked: fieldValue === 'Yes',
+          },
+          {
+            text: 'No',
+            value: 'No',
+            checked: fieldValue === 'No',
+          },
+        ]
+
+        return this.editRadioFields(
+          `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,
+          smokerOrVaperFieldData,
+          options,
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { pageTitle, code, fieldName, url } = smokerOrVaperFieldData
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const radioField = req.body.radioField || null
+
+        try {
+          await this.personalPageService.updateSmokerOrVaper(clientToken, prisonerNumber, radioField)
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditPhysicalCharacteristics,
+              details: { pageTitle, code, fieldName, radioField, url },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
+
   /**
    * Handler for editing single-value radio fields.
    *
@@ -434,18 +531,13 @@ export default class PersonalController {
    *   Face shape
    *   Build
    */
-  radioField(fieldData: RadioFieldData) {
+  physicalCharacteristicRadioField(fieldData: RadioFieldData) {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, code, hintText, auditPage } = fieldData
+        const { clientToken } = req.middleware
         const { prisonerNumber } = req.params
-        const { clientToken, prisonerData } = req.middleware
-        const { firstName, lastName, cellLocation } = prisonerData
+        const { pageTitle, code } = fieldData
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const errors = req.flash('errors')
-
-        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-
         const [characteristics, prisonPerson] = await Promise.all([
           this.personalPageService.getReferenceDataCodes(clientToken, code),
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
@@ -454,29 +546,9 @@ export default class PersonalController {
           requestBodyFlash?.radioField ||
           (prisonPerson?.physicalAttributes[code as keyof PrisonPersonPhysicalAttributes] as PrisonPersonCharacteristic)
             ?.id
+        const options = objectToRadioOptions(characteristics, 'id', 'description', fieldValue)
 
-        await this.auditService.sendPageView({
-          user: res.locals.user,
-          prisonerNumber: prisonerData.prisonerNumber,
-          prisonId: prisonerData.prisonId,
-          correlationId: req.id,
-          page: auditPage,
-        })
-
-        res.render('pages/edit/radioField', {
-          pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle: pageTitle,
-          prisonerNumber,
-          breadcrumbPrisonerName: prisonerBannerName,
-          errors,
-          hintText,
-          options: objectToSelectOptions(characteristics, 'id', 'description', fieldValue),
-          miniBannerData: {
-            prisonerName: prisonerBannerName,
-            prisonerNumber,
-            cellLocation: formatLocation(cellLocation),
-          },
-        })
+        return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
@@ -556,7 +628,7 @@ export default class PersonalController {
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
-          options: objectToSelectOptions(characteristics, 'id', 'description', fieldValue),
+          options: objectToRadioOptions(characteristics, 'id', 'description', fieldValue),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,
@@ -640,8 +712,8 @@ export default class PersonalController {
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
-          leftOptions: objectToSelectOptions(characteristics, 'id', 'description', leftEyeColour),
-          rightOptions: objectToSelectOptions(characteristics, 'id', 'description', rightEyeColour),
+          leftOptions: objectToRadioOptions(characteristics, 'id', 'description', leftEyeColour),
+          rightOptions: objectToRadioOptions(characteristics, 'id', 'description', rightEyeColour),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,

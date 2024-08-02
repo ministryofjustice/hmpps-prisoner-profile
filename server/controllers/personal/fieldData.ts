@@ -63,3 +63,10 @@ export const buildFieldData: RadioFieldData = {
   url: 'build',
   auditPage: Page.EditBuild,
 }
+
+export const smokerOrVaperFieldData: RadioFieldData = {
+  auditPage: Page.EditSmokerOrVaper,
+  fieldName: 'smokerOrVaper',
+  pageTitle: 'Smoker or vaper',
+  url: 'smoker-or-vaper',
+}

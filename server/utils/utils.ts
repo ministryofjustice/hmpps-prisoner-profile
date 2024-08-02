@@ -592,10 +592,33 @@ export interface SelectOption {
   }
 }
 
+export interface RadioOption {
+  text: string
+  value: string | number
+  checked?: boolean
+  attributes?: {
+    hidden?: 'hidden'
+    disabled?: 'disabled'
+  }
+}
+
 export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {
   return refData.map(r => ({
     text: r.description,
     value: r.code,
+  }))
+}
+
+export const objectToRadioOptions = <T>(
+  array: T[],
+  id: keyof (typeof array)[number],
+  description: keyof (typeof array)[number],
+  checked?: string,
+): RadioOption[] => {
+  return array.map(obj => ({
+    text: obj[description] as string,
+    value: obj[id] as string | number,
+    ...(checked && obj[id as keyof typeof obj] === checked && { checked: true }),
   }))
 }
 
@@ -608,7 +631,7 @@ export const objectToSelectOptions = <T>(
   return array.map(obj => ({
     text: obj[description] as string,
     value: obj[id] as string | number,
-    ...(selected && obj[id as keyof typeof obj] === selected && { checked: true }),
+    ...(selected && obj[id as keyof typeof obj] === selected && { selected: true }),
   }))
 }
 
