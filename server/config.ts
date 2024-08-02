@@ -341,6 +341,9 @@ export default {
       EXI: {
         omu: process.env.EXETER_OMU_EMAIL,
       },
+      WSI: {
+        omu: process.env.WORMWOOD_SCRUBS_OMU_EMAIL,
+      },
     },
   },
   featureToggles: {
