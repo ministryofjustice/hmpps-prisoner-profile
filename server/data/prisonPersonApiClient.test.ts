@@ -24,8 +24,16 @@ describe('prisonPersonApiClient', () => {
       const prisonPerson: PrisonPerson = {
         prisonerNumber: 'A8469DY',
         physicalAttributes: {
-          height: 100,
-          weight: 100,
+          height: {
+            value: 100,
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          weight: {
+            value: 100,
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
           shoeSize: '7.5',
           hair: { id: 'BLONDE', description: 'Blonde' },
           facialHair: { id: 'MOUSTACHE', description: 'Moustache' },

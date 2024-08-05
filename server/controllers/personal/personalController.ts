@@ -100,7 +100,7 @@ export default class PersonalController {
             prisonerNumber,
             breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
             errors,
-            fieldValue: requestBodyFlash ? requestBodyFlash.editField : prisonPerson?.physicalAttributes.height,
+            fieldValue: requestBodyFlash ? requestBodyFlash.editField : prisonPerson?.physicalAttributes?.height?.value,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -143,12 +143,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const prisonPersonHeight = prisonPerson?.physicalAttributes.height
+          const prisonPersonHeight = prisonPerson?.physicalAttributes?.height?.value
 
           const { feet, inches } =
             prisonPersonHeight === undefined || prisonPersonHeight === null
               ? { feet: undefined, inches: undefined }
-              : centimetresToFeetAndInches(prisonPerson?.physicalAttributes.height)
+              : centimetresToFeetAndInches(prisonPerson?.physicalAttributes?.height?.value)
 
           const requestBodyFlash = requestBodyFromFlash<{ feet: string; inches: string }>(req)
           const errors = req.flash('errors')
@@ -237,7 +237,7 @@ export default class PersonalController {
             }),
             errors,
             fieldName: 'weight',
-            fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes.weight,
+            fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes?.weight?.value,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -268,12 +268,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const prisonPersonWeight = prisonPerson?.physicalAttributes.weight
+          const prisonPersonWeight = prisonPerson?.physicalAttributes?.weight?.value
 
           const { stone, pounds } =
             prisonPersonWeight === undefined || prisonPersonWeight === null
               ? { stone: undefined, pounds: undefined }
-              : kilogramsToStoneAndPounds(prisonPerson?.physicalAttributes.weight)
+              : kilogramsToStoneAndPounds(prisonPersonWeight)
 
           const requestBodyFlash = requestBodyFromFlash<{ stone: string; pounds: string }>(req)
           const errors = req.flash('errors')

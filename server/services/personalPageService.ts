@@ -28,7 +28,7 @@ import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import {
   PrisonPerson,
   PrisonPersonApiClient,
-  PrisonPersonPhysicalAttributes,
+  PrisonPersonPhysicalAttributesUpdate,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalPageService {
@@ -38,7 +38,7 @@ export default class PersonalPageService {
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
   ) {}
 
-  async getPrisonPerson(token: string, prisonerNumber: string, enablePrisonPerson: boolean) {
+  async getPrisonPerson(token: string, prisonerNumber: string, enablePrisonPerson: boolean): Promise<PrisonPerson> {
     if (enablePrisonPerson) {
       const apiClient = this.prisonPersonApiClientBuilder(token)
       return apiClient.getPrisonPerson(prisonerNumber)
@@ -49,7 +49,7 @@ export default class PersonalPageService {
   async updatePhysicalAttributes(
     token: string,
     prisonerNumber: string,
-    physicalAttributes: Partial<PrisonPersonPhysicalAttributes>,
+    physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
   ) {
     const apiClient = this.prisonPersonApiClientBuilder(token)
     return apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
@@ -326,8 +326,12 @@ export default class PersonalPageService {
     prisonPerson: PrisonPerson,
   ): PhysicalCharacteristics {
     return {
-      height: formatHeight(prisonPerson ? prisonPerson.physicalAttributes?.height : prisonerData.heightCentimetres),
-      weight: formatWeight(prisonPerson ? prisonPerson.physicalAttributes?.weight : prisonerData.weightKilograms),
+      height: formatHeight(
+        prisonPerson ? prisonPerson.physicalAttributes?.height?.value : prisonerData.heightCentimetres,
+      ),
+      weight: formatWeight(
+        prisonPerson ? prisonPerson.physicalAttributes?.weight?.value : prisonerData.weightKilograms,
+      ),
       build: prisonPerson
         ? prisonPerson.physicalAttributes?.build?.description || 'Not entered'
         : prisonerData.build || 'Not entered',

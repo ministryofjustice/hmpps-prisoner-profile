@@ -3,6 +3,7 @@ import {
   PrisonPerson,
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributes,
+  PrisonPersonPhysicalAttributesUpdate,
   ReferenceDataCode,
   ReferenceDataDomain,
 } from './interfaces/prisonPersonApi/prisonPersonApiClient'
@@ -23,7 +24,7 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   /* PATCH endpoint for updating one or more physical attributes */
   async updatePhysicalAttributes(
     prisonerNumber: string,
-    physicalAttributes: Partial<PrisonPersonPhysicalAttributes>,
+    physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
   ): Promise<PrisonPersonPhysicalAttributes> {
     return this.restClient.patch<PrisonPersonPhysicalAttributes>({
       path: `/prisoners/${prisonerNumber}/physical-attributes`,
