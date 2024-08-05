@@ -34,7 +34,7 @@ context('Edit smoker or vaper', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Does John Saunders smoke or vape?',
     successfulFlashMessage: 'Smoker or vaper updated',
-    validInputs: { radioInput: 'Yes' },
+    validInputs: { radioInputs: { radioField: 'Yes' } },
     redirectAnchor: 'personal-details',
   })
 })
