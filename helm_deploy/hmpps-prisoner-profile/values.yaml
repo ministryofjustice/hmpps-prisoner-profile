@@ -68,6 +68,7 @@ generic-service:
       PRESTON_OMU_EMAIL: "PRESTON_OMU_EMAIL"
       THAMESIDE_OMU_EMAIL: "THAMESIDE_OMU_EMAIL"
       WANDSWORTH_OMU_EMAIL: "WANDSWORTH_OMU_EMAIL"
+      WORMWOOD_SCRUBS_OMU_EMAIL: "WORMWOOD_SCRUBS_OMU_EMAIL"
     elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
