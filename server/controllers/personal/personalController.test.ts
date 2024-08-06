@@ -41,8 +41,8 @@ describe('PersonalController', () => {
   const defaultPrisonPerson = {
     prisonerNumber: 'ABC123',
     physicalAttributes: {
-      height: 102,
-      weight: 60,
+      height: { value: 102, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+      weight: { value: 60, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
       shoeSize: '7',
       hair: { id: '', description: '' },
       facialHair: { id: '', description: '' },
