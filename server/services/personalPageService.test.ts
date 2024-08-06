@@ -43,8 +43,8 @@ describe('PersonalPageService', () => {
       getPrisonPerson: jest.fn(async () => ({
         prisonerNumber: 'abc123',
         physicalAttributes: {
-          height: 100,
-          weight: 100,
+          height: { value: 100, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+          weight: { value: 100, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
           shoeSize: '7.5',
           hair: { id: '', description: '' },
           facialHair: { id: '', description: '' },

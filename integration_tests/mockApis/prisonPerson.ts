@@ -9,8 +9,8 @@ import { stubGetWithBody, stubPatchWithResponse } from './utils'
 const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   prisonerNumber,
   physicalAttributes: {
-    height: 150,
-    weight: 65,
+    height: { value: 150, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+    weight: { value: 65, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
     shoeSize: '7.5',
     hair: { id: '', description: '' },
     facialHair: { id: '', description: '' },

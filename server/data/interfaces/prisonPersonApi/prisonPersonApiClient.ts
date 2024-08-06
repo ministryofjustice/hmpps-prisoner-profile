@@ -1,4 +1,22 @@
+export interface ValueWithMetadata<T> {
+  value?: T
+  lastModifiedAt: string
+  lastModifiedBy: string
+}
+
 export interface PrisonPersonPhysicalAttributes {
+  height?: ValueWithMetadata<number>
+  weight?: ValueWithMetadata<number>
+  shoeSize?: string
+  hair?: PrisonPersonCharacteristic
+  facialHair?: PrisonPersonCharacteristic
+  face?: PrisonPersonCharacteristic
+  build?: PrisonPersonCharacteristic
+  leftEyeColour?: PrisonPersonCharacteristic
+  rightEyeColour?: PrisonPersonCharacteristic
+}
+
+export interface PrisonPersonPhysicalAttributesUpdate {
   height: number
   weight: number
   shoeSize: string
@@ -60,13 +78,19 @@ export interface ReferenceDataCode {
 
 export interface PrisonPersonApiClient {
   getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson>
+
   updatePhysicalAttributes(
     prisonerNumber: string,
-    physicalAttributes: Partial<PrisonPersonPhysicalAttributes>,
+    physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
   ): Promise<PrisonPersonPhysicalAttributes>
+
   updateSmokerOrVaper(prisonerNumber: string, value: string): Promise<PrisonPerson>
+
   getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]>
+
   getReferenceDataDomain(domain: string): Promise<ReferenceDataDomain>
+
   getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>
+
   getReferenceDataCode(domain: string, code: string): Promise<ReferenceDataCode>
 }
