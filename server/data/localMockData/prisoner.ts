@@ -144,7 +144,7 @@ export const PrisonerMockDataA: Prisoner = {
   leftEyeColour: 'Blue',
   rightEyeColour: 'Blue',
   shapeOfFace: 'Angular',
-  shoeSize: 10,
+  shoeSize: '10',
 }
 
 export const PrisonerMockDataB: Prisoner = {
@@ -208,7 +208,7 @@ export const PrisonerMockDataB: Prisoner = {
   leftEyeColour: 'Blue',
   rightEyeColour: 'Blue',
   shapeOfFace: 'Angular',
-  shoeSize: 10,
+  shoeSize: '10',
 }
 
 export const PrisonerOnRemandMockData: Prisoner = {
@@ -355,5 +355,5 @@ export const PrisonerOnRemandMockData: Prisoner = {
   leftEyeColour: 'Blue',
   rightEyeColour: 'Blue',
   shapeOfFace: 'Angular',
-  shoeSize: 10,
+  shoeSize: '10',
 }

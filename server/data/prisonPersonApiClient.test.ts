@@ -34,13 +34,17 @@ describe('prisonPersonApiClient', () => {
             lastModifiedAt: '2024-07-01T01:02:03.456+0100',
             lastModifiedBy: 'USER1',
           },
-          shoeSize: '7.5',
           hair: { id: 'BLONDE', description: 'Blonde' },
           facialHair: { id: 'MOUSTACHE', description: 'Moustache' },
           face: { id: 'OVAL', description: 'Oval' },
           build: { id: 'THIN', description: 'Thin' },
           leftEyeColour: { id: 'BLUE', description: 'Blue' },
           rightEyeColour: { id: 'GREEN', description: 'Green' },
+          shoeSize: {
+            value: '11',
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
         },
       }
       fakePrisonerSearchApi
