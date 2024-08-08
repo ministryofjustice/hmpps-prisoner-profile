@@ -24,10 +24,11 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
     isInUsersCaseLoad(prisonId, user) || (prisonerIsTRN(prisonId) && userHasRoles([Role.GlobalSearch], userRoles))
 
   if (isInUsersCaseLoad(prisonId, user)) {
+    const location = prisonerData.cellLocation + prisonerData.inOutStatus === 'OUT' ? ' (outside)' : ''
     profileBannerTopLinks.push({
       heading: 'Location',
       hiddenLabel: 'View location details',
-      info: prisonerData.cellLocation,
+      info: location,
       classes: '',
       url: `/prisoner/${prisonerData.prisonerNumber}/location-details`,
     })
