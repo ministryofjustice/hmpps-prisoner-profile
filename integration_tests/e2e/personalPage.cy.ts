@@ -71,10 +71,18 @@ context('When signed in', () => {
     })
 
     it('Hides the fields within personal details', () => {
-      cy.getDataQa('hidden-place-of-birth').should('exist')
-      cy.getDataQa('hidden-religion-or-belief').should('exist')
-      cy.getDataQa('hidden-sexual-orientation').should('exist')
-      cy.getDataQa('hidden-personal-details').should('exist')
+      cy.getDataQa('hidden-place-of-birth-key').should('exist')
+      cy.getDataQa('hidden-religion-or-belief-key').should('exist')
+      cy.getDataQa('hidden-sexual-orientation-key').should('exist')
+      cy.getDataQa('hidden-marriage-or-civil-partnership-key').should('exist')
+      cy.getDataQa('hidden-number-of-children-key').should('exist')
+      cy.getDataQa('hidden-languages-key').should('exist')
+      cy.getDataQa('hidden-type-of-diet-key').should('exist')
+      cy.getDataQa('hidden-smoker-or-vaper-key').should('exist')
+      cy.getDataQa('hidden-youth-offender-key').should('exist')
+      cy.getDataQa('hidden-domestic-abuse-perpetrator-key').should('exist')
+      cy.getDataQa('hidden-domestic-abuse-victim-key').should('exist')
+      cy.getDataQa('hidden-social-care-needed-key').should('exist')
     })
 
     it('Personal page should go to 404 not found page', () => {

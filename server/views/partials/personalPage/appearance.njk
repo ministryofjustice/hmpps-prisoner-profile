@@ -47,41 +47,20 @@
       <h3 class="govuk-heading-m">Physical characteristics</h3>
       {{
         govukSummaryList({
-        classes: listClasses,
-        rows: [
-        "Height" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.height, "personal/edit/height", { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'height' } ),
-        "Weight" | summaryListRowWithOptionalChangeLink(physicalCharacteristics.weight, "personal/edit/weight/imperial", { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'weight' } ),
-        "Hair type or colour" | summaryListRowWithOptionalChangeLink(
-          physicalCharacteristics.hairColour, "personal/edit/hair",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' }
-        ),
-        "Left eye colour" | summaryListRowWithOptionalChangeLink(
-            physicalCharacteristics.leftEyeColour, changeEyeColourUrl,
-            { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' }
-        ),
-        "Right eye colour" | summaryListRowWithOptionalChangeLink(
-            physicalCharacteristics.rightEyeColour, changeEyeColourUrl,
-            { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' }
-        ),
-        "Facial hair" | summaryListRowWithOptionalChangeLink(
-          physicalCharacteristics.facialHair, "personal/edit/facial-hair",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: 'facial hair type' }
-        ),
-        "Shape of face" | summaryListRowWithOptionalChangeLink(
-          physicalCharacteristics.shapeOfFace, "personal/edit/face-shape",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: 'face shape' }
-        ),
-        "Build" | summaryListRowWithOptionalChangeLink(
-          physicalCharacteristics.build, "personal/edit/build",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' }
-        ),
-        "Shoe size" | summaryListRowWithOptionalChangeLink(
-          physicalCharacteristics.shoeSize, "personal/edit/shoe-size",
-          { changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'shoeSize' }
-        ),
-        {key: { text: "Warned about tattooing"}, value: { text: physicalCharacteristics.warnedAboutTattooing } },
-        {key: { text: "Warned not to change appearance"}, value: { text: physicalCharacteristics.warnedNotToChangeAppearance } }
-        ]
+          classes: listClasses,
+          rows: toSummaryListRows([
+              { key: "Height", value: physicalCharacteristics.height, options: { dataQa: "height", href: "personal/edit/height", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'height' } },
+              { key: "Weight", value: physicalCharacteristics.weight, options: { dataQa: "weight", href: "personal/edit/weight", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'weight' } },
+              { key: "Hair type or colour", value: physicalCharacteristics.hairColour, options: { dataQa: "hair-type-or-colour", href: "personal/edit/hair", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' } },
+              { key: "Left eye colour", value: physicalCharacteristics.leftEyeColour, options: { dataQa: "left-eye-colour", href: changeEyeColourUrl, changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
+              { key: "Right eye colour", value: physicalCharacteristics.rightEyeColour, options: { dataQa: "right-eye-colour", href: changeEyeColourUrl, changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
+              { key: "Facial hair", value: physicalCharacteristics.facialHair, options: { dataQa: "facial-hair", href: "personal/edit/facial-hair", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'facialHair', hiddenText: "facial hair type" } },
+              { key: "Shape of face", value: physicalCharacteristics.shapeOfFace, options: { dataQa: "face-shape", href: "personal/edit/face-shape", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'faceShape', hiddenText: "face shape" } },
+              { key: "Build", value: physicalCharacteristics.build, options: { dataQa: "build", href: "personal/edit/build", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'build' } },
+              { key: "Shoe size", value: physicalCharacteristics.shoeSize, options: { dataQa: "shoe-size", href: "personal/edit/shoe-size", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'shoeSize' } },
+              { key: "Warned about tattooing", value: physicalCharacteristics.warnedAboutTattooing, options: { dataQa: "warned-about-tattooing" } },
+              { key: "Warned not to change appearance", value: physicalCharacteristics.warnedNotToChangeAppearance, options: { dataQa: "warned-not-to-change-appearance" } }
+          ])
         })
       }}
       {% if physicalCharacteristics.distinguishingMarks.length > 0 %}
