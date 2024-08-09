@@ -362,7 +362,7 @@ export default class PersonalController {
 
         const fieldValue = requestBodyFlash
           ? requestBodyFlash[fieldName]
-          : (prisonPerson?.physicalAttributes[fieldName] as ValueWithMetadata<string>).value
+          : (prisonPerson?.physicalAttributes[fieldName] as ValueWithMetadata<string>)?.value
 
         await this.auditService.sendPageView({
           user: res.locals.user,
