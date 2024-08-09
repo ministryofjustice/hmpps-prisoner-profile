@@ -1,11 +1,13 @@
+import { parseISO, startOfDay } from 'date-fns'
 import toPersonalLearningPlanActionPlan from './personalLearningPlanActionPlanMapper'
-import { aValidActionPlanResponse, aValidGoalResponse } from '../../data/localMockData/actionPlanResponse'
+import { aValidGetGoalsResponse } from '../../data/localMockData/getGoalsResponse'
+import aValidGoalResponse from '../../data/localMockData/goalResponse'
 import { PersonalLearningPlanActionPlan } from '../interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 
 describe('personalLearningPlanActionPlanMapper', () => {
-  it('should map ActionPlanResponse to a PersonalLearningPlanActionPlan', () => {
+  it('should map GetGoalsResponse to a PersonalLearningPlanActionPlan', () => {
     // Given
-    const apiActionPlanResponse = aValidActionPlanResponse({
+    const apiGetGoalsResponse = aValidGetGoalsResponse({
       reference: 'a20912ab-4dae-4aa4-8bc5-32319da8fceb',
       prisonNumber: 'A1234BC',
       goals: [
@@ -18,6 +20,7 @@ describe('personalLearningPlanActionPlanMapper', () => {
           updatedAt: '2023-09-23T14:43:02.094Z',
           updatedBy: 'user_b',
           updatedByDisplayName: 'User B',
+          targetCompletionDate: '2024-02-01',
         }),
         aValidGoalResponse({
           title: 'Learn basic carpentry',
@@ -28,6 +31,7 @@ describe('personalLearningPlanActionPlanMapper', () => {
           updatedAt: '2023-07-01T11:14:43.017Z',
           updatedBy: 'user_d',
           updatedByDisplayName: 'User D',
+          targetCompletionDate: '2024-02-29',
         }),
       ],
     })
@@ -38,42 +42,42 @@ describe('personalLearningPlanActionPlanMapper', () => {
         {
           reference: 'd38a6c41-13d1-1d05-13c2-24619966119b',
           title: 'Learn French',
-          createdAt: new Date('2023-01-16T09:14:43.158Z'),
+          createdAt: parseISO('2023-01-16T09:14:43.158Z'),
           createdBy: 'user_a',
           createdByDisplayName: 'User A',
-          updatedAt: new Date('2023-09-23T14:43:02.094Z'),
+          updatedAt: parseISO('2023-09-23T14:43:02.094Z'),
           updatedBy: 'user_b',
           updatedByDisplayName: 'User B',
-          sequenceNumber: 1,
+          targetCompletionDate: startOfDay(parseISO('2024-02-01')),
         },
         {
           reference: '30b8abe1-736f-426d-87a7-0e1a7f2f63ab',
           title: 'Learn basic carpentry',
-          createdAt: new Date('2023-03-20T10:24:03.651Z'),
+          createdAt: parseISO('2023-03-20T10:24:03.651Z'),
           createdBy: 'user_c',
           createdByDisplayName: 'User C',
-          updatedAt: new Date('2023-07-01T11:14:43.017Z'),
+          updatedAt: parseISO('2023-07-01T11:14:43.017Z'),
           updatedBy: 'user_d',
           updatedByDisplayName: 'User D',
-          sequenceNumber: 2,
+          targetCompletionDate: startOfDay(parseISO('2024-02-29')),
         },
       ],
-      updatedAt: new Date('2023-09-23T14:43:02.094Z'),
+      updatedAt: parseISO('2023-09-23T14:43:02.094Z'),
       updatedBy: 'user_b',
       updatedByDisplayName: 'User B',
       problemRetrievingData: false,
     }
 
     // When
-    const actual = toPersonalLearningPlanActionPlan(apiActionPlanResponse)
+    const actual = toPersonalLearningPlanActionPlan('A1234BC', apiGetGoalsResponse)
 
     // Then
     expect(actual).toEqual(expected)
   })
 
-  it('should map to PersonalLearningPlanActionPlan given ActionPlanResponse with no goals', () => {
+  it('should map to PersonalLearningPlanActionPlan given GetGoalsResponse with no goals', () => {
     // Given
-    const apiActionPlanResponse = aValidActionPlanResponse({
+    const apiGetGoalsResponse = aValidGetGoalsResponse({
       reference: 'a20912ab-4dae-4aa4-8bc5-32319da8fceb',
       prisonNumber: 'A1234BC',
       goals: [],
@@ -89,7 +93,7 @@ describe('personalLearningPlanActionPlanMapper', () => {
     }
 
     // When
-    const actual = toPersonalLearningPlanActionPlan(apiActionPlanResponse)
+    const actual = toPersonalLearningPlanActionPlan('A1234BC', apiGetGoalsResponse)
 
     // Then
     expect(actual).toEqual(expected)
