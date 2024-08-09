@@ -16,10 +16,12 @@ export default class EducationAndWorkPlanApiPersonalLearningPlanService extends 
 
   async getPrisonerActionPlan(prisonerNumber: string, systemToken: string): Promise<PersonalLearningPlanActionPlan> {
     try {
-      const plpActionPlan =
-        await this.educationAndWorkPlanApiClientBuilder(systemToken).getPrisonerActionPlan(prisonerNumber)
-      return toPersonalLearningPlanActionPlan(plpActionPlan)
+      const activeGoals = await this.educationAndWorkPlanApiClientBuilder(systemToken).getActiveGoals(prisonerNumber)
+      return toPersonalLearningPlanActionPlan(prisonerNumber, activeGoals)
     } catch (error) {
+      if (error.status === 404) {
+        return toPersonalLearningPlanActionPlan(prisonerNumber, { goals: [] })
+      }
       logger.error('Error calling the Education And Work Plan API to get the prisoner action plan', error)
       return { problemRetrievingData: true } as PersonalLearningPlanActionPlan
     }

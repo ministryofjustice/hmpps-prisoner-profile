@@ -25,7 +25,7 @@ const aValidPersonalLearningPlanGoal = (options?: {
   updatedAt?: Date
   updatedBy?: string
   updatedByDisplayName?: string
-  sequenceNumber?: number
+  targetCompletionDate?: Date
 }): PersonalLearningPlanGoal => {
   return {
     reference: options?.reference || 'd38a6c41-13d1-1d05-13c2-24619966119b',
@@ -36,7 +36,7 @@ const aValidPersonalLearningPlanGoal = (options?: {
     updatedBy: options?.updatedBy || 'asmith_gen',
     updatedByDisplayName: options?.updatedByDisplayName || 'Alex Smith',
     updatedAt: options?.updatedAt || new Date('2023-09-23T14:43:02.094Z'),
-    sequenceNumber: options?.sequenceNumber || 1,
+    targetCompletionDate: options?.targetCompletionDate || new Date('2024-02-29'),
   }
 }
 
