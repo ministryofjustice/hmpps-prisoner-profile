@@ -7,7 +7,7 @@ export interface ValueWithMetadata<T> {
 export interface PrisonPersonPhysicalAttributes {
   height?: ValueWithMetadata<number>
   weight?: ValueWithMetadata<number>
-  shoeSize?: string
+  shoeSize?: ValueWithMetadata<string>
   hair?: PrisonPersonCharacteristic
   facialHair?: PrisonPersonCharacteristic
   face?: PrisonPersonCharacteristic

@@ -1,17 +1,20 @@
 import { shoeSizeValidator } from './shoeSizeValidator'
 
 describe('shoeSizeValidator', () => {
-  it.each([{ shoeSize: '1.0' }, { shoeSize: '25.0' }, { shoeSize: '12.5' }, { shoeSize: '7.0' }])(
-    'Valid request: %s',
-    async ({ shoeSize }) => {
-      const body = { shoeSize }
-      const errors = await shoeSizeValidator(body)
-      expect(errors.length).toEqual(0)
-    },
-  )
+  it.each([
+    { shoeSize: null },
+    { shoeSize: '' },
+    { shoeSize: '1' },
+    { shoeSize: '25' },
+    { shoeSize: '12.5' },
+    { shoeSize: '7.0' },
+  ])('Valid request: %s', async ({ shoeSize }) => {
+    const body = { shoeSize }
+    const errors = await shoeSizeValidator(body)
+    expect(errors.length).toEqual(0)
+  })
 
   it.each([
-    [{ shoeSize: '' }, 'Enter a whole or half number between 1 and 25'],
     [{ shoeSize: '0' }, 'Enter a whole or half number between 1 and 25'],
     [{ shoeSize: '0.5' }, 'Enter a whole or half number between 1 and 25'],
     [{ shoeSize: '10.4' }, 'Enter a whole or half number between 1 and 25'],

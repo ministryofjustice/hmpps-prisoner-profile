@@ -43,13 +43,13 @@ describe('PersonalController', () => {
     physicalAttributes: {
       height: { value: 102, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
       weight: { value: 60, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-      shoeSize: '7',
       hair: { id: '', description: '' },
       facialHair: { id: '', description: '' },
       face: { id: '', description: '' },
       build: { id: '', description: '' },
       leftEyeColour: { id: '', description: '' },
       rightEyeColour: { id: '', description: '' },
+      shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
     },
   }
 
@@ -814,7 +814,7 @@ describe('PersonalController', () => {
           hintText: shoeSizeFieldData.hintText,
           inputClasses: shoeSizeFieldData.inputClasses,
           fieldName: shoeSizeFieldData.fieldName,
-          fieldValue: '7',
+          fieldValue: '11',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',

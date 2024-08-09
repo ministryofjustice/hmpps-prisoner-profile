@@ -23,6 +23,7 @@ import {
   PrisonPersonCharacteristic,
   PrisonPersonCharacteristicCode,
   PrisonPersonPhysicalAttributes,
+  ValueWithMetadata,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PersonalController {
@@ -359,12 +360,9 @@ export default class PersonalController {
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
         const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-        // TODO remove when API returns value
-        if (prisonPerson) {
-          prisonPerson.physicalAttributes.shoeSize = '7'
-        }
-
-        const fieldValue = requestBodyFlash ? requestBodyFlash[fieldName] : prisonPerson?.physicalAttributes[fieldName]
+        const fieldValue = requestBodyFlash
+          ? requestBodyFlash[fieldName]
+          : (prisonPerson?.physicalAttributes[fieldName] as ValueWithMetadata<string>).value
 
         await this.auditService.sendPageView({
           user: res.locals.user,

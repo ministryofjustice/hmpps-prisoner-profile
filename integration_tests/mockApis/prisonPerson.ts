@@ -11,13 +11,13 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   physicalAttributes: {
     height: { value: 150, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
     weight: { value: 65, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-    shoeSize: '7.5',
     hair: { id: '', description: '' },
     facialHair: { id: '', description: '' },
     face: { id: '', description: '' },
     build: { id: '', description: '' },
     leftEyeColour: { id: '', description: '' },
     rightEyeColour: { id: '', description: '' },
+    shoeSize: { value: '7.5', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
   },
 })
 
