@@ -82,7 +82,6 @@ export default class PersonalPageService {
     ])
 
     const addresses: Addresses = this.addresses(addressList)
-
     return {
       personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
@@ -333,7 +332,7 @@ export default class PersonalPageService {
         prisonPerson ? prisonPerson.physicalAttributes?.weight?.value : prisonerData.weightKilograms,
       ),
       build: prisonPerson
-        ? prisonPerson.physicalAttributes?.build?.description || 'Not entered'
+        ? prisonPerson.physicalAttributes?.build?.value?.description || 'Not entered'
         : prisonerData.build || 'Not entered',
       distinguishingMarks:
         inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
@@ -345,19 +344,19 @@ export default class PersonalPageService {
           type,
         })) || [],
       facialHair: prisonPerson
-        ? prisonPerson.physicalAttributes?.facialHair?.description || 'Not entered'
+        ? prisonPerson.physicalAttributes?.facialHair?.value?.description || 'Not entered'
         : prisonerData.facialHair || 'Not entered',
       hairColour: prisonPerson
-        ? prisonPerson.physicalAttributes?.hair?.description || 'Not entered'
+        ? prisonPerson.physicalAttributes?.hair?.value?.description || 'Not entered'
         : prisonerData.hairColour || 'Not entered',
       leftEyeColour: prisonPerson
-        ? prisonPerson.physicalAttributes?.leftEyeColour?.description || 'Not entered'
+        ? prisonPerson.physicalAttributes?.leftEyeColour?.value?.description || 'Not entered'
         : prisonerData.leftEyeColour || 'Not entered',
       rightEyeColour: prisonPerson
-        ? prisonPerson.physicalAttributes?.rightEyeColour?.description || 'Not entered'
+        ? prisonPerson.physicalAttributes?.rightEyeColour?.value?.description || 'Not entered'
         : prisonerData.rightEyeColour || 'Not entered',
       shapeOfFace: prisonPerson
-        ? prisonPerson.physicalAttributes?.face?.description || 'Not entered'
+        ? prisonPerson.physicalAttributes?.face?.value?.description || 'Not entered'
         : prisonerData.shapeOfFace || 'Not entered',
       shoeSize: prisonPerson
         ? prisonPerson.physicalAttributes?.shoeSize?.value || 'Not entered'
