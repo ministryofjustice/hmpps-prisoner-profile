@@ -10,8 +10,10 @@
 {% endfor %}
 {% set dateOfBirthText %}
   {{ personalDetails.dateOfBirth }}
-  ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month')}} old)
+  ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month') }} old)
 {% endset %}
+{% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
+
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
@@ -33,34 +35,32 @@
       {% endif %}
 
       <hr class="govuk-section-break govuk-section-break--visible" />
-      <dl class="govuk-summary-list">
-        {{ summaryListRow("Preferred name", personalDetails.preferredName, "preferred-name", { hideIfEmpty: true }) }}
-        {{ summaryListRow("Date of birth", dateOfBirthText, "date-of-birth") }}
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'place-of-birth', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
-          {{ summaryListRow("Place of birth", personalDetails.placeOfBirth | title, "place-of-birth") }}
-        {%- endcall -%}
-        {{ summaryListRow("Nationality", personalDetails.nationality, "nationality") }}
-        {{ summaryListRow("Other nationalities", personalDetails.otherNationalities, "other-nationalities", { hideIfEmpty: true }) }}
-        {{ summaryListRow("Ethnic group", personalDetails.ethnicGroup, "ethnic-group") }}
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'religion-or-belief', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
-          {{ summaryListRow("Religion or belief", religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), "religion-or-belief", { html: true }) }}
-        {%- endcall -%}
-        {{ summaryListRow("Sex", personalDetails.sex, "sex") }}
-        {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'sexual-orientation', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
-          {{ summaryListRow("Sexual orientation", personalDetails.sexualOrientation, "sexual-orientation") }}
-        {%- endcall -%}
-        {%- call conditionallyShow({condition:isInUsersCaseLoad(prisonId, user), id: 'personal-details', visibleClasses: 'hmpps-conditional-summary-row'}) -%}
-          {{ summaryListRow("Marriage or civil partnership status", personalDetails.marriageOrCivilPartnership, "marriage-or-civil-partnership") }}
-          {{ summaryListRow("Number of children", personalDetails.numberOfChildren, "number-of-children") }}
-          {{ summaryListRow("Languages", languagesHtml(personalDetails), "languages", { html: true }) }}
-          {{ summaryListRow("Type of diet", personalDetails.typeOfDiet, "type-of-diet") }}
-          {{ summaryListRow("Smoker or vaper", personalDetails.smokerOrVaper, "smoker-or-vaper") }}
-          {{ summaryListRow("Youth offender", personalDetails.youthOffender, "youth-offender") }}
-          {{ summaryListRow("Domestic abuse perpetrator", personalDetails.domesticAbusePerpetrator, "domestic-abuse-perpetrator", { hideIfEmpty: true }) }}
-          {{ summaryListRow("Domestic abuse victim", personalDetails.domesticAbuseVictim, "domestic-abuse-victim", { hideIfEmpty: true }) }}
-          {{ summaryListRow("Social care needed", personalDetails.socialCareNeeded, "social-care-needed", { hideIfEmpty: true }) }}
-        {%- endcall -%}
-      </dl>
+
+      {{
+        govukSummaryList({
+        classes: listClasses,
+        rows: toSummaryListRows([
+            { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
+            { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
+            { key: "Place of birth", value: personalDetails.placeOfBirth | title, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad } },
+            { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality" } },
+            { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
+            { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
+            { key: "Religion or belief", value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), options: { dataQa: "religion-or-belief", html: true, visible: inUsersCaseLoad } },
+            { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
+            { key: "Sexual orientation", value: personalDetails.sexualOrientation, options: { dataQa: "sexual-orientation", visible: inUsersCaseLoad } },
+            { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
+            { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
+            { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
+            { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad } },
+            { key: "Smoker or vaper", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, href: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
+            { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
+            { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
+            { key: "Domestic abuse victim", value: personalDetails.domesticAbuseVictim, options: { dataQa: "domestic-abuse-victim", hideIfEmpty: true, visible: inUsersCaseLoad } },
+            { key: "Social care needed", value: personalDetails.socialCareNeeded, options: { dataQa: "social-care-needed", hideIfEmpty: true, visible: inUsersCaseLoad } }
+          ])
+        })
+      }}
     </div>
   </div>
 {%- endcall -%}
