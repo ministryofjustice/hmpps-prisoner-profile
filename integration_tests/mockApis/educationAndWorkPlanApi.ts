@@ -1,17 +1,19 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
-const stubGetPlpActionPlan = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetPlpActiveGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/plpApi/action-plans/${prisonerNumber}`,
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
+      queryParameters: {
+        status: { equalTo: 'ACTIVE' },
+      },
     },
     response: {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        prisonerNumber: `${prisonerNumber}`,
         goals: [
           {
             goalReference: '10efc562-be8f-4675-9283-9ede0c19dade',
@@ -43,27 +45,32 @@ const stubGetPlpActionPlan = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
     },
   })
 
-const stubGetPlpActionPlanForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetPlpActiveGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/plpApi/action-plans/${prisonerNumber}`,
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
+      queryParameters: {
+        status: { equalTo: 'ACTIVE' },
+      },
     },
     response: {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        prisonerNumber: `${prisonerNumber}`,
         goals: [],
       },
     },
   })
 
-const stubGetPlpActionPlan500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetPlpActiveGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/plpApi/action-plans/${prisonerNumber}`,
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
+      queryParameters: {
+        status: { equalTo: 'ACTIVE' },
+      },
     },
     response: {
       status: 500,
@@ -78,4 +85,31 @@ const stubGetPlpActionPlan500Error = (prisonerNumber = 'G6123VU'): SuperAgentReq
     },
   })
 
-export default { stubGetPlpActionPlan, stubGetPlpActionPlanForPrisonerWithNoGoals, stubGetPlpActionPlan500Error }
+const stubGetPlpActiveGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
+      queryParameters: {
+        status: { equalTo: 'ACTIVE' },
+      },
+    },
+    response: {
+      status: 404,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        status: 404,
+        errorCode: null,
+        userMessage: 'Prisoner has no plan',
+        developerMessage: 'Prisoner has no plan',
+        moreInfo: null,
+      },
+    },
+  })
+
+export default {
+  stubGetPlpActiveGoals,
+  stubGetPlpActiveGoalsForPrisonerWithNoGoals,
+  stubGetPlpActiveGoals500Error,
+  stubGetPlpActiveGoalsPrisonerHasNoPlanYet,
+}

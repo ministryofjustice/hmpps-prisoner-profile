@@ -2,8 +2,8 @@
 
 <div data-qa="plp-vc2-goals">
   <p class="govuk-body" data-qa="goals-info-text">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
-  {% for goal in personalLearningPlanActionPlan.goals %}
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Goal {{ goal.sequenceNumber }}</h3>
+  {% for goal in personalLearningPlanActionPlan.goals | sort(attribute = 'targetCompletionDate') %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Achieve goal by {{ goal.targetCompletionDate | formatDate }}</h3>
     <div class="hmpps-goal-container">
       <p class="govuk-body app-u-multiline-text">{{ goal.title }}</p>
     </div>

@@ -116,7 +116,7 @@ export default interface Prisoner {
     | 'Stocky'
     | 'Stooped'
     | 'Thin'
-  shoeSize?: number
+  shoeSize?: string
   tattoos?: BodyPartDetail[]
   scars?: BodyPartDetail[]
   marks?: BodyPartDetail[]

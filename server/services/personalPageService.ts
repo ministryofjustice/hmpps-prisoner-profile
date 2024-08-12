@@ -359,7 +359,9 @@ export default class PersonalPageService {
       shapeOfFace: prisonPerson
         ? prisonPerson.physicalAttributes?.face?.description || 'Not entered'
         : prisonerData.shapeOfFace || 'Not entered',
-      shoeSize: prisonerData.shoeSize ? prisonerData.shoeSize.toString() : 'Not entered',
+      shoeSize: prisonPerson
+        ? prisonPerson.physicalAttributes?.shoeSize?.value || 'Not entered'
+        : prisonerData.shoeSize || 'Not entered',
       warnedAboutTattooing:
         getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
         'Needs to be warned',
