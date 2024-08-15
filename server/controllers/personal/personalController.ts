@@ -542,8 +542,11 @@ export default class PersonalController {
         ])
         const fieldValue =
           requestBodyFlash?.radioField ||
-          (prisonPerson?.physicalAttributes[code as keyof PrisonPersonPhysicalAttributes] as PrisonPersonCharacteristic)
-            ?.id
+          (
+            prisonPerson?.physicalAttributes[
+              code as keyof PrisonPersonPhysicalAttributes
+            ] as ValueWithMetadata<PrisonPersonCharacteristic>
+          )?.value?.id
         const options = objectToRadioOptions(characteristics, 'id', 'description', fieldValue)
 
         return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
@@ -606,8 +609,9 @@ export default class PersonalController {
 
         /* Set radio to correct eye colour if both left and right values are the same, otherwise leave unselected. */
         const eyeColour =
-          prisonPerson?.physicalAttributes.leftEyeColour?.id === prisonPerson?.physicalAttributes.rightEyeColour?.id
-            ? prisonPerson?.physicalAttributes.leftEyeColour?.id
+          prisonPerson?.physicalAttributes.leftEyeColour?.value?.id ===
+          prisonPerson?.physicalAttributes.rightEyeColour?.value?.id
+            ? prisonPerson?.physicalAttributes.leftEyeColour?.value?.id
             : undefined
 
         const fieldValue = requestBodyFlash?.eyeColour || eyeColour
@@ -693,8 +697,10 @@ export default class PersonalController {
           this.personalPageService.getReferenceDataCodes(clientToken, code),
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
-        const leftEyeColour = requestBodyFlash?.leftEyeColour || prisonPerson?.physicalAttributes.leftEyeColour?.id
-        const rightEyeColour = requestBodyFlash?.rightEyeColour || prisonPerson?.physicalAttributes.rightEyeColour?.id
+        const leftEyeColour =
+          requestBodyFlash?.leftEyeColour || prisonPerson?.physicalAttributes.leftEyeColour?.value?.id
+        const rightEyeColour =
+          requestBodyFlash?.rightEyeColour || prisonPerson?.physicalAttributes.rightEyeColour?.value?.id
 
         await this.auditService.sendPageView({
           user: res.locals.user,

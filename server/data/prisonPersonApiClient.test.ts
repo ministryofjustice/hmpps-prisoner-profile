@@ -34,12 +34,36 @@ describe('prisonPersonApiClient', () => {
             lastModifiedAt: '2024-07-01T01:02:03.456+0100',
             lastModifiedBy: 'USER1',
           },
-          hair: { id: 'BLONDE', description: 'Blonde' },
-          facialHair: { id: 'MOUSTACHE', description: 'Moustache' },
-          face: { id: 'OVAL', description: 'Oval' },
-          build: { id: 'THIN', description: 'Thin' },
-          leftEyeColour: { id: 'BLUE', description: 'Blue' },
-          rightEyeColour: { id: 'GREEN', description: 'Green' },
+          hair: {
+            value: { id: 'BLONDE', description: 'Blonde' },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          facialHair: {
+            value: { id: 'MOUSTACHE', description: 'Moustache' },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          face: {
+            value: { id: 'OVAL', description: 'Oval' },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          build: {
+            value: { id: 'THIN', description: 'Thin' },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          leftEyeColour: {
+            value: { id: 'BLUE', description: 'Blue' },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          rightEyeColour: {
+            value: { id: 'GREEN', description: 'Green' },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
           shoeSize: {
             value: '11',
             lastModifiedAt: '2024-07-01T01:02:03.456+0100',
