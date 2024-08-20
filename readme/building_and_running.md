@@ -98,13 +98,25 @@ CONTENTFUL_ACCESS_TOKEN=
 
 </details>
 
-2/ And then, to build the assets and start the app with nodemon:
+Secrets can be extracted from the relevant kubernetes namespace on Cloud Platform using the follow example command below. The values are base64 encoded and this command uses the `jq` CLI tool to decode the values.
+
+```
+kubectl get secret <INSERT_SECRET_NAME> -n hmpps-prisoner-profile-dev -o json | jq '.data|map_values(@base64d)'
+```
+
+2/ Run a local version of Redis:
+
+```
+docker-compose up redis
+```
+
+3/ And then, to build the assets and start the app with nodemon:
 
 ```
 npm run start:dev
 ```
 
-3/ To access the service, navigate in a web browser to http://localhost:3000/prisoner/XYZ
+4/ To access the service, navigate in a web browser to http://localhost:3000/prisoner/XYZ
 replacing XYZ with the desired offender number in the development environment
 
 ### Developing locally
@@ -133,6 +145,8 @@ and sign in with the following test credentials:
 
 username: `ITAG_USER`
 password: `password`
+
+**NOTE** - This requires wiremock responses to be setup (in `wiremock-local/mappings`) for the required API calls.
 
 ### Run linter
 
