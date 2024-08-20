@@ -17,7 +17,6 @@ context('Update Case Note Page', () => {
     cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetCaseNotesUsage', 'G6123VU')
     cy.task('stubGetCaseNoteTypes')
-    cy.task('stubGetCaseNoteTypesForUser')
     cy.task('stubUpdateCaseNote')
     cy.task('stubComponentsMeta', componentsNoServicesMock)
   })

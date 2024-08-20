@@ -104,7 +104,6 @@ export default class CaseNotesController {
 
   public displayAddCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const userToken = res.locals.user.token
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
       const { permissions } = req.middleware
@@ -125,7 +124,7 @@ export default class CaseNotesController {
       const errors = req.flash('errors')
 
       const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
-        token: userToken,
+        token: req.middleware.clientToken,
         canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
         canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
       })
@@ -169,7 +168,6 @@ export default class CaseNotesController {
 
   public post(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const userToken = res.locals.user.token
       const { permissions } = req.middleware
       const { prisonerNumber } = req.params
       const { type, subType, text, date, hours, minutes, refererUrl } = req.body
@@ -185,7 +183,7 @@ export default class CaseNotesController {
       const errors = req.errors || []
       if (!errors.length) {
         const allowedCaseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
-          token: userToken,
+          token: req.middleware.clientToken,
           canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
           canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
         })

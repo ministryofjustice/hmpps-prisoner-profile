@@ -171,7 +171,7 @@ describe('Case Notes Controller', () => {
     await controller.displayAddCaseNote()(req, res)
 
     expect(getCaseNoteTypesForUserSpy).toHaveBeenCalledWith({
-      token: res.locals.user.token,
+      token: req.middleware.clientToken,
       canViewSensitiveCaseNotes: false,
       canEditSensitiveCaseNotes: false,
     })
