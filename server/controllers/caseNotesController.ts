@@ -337,9 +337,7 @@ export default class CaseNotesController {
    * @param onlyActive - if true, filter out types/subtypes where activeFlag !== 'Y'
    */
   private mapCaseNoteTypes(caseNoteTypes: CaseNoteType[], type?: string, onlyActive = false) {
-    const types = caseNoteTypes
-      ?.filter(t => !onlyActive || t.activeFlag === 'Y')
-      .map(t => ({ value: t.code, text: t.description }))
+    const types = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
 
     const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = caseNoteTypes.reduce(
       (ts, t) => ({

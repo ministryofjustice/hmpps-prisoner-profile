@@ -4,7 +4,6 @@ import { QueryParams } from '../../../interfaces/QueryParams'
 export default interface CaseNoteType {
   code: string
   description: string
-  activeFlag: string
   subCodes: CaseNoteSubType[]
 }
 
