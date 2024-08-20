@@ -19,10 +19,17 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
-  if (!body.location) {
+  if (!body.location && body.appointmentType !== 'VLB') {
     errors.push({
       text: 'Select the location',
       href: '#location',
+    })
+  }
+
+  if (!body.vlbLocation && body.appointmentType === 'VLB') {
+    errors.push({
+      text: 'Select the location',
+      href: '#vlbLocation',
     })
   }
 

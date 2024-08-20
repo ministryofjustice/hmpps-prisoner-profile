@@ -35,6 +35,11 @@ import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../servi
 import config from '../config'
 import logger from '../../logger'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
+import CourtLocation from '../data/interfaces/whereaboutsApi/CourtLocation'
+import Court from '../data/interfaces/bookAVideoLinkApi/Court'
+import VideoLinkLocation from '../data/interfaces/bookAVideoLinkApi/Location'
+import Location from '../data/interfaces/prisonApi/Location'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 const { confirmBookingPrisonTemplateId, emails } = config.notifications
@@ -92,11 +97,19 @@ export default class AppointmentController {
         },
         appointmentTypes: refDataToSelectOptions(appointmentTypes),
         locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        vlbLocations: config.featureToggles.bookAVideoLinkEnabled
+          ? objectToSelectOptions(
+              await this.appointmentService.getVideoLocations(clientToken, prisonId),
+              'key',
+              'description',
+            )
+          : [],
         repeatOptions,
         today: formatDate(now.toISOString(), 'short'),
         formValues,
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
+        bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
       })
     }
   }
@@ -109,6 +122,7 @@ export default class AppointmentController {
       const {
         appointmentType,
         location,
+        vlbLocation,
         date,
         startTimeHours,
         startTimeMinutes,
@@ -124,7 +138,7 @@ export default class AppointmentController {
 
       const appointmentForm: AppointmentForm = {
         appointmentType,
-        location,
+        location: appointmentType === 'VLB' ? vlbLocation : location,
         date,
         startTimeHours,
         startTimeMinutes,
@@ -145,7 +159,7 @@ export default class AppointmentController {
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
-          locationId: Number(location),
+          locationId: appointmentType === 'VLB' ? vlbLocation : location,
           startTime,
           endTime,
           comment: comments,
@@ -296,17 +310,27 @@ export default class AppointmentController {
         clientToken,
         user.activeCaseLoadId,
       )
-      courts.push({ id: 'other', name: 'Other' })
+
+      if (!config.featureToggles.bookAVideoLinkEnabled) {
+        ;(courts as CourtLocation[]).push({ id: 'other', name: 'Other' })
+      }
 
       const { firstName, lastName, cellLocation, bookingId, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
       const { appointmentDefaults, appointmentForm, formValues } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
-      const location = locations.find(loc => loc.locationId === appointmentDefaults.locationId)?.userDescription
+      const location = config.featureToggles.bookAVideoLinkEnabled
+        ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentDefaults.locationId)?.description
+        : (locations as Location[]).find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
+
+      const hearingTypes = config.featureToggles.bookAVideoLinkEnabled
+        ? objectToSelectOptions(await this.appointmentService.getCourtHearingTypes(clientToken), 'code', 'description')
+        : []
 
       const appointmentData = {
         bookingId,
+        prisonId,
         miniBannerData: {
           prisonerName,
           prisonerNumber,
@@ -337,10 +361,16 @@ export default class AppointmentController {
       return res.render('pages/appointments/prePostAppointments', {
         pageTitle: 'Video link booking details',
         ...appointmentData,
-        courts: objectToSelectOptions(courts, 'id', 'name'),
-        locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        courts: config.featureToggles.bookAVideoLinkEnabled
+          ? objectToSelectOptions(courts as Court[], 'code', 'description')
+          : objectToSelectOptions(courts as CourtLocation[], 'id', 'name'),
+        locations: config.featureToggles.bookAVideoLinkEnabled
+          ? objectToSelectOptions(locations as VideoLinkLocation[], 'key', 'description')
+          : objectToSelectOptions(locations as Location[], 'locationId', 'userDescription'),
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
+        bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
+        hearingTypes,
       })
     }
   }
@@ -352,12 +382,14 @@ export default class AppointmentController {
 
       const {
         bookingId,
+        prisonId,
         preAppointment,
         preAppointmentLocation,
         postAppointment,
         postAppointmentLocation,
         court,
         otherCourt,
+        hearingType,
       } = req.body
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
@@ -376,34 +408,74 @@ export default class AppointmentController {
           PRE_POST_APPOINTMENT_DURATION_MINS,
         )
 
-        const videoLinkBookingForm: VideoLinkBookingForm = {
-          bookingId,
-          courtId: court,
-          court: court === 'other' ? otherCourt : undefined,
-          comment: appointmentDefaults.comment,
-          madeByTheCourt: false,
-          pre:
-            preAppointment === 'yes'
-              ? {
-                  locationId: preAppointmentLocation,
-                  startTime: formatDateTimeISO(preAppointmentStartTime),
-                  endTime: appointmentDefaults.startTime,
-                }
-              : undefined,
-          main: {
-            locationId: appointmentDefaults.locationId,
-            startTime: appointmentDefaults.startTime,
-            endTime: appointmentDefaults.endTime,
-          },
-          post:
-            postAppointment === 'yes'
-              ? {
-                  locationId: postAppointmentLocation,
-                  startTime: appointmentDefaults.endTime,
-                  endTime: formatDateTimeISO(postAppointmentEndTime),
-                }
-              : undefined,
-        }
+        const videoLinkBookingForm = !config.featureToggles.bookAVideoLinkEnabled
+          ? ({
+              bookingId,
+              courtId: court,
+              court: court === 'other' ? otherCourt : undefined,
+              comment: appointmentDefaults.comment,
+              madeByTheCourt: false,
+              pre:
+                preAppointment === 'yes'
+                  ? {
+                      locationId: preAppointmentLocation,
+                      startTime: formatDateTimeISO(preAppointmentStartTime),
+                      endTime: appointmentDefaults.startTime,
+                    }
+                  : undefined,
+              main: {
+                locationId: +appointmentDefaults.locationId,
+                startTime: appointmentDefaults.startTime,
+                endTime: appointmentDefaults.endTime,
+              },
+              post:
+                postAppointment === 'yes'
+                  ? {
+                      locationId: postAppointmentLocation,
+                      startTime: appointmentDefaults.endTime,
+                      endTime: formatDateTimeISO(postAppointmentEndTime),
+                    }
+                  : undefined,
+            } as VideoLinkBookingForm)
+          : ({
+              bookingType: 'COURT',
+              prisoners: [
+                {
+                  prisonCode: prisonId,
+                  prisonerNumber,
+                  appointments: [
+                    preAppointment === 'yes'
+                      ? {
+                          type: 'VLB_COURT_PRE',
+                          locationKey: preAppointmentLocation,
+                          date: formatDateISO(parseDate(appointmentForm.date)),
+                          startTime: timeFormat(formatDateTimeISO(preAppointmentStartTime)),
+                          endTime: timeFormat(appointmentDefaults.startTime),
+                        }
+                      : undefined,
+                    {
+                      type: 'VLB_COURT_MAIN',
+                      locationKey: appointmentDefaults.locationId,
+                      date: formatDateISO(parseDate(appointmentForm.date)),
+                      startTime: timeFormat(appointmentDefaults.startTime),
+                      endTime: timeFormat(appointmentDefaults.endTime),
+                    },
+                    postAppointment === 'yes'
+                      ? {
+                          type: 'VLB_COURT_POST',
+                          locationKey: postAppointmentLocation,
+                          date: formatDateISO(parseDate(appointmentForm.date)),
+                          startTime: timeFormat(appointmentDefaults.endTime),
+                          endTime: timeFormat(formatDateTimeISO(postAppointmentEndTime)),
+                        }
+                      : undefined,
+                  ].filter(Boolean),
+                },
+              ],
+              courtCode: court,
+              courtHearingType: hearingType,
+              comments: appointmentDefaults.comment,
+            } as CreateVideoBookingRequest)
 
         try {
           await this.appointmentService.addVideoLinkBooking(clientToken, videoLinkBookingForm)
@@ -424,6 +496,7 @@ export default class AppointmentController {
           postAppointmentLocation,
           court,
           otherCourt,
+          hearingType,
         },
       })
 
@@ -468,14 +541,21 @@ export default class AppointmentController {
         this.appointmentService.getUserEmail(clientToken, username),
       ])
 
-      const location = locations.find(loc => loc.locationId === Number(appointmentDefaults.locationId))?.userDescription
-      const preLocation = locations.find(
-        loc => loc.locationId === Number(formValues.preAppointmentLocation),
-      )?.userDescription
-      const postLocation = locations.find(
-        loc => loc.locationId === Number(formValues.postAppointmentLocation),
-      )?.userDescription
-      const courtDescription = courts.find(court => court.id === formValues.court)?.name
+      const location = config.featureToggles.bookAVideoLinkEnabled
+        ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentDefaults.locationId)?.description
+        : (locations as Location[]).find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
+
+      const preLocation = config.featureToggles.bookAVideoLinkEnabled
+        ? (locations as VideoLinkLocation[]).find(loc => loc.key === formValues.preAppointmentLocation)?.description
+        : (locations as Location[]).find(loc => loc.locationId === +formValues.preAppointmentLocation)?.userDescription
+
+      const postLocation = config.featureToggles.bookAVideoLinkEnabled
+        ? (locations as VideoLinkLocation[]).find(loc => loc.key === formValues.postAppointmentLocation)?.description
+        : (locations as Location[]).find(loc => loc.locationId === +formValues.postAppointmentLocation)?.userDescription
+
+      const courtDescription = config.featureToggles.bookAVideoLinkEnabled
+        ? (courts as Court[]).find(court => court.code === formValues.court)?.description
+        : (courts as CourtLocation[]).find(court => court.id === formValues.court)?.name
 
       const preAppointmentStartTime = subMinutes(
         new Date(appointmentDefaults.startTime),
@@ -508,6 +588,12 @@ export default class AppointmentController {
               )}`
             : undefined,
         court: formValues.court === 'other' ? formValues.otherCourt : courtDescription,
+        hearingType: config.featureToggles.bookAVideoLinkEnabled
+          ? await this.appointmentService
+              .getCourtHearingTypes(clientToken)
+              .then(r => r.find(ht => ht.code === formValues.hearingType).description)
+          : undefined,
+        bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
       }
 
       // Save appointment details to session for movement slips to pick up if needed
@@ -647,11 +733,18 @@ export default class AppointmentController {
 
       const isoDate = dateToIsoDate(req.query.date as string)
       const locationId = +req.query.locationId
+      const locationKey = req.query.locationKey as string
 
-      const [location, events] = await Promise.all([
-        this.appointmentService.getLocation(clientToken, locationId),
-        this.appointmentService.getExistingEventsForLocation(clientToken, user.activeCaseLoadId, locationId, isoDate),
-      ])
+      const location = locationId
+        ? await this.appointmentService.getLocation(clientToken, locationId)
+        : await this.appointmentService.getLocationByKey(clientToken, locationKey)
+
+      const events = await this.appointmentService.getExistingEventsForLocation(
+        clientToken,
+        user.activeCaseLoadId,
+        location.locationId,
+        isoDate,
+      )
 
       this.auditService
         .sendEvent({

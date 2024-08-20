@@ -2,7 +2,7 @@ import { AppointmentDefaults } from '../interfaces/whereaboutsApi/Appointment'
 
 export const appointmentMock: AppointmentDefaults = {
   bookingId: 1,
-  locationId: 1,
+  locationId: '1',
   appointmentType: 'CANT',
   comment: 'Comment',
   startTime: '2023-01-01T12:34:56',

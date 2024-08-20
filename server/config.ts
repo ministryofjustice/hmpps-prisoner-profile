@@ -134,6 +134,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_URL_TIMEOUT_DEADLINE', 20000))),
     },
+    bookAVideoLinkApi: {
+      url: get('BOOK_A_VIDEO_LINK_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_SECONDS', 20000)),
+        deadline: Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_SECONDS', 20000)),
+      },
+      agent: new AgentConfig(Number(get('BOOK_A_VIDEO_LINK_API_TIMEOUT_DEADLINE', 20000))),
+    },
     caseNotesApi: {
       url: get('CASE_NOTES_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
@@ -355,6 +363,7 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
+    bookAVideoLinkEnabled: toBoolean(get('BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED', 'false')),
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
     prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),

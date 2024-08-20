@@ -107,6 +107,7 @@ describe('Appointments Controller', () => {
     null,
     null,
     null,
+    null,
   ) as jest.Mocked<AppointmentService>
   const prisonerSearchService: PrisonerSearchService = new PrisonerSearchService(
     null,

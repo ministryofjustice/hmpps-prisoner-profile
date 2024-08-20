@@ -33,7 +33,7 @@ export interface AppointmentForm {
 export interface AppointmentDefaults {
   bookingId: number
   appointmentType: string
-  locationId: number
+  locationId: string
   startTime: string
   endTime: string
   comment?: string
@@ -49,11 +49,12 @@ export interface PrePostAppointmentDetails {
   // PrePost Form values
   formValues?: {
     preAppointment?: string
-    preAppointmentLocation?: number
+    preAppointmentLocation?: string
     postAppointment?: string
-    postAppointmentLocation?: number
+    postAppointmentLocation?: string
     court?: string
     otherCourt?: string
+    hearingType?: string
   }
 }
 

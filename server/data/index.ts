@@ -35,6 +35,7 @@ import AlertsApiRestClient from './alertsApiClient'
 import RedisFeatureToggleStore from './featureToggleStore/redisFeatureToggleStore'
 import InMemoryFeatureToggleStore from './featureToggleStore/inMemoryFeatureToggleStore'
 import PrisonPersonApiRestClient from './prisonPersonApiClient'
+import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
 
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo())
@@ -58,6 +59,7 @@ export const dataAccess = {
   ),
   nonAssociationsApiClientBuilder: (token: string) => new NonAssociationsApiRestClient(token),
   whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token),
+  bookAVideoLinkApiClientBuilder: (token: string) => new BookAVideoLinkRestApiClient(token),
   prisonerProfileDeliusApiClientBuilder: (token: string) => new PrisonerProfileDeliusApiRestClient(token),
   manageUsersApiClientBuilder: (token: string) => new ManageUsersApiRestClient(token),
   complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token),

@@ -60,6 +60,7 @@ ACTIVITIES_URL=https://activities-dev.prison.service.justice.gov.uk/activities
 ADJUDICATIONS_UI_URL=https://manage-adjudications-dev.hmpps.service.justice.gov.uk
 ALLOCATION_MANAGER_ENDPOINT_URL=https://dev.moic.service.justice.gov.uk
 APPOINTMENTS_URL=https://activities-dev.prison.service.justice.gov.uk/appointments
+BOOK_A_VIDEO_LINK_API_URL=https://book-a-video-link-api-dev.prison.service.justice.gov.uk
 CALCULATE_RELEASE_DATES_UI_URL=https://calculate-release-dates-dev.hmpps.service.justice.gov.uk
 CASE_NOTES_API_URL=https://dev.offender-case-notes.service.justice.gov.uk
 COMPONENT_API_LATEST=true

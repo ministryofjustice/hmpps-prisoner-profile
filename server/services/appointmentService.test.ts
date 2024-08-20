@@ -1,3 +1,4 @@
+import { Promise } from 'cypress/types/cy-bluebird'
 import AppointmentService from './appointmentService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
@@ -12,6 +13,8 @@ import { courtEventPrisonerSchedulesMock, prisonerSchedulesMock } from '../data/
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { ManageUsersApiClient } from '../data/interfaces/manageUsersApi/manageUsersApiClient'
 import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
+import { BookAVideoLinkApiClient } from '../data/interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
+import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
@@ -21,6 +24,7 @@ describe('Appointment Service', () => {
   let prisonApiClient: PrisonApiClient
   let whereaboutsApiClient: WhereaboutsApiClient
   let manageUsersApiClient: ManageUsersApiClient
+  let bookAVideoLinkApiClient: BookAVideoLinkApiClient
 
   beforeEach(() => {
     prisonApiClient = {
@@ -48,10 +52,17 @@ describe('Appointment Service', () => {
     manageUsersApiClient = {
       getUserEmail: jest.fn(async () => userEmailDataMock),
     }
+    bookAVideoLinkApiClient = {
+      addVideoLinkBooking: jest.fn(),
+      getVideoLocations: jest.fn(),
+      getCourts: jest.fn(),
+      getCourtHearingTypes: jest.fn(),
+    }
     appointmentService = new AppointmentService(
       () => prisonApiClient,
       () => whereaboutsApiClient,
       () => manageUsersApiClient,
+      () => bookAVideoLinkApiClient,
     )
   })
 

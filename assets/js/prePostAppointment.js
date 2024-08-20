@@ -8,10 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function getPrePostEventsForLocation(input, container) {
     const locationId = Number(input.value)
+    const locationKey = input.value
     const date = document.getElementById('date').value
 
     const response =
-      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`))
+      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`)) ||
+      date && locationKey && (await fetch(`/api/get-location-events?date=${date}&locationKey=${locationKey}`))
 
     if (response?.ok) {
       container.innerHTML = await response.text()
