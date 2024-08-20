@@ -52,10 +52,6 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) })
   }
 
-  async getCaseNoteTypesForUser(): Promise<CaseNoteType[]> {
-    return this.get<CaseNoteType[]>({ path: `/case-notes/types-for-user` })
-  }
-
   async addCaseNote(prisonerNumber: string, caseNote: CaseNote): Promise<CaseNote> {
     return (await this.post({ path: `/case-notes/${prisonerNumber}`, data: caseNote })) as Promise<CaseNote>
   }

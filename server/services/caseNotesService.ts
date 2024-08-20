@@ -129,9 +129,22 @@ export default class CaseNotesService {
     }
   }
 
-  public async getCaseNoteTypesForUser(token: string) {
+  public async getCaseNoteTypesForUser({
+    token,
+    canViewSensitiveCaseNotes,
+    canEditSensitiveCaseNotes,
+  }: {
+    token: string
+    canViewSensitiveCaseNotes?: boolean
+    canEditSensitiveCaseNotes?: boolean
+  }) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
-    return caseNotesApiClient.getCaseNoteTypesForUser()
+    return caseNotesApiClient.getCaseNoteTypes({
+      dpsUserSelectableOnly: true,
+      includeInactive: false,
+      includeSensitive: canViewSensitiveCaseNotes,
+      includeRestrictedUse: canEditSensitiveCaseNotes,
+    })
   }
 
   public async getCaseNote(token: string, prisonerNumber: string, caseNoteId: string): Promise<CaseNote> {

@@ -66,15 +66,6 @@ describe('caseNotesApiClient', () => {
     })
   })
 
-  describe('getCaseNoteTypesForUser', () => {
-    it('Should return data from the API', async () => {
-      mockSuccessfulCaseNotesApiCall(`/case-notes/types-for-user`, caseNoteTypesMock)
-
-      const output = await caseNotesApiClient.getCaseNoteTypesForUser()
-      expect(output).toEqual(caseNoteTypesMock)
-    })
-  })
-
   describe('addCaseNote', () => {
     it('Should return data from the API', async () => {
       const prisonerNumber = 'AB1234Y'
