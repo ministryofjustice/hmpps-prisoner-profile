@@ -111,6 +111,7 @@ describe('Case Notes Controller', () => {
           endDate: '02/02/2023',
         },
         canViewSensitiveCaseNotes: false,
+        canEditSensitiveCaseNotes: false,
         canDeleteSensitiveCaseNotes: false,
         currentUserDetails: user,
       })
@@ -155,6 +156,7 @@ describe('Case Notes Controller', () => {
           endDate: '02/02/2023',
         },
         canViewSensitiveCaseNotes: true,
+        canEditSensitiveCaseNotes: false,
         canDeleteSensitiveCaseNotes: false,
         currentUserDetails: user,
       })

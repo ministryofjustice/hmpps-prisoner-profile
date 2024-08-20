@@ -43,6 +43,7 @@ export default class CaseNotesService {
     prisonerData,
     queryParams = {},
     canViewSensitiveCaseNotes = false,
+    canEditSensitiveCaseNotes = false,
     canDeleteSensitiveCaseNotes = false,
     currentUserDetails,
   }: {
@@ -50,6 +51,7 @@ export default class CaseNotesService {
     prisonerData: Prisoner
     queryParams?: CaseNotesListQueryParams
     canViewSensitiveCaseNotes?: boolean
+    canEditSensitiveCaseNotes?: boolean
     canDeleteSensitiveCaseNotes?: boolean
     currentUserDetails: HmppsUser
   }): Promise<CaseNotesPageData> {
@@ -64,7 +66,12 @@ export default class CaseNotesService {
     const errors: HmppsError[] = validateDateRange(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList<CaseNotePageData>
-    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
+    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes({
+      dpsUserSelectableOnly: false,
+      includeInactive: true,
+      includeSensitive: canViewSensitiveCaseNotes,
+      includeRestrictedUse: canEditSensitiveCaseNotes,
+    })
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {

@@ -59,9 +59,9 @@ describe('caseNotesApiClient', () => {
 
   describe('getCaseNoteTypes', () => {
     it('Should return data from the API', async () => {
-      mockSuccessfulCaseNotesApiCall(`/case-notes/types`, caseNoteTypesMock)
+      mockSuccessfulCaseNotesApiCall(`/case-notes/types?selectableBy=ALL&include=INACTIVE`, caseNoteTypesMock)
 
-      const output = await caseNotesApiClient.getCaseNoteTypes()
+      const output = await caseNotesApiClient.getCaseNoteTypes({ includeInactive: true })
       expect(output).toEqual(caseNoteTypesMock)
     })
   })

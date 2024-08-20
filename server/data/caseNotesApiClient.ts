@@ -5,7 +5,7 @@ import config from '../config'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
 import PagedList, { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
-import CaseNoteType from './interfaces/caseNotesApi/CaseNoteType'
+import CaseNoteType, { CaseNotesTypeParams, CaseNotesTypeQueryParams } from './interfaces/caseNotesApi/CaseNoteType'
 import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
@@ -40,8 +40,16 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<PagedList<CaseNote>>({ path: `/case-notes/${offenderNumber}`, query: mapToQueryString(params) })
   }
 
-  async getCaseNoteTypes(): Promise<CaseNoteType[]> {
-    return this.get<CaseNoteType[]>({ path: `/case-notes/types` })
+  async getCaseNoteTypes(queryParams: CaseNotesTypeParams): Promise<CaseNoteType[]> {
+    const params: CaseNotesTypeQueryParams = {
+      selectableBy: queryParams.dpsUserSelectableOnly ? 'DPS_USER' : 'ALL',
+      include: [
+        ...(queryParams.includeSensitive ? ['SENSITIVE'] : []),
+        ...(queryParams.includeRestrictedUse ? ['RESTRICTED'] : []),
+        ...(queryParams.includeInactive ? ['INACTIVE'] : []),
+      ] as ('SENSITIVE' | 'RESTRICTED' | 'INACTIVE')[],
+    }
+    return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) })
   }
 
   async getCaseNoteTypesForUser(): Promise<CaseNoteType[]> {
