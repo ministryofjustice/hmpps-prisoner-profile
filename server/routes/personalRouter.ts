@@ -16,7 +16,9 @@ import {
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
+  heightFieldData,
   shoeSizeFieldData,
+  weightFieldData,
 } from '../controllers/personal/fieldData'
 import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
@@ -31,6 +33,7 @@ export default function personalRouter(services: Services): Router {
 
   const personalController = new PersonalController(
     services.personalPageService,
+    services.prisonPersonService,
     services.careNeedsService,
     services.auditService,
   )
@@ -279,6 +282,22 @@ export default function personalRouter(services: Services): Router {
       method: personalController.eyeColourIndividual().submit,
     },
   })
+
+  get(
+    `${basePath}/history/height`,
+    auditPageAccessAttempt({ services, page: Page.HeightHistory }),
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    personalController.history(heightFieldData),
+  )
+
+  get(
+    `${basePath}/history/weight`,
+    auditPageAccessAttempt({ services, page: Page.WeightHistory }),
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    personalController.history(weightFieldData),
+  )
 
   return router
 }

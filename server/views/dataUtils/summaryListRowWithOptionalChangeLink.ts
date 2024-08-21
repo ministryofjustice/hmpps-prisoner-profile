@@ -1,12 +1,14 @@
 interface Options {
   changeLinkEnabled?: boolean
-  href?: string
+  changeHref?: string
   rowUpdated?: boolean
   hiddenText?: string
   hideIfEmpty?: boolean
   visible?: boolean
   dataQa?: string
   html?: boolean
+  historyLinkEnabled?: boolean
+  historyHref?: string
 }
 
 const defaultOptions: Options = {
@@ -37,16 +39,28 @@ const summaryListRowWithOptionalChangeLink = (key: string, value: string, opts: 
     return options.html ? { html: value } : { text: value }
   }
 
-  const items = options.changeLinkEnabled
-    ? [
-        {
-          href: options.href,
-          text: 'Change',
-          visuallyHiddenText: options.hiddenText || key,
-          classes: 'govuk-link--no-visited-state',
-        },
-      ]
-    : []
+  const items = [
+    ...(options.historyLinkEnabled
+      ? [
+          {
+            href: options.historyHref,
+            text: 'History',
+            visuallyHiddenText: options.hiddenText || key,
+            classes: 'govuk-link--no-visited-state',
+          },
+        ]
+      : []),
+    ...(options.changeLinkEnabled
+      ? [
+          {
+            href: options.changeHref,
+            text: 'Change',
+            visuallyHiddenText: options.hiddenText || key,
+            classes: 'govuk-link--no-visited-state',
+          },
+        ]
+      : []),
+  ]
 
   const classes = [options.rowUpdated ? 'row-updated' : '', rowHidden ? 'govuk-summary-list__row--hidden' : ''].join(
     ' ',
