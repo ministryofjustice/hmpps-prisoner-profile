@@ -8,12 +8,12 @@ export interface PrisonPersonPhysicalAttributes {
   height?: ValueWithMetadata<number>
   weight?: ValueWithMetadata<number>
   shoeSize?: ValueWithMetadata<string>
-  hair?: PrisonPersonCharacteristic
-  facialHair?: PrisonPersonCharacteristic
-  face?: PrisonPersonCharacteristic
-  build?: PrisonPersonCharacteristic
-  leftEyeColour?: PrisonPersonCharacteristic
-  rightEyeColour?: PrisonPersonCharacteristic
+  hair?: ValueWithMetadata<PrisonPersonCharacteristic>
+  facialHair?: ValueWithMetadata<PrisonPersonCharacteristic>
+  face?: ValueWithMetadata<PrisonPersonCharacteristic>
+  build?: ValueWithMetadata<PrisonPersonCharacteristic>
+  leftEyeColour?: ValueWithMetadata<PrisonPersonCharacteristic>
+  rightEyeColour?: ValueWithMetadata<PrisonPersonCharacteristic>
 }
 
 export interface PrisonPersonPhysicalAttributesUpdate {
