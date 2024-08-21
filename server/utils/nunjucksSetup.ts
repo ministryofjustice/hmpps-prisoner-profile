@@ -8,6 +8,7 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
+  fieldHistoryToRows,
   findError,
   formatMoney,
   formatName,
@@ -161,4 +162,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
+  njkEnv.addFilter('fieldHistoryToRows', fieldHistoryToRows)
 }

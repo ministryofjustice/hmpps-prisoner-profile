@@ -84,6 +84,7 @@ describe('PersonalPageService', () => {
       getReferenceDataCodes: jest.fn(),
       getReferenceDataCode: jest.fn(),
       updateSmokerOrVaper: jest.fn(),
+      getFieldHistory: jest.fn(),
     }
   })
 
