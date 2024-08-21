@@ -76,6 +76,23 @@ export interface ReferenceDataCode {
   deactivatedBy?: string
 }
 
+export interface ReferenceDataCodeSimple {
+  id: string
+  description: string
+  listSequence: number
+  isActive: boolean
+}
+
+export interface FieldHistory {
+  valueInt: number
+  valueString: string
+  valueRef: ReferenceDataCodeSimple
+  appliesFrom: string
+  appliesTo: string
+  createdBy: string
+  source: string
+}
+
 export interface PrisonPersonApiClient {
   getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson>
 
@@ -93,4 +110,6 @@ export interface PrisonPersonApiClient {
   getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>
 
   getReferenceDataCode(domain: string, code: string): Promise<ReferenceDataCode>
+
+  getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]>
 }

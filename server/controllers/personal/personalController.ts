@@ -10,7 +10,15 @@ import {
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
-import { formatLocation, formatName, objectToRadioOptions, RadioOption, userHasRoles } from '../../utils/utils'
+import {
+  fieldHistoryToFormattedValue,
+  fieldHistoryToRows,
+  formatLocation,
+  formatName,
+  objectToRadioOptions,
+  RadioOption,
+  userHasRoles,
+} from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
@@ -25,10 +33,13 @@ import {
   PrisonPersonPhysicalAttributes,
   ValueWithMetadata,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import PrisonPersonService from '../../services/prisonPersonService'
+import { formatDateTime } from '../../utils/dateHelpers'
 
 export default class PersonalController {
   constructor(
     private readonly personalPageService: PersonalPageService,
+    private readonly prisonPersonService: PrisonPersonService,
     private readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
   ) {}
@@ -763,6 +774,42 @@ export default class PersonalController {
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
+    }
+  }
+
+  history(fieldData: TextFieldData) {
+    const { pageTitle, fieldName, formatter, auditPage } = fieldData
+
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { prisonerNumber } = req.params
+      const { clientToken, prisonerData } = req.middleware
+      const { firstName, lastName } = prisonerData
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const fieldHistory = await this.prisonPersonService.getFieldHistory(clientToken, prisonerNumber, fieldName)
+      const latestFieldHistory = fieldHistory.pop()
+      const currentValue = fieldHistoryToFormattedValue(latestFieldHistory, formatter)
+      const currentCreatedBy = latestFieldHistory.createdBy
+      const currentAppliesFrom = formatDateTime(latestFieldHistory.appliesFrom)
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: auditPage,
+      })
+
+      res.render('pages/edit/fieldHistory', {
+        pageTitle: `${pageTitle} history - Prisoner personal details`,
+        formTitle: `${pageTitle}`,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerBannerName,
+        fieldHistory: fieldHistoryToRows(fieldHistory.reverse().slice(1), formatter),
+        currentValue,
+        currentCreatedBy,
+        currentAppliesFrom,
+        miniBannerData: miniBannerData(prisonerData),
+      })
     }
   }
 }

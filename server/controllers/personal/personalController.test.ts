@@ -16,9 +16,12 @@ import {
   PrisonPersonCharacteristicCode,
   ReferenceDataCode,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import PrisonPersonService from '../../services/prisonPersonService'
+import { prisonPersonServiceMock } from '../../../tests/mocks/prisonPersonServiceMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
+  let prisonPersonService: PrisonPersonService
   let auditService: AuditService
   let careNeedsService: CareNeedsService
   let controller: PersonalController
@@ -78,8 +81,9 @@ describe('PersonalController', () => {
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
+    prisonPersonService = prisonPersonServiceMock() as PrisonPersonService
 
-    controller = new PersonalController(personalPageService, careNeedsService, auditService)
+    controller = new PersonalController(personalPageService, prisonPersonService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
   })
 
