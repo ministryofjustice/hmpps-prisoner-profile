@@ -1,4 +1,3 @@
-import { Promise } from 'cypress/types/cy-bluebird'
 import AppointmentService from './appointmentService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
@@ -14,7 +13,6 @@ import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { ManageUsersApiClient } from '../data/interfaces/manageUsersApi/manageUsersApiClient'
 import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 import { BookAVideoLinkApiClient } from '../data/interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
-import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
