@@ -38,3 +38,14 @@ export const courtLocationsSelectOptionsMock: SelectOption[] = [
     text: 'Barnsley Court',
   },
 ]
+
+export const courtLocationsSelectOptionsMockBavl: SelectOption[] = [
+  {
+    value: 'ABC',
+    text: 'Leeds Court',
+  },
+  {
+    value: 'DEF',
+    text: 'Barnsley Court',
+  },
+]

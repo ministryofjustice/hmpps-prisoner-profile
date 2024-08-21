@@ -28,7 +28,7 @@ export const locationsMock: Location[] = [
 export const locationsMockBavl: VideoLocation[] = [
   {
     key: 'VIDEO_LINK_ROOM',
-    description: 'VIDEO_LINK_ROOM',
+    description: 'Video Link Room',
     enabled: true,
   },
 ]
@@ -41,5 +41,12 @@ export const locationsSelectOptionsMock: SelectOption[] = [
   {
     value: 26152,
     text: 'Chapel',
+  },
+]
+
+export const locationsSelectOptionsMockBavl: SelectOption[] = [
+  {
+    value: 'VIDEO_LINK_ROOM',
+    text: 'Video Link Room',
   },
 ]

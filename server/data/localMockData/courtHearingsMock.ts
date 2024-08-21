@@ -1,5 +1,6 @@
 import { CourtHearing } from '../interfaces/prisonApi/CourtCase'
 import ReferenceCode from '../interfaces/bookAVideoLinkApi/ReferenceCode'
+import { SelectOption } from '../../utils/utils'
 
 export const CourtHearingsMock: CourtHearing[] = [
   {
@@ -85,5 +86,12 @@ export const courtHearingTypes: ReferenceCode[] = [
     groupCode: 'COURT_HEARING_TYPE',
     code: 'APPEAL',
     description: 'Appeal',
+  },
+]
+
+export const courtHearingTypesSelectOptions: SelectOption[] = [
+  {
+    value: 'APPEAL',
+    text: 'Appeal',
   },
 ]
