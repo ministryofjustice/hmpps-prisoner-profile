@@ -3,8 +3,8 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { appointmentTypesMock } from '../data/localMockData/appointmentTypesMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { locationsMock } from '../data/localMockData/locationsMock'
-import { courtLocationsMock } from '../data/localMockData/courtLocationsMock'
+import { locationsMock, locationsMockBavl } from '../data/localMockData/locationsMock'
+import { courtLocationsMock, courtLocationsMockBavl } from '../data/localMockData/courtLocationsMock'
 import { appointmentMock } from '../data/localMockData/appointmentMock'
 import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock'
 import { offenderSentenceDetailsMock } from '../data/localMockData/offenderSentenceDetailsMock'
@@ -13,6 +13,8 @@ import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { ManageUsersApiClient } from '../data/interfaces/manageUsersApi/manageUsersApiClient'
 import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 import { BookAVideoLinkApiClient } from '../data/interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
+import config from '../config'
+import { courtHearingTypes } from '../data/localMockData/courtHearingsMock'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
@@ -36,6 +38,7 @@ describe('Appointment Service', () => {
       getExternalTransfers: jest.fn(async () => prisonerSchedulesMock),
       getActivities: jest.fn(async () => prisonerSchedulesMock),
       getLocation: jest.fn(async () => locationsMock[0]),
+      getLocationByKey: jest.fn(async () => locationsMock[0]),
       getActivitiesAtLocation: jest.fn(async () => prisonerSchedulesMock),
       getActivityList: jest.fn(async () => prisonerSchedulesMock),
       getAgencyDetails: jest.fn(async () => AgenciesMock),
@@ -51,10 +54,10 @@ describe('Appointment Service', () => {
       getUserEmail: jest.fn(async () => userEmailDataMock),
     }
     bookAVideoLinkApiClient = {
-      addVideoLinkBooking: jest.fn(),
-      getVideoLocations: jest.fn(),
-      getCourts: jest.fn(),
-      getCourtHearingTypes: jest.fn(),
+      addVideoLinkBooking: jest.fn(async () => 12345),
+      getVideoLocations: jest.fn(async () => locationsMockBavl),
+      getCourts: jest.fn(async () => courtLocationsMockBavl),
+      getCourtHearingTypes: jest.fn(async () => courtHearingTypes),
     }
     appointmentService = new AppointmentService(
       () => prisonApiClient,
@@ -62,6 +65,8 @@ describe('Appointment Service', () => {
       () => manageUsersApiClient,
       () => bookAVideoLinkApiClient,
     )
+
+    config.featureToggles.bookAVideoLinkEnabled = false
   })
 
   afterEach(() => {
@@ -86,6 +91,16 @@ describe('Appointment Service', () => {
       expect(prisonApiClient.getLocationsForAppointments).toHaveBeenCalled()
       expect(refData).toEqual({ courts: courtLocationsMock, locations: locationsMock })
     })
+
+    it('should call API to get ref data when BVL enabled', async () => {
+      config.featureToggles.bookAVideoLinkEnabled = true
+
+      const refData = await appointmentService.getPrePostAppointmentRefData('', 'MDI')
+
+      expect(bookAVideoLinkApiClient.getCourts).toHaveBeenCalled()
+      expect(bookAVideoLinkApiClient.getVideoLocations).toHaveBeenCalled()
+      expect(refData).toEqual({ courts: courtLocationsMockBavl, locations: locationsMockBavl })
+    })
   })
 
   describe('createAppointments', () => {
@@ -103,6 +118,33 @@ describe('Appointment Service', () => {
 
       expect(whereaboutsApiClient.addVideoLinkBooking).toHaveBeenCalledWith(videoLinkBookingMock)
       expect(response).toEqual(12345)
+    })
+
+    it('should call API to create video link booking when BAVL enabled', async () => {
+      config.featureToggles.bookAVideoLinkEnabled = true
+
+      const response = await appointmentService.addVideoLinkBooking('', videoLinkBookingMock)
+
+      expect(bookAVideoLinkApiClient.addVideoLinkBooking).toHaveBeenCalledWith(videoLinkBookingMock)
+      expect(response).toEqual(12345)
+    })
+  })
+
+  describe('getVideoLocations', () => {
+    it('should call API to get location', async () => {
+      const response = await appointmentService.getVideoLocations('', 'CODE')
+
+      expect(bookAVideoLinkApiClient.getVideoLocations).toHaveBeenCalledWith('CODE')
+      expect(response).toEqual(locationsMockBavl)
+    })
+  })
+
+  describe('getCourtHearingTypes', () => {
+    it('should call API to get court hearing types', async () => {
+      const response = await appointmentService.getCourtHearingTypes('')
+
+      expect(bookAVideoLinkApiClient.getCourtHearingTypes).toHaveBeenCalled()
+      expect(response).toEqual(courtHearingTypes)
     })
   })
 
@@ -248,6 +290,15 @@ describe('Appointment Service', () => {
       const response = await appointmentService.getLocation('', 27000)
 
       expect(prisonApiClient.getLocation).toHaveBeenCalledWith(27000)
+      expect(response).toEqual(locationsMock[0])
+    })
+  })
+
+  describe('getLocationByKey', () => {
+    it('should call API to get location', async () => {
+      const response = await appointmentService.getLocationByKey('', 'CODE')
+
+      expect(prisonApiClient.getLocationByKey).toHaveBeenCalledWith('CODE')
       expect(response).toEqual(locationsMock[0])
     })
   })

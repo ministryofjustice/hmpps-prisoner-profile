@@ -3,6 +3,7 @@ import { addYears, isAfter, isBefore, isPast, isWeekend, subDays } from 'date-fn
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
+import config from '../config'
 
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
@@ -19,14 +20,14 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
-  if (!body.location && body.appointmentType !== 'VLB') {
+  if (!body.location && (body.appointmentType !== 'VLB' || !config.featureToggles.bookAVideoLinkEnabled)) {
     errors.push({
       text: 'Select the location',
       href: '#location',
     })
   }
 
-  if (!body.vlbLocation && body.appointmentType === 'VLB') {
+  if (!body.vlbLocation && body.appointmentType === 'VLB' && config.featureToggles.bookAVideoLinkEnabled) {
     errors.push({
       text: 'Select the location',
       href: '#vlbLocation',

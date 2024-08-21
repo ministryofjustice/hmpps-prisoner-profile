@@ -138,7 +138,7 @@ export default class AppointmentController {
 
       const appointmentForm: AppointmentForm = {
         appointmentType,
-        location: appointmentType === 'VLB' ? vlbLocation : location,
+        location: appointmentType === 'VLB' && config.featureToggles.bookAVideoLinkEnabled ? vlbLocation : location,
         date,
         startTimeHours,
         startTimeMinutes,
@@ -159,7 +159,7 @@ export default class AppointmentController {
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
-          locationId: appointmentType === 'VLB' ? vlbLocation : location,
+          locationId: appointmentType === 'VLB' && config.featureToggles.bookAVideoLinkEnabled ? vlbLocation : location,
           startTime,
           endTime,
           comment: comments,

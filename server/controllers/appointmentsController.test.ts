@@ -186,6 +186,8 @@ describe('Appointments Controller', () => {
       },
       refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
       errors: undefined,
+      bookAVideoLinkEnabled: false,
+      vlbLocations: [],
     })
   })
 

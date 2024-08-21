@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
     const locationId = appointmentLocationGroup.style.display === 'block' && appointmentLocationSelect.value
-    const locationKey = videoLocationGroup.style.display === 'block' && videoLocationSelect.value
+    const locationKey = videoLocationGroup?.style.display === 'block' && videoLocationSelect?.value
 
     const response =
       date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`)) ||
@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function showHideRecurring() {
     const appointmentType = appointmentTypeSelect.value
 
+    console.log(appointmentType)
+
     if (appointmentType === 'VLB') {
       recurringRadios.style.display = 'none'
     } else {
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   appointmentLocationSelect.addEventListener('change', () => {
     getEventsForLocation()
   })
-  videoLocationSelect.addEventListener('change', () => {
+  videoLocationSelect?.addEventListener('change', () => {
     getEventsForLocation()
   })
   appointmentDateInput.addEventListener('change', () => {
