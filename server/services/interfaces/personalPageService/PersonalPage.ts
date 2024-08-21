@@ -13,6 +13,7 @@ export default interface PersonalPage {
   security: Security
   learnerNeurodivergence: LearnerNeurodivergence[]
   hasCurrentBelief: boolean
+  showFieldHistoryLink: boolean
 }
 
 export interface PersonalDetails {

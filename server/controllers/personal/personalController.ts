@@ -84,6 +84,10 @@ export default class PersonalController {
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        historyEnabled:
+          personalPageData.showFieldHistoryLink &&
+          enablePrisonPerson(activeCaseLoadId) &&
+          userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
       })
     }
   }
@@ -788,8 +792,8 @@ export default class PersonalController {
       const fieldHistory = await this.prisonPersonService.getFieldHistory(clientToken, prisonerNumber, fieldName)
       const latestFieldHistory = fieldHistory.pop()
       const currentValue = fieldHistoryToFormattedValue(latestFieldHistory, formatter)
-      const currentCreatedBy = latestFieldHistory.createdBy
-      const currentAppliesFrom = formatDateTime(latestFieldHistory.appliesFrom)
+      const currentCreatedBy = latestFieldHistory?.createdBy
+      const currentAppliesFrom = formatDateTime(latestFieldHistory?.appliesFrom)
 
       await this.auditService.sendPageView({
         user: res.locals.user,
@@ -799,12 +803,12 @@ export default class PersonalController {
         page: auditPage,
       })
 
-      res.render('pages/edit/fieldHistory', {
+      return res.render('pages/edit/fieldHistory', {
         pageTitle: `${pageTitle} history - Prisoner personal details`,
         formTitle: `${pageTitle}`,
         prisonerNumber,
         breadcrumbPrisonerName: prisonerBannerName,
-        fieldHistory: fieldHistoryToRows(fieldHistory.reverse().slice(1), formatter),
+        fieldHistory: fieldHistoryToRows(fieldHistory.reverse(), formatter),
         currentValue,
         currentCreatedBy,
         currentAppliesFrom,
