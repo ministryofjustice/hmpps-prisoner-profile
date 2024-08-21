@@ -33,7 +33,7 @@ export interface AppointmentForm {
 export interface AppointmentDefaults {
   bookingId: number
   appointmentType: string
-  locationId: string
+  locationId: number
   startTime: string
   endTime: string
   comment?: string

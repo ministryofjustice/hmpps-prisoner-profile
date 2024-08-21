@@ -159,7 +159,7 @@ export default class AppointmentController {
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
-          locationId: appointmentType === 'VLB' && config.featureToggles.bookAVideoLinkEnabled ? vlbLocation : location,
+          locationId: Number(location),
           startTime,
           endTime,
           comment: comments,
@@ -321,7 +321,7 @@ export default class AppointmentController {
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const location = config.featureToggles.bookAVideoLinkEnabled
-        ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentDefaults.locationId)?.description
+        ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentForm.location)?.description
         : (locations as Location[]).find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
 
       const hearingTypes = config.featureToggles.bookAVideoLinkEnabled
@@ -530,7 +530,8 @@ export default class AppointmentController {
       if (!appointmentFlash?.length) {
         return new ServerError('PrePostAppointmentDetails not found in request')
       }
-      const { appointmentDefaults, formValues } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
+      const { appointmentDefaults, appointmentForm, formValues } =
+        appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
@@ -542,7 +543,7 @@ export default class AppointmentController {
       ])
 
       const location = config.featureToggles.bookAVideoLinkEnabled
-        ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentDefaults.locationId)?.description
+        ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentForm.location)?.description
         : (locations as Location[]).find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
 
       const preLocation = config.featureToggles.bookAVideoLinkEnabled
