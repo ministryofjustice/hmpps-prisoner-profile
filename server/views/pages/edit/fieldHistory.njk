@@ -24,7 +24,8 @@
 
   <div class="govuk-grid-row govuk-!-margin-bottom-5">
     <div class="govuk-grid-column-three-quarters">
-      <span class="govuk-!-font-size-19 govuk-!-font-weight-bold">Current value: </span> {{ currentValue }}
+      <div><span class="govuk-!-font-size-19 govuk-!-font-weight-bold">Current value: </span> {{ currentValue }}</div>
+      <div class="govuk-!-font-size-19"><span class="govuk-!-font-weight-bold">Entered by:</span> {{ currentCreatedBy }} on {{ currentAppliesFrom }}</div>
     </div>
   </div>
 
@@ -46,7 +47,7 @@
         attributes: { "data-qa": "field-history-table" }
       }) }}
 
-      <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/personal#appearance" data-qa="field-history-back-link">Return to prisoner's profile</a>
+      <a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/personal#appearance" data-qa="field-history-back-link">Return to prisoner's personal details</a>
 
     </div>
   </div>

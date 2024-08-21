@@ -34,6 +34,7 @@ import {
   ValueWithMetadata,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
+import { formatDateTime } from '../../utils/dateHelpers'
 
 export default class PersonalController {
   constructor(
@@ -785,7 +786,10 @@ export default class PersonalController {
       const { firstName, lastName } = prisonerData
       const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
       const fieldHistory = await this.prisonPersonService.getFieldHistory(clientToken, prisonerNumber, fieldName)
-      const currentValue = fieldHistoryToFormattedValue(fieldHistory.pop(), formatter)
+      const latestFieldHistory = fieldHistory.pop()
+      const currentValue = fieldHistoryToFormattedValue(latestFieldHistory, formatter)
+      const currentCreatedBy = latestFieldHistory.createdBy
+      const currentAppliesFrom = formatDateTime(latestFieldHistory.appliesFrom)
 
       await this.auditService.sendPageView({
         user: res.locals.user,
@@ -802,6 +806,8 @@ export default class PersonalController {
         breadcrumbPrisonerName: prisonerBannerName,
         fieldHistory: fieldHistoryToRows(fieldHistory.reverse().slice(1), formatter),
         currentValue,
+        currentCreatedBy,
+        currentAppliesFrom,
         miniBannerData: miniBannerData(prisonerData),
       })
     }
