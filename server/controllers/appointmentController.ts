@@ -455,7 +455,7 @@ export default class AppointmentController {
                       : undefined,
                     {
                       type: 'VLB_COURT_MAIN',
-                      locationKey: appointmentDefaults.locationId,
+                      locationKey: appointmentForm.location,
                       date: formatDateISO(parseDate(appointmentForm.date)),
                       startTime: timeFormat(appointmentDefaults.startTime),
                       endTime: timeFormat(appointmentDefaults.endTime),
