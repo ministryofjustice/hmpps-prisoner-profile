@@ -62,9 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showHideRecurring() {
     const appointmentType = appointmentTypeSelect.value
-
-    console.log(appointmentType)
-
     if (appointmentType === 'VLB') {
       recurringRadios.style.display = 'none'
     } else {
