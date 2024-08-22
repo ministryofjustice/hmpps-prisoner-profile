@@ -1,6 +1,11 @@
 import { PrePostAppointmentValidator } from './prePostAppointmentValidator'
+import config from '../config'
 
 describe('Validation middleware', () => {
+  beforeEach(() => {
+    config.featureToggles.bookAVideoLinkEnabled = false
+  })
+
   it('should pass validation with good data', async () => {
     const vlbForm = {
       preAppointment: 'no',
@@ -11,6 +16,20 @@ describe('Validation middleware', () => {
     const result = PrePostAppointmentValidator(vlbForm)
 
     expect(result).toEqual([])
+  })
+
+  it('should fail validation when hearing type is missing', async () => {
+    config.featureToggles.bookAVideoLinkEnabled = true
+
+    const vlbForm = {
+      preAppointment: 'no',
+      postAppointment: 'no',
+      court: 'CODE',
+    }
+
+    const result = PrePostAppointmentValidator(vlbForm)
+
+    expect(result).toEqual([{ text: 'Select the hearing type', href: '#hearingType' }])
   })
 
   it('should fail validation with no data', async () => {

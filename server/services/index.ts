@@ -33,6 +33,7 @@ import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
+import PrisonPersonService from './prisonPersonService'
 
 export const services = () => {
   const {
@@ -48,6 +49,7 @@ export const services = () => {
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
     manageUsersApiClientBuilder,
+    bookAVideoLinkApiClientBuilder,
     complexityApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
@@ -94,6 +96,7 @@ export const services = () => {
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
     manageUsersApiClientBuilder,
+    bookAVideoLinkApiClientBuilder,
   )
   const professionalContactsService = new ProfessionalContactsService(
     prisonApiClientBuilder,
@@ -116,6 +119,7 @@ export const services = () => {
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
+  const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -165,6 +169,7 @@ export const services = () => {
     featureToggleService,
     careNeedsService,
     permissionsService,
+    prisonPersonService,
   }
 }
 

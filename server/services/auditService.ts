@@ -66,6 +66,8 @@ export enum Page {
   ProbationDocuments = 'PROBATION_DOCUMENTS',
   VisitDetails = 'VISIT_DETAILS',
   PastCareNeeds = 'PAST_CARE_NEEDS',
+  HeightHistory = 'HEIGHT_HISTORY',
+  WeightHistory = 'WEIGHT_HISTORY',
 }
 
 // eslint-disable-next-line no-shadow

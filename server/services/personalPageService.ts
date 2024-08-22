@@ -102,6 +102,7 @@ export default class PersonalPageService {
       },
       learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
+      showFieldHistoryLink: !!prisonPerson,
     }
   }
 

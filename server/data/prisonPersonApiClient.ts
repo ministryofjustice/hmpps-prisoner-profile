@@ -1,5 +1,6 @@
 import config from '../config'
 import {
+  FieldHistory,
   PrisonPerson,
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributes,
@@ -58,5 +59,9 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   async updateSmokerOrVaper(_prisonerNumber: string, _value: string): Promise<PrisonPerson> {
     // TODO: Implement this in the future when the API exists
     return null
+  }
+
+  async getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]> {
+    return this.restClient.get<FieldHistory[]>({ path: `/prisoners/${prisonerNumber}/field-history/${field}` })
   }
 }

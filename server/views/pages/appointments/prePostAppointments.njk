@@ -115,6 +115,7 @@
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <input type="hidden" id="date" name="date" value="{{ date }}"/>
                     <input type="hidden" id="bookingId" name="bookingId" value="{{ bookingId }}"/>
+                    <input type="hidden" id="prisonId" name="prisonId" value="{{ prisonId }}"/>
 
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
@@ -187,6 +188,18 @@
                                 items: courts | addDefaultSelectedValue('Choose court') | setSelected(formValues.court),
                                 errorMessage: errors | findError("court")
                             }) }}
+
+                            {% if bookAVideoLinkEnabled %}
+                                {{ govukSelect({
+                                    name: "hearingType",
+                                    id: "hearingType",
+                                    label: {
+                                        text: "What is the hearing type?"
+                                    },
+                                    items: hearingTypes | addDefaultSelectedValue('Choose hearing type') | setSelected(formValues.hearingType),
+                                    errorMessage: errors | findError("hearingType")
+                                }) }}
+                            {% endif %}
                         </div>
                     </div>
 

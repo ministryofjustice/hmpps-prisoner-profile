@@ -3,6 +3,7 @@ import {
   PrisonPersonPhysicalAttributes,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Page } from '../../services/auditService'
+import { formatHeight, formatWeight } from '../../utils/utils'
 
 export interface FieldData {
   pageTitle: string
@@ -14,6 +15,7 @@ export interface TextFieldData extends FieldData {
   fieldName: keyof PrisonPersonPhysicalAttributes
   hintText?: string
   inputClasses?: string
+  formatter?: (value: number | string) => string
 }
 export interface RadioFieldData extends FieldData {
   fieldName: string
@@ -69,4 +71,20 @@ export const smokerOrVaperFieldData: RadioFieldData = {
   fieldName: 'smokerOrVaper',
   pageTitle: 'Smoker or vaper',
   url: 'smoker-or-vaper',
+}
+
+export const heightFieldData: TextFieldData = {
+  auditPage: Page.HeightHistory,
+  fieldName: 'height',
+  pageTitle: 'Height',
+  url: 'height',
+  formatter: formatHeight,
+}
+
+export const weightFieldData: TextFieldData = {
+  auditPage: Page.WeightHistory,
+  fieldName: 'weight',
+  pageTitle: 'Weight',
+  url: 'weight',
+  formatter: formatWeight,
 }
