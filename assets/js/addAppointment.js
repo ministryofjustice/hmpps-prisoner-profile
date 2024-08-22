@@ -71,17 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showHideVlbLocations() {
     const appointmentType = appointmentTypeSelect.value
-    if (videoLocationGroup !== null) {
-      if (appointmentType === 'VLB') {
-        appointmentLocationGroup.style.display = 'none'
-        videoLocationGroup.style.display = 'block'
-      } else {
-        appointmentLocationGroup.style.display = 'block'
-        videoLocationGroup.style.display = 'none'
-      }
-
-      getEventsForLocation()
+    if (appointmentType === 'VLB' && videoLocationGroup) {
+      appointmentLocationGroup.style.display = 'none'
+      videoLocationGroup.style.display = 'block'
+    } else {
+      appointmentLocationGroup.style.display = 'block'
+      videoLocationGroup ? videoLocationGroup.style.display = 'none' : null
     }
+
+    getEventsForLocation()
   }
 
   appointmentTypeSelect.addEventListener('change', () => {
