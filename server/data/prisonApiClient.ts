@@ -462,6 +462,10 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<Location>({ path: `/api/locations/${locationId}` })
   }
 
+  async getLocationByKey(locationKey: string): Promise<Location> {
+    return this.restClient.get<Location>({ path: `/api/locations/code/${locationKey}` })
+  }
+
   async getActivitiesAtLocation(
     locationId: number,
     date: string,

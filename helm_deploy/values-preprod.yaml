@@ -77,6 +77,7 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     PRISON_PERSON_API_ENABLED: "true"
     PRISON_PERSON_API_ENABLED_PRISONS: "KMI"
+    BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "false"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
