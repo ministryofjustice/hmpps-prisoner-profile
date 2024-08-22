@@ -754,7 +754,7 @@ export const fieldHistoryToFormattedValue = (
   field: FieldHistory,
   formatValue: (value: number | string) => string = value => value as string,
 ): string => {
-  const value = field.valueInt || field.valueString || field.valueRef?.description
+  const value = field?.valueInt || field?.valueString || field?.valueRef?.description
   return value ? formatValue(value) : 'Not entered'
 }
 

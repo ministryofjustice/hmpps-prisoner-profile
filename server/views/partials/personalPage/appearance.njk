@@ -49,8 +49,8 @@
         govukSummaryList({
           classes: listClasses,
           rows: toSummaryListRows([
-              { key: "Height", value: physicalCharacteristics.height, options: { dataQa: "height", changeHref: "personal/edit/height", changeLinkEnabled: editEnabled, historyLinkEnabled: true, historyHref: 'personal/history/height', rowUpdated: flashMessage.fieldName === 'height' } },
-              { key: "Weight", value: physicalCharacteristics.weight, options: { dataQa: "weight", changeHref: "personal/edit/weight", changeLinkEnabled: editEnabled, historyLinkEnabled: true, historyHref: 'personal/history/weight', rowUpdated: flashMessage.fieldName === 'weight' } },
+              { key: "Height", value: physicalCharacteristics.height, options: { dataQa: "height", changeHref: "personal/edit/height", changeLinkEnabled: editEnabled, historyLinkEnabled: historyEnabled, historyHref: 'personal/history/height', rowUpdated: flashMessage.fieldName === 'height' } },
+              { key: "Weight", value: physicalCharacteristics.weight, options: { dataQa: "weight", changeHref: "personal/edit/weight", changeLinkEnabled: editEnabled, historyLinkEnabled: historyEnabled, historyHref: 'personal/history/weight', rowUpdated: flashMessage.fieldName === 'weight' } },
               { key: "Hair type or colour", value: physicalCharacteristics.hairColour, options: { dataQa: "hair-type-or-colour", changeHref: "personal/edit/hair", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'hair' } },
               { key: "Left eye colour", value: physicalCharacteristics.leftEyeColour, options: { dataQa: "left-eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
               { key: "Right eye colour", value: physicalCharacteristics.rightEyeColour, options: { dataQa: "right-eye-colour", changeHref: changeEyeColourUrl, changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'eyeColour' } },
