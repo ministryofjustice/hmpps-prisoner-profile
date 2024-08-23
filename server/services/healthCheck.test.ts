@@ -1,6 +1,6 @@
+import type { HealthCheckCallback, HealthCheckService } from './healthCheck'
 import healthCheck from './healthCheck'
 import type { ApplicationInfo } from '../applicationInfo'
-import type { HealthCheckCallback, HealthCheckService } from './healthCheck'
 
 describe('Healthcheck', () => {
   const testAppInfo: ApplicationInfo = {
@@ -11,8 +11,9 @@ describe('Healthcheck', () => {
     branchName: 'main',
   }
 
-  it('Healthcheck reports healthy', done => {
-    const successfulChecks = [successfulCheck('check1'), successfulCheck('check2')]
+  it('Healthcheck reports UP', done => {
+    const nonResilientChecks = [successfulCheck('check1'), successfulCheck('check2')]
+    const resilientChecks = [successfulCheck('check3'), successfulCheck('check4')]
 
     const callback: HealthCheckCallback = result => {
       expect(result).toEqual(
@@ -27,17 +28,26 @@ describe('Healthcheck', () => {
               status: 'UP',
               details: 'some message',
             },
+            check3: {
+              status: 'UP',
+              details: 'some message',
+            },
+            check4: {
+              status: 'UP',
+              details: 'some message',
+            },
           },
         }),
       )
       done()
     }
 
-    healthCheck(testAppInfo, callback, successfulChecks)
+    healthCheck(testAppInfo, callback, nonResilientChecks, resilientChecks)
   })
 
-  it('Healthcheck reports unhealthy', done => {
-    const successfulChecks = [successfulCheck('check1'), erroredCheck('check2')]
+  it('Healthcheck reports DOWN', done => {
+    const nonResilientChecks = [successfulCheck('check1'), erroredCheck('check2')]
+    const resilientChecks = [successfulCheck('check3'), successfulCheck('check4')]
 
     const callback: HealthCheckCallback = result => {
       expect(result).toEqual(
@@ -52,13 +62,55 @@ describe('Healthcheck', () => {
               status: 'DOWN',
               details: 'some error',
             },
+            check3: {
+              status: 'UP',
+              details: 'some message',
+            },
+            check4: {
+              status: 'UP',
+              details: 'some message',
+            },
           },
         }),
       )
       done()
     }
 
-    healthCheck(testAppInfo, callback, successfulChecks)
+    healthCheck(testAppInfo, callback, nonResilientChecks, resilientChecks)
+  })
+
+  it('Healthcheck reports DEGRADED', done => {
+    const nonResilientChecks = [successfulCheck('check1'), successfulCheck('check2')]
+    const resilientChecks = [successfulCheck('check3'), erroredCheck('check4')]
+
+    const callback: HealthCheckCallback = result => {
+      expect(result).toEqual(
+        expect.objectContaining({
+          status: 'DEGRADED',
+          components: {
+            check1: {
+              status: 'UP',
+              details: 'some message',
+            },
+            check2: {
+              status: 'UP',
+              details: 'some message',
+            },
+            check3: {
+              status: 'UP',
+              details: 'some message',
+            },
+            check4: {
+              status: 'DOWN',
+              details: 'some error',
+            },
+          },
+        }),
+      )
+      done()
+    }
+
+    healthCheck(testAppInfo, callback, nonResilientChecks, resilientChecks)
   })
 })
 
