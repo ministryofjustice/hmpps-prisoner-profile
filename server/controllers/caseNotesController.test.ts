@@ -172,7 +172,6 @@ describe('Case Notes Controller', () => {
 
     expect(getCaseNoteTypesForUserSpy).toHaveBeenCalledWith({
       token: req.middleware.clientToken,
-      canViewSensitiveCaseNotes: false,
       canEditSensitiveCaseNotes: false,
     })
     expect(res.render).toHaveBeenCalledWith('pages/caseNotes/addCaseNote', {

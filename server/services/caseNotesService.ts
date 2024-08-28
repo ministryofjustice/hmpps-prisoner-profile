@@ -69,8 +69,7 @@ export default class CaseNotesService {
     const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes({
       dpsUserSelectableOnly: false,
       includeInactive: true,
-      includeSensitive: canViewSensitiveCaseNotes,
-      includeRestrictedUse: canEditSensitiveCaseNotes,
+      includeRestricted: canEditSensitiveCaseNotes,
     })
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
@@ -131,19 +130,16 @@ export default class CaseNotesService {
 
   public async getCaseNoteTypesForUser({
     token,
-    canViewSensitiveCaseNotes,
     canEditSensitiveCaseNotes,
   }: {
     token: string
-    canViewSensitiveCaseNotes?: boolean
     canEditSensitiveCaseNotes?: boolean
   }) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     return caseNotesApiClient.getCaseNoteTypes({
       dpsUserSelectableOnly: true,
       includeInactive: false,
-      includeSensitive: canViewSensitiveCaseNotes,
-      includeRestrictedUse: canEditSensitiveCaseNotes,
+      includeRestricted: canEditSensitiveCaseNotes,
     })
   }
 

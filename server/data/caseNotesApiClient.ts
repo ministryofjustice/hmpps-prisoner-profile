@@ -62,10 +62,9 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     const params: CaseNotesTypeQueryParams = {
       selectableBy: queryParams.dpsUserSelectableOnly ? 'DPS_USER' : 'ALL',
       include: [
-        ...(queryParams.includeSensitive ? ['SENSITIVE'] : []),
-        ...(queryParams.includeRestrictedUse ? ['RESTRICTED'] : []),
+        ...(queryParams.includeRestricted ? ['RESTRICTED'] : []),
         ...(queryParams.includeInactive ? ['INACTIVE'] : []),
-      ] as ('SENSITIVE' | 'RESTRICTED' | 'INACTIVE')[],
+      ] as ('RESTRICTED' | 'INACTIVE')[],
     }
     return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: this.mapCaseNoteTypesQueryString(params) })
   }

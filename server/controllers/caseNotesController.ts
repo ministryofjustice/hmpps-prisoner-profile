@@ -125,7 +125,6 @@ export default class CaseNotesController {
 
       const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
         token: req.middleware.clientToken,
-        canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
         canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
       })
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(caseNoteTypes, formValues.type, true)
@@ -184,7 +183,6 @@ export default class CaseNotesController {
       if (!errors.length) {
         const allowedCaseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
           token: req.middleware.clientToken,
-          canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
           canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
         })
         if (!allowedCaseNoteTypes.some(allowedType => allowedType.code === type)) {
