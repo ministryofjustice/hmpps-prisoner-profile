@@ -61,12 +61,10 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   async getCaseNoteTypes(queryParams: CaseNotesTypeParams): Promise<CaseNoteType[]> {
     const params: CaseNotesTypeQueryParams = {
       selectableBy: queryParams.dpsUserSelectableOnly ? 'DPS_USER' : 'ALL',
-      include: [
-        ...(queryParams.includeRestricted ? ['RESTRICTED'] : []),
-        ...(queryParams.includeInactive ? ['INACTIVE'] : []),
-      ] as ('RESTRICTED' | 'INACTIVE')[],
+      includeInactive: queryParams.includeInactive,
+      includeRestricted: queryParams.includeRestricted,
     }
-    return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: this.mapCaseNoteTypesQueryString(params) })
+    return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) })
   }
 
   async addCaseNote(prisonerNumber: string, caseNote: CaseNote): Promise<CaseNote> {

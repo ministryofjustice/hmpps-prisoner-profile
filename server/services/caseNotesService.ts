@@ -43,7 +43,6 @@ export default class CaseNotesService {
     prisonerData,
     queryParams = {},
     canViewSensitiveCaseNotes = false,
-    canEditSensitiveCaseNotes = false,
     canDeleteSensitiveCaseNotes = false,
     currentUserDetails,
   }: {
@@ -51,7 +50,6 @@ export default class CaseNotesService {
     prisonerData: Prisoner
     queryParams?: CaseNotesListQueryParams
     canViewSensitiveCaseNotes?: boolean
-    canEditSensitiveCaseNotes?: boolean
     canDeleteSensitiveCaseNotes?: boolean
     currentUserDetails: HmppsUser
   }): Promise<CaseNotesPageData> {
@@ -69,7 +67,7 @@ export default class CaseNotesService {
     const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes({
       dpsUserSelectableOnly: false,
       includeInactive: true,
-      includeRestricted: canEditSensitiveCaseNotes,
+      includeRestricted: true,
     })
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 

@@ -14,6 +14,7 @@ export interface CaseNotesTypeParams extends QueryParams {
 }
 
 export interface CaseNotesTypeQueryParams extends QueryParams {
-  selectableBy: 'ALL' | 'DPS_USER'
-  include: ('INACTIVE' | 'RESTRICTED')[]
+  selectableBy?: 'ALL' | 'DPS_USER'
+  includeInactive?: boolean
+  includeRestricted?: boolean
 }

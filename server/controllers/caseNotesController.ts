@@ -63,7 +63,6 @@ export default class CaseNotesController {
           prisonerData,
           queryParams,
           canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
-          canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
           canDeleteSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.delete,
           currentUserDetails: res.locals.user,
         }),
