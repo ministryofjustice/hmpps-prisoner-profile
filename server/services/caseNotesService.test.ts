@@ -20,7 +20,6 @@ describe('Case Notes Page', () => {
     prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
     caseNotesApiClientSpy = {
       getCaseNoteTypes: jest.fn(async () => caseNoteTypesMock),
-      getCaseNoteTypesForUser: jest.fn(async () => caseNoteTypesMock),
       getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
       addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
       updateCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
@@ -69,10 +68,10 @@ describe('Case Notes Page', () => {
   })
 
   describe('Get Case Note Types for HmppsUser', () => {
-    it('should call Case Notes API tp get case notes types for user', async () => {
-      await caseNotesService.getCaseNoteTypesForUser('')
+    it('should call Case Notes API to get case notes types for user', async () => {
+      await caseNotesService.getCaseNoteTypesForUser({ token: '' })
 
-      expect(caseNotesApiClientSpy.getCaseNoteTypesForUser).toHaveBeenCalled()
+      expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
     })
   })
 

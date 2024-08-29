@@ -64,7 +64,11 @@ export default class CaseNotesService {
     const errors: HmppsError[] = validateDateRange(queryParams.startDate, queryParams.endDate)
 
     let pagedCaseNotes: PagedList<CaseNotePageData>
-    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes()
+    const caseNoteTypes = await caseNotesApiClient.getCaseNoteTypes({
+      dpsUserSelectableOnly: false,
+      includeInactive: true,
+      includeRestricted: true,
+    })
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {
@@ -122,9 +126,19 @@ export default class CaseNotesService {
     }
   }
 
-  public async getCaseNoteTypesForUser(token: string) {
+  public async getCaseNoteTypesForUser({
+    token,
+    canEditSensitiveCaseNotes,
+  }: {
+    token: string
+    canEditSensitiveCaseNotes?: boolean
+  }) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
-    return caseNotesApiClient.getCaseNoteTypesForUser()
+    return caseNotesApiClient.getCaseNoteTypes({
+      dpsUserSelectableOnly: true,
+      includeInactive: false,
+      includeRestricted: canEditSensitiveCaseNotes,
+    })
   }
 
   public async getCaseNote(token: string, prisonerNumber: string, caseNoteId: string): Promise<CaseNote> {

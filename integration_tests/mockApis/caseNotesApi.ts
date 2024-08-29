@@ -109,23 +109,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/types`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: caseNoteTypesMock,
-      },
-    })
-  },
-
-  stubGetCaseNoteTypesForUser: () => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/casenotes/case-notes/types-for-user`,
+        urlPathPattern: `/casenotes/case-notes/types*`,
       },
       response: {
         status: 200,

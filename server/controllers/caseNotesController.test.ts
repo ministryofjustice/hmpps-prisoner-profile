@@ -168,7 +168,10 @@ describe('Case Notes Controller', () => {
 
     await controller.displayAddCaseNote()(req, res)
 
-    expect(getCaseNoteTypesForUserSpy).toHaveBeenCalledWith(res.locals.user.token)
+    expect(getCaseNoteTypesForUserSpy).toHaveBeenCalledWith({
+      token: req.middleware.clientToken,
+      canEditSensitiveCaseNotes: false,
+    })
     expect(res.render).toHaveBeenCalledWith('pages/caseNotes/addCaseNote', {
       today: formatDate(new Date().toISOString(), 'short'),
       refererUrl: req.headers.referer,
@@ -280,6 +283,16 @@ describe('Case Notes Controller', () => {
           refererUrl: 'http://referer',
         },
         flash: jest.fn(),
+        middleware: {
+          ...req.middleware,
+          permissions: {
+            sensitiveCaseNotes: {
+              view: true,
+              edit: false,
+              delete: false,
+            },
+          },
+        },
       }
 
       jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNoteTypesForUser').mockResolvedValue([])
