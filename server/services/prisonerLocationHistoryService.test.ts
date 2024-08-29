@@ -33,7 +33,6 @@ describe('prisonerLocationHistoryService', () => {
 
     caseNotesApiClient = {
       getCaseNoteTypes: jest.fn(),
-      getCaseNoteTypesForUser: jest.fn(),
       getCaseNotes: jest.fn(),
       addCaseNote: jest.fn(),
       updateCaseNote: jest.fn(),
