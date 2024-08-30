@@ -2,7 +2,7 @@ import { TelemetryClient } from 'applicationinsights'
 import { PrisonUser } from '../../interfaces/HmppsUser'
 
 export default class MetricsService {
-  constructor(private readonly telemetryClient: TelemetryClient) {}
+  constructor(private readonly telemetryClient?: TelemetryClient) {}
 
   trackPrisonPersonUpdate({
     prisonerNumber,
@@ -13,7 +13,7 @@ export default class MetricsService {
     fieldsUpdated: string[]
     user: PrisonUser
   }) {
-    this.telemetryClient.trackEvent({
+    this.telemetryClient?.trackEvent({
       name: 'prisoner-profile-prison-person-updated',
       properties: {
         prisonerNumber,
