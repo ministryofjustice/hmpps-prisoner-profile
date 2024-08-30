@@ -18,11 +18,16 @@ import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodi
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import MetricsService from './metrics/metricsService'
+import { prisonUserMock } from '../data/localMockData/user'
+
+jest.mock('./metrics/metricsService')
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
   let prisonPersonApiClient: PrisonPersonApiClient
+  let metricsService: MetricsService
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -86,6 +91,8 @@ describe('PersonalPageService', () => {
       updateSmokerOrVaper: jest.fn(),
       getFieldHistory: jest.fn(),
     }
+
+    metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
   })
 
   const constructService = () =>
@@ -93,6 +100,7 @@ describe('PersonalPageService', () => {
       () => prisonApiClient,
       () => curiousApiClient,
       () => prisonPersonApiClient,
+      metricsService,
     )
 
   describe('Getting information from the Prison API', () => {
@@ -517,17 +525,34 @@ describe('PersonalPageService', () => {
   })
 
   describe('Prison Person API Enabled', () => {
-    it('Sets the height and weight on the prison person API', async () => {
+    it('Gets the height and weight from the prison person API', async () => {
       const data = await constructService().get('token', PrisonerMockDataA, true)
       expect(data.physicalCharacteristics.height).toBe('1m')
       expect(data.physicalCharacteristics.weight).toBe('100kg')
     })
   })
 
+  describe('Update physical attributes', () => {
+    it('Makes a call to the prison person api to update physical attributes', async () => {
+      await constructService().updatePhysicalAttributes('token', prisonUserMock, 'A1234AA', { height: 123 })
+      expect(prisonPersonApiClient.updatePhysicalAttributes).toHaveBeenCalledWith('A1234AA', { height: 123 })
+      expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['height'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
   describe('Update Smoker or Vaper', () => {
     it('Updates the smoker or vaper on the API', async () => {
-      await constructService().updateSmokerOrVaper('token', 'abc123', 'Yes')
-      expect(prisonPersonApiClient.updateSmokerOrVaper).toHaveBeenCalledWith('abc123', 'Yes')
+      await constructService().updateSmokerOrVaper('token', prisonUserMock, 'A1234AA', 'Yes')
+      expect(prisonPersonApiClient.updateSmokerOrVaper).toHaveBeenCalledWith('A1234AA', 'Yes')
+      expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['smokerOrVaper'],
+        user: prisonUserMock,
+      })
     })
   })
 })

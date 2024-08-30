@@ -38,7 +38,7 @@ import PrisonPersonApiRestClient from './prisonPersonApiClient'
 import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
 
 initialiseAppInsights()
-buildAppInsightsClient(applicationInfo())
+const telemetryClient = buildAppInsightsClient(applicationInfo())
 
 type RestClientBuilder<T> = (token: string) => T
 
@@ -73,6 +73,7 @@ export const dataAccess = {
     ? new RedisFeatureToggleStore(createRedisClient())
     : new InMemoryFeatureToggleStore(),
   prisonPersonApiClientBuilder: (token: string) => new PrisonPersonApiRestClient(token),
+  telemetryClient,
 }
 
 export type DataAccess = typeof dataAccess

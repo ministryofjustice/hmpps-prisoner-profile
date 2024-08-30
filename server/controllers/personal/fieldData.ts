@@ -6,21 +6,21 @@ import { Page } from '../../services/auditService'
 import { formatHeight, formatWeight } from '../../utils/utils'
 
 export interface FieldData {
+  fieldName: string
   pageTitle: string
   auditPage: Page
   url: string
+  hintText?: string
 }
 
 export interface TextFieldData extends FieldData {
   fieldName: keyof PrisonPersonPhysicalAttributes
-  hintText?: string
   inputClasses?: string
   formatter?: (value: number | string) => string
 }
+
 export interface RadioFieldData extends FieldData {
-  fieldName: string
   code?: PrisonPersonCharacteristicCode
-  hintText?: string
 }
 
 export const shoeSizeFieldData: TextFieldData = {
