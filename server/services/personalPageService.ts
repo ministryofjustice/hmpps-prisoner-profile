@@ -30,12 +30,15 @@ import {
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributesUpdate,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import MetricsService from './metrics/metricsService'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
+    private readonly metricsService: MetricsService,
   ) {}
 
   async getPrisonPerson(token: string, prisonerNumber: string, enablePrisonPerson: boolean): Promise<PrisonPerson> {
@@ -48,11 +51,20 @@ export default class PersonalPageService {
 
   async updatePhysicalAttributes(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
   ) {
     const apiClient = this.prisonPersonApiClientBuilder(token)
-    return apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+    const response = await apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: Object.keys(physicalAttributes),
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 
   public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
@@ -383,8 +395,16 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
-  async updateSmokerOrVaper(clientToken: string, prisonerNumber: string, value: string) {
+  async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, value: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    return prisonPersonApiClient.updateSmokerOrVaper(prisonerNumber, value)
+    const response = prisonPersonApiClient.updateSmokerOrVaper(prisonerNumber, value)
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['smokerOrVaper'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 }

@@ -34,6 +34,7 @@ import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
 import PrisonPersonService from './prisonPersonService'
+import MetricsService from './metrics/metricsService'
 
 export const services = () => {
   const {
@@ -57,6 +58,7 @@ export const services = () => {
     prisonPersonApiClientBuilder,
     prisonRegisterStore,
     featureToggleStore,
+    telemetryClient,
   } = dataAccess
 
   const auditService = AuditService({
@@ -67,6 +69,7 @@ export const services = () => {
     enabled: config.apis.audit.enabled,
   })
 
+  const metricsService = new MetricsService(telemetryClient)
   const featureToggleService = new FeatureToggleService(featureToggleStore)
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(prisonApiClientBuilder)
@@ -81,6 +84,7 @@ export const services = () => {
     prisonApiClientBuilder,
     curiousApiClientBuilder,
     prisonPersonApiClientBuilder,
+    metricsService,
   )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService)
