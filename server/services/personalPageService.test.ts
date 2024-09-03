@@ -82,13 +82,20 @@ describe('PersonalPageService', () => {
           },
           shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
         },
+        health: {
+          smokerOrVaper: {
+            value: { id: 'SMOKE_YES', description: '', listSequence: 0, isActive: true },
+            lastModifiedAt: '2024-07-01T01:02:03+0100',
+            lastModifiedBy: 'USER1',
+          },
+        },
       })),
       updatePhysicalAttributes: jest.fn(),
       getReferenceDataDomains: jest.fn(),
       getReferenceDataDomain: jest.fn(),
       getReferenceDataCodes: jest.fn(),
       getReferenceDataCode: jest.fn(),
-      updateSmokerOrVaper: jest.fn(),
+      updateHealth: jest.fn(),
       getFieldHistory: jest.fn(),
     }
 
@@ -546,8 +553,8 @@ describe('PersonalPageService', () => {
 
   describe('Update Smoker or Vaper', () => {
     it('Updates the smoker or vaper on the API', async () => {
-      await constructService().updateSmokerOrVaper('token', prisonUserMock, 'A1234AA', 'Yes')
-      expect(prisonPersonApiClient.updateSmokerOrVaper).toHaveBeenCalledWith('A1234AA', 'Yes')
+      await constructService().updateSmokerOrVaper('token', prisonUserMock, 'abc123', 'Yes')
+      expect(prisonPersonApiClient.updateHealth).toHaveBeenCalledWith('abc123', { smokerOrVaper: 'Yes' })
       expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['smokerOrVaper'],

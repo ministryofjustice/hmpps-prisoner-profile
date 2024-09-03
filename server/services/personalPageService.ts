@@ -395,9 +395,9 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
-  async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, value: string) {
+  async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = prisonPersonApiClient.updateSmokerOrVaper(prisonerNumber, value)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['smokerOrVaper'],

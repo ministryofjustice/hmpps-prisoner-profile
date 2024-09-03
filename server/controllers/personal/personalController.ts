@@ -491,26 +491,21 @@ export default class PersonalController {
   smokerOrVaper() {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { inmateDetail, prisonerData } = req.middleware
+        const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const fieldValue =
           requestBodyFlash?.radioField ||
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
+        const [smokerOrVaperValues] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, 'SMOKE'),
+        ])
 
-        // Placeholder for now
-        const options: RadioOption[] = [
-          {
-            text: 'Yes',
-            value: 'Yes',
-            checked: fieldValue === 'Yes',
-          },
-          {
-            text: 'No',
-            value: 'No',
-            checked: fieldValue === 'No',
-          },
-        ]
+        const options: RadioOption[] = smokerOrVaperValues.map(({ description, id }) => ({
+          text: description,
+          value: id,
+          checked: fieldValue === id,
+        }))
 
         return this.editRadioFields(
           `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,

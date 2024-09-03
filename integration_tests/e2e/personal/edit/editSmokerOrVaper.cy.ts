@@ -1,4 +1,9 @@
 import { Role } from '../../../../server/data/enums/role'
+import {
+  referenceDataDomainMock,
+  referenceDataDomainsMock,
+  smokerCodesMock,
+} from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
 
@@ -29,12 +34,19 @@ context('Edit smoker or vaper', () => {
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPrisonPersonUpdateHealth', { prisonerNumber })
+      cy.setupPersonRefDataStubs({
+        domainsResp: referenceDataDomainsMock,
+        domainResp: referenceDataDomainMock,
+        codesResp: smokerCodesMock,
+        codeResp: smokerCodesMock[0],
+      })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/smoker-or-vaper`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Does John Saunders smoke or vape?',
     successfulFlashMessage: 'Smoker or vaper updated',
-    validInputs: { radioInputs: { radioField: 'Yes' } },
+    validInputs: { radioInputs: { radioField: 'SMOKE_SMOKER' } },
     redirectAnchor: 'personal-details',
   })
 })
