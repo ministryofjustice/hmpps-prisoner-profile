@@ -558,8 +558,8 @@ describe('PersonalPageService', () => {
 
   describe('Update Smoker or Vaper', () => {
     it('Updates the smoker or vaper on the API', async () => {
-      await constructService().updateSmokerOrVaper('token', prisonUserMock, 'abc123', 'Yes')
-      expect(prisonPersonApiClient.updateHealth).toHaveBeenCalledWith('abc123', { smokerOrVaper: 'Yes' })
+      await constructService().updateSmokerOrVaper('token', prisonUserMock, 'A1234AA', 'Yes')
+      expect(prisonPersonApiClient.updateHealth).toHaveBeenCalledWith('A1234AA', { smokerOrVaper: 'Yes' })
       expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['smokerOrVaper'],
