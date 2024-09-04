@@ -70,14 +70,26 @@ describe('PersonalController', () => {
       },
       shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
     },
+    health: {
+      smokerOrVaper: {
+        value: { id: 'YES', description: '', listSequence: 0, isActive: true },
+        lastModifiedAt: '2024-07-01T01:02:03+0100',
+        lastModifiedBy: 'USER1',
+      },
+    },
   }
 
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
-    personalPageService.getReferenceDataCodes = jest.fn(
-      async () => physicalCharacteristicsMock.field as ReferenceDataCode[],
-    )
+    personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
+      if (domain === 'smoke')
+        return [
+          { id: 'Yes', description: 'Yes' },
+          { id: 'No', description: 'No' },
+        ] as ReferenceDataCode[]
+      return physicalCharacteristicsMock.field as ReferenceDataCode[]
+    })
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService

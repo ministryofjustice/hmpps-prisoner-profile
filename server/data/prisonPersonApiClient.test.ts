@@ -70,6 +70,18 @@ describe('prisonPersonApiClient', () => {
             lastModifiedBy: 'USER1',
           },
         },
+        health: {
+          smokerOrVaper: {
+            value: {
+              id: 'SMOKER_SMOKE',
+              description: '',
+              isActive: true,
+              listSequence: 0,
+            },
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+        },
       }
       fakePrisonerSearchApi
         .get('/prisoners/A8469DY')

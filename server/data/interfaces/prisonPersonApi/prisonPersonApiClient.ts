@@ -45,6 +45,7 @@ export interface PrisonPersonCharacteristic {
 export interface PrisonPerson {
   prisonerNumber: string
   physicalAttributes: PrisonPersonPhysicalAttributes
+  health: PrisonPersonHealth
 }
 
 export interface ReferenceDataDomain {
@@ -93,6 +94,14 @@ export interface FieldHistory {
   source: string
 }
 
+export interface PrisonPersonHealth {
+  smokerOrVaper: ValueWithMetadata<ReferenceDataCodeSimple>
+}
+
+export interface PrisonPersonHealthUpdate {
+  smokerOrVaper: string
+}
+
 export interface PrisonPersonApiClient {
   getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson>
 
@@ -101,7 +110,7 @@ export interface PrisonPersonApiClient {
     physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
   ): Promise<PrisonPersonPhysicalAttributes>
 
-  updateSmokerOrVaper(prisonerNumber: string, value: string): Promise<PrisonPerson>
+  updateHealth(prisonerNumber: string, healthData: Partial<PrisonPersonHealthUpdate>): Promise<PrisonPerson>
 
   getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]>
 
