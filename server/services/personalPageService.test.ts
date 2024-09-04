@@ -82,13 +82,20 @@ describe('PersonalPageService', () => {
           },
           shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
         },
+        health: {
+          smokerOrVaper: {
+            value: { id: 'SMOKE_YES', description: 'Yes they smoke', listSequence: 0, isActive: true },
+            lastModifiedAt: '2024-07-01T01:02:03+0100',
+            lastModifiedBy: 'USER1',
+          },
+        },
       })),
       updatePhysicalAttributes: jest.fn(),
       getReferenceDataDomains: jest.fn(),
       getReferenceDataDomain: jest.fn(),
       getReferenceDataCodes: jest.fn(),
       getReferenceDataCode: jest.fn(),
-      updateSmokerOrVaper: jest.fn(),
+      updateHealth: jest.fn(),
       getFieldHistory: jest.fn(),
     }
 
@@ -191,9 +198,14 @@ describe('PersonalPageService', () => {
         expect(response.personalDetails.sexualOrientation).toEqual('Heterosexual / Straight')
       })
 
-      it('Maps the smoker or vaper field', async () => {
-        const response = await constructService().get('token', PrisonerMockDataA)
-        expect(response.personalDetails.smokerOrVaper).toEqual('No')
+      describe('Smoker or vaper', () => {
+        it.each([
+          [true, 'Yes they smoke'],
+          [false, 'No'],
+        ])('Maps the smoker or vaper field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
+          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
+          expect(response.personalDetails.smokerOrVaper).toEqual(expectedValue)
+        })
       })
 
       it('Maps the social care needed field', async () => {
@@ -547,7 +559,7 @@ describe('PersonalPageService', () => {
   describe('Update Smoker or Vaper', () => {
     it('Updates the smoker or vaper on the API', async () => {
       await constructService().updateSmokerOrVaper('token', prisonUserMock, 'A1234AA', 'Yes')
-      expect(prisonPersonApiClient.updateSmokerOrVaper).toHaveBeenCalledWith('A1234AA', 'Yes')
+      expect(prisonPersonApiClient.updateHealth).toHaveBeenCalledWith('A1234AA', { smokerOrVaper: 'Yes' })
       expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['smokerOrVaper'],

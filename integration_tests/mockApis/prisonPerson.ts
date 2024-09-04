@@ -1,5 +1,6 @@
 import {
   PrisonPerson,
+  PrisonPersonHealth,
   PrisonPersonPhysicalAttributes,
   ReferenceDataCode,
   ReferenceDataDomain,
@@ -30,6 +31,13 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
       lastModifiedBy: 'USER1',
     },
     shoeSize: { value: '7.5', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+  },
+  health: {
+    smokerOrVaper: {
+      value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
+      lastModifiedAt: '2024-07-01T01:02:03+0100',
+      lastModifiedBy: 'USER1',
+    },
   },
 })
 
@@ -63,6 +71,21 @@ export default {
       path: `${baseUrl}prisoners/${prisonerNumber}/physical-attributes`,
       responseBody: {
         ...mockPrisonPerson(prisonerNumber).physicalAttributes,
+        ...overrides,
+      },
+    }),
+
+  stubPrisonPersonUpdateHealth: ({
+    prisonerNumber,
+    overrides = {},
+  }: {
+    prisonerNumber: string
+    overrides: Partial<PrisonPersonHealth>
+  }) =>
+    stubPatchWithResponse<PrisonPersonHealth>({
+      path: `${baseUrl}prisoners/${prisonerNumber}/health`,
+      responseBody: {
+        ...mockPrisonPerson(prisonerNumber).health,
         ...overrides,
       },
     }),
