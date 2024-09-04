@@ -1,4 +1,5 @@
 import Location from '../interfaces/prisonApi/Location'
+import VideoLocation from '../interfaces/bookAVideoLinkApi/Location'
 import { SelectOption } from '../../utils/utils'
 
 export const locationsMock: Location[] = [
@@ -24,6 +25,14 @@ export const locationsMock: Location[] = [
   },
 ]
 
+export const locationsMockBavl: VideoLocation[] = [
+  {
+    key: 'VIDEO_LINK_ROOM',
+    description: 'Video Link Room',
+    enabled: true,
+  },
+]
+
 export const locationsSelectOptionsMock: SelectOption[] = [
   {
     value: 27000,
@@ -32,5 +41,12 @@ export const locationsSelectOptionsMock: SelectOption[] = [
   {
     value: 26152,
     text: 'Chapel',
+  },
+]
+
+export const locationsSelectOptionsMockBavl: SelectOption[] = [
+  {
+    value: 'VIDEO_LINK_ROOM',
+    text: 'Video Link Room',
   },
 ]

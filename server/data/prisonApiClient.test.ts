@@ -559,6 +559,14 @@ describe('prisonApiClient', () => {
     })
   })
 
+  describe('getLocationByKey', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulPrisonApiCall(`/api/locations/code/CODE`, locationsMock[0])
+      const output = await prisonApiClient.getLocationByKey('CODE')
+      expect(output).toEqual(locationsMock[0])
+    })
+  })
+
   describe('getActivitiesAtLocation', () => {
     it('Should return data from the API', async () => {
       const locationId = 27000

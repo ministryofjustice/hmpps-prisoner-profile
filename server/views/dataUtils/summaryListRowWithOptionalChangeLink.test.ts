@@ -62,7 +62,7 @@ describe('summaryListRowWithOptionalChangeLink', () => {
 
   describe('With change link enabled', () => {
     it('Creates a list row with change link', () => {
-      const res = summaryListRowWithOptionalChangeLink('key', 'value', { changeLinkEnabled: true, href: 'href' })
+      const res = summaryListRowWithOptionalChangeLink('key', 'value', { changeLinkEnabled: true, changeHref: 'href' })
       expect(res.actions.items).toEqual(
         expect.arrayContaining([expect.objectContaining({ text: 'Change', href: 'href', visuallyHiddenText: 'key' })]),
       )

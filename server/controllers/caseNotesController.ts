@@ -103,9 +103,9 @@ export default class CaseNotesController {
 
   public displayAddCaseNote(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const userToken = res.locals.user.token
       const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const { permissions } = req.middleware
 
       const now = new Date()
       const caseNoteFlash = req.flash('caseNote')
@@ -122,7 +122,10 @@ export default class CaseNotesController {
           }
       const errors = req.flash('errors')
 
-      const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser(userToken)
+      const caseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
+        token: req.middleware.clientToken,
+        canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
+      })
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(caseNoteTypes, formValues.type, true)
 
       // Generate back link based on where the user came from - default to profile overview if no referer
@@ -163,7 +166,7 @@ export default class CaseNotesController {
 
   public post(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const userToken = res.locals.user.token
+      const { permissions } = req.middleware
       const { prisonerNumber } = req.params
       const { type, subType, text, date, hours, minutes, refererUrl } = req.body
       const caseNote = {
@@ -177,7 +180,10 @@ export default class CaseNotesController {
 
       const errors = req.errors || []
       if (!errors.length) {
-        const allowedCaseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser(userToken)
+        const allowedCaseNoteTypes = await this.caseNotesService.getCaseNoteTypesForUser({
+          token: req.middleware.clientToken,
+          canEditSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.edit,
+        })
         if (!allowedCaseNoteTypes.some(allowedType => allowedType.code === type)) {
           logger.info(`User not permitted to create case note of type: ${type}`)
           return next()
@@ -328,9 +334,7 @@ export default class CaseNotesController {
    * @param onlyActive - if true, filter out types/subtypes where activeFlag !== 'Y'
    */
   private mapCaseNoteTypes(caseNoteTypes: CaseNoteType[], type?: string, onlyActive = false) {
-    const types = caseNoteTypes
-      ?.filter(t => !onlyActive || t.activeFlag === 'Y')
-      .map(t => ({ value: t.code, text: t.description }))
+    const types = caseNoteTypes?.map(t => ({ value: t.code, text: t.description }))
 
     const typeSubTypeMap: { [key: string]: { value: string; text: string }[] } = caseNoteTypes.reduce(
       (ts, t) => ({

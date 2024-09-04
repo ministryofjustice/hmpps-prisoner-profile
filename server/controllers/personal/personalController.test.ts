@@ -16,9 +16,12 @@ import {
   PrisonPersonCharacteristicCode,
   ReferenceDataCode,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import PrisonPersonService from '../../services/prisonPersonService'
+import { prisonPersonServiceMock } from '../../../tests/mocks/prisonPersonServiceMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
+  let prisonPersonService: PrisonPersonService
   let auditService: AuditService
   let careNeedsService: CareNeedsService
   let controller: PersonalController
@@ -67,19 +70,32 @@ describe('PersonalController', () => {
       },
       shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
     },
+    health: {
+      smokerOrVaper: {
+        value: { id: 'YES', description: '', listSequence: 0, isActive: true },
+        lastModifiedAt: '2024-07-01T01:02:03+0100',
+        lastModifiedBy: 'USER1',
+      },
+    },
   }
 
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
-    personalPageService.getReferenceDataCodes = jest.fn(
-      async () => physicalCharacteristicsMock.field as ReferenceDataCode[],
-    )
+    personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
+      if (domain === 'smoke')
+        return [
+          { id: 'Yes', description: 'Yes' },
+          { id: 'No', description: 'No' },
+        ] as ReferenceDataCode[]
+      return physicalCharacteristicsMock.field as ReferenceDataCode[]
+    })
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
+    prisonPersonService = prisonPersonServiceMock() as PrisonPersonService
 
-    controller = new PersonalController(personalPageService, careNeedsService, auditService)
+    controller = new PersonalController(personalPageService, prisonPersonService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
   })
 
@@ -166,6 +182,7 @@ describe('PersonalController', () => {
           await action(request, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
+            prisonUserMock,
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
@@ -290,6 +307,7 @@ describe('PersonalController', () => {
           await action(request, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
+            prisonUserMock,
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
@@ -385,7 +403,6 @@ describe('PersonalController', () => {
             body: { kilograms: '80' },
             flash: jest.fn(),
           } as any
-          res = { redirect: jest.fn() } as any
         })
 
         it.each([
@@ -398,6 +415,7 @@ describe('PersonalController', () => {
           await action(request, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
+            prisonUserMock,
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
@@ -523,6 +541,7 @@ describe('PersonalController', () => {
           await action(request, res)
           expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
             expect.anything(),
+            prisonUserMock,
             expect.anything(),
             expect.objectContaining(updateRequest),
           )
@@ -660,7 +679,7 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC', {
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
           build: 'CODE3',
         })
       })
@@ -774,7 +793,7 @@ describe('PersonalController', () => {
 
       it('Updates the smoker or vaper', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith('token', 'A1234BC', 'Yes')
+        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'Yes')
       })
 
       it('Redirects to the personal page #personal-details on success', async () => {
@@ -889,6 +908,7 @@ describe('PersonalController', () => {
         await action(request, res)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith(
           expect.anything(),
+          prisonUserMock,
           expect.anything(),
           expect.objectContaining(updateRequest),
         )
@@ -1012,7 +1032,7 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC', {
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
           leftEyeColour: 'CODE3',
           rightEyeColour: 'CODE3',
         })
@@ -1160,7 +1180,7 @@ describe('PersonalController', () => {
 
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC', {
+        expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
           leftEyeColour: 'CODE3',
           rightEyeColour: 'CODE1',
         })

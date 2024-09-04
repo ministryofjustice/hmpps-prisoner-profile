@@ -1,7 +1,9 @@
 import config from '../config'
 import {
+  FieldHistory,
   PrisonPerson,
   PrisonPersonApiClient,
+  PrisonPersonHealthUpdate,
   PrisonPersonPhysicalAttributes,
   PrisonPersonPhysicalAttributesUpdate,
   ReferenceDataCode,
@@ -55,8 +57,14 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
     return this.restClient.get<ReferenceDataCode>({ path: `/reference-data/domains/${domain}/codes/${code}` })
   }
 
-  async updateSmokerOrVaper(_prisonerNumber: string, _value: string): Promise<PrisonPerson> {
-    // TODO: Implement this in the future when the API exists
-    return null
+  async updateHealth(prisonerNumber: string, healthData: Partial<PrisonPersonHealthUpdate>): Promise<PrisonPerson> {
+    return this.restClient.patch<PrisonPerson>({
+      path: `/prisoners/${prisonerNumber}/health`,
+      data: healthData,
+    })
+  }
+
+  async getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]> {
+    return this.restClient.get<FieldHistory[]>({ path: `/prisoners/${prisonerNumber}/field-history/${field}` })
   }
 }

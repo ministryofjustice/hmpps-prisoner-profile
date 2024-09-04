@@ -30,12 +30,15 @@ import {
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributesUpdate,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { PrisonUser } from '../interfaces/HmppsUser'
+import MetricsService from './metrics/metricsService'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
+    private readonly metricsService: MetricsService,
   ) {}
 
   async getPrisonPerson(token: string, prisonerNumber: string, enablePrisonPerson: boolean): Promise<PrisonPerson> {
@@ -48,11 +51,20 @@ export default class PersonalPageService {
 
   async updatePhysicalAttributes(
     token: string,
+    user: PrisonUser,
     prisonerNumber: string,
     physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
   ) {
     const apiClient = this.prisonPersonApiClientBuilder(token)
-    return apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+    const response = await apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: Object.keys(physicalAttributes),
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 
   public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
@@ -83,7 +95,13 @@ export default class PersonalPageService {
 
     const addresses: Addresses = this.addresses(addressList)
     return {
-      personalDetails: this.personalDetails(prisonerData, inmateDetail, prisonerDetail, secondaryLanguages),
+      personalDetails: this.personalDetails(
+        prisonerData,
+        inmateDetail,
+        prisonerDetail,
+        secondaryLanguages,
+        prisonPerson,
+      ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
       addresses,
@@ -102,6 +120,7 @@ export default class PersonalPageService {
       },
       learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
+      showFieldHistoryLink: !!prisonPerson,
     }
   }
 
@@ -138,6 +157,7 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
+    prisonPerson: PrisonPerson,
   ): PersonalDetails {
     const { profileInformation } = inmateDetail
 
@@ -199,8 +219,9 @@ export default class PersonalPageService {
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
-      smokerOrVaper:
-        getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
+      smokerOrVaper: prisonPerson
+        ? prisonPerson.health?.smokerOrVaper?.value?.description || 'Not entered'
+        : getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
@@ -382,8 +403,16 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
-  async updateSmokerOrVaper(clientToken: string, prisonerNumber: string, value: string) {
+  async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    return prisonPersonApiClient.updateSmokerOrVaper(prisonerNumber, value)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['smokerOrVaper'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 }
