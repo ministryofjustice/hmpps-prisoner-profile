@@ -125,11 +125,12 @@ export default class PersonalController {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
           const { editField } = req.body
+          const user = res.locals.user as PrisonUser
 
           const height = editField ? parseInt(editField, 10) : 0
 
           try {
-            await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
               height: editField ? height : null,
             })
 
@@ -137,7 +138,7 @@ export default class PersonalController {
 
             this.auditService
               .sendPostSuccess({
-                user: res.locals.user,
+                user,
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
@@ -193,6 +194,7 @@ export default class PersonalController {
         submit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
+          const user = res.locals.user as PrisonUser
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
 
           const feet = feetString ? parseInt(feetString, 10) : 0
@@ -200,7 +202,7 @@ export default class PersonalController {
 
           try {
             const height = feetAndInchesToCentimetres(feet, inches)
-            await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
               height: !feetString && !inchesString ? null : height,
             })
 
@@ -208,7 +210,7 @@ export default class PersonalController {
 
             this.auditService
               .sendPostSuccess({
-                user: res.locals.user,
+                user,
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
@@ -261,15 +263,27 @@ export default class PersonalController {
         submit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
+          const user = res.locals.user as PrisonUser
           const { kilograms } = req.body
           const weight = parseInt(kilograms, 10)
 
           try {
-            await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
               weight: kilograms ? weight : null,
             })
 
             req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
+
+            this.auditService
+              .sendPostSuccess({
+                user,
+                prisonerNumber,
+                correlationId: req.id,
+                action: PostAction.EditPhysicalCharacteristics,
+                details: { pageTitle: 'Weight' },
+              })
+              .catch(error => logger.error(error))
+
             return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
           } catch (e) {
             req.flash('requestBody', JSON.stringify(req.body))
@@ -328,6 +342,7 @@ export default class PersonalController {
         submit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken } = req.middleware
+          const user = res.locals.user as PrisonUser
           const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
 
           const stone = stoneString ? parseInt(stoneString, 10) : 0
@@ -335,7 +350,7 @@ export default class PersonalController {
 
           try {
             const weight = stoneAndPoundsToKilograms(stone, pounds)
-            await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
               weight: !stoneString && !poundsString ? null : weight,
             })
 
@@ -404,10 +419,11 @@ export default class PersonalController {
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
         const fieldValue = req.body[fieldName] || null
 
         try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
             [fieldName]: fieldValue,
           })
 
@@ -475,26 +491,21 @@ export default class PersonalController {
   smokerOrVaper() {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { inmateDetail, prisonerData } = req.middleware
+        const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const fieldValue =
           requestBodyFlash?.radioField ||
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
+        const [smokerOrVaperValues] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, 'smoke'),
+        ])
 
-        // Placeholder for now
-        const options: RadioOption[] = [
-          {
-            text: 'Yes',
-            value: 'Yes',
-            checked: fieldValue === 'Yes',
-          },
-          {
-            text: 'No',
-            value: 'No',
-            checked: fieldValue === 'No',
-          },
-        ]
+        const options: RadioOption[] = smokerOrVaperValues.map(({ description, id }) => ({
+          text: description,
+          value: id,
+          checked: fieldValue === id,
+        }))
 
         return this.editRadioFields(
           `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,
@@ -507,10 +518,11 @@ export default class PersonalController {
         const { pageTitle, code, fieldName, url } = smokerOrVaperFieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
 
         try {
-          await this.personalPageService.updateSmokerOrVaper(clientToken, prisonerNumber, radioField)
+          await this.personalPageService.updateSmokerOrVaper(clientToken, user, prisonerNumber, radioField)
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
           this.auditService
@@ -571,10 +583,11 @@ export default class PersonalController {
         const { pageTitle, code, fieldName, url } = fieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
 
         try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
             [code]: radioField,
           })
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
@@ -661,10 +674,11 @@ export default class PersonalController {
 
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
         const eyeColour = req.body.eyeColour || null
 
         try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
             leftEyeColour: eyeColour,
             rightEyeColour: eyeColour,
           })
@@ -747,11 +761,12 @@ export default class PersonalController {
 
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
         const leftEyeColour = req.body.leftEyeColour || null
         const rightEyeColour = req.body.rightEyeColour || null
 
         try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, prisonerNumber, {
+          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
             leftEyeColour,
             rightEyeColour,
           })
