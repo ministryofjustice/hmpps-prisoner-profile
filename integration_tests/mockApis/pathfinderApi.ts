@@ -33,4 +33,15 @@ export default {
       },
     })
   },
+
+  stubPathfinderApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/pathfinder/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

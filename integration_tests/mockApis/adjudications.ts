@@ -35,4 +35,15 @@ export default {
       },
     })
   },
+
+  stubAdjudicationsApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/adjudications/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

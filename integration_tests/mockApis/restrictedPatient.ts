@@ -23,4 +23,15 @@ export default {
       },
     })
   },
+
+  stubRestrictedPatientApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/restrictedPatient/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

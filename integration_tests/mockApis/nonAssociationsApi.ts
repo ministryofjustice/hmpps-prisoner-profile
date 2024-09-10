@@ -36,4 +36,15 @@ export default {
       },
     })
   },
+
+  stubNonAssociationsApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/nonassociations/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

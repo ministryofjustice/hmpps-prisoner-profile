@@ -26,4 +26,15 @@ export default {
       },
     })
   },
+
+  stubCalculateReleaseDatesApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/calculateReleaseDatesApi/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

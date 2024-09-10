@@ -6,6 +6,7 @@ import {
   ReferenceDataDomain,
 } from '../../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { stubGetWithBody, stubPatchWithResponse } from './utils'
+import { stubFor } from './wiremock'
 
 const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   prisonerNumber,
@@ -113,5 +114,16 @@ export default {
     stubGetWithBody({
       path: `${baseUrl}reference-data/domains/[^/]*/codes/[^/]*`,
       body: resp,
+    }),
+
+  stubPrisonPersonApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `${baseUrl}health/ping`,
+      },
+      response: {
+        status: httpStatus,
+      },
     }),
 }

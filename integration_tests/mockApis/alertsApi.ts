@@ -252,4 +252,15 @@ export default {
       },
     })
   },
+
+  stubAlertsApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/alertsApi/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

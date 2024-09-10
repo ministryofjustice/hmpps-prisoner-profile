@@ -17,4 +17,15 @@ export default {
       },
     })
   },
+
+  stubComponentsApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/component/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

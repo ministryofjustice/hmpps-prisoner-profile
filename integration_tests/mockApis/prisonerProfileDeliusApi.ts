@@ -69,4 +69,15 @@ export default {
       },
     })
   },
+
+  stubDeliusApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/delius/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

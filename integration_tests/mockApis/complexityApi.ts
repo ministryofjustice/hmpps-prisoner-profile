@@ -18,4 +18,15 @@ export default {
       },
     })
   },
+
+  stubComplexityApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/complexity/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

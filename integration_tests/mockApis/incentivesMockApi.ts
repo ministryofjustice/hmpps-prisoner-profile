@@ -17,4 +17,15 @@ export default {
       },
     })
   },
+
+  stubIncentivesApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/incentives/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

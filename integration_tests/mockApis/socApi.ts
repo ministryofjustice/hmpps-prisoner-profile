@@ -33,4 +33,15 @@ export default {
       },
     })
   },
+
+  stubSocApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/soc/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }
