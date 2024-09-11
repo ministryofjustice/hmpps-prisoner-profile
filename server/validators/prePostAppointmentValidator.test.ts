@@ -77,4 +77,19 @@ describe('Validation middleware', () => {
 
     expect(result).toEqual([{ text: 'Enter the name of the court', href: '#otherCourt' }])
   })
+
+  it('should fail validation for a video link URL which is too long', async () => {
+    const vlbForm = {
+      preAppointment: 'no',
+      postAppointment: 'no',
+      court: 'CODE',
+      videoLinkUrl: 'a'.repeat(121),
+    }
+
+    const result = PrePostAppointmentValidator(vlbForm)
+
+    expect(result).toEqual([
+      { text: 'Enter a court hearing link which is 120 characters or less', href: '#videoLinkUrl' },
+    ])
+  })
 })
