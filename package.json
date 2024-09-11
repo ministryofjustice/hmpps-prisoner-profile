@@ -189,11 +189,7 @@
   "overrides": {
     "semver": "^7.5.3",
     "aws-sdk-client-mock": {
-      "sinon": {
-        "nise": {
-          "path-to-regexp": "8.1.0"
-        }
-      }
+      "sinon": "18.0.1"
     },
     "jest-html-reporter": {
       "typescript": "$typescript"
