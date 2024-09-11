@@ -187,12 +187,11 @@
     "typescript": "^5.5.4"
   },
   "overrides": {
-    "semver": "^7.5.3",
+    "aws-sdk-client-mock": {
+      "sinon": "18.0.1"
+    },
     "jest-html-reporter": {
       "typescript": "$typescript"
-    },
-    "cypress": {
-      "@cypress/request": "^3.0.0"
     }
   }
 }
