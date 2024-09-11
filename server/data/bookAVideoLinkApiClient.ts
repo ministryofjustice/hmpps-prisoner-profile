@@ -21,7 +21,7 @@ export default class BookAVideoLinkRestApiClient implements BookAVideoLinkApiCli
   async getVideoLocations(prisonCode: string): Promise<Location[]> {
     return this.restClient.get({
       path: `/prisons/${prisonCode}/locations`,
-      query: mapToQueryString({ videoLinkOnly: true }),
+      query: mapToQueryString({ videoLinkOnly: false }),
     })
   }
 

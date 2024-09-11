@@ -390,6 +390,7 @@ export default class AppointmentController {
         court,
         otherCourt,
         hearingType,
+        videoLinkUrl,
       } = req.body
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
@@ -474,7 +475,8 @@ export default class AppointmentController {
               ],
               courtCode: court,
               courtHearingType: hearingType,
-              comments: appointmentDefaults.comment,
+              comments: appointmentDefaults.comment.trim() || undefined,
+              videoLinkUrl: videoLinkUrl.trim() || undefined,
             } as CreateVideoBookingRequest)
 
         try {
@@ -497,6 +499,7 @@ export default class AppointmentController {
           court,
           otherCourt,
           hearingType,
+          videoLinkUrl,
         },
       })
 
@@ -594,6 +597,7 @@ export default class AppointmentController {
               .getCourtHearingTypes(clientToken)
               .then(r => r.find(ht => ht.code === formValues.hearingType).description)
           : undefined,
+        videoLinkUrl: formValues.videoLinkUrl,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
       }
 
