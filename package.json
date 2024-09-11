@@ -192,9 +192,6 @@
     },
     "jest-html-reporter": {
       "typescript": "$typescript"
-    },
-    "cypress": {
-      "@cypress/request": "^3.0.0"
     }
   }
 }
