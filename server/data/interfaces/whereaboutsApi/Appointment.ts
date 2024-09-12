@@ -55,6 +55,7 @@ export interface PrePostAppointmentDetails {
     court?: string
     otherCourt?: string
     hearingType?: string
+    videoLinkUrl?: string
   }
 }
 
