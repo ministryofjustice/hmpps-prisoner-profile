@@ -831,4 +831,94 @@ export default class PersonalController {
       })
     }
   }
+
+  medicalDiet() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Medical diet'
+        const { prisonerNumber } = req.params
+        const { prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
+        const checkedItems = requestBodyFlash ? Object.values(requestBodyFlash).flat() : []
+
+        const errors = req.flash('errors')
+
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+        const checkboxInputs: {
+          label: string
+          value: string
+          subValues?: { title: string; hint: string; items: { label: string; value: string }[] }
+        }[] = [
+          {
+            label: "A 'free from' diet",
+            value: 'FREE_FROM',
+            subValues: {
+              title: 'Which foods does this diet exclude',
+              hint: 'Select all that apply',
+              items: [
+                {
+                  label: 'Any foods that interact with monoamine oxidase inhibitors',
+                  value: 'MONOAMINE',
+                },
+                { label: 'Cheese', value: 'CHEESE' },
+                { label: 'Egg', value: 'EGG' },
+                { label: 'Fat', value: 'FAT' },
+                { label: 'Fried food', value: 'FRIED_FOOD' },
+                { label: 'Fish', value: 'FISH' },
+                { label: 'Garlic', value: 'GARLIC' },
+                { label: 'Lactose', value: 'LACTOSE' },
+                { label: 'Onion', value: 'ONION' },
+                { label: 'Pork', value: 'PORK' },
+                { label: 'Potato', value: 'POTATO' },
+              ],
+            },
+          },
+          { label: 'Low fat', value: 'LOW_FAT' },
+          { label: 'Low salt', value: 'LOW_SALT' },
+          { label: 'Diabetic', value: 'DIABETIC' },
+          { label: 'Low cholesterol', value: 'LOW_CHOLESTEROL' },
+          { label: 'Coeliac', value: 'COELIAC' },
+          { label: 'Pregnant', value: 'PREGNANT' },
+          { label: 'Disordered eating', value: 'DISORDERED_EATING' },
+        ]
+
+        // TODO
+        // await this.auditService.sendPageView({
+        //   user: res.locals.user,
+        //   prisonerNumber: prisonerData.prisonerNumber,
+        //   prisonId: prisonerData.prisonId,
+        //   correlationId: req.id,
+        //   page: auditPage,
+        // })
+
+        res.render('pages/edit/medicalDiet', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: pageTitle,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          checkboxInputs,
+          checkedItems,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        // Don't do anything for now as the API is yet to be determined
+        const { prisonerNumber } = req.params
+        req.flash('flashMessage', {
+          text: `Medical diet updated`,
+          type: FlashMessageType.success,
+          fieldName: 'medicalDiet',
+        })
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      },
+    }
+  }
 }

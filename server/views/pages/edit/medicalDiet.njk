@@ -1,0 +1,151 @@
+{% extends "../index.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
+  ]
+%}
+{% macro checkBoxForCheckboxFieldData(fieldData, options) %}
+  {% set checkboxes = [] %}
+  {% set items = fieldData.inputs | checkboxFieldDataToInputs(checkedItems) %}
+  {% for item in items %}
+    {% if item.subValues %}
+      {% set subValueHtml %}
+        {{
+          govukCheckboxes({
+            name: item.value + "-subvalues",
+            fieldset: {
+              legend: {
+                text: item.subValues.title
+              }
+            },
+            hint: { text: item.subValues.hint },
+            items: item.subValues.items
+          })
+        }}
+      {% endset %}
+      {%
+        set checkboxes = (checkboxes.push(
+        {
+                value: item.value,
+                text: item.text,
+                checked: item.checked,
+                conditional: {
+                  html: subValueHtml
+                }
+              }
+            ), checkboxes)
+      %}
+    {% else %}
+      {%
+        set checkboxes = (checkboxes.push({
+          value: item.value,
+          text: item.text,
+          checked: item.checked
+        }), checkboxes)
+      %}
+    {% endif %}
+  {% endfor %}
+
+  {# No/Dont know #}
+  {% if options.showNo | d(false) or options.showDontKnow | d(false) %}
+    {%
+      set checkboxes = (checkboxes.push({
+        divider: "or"
+      }), checkboxes)
+    %}
+    {% if options.showNo %}
+      {%
+        set checkboxes = (checkboxes.push({
+          value: "NO",
+          text: "No",
+          behaviour: "exclusive"
+        }), checkboxes)
+      %}
+    {% endif %}
+    {% if options.showDontKnow %}
+      {%
+        set checkboxes = (checkboxes.push({
+          value: "DONT_NO",
+          text: "Don't know",
+          behaviour: "exclusive"
+        }), checkboxes)
+      %}
+    {% endif %}
+  {% endif %}
+
+  {{
+    govukCheckboxes({
+      name: fieldData.name,
+      items: checkboxes
+    })
+  }}
+{% endmacro %}
+
+{% block body %}
+
+  {% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{
+          govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true }
+          })
+        }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form method="post" novalidate="novalidate" autocomplete="off">
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+          {%
+            call govukFieldset({
+              legend: {
+                text: "Medical diet",
+                classes: "govuk-fieldset__legend--l",
+                isPageHeading: true
+              }
+            })
+          %}
+            {{ checkBoxForCheckboxFieldData({name: 'medicalDiet', inputs: checkboxInputs }, {showNo: true, showDontKnow: true}) }}
+          {% endcall %}
+        </div>
+        <div class="govuk-button-group">
+          {{
+            govukButton({
+            text: "Save",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "edit-submit-button" }
+            })
+          }}
+          <a
+            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button"
+            >Cancel</a
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

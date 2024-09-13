@@ -31,6 +31,13 @@ describe('summaryListRowWithOptionalChangeLink', () => {
     expect(res.value.html).toEqual('value')
   })
 
+  describe('With the merge key down option enabled', () => {
+    it('Adds the correct CSS class', () => {
+      const res = summaryListRowWithOptionalChangeLink('key', 'value', { mergeKeyDown: true })
+      expect(res.classes.includes('hmpps-merged-key-summary-list-row')).toBe(true)
+    })
+  })
+
   describe('When row is not visible', () => {
     it('Displays no value', () => {
       const res = summaryListRowWithOptionalChangeLink('key', 'value', { visible: false })

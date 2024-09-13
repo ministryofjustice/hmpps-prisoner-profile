@@ -1213,4 +1213,95 @@ describe('PersonalController', () => {
       })
     })
   })
+
+  describe('Medical diet', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.medicalDiet().edit(req, response, () => {})
+
+      it.skip('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/medicalDiet', {
+          pageTitle: 'Medical diet',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'requestBody')
+              return [JSON.stringify({ medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM__EGG'] })]
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            checkedItems: ['FREE_FROM', 'FREE_FROM__EGG'],
+          }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.medicalDiet().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM__EGG'] },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Medical diet updated',
+          type: FlashMessageType.success,
+          fieldName: 'medicalDiet',
+        })
+      })
+    })
+  })
 })

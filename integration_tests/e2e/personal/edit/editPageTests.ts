@@ -7,6 +7,7 @@ import Page from '../../../pages/page'
 export interface EditPageInputs {
   textInputs?: { [key: string]: string }
   radioInputs?: { [key: string]: string }
+  checkboxInputs?: { [key: string]: (string | { value: string; subvalues: string[] })[] }
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
@@ -46,6 +47,7 @@ export function editPageTests<TPage extends EditPage>(options: {
   const fillWithInputs = (inputs: EditPageInputs) => {
     if (inputs.textInputs) page.fillInTextFields(inputs.textInputs)
     if (inputs.radioInputs) page.selectRadios(inputs.radioInputs)
+    if (inputs.checkboxInputs) page.selectCheckboxes(inputs.checkboxInputs)
   }
 
   context('Edit page tests', () => {
