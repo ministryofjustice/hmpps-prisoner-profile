@@ -17,7 +17,7 @@ describe('Case Notes Page', () => {
   let caseNotesApiClientSpy: CaseNotesApiClient
 
   beforeEach(() => {
-    prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
+    prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH', prisonId: 'MDI' } as Prisoner
     caseNotesApiClientSpy = {
       getCaseNoteTypes: jest.fn(async () => caseNoteTypesMock),
       getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
@@ -45,9 +45,13 @@ describe('Case Notes Page', () => {
 
       expect(caseNotesPageData.fullName).toEqual('John Smith')
       expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
-        includeSensitive: 'false',
-      })
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(
+        prisonerData.prisonerNumber,
+        prisonerData.prisonId,
+        {
+          includeSensitive: 'false',
+        },
+      )
     })
 
     it('should allow inclusion of sensitive case notes', async () => {
@@ -61,9 +65,13 @@ describe('Case Notes Page', () => {
         canViewSensitiveCaseNotes: true,
       })
 
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
-        includeSensitive: 'true',
-      })
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(
+        prisonerData.prisonerNumber,
+        prisonerData.prisonId,
+        {
+          includeSensitive: 'true',
+        },
+      )
     })
   })
 
@@ -87,9 +95,9 @@ describe('Case Notes Page', () => {
         minutes: '30',
       } as CaseNoteForm
       const occurrenceDateTime = '2023-01-01T12:30:00'
-      await caseNotesService.addCaseNote('', prisonerNumber, updateCaseNoteForm)
+      await caseNotesService.addCaseNote('', prisonerNumber, 'MDI', updateCaseNoteForm)
 
-      expect(caseNotesApiClientSpy.addCaseNote).toHaveBeenCalledWith(prisonerNumber, {
+      expect(caseNotesApiClientSpy.addCaseNote).toHaveBeenCalledWith(prisonerNumber, prisonerData.prisonId, {
         type: 'TYPE',
         subType: 'SUBTYPE',
         text: 'Text',
@@ -108,14 +116,19 @@ describe('Case Notes Page', () => {
         currentLength: 1,
         username: 'AB123456',
       }
-      await caseNotesService.updateCaseNote('', prisonerNumber, caseNoteId, updateCaseNoteForm)
+      await caseNotesService.updateCaseNote('', prisonerNumber, 'MDI', caseNoteId, updateCaseNoteForm)
 
-      expect(caseNotesApiClientSpy.updateCaseNote).toHaveBeenCalledWith(prisonerNumber, 'abc123', {
-        text: 'Text',
-        isExternal: false,
-        currentLength: 1,
-        username: 'AB123456',
-      })
+      expect(caseNotesApiClientSpy.updateCaseNote).toHaveBeenCalledWith(
+        prisonerNumber,
+        prisonerData.prisonId,
+        'abc123',
+        {
+          text: 'Text',
+          isExternal: false,
+          currentLength: 1,
+          username: 'AB123456',
+        },
+      )
     })
   })
 
