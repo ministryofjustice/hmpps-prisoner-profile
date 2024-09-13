@@ -1,5 +1,5 @@
 import RestClient from './restClient'
-import { arrayToQueryString, mapToQueryString } from '../utils/utils'
+import { mapToQueryString } from '../utils/utils'
 
 import config from '../config'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
@@ -7,7 +7,6 @@ import PagedList, { CaseNotesListQueryParams } from './interfaces/prisonApi/Page
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 import CaseNoteType, { CaseNotesTypeParams, CaseNotesTypeQueryParams } from './interfaces/caseNotesApi/CaseNoteType'
 import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
-import { QueryParams } from '../interfaces/QueryParams'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   private readonly restClient: RestClient
@@ -32,23 +31,6 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.restClient.put(args)
   }
 
-  mapCaseNoteTypesQueryString(params: QueryParams) {
-    if (!params) return ''
-    return Object.keys(params)
-      .filter(key => params[key] !== undefined && params[key] !== null)
-      .map(key => {
-        if (Array.isArray(params[key])) {
-          // Case Note Type endpoint requires include= when the array for "include" is empty
-          if (params[key].length === 0) {
-            return `${key}=`
-          }
-          return arrayToQueryString(params[key], key)
-        }
-        return `${key}=${encodeURIComponent(params[key])}`
-      })
-      .join('&')
-  }
-
   async getCaseNotes(
     offenderNumber: string,
     caseloadId: string,
@@ -62,7 +44,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<PagedList<CaseNote>>({
       path: `/case-notes/${offenderNumber}`,
       query: mapToQueryString(params),
-      headers: { 'Caseload-ID': caseloadId },
+      headers: { caseloadId },
     })
   }
 
@@ -79,7 +61,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return (await this.post({
       path: `/case-notes/${prisonerNumber}`,
       data: caseNote,
-      headers: { 'Caseload-ID': caseloadId },
+      headers: { caseloadId },
     })) as Promise<CaseNote>
   }
 
@@ -92,7 +74,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return (await this.put({
       path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
       data: { text: updateCaseNoteForm.text },
-      headers: { 'Caseload-ID': caseloadId },
+      headers: { caseloadId },
     })) as Promise<CaseNote>
   }
 
@@ -104,7 +86,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   ): Promise<CaseNote> {
     return this.get<CaseNote>({
       path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
-      headers: { 'Caseload-ID': caseloadId },
+      headers: { caseloadId },
       ignore404,
     })
   }
