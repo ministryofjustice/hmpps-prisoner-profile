@@ -120,7 +120,8 @@
           {%
             call govukFieldset({
               legend: {
-                text: "Medical diet",
+                text: "Does " + prisonerName + " have any of these medical dietary requirements?",
+                hintText: "Select all that apply",
                 classes: "govuk-fieldset__legend--l",
                 isPageHeading: true
               }
@@ -139,7 +140,7 @@
             })
           }}
           <a
-            href="/prisoner/{{ prisonerNumber }}/personal#appearance"
+            href="/prisoner/{{ prisonerNumber }}/personal#personal-details"
             class="govuk-link govuk-link--no-visited-state"
             data-qa="edit-cancel-button"
             >Cancel</a

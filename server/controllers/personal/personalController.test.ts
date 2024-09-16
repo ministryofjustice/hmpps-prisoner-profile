@@ -1231,6 +1231,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith('pages/edit/medicalDiet', {
           pageTitle: 'Medical diet',
           prisonerNumber: 'ABC123',
+          prisonerName: 'First Last',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
           miniBannerData: {

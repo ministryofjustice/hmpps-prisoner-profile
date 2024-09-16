@@ -44,7 +44,7 @@ context('Edit medical diet', () => {
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/medical-diet`,
     editPageWithTitle: EditPage,
-    editPageTitle: 'Medical diet',
+    editPageTitle: 'Does John Saunders have any of these medical dietary requirements?',
     successfulFlashMessage: 'Medical diet updated',
     validInputs: {
       checkboxInputs: { medicalDiet: [{ value: 'FREE_FROM', subvalues: ['LACTOSE', 'CHEESE'] }, 'LOW_FAT'] },

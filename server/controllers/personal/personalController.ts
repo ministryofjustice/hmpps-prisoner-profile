@@ -845,6 +845,7 @@ export default class PersonalController {
         const errors = req.flash('errors')
 
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
 
         const checkboxInputs: {
           label: string
@@ -897,6 +898,7 @@ export default class PersonalController {
           pageTitle: `${pageTitle} - Prisoner personal details`,
           formTitle: pageTitle,
           prisonerNumber,
+          prisonerName,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
           checkboxInputs,
