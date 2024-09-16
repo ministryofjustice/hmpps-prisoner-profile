@@ -8,6 +8,7 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
+  checkboxFieldDataToInputs,
   fieldHistoryToRows,
   findError,
   formatMoney,
@@ -163,4 +164,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('fieldHistoryToRows', fieldHistoryToRows)
+  njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
 }

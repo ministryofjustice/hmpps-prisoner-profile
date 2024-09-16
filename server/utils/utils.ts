@@ -769,3 +769,41 @@ export const fieldHistoryToRows = (
     { text: field.createdBy },
   ])
 }
+
+export const checkboxFieldDataToInputs = (
+  fieldData: {
+    label: string
+    value: string
+    subValues?: { title: string; hint: string; items: { label: string; value: string }[] }
+  }[],
+  checked: string[] = [],
+  valuePrefix: string = '',
+): {
+  value: string
+  text: string
+  checked: boolean
+  subValues?: { title: string; hint: string; items: { value: string; text: string; checked: boolean }[] }
+}[] => {
+  return fieldData.map(i => {
+    if (i.subValues) {
+      return {
+        value: i.value,
+        text: i.label,
+        checked: checked.includes(i.value),
+        subValues: {
+          title: i.subValues.title,
+          hint: i.subValues.hint,
+          items: checkboxFieldDataToInputs(i.subValues.items, checked, i.value),
+        },
+      }
+    }
+
+    const value = valuePrefix ? `${valuePrefix}__${i.value}` : i.value
+
+    return {
+      value,
+      text: i.label,
+      checked: checked.includes(value),
+    }
+  })
+}
