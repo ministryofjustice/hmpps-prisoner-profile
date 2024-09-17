@@ -257,6 +257,7 @@ describe('Case Notes Controller', () => {
       expect(addCaseNoteSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
         PrisonerMockDataA.prisonerNumber,
+        'MDI',
         caseNoteForm,
       )
       expect(res.redirect).toHaveBeenCalledWith(
@@ -323,6 +324,7 @@ describe('Case Notes Controller', () => {
       expect(getCaseNoteSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
         req.params.prisonerNumber,
+        'MDI',
         req.params.caseNoteId,
       )
 
@@ -410,6 +412,7 @@ describe('Case Notes Controller', () => {
       expect(updateCaseNoteSpy).toHaveBeenCalledWith(
         req.middleware.clientToken,
         PrisonerMockDataA.prisonerNumber,
+        'MDI',
         caseNoteId,
         updateCaseNoteForm,
       )

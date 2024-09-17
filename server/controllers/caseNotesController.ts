@@ -190,7 +190,12 @@ export default class CaseNotesController {
         }
 
         try {
-          await this.caseNotesService.addCaseNote(req.middleware.clientToken, prisonerNumber, caseNote)
+          await this.caseNotesService.addCaseNote(
+            req.middleware.clientToken,
+            prisonerNumber,
+            req.middleware.prisonerData.prisonId,
+            caseNote,
+          )
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
@@ -232,7 +237,7 @@ export default class CaseNotesController {
       const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
 
-      const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
+      const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
       if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
         logger.info(`User not permitted to edit sensitive case note: ${caseNoteId}`)
@@ -283,7 +288,8 @@ export default class CaseNotesController {
       const { prisonerNumber, caseNoteId } = req.params
       const { text, isExternal, currentLength, username } = req.body
       const { clientToken, permissions } = req.middleware
-      const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, caseNoteId)
+      const { prisonId } = req.middleware.prisonerData
+      const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
       if (currentCaseNote.sensitive && !permissions.sensitiveCaseNotes?.edit) {
         logger.info(`User not permitted to edit sensitive case notes`)
@@ -293,7 +299,7 @@ export default class CaseNotesController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.caseNotesService.updateCaseNote(req.middleware.clientToken, prisonerNumber, caseNoteId, {
+          await this.caseNotesService.updateCaseNote(req.middleware.clientToken, prisonerNumber, prisonId, caseNoteId, {
             text,
             isExternal,
             currentLength: +currentLength,

@@ -42,6 +42,7 @@ export default class PrisonerLocationHistoryService {
     const fetchWhatHappened = async (
       bookingId: number,
       offenderNo: string,
+      caseloadId: string,
       bedAssignmentHistorySequence: number,
       caseNotesApi: CaseNotesApiClient,
       whereaboutsApi: WhereaboutsApiClient,
@@ -50,6 +51,7 @@ export default class PrisonerLocationHistoryService {
       if (cellMoveReason) {
         const caseNote = await caseNotesApi.getCaseNote(
           offenderNo,
+          caseloadId,
           cellMoveReason.cellMoveReason?.caseNoteId.toString(),
           true,
         )
@@ -97,7 +99,14 @@ export default class PrisonerLocationHistoryService {
 
     const [movementMadeByName, whatHappenedDetails, locationHistoryWithPrisoner] = await Promise.all([
       fetchStaffName(movementMadeBy, prisonApiClient),
-      fetchWhatHappened(bookingId, offenderNo, bedAssignmentHistorySequence, caseNotesApiClient, whereaboutsApiClient),
+      fetchWhatHappened(
+        bookingId,
+        offenderNo,
+        prisonerData.prisonId,
+        bedAssignmentHistorySequence,
+        caseNotesApiClient,
+        whereaboutsApiClient,
+      ),
       getLocationHistoryWithPrisoner(locationHistory, prisonApiClient),
     ])
 
