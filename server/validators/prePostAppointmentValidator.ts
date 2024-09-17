@@ -40,5 +40,12 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Enter the name of the court', href: '#otherCourt' })
   }
 
+  if (body.videoLinkUrl && body.videoLinkUrl.length > 120) {
+    errors.push({
+      text: 'Enter a court hearing link which is 120 characters or less',
+      href: '#videoLinkUrl',
+    })
+  }
+
   return errors
 }

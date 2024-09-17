@@ -199,6 +199,16 @@
                                     items: hearingTypes | addDefaultSelectedValue('Choose hearing type') | setSelected(formValues.hearingType),
                                     errorMessage: errors | findError("hearingType")
                                 }) }}
+
+                                {{ govukInput({
+                                    name: "videoLinkUrl",
+                                    id: "videoLinkUrl",
+                                    label: {
+                                        text: "Court hearing link (optional)"
+                                    },
+                                    value: formValues.videoLinkUrl,
+                                    errorMessage: errors | findError("videoLinkUrl")
+                                }) }}
                             {% endif %}
                         </div>
                     </div>

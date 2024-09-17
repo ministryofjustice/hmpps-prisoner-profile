@@ -299,5 +299,19 @@ export default function personalRouter(services: Services): Router {
     personalController.history(weightFieldData),
   )
 
+  editRoute({
+    path: 'edit/medical-diet',
+    edit: {
+      // TODO
+      audit: Page.EditEyeColour,
+      method: personalController.medicalDiet().edit,
+    },
+    submit: {
+      // TODO
+      audit: Page.PostEditEyeColour,
+      method: personalController.medicalDiet().submit,
+    },
+  })
+
   return router
 }

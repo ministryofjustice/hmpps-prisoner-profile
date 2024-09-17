@@ -9,12 +9,14 @@ interface Options {
   html?: boolean
   historyLinkEnabled?: boolean
   historyHref?: string
+  mergeKeyDown?: boolean
 }
 
 const defaultOptions: Options = {
   changeLinkEnabled: false,
   rowUpdated: false,
   hideIfEmpty: true,
+  mergeKeyDown: false,
 }
 
 export const listToSummaryListRows = (
@@ -27,7 +29,16 @@ export const listToSummaryListRows = (
   return items.map(i => summaryListRowWithOptionalChangeLink(i.key, i.value, i.options))
 }
 
-const summaryListRowWithOptionalChangeLink = (key: string, value: string, opts: Options = {}) => {
+const summaryListRowWithOptionalChangeLink = (
+  key: string,
+  value: string,
+  opts: Options = {},
+): {
+  key: { html?: string; text?: string }
+  value: { html?: string; text?: string }
+  actions: { items: { href: string; text: string; visuallyHiddenText: string; classes: string }[] }
+  classes: string
+} => {
   const options = { ...defaultOptions, ...opts }
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
@@ -62,9 +73,11 @@ const summaryListRowWithOptionalChangeLink = (key: string, value: string, opts: 
       : []),
   ]
 
-  const classes = [options.rowUpdated ? 'row-updated' : '', rowHidden ? 'govuk-summary-list__row--hidden' : ''].join(
-    ' ',
-  )
+  const classes = [
+    options.rowUpdated ? 'row-updated' : '',
+    rowHidden ? 'govuk-summary-list__row--hidden' : '',
+    options.mergeKeyDown ? 'hmpps-merged-key-summary-list-row' : '',
+  ].join(' ')
 
   const keyResult = options.dataQa
     ? { html: `<span data-qa="${rowHidden ? 'hidden-' : ''}${options.dataQa}-key">${key}</span>` }

@@ -1,5 +1,6 @@
 import Page, { PageElement } from '../page'
 
+type CheckboxValue = string | { value: string; subvalues: string[] }
 export default class EditPage extends Page {
   constructor(pageTitle: string) {
     super(pageTitle)
@@ -22,6 +23,21 @@ export default class EditPage extends Page {
   selectRadios = (fields: { [key: string]: string }) => {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`input[name=${key}][value=${value}]`).click()
+    })
+  }
+
+  selectCheckboxes = (fields: { [key: string]: CheckboxValue[] }) => {
+    Object.entries(fields).forEach(([name, values]) => {
+      values.forEach(value => {
+        if (typeof value === 'string') {
+          cy.get(`input[name=${name}][value=${value}]`).click()
+        } else {
+          cy.get(`input[name=${name}][value=${value.value}]`).click()
+          value.subvalues.forEach(subValue => {
+            cy.get(`input[name=${value.value}-subvalues][value=${value.value}__${subValue}]`).click()
+          })
+        }
+      })
     })
   }
 
