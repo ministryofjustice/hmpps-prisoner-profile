@@ -390,6 +390,7 @@ export default class AppointmentController {
         court,
         otherCourt,
         hearingType,
+        cvpRequired,
         videoLinkUrl,
       } = req.body
       const appointmentFlash = req.flash('postVLBDetails')
@@ -499,6 +500,7 @@ export default class AppointmentController {
           court,
           otherCourt,
           hearingType,
+          cvpRequired,
           videoLinkUrl,
         },
       })

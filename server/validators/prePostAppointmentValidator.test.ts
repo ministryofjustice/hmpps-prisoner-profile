@@ -11,6 +11,7 @@ describe('Validation middleware', () => {
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'CODE',
+      cvpRequired: 'no',
     }
 
     const result = PrePostAppointmentValidator(vlbForm)
@@ -25,6 +26,7 @@ describe('Validation middleware', () => {
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'CODE',
+      cvpRequired: 'no',
     }
 
     const result = PrePostAppointmentValidator(vlbForm)
@@ -45,6 +47,7 @@ describe('Validation middleware', () => {
       { text: 'Select if a room is needed for the pre-court hearing briefing', href: '#preAppointment' },
       { text: 'Select if a room is needed for the post-court hearing briefing', href: '#postAppointment' },
       { text: 'Select which court the hearing is for', href: '#court' },
+      { text: 'Select if you know the court hearing link', href: '#cvpRequired' },
     ])
   })
 
@@ -55,6 +58,7 @@ describe('Validation middleware', () => {
       postAppointment: 'yes',
       postAppointmentLocation: '',
       court: 'CODE',
+      cvpRequired: 'no',
     }
 
     const result = PrePostAppointmentValidator(vlbForm)
@@ -71,6 +75,7 @@ describe('Validation middleware', () => {
       postAppointment: 'no',
       court: 'other',
       otherCourt: '',
+      cvpRequired: 'no',
     }
 
     const result = PrePostAppointmentValidator(vlbForm)
@@ -78,11 +83,25 @@ describe('Validation middleware', () => {
     expect(result).toEqual([{ text: 'Enter the name of the court', href: '#otherCourt' }])
   })
 
+  it('should fail validation for a missing video link URL', async () => {
+    const vlbForm = {
+      preAppointment: 'no',
+      postAppointment: 'no',
+      court: 'CODE',
+      cvpRequired: 'yes',
+    }
+
+    const result = PrePostAppointmentValidator(vlbForm)
+
+    expect(result).toEqual([{ text: 'Enter the court hearing link', href: '#videoLinkUrl' }])
+  })
+
   it('should fail validation for a video link URL which is too long', async () => {
     const vlbForm = {
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'CODE',
+      cvpRequired: 'yes',
       videoLinkUrl: 'a'.repeat(121),
     }
 
