@@ -40,7 +40,7 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Enter the name of the court', href: '#otherCourt' })
   }
 
-  if (!body.cvpRequired) {
+  if (!body.cvpRequired && config.featureToggles.bookAVideoLinkEnabled) {
     errors.push({ text: 'Select if you know the court hearing link', href: '#cvpRequired' })
   }
 
