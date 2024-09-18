@@ -11,6 +11,7 @@ import {
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import {
+  CheckboxOptions,
   fieldHistoryToFormattedValue,
   fieldHistoryToRows,
   formatLocation,
@@ -22,7 +23,7 @@ import {
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { RadioFieldData, smokerOrVaperFieldData, TextFieldData } from './fieldData'
+import { CheckboxFieldData, RadioFieldData, smokerOrVaperFieldData, TextFieldData } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -35,6 +36,7 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
+import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
 
 export default class PersonalController {
   constructor(
@@ -832,92 +834,163 @@ export default class PersonalController {
     }
   }
 
+  editCheckboxes(formTitle: string, fieldData: CheckboxFieldData, options: CheckboxOptions[]) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { prisonerNumber } = req.params
+      const { prisonerData } = req.middleware
+      const { firstName, lastName, cellLocation } = prisonerData
+      const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
+      const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
+
+      const errors = req.flash('errors')
+
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: fieldData.auditPage,
+      })
+
+      res.render('pages/edit/checkboxField', {
+        pageTitle: `${fieldData.pageTitle} - Prisoner personal details`,
+        formTitle,
+        formHint: fieldData.hintText || '',
+        fieldName: fieldData.fieldName,
+        formOptions: fieldData.options,
+        prisonerNumber,
+        prisonerName,
+        breadcrumbPrisonerName: prisonerBannerName,
+        errors,
+        checkboxInputs: options,
+        checkedItems,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
   medicalDiet() {
+    const fieldData: CheckboxFieldData = {
+      fieldName: 'medicalDiet',
+      auditPage: Page.EditMedicalDiet,
+      pageTitle: 'Medical diet',
+      url: 'medical-diet',
+      hintText: 'Select all that apply',
+      options: {
+        showDontKnow: true,
+        showNo: true,
+      },
+    }
+
+    const checkboxInputs: CheckboxOptions[] = [
+      {
+        text: "A 'free from' diet",
+        value: 'FREE_FROM',
+        subValues: {
+          title: 'Which foods does this diet exclude',
+          hint: 'Select all that apply',
+          options: [
+            {
+              text: 'Any foods that interact with monoamine oxidase inhibitors',
+              value: 'MONOAMINE',
+            },
+            { text: 'Cheese', value: 'CHEESE' },
+            { text: 'Egg', value: 'EGG' },
+            { text: 'Fat', value: 'FAT' },
+            { text: 'Fried food', value: 'FRIED_FOOD' },
+            { text: 'Fish', value: 'FISH' },
+            { text: 'Garlic', value: 'GARLIC' },
+            { text: 'Lactose', value: 'LACTOSE' },
+            { text: 'Onion', value: 'ONION' },
+            { text: 'Pork', value: 'PORK' },
+            { text: 'Potato', value: 'POTATO' },
+          ],
+        },
+      },
+      { text: 'Low fat', value: 'LOW_FAT' },
+      { text: 'Low salt', value: 'LOW_SALT' },
+      { text: 'Diabetic', value: 'DIABETIC' },
+      { text: 'Low cholesterol', value: 'LOW_CHOLESTEROL' },
+      { text: 'Coeliac', value: 'COELIAC' },
+      { text: 'Pregnant', value: 'PREGNANT' },
+      { text: 'Disordered eating', value: 'DISORDERED_EATING' },
+    ]
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Medical diet'
-        const { prisonerNumber } = req.params
         const { prisonerData } = req.middleware
-        const { firstName, lastName, cellLocation } = prisonerData
-        const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
-        const checkedItems = requestBodyFlash ? Object.values(requestBodyFlash).flat() : []
-
-        const errors = req.flash('errors')
-
-        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const formTitle = `Does ${prisonerName} have any of these medical dietary requirements?`
 
-        const checkboxInputs: {
-          label: string
-          value: string
-          subValues?: { title: string; hint: string; items: { label: string; value: string }[] }
-        }[] = [
-          {
-            label: "A 'free from' diet",
-            value: 'FREE_FROM',
-            subValues: {
-              title: 'Which foods does this diet exclude',
-              hint: 'Select all that apply',
-              items: [
-                {
-                  label: 'Any foods that interact with monoamine oxidase inhibitors',
-                  value: 'MONOAMINE',
-                },
-                { label: 'Cheese', value: 'CHEESE' },
-                { label: 'Egg', value: 'EGG' },
-                { label: 'Fat', value: 'FAT' },
-                { label: 'Fried food', value: 'FRIED_FOOD' },
-                { label: 'Fish', value: 'FISH' },
-                { label: 'Garlic', value: 'GARLIC' },
-                { label: 'Lactose', value: 'LACTOSE' },
-                { label: 'Onion', value: 'ONION' },
-                { label: 'Pork', value: 'PORK' },
-                { label: 'Potato', value: 'POTATO' },
-              ],
-            },
-          },
-          { label: 'Low fat', value: 'LOW_FAT' },
-          { label: 'Low salt', value: 'LOW_SALT' },
-          { label: 'Diabetic', value: 'DIABETIC' },
-          { label: 'Low cholesterol', value: 'LOW_CHOLESTEROL' },
-          { label: 'Coeliac', value: 'COELIAC' },
-          { label: 'Pregnant', value: 'PREGNANT' },
-          { label: 'Disordered eating', value: 'DISORDERED_EATING' },
-        ]
-
-        // TODO
-        // await this.auditService.sendPageView({
-        //   user: res.locals.user,
-        //   prisonerNumber: prisonerData.prisonerNumber,
-        //   prisonId: prisonerData.prisonId,
-        //   correlationId: req.id,
-        //   page: auditPage,
-        // })
-
-        res.render('pages/edit/medicalDiet', {
-          pageTitle: `${pageTitle} - Prisoner personal details`,
-          formTitle: pageTitle,
-          prisonerNumber,
-          prisonerName,
-          breadcrumbPrisonerName: prisonerBannerName,
-          errors,
-          checkboxInputs,
-          checkedItems,
-          miniBannerData: {
-            prisonerName: prisonerBannerName,
-            prisonerNumber,
-            cellLocation: formatLocation(cellLocation),
-          },
-        })
+        return this.editCheckboxes(formTitle, fieldData, checkboxInputs)(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        // Don't do anything for now as the API is yet to be determined
         const { prisonerNumber } = req.params
         req.flash('flashMessage', {
           text: `Medical diet updated`,
           type: FlashMessageType.success,
           fieldName: 'medicalDiet',
+        })
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      },
+    }
+  }
+
+  foodAllergies() {
+    const fieldData: CheckboxFieldData = {
+      fieldName: 'foodAllergies',
+      auditPage: Page.EditFoodAllergies,
+      pageTitle: 'Food allergies',
+      url: 'food-allergies',
+      hintText: 'Select all that apply',
+      options: {
+        showDontKnow: true,
+        showNo: true,
+      },
+    }
+
+    const checkboxInputs: CheckboxOptions[] = [
+      { text: 'Celery', value: 'CELERY' },
+      { text: 'Cereals containing gluten', value: 'GLUTEN' },
+      { text: 'Crustaceans', value: 'CRUSTACEANS' },
+      { text: 'Egg', value: 'EGG' },
+      { text: 'Fish', value: 'FISH' },
+      { text: 'Lupin', value: 'LUPIN' },
+      { text: 'Milk', value: 'MILK' },
+      { text: 'Molluscs', value: 'MOLLUSCS' },
+      { text: 'Mustard', value: 'MUSTARD' },
+      { text: 'Peanuts', value: 'PEANUTS' },
+      { text: 'Seasame', value: 'SEASAME' },
+      { text: 'Soya', value: 'SOYA' },
+      { text: 'Sulpur Dioxide', value: 'SULPUR_DIOXIDE' },
+      { text: 'Tree nuts', value: 'TREE_NUTS' },
+    ]
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const formTitle = `Does ${prisonerName} have any food allergies?`
+
+        return this.editCheckboxes(formTitle, fieldData, checkboxInputs)(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        req.flash('flashMessage', {
+          text: `Food allergies updated`,
+          type: FlashMessageType.success,
+          fieldName: 'foodAllergies',
         })
         return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
       },
