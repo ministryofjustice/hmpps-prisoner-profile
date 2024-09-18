@@ -17,4 +17,15 @@ export default {
       },
     })
   },
+
+  stubWhereaboutsApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/whereabouts/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

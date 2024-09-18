@@ -107,9 +107,21 @@ const stubGetPlpActiveGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): 
     },
   })
 
+const stubPlpApiPing = (httpStatus: number) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/plpApi/health/ping',
+    },
+    response: {
+      status: httpStatus,
+    },
+  })
+
 export default {
   stubGetPlpActiveGoals,
   stubGetPlpActiveGoalsForPrisonerWithNoGoals,
   stubGetPlpActiveGoals500Error,
   stubGetPlpActiveGoalsPrisonerHasNoPlanYet,
+  stubPlpApiPing,
 }

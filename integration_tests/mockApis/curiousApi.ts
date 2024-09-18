@@ -313,4 +313,15 @@ export default {
       },
     })
   },
+
+  stubCuriousApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/curiousApi/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

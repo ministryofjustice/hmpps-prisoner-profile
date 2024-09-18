@@ -49,4 +49,15 @@ const stubPrisonById404Error = (prisonId = 'MDI'): SuperAgentRequest =>
     },
   })
 
-export default { stubGetAllPrisons, getPrisonById, stubPrisonById404Error }
+const stubPrisonRegisterApiPing = (httpStatus: number) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/prisonRegister/health/ping',
+    },
+    response: {
+      status: httpStatus,
+    },
+  })
+
+export default { stubGetAllPrisons, getPrisonById, stubPrisonById404Error, stubPrisonRegisterApiPing }

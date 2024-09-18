@@ -45,4 +45,15 @@ export default {
       response,
     })
   },
+
+  stubKeyworkerApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/keyworker/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

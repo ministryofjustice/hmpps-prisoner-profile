@@ -232,4 +232,15 @@ export default {
       },
     })
   },
+
+  stubCaseNotesApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/casenotes/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }

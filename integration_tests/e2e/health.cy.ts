@@ -18,7 +18,7 @@ context('Healthcheck', () => {
     })
   })
 
-  context('Some unhealthy', () => {
+  context('Some mandatory APIs unhealthy', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupHealthPings({ httpStatus: 500 })
@@ -34,6 +34,27 @@ context('Healthcheck', () => {
 
     it('Health check page is visible and DOWN', () => {
       cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).its('body.status').should('equal', 'DOWN')
+    })
+  })
+
+  context('Some optional APIs unhealthy', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupHealthPings({ httpStatus: 200 })
+      cy.task('stubKeyworkerApiPing', 500)
+    })
+
+    it('Reports correctly when keyworker API is down', () => {
+      cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).then(response => {
+        expect(response.body.components.keyworkerApi.status).to.equal('DOWN')
+        expect(response.body.components.keyworkerApi.details).to.contain({ status: 500, retries: 2 })
+      })
+    })
+
+    it('Health check page is visible and DEGRADED', () => {
+      cy.request({ url: '/health', method: 'GET', failOnStatusCode: false })
+        .its('body.status')
+        .should('equal', 'DEGRADED')
     })
   })
 })

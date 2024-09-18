@@ -56,4 +56,15 @@ export default {
       },
     })
   },
+
+  stubAllocationApiPing: (httpStatus: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/allocation/health/ping',
+      },
+      response: {
+        status: httpStatus,
+      },
+    }),
 }
