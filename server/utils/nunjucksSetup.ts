@@ -8,7 +8,6 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
-  checkboxFieldDataToInputs,
   fieldHistoryToRows,
   findError,
   formatMoney,
@@ -25,6 +24,7 @@ import {
   toNonAssociationRows,
   userHasRoles,
 } from './utils'
+import { checkboxFieldDataToInputs } from './checkboxUtils'
 import { pluralise } from './pluralise'
 import { formatAddressDate, formatDate, formatDateTime, timeFormat } from './dateHelpers'
 import config from '../config'

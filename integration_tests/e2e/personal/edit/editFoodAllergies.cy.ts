@@ -29,14 +29,13 @@ context('Edit medical diet', () => {
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubPrisonPersonUpdateHealth', { prisonerNumber })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/medical-diet`,
+    editUrl: `prisoner/${prisonerNumber}/personal/edit/food-allergies`,
     editPageWithTitle: EditPage,
-    editPageTitle: 'Does John Saunders have any of these medical dietary requirements?',
-    successfulFlashMessage: 'Medical diet updated',
+    editPageTitle: 'Does John Saunders have any food allergies?',
+    successfulFlashMessage: 'Food allergies updated',
     validInputs: {
-      checkboxInputs: { medicalDiet: [{ value: 'FREE_FROM', subvalues: ['LACTOSE', 'CHEESE'] }, 'LOW_FAT'] },
+      checkboxInputs: { foodAllergies: ['EGG', 'GLUTEN'] },
     },
     redirectAnchor: 'personal-details',
   })

@@ -23,6 +23,13 @@ export interface RadioFieldData extends FieldData {
   code?: PrisonPersonCharacteristicCode
 }
 
+export interface CheckboxFieldData extends FieldData {
+  options?: {
+    showDontKnow?: boolean
+    showNo?: boolean
+  }
+}
+
 export const shoeSizeFieldData: TextFieldData = {
   pageTitle: 'Shoe size',
   fieldName: 'shoeSize',

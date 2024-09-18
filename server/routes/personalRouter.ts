@@ -302,14 +302,24 @@ export default function personalRouter(services: Services): Router {
   editRoute({
     path: 'edit/medical-diet',
     edit: {
-      // TODO
-      audit: Page.EditEyeColour,
+      audit: Page.EditMedicalDiet,
       method: personalController.medicalDiet().edit,
     },
     submit: {
-      // TODO
-      audit: Page.PostEditEyeColour,
+      audit: Page.PostEditMedicalDiet,
       method: personalController.medicalDiet().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/food-allergies',
+    edit: {
+      audit: Page.EditFoodAllergies,
+      method: personalController.foodAllergies().edit,
+    },
+    submit: {
+      audit: Page.PostEditFoodAllergies,
+      method: personalController.foodAllergies().submit,
     },
   })
 
