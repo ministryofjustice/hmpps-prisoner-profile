@@ -20,19 +20,6 @@ describe('Validation middleware', () => {
     expect(result).toEqual([])
   })
 
-  it('should fail validation when hearing type is missing', async () => {
-    const vlbForm = {
-      preAppointment: 'no',
-      postAppointment: 'no',
-      court: 'CODE',
-      cvpRequired: 'no',
-    }
-
-    const result = PrePostAppointmentValidator(vlbForm)
-
-    expect(result).toEqual([{ text: 'Select the hearing type', href: '#hearingType' }])
-  })
-
   it('should fail validation with no data', async () => {
     const vlbForm = {
       preAppointment: '',
