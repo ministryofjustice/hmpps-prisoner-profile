@@ -200,15 +200,45 @@
                                     errorMessage: errors | findError("hearingType")
                                 }) }}
 
-                                {{ govukInput({
-                                    name: "videoLinkUrl",
-                                    id: "videoLinkUrl",
-                                    label: {
-                                        text: "Court hearing link (optional)"
+                                {% set courtHearingLinkHtml %}
+                                    {{ govukInput({
+                                        name: "videoLinkUrl",
+                                        id: "videoLinkUrl",
+                                        label: {
+                                            text: "Court hearing link"
+                                        },
+                                        value: formValues.videoLinkUrl,
+                                        errorMessage: errors | findError("videoLinkUrl")
+                                    }) }}
+                                {% endset %}
+
+                                {{ govukRadios({
+                                    idPrefix: "cvpRequired",
+                                    name: "cvpRequired",
+                                    errorMessage: errors | findError('cvpRequired'),
+                                    fieldset: {
+                                        legend: {
+                                            text: "Do you know the link for this video link hearing?",
+                                            classes: "govuk-fieldset__legend--s"
+                                        }
                                     },
-                                    value: formValues.videoLinkUrl,
-                                    errorMessage: errors | findError("videoLinkUrl")
+                                    items: [
+                                        {
+                                            value: "yes",
+                                            text: "Yes",
+                                            checked: formValues.cvpRequired == 'yes',
+                                            conditional: {
+                                                html: courtHearingLinkHtml
+                                            }
+                                        },
+                                        {
+                                            value: "no",
+                                            text: "No",
+                                            checked: formValues.cvpRequired == 'no'
+                                        }
+                                    ]
                                 }) }}
+
                             {% endif %}
                         </div>
                     </div>

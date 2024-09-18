@@ -86,6 +86,8 @@ const formBodyVLB = {
   postAppointment: 'yes',
   postAppointmentLocation: locationsMock[1].locationId,
   court: courtLocationsMock[0].id,
+  cvpRequired: 'yes',
+  videoLinkUrl: 'http://test.url',
 }
 
 const videoLinkBookingForm: VideoLinkBookingForm = {
@@ -621,6 +623,7 @@ describe('Appointments Controller', () => {
       profileUrl: `/prisoner/${prisonerNumber}`,
       movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
       bookAVideoLinkEnabled: false,
+      videoLinkUrl: 'http://test.url',
     })
   })
 
