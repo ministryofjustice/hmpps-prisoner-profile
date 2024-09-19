@@ -162,7 +162,7 @@ context('Case Notes Page', () => {
     })
 
     it('Displays the case notes and sorts results by Created (oldest)', () => {
-      caseNotesPage.sort().invoke('attr', 'value').should('eq', '') // Default sort - Created (most recent)
+      caseNotesPage.sort().invoke('attr', 'value').should('eq', 'creationDateTime,DESC') // Default sort - Created (most recent)
       caseNotesPage.caseNotesListItem().first().contains('18 April 2023 at 17:15')
       caseNotesPage.caseNotesListItem().first().contains('Created by: John Smith')
 

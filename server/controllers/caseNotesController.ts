@@ -40,8 +40,8 @@ export default class CaseNotesController {
         permissions,
       } = req.middleware
 
+      queryParams.sort = (req.query.sort as string) || 'creationDateTime,DESC'
       if (req.query.page) queryParams.page = +req.query.page
-      if (req.query.sort) queryParams.sort = req.query.sort as string
       if (req.query.type) queryParams.type = req.query.type as string
       if (req.query.subType) queryParams.subType = req.query.subType as string
       if (req.query.startDate) queryParams.startDate = req.query.startDate as string
