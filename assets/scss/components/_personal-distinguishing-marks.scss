@@ -1,0 +1,159 @@
+.personal-distinguishing-marks {
+  display: flex;
+
+  dl {
+    margin: 0;
+  }
+
+  dt {
+    @include govuk-font($size: 19, $weight: 'bold');
+  }
+
+
+  &__row {
+    margin-bottom: govuk-spacing(3);
+    border-bottom: 1px solid $govuk-border-colour;
+
+    &__key {
+      padding-bottom: govuk-spacing(3);
+    }
+
+    &__empty {
+      display: flex;
+    }
+
+    &__populated {
+      dd {
+        margin: 0;
+
+        details {
+          margin-bottom: govuk-spacing(2);
+
+          &:not(:last-of-type) {
+            padding-bottom: govuk-spacing(2);
+            border-bottom: 1px solid $govuk-canvas-background-colour;
+          }
+        }
+        summary.govuk-details__summary {
+          color: govuk-colour('black');
+        }
+      }
+
+
+
+      &__row {
+        padding: 0 0 govuk-spacing(3) 0;
+      }
+    }
+
+    &__mark {
+      margin: 0;
+      &__row {
+        margin: 0;
+      }
+    }
+  }
+
+  &__info {
+    width: 100%;
+  }
+
+  &__image-container {
+    position: relative;
+
+    .dm-base-image {
+      display: block;
+    }
+
+    .dm-overlay-face {
+      position: absolute;
+      top: 16px;
+      left: 61px;
+      height: 65px;
+    }
+
+    .dm-overlay-neck {
+      position: absolute;
+      top: 72px;
+      left: 70px;
+      height: 18px;
+    }
+
+    .dm-overlay-torso {
+      position: absolute;
+      top: 87px;
+      left: 41px;
+      height: 175px;
+    }
+
+    .dm-overlay-right-arm {
+      position: absolute;
+      top: 102px;
+      left: 15px;
+      height: 171px;
+    }
+
+    .dm-overlay-right-hand {
+      position: absolute;
+      top: 269px;
+      left: 15px;
+      height: 48px;
+    }
+
+    .dm-overlay-left-arm {
+      position: absolute;
+      top: 102px;
+      left: 121px;
+      height: 175px;
+    }
+
+    .dm-overlay-left-hand {
+      position: absolute;
+      top: 269px;
+      left: 129px;
+      height: 48px;
+    }
+
+    .dm-overlay-right-leg {
+      position: absolute;
+      top: 261px;
+      left: 43px;
+      height: 241px;
+    }
+
+    .dm-overlay-right-foot {
+      position: absolute;
+      top: 499px;
+      left: 51px;
+      height: 57px;
+    }
+
+    .dm-overlay-left-leg {
+      position: absolute;
+      top: 261px;
+      left: 85px;
+      height: 241px;
+    }
+
+    .dm-overlay-left-foot {
+      position: absolute;
+      top: 499px;
+      left: 93px;
+      height: 57px;
+    }
+
+    .dm-overlay-back-head {
+      position: absolute;
+      top: 15px;
+      left: 218px;
+      height: 60px;
+    }
+
+    .dm-overlay-back {
+      position: absolute;
+      top: 87px;
+      left: 199px;
+      height: 176px;
+    }
+  }
+}

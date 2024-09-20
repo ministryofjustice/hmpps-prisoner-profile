@@ -26,6 +26,7 @@ import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import {
+  PrisonPersonDistinguishingMark,
   PrisonPerson,
   PrisonPersonApiClient,
   PrisonPersonPhysicalAttributesUpdate,
@@ -47,6 +48,11 @@ export default class PersonalPageService {
       return apiClient.getPrisonPerson(prisonerNumber)
     }
     return null
+  }
+
+  async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
+    const apiClient = this.prisonPersonApiClientBuilder(token)
+    return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
   async updatePhysicalAttributes(
@@ -81,6 +87,7 @@ export default class PersonalPageService {
       identifiers,
       beliefs,
       prisonPerson,
+      distinguishingMarks,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -91,6 +98,7 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
+      enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -121,6 +129,7 @@ export default class PersonalPageService {
       learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
+      distinguishingMarks,
     }
   }
 
