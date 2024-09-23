@@ -424,4 +424,13 @@ export default class PersonalPageService {
 
     return response
   }
+
+  async updateCityOrTownOfBirth(
+    _clientToken: string,
+    _user: PrisonUser,
+    _prisonerNumber: string,
+    _cityOrTownOfBirth: string,
+  ) {
+    // TODO: Call new Prison API edit endpoint
+  }
 }

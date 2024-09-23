@@ -23,7 +23,13 @@ import {
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { CheckboxFieldData, RadioFieldData, smokerOrVaperFieldData, TextFieldData } from './fieldData'
+import {
+  CheckboxFieldData,
+  PhysicalAttributesTextFieldData,
+  RadioFieldData,
+  smokerOrVaperFieldData,
+  TextFieldData,
+} from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -37,6 +43,9 @@ import {
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
 import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
+
+type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
+type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
 
 export default class PersonalController {
   constructor(
@@ -379,22 +388,62 @@ export default class PersonalController {
     }
   }
 
-  textInput(fieldData: TextFieldData) {
-    const { pageTitle, hintText, auditPage, fieldName, url, inputClasses } = fieldData
+  cityOrPlaceOfBirthTextInput = (fieldData: TextFieldData) =>
+    this.textInput(fieldData, this.getCityOrPlaceOfBirth.bind(this), this.setCityOrPlaceOfBirth.bind(this))
+
+  private async getCityOrPlaceOfBirth(req: Request): Promise<string> {
+    return Promise.resolve(req.middleware?.inmateDetail?.birthPlace)
+  }
+
+  private async setCityOrPlaceOfBirth(
+    req: Request,
+    res: Response,
+    _fieldData: TextFieldData,
+    value: string,
+  ): Promise<void> {
+    const { prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const user = res.locals.user as PrisonUser
+    await this.personalPageService.updateCityOrTownOfBirth(clientToken, user, prisonerNumber, value)
+  }
+
+  physicalAttributesTextInput = (fieldData: PhysicalAttributesTextFieldData) =>
+    this.textInput(fieldData, this.getPhysicalAttributesText.bind(this), this.setPhysicalAttributesText.bind(this))
+
+  private async getPhysicalAttributesText(req: Request, fieldData: PhysicalAttributesTextFieldData): Promise<string> {
+    const { prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+    return (prisonPerson?.physicalAttributes[fieldData.fieldName] as ValueWithMetadata<string>)?.value
+  }
+
+  private async setPhysicalAttributesText(
+    req: Request,
+    res: Response,
+    fieldData: PhysicalAttributesTextFieldData,
+    value: string,
+  ): Promise<void> {
+    const { prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const user = res.locals.user as PrisonUser
+    await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+      [fieldData.fieldName]: value,
+    })
+  }
+
+  private textInput(fieldData: TextFieldData, getter: TextFieldGetter, setter: TextFieldSetter) {
+    const { pageTitle, hintText, auditPage, fieldName, url, redirectAnchor, inputClasses } = fieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { clientToken, prisonerData } = req.middleware
+        const { prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ [fieldName: string]: string }>(req)
         const errors = req.flash('errors')
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-        const fieldValue = requestBodyFlash
-          ? requestBodyFlash[fieldName]
-          : (prisonPerson?.physicalAttributes[fieldName] as ValueWithMetadata<string>)?.value
+        const fieldValue = requestBodyFlash ? requestBodyFlash[fieldName] : await getter(req, fieldData)
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -420,14 +469,10 @@ export default class PersonalController {
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
         const fieldValue = req.body[fieldName] || null
 
         try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-            [fieldName]: fieldValue,
-          })
+          await setter(req, res, fieldData, fieldValue)
 
           req.flash('flashMessage', {
             text: `${pageTitle} updated`,
@@ -445,7 +490,7 @@ export default class PersonalController {
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('requestBody', JSON.stringify(req.body))
           req.flash('errors', [{ text: 'There was an error please try again' }])

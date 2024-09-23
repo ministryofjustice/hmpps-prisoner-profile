@@ -13,6 +13,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
   buildFieldData,
+  cityOrTownOfBirthFieldData,
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
@@ -181,11 +182,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/shoe-size',
     edit: {
       audit: Page.EditShoeSize,
-      method: personalController.textInput(shoeSizeFieldData).edit,
+      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditShoeSize,
-      method: personalController.textInput(shoeSizeFieldData).submit,
+      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).submit,
       validation: {
         validators: [shoeSizeValidator],
         redirectBackOnError: true,
@@ -320,6 +321,18 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditFoodAllergies,
       method: personalController.foodAllergies().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/city-or-town-of-birth',
+    edit: {
+      audit: Page.EditCityOrTownOfBirth,
+      method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditCityOrTownOfBirth,
+      method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
     },
   })
 
