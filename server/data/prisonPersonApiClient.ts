@@ -1,3 +1,4 @@
+import { Readable } from 'stream'
 import config from '../config'
 import {
   FieldHistory,
@@ -72,6 +73,12 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   async getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
     return this.restClient.get<PrisonPersonDistinguishingMark[]>({
       path: `/identifying-marks/prisoner/${prisonerNumber}`,
+    })
+  }
+
+  async getImage(imageId: string): Promise<Readable> {
+    return this.restClient.stream({
+      path: `/photographs/${imageId}/file`,
     })
   }
 }

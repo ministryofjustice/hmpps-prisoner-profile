@@ -1,3 +1,5 @@
+import { Readable } from 'stream'
+
 export interface ValueWithMetadata<T> {
   value?: T
   lastModifiedAt: string
@@ -162,4 +164,6 @@ export interface PrisonPersonApiClient {
   getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]>
 
   getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]>
+
+  getImage(imageId: string): Promise<Readable>
 }

@@ -99,6 +99,7 @@ describe('PersonalPageService', () => {
       updateHealth: jest.fn(),
       getFieldHistory: jest.fn(),
       getDistinguishingMarks: jest.fn().mockResolvedValue([distinguishingMarkMock]),
+      getImage: jest.fn(),
     }
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>

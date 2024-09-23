@@ -52,6 +52,7 @@ context('When signed in', () => {
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
       cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       visitPersonalDetailsPage()
     })
 
@@ -292,25 +293,37 @@ context('When signed in', () => {
         page.appearance().shoeSize().should('include.text', '10')
         page.appearance().warnedAboutTattooing().should('include.text', 'Yes')
         page.appearance().warnedNotTochangeAppearance().should('include.text', 'Yes')
+      })
 
-        page.appearance().distinguishingMarks(0).bodyPart().should('include.text', 'Arm')
-        page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
-        page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
-        page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
-        page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
+      it('Displays the distinguishing marks', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.appearance().prisonPersonDistinguishingMarks().tattoos().should('include.text', 'Not entered')
+        page.appearance().prisonPersonDistinguishingMarks().others().should('include.text', 'Not entered')
 
-        page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Torso')
-        page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
-        page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
-        page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
-        page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
+        page.appearance().prisonPersonDistinguishingMarks().scars().find('details > summary').click()
 
-        page.appearance().distinguishingMarks(2).bodyPart().should('include.text', 'Leg')
-        page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
-        page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
-        page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
-        page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
-        page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
+        const scarsDetail = page
+          .appearance()
+          .prisonPersonDistinguishingMarks()
+          .scars()
+          .find('details > .govuk-details__text')
+
+        scarsDetail.should('be.visible')
+
+        const scarsDetailHeaders = scarsDetail.find('dt')
+
+        scarsDetailHeaders.each((element, index) => {
+          const expectedHeaders = ['Location', 'Description', 'Photograph']
+          const expectedTexts = ['Arm - no specific location', 'Horrible arm scar']
+
+          cy.wrap(element).should('include.text', expectedHeaders[index])
+
+          if (index < 2) {
+            cy.wrap(element.siblings('dd')).should('include.text', expectedTexts[index])
+          } else {
+            cy.wrap(element.siblings('dd')).find('img').should('have.length', 1)
+          }
+        })
       })
     })
 
@@ -493,6 +506,52 @@ context('When signed in', () => {
         page.neurodiversity().neurodiversityAssessed().should('be.visible')
         page.neurodiversity().neurodiversityTitle().should('be.visible')
       })
+    })
+  })
+
+  context('Prison person api is disabled', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth({
+        caseLoads: [
+          {
+            caseLoadId: 'DTI',
+            currentlyActive: true,
+            description: '',
+            type: '',
+            caseloadFunction: '',
+          },
+        ],
+      })
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
+      cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
+      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays distinguishingMarks information from inmate details', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+
+      page.appearance().distinguishingMarks(0).bodyPart().should('include.text', 'Arm')
+      page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
+      page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
+      page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
+
+      page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Torso')
+      page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
+      page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
+      page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
+
+      page.appearance().distinguishingMarks(2).bodyPart().should('include.text', 'Leg')
+      page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
+      page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
+      page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
+      page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
     })
   })
 })

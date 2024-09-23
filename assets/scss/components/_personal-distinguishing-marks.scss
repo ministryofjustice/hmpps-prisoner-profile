@@ -3,6 +3,10 @@
 
   dl {
     margin: 0;
+    &:not(:last-of-type) {
+      border-bottom: 1px solid $govuk-canvas-background-colour;
+      margin-bottom: govuk-spacing(3);
+    }
   }
 
   dt {
@@ -37,12 +41,21 @@
         summary.govuk-details__summary {
           color: govuk-colour('black');
         }
+
+        div.govuk-details__text {
+          padding-bottom: 0;
+        }
       }
-
-
 
       &__row {
         padding: 0 0 govuk-spacing(3) 0;
+
+        &__image-list {
+          list-style-type: none;
+          padding-left: 0;
+          margin-bottom: 0;
+          margin-top: govuk-spacing(1);
+        }
       }
     }
 

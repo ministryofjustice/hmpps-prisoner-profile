@@ -138,6 +138,14 @@ export default class PersonalPage extends Page {
           image: () => mark().findDataQa('mark-image'),
         }
       },
+      prisonPersonDistinguishingMarks: () => {
+        const marks = () => cy.get('.personal-distinguishing-marks__info')
+        return {
+          tattoos: () => marks().findDataQa('distinguishing-marks-tattoos'),
+          scars: () => marks().findDataQa('distinguishing-marks-scars'),
+          others: () => marks().findDataQa('distinguishing-marks-others'),
+        }
+      },
     }
   }
 

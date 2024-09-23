@@ -6,6 +6,10 @@ import {
   ReferenceDataDomain,
 } from '../../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { stubGetWithBody, stubPatchWithResponse } from './utils'
+import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
+import { stubFor } from './wiremock'
+
+const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   prisonerNumber,
@@ -89,6 +93,28 @@ export default {
         ...overrides,
       },
     }),
+
+  stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubGetWithBody({
+      path: `${baseUrl}identifying-marks/prisoner/${prisonerNumber}`,
+      body: [distinguishingMarkMock],
+    }),
+
+  stubPrisonPersonGetImage: (photoId: string = distinguishingMarkMock.photographUuids[0]) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `${baseUrl}photographs/${photoId}/file`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+        bodyFileName: placeHolderImagePath,
+      },
+    })
+  },
 
   // Reference data
   stubGetReferenceDataDomains: (resp: ReferenceDataDomain[]) =>

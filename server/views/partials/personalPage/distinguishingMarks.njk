@@ -21,10 +21,23 @@
                                 <dd class='govuk-!-margin-left-0'>{{ mark.location }} </dd>
                             </div>
 
-                            <div class="personal-distinguishing-marks__row__mark__row">
+                            <div class="personal-distinguishing-marks__row__populated__row">
                                 <dt class="personal-distinguishing-marks__row__mark__row__key">Description</dt>
                                 <dd class='govuk-!-margin-left-0'>{{ mark.comment or "Not entered" }}</dd>
                             </div>
+
+                            {% if mark.photographUuids.length %}
+                                <div class="personal-distinguishing-marks__row__populated__row">
+                                    <dt class="personal-distinguishing-marks__row__mark__row__key">Photograph{% if mark.photographUuids.length > 1 %}s{% endif %}</dt>
+                                    <dd class='govuk-!-margin-left-0'>
+                                        <ul class="personal-distinguishing-marks__row__populated__row__image-list">
+                                        {% for imageId in mark.photographUuids %}
+                                            <li><img src="/api/prison-person-image/{{ imageId }}" alt="Image of something" width="150px" /></li>
+                                        {% endfor %}
+                                        </ul>
+                                    </dd>
+                                </div>
+                            {% endif %}
                         </dl>
                     {% endfor %}
                 </div>
@@ -47,20 +60,18 @@
         <dl>
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.tattoos | length else "populated" }}">
                 <dt class="personal-distinguishing-marks__row__key">Tattoos {{ groupedDistinguishingMarks.tattoos.length }}</dt>
-                <dd>{{ distinguishingMark(groupedDistinguishingMarks.tattoos) }}</dd>
+                <dd data-qa="distinguishing-marks-tattoos">{{ distinguishingMark(groupedDistinguishingMarks.tattoos) }}</dd>
             </div>
 
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.scars | length else "populated" }}">
                 <dt class="personal-distinguishing-marks__row__key">Scars</dt>
-                <dd >{{ distinguishingMark(groupedDistinguishingMarks.scars) }}</dd>
+                <dd data-qa="distinguishing-marks-scars" >{{ distinguishingMark(groupedDistinguishingMarks.scars) }}</dd>
             </div>
 
             <div class="personal-distinguishing-marks__row personal-distinguishing-marks__row__{{ "empty" if not groupedDistinguishingMarks.others | length else "populated" }}">
                 <dt class="personal-distinguishing-marks__row__key">Other marks</dt>
-                <dd>{{ distinguishingMark(groupedDistinguishingMarks.others) }}</dd>
+                <dd data-qa="distinguishing-marks-others">{{ distinguishingMark(groupedDistinguishingMarks.others) }}</dd>
             </div>
         </dl>
     </div>
 </div>
-
-
