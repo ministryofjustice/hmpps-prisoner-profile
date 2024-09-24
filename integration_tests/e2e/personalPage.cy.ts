@@ -300,30 +300,58 @@ context('When signed in', () => {
         page.appearance().prisonPersonDistinguishingMarks().tattoos().should('include.text', 'Not entered')
         page.appearance().prisonPersonDistinguishingMarks().others().should('include.text', 'Not entered')
 
-        page.appearance().prisonPersonDistinguishingMarks().scars().find('details > summary').click()
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().find('summary').click()
 
-        const scarsDetail = page
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+        const scarsDetailHeaders = page
           .appearance()
           .prisonPersonDistinguishingMarks()
-          .scars()
-          .find('details > .govuk-details__text')
-
-        scarsDetail.should('be.visible')
-
-        const scarsDetailHeaders = scarsDetail.find('dt')
+          .scarsDetail()
+          .content()
+          .find('dt')
 
         scarsDetailHeaders.each((element, index) => {
-          const expectedHeaders = ['Location', 'Description', 'Photograph']
+          const expectedHeaders = ['Location', 'Description']
           const expectedTexts = ['Arm - no specific location', 'Horrible arm scar']
 
           cy.wrap(element).should('include.text', expectedHeaders[index])
-
-          if (index < 2) {
-            cy.wrap(element.siblings('dd')).should('include.text', expectedTexts[index])
-          } else {
-            cy.wrap(element.siblings('dd')).find('img').should('have.length', 1)
-          }
+          cy.wrap(element).siblings('dd').should('include.text', expectedTexts[index])
         })
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().content().find('img').should('have.length', 1)
+      })
+
+      it('Includes hide/show all functionality for a distinguishing mark type', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+
+        const button = page
+          .appearance()
+          .prisonPersonDistinguishingMarks()
+          .scars()
+          .find('button.hmpps-open-close-all__button')
+          .should('include.text', 'Show all scar details')
+
+        button.click()
+        button.should('include.text', 'Hide all scar details')
+
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+
+        button.click()
+        button.should('include.text', 'Show all scar details')
+
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+
+        // clicking the individual details should also update the button state
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().find('summary').click()
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+
+        page
+          .appearance()
+          .prisonPersonDistinguishingMarks()
+          .scars()
+          .find('button.hmpps-open-close-all__button')
+          .should('include.text', 'Hide all scar details')
       })
     })
 

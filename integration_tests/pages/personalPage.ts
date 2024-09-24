@@ -140,10 +140,15 @@ export default class PersonalPage extends Page {
       },
       prisonPersonDistinguishingMarks: () => {
         const marks = () => cy.get('.personal-distinguishing-marks__info')
+        const scarsDetail = () => marks().findDataQa('distinguishing-marks-scars').find('details')
         return {
           tattoos: () => marks().findDataQa('distinguishing-marks-tattoos'),
           scars: () => marks().findDataQa('distinguishing-marks-scars'),
           others: () => marks().findDataQa('distinguishing-marks-others'),
+          scarsDetail: () => ({
+            detail: () => scarsDetail(),
+            content: () => scarsDetail().find('div.govuk-details__text'),
+          }),
         }
       },
     }

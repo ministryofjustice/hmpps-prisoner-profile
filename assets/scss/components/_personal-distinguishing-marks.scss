@@ -1,5 +1,6 @@
 .personal-distinguishing-marks {
   display: flex;
+  flex-wrap: wrap;
 
   dl {
     margin: 0;
@@ -18,26 +19,19 @@
     margin-bottom: govuk-spacing(3);
     border-bottom: 1px solid $govuk-border-colour;
 
-    &__key {
-      padding-bottom: govuk-spacing(3);
-    }
-
     &__empty {
       display: flex;
+      padding-bottom: govuk-spacing(3);
+
+      dt {
+        min-width: 100px;
+      }
     }
 
     &__populated {
       dd {
         margin: 0;
 
-        details {
-          margin-bottom: govuk-spacing(2);
-
-          &:not(:last-of-type) {
-            padding-bottom: govuk-spacing(2);
-            border-bottom: 1px solid $govuk-canvas-background-colour;
-          }
-        }
         summary.govuk-details__summary {
           color: govuk-colour('black');
         }
@@ -47,28 +41,49 @@
         }
       }
 
-      &__row {
-        padding: 0 0 govuk-spacing(3) 0;
+      details {
+        margin-bottom: govuk-spacing(2);
 
-        &__image-list {
-          list-style-type: none;
-          padding-left: 0;
-          margin-bottom: 0;
-          margin-top: govuk-spacing(1);
+        &:not(:last-of-type) {
+          padding-bottom: govuk-spacing(2);
+          border-bottom: 1px solid $govuk-canvas-background-colour;
         }
       }
-    }
 
-    &__mark {
-      margin: 0;
+      &__mark {
+        &:not(:last-of-type) {
+          padding-bottom: govuk-spacing(3);
+          margin-bottom: govuk-spacing(3);
+          border-bottom: 1px solid $govuk-canvas-background-colour;
+        }
+
+        dl {
+          &:not(:last-child) {
+            margin-bottom: govuk-spacing(3);
+          }
+        }
+      }
+
       &__row {
-        margin: 0;
+        &:not(:last-of-type) {
+          padding: 0 0 govuk-spacing(3) 0;
+        }
+
+        &__image-list {
+          display: flex;
+          flex-direction: column;
+          img {
+            &:not(:last-of-type) {
+              margin-bottom: govuk-spacing(2);
+            }
+          }
+        }
       }
     }
   }
 
   &__info {
-    width: 100%;
+    flex-grow: 1;
   }
 
   &__image-container {
@@ -76,95 +91,110 @@
 
     .dm-base-image {
       display: block;
+      margin-top: 5px;
+    }
+
+    .dm-base-label-front {
+        position: absolute;
+        left: 67px;
+        top: 0;
+        font-size: 16px;
+    }
+
+    .dm-base-label-back {
+      position: absolute;
+      left: 226px;
+      top: 0;
+      font-size: 16px;
     }
 
     .dm-overlay-face {
       position: absolute;
-      top: 16px;
+      top: 21px;
       left: 61px;
       height: 65px;
     }
 
     .dm-overlay-neck {
       position: absolute;
-      top: 72px;
+      top: 77px;
       left: 70px;
       height: 18px;
     }
 
     .dm-overlay-torso {
       position: absolute;
-      top: 87px;
+      top: 92px;
       left: 41px;
       height: 175px;
     }
 
     .dm-overlay-right-arm {
       position: absolute;
-      top: 102px;
+      top: 107px;
       left: 15px;
       height: 171px;
     }
 
     .dm-overlay-right-hand {
       position: absolute;
-      top: 269px;
+      top: 274px;
       left: 15px;
       height: 48px;
     }
 
     .dm-overlay-left-arm {
       position: absolute;
-      top: 102px;
+      top: 107px;
       left: 121px;
       height: 175px;
     }
 
     .dm-overlay-left-hand {
       position: absolute;
-      top: 269px;
+      top: 274px;
       left: 129px;
       height: 48px;
     }
 
     .dm-overlay-right-leg {
       position: absolute;
-      top: 261px;
+      top: 266px;
       left: 43px;
       height: 241px;
     }
 
     .dm-overlay-right-foot {
       position: absolute;
-      top: 499px;
+      top: 504px;
       left: 51px;
       height: 57px;
     }
 
     .dm-overlay-left-leg {
       position: absolute;
-      top: 261px;
+      top: 266px;
       left: 85px;
       height: 241px;
     }
 
     .dm-overlay-left-foot {
       position: absolute;
-      top: 499px;
+      top: 504px;
       left: 93px;
       height: 57px;
     }
 
     .dm-overlay-back-head {
       position: absolute;
-      top: 15px;
+      top: 20px;
       left: 218px;
       height: 60px;
     }
 
     .dm-overlay-back {
       position: absolute;
-      top: 87px;
+      top: 92px;
       left: 199px;
       height: 176px;
     }
