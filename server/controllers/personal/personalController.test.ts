@@ -152,8 +152,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ editField: '1234' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ editField: '1234' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -254,8 +253,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ feet: '5', inches: '10' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ feet: '5', inches: '10' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -383,8 +381,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ kilograms: '1234' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -488,8 +485,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ stone: '5', pounds: '10' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ stone: '5', pounds: '10' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -763,8 +759,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ radioField: 'No' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'No' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -876,8 +871,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ shoeSize: '1234' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -984,8 +978,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -1367,9 +1360,9 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody')
-              return [JSON.stringify({ medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM__EGG'] })]
-            return []
+            return key === 'requestBody'
+              ? [JSON.stringify({ medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM__EGG'] })]
+              : []
           },
           middleware: defaultMiddleware,
         } as any

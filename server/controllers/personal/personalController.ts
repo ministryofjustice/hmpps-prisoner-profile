@@ -392,7 +392,7 @@ export default class PersonalController {
     this.textInput(fieldData, this.getCityOrPlaceOfBirth.bind(this), this.setCityOrPlaceOfBirth.bind(this))
 
   private async getCityOrPlaceOfBirth(req: Request): Promise<string> {
-    return Promise.resolve(req.middleware?.inmateDetail?.birthPlace)
+    return req.middleware?.inmateDetail?.birthPlace
   }
 
   private async setCityOrPlaceOfBirth(
