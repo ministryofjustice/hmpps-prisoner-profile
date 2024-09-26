@@ -99,6 +99,12 @@ export default function routes(services: Services): Router {
   )
 
   get(
+    '/api/prison-person-image/:imageId',
+    auditPageAccessAttempt({ services, page: ApiAction.Image }),
+    services.commonApiRoutes.prisonPersonImage,
+  )
+
+  get(
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),

@@ -41,7 +41,7 @@
 {% endmacro %}
 
 {%- call summaryCard({title: "Appearance", id: "appearance"}) -%}
-  {% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length %}
+  {% set listClasses = 'govuk-summary-list--bottom-border' if physicalCharacteristics.distinguishingMarks.length or distinguishingMarks %}
   <div class="govuk-grid-row" data-qa="appearance">
     <div class="govuk-grid-column-full" data-qa="physical-characteristics">
       <h3 class="govuk-heading-m">Physical characteristics</h3>
@@ -63,13 +63,15 @@
           ])
         })
       }}
-      {% if physicalCharacteristics.distinguishingMarks.length > 0 %}
-        <h3 class="govuk-heading-m">Distinguishing marks</h3>
-        <dl class="govuk-summary-list hmpps-distinguishing-marks" data-qa="distinguishing-marks">
-          {% for m in physicalCharacteristics.distinguishingMarks %}
-            {{ summaryListRow(m.type, mark(m), "distinguishing-mark") }}
-          {% endfor %}
-        </dl>
+        {% if distinguishingMarks %}
+            {% include "./distinguishingMarks.njk" %}
+        {% elseif physicalCharacteristics.distinguishingMarks.length > 0 %}
+            <h3 class="govuk-heading-m">Distinguishing marks</h3>
+            <dl class="govuk-summary-list hmpps-distinguishing-marks" data-qa="distinguishing-marks">
+              {% for m in physicalCharacteristics.distinguishingMarks %}
+                {{ summaryListRow(m.type, mark(m), "distinguishing-mark") }}
+              {% endfor %}
+            </dl>
       {% endif %}
     </div>
   </div>

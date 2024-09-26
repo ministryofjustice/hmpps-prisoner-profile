@@ -1,3 +1,5 @@
+import { Readable } from 'stream'
+
 export interface ValueWithMetadata<T> {
   value?: T
   lastModifiedAt: string
@@ -102,6 +104,45 @@ export interface PrisonPersonHealthUpdate {
   smokerOrVaper: string
 }
 
+export interface PrisonPersonDistinguishingMark {
+  id: string
+  prisonerNumber: string
+  bodyPart: ReferenceDataCodeSimple & {
+    id:
+      | 'BODY_PART_ANKLE'
+      | 'BODY_PART_ARM'
+      | 'BODY_PART_EAR'
+      | 'BODY_PART_ELBOW'
+      | 'BODY_PART_FACE'
+      | 'BODY_PART_FINGER'
+      | 'BODY_PART_FOOT'
+      | 'BODY_PART_HAND'
+      | 'BODY_PART_HEAD'
+      | 'BODY_PART_KNEE'
+      | 'BODY_PART_LEG'
+      | 'BODY_PART_LIP'
+      | 'BODY_PART_NECK'
+      | 'BODY_PART_NOSE'
+      | 'BODY_PART_SHOULDER'
+      | 'BODY_PART_THIGH'
+      | 'BODY_PART_TOE'
+      | 'BODY_PART_TORSO'
+  }
+  markType: ReferenceDataCodeSimple & {
+    id: 'MARK_TYPE_MARK' | 'MARK_TYPE_SCAR' | 'MARK_TYPE_TAT' | 'MARK_TYPE_OTH'
+  }
+  side?: ReferenceDataCodeSimple & {
+    id: 'SIDE_B' | 'SIDE_F' | 'SIDE_L' | 'SIDE_R' | 'SIDE_S'
+  }
+  partOrientation?: ReferenceDataCodeSimple & {
+    id: 'PART_ORIENT_CENTR' | 'PART_ORIENT_FACE' | 'PART_ORIENT_LOW' | 'PART_ORIENT_UPP'
+  }
+  comment?: string
+  photographUuids?: string[]
+  createdBy: string
+  createdAt: string
+}
+
 export interface PrisonPersonApiClient {
   getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson>
 
@@ -121,4 +162,8 @@ export interface PrisonPersonApiClient {
   getReferenceDataCode(domain: string, code: string): Promise<ReferenceDataCode>
 
   getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]>
+
+  getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]>
+
+  getImage(imageId: string): Promise<Readable>
 }
