@@ -52,7 +52,7 @@
         rows: toSummaryListRows([
             { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
             { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
-            { key: "Place of birth", value: personalDetails.placeOfBirth | title, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad } },
+            { key: "Place of birth", value: personalDetails.placeOfBirth | title, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
             { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality" } },
             { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
             { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },

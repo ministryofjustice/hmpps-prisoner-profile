@@ -7,7 +7,7 @@ import { AuditService, Page } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import { RadioFieldData, shoeSizeFieldData } from './fieldData'
+import { cityOrTownOfBirthFieldData, RadioFieldData, shoeSizeFieldData } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
@@ -31,6 +31,7 @@ describe('PersonalController', () => {
     clientToken: 'token',
     prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001', prisonerNumber: 'ABC123' },
     inmateDetail: {
+      birthPlace: 'SHEFFIELD',
       profileInformation: [
         { question: 'Smoker of Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
       ],
@@ -151,8 +152,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ editField: '1234' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ editField: '1234' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -253,8 +253,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ feet: '5', inches: '10' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ feet: '5', inches: '10' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -382,8 +381,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ kilograms: '1234' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -487,8 +485,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ stone: '5', pounds: '10' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ stone: '5', pounds: '10' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -762,8 +759,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ radioField: 'No' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'No' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -824,10 +820,10 @@ describe('PersonalController', () => {
     })
   })
 
-  describe('Text input', () => {
+  describe('physical attributes text input', () => {
     describe('edit', () => {
       const action = async (req: any, response: any) =>
-        controller.textInput(shoeSizeFieldData).edit(req, response, () => {})
+        controller.physicalAttributesTextInput(shoeSizeFieldData).edit(req, response, () => {})
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
@@ -875,8 +871,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ shoeSize: '1234' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -888,7 +883,7 @@ describe('PersonalController', () => {
     describe('submit', () => {
       let validRequest: any
       const action = async (req: any, response: any) =>
-        controller.textInput(shoeSizeFieldData).submit(req, response, () => {})
+        controller.physicalAttributesTextInput(shoeSizeFieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
@@ -929,6 +924,112 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/shoe-size')
+      })
+    })
+  })
+
+  describe('city or town of birth text input', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) =>
+        controller.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
+          pageTitle: 'City or town of birth - Prisoner personal details',
+          formTitle: 'City or town of birth',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          hintText: cityOrTownOfBirthFieldData.hintText,
+          inputClasses: cityOrTownOfBirthFieldData.inputClasses,
+          fieldName: cityOrTownOfBirthFieldData.fieldName,
+          fieldValue: 'SHEFFIELD',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: 'SHEFFIELD' }))
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) =>
+        controller.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'ABC123' },
+          body: { cityOrTownOfBirth: 'SHEFFIELD' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it.each([
+        { cityOrTownOfBirth: '', updateRequest: null },
+        { cityOrTownOfBirth: 'ROTHERHAM', updateRequest: 'ROTHERHAM' },
+      ])('Valid request: %s', async ({ cityOrTownOfBirth, updateRequest }) => {
+        const request = { ...validRequest, body: { cityOrTownOfBirth } }
+        await action(request, res)
+        expect(personalPageService.updateCityOrTownOfBirth).toHaveBeenCalledWith(
+          expect.anything(),
+          prisonUserMock,
+          expect.anything(),
+          updateRequest,
+        )
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'City or town of birth updated',
+          type: FlashMessageType.success,
+          fieldName: 'cityOrTownOfBirth',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateCityOrTownOfBirth = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/city-or-town-of-birth')
       })
     })
   })
@@ -1259,9 +1360,9 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody')
-              return [JSON.stringify({ medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM__EGG'] })]
-            return []
+            return key === 'requestBody'
+              ? [JSON.stringify({ medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM__EGG'] })]
+              : []
           },
           middleware: defaultMiddleware,
         } as any
