@@ -74,6 +74,7 @@ export const services = () => {
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
+  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
   const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder, featureToggleService)
@@ -123,7 +124,6 @@ export const services = () => {
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
   const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, prisonPersonService)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),

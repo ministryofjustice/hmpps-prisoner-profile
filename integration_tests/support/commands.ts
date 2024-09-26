@@ -176,8 +176,6 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubGetIdentifiers', prisonerNumber)
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
   cy.task('stubBeliefHistory')
-  cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber })
-  cy.task('stubPrisonPersonGetImage', { prisonerNumber })
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {

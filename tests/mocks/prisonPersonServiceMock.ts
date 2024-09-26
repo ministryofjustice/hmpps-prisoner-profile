@@ -3,5 +3,4 @@ import PrisonPersonService from '../../server/services/prisonPersonService'
 
 export const prisonPersonServiceMock = (): Interface<PrisonPersonService> => ({
   getFieldHistory: jest.fn(),
-  getImage: jest.fn(),
 })

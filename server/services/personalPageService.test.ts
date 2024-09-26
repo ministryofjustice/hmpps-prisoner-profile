@@ -20,7 +20,6 @@ import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import MetricsService from './metrics/metricsService'
 import { prisonUserMock } from '../data/localMockData/user'
-import { distinguishingMarkMock } from '../data/localMockData/distinguishingMarksMock'
 
 jest.mock('./metrics/metricsService')
 
@@ -98,8 +97,6 @@ describe('PersonalPageService', () => {
       getReferenceDataCode: jest.fn(),
       updateHealth: jest.fn(),
       getFieldHistory: jest.fn(),
-      getDistinguishingMarks: jest.fn().mockResolvedValue([distinguishingMarkMock]),
-      getImage: jest.fn(),
     }
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
@@ -568,18 +565,6 @@ describe('PersonalPageService', () => {
         fieldsUpdated: ['smokerOrVaper'],
         user: prisonUserMock,
       })
-    })
-  })
-
-  describe('Prison person distinguishing marks', () => {
-    it('should get distinguishing marks from prison person api when enabled', async () => {
-      const { distinguishingMarks } = await constructService().get('token', PrisonerMockDataA, true)
-      expect(distinguishingMarks).toEqual([distinguishingMarkMock])
-    })
-
-    it('should not get distinguishing marks from prison person api when not enabled', async () => {
-      const { distinguishingMarks } = await constructService().get('token', PrisonerMockDataA, false)
-      expect(distinguishingMarks).toEqual(null)
     })
   })
 })

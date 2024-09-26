@@ -41,7 +41,6 @@ import incentiveSummaryToMiniSummary from '../views/dataUtils/incentiveSummaryTo
 import summaryListRowWithOptionalChangeLink, {
   listToSummaryListRows,
 } from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
-import groupDistinguishingMarks from '../views/dataUtils/groupDistinguishingMarksForView'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -166,5 +165,4 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('fieldHistoryToRows', fieldHistoryToRows)
   njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
-  njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
 }
