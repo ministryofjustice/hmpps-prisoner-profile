@@ -326,7 +326,7 @@ export default (distinguishingMarks: PrisonPersonDistinguishingMark[]): Categori
       // If the body part config for mark has highlight image config, add it to the highlights array (if not already there) to be used by view
       const highlight = bodyPartConfig?.getHighlightConfig(mark)
       const newHighlights =
-        highlight && highlights.find(hl => hl.name === highlight.name) ? highlights : [...highlights, highlight]
+        !highlight || highlights.find(hl => hl.name === highlight.name) ? highlights : [...highlights, highlight]
 
       return {
         ...newGroupedMarks,

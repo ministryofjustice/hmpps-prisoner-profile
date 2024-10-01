@@ -1,0 +1,55 @@
+{% extends "../index.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#appearance" %}
+{% set pageTitle =  "Select "+ markType + " location" %}
+
+{% block body %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
+    </div>
+</div>
+    <h1 class='govuk-!-margin-top-0'>Select where the {{ markType }} is</h1>
+    <p data-qa='explanation-text'>You can only select one body part at a time. You can add more {{ markType}}s for this person later.</p>
+
+<div class="new-dm-body-image-container {{ "dm-base-image-selected" if selected }}" {% if selected %} data-selected="{{ selected }}" {% endif %}>
+    <img src='/assets/images/distinguishingMarks/base-person.svg' alt="" usemap="#body-part-map" aria-describedby="selection-text" />
+    <map name="body-part-map">
+        <area shape="rect" coords="54, 0, 110, 73" alt="Face" href="?{{ "selected=face" if selected !== "face" }}" data-area-value="face">
+        <area shape="rect" coords="237, 0, 294, 67" alt="Head" href="?{{ "selected=head" if selected !== "head" }}" data-area-value="head">
+        <area shape="rect" coords="66, 66, 99, 84" alt="Neck" href="?{{ "selected=neck" if selected !== "neck" }}" data-area-value="neck">
+        <area shape="poly" coords="32, 101, 67, 87, 100, 87, 133, 103, 120, 215, 134, 288, 33, 287, 45, 209" href="?{{ "selected=torso" if selected !== "torso" }}" alt="Torso" data-area-value="torso">
+        <area shape="poly" coords="11, 115, 32, 101, 40, 163, 18, 300, -2, 301" href="?{{ "selected=rightArm" if selected !== "rightArm" }}" alt="Right arm" data-area-value="rightArm">
+        <area shape="poly" coords="134, 103, 154, 112, 166, 301, 151, 299, 126, 163" href="?{{ "selected=leftArm" if selected !== "leftArm" }}" alt="Left arm" data-area-value="leftArm">
+        <area shape="poly" coords="82, 288, 70, 568, 49, 569, 31, 288" href="?{{ "selected=rightLeg" if selected !== "rightLeg" }}" alt="Right leg" data-area-value="rightLeg">
+        <area shape="poly" coords="133, 288, 123, 567, 96, 568, 82, 288" href="?{{ "selected=leftLeg" if selected !== "leftLeg" }}" alt="Left leg" data-area-value="leftLeg">
+        <area shape="poly" coords="216, 101, 251, 87, 284, 87, 317, 103, 304, 215, 318, 288, 217, 287, 229, 209" href="?{{ "selected=back" if selected !== "back" }}" alt="Back" data-area-value="back">
+        <area shape="poly" coords="-2, 300, 17, 298, 32, 317, 30, 354, 0, 334" href="?{{ "selected=rightHand" if selected !== "rightHand" }}" alt="Right hand" data-area-value="rightHand">
+        <area shape="poly" coords="134, 338, 145, 299, 168, 302, 167, 331, 136, 357" href="?{{ "selected=leftHand" if selected !== "leftHand" }}" alt="Left hand" data-area-value="leftHand">
+        <area shape="rect" coords="45, 570, 74, 632" href="?{{ "selected=rightFoot" if selected !== "rightFoot" }}" alt="Right foot" data-area-value="rightFoot">
+        <area shape="rect" coords="92, 568, 121, 633" href="?{{ "selected=leftFoot" if selected !== "leftFoot" }}" alt="Left foot" data-area-value="leftFoot">
+    </map>
+    <p class='dm-base-label-front' alt=''>Front</p>
+    <p class='dm-base-label-back' alt=''>Back</p>
+</div>
+<p id="distinguishing-mark-selection-text" class="govuk-!-margin-bottom-6">{{ selected | toBodyPartDisplayText | capitalize + " selected"  if selected else "No body part selected" }}</p>
+
+<form id="body-part-form" method="post" autocomplete="off">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+    <input type="hidden" name="bodyPart" value="{{ selected }}">
+
+    <div class="govuk-button-group">
+        {{ govukButton({ text: "Continue to add details", attributes: { value: "continue" }, type: "submit" }) }}
+        {{ govukButton({ text: "Save and return to profile", attributes: { value: "returnToProfile" }, type: "submit", classes: "govuk-button--secondary"}) }}
+        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/distinguishingMarksMap.js" nonce="{{ cspNonce }}"></script>
+{% endblock %}

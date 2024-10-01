@@ -104,43 +104,50 @@ export interface PrisonPersonHealthUpdate {
   smokerOrVaper: string
 }
 
+export type BodyPartId =
+  | 'BODY_PART_ANKLE'
+  | 'BODY_PART_ARM'
+  | 'BODY_PART_EAR'
+  | 'BODY_PART_ELBOW'
+  | 'BODY_PART_FACE'
+  | 'BODY_PART_FINGER'
+  | 'BODY_PART_FOOT'
+  | 'BODY_PART_HAND'
+  | 'BODY_PART_HEAD'
+  | 'BODY_PART_KNEE'
+  | 'BODY_PART_LEG'
+  | 'BODY_PART_LIP'
+  | 'BODY_PART_NECK'
+  | 'BODY_PART_NOSE'
+  | 'BODY_PART_SHOULDER'
+  | 'BODY_PART_THIGH'
+  | 'BODY_PART_TOE'
+  | 'BODY_PART_TORSO'
+
+export type MarkTypeId = 'MARK_TYPE_MARK' | 'MARK_TYPE_SCAR' | 'MARK_TYPE_TAT' | 'MARK_TYPE_OTH'
+export type BodyPartSideId = 'SIDE_B' | 'SIDE_F' | 'SIDE_L' | 'SIDE_R' | 'SIDE_S'
+export type PartOrientationId = 'PART_ORIENT_CENTR' | 'PART_ORIENT_FACE' | 'PART_ORIENT_LOW' | 'PART_ORIENT_UPP'
+
 export interface PrisonPersonDistinguishingMark {
   id: string
   prisonerNumber: string
-  bodyPart: ReferenceDataCodeSimple & {
-    id:
-      | 'BODY_PART_ANKLE'
-      | 'BODY_PART_ARM'
-      | 'BODY_PART_EAR'
-      | 'BODY_PART_ELBOW'
-      | 'BODY_PART_FACE'
-      | 'BODY_PART_FINGER'
-      | 'BODY_PART_FOOT'
-      | 'BODY_PART_HAND'
-      | 'BODY_PART_HEAD'
-      | 'BODY_PART_KNEE'
-      | 'BODY_PART_LEG'
-      | 'BODY_PART_LIP'
-      | 'BODY_PART_NECK'
-      | 'BODY_PART_NOSE'
-      | 'BODY_PART_SHOULDER'
-      | 'BODY_PART_THIGH'
-      | 'BODY_PART_TOE'
-      | 'BODY_PART_TORSO'
-  }
-  markType: ReferenceDataCodeSimple & {
-    id: 'MARK_TYPE_MARK' | 'MARK_TYPE_SCAR' | 'MARK_TYPE_TAT' | 'MARK_TYPE_OTH'
-  }
-  side?: ReferenceDataCodeSimple & {
-    id: 'SIDE_B' | 'SIDE_F' | 'SIDE_L' | 'SIDE_R' | 'SIDE_S'
-  }
-  partOrientation?: ReferenceDataCodeSimple & {
-    id: 'PART_ORIENT_CENTR' | 'PART_ORIENT_FACE' | 'PART_ORIENT_LOW' | 'PART_ORIENT_UPP'
-  }
+  bodyPart: ReferenceDataCodeSimple & { id: BodyPartId }
+  markType: ReferenceDataCodeSimple & { id: MarkTypeId }
+  side?: ReferenceDataCodeSimple & { id: BodyPartSideId }
+  partOrientation?: ReferenceDataCodeSimple & { id: PartOrientationId }
   comment?: string
   photographUuids?: string[]
   createdBy: string
   createdAt: string
+}
+
+export interface PrisonPersonDistinguishingMarkRequest {
+  prisonerNumber: string
+  bodyPart: BodyPartId
+  markType: MarkTypeId
+  side?: BodyPartSideId
+  partOrientation?: PartOrientationId
+  comment?: string
 }
 
 export interface PrisonPersonApiClient {
@@ -164,6 +171,10 @@ export interface PrisonPersonApiClient {
   getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]>
 
   getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]>
+
+  postDistinguishingMark(
+    distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
+  ): Promise<PrisonPersonDistinguishingMark>
 
   getImage(imageId: string): Promise<Readable>
 }
