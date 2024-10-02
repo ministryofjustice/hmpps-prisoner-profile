@@ -2,11 +2,26 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#appearance" %}
 {% set pageTitle =  "Select "+ markType + " location" %}
 
 {% block body %}
+
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+                govukErrorSummary({
+                    titleText: "There is a problem",
+                    errorList: errors,
+                    attributes: { 'data-qa-errors': true }
+                })
+            }}
+        </div>
+    </div>
+{% endif %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}

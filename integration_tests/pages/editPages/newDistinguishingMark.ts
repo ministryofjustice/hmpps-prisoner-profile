@@ -25,4 +25,6 @@ export default class NewDistinguishingMark extends Page {
   continueBtn = (): PageElement => cy.get('button[type=submit][value=continue]')
 
   saveAndReturnBtn = (): PageElement => cy.get('button[type=submit][value=returnToProfile]')
+
+  validationErrorBox = (): PageElement => cy.get('.govuk-error-summary')
 }

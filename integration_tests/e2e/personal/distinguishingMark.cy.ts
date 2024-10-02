@@ -190,5 +190,15 @@ context('New distinguishing feature', () => {
       cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
       cy.location('hash').should('eq', '#appearance')
     })
+
+    it('No selection causes a validation error', () => {
+      visitNewMarkPage()
+      const page = Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the mark is')
+
+      page.saveAndReturnBtn().click()
+      Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the mark is')
+      page.validationErrorBox().should('be.visible')
+      page.validationErrorBox().should('contain.text', 'Select a body part')
+    })
   })
 })

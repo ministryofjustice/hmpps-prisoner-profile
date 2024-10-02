@@ -4,6 +4,8 @@ import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import DistinguishingMarksController from '../controllers/distinguishingMarksController'
 import { Services } from '../services'
+import validationMiddleware from '../middleware/validationMiddleware'
+import { newDistinguishingMarkValidator } from '../validators/personal/distinguishingMarksValidator'
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -21,12 +23,25 @@ export default function distinguishingMarksRouter(services: Services): Router {
     }
 
     res.locals = { ...res.locals, ...formattedData }
+
+    next()
+  })
+
+  router.get('*', (req, res, next) => {
+    res.locals = { ...res.locals, errors: req.flash('errors') }
     next()
   })
 
   const distinguishingMarksController = new DistinguishingMarksController(services.distinguishingMarksService)
   get('/add/:markType', distinguishingMarksController.newDistinguishingMark)
-  post('/add/:markType', distinguishingMarksController.postNewDistinguishingMark)
+  post(
+    '/add/:markType',
+    validationMiddleware([newDistinguishingMarkValidator], {
+      redirectBackOnError: true,
+      redirectTo: 'personal/edit/distinguishing-mark/add/mark',
+    }),
+    distinguishingMarksController.postNewDistinguishingMark,
+  )
 
   return router
 }

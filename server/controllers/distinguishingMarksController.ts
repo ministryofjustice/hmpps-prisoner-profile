@@ -28,20 +28,14 @@ export default class DistinguishingMarksController {
     const { bodyPart } = req.body
     const { clientToken } = req.middleware
 
-    const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPart)
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
-    if (!verifiedSelection) {
-      // TODO validation flow
-      throw new Error('Unacceptable selection')
-    }
 
     await this.distinguishingMarksService.postNewDistinguishingMark(
       clientToken,
       prisonerNumber,
       verifiedMarkType,
-      verifiedSelection,
+      bodyPart,
     )
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
