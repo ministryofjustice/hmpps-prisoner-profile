@@ -35,6 +35,7 @@ import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
 import PrisonPersonService from './prisonPersonService'
 import MetricsService from './metrics/metricsService'
+import DistinguishingMarksService from './distinguishingMarksService'
 
 export const services = () => {
   const {
@@ -123,6 +124,7 @@ export const services = () => {
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
   const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
+  const distinguishingMarksService = new DistinguishingMarksService(prisonPersonApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, prisonPersonService)
 
   const apolloClient = new ApolloClient({
@@ -174,6 +176,7 @@ export const services = () => {
     careNeedsService,
     permissionsService,
     prisonPersonService,
+    distinguishingMarksService,
   }
 }
 

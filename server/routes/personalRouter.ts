@@ -25,6 +25,7 @@ import validationMiddleware, { Validator } from '../middleware/validationMiddlew
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
+import distinguishingMarksRouter from './distinguishingMarksRouter'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -335,6 +336,14 @@ export default function personalRouter(services: Services): Router {
       method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
     },
   })
+
+  router.use(
+    `${basePath}/edit/distinguishing-mark`,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editRouteChecks(),
+    distinguishingMarksRouter(services),
+  )
 
   return router
 }

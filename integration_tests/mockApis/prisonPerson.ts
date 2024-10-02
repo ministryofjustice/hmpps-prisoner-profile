@@ -116,6 +116,22 @@ export default {
     })
   },
 
+  stubPostNewDistinguishingMark: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}identifying-marks/mark`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: distinguishingMarkMock,
+      },
+    })
+  },
+
   // Reference data
   stubGetReferenceDataDomains: (resp: ReferenceDataDomain[]) =>
     stubGetWithBody({

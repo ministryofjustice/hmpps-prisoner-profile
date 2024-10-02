@@ -10,6 +10,7 @@ import {
   PrisonPersonPhysicalAttributesUpdate,
   ReferenceDataCode,
   ReferenceDataDomain,
+  PrisonPersonDistinguishingMarkRequest,
 } from './interfaces/prisonPersonApi/prisonPersonApiClient'
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
@@ -73,6 +74,15 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   async getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
     return this.restClient.get<PrisonPersonDistinguishingMark[]>({
       path: `/identifying-marks/prisoner/${prisonerNumber}`,
+    })
+  }
+
+  postDistinguishingMark(
+    distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
+  ): Promise<PrisonPersonDistinguishingMark> {
+    return this.restClient.postMultipart<PrisonPersonDistinguishingMark>({
+      path: '/identifying-marks/mark',
+      data: distinguishingMarkRequest,
     })
   }
 

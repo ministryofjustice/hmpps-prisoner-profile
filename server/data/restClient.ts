@@ -23,6 +23,7 @@ interface PostRequest {
   data?: object | string[]
   raw?: boolean
   query?: object | string
+  file?: Buffer
 }
 
 interface PutRequest {
@@ -120,6 +121,48 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
+      return raw ? result : result.body
+    } catch (error) {
+      const sanitisedError = sanitiseError(error, endpoint)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
+      throw sanitisedError
+    }
+  }
+
+  async postMultipart<T>({
+    path = null,
+    query = '',
+    headers = {},
+    responseType = '',
+    file = null,
+    data = {},
+    raw = false,
+  }: PostRequest = {}): Promise<T> {
+    logger.info(`Post multipart using user credentials: calling ${this.name}: ${path}`)
+    const endpoint = `${this.apiUrl()}${path}`
+    const request = superagent
+      .post(endpoint)
+      .agent(this.agent)
+      .query(query)
+      .auth(this.token, { type: 'bearer' })
+      .set(headers)
+      .responseType(responseType)
+      .timeout(this.timeoutConfig())
+      .retry(2, (err, res) => {
+        if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+        return undefined // retry handler only for logging retries, not to influence retry logic
+      })
+
+    Object.entries(data).forEach(([key, value]) => {
+      request.field(key, value)
+    })
+
+    if (file) {
+      request.attach('file', file)
+    }
+
+    try {
+      const result = await request
       return raw ? result : result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
