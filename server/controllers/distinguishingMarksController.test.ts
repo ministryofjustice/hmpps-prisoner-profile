@@ -122,4 +122,108 @@ describe('Distinguishing Marks Controller', () => {
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
     })
   })
+
+  describe('newDistinguishingMarkWithDetail', () => {
+    it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', markType => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType, bodyPart: 'leftLeg' },
+        query: {},
+      } as undefined as Request
+      controller.newDistinguishingMarkWithDetail(typeReq, res as Response)
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
+        markType,
+        bodyPart: 'leftLeg',
+      })
+    })
+
+    it.each(bodyPartSelections)('should render the view when bodyPart is %s', bodyPart => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart },
+        query: {},
+      } as undefined as Request
+      controller.newDistinguishingMarkWithDetail(typeReq, res as Response)
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
+        markType: 'tattoo',
+        bodyPart,
+      })
+    })
+
+    it('redirects back if the mark type is invalid', () => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        query: {},
+      } as undefined as Request
+      controller.newDistinguishingMarkWithDetail(typeReq, res as Response)
+
+      expect(res.render).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+    })
+
+    it('redirects back if the body part is invalid', () => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', bodyPart: 'invalidPart' },
+        query: {},
+      } as undefined as Request
+      controller.newDistinguishingMarkWithDetail(typeReq, res as Response)
+
+      expect(res.render).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+    })
+  })
+
+  describe('postNewDistinguishingMarkWithDetail', () => {
+    it('should add a new distinguishing mark with valid bodyPart and description', async () => {
+      const req = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        body: {
+          specificBodyPart: 'lowerLeftArm',
+          'description-lowerLeftArm': 'A tattoo',
+        },
+        files: {},
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.postNewDistinguishingMarkWithDetail(req, res as Response)
+
+      expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
+        'token',
+        'A12345',
+        'tattoo',
+        'lowerLeftArm',
+        'A tattoo',
+        undefined,
+      )
+    })
+
+    it('should use first file for body part', async () => {
+      const req = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo' },
+        body: {
+          specificBodyPart: 'lowerLeftArm',
+          'description-lowerLeftArm': 'A tattoo',
+        },
+        files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.postNewDistinguishingMarkWithDetail(req, res as Response)
+
+      expect(distinguishingMarksService.postNewDistinguishingMark).toHaveBeenCalledWith(
+        'token',
+        'A12345',
+        'tattoo',
+        'lowerLeftArm',
+        'A tattoo',
+        { originalname: 'file.jpg' },
+      )
+    })
+  })
 })

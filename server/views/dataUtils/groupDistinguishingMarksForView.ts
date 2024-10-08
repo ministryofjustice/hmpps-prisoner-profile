@@ -2,7 +2,7 @@ import { PrisonPersonDistinguishingMark } from '../../data/interfaces/prisonPers
 
 type DistinguishingMarkDecorated = PrisonPersonDistinguishingMark & { location: string }
 type MarkCategory = 'tattoos' | 'scars' | 'others'
-type BodyPart =
+type BodyPartCategory =
   | 'Left arm'
   | 'Right arm'
   | 'Arm'
@@ -20,7 +20,7 @@ type BodyPart =
   | 'Back'
   | 'Uncategorised'
 
-type CategorisedMarks = Record<MarkCategory, Partial<Record<BodyPart, DistinguishingMarkDecorated[]>>>
+type CategorisedMarks = Record<MarkCategory, Partial<Record<BodyPartCategory, DistinguishingMarkDecorated[]>>>
 export type CategorisedMarksForView = CategorisedMarks & {
   highlights: {
     asset: string
@@ -30,7 +30,7 @@ export type CategorisedMarksForView = CategorisedMarks & {
 }
 
 interface BodyPartConfig {
-  name: BodyPart
+  name: BodyPartCategory
   markIsForBodyPart: (mark: PrisonPersonDistinguishingMark) => boolean
   getHighlightConfig: (mark: PrisonPersonDistinguishingMark) => {
     asset: string
@@ -105,7 +105,8 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       mark.bodyPart.id === 'BODY_PART_HEAD' ||
       mark.bodyPart.id === 'BODY_PART_EAR' ||
       mark.bodyPart.id === 'BODY_PART_LIP' ||
-      mark.bodyPart.id === 'BODY_PART_NECK',
+      mark.bodyPart.id === 'BODY_PART_NECK' ||
+      mark.bodyPart.id === 'BODY_PART_NOSE',
     getHighlightConfig: (mark: PrisonPersonDistinguishingMark) =>
       mark.bodyPart.id === 'BODY_PART_HEAD'
         ? {
@@ -123,6 +124,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.bodyPart.id === 'BODY_PART_NECK') return 'Neck'
       if (mark.bodyPart.id === 'BODY_PART_EAR') return 'Ear'
       if (mark.bodyPart.id === 'BODY_PART_LIP') return 'Lip'
+      if (mark.bodyPart.id === 'BODY_PART_NOSE') return 'Nose'
       return 'Head'
     },
   },
@@ -337,7 +339,7 @@ export default (distinguishingMarks: PrisonPersonDistinguishingMark[]): Categori
   )
 }
 
-function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPart]) {
+function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPartCategory]) {
   const [markCategory, bodyPartDescription] = path
 
   // create new body part category if it doesn't exist

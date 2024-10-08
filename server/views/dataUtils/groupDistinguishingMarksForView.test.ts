@@ -208,6 +208,7 @@ describe('groupIdentifyingMarks', () => {
           ${'BODY_PART_EAR'}   | ${true}
           ${'BODY_PART_LIP'}   | ${true}
           ${'BODY_PART_NECK'}  | ${true}
+          ${'BODY_PART_NOSE'}  | ${true}
           ${'BODY_PART_ELBOW'} | ${false}
         `('returns $expected when body part id is $bodyPartId', ({ bodyPartId, isFaceAndHead }) => {
           const grouped = groupIdentifyingMarks([

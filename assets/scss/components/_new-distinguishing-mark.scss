@@ -46,16 +46,6 @@
     background: url("/assets/images/distinguishingMarks/neck-overlay.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="head"]::after,
-  &.dm-base-image-selected[data-selected="head"]::before {
-    display: block;
-    top: 26px;
-    left: 239px;
-    height: 68px;
-    width: 58px;
-    background: url("/assets/images/distinguishingMarks/back-head-overlay.svg") no-repeat;
-  }
-
   &.dm-base-image-hover[data-hover-value="rightArm"]::after,
   &.dm-base-image-selected[data-selected="rightArm"]::before {
     display: block;
