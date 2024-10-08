@@ -117,7 +117,7 @@
 
             <div class="govuk-button-group">
                 {{ govukButton({ text: "Save and return to profile", attributes: { name: "action", value: "returnToProfile" }, type: "submit" }) }}
-                {{ govukButton({ text: "Save and add more tattoos", attributes: { name: "action", value: "addMore" }, type: "submit", classes: "govuk-button--secondary"}) }}
+                {{ govukButton({ text: "Save and add more "+markType+"s", attributes: { name: "action", value: "addMore" }, type: "submit", classes: "govuk-button--secondary"}) }}
                 <a href="/prisoner/{{ prisonerNumber }}/personal#appearance }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
             </div>
         </form>

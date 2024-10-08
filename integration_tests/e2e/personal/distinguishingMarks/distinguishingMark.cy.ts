@@ -113,7 +113,7 @@ context('New distinguishing feature', () => {
 
     context('Selecting body parts', () => {
       const areas = [
-        { alt: 'Head', description: 'Head selected', value: 'head' },
+        { alt: 'Neck', description: 'Neck selected', value: 'neck' },
         { alt: 'Left arm', description: 'Left arm selected', value: 'leftArm' },
         { alt: 'Right arm', description: 'Right arm selected', value: 'rightArm' },
         { alt: 'Left leg', description: 'Left leg selected', value: 'leftLeg' },
@@ -145,31 +145,31 @@ context('New distinguishing feature', () => {
       visitNewMarkPage()
       const page = Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the mark is')
 
-      const selection = page.bodyParts().filter('[alt="Head"]')
+      const selection = page.bodyParts().filter('[alt="Face"]')
 
       selection.click({ force: true })
-      page.selectionDescription().should('contain.text', 'Head selected')
-      page.formValue('bodyPart').should('have.value', 'head')
+      page.selectionDescription().should('contain.text', 'Face selected')
+      page.formValue('bodyPart').should('have.value', 'face')
 
       selection.click({ force: true })
       page.selectionDescription().should('contain.text', 'No body part selected')
       page.formValue('bodyPart').should('not.have.attr', 'value')
 
       selection.click({ force: true })
-      page.selectionDescription().should('contain.text', 'Head selected')
-      page.formValue('bodyPart').should('have.value', 'head')
+      page.selectionDescription().should('contain.text', 'Face selected')
+      page.formValue('bodyPart').should('have.value', 'face')
     })
 
     it('User can change body parts', () => {
       visitNewMarkPage()
       const page = Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the mark is')
 
-      const headSelection = page.bodyParts().filter('[alt="Head"]')
+      const headSelection = page.bodyParts().filter('[alt="Face"]')
       const rightArmSelection = page.bodyParts().filter('[alt="Right arm"]')
 
       headSelection.click({ force: true })
-      page.selectionDescription().should('contain.text', 'Head selected')
-      page.formValue('bodyPart').should('have.value', 'head')
+      page.selectionDescription().should('contain.text', 'Face selected')
+      page.formValue('bodyPart').should('have.value', 'face')
 
       rightArmSelection.click({ force: true })
       page.selectionDescription().should('contain.text', 'Right arm selected')
@@ -180,11 +180,11 @@ context('New distinguishing feature', () => {
       visitNewMarkPage()
       const page = Page.verifyOnPageWithTitle(NewDistinguishingMark, 'Select where the mark is')
 
-      const selection = page.bodyParts().filter('[alt="Head"]')
+      const selection = page.bodyParts().filter('[alt="Face"]')
 
       selection.click({ force: true })
-      page.selectionDescription().should('contain.text', 'Head selected')
-      page.formValue('bodyPart').should('have.value', 'head')
+      page.selectionDescription().should('contain.text', 'Face selected')
+      page.formValue('bodyPart').should('have.value', 'face')
 
       page.saveAndReturnBtn().click()
       cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
