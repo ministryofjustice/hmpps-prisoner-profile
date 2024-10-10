@@ -1,4 +1,4 @@
-import Page, { PageElement } from '../page'
+import Page, { PageElement } from '../../page'
 
 export default class NewDistinguishingMark extends Page {
   constructor(pageTitle: string) {

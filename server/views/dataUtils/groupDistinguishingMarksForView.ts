@@ -2,25 +2,26 @@ import { PrisonPersonDistinguishingMark } from '../../data/interfaces/prisonPers
 
 type DistinguishingMarkDecorated = PrisonPersonDistinguishingMark & { location: string }
 type MarkCategory = 'tattoos' | 'scars' | 'others'
-type BodyPart =
-  | 'Left arm'
-  | 'Right arm'
+type BodyPartCategory =
   | 'Arm'
+  | 'Back'
   | 'Face and head'
-  | 'Right foot'
-  | 'Left foot'
   | 'Foot'
-  | 'Right hand'
-  | 'Left hand'
+  | 'Front and sides'
   | 'Hand'
-  | 'Right leg'
+  | 'Left arm'
+  | 'Left foot'
+  | 'Left hand'
   | 'Left leg'
   | 'Leg'
-  | 'Front and sides'
-  | 'Back'
+  | 'Neck'
+  | 'Right arm'
+  | 'Right foot'
+  | 'Right hand'
+  | 'Right leg'
   | 'Uncategorised'
 
-type CategorisedMarks = Record<MarkCategory, Partial<Record<BodyPart, DistinguishingMarkDecorated[]>>>
+type CategorisedMarks = Record<MarkCategory, Partial<Record<BodyPartCategory, DistinguishingMarkDecorated[]>>>
 export type CategorisedMarksForView = CategorisedMarks & {
   highlights: {
     asset: string
@@ -30,7 +31,7 @@ export type CategorisedMarksForView = CategorisedMarks & {
 }
 
 interface BodyPartConfig {
-  name: BodyPart
+  name: BodyPartCategory
   markIsForBodyPart: (mark: PrisonPersonDistinguishingMark) => boolean
   getHighlightConfig: (mark: PrisonPersonDistinguishingMark) => {
     asset: string
@@ -98,6 +99,16 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       return 'Arm - no specific location'
     },
   },
+  neck: {
+    name: 'Neck',
+    markIsForBodyPart: (mark: PrisonPersonDistinguishingMark) => mark.bodyPart.id === 'BODY_PART_NECK',
+    getHighlightConfig: (_mark: PrisonPersonDistinguishingMark) => ({
+      asset: '/assets/images/distinguishingMarks/neck-overlay.svg',
+      class: 'dm-overlay-neck',
+      name: 'neck',
+    }),
+    getLocationDescription: () => 'Neck',
+  },
   faceAndHead: {
     name: 'Face and head',
     markIsForBodyPart: (mark: PrisonPersonDistinguishingMark) =>
@@ -105,7 +116,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       mark.bodyPart.id === 'BODY_PART_HEAD' ||
       mark.bodyPart.id === 'BODY_PART_EAR' ||
       mark.bodyPart.id === 'BODY_PART_LIP' ||
-      mark.bodyPart.id === 'BODY_PART_NECK',
+      mark.bodyPart.id === 'BODY_PART_NOSE',
     getHighlightConfig: (mark: PrisonPersonDistinguishingMark) =>
       mark.bodyPart.id === 'BODY_PART_HEAD'
         ? {
@@ -120,9 +131,9 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
           },
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
       if (mark.bodyPart.id === 'BODY_PART_FACE') return 'Face'
-      if (mark.bodyPart.id === 'BODY_PART_NECK') return 'Neck'
       if (mark.bodyPart.id === 'BODY_PART_EAR') return 'Ear'
       if (mark.bodyPart.id === 'BODY_PART_LIP') return 'Lip'
+      if (mark.bodyPart.id === 'BODY_PART_NOSE') return 'Nose'
       return 'Head'
     },
   },
@@ -337,7 +348,7 @@ export default (distinguishingMarks: PrisonPersonDistinguishingMark[]): Categori
   )
 }
 
-function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPart]) {
+function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPartCategory]) {
   const [markCategory, bodyPartDescription] = path
 
   // create new body part category if it doesn't exist

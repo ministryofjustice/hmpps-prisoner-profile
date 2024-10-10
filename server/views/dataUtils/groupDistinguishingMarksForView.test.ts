@@ -69,7 +69,6 @@ describe('groupIdentifyingMarks', () => {
         ${'BODY_PART_ARM'}      | ${sideLeft}  | ${true}
         ${'BODY_PART_SHOULDER'} | ${sideLeft}  | ${true}
         ${'BODY_PART_ELBOW'}    | ${sideLeft}  | ${true}
-        ${'BODY_PART_NECK'}     | ${sideLeft}  | ${false}
         ${'BODY_PART_ELBOW'}    | ${sideRight} | ${false}
       `(
         'returns $expected when body part id is $bodyPartId and side id is $sideId',
@@ -113,7 +112,6 @@ describe('groupIdentifyingMarks', () => {
           ${'BODY_PART_ARM'}      | ${tattooMark} | ${sideRight} | ${true}
           ${'BODY_PART_SHOULDER'} | ${tattooMark} | ${sideRight} | ${true}
           ${'BODY_PART_ELBOW'}    | ${tattooMark} | ${sideRight} | ${true}
-          ${'BODY_PART_NECK'}     | ${tattooMark} | ${sideRight} | ${false}
           ${'BODY_PART_ELBOW'}    | ${tattooMark} | ${sideLeft}  | ${false}
         `(
           'returns $expected when body part id is $bodyPartId and side id is $sideId',
@@ -200,14 +198,25 @@ describe('groupIdentifyingMarks', () => {
         )
       })
 
+      describe('Neck', () => {
+        it('returns true when body part id is BODY_PART_NECK', () => {
+          const grouped = groupIdentifyingMarks([
+            generateDistinguishingMarks({
+              bodyPart: { id: 'BODY_PART_NECK', description: 'xxx', listSequence: 0, isActive: true },
+            }),
+          ])
+
+          expect(grouped.tattoos?.['Neck']?.length === 1).toBe(true)
+        })
+      })
+
       describe('Face and head', () => {
         test.each`
           bodyPartId           | isFaceAndHead
           ${'BODY_PART_FACE'}  | ${true}
           ${'BODY_PART_HEAD'}  | ${true}
           ${'BODY_PART_EAR'}   | ${true}
-          ${'BODY_PART_LIP'}   | ${true}
-          ${'BODY_PART_NECK'}  | ${true}
+          ${'BODY_PART_NOSE'}  | ${true}
           ${'BODY_PART_ELBOW'} | ${false}
         `('returns $expected when body part id is $bodyPartId', ({ bodyPartId, isFaceAndHead }) => {
           const grouped = groupIdentifyingMarks([
@@ -222,7 +231,6 @@ describe('groupIdentifyingMarks', () => {
         test.each`
           bodyPartId          | locationText
           ${'BODY_PART_FACE'} | ${'Face'}
-          ${'BODY_PART_NECK'} | ${'Neck'}
           ${'BODY_PART_EAR'}  | ${'Ear'}
           ${'BODY_PART_LIP'}  | ${'Lip'}
           ${'BODY_PART_HEAD'} | ${'Head'}

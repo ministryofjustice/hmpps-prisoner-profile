@@ -43,6 +43,7 @@ import summaryListRowWithOptionalChangeLink, {
 } from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
 import groupDistinguishingMarks from '../views/dataUtils/groupDistinguishingMarksForView'
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
+import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -169,4 +170,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
   njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
+  njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)
 }

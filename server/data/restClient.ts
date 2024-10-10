@@ -23,7 +23,7 @@ interface PostRequest {
   data?: object | string[]
   raw?: boolean
   query?: object | string
-  file?: Buffer
+  file?: { buffer: Buffer; originalname: string }
 }
 
 interface PutRequest {
@@ -142,6 +142,7 @@ export default class RestClient {
     const endpoint = `${this.apiUrl()}${path}`
     const request = superagent
       .post(endpoint)
+      .type('form')
       .agent(this.agent)
       .query(query)
       .auth(this.token, { type: 'bearer' })
@@ -158,7 +159,7 @@ export default class RestClient {
     })
 
     if (file) {
-      request.attach('file', file)
+      request.attach('file', file.buffer, file.originalname)
     }
 
     try {

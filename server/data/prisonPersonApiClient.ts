@@ -14,6 +14,7 @@ import {
 } from './interfaces/prisonPersonApi/prisonPersonApiClient'
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
+import MulterFile from '../controllers/interfaces/MulterFile'
 
 export default class PrisonPersonApiRestClient implements PrisonPersonApiClient {
   private readonly restClient: RestClient
@@ -79,10 +80,12 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
 
   postDistinguishingMark(
     distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
+    photograph: MulterFile,
   ): Promise<PrisonPersonDistinguishingMark> {
     return this.restClient.postMultipart<PrisonPersonDistinguishingMark>({
       path: '/identifying-marks/mark',
       data: distinguishingMarkRequest,
+      file: photograph,
     })
   }
 

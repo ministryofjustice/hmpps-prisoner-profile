@@ -1,4 +1,5 @@
 import { Readable } from 'stream'
+import MulterFile from '../../../controllers/interfaces/MulterFile'
 
 export interface ValueWithMetadata<T> {
   value?: T
@@ -174,6 +175,7 @@ export interface PrisonPersonApiClient {
 
   postDistinguishingMark(
     distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
+    photograph?: MulterFile,
   ): Promise<PrisonPersonDistinguishingMark>
 
   getImage(imageId: string): Promise<Readable>
