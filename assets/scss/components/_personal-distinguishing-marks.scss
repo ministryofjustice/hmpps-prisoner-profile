@@ -53,6 +53,8 @@
       }
 
       &__mark {
+        max-width: 350px;
+
         &:not(:last-of-type) {
           padding-bottom: govuk-spacing(3);
           margin-bottom: govuk-spacing(3);
