@@ -1,4 +1,5 @@
 import { CheckboxOptions } from './utils'
+import { ReferenceDataDomain } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export const checkboxInputToSelectedValues = (
   rootFieldName: string,
@@ -52,6 +53,40 @@ export const checkboxFieldDataToInputs = (
       value,
       text: i.text,
       checked: checked.includes(value),
+    }
+  })
+}
+
+export const referenceDataDomainToCheckboxOptions = (referenceDataDomain: ReferenceDataDomain): CheckboxOptions[] => {
+  const subDomainCodes: {
+    [key: string]: CheckboxOptions['subValues']
+  } = referenceDataDomain.subDomains.reduce(
+    (result, subDomain) => ({
+      ...result,
+      [subDomain.code]: {
+        title: subDomain.description,
+        hint: 'Select all that apply',
+        options: subDomain.referenceDataCodes.map(code => ({
+          text: code.description,
+          value: code.id,
+        })),
+      },
+    }),
+    {} as { [key: string]: CheckboxOptions['subValues'] },
+  )
+
+  return referenceDataDomain.referenceDataCodes.map(code => {
+    const subValues = subDomainCodes[code.code]
+    if (subValues) {
+      return {
+        text: code.description,
+        value: code.id,
+        subValues,
+      }
+    }
+    return {
+      text: code.description,
+      value: code.id,
     }
   })
 }

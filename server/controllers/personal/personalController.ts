@@ -42,7 +42,7 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
-import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
+import { checkboxInputToSelectedValues, referenceDataDomainToCheckboxOptions } from '../../utils/checkboxUtils'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -934,48 +934,21 @@ export default class PersonalController {
       },
     }
 
-    const checkboxInputs: CheckboxOptions[] = [
-      {
-        text: "A 'free from' diet",
-        value: 'FREE_FROM',
-        subValues: {
-          title: 'Which foods does this diet exclude',
-          hint: 'Select all that apply',
-          options: [
-            {
-              text: 'Any foods that interact with monoamine oxidase inhibitors',
-              value: 'MONOAMINE',
-            },
-            { text: 'Cheese', value: 'CHEESE' },
-            { text: 'Egg', value: 'EGG' },
-            { text: 'Fat', value: 'FAT' },
-            { text: 'Fried food', value: 'FRIED_FOOD' },
-            { text: 'Fish', value: 'FISH' },
-            { text: 'Garlic', value: 'GARLIC' },
-            { text: 'Lactose', value: 'LACTOSE' },
-            { text: 'Onion', value: 'ONION' },
-            { text: 'Pork', value: 'PORK' },
-            { text: 'Potato', value: 'POTATO' },
-          ],
-        },
-      },
-      { text: 'Low fat', value: 'LOW_FAT' },
-      { text: 'Low salt', value: 'LOW_SALT' },
-      { text: 'Diabetic', value: 'DIABETIC' },
-      { text: 'Low cholesterol', value: 'LOW_CHOLESTEROL' },
-      { text: 'Coeliac', value: 'COELIAC' },
-      { text: 'Pregnant', value: 'PREGNANT' },
-      { text: 'Disordered eating', value: 'DISORDERED_EATING' },
-    ]
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerData } = req.middleware
+        const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const formTitle = `Does ${prisonerName} have any of these medical dietary requirements?`
+        const [medicalDietaryRequirementValues] = await Promise.all([
+          this.personalPageService.getReferenceDataDomain(clientToken, 'medicalDiet'),
+        ])
 
-        return this.editCheckboxes(formTitle, fieldData, checkboxInputs)(req, res, next)
+        return this.editCheckboxes(
+          formTitle,
+          fieldData,
+          referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
+        )(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
@@ -1003,31 +976,21 @@ export default class PersonalController {
       },
     }
 
-    const checkboxInputs: CheckboxOptions[] = [
-      { text: 'Celery', value: 'CELERY' },
-      { text: 'Cereals containing gluten', value: 'GLUTEN' },
-      { text: 'Crustaceans', value: 'CRUSTACEANS' },
-      { text: 'Egg', value: 'EGG' },
-      { text: 'Fish', value: 'FISH' },
-      { text: 'Lupin', value: 'LUPIN' },
-      { text: 'Milk', value: 'MILK' },
-      { text: 'Molluscs', value: 'MOLLUSCS' },
-      { text: 'Mustard', value: 'MUSTARD' },
-      { text: 'Peanuts', value: 'PEANUTS' },
-      { text: 'Seasame', value: 'SEASAME' },
-      { text: 'Soya', value: 'SOYA' },
-      { text: 'Sulpur Dioxide', value: 'SULPUR_DIOXIDE' },
-      { text: 'Tree nuts', value: 'TREE_NUTS' },
-    ]
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerData } = req.middleware
+        const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const formTitle = `Does ${prisonerName} have any food allergies?`
+        const [foodAllergyValues] = await Promise.all([
+          this.personalPageService.getReferenceDataDomain(clientToken, 'foodAllergy'),
+        ])
 
-        return this.editCheckboxes(formTitle, fieldData, checkboxInputs)(req, res, next)
+        return this.editCheckboxes(formTitle, fieldData, referenceDataDomainToCheckboxOptions(foodAllergyValues))(
+          req,
+          res,
+          next,
+        )
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {

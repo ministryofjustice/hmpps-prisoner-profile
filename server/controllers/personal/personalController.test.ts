@@ -18,6 +18,10 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { prisonPersonServiceMock } from '../../../tests/mocks/prisonPersonServiceMock'
+import {
+  mockFoodAllergiesReferenceDataDomain,
+  mockMedicalDietReferenceDataDomain,
+} from '../../data/localMockData/prisonPersonApi/referenceDataMocks'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -90,6 +94,11 @@ describe('PersonalController', () => {
           { id: 'No', description: 'No' },
         ] as ReferenceDataCode[]
       return physicalCharacteristicsMock.field as ReferenceDataCode[]
+    })
+    personalPageService.getReferenceDataDomain = jest.fn(async (_, domain) => {
+      if (domain === 'medicalDiet') return mockMedicalDietReferenceDataDomain
+      if (domain === 'foodAllergy') return mockFoodAllergiesReferenceDataDomain
+      return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()

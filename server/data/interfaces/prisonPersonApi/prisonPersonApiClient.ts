@@ -63,6 +63,7 @@ export interface ReferenceDataDomain {
   deactivatedAt?: string
   deactivatedBy?: string
   referenceDataCodes?: ReferenceDataCode[]
+  subDomains: ReferenceDataDomain[]
 }
 
 export interface ReferenceDataCode {
@@ -161,7 +162,7 @@ export interface PrisonPersonApiClient {
 
   updateHealth(prisonerNumber: string, healthData: Partial<PrisonPersonHealthUpdate>): Promise<PrisonPerson>
 
-  getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]>
+  getReferenceDataDomains(includeInactive?: boolean, includeSubDomains?: boolean): Promise<ReferenceDataDomain[]>
 
   getReferenceDataDomain(domain: string): Promise<ReferenceDataDomain>
 
