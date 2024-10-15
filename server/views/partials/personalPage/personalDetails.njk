@@ -15,13 +15,20 @@
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro medicalDietHtml(personalDetails) %}
   <span class="govuk-!-font-weight-bold">Medical diet</span><br />
-  Free from dairy<br />
-  Low salt<br />
+  {% for diet in personalDetails.medicalDietaryRequirements %}
+    {{ diet }}<br />
+  {% endfor %}
 {% endmacro %}
 
 {% macro foodAllergiesHtml(personalDetails) %}
   <span class="govuk-!-font-weight-bold">Food allergies</span><br />
-  Cheese
+  {% if personalDetails.foodAllergies.length > 0 %}
+    {% for allergy in personalDetails.foodAllergies %}
+      {{ allergy }}<br />
+    {% endfor %}
+  {% else %}
+    None
+  {% endif %}
 {% endmacro %}
 
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}

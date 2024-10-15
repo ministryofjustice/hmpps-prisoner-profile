@@ -953,12 +953,38 @@ export default class PersonalController {
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        req.flash('flashMessage', {
-          text: `Medical diet updated`,
-          type: FlashMessageType.success,
-          fieldName: 'medicalDiet',
-        })
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, req.body)
+
+        try {
+          await this.personalPageService.updateMedicalDietaryRequirements(
+            clientToken,
+            user,
+            prisonerNumber,
+            checkedItems,
+          )
+          req.flash('flashMessage', {
+            text: `Medical diet updated`,
+            type: FlashMessageType.success,
+            fieldName: 'medicalDiet',
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditMedicalDiet,
+              details: { medicalDietaryRequirements: checkedItems },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${fieldData.url}`)
       },
     }
   }
@@ -995,12 +1021,33 @@ export default class PersonalController {
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        req.flash('flashMessage', {
-          text: `Food allergies updated`,
-          type: FlashMessageType.success,
-          fieldName: 'foodAllergies',
-        })
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, req.body)
+
+        try {
+          await this.personalPageService.updateFoodAllergies(clientToken, user, prisonerNumber, checkedItems)
+          req.flash('flashMessage', {
+            text: `Food allergies updated`,
+            type: FlashMessageType.success,
+            fieldName: 'foodAllergies',
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditFoodAllergies,
+              details: { medicalDietaryRequirements: checkedItems },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${fieldData.url}`)
       },
     }
   }

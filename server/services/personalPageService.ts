@@ -234,6 +234,10 @@ export default class PersonalPageService {
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
+      medicalDietaryRequirements: prisonPerson
+        ? prisonPerson.health?.medicalDietaryRequirements.map(x => x.description)
+        : [],
+      foodAllergies: prisonPerson ? prisonPerson.health?.foodAllergies.map(x => x.description) : [],
     }
   }
 
@@ -423,6 +427,35 @@ export default class PersonalPageService {
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['smokerOrVaper'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateMedicalDietaryRequirements(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    medicalDietaryRequirements: string[],
+  ) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { medicalDietaryRequirements })
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['medicalDietaryRequirements'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateFoodAllergies(clientToken: string, user: PrisonUser, prisonerNumber: string, foodAllergies: string[]) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['foodAllergies'],
       prisonerNumber,
       user,
     })

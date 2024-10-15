@@ -100,10 +100,14 @@ export interface FieldHistory {
 
 export interface PrisonPersonHealth {
   smokerOrVaper: ValueWithMetadata<ReferenceDataCodeSimple>
+  foodAllergies: ReferenceDataCodeSimple[]
+  medicalDietaryRequirements: ReferenceDataCodeSimple[]
 }
 
 export interface PrisonPersonHealthUpdate {
-  smokerOrVaper: string
+  smokerOrVaper?: string
+  foodAllergies?: string[]
+  medicalDietaryRequirements?: string[]
 }
 
 export type BodyPartId =

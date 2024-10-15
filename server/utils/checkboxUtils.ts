@@ -4,7 +4,7 @@ import { ReferenceDataDomain } from '../data/interfaces/prisonPersonApi/prisonPe
 export const checkboxInputToSelectedValues = (
   rootFieldName: string,
   selectedOptions: { [key: string]: string[] } | null,
-) => {
+): string[] => {
   if (!selectedOptions) return []
   // Get the selected values not including sub-values
   const selectedValues = selectedOptions[rootFieldName]
@@ -26,7 +26,6 @@ export const checkboxInputToSelectedValues = (
 export const checkboxFieldDataToInputs = (
   fieldData: CheckboxOptions[],
   checked: string[] = [],
-  valuePrefix: string = '',
 ): {
   value: string
   text: string
@@ -42,17 +41,15 @@ export const checkboxFieldDataToInputs = (
         subValues: {
           title: i.subValues.title,
           hint: i.subValues.hint,
-          items: checkboxFieldDataToInputs(i.subValues.options, checked, i.value),
+          items: checkboxFieldDataToInputs(i.subValues.options, checked),
         },
       }
     }
 
-    const value = valuePrefix ? `${valuePrefix}__${i.value}` : i.value
-
     return {
-      value,
+      value: i.value,
       text: i.text,
-      checked: checked.includes(value),
+      checked: checked.includes(i.value),
     }
   })
 }

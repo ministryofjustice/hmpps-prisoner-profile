@@ -34,7 +34,7 @@ export default class EditPage extends Page {
         } else {
           cy.get(`input[name=${name}][value=${value.value}]`).click()
           value.subValues.forEach(subValue => {
-            cy.get(`input[name=${value.value}-subvalues][value=${value.value}__${subValue}]`).click()
+            cy.get(`input[name=${value.value}-subvalues][value=${subValue}]`).click()
           })
         }
       })

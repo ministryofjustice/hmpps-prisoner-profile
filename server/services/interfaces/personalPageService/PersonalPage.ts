@@ -54,6 +54,8 @@ export interface PersonalDetails {
   socialCareNeeded: string
   typeOfDiet: string
   youthOffender: string
+  medicalDietaryRequirements: string[]
+  foodAllergies: string[]
 }
 
 export interface IdentityNumber {
@@ -116,6 +118,7 @@ export interface DistinguishingMark {
   comment: string
   imageId: number
 }
+
 export interface PhysicalCharacteristics {
   height: string
   weight: string
