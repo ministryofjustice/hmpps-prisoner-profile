@@ -1027,6 +1027,7 @@ export default class PersonalController {
 
         try {
           await this.personalPageService.updateFoodAllergies(clientToken, user, prisonerNumber, checkedItems)
+
           req.flash('flashMessage', {
             text: `Food allergies updated`,
             type: FlashMessageType.success,
@@ -1039,7 +1040,7 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditFoodAllergies,
-              details: { medicalDietaryRequirements: checkedItems },
+              details: { foodAllergies: checkedItems },
             })
             .catch(error => logger.error(error))
 

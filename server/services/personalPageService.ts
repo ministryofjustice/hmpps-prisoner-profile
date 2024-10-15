@@ -454,6 +454,7 @@ export default class PersonalPageService {
   async updateFoodAllergies(clientToken: string, user: PrisonUser, prisonerNumber: string, foodAllergies: string[]) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     const response = prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
+
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['foodAllergies'],
       prisonerNumber,

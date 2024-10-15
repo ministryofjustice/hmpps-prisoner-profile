@@ -30,6 +30,7 @@ context('Edit medical diet', () => {
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPrisonPersonUpdateHealth', { prisonerNumber })
       cy.task('stubGetReferenceDataDomain', mockFoodAllergiesReferenceDataDomain)
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/food-allergies`,
