@@ -6,7 +6,6 @@ import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
 import PagedList, { CaseNotesListQueryParams } from './interfaces/prisonApi/PagedList'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 import CaseNoteType, { CaseNotesTypeParams, CaseNotesTypeQueryParams } from './interfaces/caseNotesApi/CaseNoteType'
-import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
 
 export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   private readonly restClient: RestClient
@@ -33,7 +32,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
 
   async getCaseNotes(
     offenderNumber: string,
-    caseloadId: string,
+    prisonerLocationId: string,
     queryParams?: CaseNotesListQueryParams,
   ): Promise<PagedList<CaseNote>> {
     // Set defaults then apply queryParams
@@ -44,7 +43,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<PagedList<CaseNote>>({
       path: `/case-notes/${offenderNumber}`,
       query: mapToQueryString(params),
-      headers: { caseloadId },
+      headers: { prisonerLocationId },
     })
   }
 
@@ -57,36 +56,39 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) })
   }
 
-  async addCaseNote(prisonerNumber: string, caseloadId: string, caseNote: CaseNote): Promise<CaseNote> {
+  async addCaseNote(prisonerNumber: string, prisonerLocationId: string, caseNote: CaseNote): Promise<CaseNote> {
     return (await this.post({
       path: `/case-notes/${prisonerNumber}`,
-      data: caseNote,
-      headers: { caseloadId },
+      data: {
+        ...caseNote,
+        locationId: prisonerLocationId,
+      },
+      headers: { prisonerLocationId },
     })) as Promise<CaseNote>
   }
 
-  async updateCaseNote(
+  async addCaseNoteAmendment(
     prisonerNumber: string,
-    caseloadId: string,
+    prisonerLocationId: string,
     caseNoteId: string,
-    updateCaseNoteForm: UpdateCaseNoteForm,
+    text: string,
   ): Promise<CaseNote> {
     return (await this.put({
       path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
-      data: { text: updateCaseNoteForm.text },
-      headers: { caseloadId },
+      data: { text },
+      headers: { prisonerLocationId },
     })) as Promise<CaseNote>
   }
 
   async getCaseNote(
     prisonerNumber: string,
-    caseloadId: string,
+    prisonerLocationId: string,
     caseNoteId: string,
     ignore404 = false,
   ): Promise<CaseNote> {
     return this.get<CaseNote>({
       path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
-      headers: { caseloadId },
+      headers: { prisonerLocationId },
       ignore404,
     })
   }

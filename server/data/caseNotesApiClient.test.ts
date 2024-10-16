@@ -4,7 +4,6 @@ import CaseNotesApiRestClient from './caseNotesApiClient'
 import { pagedCaseNotesMock } from './localMockData/pagedCaseNotesMock'
 import { caseNoteTypesMock } from './localMockData/caseNoteTypesMock'
 import CaseNotesApiClient from './interfaces/caseNotesApi/caseNotesApiClient'
-import UpdateCaseNoteForm from './interfaces/caseNotesApi/UpdateCaseNoteForm'
 import CaseNote from './interfaces/caseNotesApi/CaseNote'
 
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -81,7 +80,7 @@ describe('caseNotesApiClient', () => {
       const prisonerNumber = 'AB1234Y'
       mockSuccessfulCaseNotesPutApiCall(`/case-notes/${prisonerNumber}/abc123`, pagedCaseNotesMock.content[0])
 
-      const output = await caseNotesApiClient.updateCaseNote(prisonerNumber, 'MDI', 'abc123', {} as UpdateCaseNoteForm)
+      const output = await caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, 'MDI', 'abc123', 'text')
       expect(output).toEqual(pagedCaseNotesMock.content[0])
     })
   })
