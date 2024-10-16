@@ -12,7 +12,6 @@ import validateDateRange from '../utils/validateDateRange'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
-import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { HmppsUser } from '../interfaces/HmppsUser'
 
@@ -167,15 +166,15 @@ export default class CaseNotesService {
     })
   }
 
-  public async updateCaseNote(
+  public async addCaseNoteAmendment(
     token: string,
     prisonerNumber: string,
     caseloadId: string,
     caseNoteId: string,
-    updatedCaseNoteForm: UpdateCaseNoteForm,
+    text: string,
   ) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
 
-    return caseNotesApiClient.updateCaseNote(prisonerNumber, caseloadId, caseNoteId, updatedCaseNoteForm)
+    return caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, caseloadId, caseNoteId, text)
   }
 }
