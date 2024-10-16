@@ -879,13 +879,20 @@ export default class PersonalController {
     }
   }
 
-  editCheckboxes(formTitle: string, fieldData: CheckboxFieldData, options: CheckboxOptions[]) {
+  editCheckboxes(
+    formTitle: string,
+    fieldData: CheckboxFieldData,
+    options: CheckboxOptions[],
+    selectedValues: string[] = [],
+  ) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { prisonerData } = req.middleware
       const { firstName, lastName, cellLocation } = prisonerData
       const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
-      const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
+      const checkedItems = requestBodyFlash
+        ? checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
+        : selectedValues
 
       const errors = req.flash('errors')
 
@@ -936,18 +943,21 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const formTitle = `Does ${prisonerName} have any of these medical dietary requirements?`
-        const [medicalDietaryRequirementValues] = await Promise.all([
+        const [medicalDietaryRequirementValues, prisonPerson] = await Promise.all([
           this.personalPageService.getReferenceDataDomain(clientToken, 'medicalDiet'),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
 
         return this.editCheckboxes(
           formTitle,
           fieldData,
           referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
+          prisonPerson?.health?.medicalDietaryRequirements.map(code => code.id),
         )(req, res, next)
       },
 
@@ -1004,19 +1014,22 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const formTitle = `Does ${prisonerName} have any food allergies?`
-        const [foodAllergyValues] = await Promise.all([
+        const [foodAllergyValues, prisonPerson] = await Promise.all([
           this.personalPageService.getReferenceDataDomain(clientToken, 'foodAllergy'),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
 
-        return this.editCheckboxes(formTitle, fieldData, referenceDataDomainToCheckboxOptions(foodAllergyValues))(
-          req,
-          res,
-          next,
-        )
+        return this.editCheckboxes(
+          formTitle,
+          fieldData,
+          referenceDataDomainToCheckboxOptions(foodAllergyValues),
+          prisonPerson?.health?.foodAllergies.map(code => code.id),
+        )(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {

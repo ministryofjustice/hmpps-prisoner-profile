@@ -15,16 +15,16 @@
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro medicalDietHtml(personalDetails) %}
   <span class="govuk-!-font-weight-bold">Medical diet</span><br />
-  {% for diet in personalDetails.medicalDietaryRequirements %}
-    {{ diet }}<br />
-  {% endfor %}
+    {% for requirement in personalDetails.medicalDietaryRequirements | formatMedicalDietaryRequirements %}
+      {{ requirement }}<br />
+    {% endfor %}
 {% endmacro %}
 
 {% macro foodAllergiesHtml(personalDetails) %}
   <span class="govuk-!-font-weight-bold">Food allergies</span><br />
   {% if personalDetails.foodAllergies.length > 0 %}
     {% for allergy in personalDetails.foodAllergies %}
-      {{ allergy }}<br />
+      {{ allergy.description }}<br />
     {% endfor %}
   {% else %}
     None

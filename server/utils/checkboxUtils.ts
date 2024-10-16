@@ -5,9 +5,12 @@ export const checkboxInputToSelectedValues = (
   rootFieldName: string,
   selectedOptions: { [key: string]: string[] } | null,
 ): string[] => {
-  if (!selectedOptions) return []
+  if (!selectedOptions || !selectedOptions[rootFieldName]) return []
+
   // Get the selected values not including sub-values
-  const selectedValues = selectedOptions[rootFieldName]
+  const selectedValues = Array.isArray(selectedOptions[rootFieldName])
+    ? selectedOptions[rootFieldName]
+    : [selectedOptions[rootFieldName]]
 
   // Ensure only exclusive options are returned in the case of hanging around sub-value options
   if (selectedValues.includes('DONT_KNOW')) return ['DONT_KNOW']

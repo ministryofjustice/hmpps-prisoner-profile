@@ -223,7 +223,7 @@ describe('PersonalPageService', () => {
 
       describe('Medical diet', () => {
         it.each([
-          [true, ['Low fat']],
+          [true, [{ id: 'MEDICAL_DIET_LOW_FAT', description: 'Low fat' }]],
           [false, []],
         ])('Maps the medical diet field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
           const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
@@ -233,7 +233,7 @@ describe('PersonalPageService', () => {
 
       describe('Food allergies', () => {
         it.each([
-          [true, ['Gluten']],
+          [true, [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten' }]],
           [false, []],
         ])('Maps the food allergies field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
           const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
