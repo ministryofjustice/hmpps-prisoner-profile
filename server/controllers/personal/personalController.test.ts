@@ -1363,7 +1363,7 @@ describe('PersonalController', () => {
           checkedItems: [],
           fieldName: 'medicalDiet',
           formHint: 'Select all that apply',
-          formOptions: { showDontKnow: true, showNo: true },
+          formOptions: { showDontKnow: false, showNo: false },
           formTitle: expect.anything(),
           miniBannerData: {
             cellLocation: '2-3-001',
@@ -1482,7 +1482,7 @@ describe('PersonalController', () => {
           checkedItems: [],
           fieldName: 'foodAllergies',
           formHint: 'Select all that apply',
-          formOptions: { showDontKnow: true, showNo: true },
+          formOptions: { showDontKnow: false, showNo: false },
           formTitle: expect.anything(),
           miniBannerData: {
             cellLocation: '2-3-001',

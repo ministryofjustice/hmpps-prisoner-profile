@@ -936,8 +936,9 @@ export default class PersonalController {
       url: 'medical-diet',
       hintText: 'Select all that apply',
       options: {
-        showDontKnow: true,
-        showNo: true,
+        // Hide these for now until the API supports them
+        showDontKnow: false,
+        showNo: false,
       },
     }
 
@@ -1007,8 +1008,9 @@ export default class PersonalController {
       url: 'food-allergies',
       hintText: 'Select all that apply',
       options: {
-        showDontKnow: true,
-        showNo: true,
+        // Hide these for now until the API supports them
+        showDontKnow: false,
+        showNo: false,
       },
     }
 
