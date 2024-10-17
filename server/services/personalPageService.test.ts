@@ -89,6 +89,15 @@ describe('PersonalPageService', () => {
             lastModifiedAt: '2024-07-01T01:02:03+0100',
             lastModifiedBy: 'USER1',
           },
+          foodAllergies: [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten', listSequence: 0, isActive: true }],
+          medicalDietaryRequirements: [
+            {
+              id: 'MEDICAL_DIET_LOW_FAT',
+              description: 'Low fat',
+              listSequence: 0,
+              isActive: true,
+            },
+          ],
         },
       })),
       updatePhysicalAttributes: jest.fn(),
@@ -209,6 +218,26 @@ describe('PersonalPageService', () => {
         ])('Maps the smoker or vaper field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
           const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
           expect(response.personalDetails.smokerOrVaper).toEqual(expectedValue)
+        })
+      })
+
+      describe('Medical diet', () => {
+        it.each([
+          [true, [{ id: 'MEDICAL_DIET_LOW_FAT', description: 'Low fat' }]],
+          [false, []],
+        ])('Maps the medical diet field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
+          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
+          expect(response.personalDetails.medicalDietaryRequirements).toEqual(expectedValue)
+        })
+      })
+
+      describe('Food allergies', () => {
+        it.each([
+          [true, [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten' }]],
+          [false, []],
+        ])('Maps the food allergies field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
+          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
+          expect(response.personalDetails.foodAllergies).toEqual(expectedValue)
         })
       })
 
@@ -567,6 +596,36 @@ describe('PersonalPageService', () => {
       expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['smokerOrVaper'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update medical diet', () => {
+    it('Updates the medical diet on the API', async () => {
+      await constructService().updateMedicalDietaryRequirements('token', prisonUserMock, 'A1234AA', [
+        'MEDICAL_DIET_LOW_FAT',
+      ])
+      expect(prisonPersonApiClient.updateHealth).toHaveBeenCalledWith('A1234AA', {
+        medicalDietaryRequirements: ['MEDICAL_DIET_LOW_FAT'],
+      })
+      expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['medicalDietaryRequirements'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update food allergies', () => {
+    it('Updates the food allergies on the API', async () => {
+      await constructService().updateFoodAllergies('token', prisonUserMock, 'A1234AA', ['FOOD_ALLERGY_GLUTEN'])
+      expect(prisonPersonApiClient.updateHealth).toHaveBeenCalledWith('A1234AA', {
+        foodAllergies: ['FOOD_ALLERGY_GLUTEN'],
+      })
+      expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['foodAllergies'],
         user: prisonUserMock,
       })
     })

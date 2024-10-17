@@ -94,6 +94,8 @@ export enum PostAction {
   CaseNote = 'ADD_CASE_NOTE',
   EditPhysicalCharacteristics = 'EDIT_PHYSICAL_CHARACTERISTICS',
   EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
+  EditMedicalDiet = 'EDIT_MEDICAL_DIET',
+  EditFoodAllergies = 'EDIT_FOOD_ALLERGIES',
 }
 
 // eslint-disable-next-line no-shadow

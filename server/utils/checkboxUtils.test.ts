@@ -91,7 +91,7 @@ describe('Checkbox Utils', () => {
           subValues: {
             title: 'subvalues',
             hint: 'hint',
-            items: [{ value: 'EXAMPLE__SUBVALUE', text: 'Subvalue', checked: false }],
+            items: [{ value: 'SUBVALUE', text: 'Subvalue', checked: false }],
           },
         },
         {
@@ -119,7 +119,7 @@ describe('Checkbox Utils', () => {
         { value: 'TWO', text: 'Two' },
       ]
 
-      expect(checkboxFieldDataToInputs(input, ['EXAMPLE__SUBVALUE'])).toEqual([
+      expect(checkboxFieldDataToInputs(input, ['SUBVALUE'])).toEqual([
         {
           value: 'EXAMPLE',
           text: 'Example',
@@ -128,8 +128,8 @@ describe('Checkbox Utils', () => {
             title: 'subvalues',
             hint: 'hint',
             items: [
-              { value: 'EXAMPLE__SUBVALUE', text: 'Subvalue', checked: true },
-              { value: 'EXAMPLE__SUBVALUE_TWO', text: 'Subvalue 2', checked: false },
+              { value: 'SUBVALUE', text: 'Subvalue', checked: true },
+              { value: 'SUBVALUE_TWO', text: 'Subvalue 2', checked: false },
             ],
           },
         },

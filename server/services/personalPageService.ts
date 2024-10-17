@@ -234,6 +234,16 @@ export default class PersonalPageService {
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
+      medicalDietaryRequirements: prisonPerson
+        ? prisonPerson.health?.medicalDietaryRequirements
+            .map(({ id, description }) => ({ id, description }))
+            .sort((a, b) => a.description.localeCompare(b.description))
+        : [],
+      foodAllergies: prisonPerson
+        ? prisonPerson.health?.foodAllergies
+            .map(({ id, description }) => ({ id, description }))
+            .sort((a, b) => a.description.localeCompare(b.description))
+        : [],
     }
   }
 
@@ -412,12 +422,47 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
+  async getReferenceDataDomain(clientToken: string, domain: string) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    return prisonPersonApiClient.getReferenceDataDomain(camelToSnakeCase(domain))
+  }
+
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['smokerOrVaper'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateMedicalDietaryRequirements(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    medicalDietaryRequirements: string[],
+  ) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { medicalDietaryRequirements })
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['medicalDietaryRequirements'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateFoodAllergies(clientToken: string, user: PrisonUser, prisonerNumber: string, foodAllergies: string[]) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['foodAllergies'],
       prisonerNumber,
       user,
     })

@@ -39,10 +39,13 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
   }
 
   /* Reference Data Domain and Code endpoints */
-  async getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]> {
+  async getReferenceDataDomains(
+    includeInactive?: boolean,
+    includeSubDomains?: boolean,
+  ): Promise<ReferenceDataDomain[]> {
     return this.restClient.get<ReferenceDataDomain[]>({
       path: `/reference-data/domains`,
-      query: mapToQueryString({ includeInactive }),
+      query: mapToQueryString({ includeInactive, includeSubDomains }),
     })
   }
 

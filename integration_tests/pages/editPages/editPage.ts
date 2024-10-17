@@ -1,6 +1,6 @@
 import Page, { PageElement } from '../page'
 
-type CheckboxValue = string | { value: string; subvalues: string[] }
+type CheckboxValue = string | { value: string; subValues: string[] }
 export default class EditPage extends Page {
   constructor(pageTitle: string) {
     super(pageTitle)
@@ -33,8 +33,8 @@ export default class EditPage extends Page {
           cy.get(`input[name=${name}][value=${value}]`).click()
         } else {
           cy.get(`input[name=${name}][value=${value.value}]`).click()
-          value.subvalues.forEach(subValue => {
-            cy.get(`input[name=${value.value}-subvalues][value=${value.value}__${subValue}]`).click()
+          value.subValues.forEach(subValue => {
+            cy.get(`input[name=${value.value}-subvalues][value=${subValue}]`).click()
           })
         }
       })
