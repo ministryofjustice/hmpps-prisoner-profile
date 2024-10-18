@@ -63,6 +63,7 @@ export interface ReferenceDataDomain {
   deactivatedAt?: string
   deactivatedBy?: string
   referenceDataCodes?: ReferenceDataCode[]
+  subDomains: ReferenceDataDomain[]
 }
 
 export interface ReferenceDataCode {
@@ -99,10 +100,14 @@ export interface FieldHistory {
 
 export interface PrisonPersonHealth {
   smokerOrVaper: ValueWithMetadata<ReferenceDataCodeSimple>
+  foodAllergies: ReferenceDataCodeSimple[]
+  medicalDietaryRequirements: ReferenceDataCodeSimple[]
 }
 
 export interface PrisonPersonHealthUpdate {
-  smokerOrVaper: string
+  smokerOrVaper?: string
+  foodAllergies?: string[]
+  medicalDietaryRequirements?: string[]
 }
 
 export type BodyPartId =
@@ -161,7 +166,7 @@ export interface PrisonPersonApiClient {
 
   updateHealth(prisonerNumber: string, healthData: Partial<PrisonPersonHealthUpdate>): Promise<PrisonPerson>
 
-  getReferenceDataDomains(includeInactive?: boolean): Promise<ReferenceDataDomain[]>
+  getReferenceDataDomains(includeInactive?: boolean, includeSubDomains?: boolean): Promise<ReferenceDataDomain[]>
 
   getReferenceDataDomain(domain: string): Promise<ReferenceDataDomain>
 

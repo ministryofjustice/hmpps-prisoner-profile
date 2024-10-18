@@ -42,6 +42,7 @@ import summaryListRowWithOptionalChangeLink, {
   listToSummaryListRows,
 } from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
 import groupDistinguishingMarks from '../views/dataUtils/groupDistinguishingMarksForView'
+import { formatMedicalDietaryRequirements } from './referenceDataCodeUtils'
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 
@@ -171,4 +172,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
   njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
   njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)
+  njkEnv.addFilter('formatMedicalDietaryRequirements', formatMedicalDietaryRequirements)
 }

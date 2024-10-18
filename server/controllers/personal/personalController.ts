@@ -42,7 +42,7 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
-import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
+import { checkboxInputToSelectedValues, referenceDataDomainToCheckboxOptions } from '../../utils/checkboxUtils'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -879,13 +879,20 @@ export default class PersonalController {
     }
   }
 
-  editCheckboxes(formTitle: string, fieldData: CheckboxFieldData, options: CheckboxOptions[]) {
+  editCheckboxes(
+    formTitle: string,
+    fieldData: CheckboxFieldData,
+    options: CheckboxOptions[],
+    selectedValues: string[] = [],
+  ) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
       const { prisonerData } = req.middleware
       const { firstName, lastName, cellLocation } = prisonerData
       const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
-      const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
+      const checkedItems = requestBodyFlash
+        ? checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
+        : selectedValues
 
       const errors = req.flash('errors')
 
@@ -929,63 +936,66 @@ export default class PersonalController {
       url: 'medical-diet',
       hintText: 'Select all that apply',
       options: {
-        showDontKnow: true,
-        showNo: true,
+        // Hide these for now until the API supports them
+        showDontKnow: false,
+        showNo: false,
       },
     }
 
-    const checkboxInputs: CheckboxOptions[] = [
-      {
-        text: "A 'free from' diet",
-        value: 'FREE_FROM',
-        subValues: {
-          title: 'Which foods does this diet exclude',
-          hint: 'Select all that apply',
-          options: [
-            {
-              text: 'Any foods that interact with monoamine oxidase inhibitors',
-              value: 'MONOAMINE',
-            },
-            { text: 'Cheese', value: 'CHEESE' },
-            { text: 'Egg', value: 'EGG' },
-            { text: 'Fat', value: 'FAT' },
-            { text: 'Fried food', value: 'FRIED_FOOD' },
-            { text: 'Fish', value: 'FISH' },
-            { text: 'Garlic', value: 'GARLIC' },
-            { text: 'Lactose', value: 'LACTOSE' },
-            { text: 'Onion', value: 'ONION' },
-            { text: 'Pork', value: 'PORK' },
-            { text: 'Potato', value: 'POTATO' },
-          ],
-        },
-      },
-      { text: 'Low fat', value: 'LOW_FAT' },
-      { text: 'Low salt', value: 'LOW_SALT' },
-      { text: 'Diabetic', value: 'DIABETIC' },
-      { text: 'Low cholesterol', value: 'LOW_CHOLESTEROL' },
-      { text: 'Coeliac', value: 'COELIAC' },
-      { text: 'Pregnant', value: 'PREGNANT' },
-      { text: 'Disordered eating', value: 'DISORDERED_EATING' },
-    ]
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerData } = req.middleware
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const formTitle = `Does ${prisonerName} have any of these medical dietary requirements?`
+        const [medicalDietaryRequirementValues, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataDomain(clientToken, 'medicalDiet'),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
 
-        return this.editCheckboxes(formTitle, fieldData, checkboxInputs)(req, res, next)
+        return this.editCheckboxes(
+          formTitle,
+          fieldData,
+          referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
+          prisonPerson?.health?.medicalDietaryRequirements.map(code => code.id),
+        )(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        req.flash('flashMessage', {
-          text: `Medical diet updated`,
-          type: FlashMessageType.success,
-          fieldName: 'medicalDiet',
-        })
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, req.body)
+
+        try {
+          await this.personalPageService.updateMedicalDietaryRequirements(
+            clientToken,
+            user,
+            prisonerNumber,
+            checkedItems,
+          )
+          req.flash('flashMessage', {
+            text: `Medical diet updated`,
+            type: FlashMessageType.success,
+            fieldName: 'medicalDiet',
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditMedicalDiet,
+              details: { medicalDietaryRequirements: checkedItems },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${fieldData.url}`)
       },
     }
   }
@@ -998,46 +1008,62 @@ export default class PersonalController {
       url: 'food-allergies',
       hintText: 'Select all that apply',
       options: {
-        showDontKnow: true,
-        showNo: true,
+        // Hide these for now until the API supports them
+        showDontKnow: false,
+        showNo: false,
       },
     }
 
-    const checkboxInputs: CheckboxOptions[] = [
-      { text: 'Celery', value: 'CELERY' },
-      { text: 'Cereals containing gluten', value: 'GLUTEN' },
-      { text: 'Crustaceans', value: 'CRUSTACEANS' },
-      { text: 'Egg', value: 'EGG' },
-      { text: 'Fish', value: 'FISH' },
-      { text: 'Lupin', value: 'LUPIN' },
-      { text: 'Milk', value: 'MILK' },
-      { text: 'Molluscs', value: 'MOLLUSCS' },
-      { text: 'Mustard', value: 'MUSTARD' },
-      { text: 'Peanuts', value: 'PEANUTS' },
-      { text: 'Seasame', value: 'SEASAME' },
-      { text: 'Soya', value: 'SOYA' },
-      { text: 'Sulpur Dioxide', value: 'SULPUR_DIOXIDE' },
-      { text: 'Tree nuts', value: 'TREE_NUTS' },
-    ]
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerData } = req.middleware
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const formTitle = `Does ${prisonerName} have any food allergies?`
+        const [foodAllergyValues, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataDomain(clientToken, 'foodAllergy'),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
 
-        return this.editCheckboxes(formTitle, fieldData, checkboxInputs)(req, res, next)
+        return this.editCheckboxes(
+          formTitle,
+          fieldData,
+          referenceDataDomainToCheckboxOptions(foodAllergyValues),
+          prisonPerson?.health?.foodAllergies.map(code => code.id),
+        )(req, res, next)
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        req.flash('flashMessage', {
-          text: `Food allergies updated`,
-          type: FlashMessageType.success,
-          fieldName: 'foodAllergies',
-        })
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const checkedItems = checkboxInputToSelectedValues(fieldData.fieldName, req.body)
+
+        try {
+          await this.personalPageService.updateFoodAllergies(clientToken, user, prisonerNumber, checkedItems)
+
+          req.flash('flashMessage', {
+            text: `Food allergies updated`,
+            type: FlashMessageType.success,
+            fieldName: 'foodAllergies',
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditFoodAllergies,
+              details: { foodAllergies: checkedItems },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${fieldData.url}`)
       },
     }
   }

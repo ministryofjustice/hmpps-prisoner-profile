@@ -7,7 +7,7 @@ import Page from '../../../pages/page'
 export interface EditPageInputs {
   textInputs?: { [key: string]: string }
   radioInputs?: { [key: string]: string }
-  checkboxInputs?: { [key: string]: (string | { value: string; subvalues: string[] })[] }
+  checkboxInputs?: { [key: string]: (string | { value: string; subValues: string[] })[] }
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
