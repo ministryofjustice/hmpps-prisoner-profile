@@ -60,7 +60,7 @@ describe('Specific Prisoner Location History', () => {
       getCaseNoteTypesForUser: jest.fn(),
       getCaseNotes: jest.fn(),
       addCaseNote: jest.fn(),
-      updateCaseNote: jest.fn(),
+      addCaseNoteAmendment: jest.fn(),
       getCaseNote: jest.fn(),
     }
 

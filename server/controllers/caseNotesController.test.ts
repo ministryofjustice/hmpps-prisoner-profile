@@ -15,7 +15,6 @@ import config from '../config'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { prisonApiAdditionalCaseNoteTextLength } from '../validators/updateCaseNoteValidator'
-import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import { HmppsUser } from '../interfaces/HmppsUser'
 
 let req: any
@@ -380,12 +379,7 @@ describe('Case Notes Controller', () => {
 
   describe('Handle update case note POST', () => {
     it('should update case note', async () => {
-      const updateCaseNoteForm: UpdateCaseNoteForm = {
-        text: 'Note text',
-        isExternal: false,
-        username: 'AB123456',
-        currentLength: 100,
-      }
+      const text = 'Note text'
       const caseNoteId = 'abc123'
 
       req = {
@@ -395,12 +389,12 @@ describe('Case Notes Controller', () => {
           caseNoteId,
         },
         body: {
-          ...updateCaseNoteForm,
+          text,
           refererUrl: 'http://referer',
         },
       }
       const updateCaseNoteSpy = jest
-        .spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
+        .spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
         .mockResolvedValue(pagedCaseNotesMock.content[0])
 
       jest
@@ -414,7 +408,7 @@ describe('Case Notes Controller', () => {
         PrisonerMockDataA.prisonerNumber,
         'MDI',
         caseNoteId,
-        updateCaseNoteForm,
+        text,
       )
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/case-notes`)
     })
@@ -428,9 +422,6 @@ describe('Case Notes Controller', () => {
         },
         body: {
           text: 'Note text',
-          isExternal: false,
-          username: 'AB123456',
-          currentLength: 100,
           refererUrl: 'http://referer',
         },
         middleware: {
@@ -445,7 +436,7 @@ describe('Case Notes Controller', () => {
         },
       }
 
-      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
+      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
       jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
 
       await controller.postUpdate()(reqWithPermission, res, next)
@@ -463,14 +454,11 @@ describe('Case Notes Controller', () => {
         },
         body: {
           text: 'Note text',
-          isExternal: false,
-          username: 'AB123456',
-          currentLength: 100,
           refererUrl: 'http://referer',
         },
       }
 
-      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'updateCaseNote')
+      const updateCaseNoteSpy = jest.spyOn<any, string>(controller['caseNotesService'], 'addCaseNoteAmendment')
       jest.spyOn<any, string>(controller['caseNotesService'], 'getCaseNote').mockResolvedValue(currentCaseNote)
 
       await controller.postUpdate()(req, res, next)

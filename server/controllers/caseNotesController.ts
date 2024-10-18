@@ -286,7 +286,7 @@ export default class CaseNotesController {
   public postUpdate(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber, caseNoteId } = req.params
-      const { text, isExternal, currentLength, username } = req.body
+      const { text } = req.body
       const { clientToken, permissions } = req.middleware
       const { prisonId } = req.middleware.prisonerData
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
@@ -299,12 +299,13 @@ export default class CaseNotesController {
       const errors = req.errors || []
       if (!errors.length) {
         try {
-          await this.caseNotesService.updateCaseNote(req.middleware.clientToken, prisonerNumber, prisonId, caseNoteId, {
+          await this.caseNotesService.addCaseNoteAmendment(
+            req.middleware.clientToken,
+            prisonerNumber,
+            prisonId,
+            caseNoteId,
             text,
-            isExternal,
-            currentLength: +currentLength,
-            username,
-          })
+          )
         } catch (error) {
           if (error.status === 400) {
             errors.push({ text: error.message })
