@@ -32,7 +32,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
 
   async getCaseNotes(
     offenderNumber: string,
-    prisonerLocationId: string,
+    caseloadId: string,
     queryParams?: CaseNotesListQueryParams,
   ): Promise<PagedList<CaseNote>> {
     // Set defaults then apply queryParams
@@ -43,7 +43,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<PagedList<CaseNote>>({
       path: `/case-notes/${offenderNumber}`,
       query: mapToQueryString(params),
-      headers: { prisonerLocationId },
+      headers: { caseloadId },
     })
   }
 
@@ -56,39 +56,39 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
     return this.get<CaseNoteType[]>({ path: `/case-notes/types`, query: mapToQueryString(params) })
   }
 
-  async addCaseNote(prisonerNumber: string, prisonerLocationId: string, caseNote: CaseNote): Promise<CaseNote> {
+  async addCaseNote(prisonerNumber: string, caseloadId: string, caseNote: CaseNote): Promise<CaseNote> {
     return (await this.post({
       path: `/case-notes/${prisonerNumber}`,
       data: {
         ...caseNote,
-        locationId: prisonerLocationId,
+        locationId: caseloadId,
       },
-      headers: { prisonerLocationId },
+      headers: { caseloadId },
     })) as Promise<CaseNote>
   }
 
   async addCaseNoteAmendment(
     prisonerNumber: string,
-    prisonerLocationId: string,
+    caseloadId: string,
     caseNoteId: string,
     text: string,
   ): Promise<CaseNote> {
     return (await this.put({
       path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
       data: { text },
-      headers: { prisonerLocationId },
+      headers: { caseloadId },
     })) as Promise<CaseNote>
   }
 
   async getCaseNote(
     prisonerNumber: string,
-    prisonerLocationId: string,
+    caseloadId: string,
     caseNoteId: string,
     ignore404 = false,
   ): Promise<CaseNote> {
     return this.get<CaseNote>({
       path: `/case-notes/${prisonerNumber}/${caseNoteId}`,
-      headers: { prisonerLocationId },
+      headers: { caseloadId },
       ignore404,
     })
   }
