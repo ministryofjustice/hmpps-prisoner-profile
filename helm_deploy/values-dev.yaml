@@ -83,3 +83,7 @@ generic-service:
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+
+  elastiCacheAlertsClusterIds:
+    cp-263d93efba298fad-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
+    cp-263d93efba298fad-002: "HMPPS Prisoner Profile ElastiCache Cluster Node 2"

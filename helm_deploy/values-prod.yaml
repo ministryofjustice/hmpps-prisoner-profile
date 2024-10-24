@@ -90,10 +90,14 @@ generic-service:
     sscl-newcastle: 62.172.79.105/32
     sscl-newport: 217.38.237.212/32
     groups:
-    - internal
-    - prisons
-    - private_prisons
-    - home_office
+      - internal
+      - prisons
+      - private_prisons
+      - home_office
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-prod
+
+  elastiCacheAlertsClusterIds:
+    cp-15ac40963e3a4fbf-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
+    cp-15ac40963e3a4fbf-002: "HMPPS Prisoner Profile ElastiCache Cluster Node 2"
