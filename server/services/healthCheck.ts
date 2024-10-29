@@ -55,6 +55,15 @@ const apiChecks = [
     : []),
   service('prisonerSearchApi', `${config.apis.prisonerSearchApi.url}/health/ping`, config.apis.prisonerSearchApi.agent),
   service('prisonApi', `${config.apis.prisonApi.url}/health/ping`, config.apis.prisonApi.agent),
+  ...(config.featureToggles.bookAVideoLinkEnabled
+    ? [
+        service(
+          'bookAVideoLinkApi',
+          `${config.apis.bookAVideoLinkApi.url}/health/ping`,
+          config.apis.bookAVideoLinkApi.agent,
+        ),
+      ]
+    : []),
 ]
 
 export default function healthCheck(
