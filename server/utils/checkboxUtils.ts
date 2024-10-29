@@ -1,5 +1,6 @@
 import { CheckboxOptions } from './utils'
 import { ReferenceDataDomain } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { CheckboxFieldData } from '../controllers/personal/fieldData'
 
 export const checkboxInputToSelectedValues = (
   rootFieldName: string,
@@ -13,8 +14,8 @@ export const checkboxInputToSelectedValues = (
     : [selectedOptions[rootFieldName]]
 
   // Ensure only exclusive options are returned in the case of hanging around sub-value options
-  if (selectedValues.includes('DONT_KNOW')) return ['DONT_KNOW']
-  if (selectedValues.includes('NO')) return ['NO']
+  if (selectedValues.find(i => i.endsWith('_DONT_KNOW'))) return selectedValues.filter(i => i.endsWith('_DONT_KNOW'))
+  if (selectedValues.find(i => i.endsWith('_NO'))) return selectedValues.filter(i => i.endsWith('_NO'))
 
   return selectedValues.reduce((res, val) => {
     res.push(val)
@@ -75,18 +76,31 @@ export const referenceDataDomainToCheckboxOptions = (referenceDataDomain: Refere
     {} as { [key: string]: CheckboxOptions['subValues'] },
   )
 
-  return referenceDataDomain.referenceDataCodes.map(code => {
-    const subValues = subDomainCodes[code.code]
-    if (subValues) {
+  return referenceDataDomain.referenceDataCodes
+    .filter(code => ![`${code.domain}_NO`, `${code.domain}_DONT_KNOW`].includes(code.id))
+    .map(code => {
+      const subValues = subDomainCodes[code.code]
+      if (subValues) {
+        return {
+          text: code.description,
+          value: code.id,
+          subValues,
+        }
+      }
       return {
         text: code.description,
         value: code.id,
-        subValues,
       }
-    }
-    return {
-      text: code.description,
-      value: code.id,
-    }
-  })
+    })
 }
+
+export const referenceDataDomainToCheckboxFieldDataOptions = (
+  referenceDataDomain: ReferenceDataDomain,
+): CheckboxFieldData['options'] => ({
+  showDontKnow: !!referenceDataDomain.referenceDataCodes.find(
+    code => code.id === `${referenceDataDomain.code}_DONT_KNOW` && code.isActive,
+  ),
+  showNo: !!referenceDataDomain.referenceDataCodes.find(
+    code => code.id === `${referenceDataDomain.code}_NO` && code.isActive,
+  ),
+})

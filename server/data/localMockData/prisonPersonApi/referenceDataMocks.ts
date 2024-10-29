@@ -55,6 +55,7 @@ export const mockMedicalDietReferenceDataDomain: ReferenceDataDomain = {
     { description: 'Coeliac', code: 'COELIAC', id: 'MEDICAL_DIET_COELIAC' },
     { description: 'Pregnant', code: 'PREGNANT', id: 'MEDICAL_DIET_PREGNANT' },
     { description: 'Disordered eating', code: 'DISORDERED_EATING', id: 'MEDICAL_DIET_DISORDERED_EATING' },
+    { description: 'No', code: 'DONT_KNOW', id: 'MEDICAL_DIET_DONT_KNOW' },
   ].map(x => ({
     ...x,
     domain: 'MEDICAL_DIET',
@@ -88,6 +89,7 @@ export const mockFoodAllergiesReferenceDataDomain: ReferenceDataDomain = {
     { description: 'Soya', code: 'SOYA' },
     { description: 'Sulpur Dioxide', code: 'SULPUR_DIOXIDE' },
     { description: 'Tree nuts', code: 'TREE_NUTS' },
+    { description: 'No', code: 'NO' },
   ].map(x => ({
     ...x,
     id: `FOOD_ALLERGY_${x.code}`,

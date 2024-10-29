@@ -42,7 +42,11 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
-import { checkboxInputToSelectedValues, referenceDataDomainToCheckboxOptions } from '../../utils/checkboxUtils'
+import {
+  checkboxInputToSelectedValues,
+  referenceDataDomainToCheckboxFieldDataOptions,
+  referenceDataDomainToCheckboxOptions,
+} from '../../utils/checkboxUtils'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -935,13 +939,7 @@ export default class PersonalController {
       pageTitle: 'Medical diet',
       url: 'medical-diet',
       hintText: 'Select all that apply',
-      options: {
-        // Hide these for now until the API supports them
-        showDontKnow: false,
-        showNo: false,
-      },
     }
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
@@ -956,7 +954,7 @@ export default class PersonalController {
 
         return this.editCheckboxes(
           formTitle,
-          fieldData,
+          { ...fieldData, options: referenceDataDomainToCheckboxFieldDataOptions(medicalDietaryRequirementValues) },
           referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
           prisonPerson?.health?.medicalDietaryRequirements.map(code => code.id),
         )(req, res, next)
@@ -978,7 +976,7 @@ export default class PersonalController {
           req.flash('flashMessage', {
             text: `Medical diet updated`,
             type: FlashMessageType.success,
-            fieldName: 'medicalDiet',
+            fieldName: fieldData.fieldName,
           })
 
           this.auditService
@@ -1007,11 +1005,6 @@ export default class PersonalController {
       pageTitle: 'Food allergies',
       url: 'food-allergies',
       hintText: 'Select all that apply',
-      options: {
-        // Hide these for now until the API supports them
-        showDontKnow: false,
-        showNo: false,
-      },
     }
 
     return {
@@ -1028,7 +1021,7 @@ export default class PersonalController {
 
         return this.editCheckboxes(
           formTitle,
-          fieldData,
+          { ...fieldData, options: referenceDataDomainToCheckboxFieldDataOptions(foodAllergyValues) },
           referenceDataDomainToCheckboxOptions(foodAllergyValues),
           prisonPerson?.health?.foodAllergies.map(code => code.id),
         )(req, res, next)
