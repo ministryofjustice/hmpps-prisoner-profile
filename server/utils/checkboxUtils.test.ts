@@ -1,5 +1,11 @@
-import { checkboxFieldDataToInputs, checkboxInputToSelectedValues } from './checkboxUtils'
+import {
+  checkboxFieldDataToInputs,
+  checkboxInputToSelectedValues,
+  referenceDataDomainToCheckboxFieldDataOptions,
+  referenceDataDomainToCheckboxOptions,
+} from './checkboxUtils'
 import { CheckboxOptions } from './utils'
+import { ReferenceDataCode, ReferenceDataDomain } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 describe('Checkbox Utils', () => {
   describe('CheckboxInputToSelectedValues', () => {
@@ -26,18 +32,29 @@ describe('Checkbox Utils', () => {
           expected: ['SELECTED'],
         },
       ],
-      ['no without other options', { fieldName: 'example', input: { example: ['NO'] }, expected: ['NO'] }],
+      [
+        'no without other options',
+        {
+          fieldName: 'example',
+          input: { example: ['EXAMPLE_NO'] },
+          expected: ['EXAMPLE_NO'],
+        },
+      ],
       [
         'no with other options',
-        { fieldName: 'example', input: { example: ['NO', 'OTHER_SELECTED'] }, expected: ['NO'] },
+        { fieldName: 'example', input: { example: ['EXAMPLE_NO', 'OTHER_SELECTED'] }, expected: ['EXAMPLE_NO'] },
       ],
       [
         'dont no without other options',
-        { fieldName: 'example', input: { example: ['DONT_KNOW'] }, expected: ['DONT_KNOW'] },
+        { fieldName: 'example', input: { example: ['EXAMPLE_DONT_KNOW'] }, expected: ['EXAMPLE_DONT_KNOW'] },
       ],
       [
         'dont no with other options',
-        { fieldName: 'example', input: { example: ['DONT_KNOW', 'OTHER_SELECTED'] }, expected: ['DONT_KNOW'] },
+        {
+          fieldName: 'example',
+          input: { example: ['EXAMPLE_DONT_KNOW', 'OTHER_SELECTED'] },
+          expected: ['EXAMPLE_DONT_KNOW'],
+        },
       ],
     ])('%s', (_, { fieldName, input, expected }) => {
       expect(checkboxInputToSelectedValues(fieldName, input)).toEqual(expected)
@@ -139,6 +156,116 @@ describe('Checkbox Utils', () => {
           checked: false,
         },
       ])
+    })
+  })
+
+  describe('referenceDataDomainToCheckboxOptions', () => {
+    it('Removes no/dont know from the options', () => {
+      const input: ReferenceDataDomain = {
+        code: 'EXAMPLE',
+        subDomains: [],
+        description: '',
+        createdBy: '',
+        isActive: true,
+        createdAt: '',
+        listSequence: 0,
+        referenceDataCodes: ['NO', 'EXAMPLE', 'DONT_KNOW'].map(id => ({
+          id: `EXAMPLE_${id}`,
+          code: 'code',
+          domain: 'EXAMPLE',
+          isActive: true,
+          createdAt: '',
+          listSequence: 0,
+          createdBy: '',
+          description: '',
+        })),
+      }
+
+      const actual = referenceDataDomainToCheckboxOptions(input)
+      expect(actual.length).toEqual(1)
+      expect(actual[0].value).toEqual('EXAMPLE_EXAMPLE')
+    })
+  })
+
+  describe('referenceDataDomainToCheckboxFieldDataOptions', () => {
+    it.each([
+      [
+        [
+          { id: 'EXAMPLE_EXAMPLE', isActive: true },
+          { id: 'EXAMPLE_NO', isActive: true },
+        ],
+        true,
+      ],
+      [
+        [
+          { id: 'EXAMPLE_EXAMPLE', isActive: true },
+          { id: 'EXAMPLE_NO', isActive: false },
+        ],
+        false,
+      ],
+      [[{ id: 'EXAMPLE_EXAMPLE', isActive: true }], false],
+    ])('Show no: %j (%s)', (referenceDataIds: Partial<ReferenceDataCode>[], expectedValue) => {
+      const input: ReferenceDataDomain = {
+        code: 'EXAMPLE',
+        subDomains: [],
+        description: '',
+        createdBy: '',
+        isActive: true,
+        createdAt: '',
+        listSequence: 0,
+        referenceDataCodes: referenceDataIds.map(({ id, isActive }) => ({
+          id,
+          code: 'code',
+          domain: 'EXAMPLE',
+          isActive,
+          createdAt: '',
+          listSequence: 0,
+          createdBy: '',
+          description: '',
+        })),
+      }
+
+      expect(referenceDataDomainToCheckboxFieldDataOptions(input).showNo).toEqual(expectedValue)
+    })
+
+    it.each([
+      [
+        [
+          { id: 'EXAMPLE_EXAMPLE', isActive: true },
+          { id: 'EXAMPLE_DONT_KNOW', isActive: true },
+        ],
+        true,
+      ],
+      [
+        [
+          { id: 'EXAMPLE_EXAMPLE', isActive: true },
+          { id: 'EXAMPLE_DONT_KNOW', isActive: false },
+        ],
+        false,
+      ],
+      [[{ id: 'EXAMPLE_EXAMPLE', isActive: true }], false],
+    ])('Show dont know: %j (%s)', (referenceDataIds: Partial<ReferenceDataCode>[], expectedValue) => {
+      const input: ReferenceDataDomain = {
+        code: 'EXAMPLE',
+        subDomains: [],
+        description: '',
+        createdBy: '',
+        isActive: true,
+        createdAt: '',
+        listSequence: 0,
+        referenceDataCodes: referenceDataIds.map(({ id, isActive }) => ({
+          id,
+          code: 'code',
+          domain: 'EXAMPLE',
+          isActive,
+          createdAt: '',
+          listSequence: 0,
+          createdBy: '',
+          description: '',
+        })),
+      }
+
+      expect(referenceDataDomainToCheckboxFieldDataOptions(input).showDontKnow).toEqual(expectedValue)
     })
   })
 })
