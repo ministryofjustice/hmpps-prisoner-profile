@@ -85,7 +85,7 @@ describe('PersonalPageService', () => {
         },
         health: {
           smokerOrVaper: {
-            value: { id: 'SMOKE_YES', description: 'Yes they smoke', listSequence: 0, isActive: true },
+            value: { id: 'SMOKE_SMOKER', description: 'Yes they smoke', listSequence: 0, isActive: true },
             lastModifiedAt: '2024-07-01T01:02:03+0100',
             lastModifiedBy: 'USER1',
           },
@@ -213,7 +213,7 @@ describe('PersonalPageService', () => {
 
       describe('Smoker or vaper', () => {
         it.each([
-          [true, 'Yes they smoke'],
+          [true, 'Smoker'],
           [false, 'No'],
         ])('Maps the smoker or vaper field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
           const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)

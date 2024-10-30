@@ -78,7 +78,7 @@ describe('PersonalController', () => {
     },
     health: {
       smokerOrVaper: {
-        value: { id: 'YES', description: '', listSequence: 0, isActive: true },
+        value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
         lastModifiedAt: '2024-07-01T01:02:03+0100',
         lastModifiedBy: 'USER1',
       },
@@ -91,10 +91,10 @@ describe('PersonalController', () => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
     personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
-      if (domain === 'smoke')
+      if (domain === 'SMOKE')
         return [
-          { id: 'Yes', description: 'Yes' },
-          { id: 'No', description: 'No' },
+          { id: 'SMOKE_SMOKER', description: 'Yes, they smoke' },
+          { id: 'SMOKE_NO', description: 'No, they do not smoke or vape' },
         ] as ReferenceDataCode[]
       return physicalCharacteristicsMock.field as ReferenceDataCode[]
     })
@@ -587,6 +587,7 @@ describe('PersonalController', () => {
       code: PrisonPersonCharacteristicCode.build,
       auditPage: 'PAGE' as Page,
       url: 'build',
+      redirectAnchor: 'appearance',
       hintText: 'Hint text',
     }
 
@@ -629,6 +630,7 @@ describe('PersonalController', () => {
               value: 'CODE3',
             },
           ],
+          redirectAnchor: 'appearance',
           miniBannerData: {
             prisonerName: 'Last, First',
             prisonerNumber: 'A1234BC',
@@ -743,9 +745,10 @@ describe('PersonalController', () => {
           hintText: undefined,
           errors: [],
           options: expect.arrayContaining([
-            expect.objectContaining({ value: 'Yes', checked: true }),
-            expect.objectContaining({ value: 'No', checked: false }),
+            expect.objectContaining({ value: 'SMOKE_SMOKER' }),
+            expect.objectContaining({ value: 'SMOKE_NO' }),
           ]),
+          redirectAnchor: 'personal-details',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -771,7 +774,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            return key === 'requestBody' ? [JSON.stringify({ radioField: 'No' })] : []
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKE_NO' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -779,7 +782,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([expect.objectContaining({ value: 'No', checked: true })]),
+            options: expect.arrayContaining([expect.objectContaining({ value: 'SMOKE_NO', checked: true })]),
           }),
         )
       })

@@ -506,7 +506,7 @@ export default class PersonalController {
 
   editRadioFields(formTitle: string, fieldData: RadioFieldData, options: RadioOption[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { pageTitle, hintText, auditPage } = fieldData
+      const { pageTitle, hintText, redirectAnchor, auditPage } = fieldData
       const { prisonerNumber } = req.params
       const { prisonerData } = req.middleware
       const { firstName, lastName, cellLocation } = prisonerData
@@ -530,6 +530,7 @@ export default class PersonalController {
         errors,
         hintText,
         options,
+        redirectAnchor,
         miniBannerData: {
           prisonerName: prisonerBannerName,
           prisonerNumber,
@@ -549,14 +550,10 @@ export default class PersonalController {
           requestBodyFlash?.radioField ||
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
         const [smokerOrVaperValues] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, 'smoke'),
+          this.personalPageService.getReferenceDataCodes(clientToken, 'SMOKE'),
         ])
 
-        const options: RadioOption[] = smokerOrVaperValues.map(({ description, id }) => ({
-          text: description,
-          value: id,
-          checked: fieldValue === id,
-        }))
+        const options = objectToRadioOptions(smokerOrVaperValues, 'id', 'description', fieldValue)
 
         return this.editRadioFields(
           `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,
