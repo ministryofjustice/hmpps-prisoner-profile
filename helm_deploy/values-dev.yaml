@@ -81,8 +81,14 @@ generic-service:
     PRISON_PERSON_API_ENABLED_PRISONS: "KMI"
     BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "true"
 
+  scheduledDowntime:
+    enabled: true
+    startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
+    shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
+
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+  businessHoursOnly: true
 
   elastiCacheAlertsClusterIds:
     cp-263d93efba298fad-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
