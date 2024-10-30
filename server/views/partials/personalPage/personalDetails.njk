@@ -72,7 +72,7 @@
             { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad } },
             { key: "Diet and food allergies", value: medicalDietHtml(personalDetails), options: {dataQa: "medical-diet", visible: editEnabled, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/medical-diet', rowUpdated: flashMessage.fieldName === 'medicalDiet', mergeKeyDown: true } },
             { key: "", value: foodAllergiesHtml(personalDetails), options: {dataQa: "food-allergies", visible: editEnabled, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/food-allergies', rowUpdated: flashMessage.fieldName === 'foodAllergies' } },
-            { key: "Smoker or vaper", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
+            { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
             { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
             { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
             { key: "Domestic abuse victim", value: personalDetails.domesticAbuseVictim, options: { dataQa: "domestic-abuse-victim", hideIfEmpty: true, visible: inUsersCaseLoad } },

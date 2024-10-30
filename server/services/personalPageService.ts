@@ -26,10 +26,11 @@ import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import {
-  PrisonPersonDistinguishingMark,
   PrisonPerson,
   PrisonPersonApiClient,
+  PrisonPersonDistinguishingMark,
   PrisonPersonPhysicalAttributesUpdate,
+  ReferenceDataCodeSimple,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
@@ -229,7 +230,7 @@ export default class PersonalPageService {
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
       smokerOrVaper: prisonPerson
-        ? prisonPerson.health?.smokerOrVaper?.value?.description || 'Not entered'
+        ? this.mapSmokerDescription(prisonPerson.health?.smokerOrVaper?.value) || 'Not entered'
         : getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
@@ -246,6 +247,13 @@ export default class PersonalPageService {
         : [],
     }
   }
+
+  private mapSmokerDescription = (refData: ReferenceDataCodeSimple) =>
+    ({
+      SMOKE_SMOKER: 'Smoker',
+      SMOKE_VAPER: 'Vaper or uses nicotine replacement therapy (NRT)',
+      SMOKE_NO: 'Does not smoke or vape',
+    })[refData?.id] ?? null
 
   private identityNumbers(prisonerData: Prisoner, identifiers: OffenderIdentifier[]): IdentityNumbers {
     return {

@@ -25,6 +25,7 @@ export interface PhysicalAttributesTextFieldData extends TextFieldData {
 
 export interface RadioFieldData extends FieldData {
   code?: PrisonPersonCharacteristicCode
+  redirectAnchor: string
 }
 
 export interface CheckboxFieldData extends FieldData {
@@ -50,6 +51,7 @@ export const hairFieldData: RadioFieldData = {
   code: PrisonPersonCharacteristicCode.hair,
   hintText: 'Select the most prominent hair type or colour.',
   url: 'hair',
+  redirectAnchor: 'appearance',
   auditPage: Page.EditHairTypeOrColour,
 }
 
@@ -59,6 +61,7 @@ export const facialHairFieldData: RadioFieldData = {
   code: PrisonPersonCharacteristicCode.facialHair,
   hintText: 'Select the most prominent type of facial hair.',
   url: 'facial-hair',
+  redirectAnchor: 'appearance',
   auditPage: Page.EditFacialHair,
 }
 
@@ -67,6 +70,7 @@ export const faceShapeFieldData: RadioFieldData = {
   fieldName: 'faceShape',
   code: PrisonPersonCharacteristicCode.face,
   url: 'face-shape',
+  redirectAnchor: 'appearance',
   auditPage: Page.EditFaceShape,
 }
 
@@ -75,6 +79,7 @@ export const buildFieldData: RadioFieldData = {
   fieldName: 'build',
   code: PrisonPersonCharacteristicCode.build,
   url: 'build',
+  redirectAnchor: 'appearance',
   auditPage: Page.EditBuild,
 }
 
@@ -83,6 +88,7 @@ export const smokerOrVaperFieldData: RadioFieldData = {
   fieldName: 'smokerOrVaper',
   pageTitle: 'Smoker or vaper',
   url: 'smoker-or-vaper',
+  redirectAnchor: 'personal-details',
 }
 
 export const heightFieldData: PhysicalAttributesTextFieldData = {
