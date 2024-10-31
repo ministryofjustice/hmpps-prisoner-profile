@@ -91,7 +91,7 @@ describe('PersonalController', () => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
     personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
-      if (domain === 'SMOKE')
+      if (domain === 'smoke')
         return [
           { id: 'SMOKE_SMOKER', description: 'Yes, they smoke' },
           { id: 'SMOKE_NO', description: 'No, they do not smoke or vape' },
