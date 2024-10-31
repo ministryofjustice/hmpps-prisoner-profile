@@ -550,7 +550,7 @@ export default class PersonalController {
           requestBodyFlash?.radioField ||
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
         const [smokerOrVaperValues] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, 'SMOKE'),
+          this.personalPageService.getReferenceDataCodes(clientToken, 'smoke'),
         ])
 
         const options = objectToRadioOptions(smokerOrVaperValues, 'id', 'description', fieldValue)
