@@ -81,15 +81,23 @@ describe('prisonPersonApiClient', () => {
             lastModifiedAt: '2024-07-01T01:02:03.456+0100',
             lastModifiedBy: 'USER1',
           },
-          foodAllergies: [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 }],
-          medicalDietaryRequirements: [
-            {
-              id: 'MEDICAL_DIET_LOW_FAT',
-              description: 'Low fat',
-              isActive: true,
-              listSequence: 0,
-            },
-          ],
+          foodAllergies: {
+            value: [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 }],
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          medicalDietaryRequirements: {
+            value: [
+              {
+                id: 'MEDICAL_DIET_LOW_FAT',
+                description: 'Low fat',
+                isActive: true,
+                listSequence: 0,
+              },
+            ],
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
         },
       }
       fakePrisonerSearchApi

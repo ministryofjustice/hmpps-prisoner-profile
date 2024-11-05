@@ -953,7 +953,7 @@ export default class PersonalController {
           formTitle,
           { ...fieldData, options: referenceDataDomainToCheckboxFieldDataOptions(medicalDietaryRequirementValues) },
           referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
-          prisonPerson?.health?.medicalDietaryRequirements.map(code => code.id),
+          prisonPerson?.health?.medicalDietaryRequirements?.value.map(code => code.id),
         )(req, res, next)
       },
 
@@ -1020,7 +1020,7 @@ export default class PersonalController {
           formTitle,
           { ...fieldData, options: referenceDataDomainToCheckboxFieldDataOptions(foodAllergyValues) },
           referenceDataDomainToCheckboxOptions(foodAllergyValues),
-          prisonPerson?.health?.foodAllergies.map(code => code.id),
+          prisonPerson?.health?.foodAllergies?.value.map(code => code.id),
         )(req, res, next)
       },
 

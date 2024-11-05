@@ -82,8 +82,16 @@ describe('PersonalController', () => {
         lastModifiedAt: '2024-07-01T01:02:03+0100',
         lastModifiedBy: 'USER1',
       },
-      medicalDietaryRequirements: [] as ReferenceDataCodeSimple[],
-      foodAllergies: [] as ReferenceDataCodeSimple[],
+      medicalDietaryRequirements: {
+        value: [] as ReferenceDataCodeSimple[],
+        lastModifiedAt: '2024-07-01T01:02:03+0100',
+        lastModifiedBy: 'USER1',
+      },
+      foodAllergies: {
+        value: [] as ReferenceDataCodeSimple[],
+        lastModifiedAt: '2024-07-01T01:02:03+0100',
+        lastModifiedBy: 'USER1',
+      },
     },
   }
 
