@@ -6,9 +6,172 @@
     margin-top: 25px;
   }
 
-  area:focus-visible {
-    outline: 3px solid black;
-    outline-offset: -2px;
+  .tooltip {
+    position: absolute;
+    padding: 0 6px;
+    background-color: white;
+    color: black;
+    border: 1px solid #6ea4d6;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    line-height: 1.5;
+    display: none;
+    z-index: 1000;
+
+    // Outer triangle for border
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid #6ea4d6; // Blue border color
+    }
+
+    // Inner triangle for white background
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid white; // White background
+    }
+  }
+
+  &.dm-base-image-hover .tooltip,
+  area:focus-visible ~ .tooltip {
+    display: block;
+    pointer-events: none;
+  }
+
+  &.dm-base-image-hover[data-hover-value="face"] .tooltip,
+  area:focus-visible[data-area-value="face"] ~ .tooltip {
+    top: 20px;
+    left: 45px;
+
+    > .tooltip-content::after {
+      content: 'Face and head';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="neck"] .tooltip,
+  area:focus-visible[data-area-value="neck"] ~ .tooltip {
+    top: 65px;
+    left: 45px;
+
+    > .tooltip-content::after {
+      content: 'Neck';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="rightArm"] .tooltip,
+  area:focus-visible[data-area-value="rightArm"] ~ .tooltip {
+    top: 130px;
+    left: -15px;
+
+    > .tooltip-content::after {
+      content: 'Right arm';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="leftArm"] .tooltip,
+  area:focus-visible[data-area-value="leftArm"] ~ .tooltip {
+    top: 130px;
+    left: 110px;
+
+    > .tooltip-content::after {
+      content: 'Left arm';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="torso"] .tooltip,
+  area:focus-visible[data-area-value="torso"] ~ .tooltip {
+    top: 130px;
+    left: 25px;
+
+    > .tooltip-content::after {
+      content: 'Front and sides';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="rightHand"] .tooltip,
+  area:focus-visible[data-area-value="rightHand"] ~ .tooltip {
+    top: 300px;
+    left: -30px;
+
+    > .tooltip-content::after {
+      content: 'Right hand';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="leftHand"] .tooltip,
+  area:focus-visible[data-area-value="leftHand"] ~ .tooltip {
+    top: 300px;
+    left: 110px;
+
+    > .tooltip-content::after {
+      content: 'Left hand';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="rightLeg"] .tooltip,
+  area:focus-visible[data-area-value="rightLeg"] ~ .tooltip {
+    top: 320px;
+    left: 20px;
+
+    > .tooltip-content::after {
+      content: 'Right leg';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="leftLeg"] .tooltip,
+  area:focus-visible[data-area-value="leftLeg"] ~ .tooltip {
+    top: 320px;
+    left: 75px;
+
+    > .tooltip-content::after {
+      content: 'Left leg';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="rightFoot"] .tooltip,
+  area:focus-visible[data-area-value="rightFoot"] ~ .tooltip {
+    top: 580px;
+    left: 20px;
+
+    > .tooltip-content::after {
+      content: 'Right foot';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="leftFoot"] .tooltip,
+  area:focus-visible[data-area-value="leftFoot"] ~ .tooltip{
+    top: 580px;
+    left: 70px;
+
+    > .tooltip-content::after {
+      content: 'Left foot';
+    }
+  }
+
+  &.dm-base-image-hover[data-hover-value="back"] .tooltip,
+  area:focus-visible[data-area-value="back"] ~ .tooltip {
+    top: 130px;
+    left: 245px;
+
+    > .tooltip-content::after {
+      content: 'Back';
+    }
   }
 
   &.dm-base-image-hover::after {
@@ -26,6 +189,12 @@
     pointer-events: none;
   }
 
+  area:focus-visible {
+    outline: none;
+    display: block;
+    position: absolute;
+  }
+
   &.dm-base-image-hover[data-hover-value="face"]::after,
   &.dm-base-image-selected[data-selected="face"]::before {
     display: block;
@@ -34,6 +203,14 @@
     height: 74px;
     width: 56px;
     background: url("/assets/images/distinguishingMarks/face-overlay.svg") no-repeat;
+  }
+
+  area[data-area-value="face"]:focus-visible {
+    top: 26px;
+    left: 55px;
+    height: 74px;
+    width: 56px;
+    background: url("/assets/images/distinguishingMarks/face-focus.svg") no-repeat;
   }
 
   &.dm-base-image-hover[data-hover-value="neck"]::after,
@@ -46,6 +223,14 @@
     background: url("/assets/images/distinguishingMarks/neck-overlay.svg") no-repeat;
   }
 
+  area[data-area-value="neck"]:focus-visible {
+    top: 91px;
+    left: 67px;
+    height: 20px;
+    width: 33px;
+    background: url("/assets/images/distinguishingMarks/neck-focus.svg") no-repeat;
+  }
+
   &.dm-base-image-hover[data-hover-value="rightArm"]::after,
   &.dm-base-image-selected[data-selected="rightArm"]::before {
     display: block;
@@ -54,6 +239,14 @@
     height: 200px;
     width: 40px;
     background: url("/assets/images/distinguishingMarks/right-arm-overlay.svg") no-repeat;
+  }
+
+  area[data-area-value="rightArm"]:focus-visible {
+    top: 127px;
+    left: 0;
+    height: 200px;
+    width: 40px;
+    background: url("/assets/images/distinguishingMarks/right-arm-focus.svg") no-repeat;
   }
 
   &.dm-base-image-hover[data-hover-value="leftArm"]::after,
@@ -66,6 +259,14 @@
     background: url("/assets/images/distinguishingMarks/left-arm-overlay.svg") no-repeat;
   }
 
+  area[data-area-value="leftArm"]:focus-visible {
+    top: 127px;
+    left: 126px;
+    height: 200px;
+    width: 40px;
+    background: url("/assets/images/distinguishingMarks/left-arm-focus.svg") no-repeat;
+  }
+
   &.dm-base-image-hover[data-hover-value="torso"]::after,
   &.dm-base-image-selected[data-selected="torso"]::before {
     display: block;
@@ -74,6 +275,14 @@
     height: 205px;
     width: 104px;
     background: url("/assets/images/distinguishingMarks/torso-front-overlay.svg") no-repeat;
+  }
+
+  area[data-area-value="torso"]:focus-visible {
+    top: 109px;
+    left: 31px;
+    height: 205px;
+    width: 104px;
+    background: url("/assets/images/distinguishingMarks/torso-front-focus.svg") no-repeat;
   }
 
   &.dm-base-image-hover[data-hover-value="rightHand"]::after,
@@ -86,6 +295,14 @@
     background: url("/assets/images/distinguishingMarks/right-hand-overlay.svg") no-repeat;
   }
 
+  area[data-area-value="rightHand"]:focus-visible {
+    top: 322px;
+    left: 0;
+    height: 55px;
+    width: 32px;
+    background: url("/assets/images/distinguishingMarks/right-hand-focus.svg") no-repeat;
+  }
+
   &.dm-base-image-hover[data-hover-value="leftHand"]::after,
   &.dm-base-image-selected[data-selected="leftHand"]::before {
     display: block;
@@ -94,6 +311,14 @@
     height: 55px;
     width: 32px;
     background: url("/assets/images/distinguishingMarks/left-hand-overlay.svg") no-repeat;
+  }
+
+  area[data-area-value="leftHand"]:focus-visible {
+    top: 322px;
+    left: 135px;
+    height: 55px;
+    width: 32px;
+    background: url("/assets/images/distinguishingMarks/left-hand-focus.svg") no-repeat;
   }
 
   &.dm-base-image-hover[data-hover-value="leftLeg"]::after,
@@ -106,6 +331,14 @@
     background: url("/assets/images/distinguishingMarks/left-leg-overlay.svg") no-repeat;
   }
 
+  area[data-area-value="leftLeg"]:focus-visible {
+    top: 313px;
+    left: 82px;
+    height: 283px;
+    width: 51px;
+    background: url("/assets/images/distinguishingMarks/left-leg-focus.svg") no-repeat;
+  }
+
   &.dm-base-image-hover[data-hover-value="rightLeg"]::after,
   &.dm-base-image-selected[data-selected="rightLeg"]::before {
     display: block;
@@ -114,6 +347,14 @@
     height: 283px;
     width: 51px;
     background: url("/assets/images/distinguishingMarks/right-leg-overlay.svg") no-repeat;
+  }
+
+  area[data-area-value="rightLeg"]:focus-visible {
+    top: 312px;
+    left: 33px;
+    height: 283px;
+    width: 51px;
+    background: url("/assets/images/distinguishingMarks/right-leg-focus.svg") no-repeat;
   }
 
   &.dm-base-image-hover[data-hover-value="rightFoot"]::after,
@@ -126,6 +367,14 @@
     background: url("/assets/images/distinguishingMarks/right-foot-overlay.svg") no-repeat;
   }
 
+  area[data-area-value="rightFoot"]:focus-visible {
+    top: 593px;
+    left: 44px;
+    height: 65px;
+    width: 31px;
+    background: url("/assets/images/distinguishingMarks/right-foot-focus.svg") no-repeat;
+  }
+
   &.dm-base-image-hover[data-hover-value="leftFoot"]::after,
   &.dm-base-image-selected[data-selected="leftFoot"]::before {
     display: block;
@@ -136,6 +385,14 @@
     background: url("/assets/images/distinguishingMarks/left-foot-overlay.svg") no-repeat;
   }
 
+  area[data-area-value="leftFoot"]:focus-visible {
+    top: 593px;
+    left: 92px;
+    height: 65px;
+    width: 31px;
+    background: url("/assets/images/distinguishingMarks/left-foot-focus.svg") no-repeat;
+  }
+
   &.dm-base-image-hover[data-hover-value="back"]::after,
   &.dm-base-image-selected[data-selected="back"]::before {
     display: block;
@@ -144,6 +401,14 @@
     height: 205px;
     width: 104px;
     background: url("/assets/images/distinguishingMarks/back-overlay.svg") no-repeat;
+  }
+
+  area[data-area-value="back"]:focus-visible {
+    top: 109px;
+    left: 216px;
+    height: 205px;
+    width: 104px;
+    background: url("/assets/images/distinguishingMarks/back-focus.svg") no-repeat;
   }
 
   .dm-base-label-front {
