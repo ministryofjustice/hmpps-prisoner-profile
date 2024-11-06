@@ -235,16 +235,14 @@ export default class PersonalPageService {
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
-      medicalDietaryRequirements: prisonPerson
-        ? prisonPerson.health?.medicalDietaryRequirements?.value
-            .map(({ id, description }) => ({ id, description }))
-            .sort((a, b) => a.description.localeCompare(b.description))
-        : [],
-      foodAllergies: prisonPerson
-        ? prisonPerson.health?.foodAllergies?.value
-            .map(({ id, description }) => ({ id, description }))
-            .sort((a, b) => a.description.localeCompare(b.description))
-        : [],
+      medicalDietaryRequirements:
+        prisonPerson?.health?.medicalDietaryRequirements?.value
+          ?.map(({ id, description }) => ({ id, description }))
+          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
+      foodAllergies:
+        prisonPerson?.health?.foodAllergies?.value
+          ?.map(({ id, description }) => ({ id, description }))
+          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
     }
   }
 
