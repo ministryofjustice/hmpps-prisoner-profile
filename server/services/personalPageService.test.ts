@@ -89,15 +89,23 @@ describe('PersonalPageService', () => {
             lastModifiedAt: '2024-07-01T01:02:03+0100',
             lastModifiedBy: 'USER1',
           },
-          foodAllergies: [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten', listSequence: 0, isActive: true }],
-          medicalDietaryRequirements: [
-            {
-              id: 'MEDICAL_DIET_LOW_FAT',
-              description: 'Low fat',
-              listSequence: 0,
-              isActive: true,
-            },
-          ],
+          foodAllergies: {
+            value: [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten', listSequence: 0, isActive: true }],
+            lastModifiedAt: '2024-07-01T01:02:03+0100',
+            lastModifiedBy: 'USER1',
+          },
+          medicalDietaryRequirements: {
+            value: [
+              {
+                id: 'MEDICAL_DIET_LOW_FAT',
+                description: 'Low fat',
+                listSequence: 0,
+                isActive: true,
+              },
+            ],
+            lastModifiedAt: '2024-07-01T01:02:03+0100',
+            lastModifiedBy: 'USER1',
+          },
         },
       })),
       updatePhysicalAttributes: jest.fn(),
