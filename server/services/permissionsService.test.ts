@@ -28,6 +28,7 @@ import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/ge
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
+import getCSIPPermissions from './utils/permissions/getCSIPPermissions'
 
 jest.mock('./utils/permissions/access/getOverviewAccessStatusCode', () => ({
   __esModule: true,
@@ -149,6 +150,11 @@ jest.mock('./utils/permissions/access/getProbationDocumentsAccessStatusCode', ()
   default: jest.fn(),
 }))
 
+jest.mock('./utils/permissions/getCSIPPermissions', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+
 describe('permissionsService', () => {
   let service: PermissionsService
   const userService = userServiceMock() as UserService
@@ -191,6 +197,7 @@ describe('permissionsService', () => {
       ;(getSocPermissions as jest.Mock).mockReturnValue('soc')
       ;(getOffenderCategorisationPermissions as jest.Mock).mockReturnValue('offender cat')
       ;(getProbationDocumentsPermissions as jest.Mock).mockReturnValue('probation docs')
+      ;(getCSIPPermissions as jest.Mock).mockReturnValue('csip')
 
       const permissions = await service.getOverviewPermissions(prisonUserMock, PrisonerMockDataA)
 
@@ -212,6 +219,7 @@ describe('permissionsService', () => {
         soc: 'soc',
         offenderCategorisation: 'offender cat',
         probationDocuments: 'probation docs',
+        csip: 'csip',
       })
     })
   })

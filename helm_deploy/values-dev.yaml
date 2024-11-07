@@ -40,6 +40,7 @@ generic-service:
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell-dev.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk"
     CCRD_UI_URL: "https://court-cases-release-dates-dev.hmpps.service.justice.gov.uk"
+    CSIP_UI_URL: "https://csip-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"

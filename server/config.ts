@@ -295,6 +295,7 @@ export default {
     changeSomeonesCell: get('CHANGE_SOMEONES_CELL_UI_URL', 'http://localhost:3001', requiredInProduction),
     incentives: get('INCENTIVES_UI_URL', 'http://localhost:3001', requiredInProduction),
     courtCaseReleaseDates: get('CCRD_UI_URL', 'http://localhost:3001', requiredInProduction),
+    csip: get('CSIP_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),
