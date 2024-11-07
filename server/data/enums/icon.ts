@@ -10,4 +10,5 @@ export enum Icon {
   CalculateReleaseDates = 'calculate-release-dates',
   ChangeCell = 'change-cell',
   LogActivityApplication = 'log-an-activity-appointment',
+  MakeCSIPReferral = 'make-csip-referral',
 }

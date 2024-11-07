@@ -246,4 +246,33 @@ describe('buildOverviewActions', () => {
       },
     )
   })
+
+  describe('Make CSIP referral', () => {
+    test.each`
+      perms                        | availableServices                        | visible
+      ${{ csip: { view: true } }}  | ${[{ id: 'csipUI', navEnabled: true }]}  | ${true}
+      ${{ csip: { view: true } }}  | ${[{ id: 'csipUI', navEnabled: false }]} | ${false}
+      ${{ csip: { view: true } }}  | ${[]}                                    | ${false}
+      ${{ csip: { view: false } }} | ${[{ id: 'csipUI', navEnabled: true }]}  | ${false}
+    `(
+      'user with csip.view: $perms.csip.view and navEnabled: $availableServices.0.navEnabled can see Make CSIP referral: $visible',
+      ({ perms, availableServices, visible }) => {
+        const resp = buildOverviewActions(
+          PrisonerMockDataA,
+          pathfinderNominal,
+          socNominal,
+          prisonUserMock,
+          config,
+          { services: availableServices } as HeaderFooterMeta,
+          perms,
+        )
+        expect(
+          !!resp.find(
+            action =>
+              action.url === `${config.serviceUrls.csip}/prisoners/${PrisonerMockDataA.prisonerNumber}/referral/start`,
+          ),
+        ).toEqual(visible)
+      },
+    )
+  })
 })

@@ -104,5 +104,14 @@ export default (
     })
   }
 
+  if (isServiceNavEnabled('csipUI', feComponentsMeta) && permissions.csip?.view) {
+    actions.push({
+      text: 'Make CSIP referral',
+      icon: Icon.MakeCSIPReferral,
+      url: `${config.serviceUrls.csip}/prisoners/${prisonerData.prisonerNumber}/referral/start`,
+      dataQA: 'make-csip-referral-action-link',
+    })
+  }
+
   return actions
 }

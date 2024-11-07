@@ -27,6 +27,7 @@ import getActiveCaseLoadOnlyAccessStatusCode from './utils/permissions/access/ge
 import getAlertsPermissions from './utils/permissions/getAlertsPermissions'
 import getCellMovePermissions from './utils/permissions/getCellMovePermissions'
 import getProbationDocumentsAccessStatusCode from './utils/permissions/access/getProbationDocumentsAccessStatusCode'
+import getCSIPPermissions from './utils/permissions/getCSIPPermissions'
 
 export interface Permissions {
   accessCode: HmppsStatusCode
@@ -49,6 +50,7 @@ export interface Permissions {
   sensitiveCaseNotes?: PermissionItem
   alerts?: PermissionItem
   cellMove?: PermissionItem
+  csip?: PermissionItem
 }
 
 export default class PermissionsService {
@@ -80,6 +82,7 @@ export default class PermissionsService {
       soc: getSocPermissions(user),
       offenderCategorisation: getOffenderCategorisationPermissions(user),
       probationDocuments: getProbationDocumentsPermissions(user, prisoner),
+      csip: getCSIPPermissions(user, prisoner),
     }
   }
 
