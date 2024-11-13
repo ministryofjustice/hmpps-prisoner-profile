@@ -1,28 +1,35 @@
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import { formatDate } from '../../utils/dateHelpers'
 import config from '../../config'
 import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
+import { MiniCardData } from '../components/miniCard/miniCardData'
 
 export default (
   categorySummary: OverviewPageData['categorySummary'],
   prisonerInCaseLoad: boolean,
   bookingId: number,
-): MiniSummaryData => {
+): MiniCardData => {
   const { codeDescription, nextReviewDate, userCanManage } = categorySummary
 
-  const categorySummaryData = {
-    bottomLabel: 'Category',
-    bottomContentLine1: codeDescription,
-    bottomContentLine3: nextReviewDate ? `Next review: ${formatDate(nextReviewDate, 'short')}` : '',
-    bottomClass: 'small',
+  return {
+    heading: 'Category',
+    items: [
+      {
+        text: codeDescription,
+      },
+      ...(nextReviewDate
+        ? [
+            {
+              text: `Next review: ${formatDate(nextReviewDate, 'short')}`,
+              classes: 'hmpps-secondary-text',
+            },
+          ]
+        : []),
+    ],
+    ...(prisonerInCaseLoad
+      ? {
+          linkHref: `${config.serviceUrls.offenderCategorisation}/${bookingId}`,
+          linkLabel: userCanManage ? 'Manage category' : 'Category',
+        }
+      : {}),
   }
-
-  if (prisonerInCaseLoad)
-    return {
-      ...categorySummaryData,
-      linkLabel: userCanManage ? 'Manage category' : 'Category',
-      linkHref: `${config.serviceUrls.offenderCategorisation}/${bookingId}`,
-    }
-
-  return categorySummaryData
 }

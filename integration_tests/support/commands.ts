@@ -20,6 +20,7 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
   cy.task('stubAssessments', bookingId)
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubGetAlerts')
+  cy.task('stubGetCurrentCsip', prisonerNumber)
 })
 
 Cypress.Commands.add(
@@ -68,6 +69,7 @@ Cypress.Commands.add(
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubComponentsMeta', componentsNoServicesMock)
+    cy.task('stubGetCurrentCsip', prisonerNumber)
   },
 )
 
