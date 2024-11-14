@@ -9,7 +9,7 @@ export function permissionsTests<TPage extends Page>({
   visitPage,
   pageToDisplay,
   pageWithTitleToDisplay,
-  options = { additionalRoles: [] },
+  options = { additionalRoles: [], preventGlobalAccess: false },
 }: {
   prisonerNumber: string
   visitPage: (prisonerDataOverrides: Partial<Prisoner>) => void
@@ -17,6 +17,7 @@ export function permissionsTests<TPage extends Page>({
   pageWithTitleToDisplay?: { page: new (title: string) => TPage; title: string }
   options?: {
     additionalRoles: Role[]
+    preventGlobalAccess?: boolean
   }
 }) {
   const verifyPageDisplayed = () => {
@@ -60,10 +61,17 @@ export function permissionsTests<TPage extends Page>({
         cy.task('stubPrisonerData', { prisonerNumber, overrides })
       })
 
-      it('Displays the page', () => {
-        visitPage(overrides)
-        verifyPageDisplayed()
-      })
+      if (options?.preventGlobalAccess) {
+        it('Does not display the page', () => {
+          visitPage(overrides)
+          new NotFoundPage().shouldBeDisplayed()
+        })
+      } else {
+        it('Displays the page', () => {
+          visitPage(overrides)
+          verifyPageDisplayed()
+        })
+      }
     })
   })
 
