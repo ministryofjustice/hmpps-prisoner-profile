@@ -29,6 +29,13 @@ export const componentsMetaMock: HeaderFooterMeta = {
       href: '',
       navEnabled: false,
     },
+    {
+      id: 'csipUI',
+      heading: '',
+      description: '',
+      href: '',
+      navEnabled: true,
+    },
   ],
 }
 

@@ -68,7 +68,7 @@ Cypress.Commands.add(
     cy.task('stubAlertDetails')
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
+    cy.task('stubComponentsMeta', componentsMock)
     cy.task('stubGetCurrentCsip', prisonerNumber)
   },
 )
