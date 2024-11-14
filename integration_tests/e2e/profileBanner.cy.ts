@@ -2,7 +2,10 @@ import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
 import { Role } from '../../server/data/enums/role'
-import { componentsMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
+import {
+  componentsMock,
+  componentsNoServicesMock,
+} from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -133,6 +136,10 @@ context('Profile banner', () => {
     })
 
     context('Non-Alerts API enabled prison', () => {
+      beforeEach(() => {
+        cy.task('stubComponentsMeta', componentsNoServicesMock)
+      })
+
       it('Shows clickable alert flags', () => {
         visitOverviewPage()
         const overviewPage = new OverviewPage()
