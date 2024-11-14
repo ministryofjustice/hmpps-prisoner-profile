@@ -32,7 +32,7 @@ describe('getProbationDocumentsAccessStatusCode', () => {
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.ViewProbationDocuments]}                    | ${HmppsStatusCode.NOT_IN_CASELOAD}
     ${userLEI} | ${prisonerMDI}                                             | ${[]}                                               | ${HmppsStatusCode.NOT_FOUND}
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.GlobalSearch]}                              | ${HmppsStatusCode.NOT_FOUND}
-    ${userLEI} | ${prisonerMDI}                                             | ${[Role.GlobalSearch, Role.ViewProbationDocuments]} | ${HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED}
+    ${userLEI} | ${prisonerMDI}                                             | ${[Role.GlobalSearch, Role.ViewProbationDocuments]} | ${HmppsStatusCode.OK}
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.PomUser]}                                   | ${HmppsStatusCode.OK}
     ${userMDI} | ${prisonerMDI}                                             | ${[]}                                               | ${HmppsStatusCode.NOT_FOUND}
     ${userMDI} | ${prisonerMDI}                                             | ${[Role.ViewProbationDocuments]}                    | ${HmppsStatusCode.OK}

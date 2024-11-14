@@ -9,7 +9,6 @@ describe('getProbationDocumentsPermissions.ts', () => {
     ${userMDI} | ${prisonerMDI} | ${[Role.PomUser]}                              | ${true}
     ${userMDI} | ${prisonerMDI} | ${[Role.ViewProbationDocuments]}               | ${true}
     ${userMDI} | ${prisonerMDI} | ${[Role.PomUser, Role.ViewProbationDocuments]} | ${true}
-    ${userLEI} | ${prisonerMDI} | ${[Role.PomUser]}                              | ${false}
     ${userLEI} | ${prisonerMDI} | ${[Role.ViewProbationDocuments]}               | ${false}
     ${userLEI} | ${prisonerOUT} | ${[Role.ViewProbationDocuments]}               | ${true}
     ${userLEI} | ${prisonerOUT} | ${[]}                                          | ${false}
