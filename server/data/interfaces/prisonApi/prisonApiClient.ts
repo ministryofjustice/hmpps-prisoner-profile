@@ -31,7 +31,6 @@ import { AgenciesEmail, AgencyDetails } from './Agency'
 import OffenderCellHistory from './OffenderCellHistoryInterface'
 import StaffDetails from './StaffDetails'
 import OffenderBooking from './OffenderBooking'
-import PrisonApiAlert, { PrisonApiAlertChanges, PrisonApiAlertType, PrisonApiCreateAlert } from './PrisonApiAlert'
 import CsraAssessment, { CsraAssessmentSummary } from './CsraAssessment'
 import Transaction from './Transaction'
 import { DamageObligationContainer } from './DamageObligation'
@@ -48,7 +47,7 @@ import Telephone from './Telephone'
 import Belief from './Belief'
 import Reception from './Reception'
 import { OffenderContacts } from './OffenderContact'
-import PagedList, { AlertsListQueryParams, VisitsListQueryParams } from './PagedList'
+import PagedList, { VisitsListQueryParams } from './PagedList'
 import VisitWithVisitors from './VisitWithVisitors'
 import PrisonDetails from './PrisonDetails'
 import CourtEvent from './CourtEvent'
@@ -100,8 +99,6 @@ export interface PrisonApiClient {
   ): Promise<OffenderAttendanceHistory>
 
   getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]>
-
-  getAlerts(bookingId: number, queryParams: AlertsListQueryParams): Promise<PagedList<PrisonApiAlert>>
 
   getProperty(bookingId: number): Promise<PropertyContainer[]>
 
@@ -158,12 +155,6 @@ export interface PrisonApiClient {
   getStaffDetails(username: string): Promise<StaffDetails>
 
   getInmatesAtLocation(locationId: number, params: object): Promise<OffenderBooking[]>
-
-  getAlertTypes(): Promise<PrisonApiAlertType[]>
-
-  createAlert(bookingId: number, alert: PrisonApiCreateAlert): Promise<PrisonApiAlert>
-
-  updateAlert(bookingId: number, alertId: string, alertChanges: PrisonApiAlertChanges): Promise<PrisonApiAlert>
 
   getScheduledEventsForThisWeek(bookingId: number): Promise<ScheduledEvent[]>
 
@@ -236,8 +227,6 @@ export interface PrisonApiClient {
   getPersonPhones(personId: number): Promise<Telephone[]>
 
   getScheduledTransfers(prisonerNumber: string): Promise<PrisonerPrisonSchedule[]>
-
-  getAlertDetails(bookingId: number, alertId: string): Promise<PrisonApiAlert>
 
   getBeliefHistory(prisonerNumber: string, bookingId?: number): Promise<Belief[]>
 

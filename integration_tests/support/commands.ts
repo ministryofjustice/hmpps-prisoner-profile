@@ -3,10 +3,7 @@ import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/Histo
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
-import {
-  componentsMock,
-  componentsNoServicesMock,
-} from '../../server/data/localMockData/componentApi/componentsMetaMock'
+import { componentsMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -20,6 +17,7 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
   cy.task('stubAssessments', bookingId)
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubGetAlerts')
+  cy.task('stubAlertDetails')
   cy.task('stubGetCurrentCsip', prisonerNumber)
 })
 
@@ -63,31 +61,13 @@ Cypress.Commands.add(
     cy.task('stubGetCommunityManager')
     cy.task('stubScheduledTransfers', prisonerNumber)
     cy.task('stubPrisonerDetail', prisonerNumber)
-    cy.task('stubPrisonApiAlertDetails')
-    cy.task('stubGetAlerts')
-    cy.task('stubAlertDetails')
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
+    cy.task('stubGetAlerts')
     cy.task('stubComponentsMeta', componentsMock)
     cy.task('stubGetCurrentCsip', prisonerNumber)
   },
 )
-
-Cypress.Commands.add('setupPrisonApiAlertsPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides = {} }) => {
-  cy.task('stubEventsForProfileImage', prisonerNumber)
-  cy.task('stubPrisonerData', { prisonerNumber, overrides: prisonerDataOverrides })
-  cy.task('stubActivePrisonApiAlerts', bookingId)
-  cy.task('stubActivePrisonApiAlertsPage2', bookingId)
-  cy.task('stubActivePrisonApiAlertsSorted', bookingId)
-  cy.task('stubActivePrisonApiAlertsFiltered', bookingId)
-  cy.task('stubInactivePrisonApiAlerts', bookingId)
-  if (bookingId === 1234567) {
-    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 0, inactiveAlertCount: 0 } })
-  } else {
-    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
-  }
-  cy.task('stubComponentsMeta', componentsNoServicesMock)
-})
 
 Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides = {} }) => {
   cy.task('stubEventsForProfileImage', prisonerNumber)
@@ -98,7 +78,6 @@ Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, priso
   } else {
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
   }
-  cy.task('stubComponentsMeta', componentsMock)
   cy.task('stubGetAlerts')
 })
 
