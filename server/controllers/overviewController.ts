@@ -28,6 +28,8 @@ import buildOverviewInfoLinks from './utils/overviewController/buildOverviewInfo
 import getPersonalDetails from './utils/overviewController/getPersonalDetails'
 import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
+import CsipService from '../services/csipService'
+import { isServiceEnabled } from '../utils/isServiceEnabled'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -46,6 +48,7 @@ export default class OverviewController {
     private readonly personalPageService: PersonalPageService,
     private readonly offenderService: OffenderService,
     private readonly professionalContactsService: ProfessionalContactsService,
+    private readonly csipService: CsipService,
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
@@ -83,6 +86,7 @@ export default class OverviewController {
       staffContacts,
       offencesOverview,
       nonAssociationSummary,
+      currentCsipDetail,
     ] = await Promise.all([
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
@@ -109,6 +113,9 @@ export default class OverviewController {
         this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
         res.locals.apiErrorCallback,
       ),
+      isServiceEnabled('csipUI', res.locals.feComponentsMeta) && permissions.csip?.view
+        ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber))
+        : null,
     ])
 
     const overviewActions = buildOverviewActions(
@@ -129,6 +136,7 @@ export default class OverviewController {
       moneySummary,
       adjudicationSummary,
       visitsSummary,
+      currentCsipDetail,
       categorySummary: getCategorySummary(prisonerData, inmateDetail, permissions.category?.edit),
       csraSummary: getCsraSummary(prisonerData),
       schedule,

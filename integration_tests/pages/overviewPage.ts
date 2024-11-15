@@ -41,13 +41,16 @@ export default class OverviewPage extends Page {
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
 
   categoryCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--categories')
 
   incentivesCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--incentives')
 
   csraCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csra')
+
+  csipCard = (): PageElement =>
+    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csip')
 
   // Non Associations
 

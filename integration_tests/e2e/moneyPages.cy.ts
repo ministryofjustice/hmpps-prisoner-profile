@@ -90,6 +90,7 @@ context('Money Pages', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   context('Spends', () => {

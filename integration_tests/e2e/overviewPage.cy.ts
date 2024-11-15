@@ -141,27 +141,36 @@ context('Overview Page', () => {
 
       it('Mini summary Group B should contain Category card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.categoryCard().contains('p', 'Category')
-        overviewPage.categoryCard().contains('p', 'B')
-        overviewPage.categoryCard().contains('p', 'Next review: 19/02/2023')
+        overviewPage.categoryCard().contains('h2', 'Category')
+        overviewPage.categoryCard().contains('.mini-card__item', 'B')
+        overviewPage.categoryCard().contains('.mini-card__item', 'Next review: 19/02/2023')
         overviewPage.categoryCard().contains('a', 'Category')
       })
 
       it('Mini summary Group B should contain Incentives card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.incentivesCard().contains('p', 'Incentives: since last review')
-        overviewPage.incentivesCard().contains('p', 'Positive behaviours: 1')
-        overviewPage.incentivesCard().contains('p', 'Negative behaviours: 1')
-        overviewPage.incentivesCard().contains('p', 'Next review by: 01/01/2024')
+        overviewPage.incentivesCard().contains('h2', 'Incentives: since last review')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 1')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Negative behaviours: 1')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Next review by: 01/01/2024')
         overviewPage.incentivesCard().contains('a', 'Incentive level details')
       })
 
       it('Mini summary Group B should contain CSRA card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.csraCard().contains('p', 'CSRA')
-        overviewPage.csraCard().contains('p', 'Standard')
-        overviewPage.csraCard().contains('p', 'Last review: 19/02/2021')
+        overviewPage.csraCard().contains('h2', 'CSRA')
+        overviewPage.csraCard().contains('.mini-card__item', 'Standard')
+        overviewPage.csraCard().contains('.mini-card__item', 'Last review: 19/02/2021')
         overviewPage.csraCard().contains('a', 'CSRA history')
+      })
+
+      it('Mini summary Group B should contain CSIP card with correct data', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.csipCard().contains('h2', 'CSIP')
+        overviewPage.csipCard().contains('.mini-card__item', 'Status: CSIP open')
+        overviewPage.csipCard().contains('.mini-card__item', 'Next review date: 01/01/2099')
+        overviewPage.csipCard().contains('.mini-card__item', 'History: 1 CSIP (1 referral)')
+        overviewPage.csipCard().contains('a', 'CSIP details')
       })
     })
 

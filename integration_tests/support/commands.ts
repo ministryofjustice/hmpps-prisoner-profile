@@ -3,7 +3,7 @@ import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/Histo
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
+import { componentsMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -18,6 +18,7 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubGetAlerts')
   cy.task('stubAlertDetails')
+  cy.task('stubGetCurrentCsip', prisonerNumber)
 })
 
 Cypress.Commands.add(
@@ -63,7 +64,8 @@ Cypress.Commands.add(
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
+    cy.task('stubComponentsMeta', componentsMock)
+    cy.task('stubGetCurrentCsip', prisonerNumber)
   },
 )
 

@@ -45,6 +45,7 @@ import groupDistinguishingMarks from '../views/dataUtils/groupDistinguishingMark
 import { formatMedicalDietaryRequirements } from './referenceDataCodeUtils'
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
+import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -164,6 +165,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
   njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
   njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
+  njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
