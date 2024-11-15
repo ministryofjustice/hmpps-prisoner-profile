@@ -30,8 +30,6 @@ import { mockStaffRoles } from './localMockData/staffRoles'
 import AgenciesMock from './localMockData/agenciesDetails'
 import { OffenderCellHistoryMock } from './localMockData/offenderCellHistoryMock'
 import StaffDetailsMock from './localMockData/staffDetails'
-import { PrisonApiAlertChanges, PrisonApiCreateAlert } from './interfaces/prisonApi/PrisonApiAlert'
-import { alertTypesMock } from './localMockData/alertTypesMock'
 import CsraAssessmentMock from './localMockData/csraAssessmentMock'
 import { transactionsMock } from './localMockData/transactionsMock'
 import { AccountCode } from './enums/accountCode'
@@ -47,13 +45,10 @@ import { GetAttributesForLocation } from './localMockData/getAttributesForLocati
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
-import { prisonApiAlertDetailsMock } from './localMockData/alertDetailsMock'
 import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 import { mockInmateAtLocation } from './localMockData/locationsInmates'
-import { AlertsListQueryParams } from './interfaces/prisonApi/PagedList'
 import { pagedVisitsMock } from './localMockData/pagedVisitsWithVisitors'
 import { visitPrisonsMock } from './localMockData/visitPrisons'
-import { pagedActivePrisonApiAlertsMock } from './localMockData/pagedAlertsMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -76,9 +71,6 @@ describe('prisonApiClient', () => {
   }
   const mockSuccessfulPrisonApiPost = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
     fakePrisonApi.post(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
-  }
-  const mockSuccessfulPrisonApiPut = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
-    fakePrisonApi.put(url, body).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
   }
 
   describe('getCaseLoads', () => {
@@ -200,20 +192,6 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/secondary-languages`, secondaryLanguagesMock)
       const output = await prisonApiClient.getSecondaryLanguages(bookingId)
       expect(output).toEqual(secondaryLanguagesMock)
-    })
-  })
-
-  describe('getAlerts', () => {
-    it('Should return data from the API', async () => {
-      const bookingId = 123456
-      const queryParams: AlertsListQueryParams = { alertStatus: 'ACTIVE', size: 20 }
-      mockSuccessfulPrisonApiCall(
-        `/api/bookings/${bookingId}/alerts/v2?size=20&alertStatus=ACTIVE`,
-        pagedActivePrisonApiAlertsMock,
-      )
-
-      const output = await prisonApiClient.getAlerts(bookingId, queryParams)
-      expect(output).toEqual(pagedActivePrisonApiAlertsMock)
     })
   })
 
@@ -364,31 +342,6 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/locations/${locationId}/inmates`, [mockInmateAtLocation])
       const output = await prisonApiClient.getInmatesAtLocation(locationId)
       expect(output).toEqual([mockInmateAtLocation])
-    })
-  })
-
-  describe('getAlertTypes', () => {
-    it('Should return data from the API', async () => {
-      mockSuccessfulPrisonApiCall(`/api/reference-domains/domains/ALERT?withSubCodes=true`, alertTypesMock)
-      const output = await prisonApiClient.getAlertTypes()
-      expect(output).toEqual(alertTypesMock)
-    })
-  })
-
-  describe('createAlert', () => {
-    it('Should return data from the API', async () => {
-      const bookingId = 123456
-      const alert = pagedActivePrisonApiAlertsMock.content[0]
-      const createAlert: PrisonApiCreateAlert = {
-        alertType: alert.alertType,
-        alertCode: alert.alertCode,
-        comment: alert.comment,
-        alertDate: alert.dateCreated,
-      }
-      mockSuccessfulPrisonApiPost(`/api/bookings/${bookingId}/alert`, createAlert, alert)
-
-      const output = await prisonApiClient.createAlert(bookingId, createAlert)
-      expect(output).toEqual(alert)
     })
   })
 
@@ -653,16 +606,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAlertDetails', () => {
-    it('Should return data from the API', async () => {
-      const bookingId = 123456
-      const alertId = '1'
-      mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/alerts/${alertId}`, prisonApiAlertDetailsMock)
-      const output = await prisonApiClient.getAlertDetails(bookingId, alertId)
-      expect(output).toEqual(prisonApiAlertDetailsMock)
-    })
-  })
-
   describe('getBeliefHistory', () => {
     it('Should return data from the API for a specific booking', async () => {
       const prisonerNumber = 'AB1234C'
@@ -681,21 +624,6 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/offenders/${prisonerNumber}/belief-history`, beliefHistoryMock)
       const output = await prisonApiClient.getBeliefHistory(prisonerNumber, bookingId)
       expect(output).toEqual(beliefHistoryMock)
-    })
-  })
-
-  describe('updateAlert', () => {
-    it('Should call API with data and return data from the API', async () => {
-      const bookingId = 123456
-      const alert = pagedActivePrisonApiAlertsMock.content[0]
-      const { alertId } = alert
-      const alertChanges: PrisonApiAlertChanges = {
-        comment: 'Comment',
-      }
-      mockSuccessfulPrisonApiPut(`/api/bookings/${bookingId}/alert/${alertId}?lockTimeout=true`, alertChanges, alert)
-
-      const output = await prisonApiClient.updateAlert(bookingId, alertId, alertChanges)
-      expect(output).toEqual(alert)
     })
   })
 

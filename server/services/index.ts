@@ -77,7 +77,7 @@ export const services = () => {
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
-  const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder, featureToggleService)
+  const alertsService = new AlertsService(alertsApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const personalPageService = new PersonalPageService(

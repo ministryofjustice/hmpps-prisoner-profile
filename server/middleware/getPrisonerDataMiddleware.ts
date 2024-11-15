@@ -5,7 +5,7 @@ import NotFoundError from '../utils/notFoundError'
 import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
-import { toAlert, toAlertSummaryData } from '../services/mappers/alertMapper'
+import { toAlertSummaryData } from '../services/mappers/alertMapper'
 
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
@@ -36,21 +36,15 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       // Get Assessment details and Inmate details, and add to prisonerData
       // Needed for CSRA and Category data
       // Need to update prisoner search endpoint to return the data needed, then this can be removed
-      // Inmate Details also needed for Alert Flags until Alerts API is live in all prisons
-      const alertsApiEnabled =
-        'activeCaseLoadId' in res.locals.user
-          ? await services.featureToggleService.getFeatureToggle(res.locals.user.activeCaseLoadId, 'alertsApiEnabled')
-          : false
       const prisonApiClient = services.dataAccess.prisonApiClientBuilder(req.middleware.clientToken)
       const alertsApiClient = services.dataAccess.alertsApiClientBuilder(req.middleware.clientToken)
       const [assessments, inmateDetail, alerts] = await Promise.all([
         prisonApiClient.getAssessments(prisonerData.bookingId),
         prisonApiClient.getInmateDetail(prisonerData.bookingId),
-        alertsApiEnabled ? alertsApiClient.getAlerts(prisonerNumber, { size: 1000 }) : undefined,
+        alertsApiClient.getAlerts(prisonerNumber, { size: 1000 }),
       ])
 
-      const mappedAlerts = alerts?.content ?? inmateDetail.alerts.map(toAlert)
-      const alertSummaryData = toAlertSummaryData(mappedAlerts)
+      const alertSummaryData = toAlertSummaryData(alerts?.content)
 
       if (assessments && Array.isArray(assessments)) {
         prisonerData.assessments = assessments.sort(

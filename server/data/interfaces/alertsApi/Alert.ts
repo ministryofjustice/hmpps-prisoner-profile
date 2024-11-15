@@ -99,3 +99,12 @@ export interface AlertSummaryData {
   inactiveAlertTypesFilter: { [key: string]: AlertTypeFilter }
   alertFlags: AlertFlagLabel[]
 }
+
+export interface AlertForm {
+  existingAlerts?: string
+  alertType?: string
+  alertCode?: string
+  description?: string
+  activeFrom?: string
+  activeTo?: string
+}
