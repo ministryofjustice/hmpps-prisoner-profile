@@ -33,7 +33,5 @@ export default function getOverviewAccessStatusCode(
     return HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED
   }
 
-  return inUsersCaseLoad || globalSearchUser || (globalSearchUser && pomUser)
-    ? HmppsStatusCode.OK
-    : HmppsStatusCode.NOT_IN_CASELOAD
+  return inUsersCaseLoad || globalSearchUser ? HmppsStatusCode.OK : HmppsStatusCode.NOT_IN_CASELOAD
 }
