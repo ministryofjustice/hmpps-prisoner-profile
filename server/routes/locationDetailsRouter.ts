@@ -20,7 +20,7 @@ export default function locationDetailsRouter(services: Services): Router {
   get(
     `${basePath}/location-details`,
     auditPageAccessAttempt({ services, page: Page.PrisonerCellHistory }),
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getLocationPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
