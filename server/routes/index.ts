@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
@@ -45,23 +44,6 @@ export default function routes(services: Services): Router {
     next()
   })
 
-  router.get(standardGetPaths, async (_req, res, next) => {
-    /* Set feature toggle for using Alerts API */
-    const feComponentsMeta = res.locals.feComponentsMeta as HeaderFooterMeta
-    if (!feComponentsMeta?.services || !('activeCaseLoadId' in res.locals.user)) return next()
-
-    try {
-      await services.featureToggleService.setFeatureToggle(
-        res.locals.user.activeCaseLoadId,
-        'alertsApiEnabled',
-        feComponentsMeta.services.some(service => service.id === 'alerts'),
-      )
-      return next()
-    } catch (_error) {
-      return next()
-    }
-  })
-
   const overviewController = new OverviewController(
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
@@ -75,6 +57,7 @@ export default function routes(services: Services): Router {
     services.personalPageService,
     services.offenderService,
     services.professionalContactsService,
+    services.csipService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(
@@ -259,7 +242,7 @@ export default function routes(services: Services): Router {
 
   get(
     `${basePath}/location-history`,
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getLocationPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
@@ -272,7 +255,7 @@ export default function routes(services: Services): Router {
 
   router.use(
     `${basePath}/money`,
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getMoneyPermissions),
     moneyRouter(services),
   )

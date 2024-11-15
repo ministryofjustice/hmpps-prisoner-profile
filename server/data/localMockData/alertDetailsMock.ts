@@ -1,4 +1,3 @@
-import PrisonApiAlert from '../interfaces/prisonApi/PrisonApiAlert'
 import { Alert } from '../interfaces/alertsApi/Alert'
 
 export const alertDetailsMock: Alert = {
@@ -71,36 +70,4 @@ export const alertDetailsCreatedViaMapperMock: Alert = {
   lastModifiedAt: undefined,
   lastModifiedByDisplayName: undefined,
   isActive: true,
-}
-
-export const prisonApiAlertDetailsMock: PrisonApiAlert = {
-  alertId: '7',
-  alertType: 'X',
-  alertTypeDescription: 'Security',
-  alertCode: 'XA',
-  alertCodeDescription: 'Arsonist',
-  comment: 'Set fire to his cell while in a double cell',
-  dateCreated: '2011-08-22',
-  expired: false,
-  active: true,
-  addedByFirstName: 'JAMES T',
-  addedByLastName: 'KIRK',
-}
-
-export const prisonApiAlertDetailsExpiresMock: PrisonApiAlert = {
-  alertId: '7',
-  alertType: 'X',
-  alertTypeDescription: 'Security',
-  alertCode: 'XA',
-  alertCodeDescription: 'Arsonist',
-  comment: 'Set fire to his cell while in a double cell',
-  dateCreated: '2011-08-22',
-  dateExpires: '2199-08-23',
-  modifiedDateTime: '2020-05-14T15:21:12.530864',
-  expired: false,
-  active: true,
-  addedByFirstName: 'JAMES T',
-  addedByLastName: 'KIRK',
-  expiredByFirstName: 'LUKE',
-  expiredByLastName: 'SKYWALKER',
 }

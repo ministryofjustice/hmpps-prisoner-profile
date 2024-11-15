@@ -25,6 +25,7 @@ import contentful from './integration_tests/mockApis/contentful'
 import alertsApi from './integration_tests/mockApis/alertsApi'
 import componentApi from './integration_tests/mockApis/componentApi'
 import prisonPersonApi from './integration_tests/mockApis/prisonPerson'
+import csipApi from './integration_tests/mockApis/csipApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -68,6 +69,7 @@ export default defineConfig({
         ...alertsApi,
         ...componentApi,
         ...prisonPersonApi,
+        ...csipApi,
       })
     },
     baseUrl: 'http://localhost:3007',

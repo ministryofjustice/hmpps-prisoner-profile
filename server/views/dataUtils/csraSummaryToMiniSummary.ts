@@ -1,27 +1,34 @@
-import MiniSummaryData from '../../services/interfaces/overviewPageService/MiniSummary'
 import { formatDate } from '../../utils/dateHelpers'
 import OverviewPageData from '../../controllers/interfaces/OverviewPageData'
+import { MiniCardData } from '../components/miniCard/miniCardData'
 
 export default (
   csraSummary: OverviewPageData['csraSummary'],
   prisonerInCaseLoad: boolean,
   prisonerNumber: string,
-): MiniSummaryData => {
+): MiniCardData => {
   const { classification, assessmentDate } = csraSummary
 
-  const csraSummaryData = {
-    bottomLabel: 'CSRA',
-    bottomContentLine1: classification || 'Not entered',
-    bottomContentLine3: assessmentDate ? `Last review: ${formatDate(assessmentDate, 'short')}` : '',
-    bottomClass: 'small',
+  return {
+    heading: 'CSRA',
+    items: [
+      {
+        text: classification || 'Not entered',
+      },
+      ...(assessmentDate
+        ? [
+            {
+              text: `Last review: ${formatDate(assessmentDate, 'short')}`,
+              classes: 'hmpps-secondary-text',
+            },
+          ]
+        : []),
+    ],
+    ...(prisonerInCaseLoad
+      ? {
+          linkHref: `/prisoner/${prisonerNumber}/csra-history`,
+          linkLabel: 'CSRA history',
+        }
+      : {}),
   }
-
-  if (prisonerInCaseLoad)
-    return {
-      ...csraSummaryData,
-      linkLabel: 'CSRA history',
-      linkHref: `/prisoner/${prisonerNumber}/csra-history`,
-    }
-
-  return csraSummaryData
 }

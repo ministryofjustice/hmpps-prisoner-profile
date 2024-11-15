@@ -1,4 +1,4 @@
-import { AlertForm } from '../interfaces/prisonApi/PrisonApiAlert'
+import { AlertForm } from '../interfaces/alertsApi/Alert'
 
 export const alertFormMock: AlertForm = {
   alertType: 'A',

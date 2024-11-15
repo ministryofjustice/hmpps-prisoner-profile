@@ -41,6 +41,8 @@ import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodi
 import ProfileInformation from '../data/interfaces/prisonApi/ProfileInformation'
 import { OverviewStatus } from './interfaces/OverviewPageData'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
+import CsipService from '../services/csipService'
+import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
 
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
@@ -77,6 +79,7 @@ describe('overviewController', () => {
   let personalPageService: PersonalPageService
   let offenderService: OffenderService
   let professionalContactsService: ProfessionalContactsService
+  let csipService: CsipService
 
   beforeEach(() => {
     req = {
@@ -118,6 +121,7 @@ describe('overviewController', () => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     offenderService = offenderServiceMock() as OffenderService
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
+    csipService = csipServiceMock() as CsipService
 
     controller = new OverviewController(
       () => pathfinderApiClient,
@@ -132,6 +136,7 @@ describe('overviewController', () => {
       personalPageService,
       offenderService,
       professionalContactsService,
+      csipService,
     )
 
     offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)

@@ -13,18 +13,19 @@ describe('incentiveSummaryToMiniSummary', () => {
     const prisonerDisplayName = 'John Doe'
     const miniSummary = incentiveSummaryToMiniSummary(incentiveSummary, prisonerNumber, prisonerDisplayName)
     expect(miniSummary).toEqual({
-      bottomLabel: 'Incentives: since last review',
-      bottomContentLine1: 'Positive behaviours: 1',
-      bottomContentLine2: 'Negative behaviours: 2',
-      bottomContentLine3: 'Next review by: 01/01/2021',
-      bottomContentError: '1 day overdue',
-      bottomClass: 'small',
+      heading: 'Incentives: since last review',
+      items: [
+        { text: 'Positive behaviours: 1' },
+        { text: 'Negative behaviours: 2' },
+        { text: 'Next review by: 01/01/2021', classes: 'hmpps-secondary-text' },
+        { text: '1 day overdue', classes: 'hmpps-red-text govuk-!-font-weight-bold' },
+      ],
       linkLabel: 'Incentive level details',
       linkHref: 'http://localhost:3001/incentive-reviews/prisoner/A1234BC',
     })
   })
 
-  it('should pliuralise the overdue days', () => {
+  it('should pluralise the overdue days', () => {
     const incentiveSummary = {
       positiveBehaviourCount: 1,
       negativeBehaviourCount: 2,
@@ -34,7 +35,17 @@ describe('incentiveSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const prisonerDisplayName = 'John Doe'
     const miniSummary = incentiveSummaryToMiniSummary(incentiveSummary, prisonerNumber, prisonerDisplayName)
-    expect(miniSummary.bottomContentError).toEqual('3 days overdue')
+    expect(miniSummary).toEqual({
+      heading: 'Incentives: since last review',
+      items: [
+        { text: 'Positive behaviours: 1' },
+        { text: 'Negative behaviours: 2' },
+        { text: 'Next review by: 01/01/2021', classes: 'hmpps-secondary-text' },
+        { text: '3 days overdue', classes: 'hmpps-red-text govuk-!-font-weight-bold' },
+      ],
+      linkLabel: 'Incentive level details',
+      linkHref: 'http://localhost:3001/incentive-reviews/prisoner/A1234BC',
+    })
   })
 
   it('should return a mini summary object with no data message if all values are null', () => {
@@ -48,9 +59,8 @@ describe('incentiveSummaryToMiniSummary', () => {
     const prisonerDisplayName = 'John Doe'
     const miniSummary = incentiveSummaryToMiniSummary(incentiveSummary, prisonerNumber, prisonerDisplayName)
     expect(miniSummary).toEqual({
-      bottomLabel: 'Incentives: since last review',
-      bottomContentLine1: 'John Doe has no incentive level history',
-      bottomClass: 'small',
+      heading: 'Incentives: since last review',
+      items: [{ text: 'John Doe has no incentive level history' }],
       linkLabel: 'Incentive level details',
       linkHref: 'http://localhost:3001/incentive-reviews/prisoner/A1234BC',
     })
@@ -61,9 +71,8 @@ describe('incentiveSummaryToMiniSummary', () => {
     const prisonerDisplayName = 'John Doe'
     const miniSummary = incentiveSummaryToMiniSummary({ error: true }, prisonerNumber, prisonerDisplayName)
     expect(miniSummary).toEqual({
-      bottomLabel: 'Incentives: since last review',
-      bottomContentLine1: 'We cannot show these details right now',
-      bottomClass: 'small',
+      heading: 'Incentives: since last review',
+      items: [{ text: 'We cannot show these details right now' }],
       linkLabel: 'Incentive level details',
       linkHref: 'http://localhost:3001/incentive-reviews/prisoner/A1234BC',
     })
