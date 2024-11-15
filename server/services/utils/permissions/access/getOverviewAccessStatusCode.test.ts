@@ -27,7 +27,7 @@ describe('getOverviewAccessStatusCode.ts', () => {
     ${userMDI} | ${prisonerTRN}                                             | ${[Role.InactiveBookings]} | ${HmppsStatusCode.OK}
     ${userLEI} | ${prisonerMDI}                                             | ${[]}                      | ${HmppsStatusCode.NOT_IN_CASELOAD}
     ${userLEI} | ${prisonerMDI}                                             | ${[Role.GlobalSearch]}     | ${HmppsStatusCode.OK}
-    ${userLEI} | ${prisonerMDI}                                             | ${[Role.PomUser]}          | ${HmppsStatusCode.OK}
+    ${userLEI} | ${prisonerMDI}                                             | ${[Role.PomUser]}          | ${HmppsStatusCode.NOT_IN_CASELOAD}
     ${userMDI} | ${prisonerMDI}                                             | ${[]}                      | ${HmppsStatusCode.OK}
   `(' User should receive correct access code', async ({ user, prisoner, roles, expected }) => {
     const accessCode = await getOverviewAccessStatusCode({ ...user, userRoles: [...roles] }, prisoner)
