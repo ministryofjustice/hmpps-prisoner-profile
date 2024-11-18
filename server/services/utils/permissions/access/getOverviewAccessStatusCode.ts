@@ -92,6 +92,10 @@ export default function getOverviewAccessStatusCode(
    * - The user has the "Global search" role
    */
   const getGlobalAccessCode = () => {
+    if (!globalSearchUser) {
+      return HmppsStatusCode.NOT_IN_CASELOAD
+    }
+
     if (!options.allowGlobal) {
       return HmppsStatusCode.GLOBAL_USER_NOT_PERMITTED
     }
