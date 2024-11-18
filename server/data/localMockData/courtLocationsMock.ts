@@ -26,6 +26,12 @@ export const courtLocationsMockBavl: Court[] = [
     description: 'Barnsley Court',
     enabled: true,
   },
+  {
+    courtId: 3,
+    code: 'SHF',
+    description: 'Sheffield Court',
+    enabled: false,
+  },
 ]
 
 export const courtLocationsSelectOptionsMock: SelectOption[] = [
@@ -47,5 +53,9 @@ export const courtLocationsSelectOptionsMockBavl: SelectOption[] = [
   {
     value: 'DEF',
     text: 'Barnsley Court',
+  },
+  {
+    value: 'SHF',
+    text: 'Sheffield Court',
   },
 ]

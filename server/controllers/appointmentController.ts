@@ -601,6 +601,9 @@ export default class AppointmentController {
           : undefined,
         videoLinkUrl: formValues.videoLinkUrl,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
+        mustContactTheCourt:
+          config.featureToggles.bookAVideoLinkEnabled &&
+          !(courts as Court[]).find(court => court.code === formValues.court)?.enabled,
       }
 
       // Save appointment details to session for movement slips to pick up if needed
