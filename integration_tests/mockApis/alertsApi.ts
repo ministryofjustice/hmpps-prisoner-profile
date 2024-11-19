@@ -24,7 +24,7 @@ export default {
             equalTo: 'true',
           },
           size: {
-            equalTo: '20',
+            matches: '(9999|20)',
           },
         },
       },
@@ -239,7 +239,7 @@ export default {
         urlPattern: `/alertsApi/prisoners/[A-Z0-9]*/alerts.*`,
         queryParameters: {
           size: {
-            equalTo: '1000',
+            matches: '(9999|20)',
           },
         },
       },

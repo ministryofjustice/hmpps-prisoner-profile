@@ -113,7 +113,26 @@ describe('Case Notes Controller', () => {
         canDeleteSensitiveCaseNotes: false,
         currentUserDetails: user,
       })
-      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, [], res.locals.user, 'case-notes')
+      expect(mapSpy).toHaveBeenCalledWith(
+        PrisonerMockDataA,
+        inmateDetailMock,
+        req.middleware.alertSummaryData,
+        res.locals.user,
+        'case-notes',
+      )
+    })
+
+    it('should handle API being unavailable', async () => {
+      jest.spyOn<any, string>(controller['caseNotesService'], 'get').mockRejectedValue(new Error())
+
+      await controller.displayCaseNotes()(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/caseNotes/caseNotesPage',
+        expect.objectContaining({
+          caseNotesApiUnavailable: true,
+        }),
+      )
     })
 
     it('should allow view of sensitive case notes if user has the appropriate permission', async () => {

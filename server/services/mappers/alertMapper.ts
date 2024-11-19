@@ -3,6 +3,8 @@ import { Alert, AlertForm, AlertSummaryData, CreateAlert } from '../../data/inte
 import { formatNamePart } from '../../utils/utils'
 import { formatDateISO, parseDate } from '../../utils/dateHelpers'
 import AlertTypeFilter from '../interfaces/alertsService/AlertsMetadata'
+import { Result } from '../../utils/result/result'
+import PagedList from '../../data/interfaces/prisonApi/PagedList'
 
 export const capitaliseAlertDisplayNames = (alert: Alert): Alert => {
   if (!alert) return null
@@ -50,7 +52,7 @@ export const toAlertTypesFilters = (alerts: Alert[]) => {
 }
 
 /* eslint-disable no-shadow, no-plusplus */
-export const toAlertSummaryData = (alerts: Alert[]): AlertSummaryData => {
+export const toAlertSummaryData = (alerts: Result<PagedList<Alert>>): AlertSummaryData => {
   const toAlertCounts = (alerts: Alert[]) => {
     return alerts.reduce(
       (acc, alert) => {
@@ -65,9 +67,14 @@ export const toAlertSummaryData = (alerts: Alert[]): AlertSummaryData => {
     )
   }
 
+  if (alerts.status === 'rejected') return { apiUnavailable: true }
+
+  const alertsContent = alerts.getOrNull().content
+
   return {
-    ...toAlertCounts(alerts),
-    ...toAlertTypesFilters(alerts),
-    alertFlags: dpsShared.alertFlags.getAlertFlagLabelsForAlerts(alerts),
+    ...toAlertCounts(alertsContent),
+    ...toAlertTypesFilters(alertsContent),
+    alertFlags: dpsShared.alertFlags.getAlertFlagLabelsForAlerts(alertsContent),
+    apiUnavailable: false,
   }
 }

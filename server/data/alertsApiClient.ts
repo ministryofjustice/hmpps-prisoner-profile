@@ -18,6 +18,8 @@ export default class AlertsApiRestClient implements AlertsApiClient {
       size: queryParams?.showAll ? 9999 : 20,
       ...queryParams,
     }
+    delete params.showAll
+
     return this.restClient.get<PagedList<Alert>>({
       path: `/prisoners/${prisonerNumber}/alerts`,
       query: mapToQueryString(params),

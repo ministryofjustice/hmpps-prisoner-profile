@@ -75,7 +75,30 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, [], res.locals.user, 'alerts')
+      expect(mapSpy).toHaveBeenCalledWith(
+        PrisonerMockDataA,
+        inmateDetailMock,
+        req.middleware.alertSummaryData,
+        res.locals.user,
+        'alerts',
+      )
+    })
+
+    it('should handle API being unavailable', async () => {
+      req.middleware.alertSummaryData.apiUnavailable = true
+      const getAlertsSpy = jest
+        .spyOn<any, string>(controller['alertsService'], 'get')
+        .mockResolvedValue({ pagedAlerts: pagedInactiveAlertsMock })
+
+      await controller.displayAlerts(req, res, next, true)
+
+      expect(getAlertsSpy).not.toHaveBeenCalled()
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/alerts/alertsPage',
+        expect.objectContaining({
+          apiUnavailable: true,
+        }),
+      )
     })
 
     it('should get inactive alerts', async () => {
@@ -101,7 +124,13 @@ describe('Alerts Controller', () => {
           to: '02/02/2023',
         },
       )
-      expect(mapSpy).toHaveBeenCalledWith(PrisonerMockDataA, inmateDetailMock, [], res.locals.user, 'alerts')
+      expect(mapSpy).toHaveBeenCalledWith(
+        PrisonerMockDataA,
+        inmateDetailMock,
+        req.middleware.alertSummaryData,
+        res.locals.user,
+        'alerts',
+      )
     })
 
     it('should set canUpdateAlert to true if user has role and caseload', async () => {
