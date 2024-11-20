@@ -17,6 +17,7 @@ import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
 import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
+import { isServiceEnabled } from '../utils/isServiceEnabled'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -97,6 +98,7 @@ export default class CaseNotesController {
         showingAll,
         hasCaseNotes,
         addCaseNoteLinkUrl,
+        canAddMoreDetails: isServiceEnabled('caseNotesApi', res.locals.feComponentsMeta),
       })
     }
   }
