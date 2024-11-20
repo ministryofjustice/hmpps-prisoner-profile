@@ -9,71 +9,85 @@
 ] %}
 {% block body %}
 
-    {% if errors.length > 0 %}
-        {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: errors,
-            attributes: { 'data-qa-errors': true }
-        })
-        }}
-    {% endif %}
-
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <h1 id="alerts">{{ 'Active' if activeTab else 'Inactive' }} alerts</h1>
-        </div>
-    </div>
-
-    {% set tabs = [
-        { text: 'Active ('+activeAlertCount+' alerts)', path: '/alerts/active', visible: true, testId: 'active' },
-        { text: 'Inactive ('+inactiveAlertCount+' alerts)', path: '/alerts/inactive', visible: true, testId: 'inactive' }
-    ]
-    %}
-
-    <div class="govuk-tabs govuk-!-display-none-print">
-        <ul class="govuk-tabs__list">
-            {% for tab in tabs %}
-                {% if tab.visible %}
-                {% set fullTabPath = '/prisoner/' + prisonerNumber + tab.path %}
-                {% set isSelected = (' govuk-tabs__list-item--selected' if currentUrlPath === fullTabPath) %}
-                    <li class="{{ 'govuk-tabs__list-item' + isSelected }}">
-                        <a class="govuk-tabs__tab" href="{{ fullTabPath }}" data-qa="{{'alerts-tabs-' + tab.testId }}">
-                            {{ tab.text }}
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="govuk-grid-row govuk-!-display-none-print">
-        <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
-        <div class="govuk-grid-column-three-quarters">
-            {% if addAlertLinkUrl %}
-            <div class="hmpps-action-header">
-                {{ hmppsActionButton({ text: 'Add alert', iconName: 'add-alert', id: 'add-alert-action-button', url: addAlertLinkUrl }) }}
+    {% if alertSummaryData.apiUnavailable %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 id="alerts">Alerts</h1>
             </div>
-            {% endif %}
         </div>
-    </div>
 
-    {% if (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
-            {% include '../../partials/alertsPage/alertsFilter.njk' %}
+        <div class="dps-banner dps-banner__error">
+            <p class="govuk-!-font-weight-bold govuk-!-margin-bottom-1">Alerts are currently unavailable</p>
+            <p>Reload the page or try again later. Alerts might still be available in other parts of DPS.</p>
         </div>
-        <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-            {% include '../../partials/alertsPage/alertsList.njk' %}
-        </div>
-    </div>
     {% else %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full" data-qa="alerts-empty-state">
-            {{ fullName }} does not have any {{ 'active' if activeTab else 'inactive' }} alerts.
-        </div>
-    </div>
-    {% endif %}
 
-    {% include "../../partials/backToTop.njk" %}
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })
+            }}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 id="alerts">{{ 'Active' if activeTab else 'Inactive' }} alerts</h1>
+            </div>
+        </div>
+
+        {% set tabs = [
+            { text: 'Active ('+activeAlertCount+' alerts)', path: '/alerts/active', visible: true, testId: 'active' },
+            { text: 'Inactive ('+inactiveAlertCount+' alerts)', path: '/alerts/inactive', visible: true, testId: 'inactive' }
+        ]
+        %}
+
+        <div class="govuk-tabs govuk-!-display-none-print">
+            <ul class="govuk-tabs__list">
+                {% for tab in tabs %}
+                    {% if tab.visible %}
+                    {% set fullTabPath = '/prisoner/' + prisonerNumber + tab.path %}
+                    {% set isSelected = (' govuk-tabs__list-item--selected' if currentUrlPath === fullTabPath) %}
+                        <li class="{{ 'govuk-tabs__list-item' + isSelected }}">
+                            <a class="govuk-tabs__tab" href="{{ fullTabPath }}" data-qa="{{'alerts-tabs-' + tab.testId }}">
+                                {{ tab.text }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="govuk-grid-row govuk-!-display-none-print">
+            <div class="govuk-grid-column-one-quarter">&nbsp;<!-- Intentionally blank - for triggering layout only --></div>
+            <div class="govuk-grid-column-three-quarters">
+                {% if addAlertLinkUrl %}
+                <div class="hmpps-action-header">
+                    {{ hmppsActionButton({ text: 'Add alert', iconName: 'add-alert', id: 'add-alert-action-button', url: addAlertLinkUrl }) }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if (activeTab and activeAlertCount) or (not activeTab and inactiveAlertCount) %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter app-sidebar govuk-!-display-none-print">
+                {% include '../../partials/alertsPage/alertsFilter.njk' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
+                {% include '../../partials/alertsPage/alertsList.njk' %}
+            </div>
+        </div>
+        {% else %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full" data-qa="alerts-empty-state">
+                {{ fullName }} does not have any {{ 'active' if activeTab else 'inactive' }} alerts.
+            </div>
+        </div>
+        {% endif %}
+
+        {% include "../../partials/backToTop.njk" %}
+    {% endif %}
 
 {% endblock %}

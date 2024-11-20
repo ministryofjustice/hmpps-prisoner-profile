@@ -52,13 +52,7 @@ export default class OverviewController {
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
-    const {
-      clientToken,
-      prisonerData,
-      inmateDetail,
-      alertSummaryData: { alertFlags },
-      permissions,
-    } = req.middleware
+    const { clientToken, prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
     const { prisonId, bookingId, prisonerNumber, prisonName } = prisonerData
     const { courCasesSummaryEnabled } = config.featureToggles
 
@@ -132,7 +126,7 @@ export default class OverviewController {
 
     const viewData: OverviewPageData = {
       pageTitle: 'Overview',
-      ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'overview'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'overview'),
       moneySummary,
       adjudicationSummary,
       visitsSummary,

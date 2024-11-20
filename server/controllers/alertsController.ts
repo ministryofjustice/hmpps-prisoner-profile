@@ -27,6 +27,14 @@ export default class AlertsController {
     // Get data from middleware
     const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
 
+    if (alertSummaryData.apiUnavailable) {
+      // Render banner
+      return res.render('pages/alerts/alertsPage', {
+        pageTitle: 'Alerts',
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
+      })
+    }
+
     // Parse query params for paging, sorting and filtering data
     const { clientToken } = req.middleware
     const queryParams: AlertsListQueryParams = {}
@@ -89,7 +97,7 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alerts/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData.alertFlags, res.locals.user, 'alerts'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
       ...alertsPageData,
       alertsList,
       showingAll,

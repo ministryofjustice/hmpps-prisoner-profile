@@ -18,6 +18,7 @@ import CaseNoteType from '../data/interfaces/caseNotesApi/CaseNoteType'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
+import { Result } from '../utils/result/result'
 
 /**
  * Parse requests for case notes routes and orchestrate response
@@ -33,13 +34,7 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       // Parse query params for paging, sorting and filtering data
       const queryParams: CaseNotesListQueryParams = {}
-      const {
-        clientToken,
-        prisonerData,
-        inmateDetail,
-        alertSummaryData: { alertFlags },
-        permissions,
-      } = req.middleware
+      const { clientToken, prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
 
       queryParams.sort = (req.query.sort as string) || 'creationDateTime,DESC'
       if (req.query.page) queryParams.page = +req.query.page
@@ -59,19 +54,29 @@ export default class CaseNotesController {
       const prisonApiClient = this.prisonApiClientBuilder(clientToken)
       const [caseNotesUsage, caseNotesPageData] = await Promise.all([
         prisonApiClient.getCaseNotesUsage(req.params.prisonerNumber),
-        this.caseNotesService.get({
-          token: clientToken,
-          prisonerData,
-          queryParams,
-          canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
-          canDeleteSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.delete,
-          currentUserDetails: res.locals.user,
-        }),
+        Result.wrap(
+          this.caseNotesService.get({
+            token: clientToken,
+            prisonerData,
+            queryParams,
+            canViewSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.view,
+            canDeleteSensitiveCaseNotes: !!permissions.sensitiveCaseNotes?.delete,
+            currentUserDetails: res.locals.user,
+          }),
+        ),
       ])
+
+      if (!caseNotesPageData.isFulfilled()) {
+        return res.render('pages/caseNotes/caseNotesPage', {
+          pageTitle: 'Case notes',
+          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+          caseNotesApiUnavailable: true,
+        })
+      }
 
       const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(
-        caseNotesPageData.caseNoteTypes,
+        caseNotesPageData.getOrThrow().caseNoteTypes,
         queryParams.type,
       )
       const showingAll = queryParams.showAll
@@ -90,8 +95,8 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'case-notes'),
-        ...caseNotesPageData,
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+        ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,
         typeSubTypeMap,
