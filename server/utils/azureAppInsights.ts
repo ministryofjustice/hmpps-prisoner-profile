@@ -10,7 +10,7 @@ import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contract
 import { RequestHandler } from 'express'
 import { ApplicationInfo } from '../applicationInfo'
 
-const prefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping']
+const requestPrefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping', 'GET /info']
 
 export type ContextObject = {
   /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -69,7 +69,7 @@ function ignoredRequestsProcessor(envelope: EnvelopeTelemetry) {
     const requestData = envelope.data.baseData
     if (requestData instanceof Contracts.RequestData) {
       const { name } = requestData
-      return prefixesToIgnore.every(prefix => !name.startsWith(prefix))
+      return requestPrefixesToIgnore.every(prefix => !name.startsWith(prefix))
     }
   }
   return true
