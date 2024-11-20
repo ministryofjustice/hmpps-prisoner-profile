@@ -135,7 +135,7 @@ context('Profile banner', () => {
     it('Shows clickable alert flags', () => {
       visitOverviewPage()
       const overviewPage = new OverviewPage()
-      overviewPage.alertFlags().children().should('have.length', '7')
+      overviewPage.alertFlags().children().should('have.length', '8')
       overviewPage.alertFlags().find(':nth-child(1)').should('contain', 'Cat A')
       overviewPage.alertFlags().find(':nth-child(2)').should('contain', 'Arsonist')
       overviewPage.alertFlags().find(':nth-child(3)').should('contain', 'Concerted indiscipline')
@@ -143,6 +143,7 @@ context('Profile banner', () => {
       overviewPage.alertFlags().find(':nth-child(5)').should('contain', 'Gang member')
       overviewPage.alertFlags().find(':nth-child(6)').should('contain', 'Hidden disability')
       overviewPage.alertFlags().find(':nth-child(7)').should('contain', 'Veteran')
+      overviewPage.alertFlags().find(':nth-child(8)').should('contain', '+74 active alerts')
     })
 
     it('Shows modal when clicking alert flag', () => {
