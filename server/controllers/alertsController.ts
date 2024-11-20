@@ -32,7 +32,6 @@ export default class AlertsController {
       return res.render('pages/alerts/alertsPage', {
         pageTitle: 'Alerts',
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
-        alertSummaryData,
       })
     }
 
@@ -104,7 +103,6 @@ export default class AlertsController {
       showingAll,
       addAlertLinkUrl,
       activeTab: isActive,
-      alertSummaryData,
     })
   }
 
