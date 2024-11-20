@@ -4,6 +4,7 @@
 
 {% macro alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) %}
     {% set otherActiveCount = alertSummaryData.activeAlertCount - alertSummaryData.alertFlags.length %}
+    {% set includePlus = alertSummaryData.alertFlags.length > 0 %}
     <ul class="alerts-list" data-qa="alert-flags">
         {% if categoryLabel %}
             {{ catAPrisonerTag(categoryLabel) }}
@@ -28,7 +29,7 @@
             {% endfor %}
             {% if otherActiveCount > 0 %}
                 <li class="alerts-list__more-link">
-                    <a href="/prisoner/{{ prisonerNumber }}/alerts/active" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16">+{{ otherActiveCount | pluralise('active alert') }}</a>
+                    <a href="/prisoner/{{ prisonerNumber }}/alerts/active" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16">{{ '+' if includePlus }}{{ otherActiveCount | pluralise('active alert') }}</a>
                 </li>
             {% endif %}
         {% endif %}
