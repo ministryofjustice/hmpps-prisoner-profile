@@ -11,6 +11,7 @@ import { RequestHandler } from 'express'
 import { ApplicationInfo } from '../applicationInfo'
 
 const requestPrefixesToIgnore = ['GET /assets/', 'GET /health', 'GET /ping', 'GET /info']
+const dependencyPrefixesToIgnore = ['sqs']
 
 export type ContextObject = {
   /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -33,6 +34,7 @@ export function buildAppInsightsClient({ applicationName, buildNumber }: Applica
     defaultClient.addTelemetryProcessor(addUserDataToRequests)
     defaultClient.addTelemetryProcessor(parameterisePaths)
     defaultClient.addTelemetryProcessor(ignoredRequestsProcessor)
+    defaultClient.addTelemetryProcessor(ignoredDependenciesProcessor)
     return defaultClient
   }
   return null
@@ -70,6 +72,17 @@ function ignoredRequestsProcessor(envelope: EnvelopeTelemetry) {
     if (requestData instanceof Contracts.RequestData) {
       const { name } = requestData
       return requestPrefixesToIgnore.every(prefix => !name.startsWith(prefix))
+    }
+  }
+  return true
+}
+
+function ignoredDependenciesProcessor(envelope: EnvelopeTelemetry) {
+  if (envelope.data.baseType === Contracts.TelemetryTypeString.Dependency) {
+    const dependencyData = envelope.data.baseData
+    if (dependencyData instanceof Contracts.RemoteDependencyData) {
+      const { target } = dependencyData
+      return dependencyPrefixesToIgnore.every(prefix => !target.startsWith(prefix))
     }
   }
   return true
