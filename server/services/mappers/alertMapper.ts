@@ -67,9 +67,9 @@ export const toAlertSummaryData = (alerts: Result<PagedList<Alert>>): AlertSumma
     )
   }
 
-  if (alerts.status === 'rejected') return { apiUnavailable: true }
+  if (!alerts.isFulfilled()) return { apiUnavailable: true }
 
-  const alertsContent = alerts.getOrNull().content
+  const alertsContent = alerts.getOrThrow().content
 
   return {
     ...toAlertCounts(alertsContent),

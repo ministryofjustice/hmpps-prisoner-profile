@@ -65,7 +65,7 @@ export default class CaseNotesController {
         ),
       ])
 
-      if (caseNotesPageData.status === 'rejected') {
+      if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
           pageTitle: 'Case notes',
           ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
@@ -75,7 +75,7 @@ export default class CaseNotesController {
 
       const hasCaseNotes = Array.isArray(caseNotesUsage) && caseNotesUsage.length
       const { types, subTypes, typeSubTypeMap } = this.mapCaseNoteTypes(
-        caseNotesPageData.getOrNull().caseNoteTypes,
+        caseNotesPageData.getOrThrow().caseNoteTypes,
         queryParams.type,
       )
       const showingAll = queryParams.showAll
@@ -95,7 +95,7 @@ export default class CaseNotesController {
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
-        ...caseNotesPageData.getOrNull(),
+        ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,
         typeSubTypeMap,

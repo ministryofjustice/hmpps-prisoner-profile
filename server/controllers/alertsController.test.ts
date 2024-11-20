@@ -96,7 +96,9 @@ describe('Alerts Controller', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/alerts/alertsPage',
         expect.objectContaining({
-          apiUnavailable: true,
+          alertSummaryData: expect.objectContaining({
+            apiUnavailable: true,
+          }),
         }),
       )
     })
