@@ -213,7 +213,7 @@ context('Sensitive Case Notes', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU', includeSensitive: true })
       cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
@@ -241,7 +241,7 @@ context('Sensitive Case Notes', () => {
       cy.task('stubInmateDetail', { bookingId: 1102484 })
       cy.task('stubPrisonerDetail', 'G6123VU')
       cy.task('stubGetCaseNotesUsage', 'G6123VU')
-      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
+      cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU', includeSensitive: true })
       cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
       caseNotesPage = visitCaseNotesPage()
     })
@@ -320,5 +320,24 @@ context('Case Notes Page Not Found', () => {
       cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/case-notes' })
       Page.verifyOnPage(NotFoundPage)
     })
+  })
+})
+
+context('Case Notes API Unavailable', () => {
+  let caseNotesPage
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+    cy.task('stubGetCaseNoteTypes')
+    cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
+    cy.task('stubInmateDetail', { bookingId: 1102484 })
+    cy.task('stubPrisonerDetail', 'G6123VU')
+    cy.task('stubGetCaseNotesUsage', 'G6123VU')
+    caseNotesPage = visitCaseNotesPage()
+  })
+
+  it('Display the API unavailable banner', () => {
+    caseNotesPage.apiUnavailableBanner().should('be.visible')
+    caseNotesPage.apiUnavailableBanner().should('contain', 'Case notes are currently unavailable')
   })
 })

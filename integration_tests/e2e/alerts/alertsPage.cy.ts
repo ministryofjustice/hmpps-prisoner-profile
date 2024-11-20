@@ -252,3 +252,28 @@ context('Alerts API enabled prison', () => {
     })
   })
 })
+
+context('Alerts API Unavailable', () => {
+  let alertsPage
+  beforeEach(() => {
+    cy.task('reset')
+    cy.setupUserAuth()
+    cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
+    cy.task('stubEventsForProfileImage', 'G6123VU')
+    cy.task('stubAssessments', 1102484)
+    cy.task('stubInmateDetail', { bookingId: 1102484 })
+    cy.task('stubGetCurrentCsip', 'G6123VU')
+    visitActiveAlertsPage()
+    alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Alerts')
+  })
+
+  it('Display the API unavailable banner in the profile banner', () => {
+    alertsPage.bannerApiUnavailableBanner().should('be.visible')
+    alertsPage.bannerApiUnavailableBanner().should('contain', 'Alerts are currently unavailable')
+  })
+
+  it('Display the API unavailable banner in the page', () => {
+    alertsPage.pageApiUnavailableBanner().should('be.visible')
+    alertsPage.pageApiUnavailableBanner().should('contain', 'Alerts are currently unavailable')
+  })
+})

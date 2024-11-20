@@ -14,10 +14,12 @@ export default class AlertsApiRestClient implements AlertsApiClient {
 
   async getAlerts(prisonerNumber: string, queryParams: AlertsApiQueryParams): Promise<PagedList<Alert>> {
     // Set defaults then apply queryParams
+    const { showAll, ...rest } = queryParams
     const params: AlertsApiQueryParams = {
-      size: queryParams?.showAll ? 9999 : 20,
-      ...queryParams,
+      size: showAll ? 9999 : 20,
+      ...rest,
     }
+
     return this.restClient.get<PagedList<Alert>>({
       path: `/prisoners/${prisonerNumber}/alerts`,
       query: mapToQueryString(params),

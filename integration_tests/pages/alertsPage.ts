@@ -52,4 +52,8 @@ export default class AlertsPage extends Page {
   viewAllLink = (): PageElement => cy.get('.hmpps-pagination-view-all a')
 
   successMessage = (): PageElement => cy.get('.hmpps-flash-message--success > p')
+
+  bannerApiUnavailableBanner = (): PageElement => cy.get('.alerts-list .dps-banner__error')
+
+  pageApiUnavailableBanner = (): PageElement => cy.get('main .dps-banner__error')
 }

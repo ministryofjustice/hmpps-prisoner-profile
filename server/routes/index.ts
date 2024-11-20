@@ -105,7 +105,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const alertSummaryData = req.middleware?.alertSummaryData
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -117,7 +117,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
       })
     },
   )
@@ -131,7 +131,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const alertSummaryData = req.middleware?.alertSummaryData
       const { workAndSkillsPageService } = services
       const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
 
@@ -162,7 +162,7 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'work-and-skills'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'work-and-skills'),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         fullCourseHistoryLinkUrl,
@@ -185,7 +185,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const alertSummaryData = req.middleware?.alertSummaryData
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
@@ -199,7 +199,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'offences'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'offences'),
         courtCaseData,
         releaseDates,
         activeTab: true,

@@ -15,11 +15,7 @@ export default class CaseNotesApiRestClient implements CaseNotesApiClient {
   }
 
   private async get<T>(args: object): Promise<T> {
-    try {
-      return await this.restClient.get<T>(args)
-    } catch (error) {
-      return error
-    }
+    return this.restClient.get<T>(args)
   }
 
   private async post(args: object): Promise<unknown> {

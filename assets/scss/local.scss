@@ -54,13 +54,24 @@
 }
 
 .dps-banner {
-  min-height: 70px;
+  font-weight: 300;
+  padding: 22px;
+  margin: 0;
+  min-height: 26px;
   border-left: 8px solid govuk-colour('green');
   background-color: govuk-colour('light-grey');
 
+  &__error {
+    border-left: 8px solid govuk-colour('red');
+  }
+
+  &__small {
+    padding: 0 22px;
+    min-height: auto;
+  }
+
   p {
-    font-weight: 300;
-    padding: 22px;
+    padding: 0;
     margin: 0;
 
     a:link, a:visited {
