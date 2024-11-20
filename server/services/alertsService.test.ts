@@ -23,6 +23,7 @@ describe('Alerts Service', () => {
       activeAlertTypesFilter: {},
       inactiveAlertTypesFilter: {},
       alertFlags: [],
+      apiUnavailable: false,
     }
     alertsApiClientSpy = {
       createAlert: jest.fn(),
