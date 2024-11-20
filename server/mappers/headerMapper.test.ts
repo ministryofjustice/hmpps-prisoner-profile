@@ -24,11 +24,27 @@ describe('HeaderMapping', () => {
   })
   describe('Category A prisoner', () => {
     it('Photo type should be photoWithheld for security purposes', async () => {
-      const headerData = mapHeaderData(PrisonerMockDataA, inmateDetailMock, [], prisonUserMock)
+      const headerData = mapHeaderData(
+        PrisonerMockDataA,
+        inmateDetailMock,
+        {
+          alertFlags: [],
+          apiUnavailable: false,
+        },
+        prisonUserMock,
+      )
       expect(headerData.photoType).toBe('photoWithheld')
     })
     it('Photo type should return as placeholder if the category is not A', async () => {
-      const headerData = mapHeaderData(PrisonerMockDataB, inmateDetailMock, [], prisonUserMock)
+      const headerData = mapHeaderData(
+        PrisonerMockDataB,
+        inmateDetailMock,
+        {
+          alertFlags: [],
+          apiUnavailable: false,
+        },
+        prisonUserMock,
+      )
       expect(headerData.photoType).toBe('placeholder')
     })
   })

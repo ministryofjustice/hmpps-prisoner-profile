@@ -6,6 +6,7 @@ import Assessment from '../data/interfaces/prisonApi/Assessment'
 import { AssessmentCode } from '../data/enums/assessmentCode'
 import logger from '../../logger'
 import { toAlertSummaryData } from '../services/mappers/alertMapper'
+import { Result } from '../utils/result/result'
 
 export default function getPrisonerData(services: Services, options: { minimal?: boolean } = {}): RequestHandler {
   return async (req, res, next) => {
@@ -41,10 +42,10 @@ export default function getPrisonerData(services: Services, options: { minimal?:
       const [assessments, inmateDetail, alerts] = await Promise.all([
         prisonApiClient.getAssessments(prisonerData.bookingId),
         prisonApiClient.getInmateDetail(prisonerData.bookingId),
-        alertsApiClient.getAlerts(prisonerNumber, { size: 1000 }),
+        Result.wrap(alertsApiClient.getAlerts(prisonerNumber, { showAll: true })),
       ])
 
-      const alertSummaryData = toAlertSummaryData(alerts?.content)
+      const alertSummaryData = toAlertSummaryData(alerts)
 
       if (assessments && Array.isArray(assessments)) {
         prisonerData.assessments = assessments.sort(

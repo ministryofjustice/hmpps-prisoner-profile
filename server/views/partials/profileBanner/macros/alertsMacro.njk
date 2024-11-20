@@ -2,23 +2,36 @@
 {% from 'components/modal/modal.njk' import modal %}
 {% from "dps/components/alert-flag/macro.njk" import alertFlag %}
 
-{% macro alertsMacro(alerts, prisonerNumber, categoryLabel) %}
+{% macro alertsMacro(alertSummaryData, prisonerNumber, categoryLabel) %}
+    {% set otherActiveCount = alertSummaryData.activeAlertCount - alertSummaryData.alertFlags.length %}
     <ul class="alerts-list" data-qa="alert-flags">
         {% if categoryLabel %}
             {{ catAPrisonerTag(categoryLabel) }}
         {% endif %}
 
-        {% for alert in alerts %}
-            <li>
-                {{ alertFlag({
-                    alert: alert,
-                    href: "/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids='),
-                    attributes: {
-                        'data-prisoner-number': prisonerNumber
-                    }
-                }) }}
-            </li>
-        {% endfor %}
+        {% if alertSummaryData.apiUnavailable %}
+            <div class="dps-banner dps-banner__error dps-banner__small govuk-!-margin-bottom-2">
+                <p class="govuk-!-font-weight-bold">Alerts are currently unavailable</p>
+                <p>Reload the page or try again later. Alerts might still be available in other parts of DPS.</p>
+            </div>
+        {% else %}
+            {% for alert in alertSummaryData.alertFlags %}
+                <li>
+                    {{ alertFlag({
+                        alert: alert,
+                        href: "/prisoner/" + prisonerNumber + "/alerts/detail?ids=" + alert.alertIds | join('&ids='),
+                        attributes: {
+                            'data-prisoner-number': prisonerNumber
+                        }
+                    }) }}
+                </li>
+            {% endfor %}
+            {% if otherActiveCount > 0 %}
+                <li class="alerts-list__more-link">
+                    <a href="/prisoner/{{ prisonerNumber }}/alerts/active" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16">+{{ otherActiveCount | pluralise('active alert') }}</a>
+                </li>
+            {% endif %}
+        {% endif %}
     </ul>
 
     {{ modal({

@@ -61,12 +61,7 @@ export default class PersonalController {
 
   displayPersonalPage() {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const {
-        prisonerData,
-        inmateDetail,
-        alertSummaryData: { alertFlags },
-        clientToken,
-      } = req.middleware
+      const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
       const user = res.locals.user as PrisonUser
       const { activeCaseLoadId, userRoles } = user
@@ -88,7 +83,7 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'personal'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===
