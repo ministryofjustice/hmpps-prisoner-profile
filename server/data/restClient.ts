@@ -68,7 +68,6 @@ export default class RestClient {
     raw = false,
     ignore404 = false,
   }: GetRequest): Promise<T> {
-    logger.info(`Get using user credentials: calling ${this.name}: ${path} ${query}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -86,10 +85,8 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
-      if (ignore404 && error.response?.status === 404) {
-        logger.info(`Returned null for 404 not found when calling ${this.name}: ${path}`)
-        return null
-      }
+      if (ignore404 && error.response?.status === 404) return null
+
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError, query }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
       throw sanitisedError
@@ -104,7 +101,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PostRequest = {}): Promise<T> {
-    logger.info(`Post using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -138,7 +134,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PostRequest = {}): Promise<T> {
-    logger.info(`Post multipart using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     const request = superagent
       .post(endpoint)
@@ -180,7 +175,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PutRequest = {}): Promise<T> {
-    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -213,7 +207,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PutRequest = {}): Promise<T> {
-    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -239,7 +232,6 @@ export default class RestClient {
   }
 
   async stream({ path = null, headers = {} }: StreamRequest = {}): Promise<Readable> {
-    logger.info(`Get using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     return new Promise((resolve, reject) => {
       superagent
