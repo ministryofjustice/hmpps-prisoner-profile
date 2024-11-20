@@ -113,7 +113,7 @@ export default {
 
   stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubGetWithBody({
-      path: `${baseUrl}identifying-marks/prisoner/${prisonerNumber}`,
+      path: `${baseUrl}distinguishing-marks/prisoner/${prisonerNumber}`,
       body: [distinguishingMarkMock],
     }),
 
@@ -137,7 +137,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}identifying-marks/mark`,
+        urlPattern: `${baseUrl}distinguishing-marks/mark`,
       },
       response: {
         status: 200,
