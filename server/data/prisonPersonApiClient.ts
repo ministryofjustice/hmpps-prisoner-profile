@@ -77,7 +77,7 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
 
   async getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
     return this.restClient.get<PrisonPersonDistinguishingMark[]>({
-      path: `/identifying-marks/prisoner/${prisonerNumber}`,
+      path: `/distinguishing-marks/prisoner/${prisonerNumber}`,
     })
   }
 
@@ -86,7 +86,7 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
     photograph: MulterFile,
   ): Promise<PrisonPersonDistinguishingMark> {
     return this.restClient.postMultipart<PrisonPersonDistinguishingMark>({
-      path: '/identifying-marks/mark',
+      path: '/distinguishing-marks/mark',
       data: distinguishingMarkRequest,
       file: photograph,
     })
