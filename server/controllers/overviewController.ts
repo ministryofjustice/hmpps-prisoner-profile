@@ -108,7 +108,7 @@ export default class OverviewController {
         res.locals.apiErrorCallback,
       ),
       isServiceEnabled('csipUI', res.locals.feComponentsMeta) && permissions.csip?.view
-        ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber))
+        ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), res.locals.apiErrorCallback)
         : null,
     ])
 
