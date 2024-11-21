@@ -183,7 +183,8 @@
                                 name: "court",
                                 id: "court",
                                 label: {
-                                    text: "Which court is the booking for?"
+                                    text: "Which court is the booking for?",
+                                    classes: 'govuk-!-font-weight-bold'
                                 },
                                 items: courts | addDefaultSelectedValue('Choose court') | setSelected(formValues.court),
                                 errorMessage: errors | findError("court")
@@ -194,7 +195,8 @@
                                     name: "hearingType",
                                     id: "hearingType",
                                     label: {
-                                        text: "What is the hearing type?"
+                                        text: "What is the hearing type?",
+                                        classes: 'govuk-!-font-weight-bold'
                                     },
                                     items: hearingTypes | addDefaultSelectedValue('Choose hearing type') | setSelected(formValues.hearingType),
                                     errorMessage: errors | findError("hearingType")
