@@ -4,15 +4,16 @@
 {%- call summaryCard({title: "Neurodiversity", id: "neurodiversity"}) -%}
   <div class="govuk-grid-row" data-qa="neurodiversity">
     <div class="govuk-grid-column-full">
-      {% if learnerNeurodivergence.length %}
+      {% set neurodivergence = learnerNeurodivergence.value %}
+      {% if neurodivergence.length %}
         <p class="govuk-body" data-qa="neurodivergence-exists">
           Information from the local education team - not a medical diagnosis.
         </p>
 
         {# Support needed #}
-        {% if learnerNeurodivergence[0].neurodivergenceSupport.length %}
+        {% if neurodivergence[0].neurodivergenceSupport.length %}
           <dl class="govuk-summary-list govuk-summary-list__row--no-border hmpps-neurodivergence-support govuk-!-margin-bottom-0" data-qa="neurodivergence-support">
-            {% for support in learnerNeurodivergence[0].neurodivergenceSupport %}
+            {% for support in neurodivergence[0].neurodivergenceSupport %}
               {% set rowLabel = "" %}
               {% if loop.index === 1 %}
                 {% set rowLabel = "Support needed" %}
@@ -20,9 +21,9 @@
               {{ summaryListRow(rowLabel, support) }}
             {% endfor %}
           </dl>
-          {%if learnerNeurodivergence[0].supportDate %}
+          {%if neurodivergence[0].supportDate %}
             <dl class="govuk-body-s-dd hmpps-recorded-on hmpps-secondary-text govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-support-needed">
-              {{ summaryListRow("", "Recorded on " + learnerNeurodivergence[0].supportDate | formatDate ) }}
+              {{ summaryListRow("", "Recorded on " + neurodivergence[0].supportDate | formatDate ) }}
             </dl>
            {% endif %}
         {% endif %}
@@ -32,15 +33,15 @@
           <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-font-weight-bold govuk-!-margin-bottom-0" data-qa="neurodiversity-title">
             {{ summaryListRow("Neurodiversity", "From self-assessment") }}
           </dl>
-          {% if learnerNeurodivergence[0].neurodivergenceSelfDeclared.length %}
+          {% if neurodivergence[0].neurodivergenceSelfDeclared.length %}
             <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-self-assessment">
-              {% for selfDeclared in learnerNeurodivergence[0].neurodivergenceSelfDeclared %}
+              {% for selfDeclared in neurodivergence[0].neurodivergenceSelfDeclared %}
                 {{ summaryListRow("", selfDeclared) }}
               {% endfor %}
             </dl>
-            {% if learnerNeurodivergence[0].selfDeclaredDate%}
+            {% if neurodivergence[0].selfDeclaredDate%}
               <dl class="govuk-body-s-dd hmpps-recorded-on hmpps-secondary-text govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-self-declared-date">
-                {{ summaryListRow("", "Recorded on " + learnerNeurodivergence[0].selfDeclaredDate | formatDate ) }}
+                {{ summaryListRow("", "Recorded on " + neurodivergence[0].selfDeclaredDate | formatDate ) }}
               </dl>
             {% endif %}
           {% else %}
@@ -50,7 +51,7 @@
           {% endif %}
 
         {# Neurodiversity assessment #}
-        {% if learnerNeurodivergence[0].neurodivergenceAssessed.length %}
+        {% if neurodivergence[0].neurodivergenceAssessed.length %}
           <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0">
             <div class="govuk-summary-list__row" data-qa="-row">
               <dt class="govuk-summary-list__key" data-qa="-key"></dt>
@@ -61,13 +62,13 @@
             {{ summaryListRow("", "From neurodiversity assessment") }}
           </dl>
           <dl class="govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-0" data-qa="neurodiversity-assessed">
-            {% for assessed in learnerNeurodivergence[0].neurodivergenceAssessed %}
+            {% for assessed in neurodivergence[0].neurodivergenceAssessed %}
               {{ summaryListRow("", assessed) }}
             {% endfor %}
           </dl>
-          {% if learnerNeurodivergence[0].assessmentDate %}
+          {% if neurodivergence[0].assessmentDate %}
             <dl class="govuk-body-s-dd hmpps-recorded-on hmpps-secondary-text govuk-summary-list govuk-summary-list__row--no-border govuk-!-margin-bottom-3" data-qa="neurodiversity-assessment-date">
-              {{ summaryListRow("", "Recorded on " + learnerNeurodivergence[0].assessmentDate | formatDate ) }}
+              {{ summaryListRow("", "Recorded on " + neurodivergence[0].assessmentDate | formatDate ) }}
             </dl>
           {% endif %}
         {% endif %}

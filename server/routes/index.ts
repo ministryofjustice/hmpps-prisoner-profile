@@ -133,7 +133,11 @@ export default function routes(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
       const { workAndSkillsPageService } = services
-      const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
+      const workAndSkillsPageData = await workAndSkillsPageService.get(
+        req.middleware.clientToken,
+        prisonerData,
+        res.locals.apiErrorCallback,
+      )
 
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
@@ -141,16 +145,18 @@ export default function routes(services: Services): Router {
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
       const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
 
+      const { curiousGoals } = workAndSkillsPageData
       const hasVc2Goals =
-        workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
+        curiousGoals.status === 'fulfilled' &&
+        (curiousGoals.value?.employmentGoals?.length > 0 ||
+          curiousGoals.value?.personalGoals?.length > 0 ||
+          curiousGoals.value?.shortTermGoals?.length > 0 ||
+          curiousGoals.value?.longTermGoals?.length > 0)
 
       const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.goals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
-        workAndSkillsPageData.curiousGoals.problemRetrievingData ||
+        curiousGoals.status === 'rejected' ||
         workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({

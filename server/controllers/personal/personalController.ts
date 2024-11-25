@@ -68,7 +68,7 @@ export default class PersonalController {
       const prisonPersonEnabled = enablePrisonPerson(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
-        this.personalPageService.get(clientToken, prisonerData, prisonPersonEnabled),
+        this.personalPageService.get(clientToken, prisonerData, prisonPersonEnabled, res.locals.apiErrorCallback),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])

@@ -10,21 +10,17 @@ import { formatDate } from '../utils/dateHelpers'
 import { RestClientBuilder } from '../data'
 import PersonalLearningPlanService from './personalLearningPlanService'
 import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
-import logger from '../../logger'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
 import toCuriousGoals from './mappers/curiousGoalsMapper'
 import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmployabilitySkills'
-import LearnerProfile from '../data/interfaces/curiousApi/LearnerProfile'
-import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
+import { Result } from '../utils/result/result'
 
 interface WorkAndSkillsData {
-  learnerEmployabilitySkills: LearnerEmployabilitySkills
-  learnerProfiles: Array<LearnerProfile>
-  learnerLatestAssessments: Array<Array<GovSummaryGroup>>
-  curiousGoals: CuriousGoals
-  learnerNeurodivergence: Array<LearnerNeurodivergence>
+  learnerEmployabilitySkills: PromiseSettledResult<LearnerEmployabilitySkills>
+  learnerLatestAssessments: PromiseSettledResult<Array<Array<GovSummaryGroup>>>
+  curiousGoals: PromiseSettledResult<CuriousGoals>
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
   unacceptableAbsences: UnacceptableAttendanceData
@@ -47,7 +43,11 @@ export default class WorkAndSkillsPageService {
     private readonly personalLearningPlanService: PersonalLearningPlanService,
   ) {}
 
-  public async get(token: string, prisonerData: Prisoner): Promise<WorkAndSkillsData> {
+  public async get(
+    token: string,
+    prisonerData: Prisoner,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<WorkAndSkillsData> {
     const curiousApiClient = this.curiousApiClientBuilder(token)
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, firstName, lastName } = prisonerData
@@ -55,30 +55,24 @@ export default class WorkAndSkillsPageService {
 
     const [
       learnerEmployabilitySkills,
-      learnerProfiles,
       learnerLatestAssessments,
       curiousGoals,
-      learnerNeurodivergence,
       offenderActivitiesHistory,
       unacceptableAbsences,
       personalLearningPlanActionPlan,
     ] = await Promise.all([
-      this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient),
-      this.getLearnerProfiles(prisonerNumber, curiousApiClient),
-      this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient),
-      this.getCuriousGoals(prisonerNumber, curiousApiClient),
-      this.getLearnerNeurodivergence(prisonerNumber, curiousApiClient),
+      this.getLearnerEmployabilitySkills(prisonerNumber, curiousApiClient, apiErrorCallback),
+      this.getLearnerLatestAssessments(prisonerNumber, curiousApiClient, apiErrorCallback),
+      this.getCuriousGoals(prisonerNumber, curiousApiClient, apiErrorCallback),
       this.getOffenderActivitiesHistory(prisonerNumber, prisonApiClient),
       this.getOffenderAttendanceHistoryStats(prisonerNumber, prisonApiClient),
       this.getPersonalLearningPlanActionPlan(prisonerNumber, token),
     ])
 
     return {
-      learnerEmployabilitySkills,
-      learnerProfiles,
-      learnerLatestAssessments,
-      curiousGoals,
-      learnerNeurodivergence,
+      learnerEmployabilitySkills: learnerEmployabilitySkills.toPromiseSettledResult(),
+      learnerLatestAssessments: learnerLatestAssessments.toPromiseSettledResult(),
+      curiousGoals: curiousGoals.toPromiseSettledResult(),
       workAndSkillsPrisonerName,
       offenderActivitiesHistory,
       unacceptableAbsences,
@@ -142,27 +136,22 @@ export default class WorkAndSkillsPageService {
   private async getLearnerEmployabilitySkills(
     prisonerNumber: string,
     curiousApiClient: CuriousApiClient,
-  ): Promise<LearnerEmployabilitySkills> {
-    const learnerEmployabilitySkills: LearnerEmployabilitySkills =
-      await curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber)
-    return learnerEmployabilitySkills
-  }
-
-  private async getLearnerProfiles(
-    prisonerNumber: string,
-    curiousApiClient: CuriousApiClient,
-  ): Promise<LearnerProfile[]> {
-    const learnerProfiles: LearnerProfile[] = await curiousApiClient.getLearnerProfile(prisonerNumber)
-    return learnerProfiles
+    apiErrorCallback: (error: Error) => void,
+  ): Promise<Result<LearnerEmployabilitySkills>> {
+    return Result.wrap(curiousApiClient.getLearnerEmployabilitySkills(prisonerNumber), apiErrorCallback)
   }
 
   private async getLearnerLatestAssessments(
     prisonerNumber: string,
     curiousApiClient: CuriousApiClient,
-  ): Promise<GovSummaryGroup[][]> {
-    const learnerLatestAssessments: LearnerLatestAssessment[] =
-      await curiousApiClient.getLearnerLatestAssessments(prisonerNumber)
+    apiErrorCallback: (error: Error) => void,
+  ): Promise<Result<GovSummaryGroup[][]>> {
+    return (await Result.wrap(curiousApiClient.getLearnerLatestAssessments(prisonerNumber), apiErrorCallback)).map(
+      assessments => (assessments ? this.mapAssessmentsToSummaryGroups(assessments) : []),
+    )
+  }
 
+  private mapAssessmentsToSummaryGroups(learnerLatestAssessments: LearnerLatestAssessment[]): GovSummaryGroup[][] {
     const multiListArray: GovSummaryGroup[][] = []
 
     if (learnerLatestAssessments) {
@@ -185,14 +174,14 @@ export default class WorkAndSkillsPageService {
     return multiListArray
   }
 
-  private async getCuriousGoals(prisonerNumber: string, curiousApiClient: CuriousApiClient): Promise<CuriousGoals> {
-    try {
-      const learnerGoals = await curiousApiClient.getLearnerGoals(prisonerNumber)
-      return learnerGoals ? toCuriousGoals(learnerGoals) : emptyCuriousGoals(prisonerNumber)
-    } catch (error) {
-      logger.error(`Error calling the Curious API to get the prisoner's goals`, error)
-      return { problemRetrievingData: true } as CuriousGoals
-    }
+  private async getCuriousGoals(
+    prisonerNumber: string,
+    curiousApiClient: CuriousApiClient,
+    apiErrorCallback: (error: Error) => void,
+  ): Promise<Result<CuriousGoals>> {
+    return (await Result.wrap(curiousApiClient.getLearnerGoals(prisonerNumber), apiErrorCallback)).map(goals =>
+      goals ? toCuriousGoals(goals) : emptyCuriousGoals(prisonerNumber),
+    )
   }
 
   private async getPersonalLearningPlanActionPlan(
@@ -200,15 +189,6 @@ export default class WorkAndSkillsPageService {
     token: string,
   ): Promise<PersonalLearningPlanActionPlan> {
     return this.personalLearningPlanService.getPrisonerActionPlan(prisonerNumber, token)
-  }
-
-  private async getLearnerNeurodivergence(
-    prisonerNumber: string,
-    curiousApiClient: CuriousApiClient,
-  ): Promise<LearnerNeurodivergence[]> {
-    const learnerNeurodivergence: LearnerNeurodivergence[] =
-      await curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
-    return learnerNeurodivergence
   }
 }
 
@@ -219,6 +199,5 @@ const emptyCuriousGoals = (prisonerNumber: string): CuriousGoals => {
     personalGoals: [],
     longTermGoals: [],
     shortTermGoals: [],
-    problemRetrievingData: false,
   }
 }

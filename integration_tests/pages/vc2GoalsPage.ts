@@ -20,4 +20,8 @@ export default class Vc2GoalsPage extends Page {
   noShortTermGoalsMessage = (): PageElement => cy.get('[data-qa="no-short-term-goals-message"]')
 
   noLongTermGoalsMessage = (): PageElement => cy.get('[data-qa="no-long-term-goals-message"]')
+
+  curiousUnavailableMessage = (): PageElement => cy.get('#vc2-goals-summary [data-qa=curious-unavailable-message]')
+
+  backLink = (): PageElement => cy.get('[data-qa="back-link"]')
 }

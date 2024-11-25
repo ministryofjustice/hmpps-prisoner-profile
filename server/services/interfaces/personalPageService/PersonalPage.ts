@@ -12,7 +12,7 @@ export default interface PersonalPage {
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
-  learnerNeurodivergence: LearnerNeurodivergence[]
+  learnerNeurodivergence: PromiseSettledResult<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
   showFieldHistoryLink: boolean
   distinguishingMarks: PrisonPersonDistinguishingMark[] | null

@@ -18,19 +18,36 @@ import {
 } from '../../server/data/localMockData/learnerEducationPagedResponse'
 
 export default {
-  stubGetLearnerEmployabilitySkills: (prisonerNumber: string) => {
+  stubGetLearnerEmployabilitySkills: ({
+    prisonerNumber,
+    error = false,
+  }: {
+    prisonerNumber: string
+    error: boolean
+  }) => {
+    const response = error
+      ? {
+          status: 500,
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          jsonBody: {
+            errorCode: 'VC5001',
+            errorMessage: 'Service unavailable',
+            httpStatusCode: 500,
+          },
+        }
+      : {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+          },
+          jsonBody: learnerEmployabilitySkills,
+        }
     return stubFor({
       request: {
         method: 'GET',
         urlPattern: `/curiousApi/learnerEmployabilitySkills/${prisonerNumber}`,
       },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: learnerEmployabilitySkills,
-      },
+      response,
     })
   },
   stubGetLearnerEducation: (prisonerNumber: string, page = 0) => {
@@ -152,19 +169,30 @@ export default {
       },
     })
   },
-  stubGetLearnerLatestAssessments: (prisonerNumber: string) => {
+  stubGetLearnerLatestAssessments: ({ prisonerNumber, error = false }: { prisonerNumber: string; error: boolean }) => {
+    const response = error
+      ? {
+          status: 500,
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          jsonBody: {
+            errorCode: 'VC5001',
+            errorMessage: 'Service unavailable',
+            httpStatusCode: 500,
+          },
+        }
+      : {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+          },
+          jsonBody: LearnerLatestAssessmentsMock,
+        }
     return stubFor({
       request: {
         method: 'GET',
         urlPattern: `/curiousApi/latestLearnerAssessments/${prisonerNumber}`,
       },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: LearnerLatestAssessmentsMock,
-      },
+      response,
     })
   },
 
