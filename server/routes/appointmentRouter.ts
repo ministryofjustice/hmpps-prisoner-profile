@@ -12,7 +12,6 @@ import { notifyClient } from '../utils/notifyClient'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import { getRequest, postRequest } from './routerUtils'
 import permissionsGuard from '../middleware/permissionsGuard'
-import { addMiddlewareError } from '../middleware/middlewareHelpers'
 import NotFoundError from '../utils/notFoundError'
 
 export default function appointmentRouter(services: Services): Router {
