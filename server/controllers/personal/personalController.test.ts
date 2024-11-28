@@ -10,10 +10,12 @@ import PersonalController from './personalController'
 import {
   cityOrTownOfBirthFieldData,
   foodAllergiesFieldData,
+  heightFieldData,
   medicalDietFieldData,
   RadioFieldData,
   shoeSizeFieldData,
   smokerOrVaperFieldData,
+  weightFieldData,
 } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
@@ -192,6 +194,28 @@ describe('PersonalController', () => {
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
         })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditHeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
 
       describe('submit', () => {
@@ -236,6 +260,21 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { editField: 157 } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })
@@ -315,6 +354,28 @@ describe('PersonalController', () => {
             expect.objectContaining({ feetValue: undefined, inchesValue: undefined }),
           )
         })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditHeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
 
       describe('submit', () => {
@@ -361,6 +422,21 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { feet: '5', inches: '2' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })
@@ -421,6 +497,28 @@ describe('PersonalController', () => {
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
         })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditWeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
 
       describe('submit', () => {
@@ -468,6 +566,21 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { kilograms: '96' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })
@@ -547,6 +660,28 @@ describe('PersonalController', () => {
             expect.objectContaining({ stoneValue: undefined, poundsValue: undefined }),
           )
         })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditWeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
 
       describe('submit', () => {
@@ -593,6 +728,21 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { stone: '15', pounds: '2' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })

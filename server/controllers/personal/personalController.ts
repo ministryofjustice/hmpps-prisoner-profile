@@ -25,12 +25,14 @@ import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
 import {
   CheckboxFieldData,
+  foodAllergiesFieldData,
+  heightFieldData,
+  medicalDietFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
   smokerOrVaperFieldData,
-  foodAllergiesFieldData,
   TextFieldData,
-  medicalDietFieldData,
+  weightFieldData,
 } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
@@ -140,6 +142,8 @@ export default class PersonalController {
           const user = res.locals.user as PrisonUser
 
           const height = editField ? parseInt(editField, 10) : 0
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousHeight = prisonPerson?.physicalAttributes?.height?.value
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -154,7 +158,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Height' },
+                details: { fieldName: heightFieldData.fieldName, previous: previousHeight, updated: height },
               })
               .catch(error => logger.error(error))
 
@@ -208,6 +212,8 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousHeight = prisonPerson?.physicalAttributes?.height?.value
 
           const feet = feetString ? parseInt(feetString, 10) : 0
           const inches = inchesString ? parseInt(inchesString, 10) : 0
@@ -226,7 +232,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Height' },
+                details: { fieldName: heightFieldData.fieldName, previous: previousHeight, updated: height },
               })
               .catch(error => logger.error(error))
 
@@ -278,6 +284,8 @@ export default class PersonalController {
           const user = res.locals.user as PrisonUser
           const { kilograms } = req.body
           const weight = parseInt(kilograms, 10)
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -292,7 +300,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Weight' },
+                details: { fieldName: weightFieldData.fieldName, previous: previousWeight, updated: weight },
               })
               .catch(error => logger.error(error))
 
@@ -328,16 +336,6 @@ export default class PersonalController {
             page: Page.EditWeight,
           })
 
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle: 'Weight' },
-            })
-            .catch(error => logger.error(error))
-
           res.render('pages/edit/weightImperial', {
             pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber,
@@ -356,6 +354,8 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
           const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
 
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
@@ -374,7 +374,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Weight' },
+                details: { fieldName: weightFieldData.fieldName, previous: previousWeight, updated: weight },
               })
               .catch(error => logger.error(error))
 
