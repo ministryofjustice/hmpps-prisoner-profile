@@ -2,7 +2,7 @@ import nock from 'nock'
 import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
-import CreateVideoBookingRequest from './interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
+import CreateVideoBookingRequest from './interfaces/bookAVideoLinkApi/VideoLinkBooking'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 

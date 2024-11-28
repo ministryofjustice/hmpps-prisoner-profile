@@ -1,9 +1,12 @@
 import RestClient from './restClient'
 import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
-import CreateVideoBookingRequest from './interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
+import CreateVideoBookingRequest, {
+  AmendVideoBookingRequest,
+  VideoBookingSearchRequest,
+  VideoLinkBooking,
+} from './interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import { mapToQueryString } from '../utils/utils'
-import Location from './interfaces/bookAVideoLinkApi/Location'
 import Court from './interfaces/bookAVideoLinkApi/Court'
 import ReferenceCode from './interfaces/bookAVideoLinkApi/ReferenceCode'
 
@@ -18,11 +21,12 @@ export default class BookAVideoLinkRestApiClient implements BookAVideoLinkApiCli
     return this.restClient.post<number>({ path: '/video-link-booking', data: videoLinkBooking })
   }
 
-  async getVideoLocations(prisonCode: string): Promise<Location[]> {
-    return this.restClient.get({
-      path: `/prisons/${prisonCode}/locations`,
-      query: mapToQueryString({ videoLinkOnly: false }),
-    })
+  async amendVideoLinkBooking(videoBookingId: number, videoLinkBooking: AmendVideoBookingRequest): Promise<void> {
+    return this.restClient.put<void>({ path: `/video-link-booking/id/${videoBookingId}`, data: videoLinkBooking })
+  }
+
+  async getVideoLinkBooking(searchRequest: VideoBookingSearchRequest): Promise<VideoLinkBooking> {
+    return this.restClient.post<VideoLinkBooking>({ path: '/video-link-booking/search', data: searchRequest })
   }
 
   async getCourts(): Promise<Court[]> {

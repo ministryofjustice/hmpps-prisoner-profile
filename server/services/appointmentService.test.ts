@@ -44,6 +44,7 @@ describe('Appointment Service', () => {
       getAgencyDetails: jest.fn(async () => AgenciesMock),
     }
     whereaboutsApiClient = {
+      getAppointment: jest.fn(),
       getCourts: jest.fn(async () => courtLocationsMock),
       createAppointments: jest.fn(async () => appointmentMock),
       addVideoLinkBooking: jest.fn(async () => 12345),
@@ -55,6 +56,7 @@ describe('Appointment Service', () => {
     }
     bookAVideoLinkApiClient = {
       addVideoLinkBooking: jest.fn(async () => 12345),
+      getVideoLinkBooking: jest.fn(),
       getVideoLocations: jest.fn(async () => locationsMockBavl),
       getCourts: jest.fn(async () => courtLocationsMockBavl),
       getCourtHearingTypes: jest.fn(async () => courtHearingTypes),
