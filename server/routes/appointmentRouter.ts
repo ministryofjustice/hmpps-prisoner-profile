@@ -12,6 +12,8 @@ import { notifyClient } from '../utils/notifyClient'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import { getRequest, postRequest } from './routerUtils'
 import permissionsGuard from '../middleware/permissionsGuard'
+import { addMiddlewareError } from '../middleware/middlewareHelpers'
+import NotFoundError from '../utils/notFoundError'
 
 export default function appointmentRouter(services: Services): Router {
   const router = Router()
@@ -35,6 +37,20 @@ export default function appointmentRouter(services: Services): Router {
     }
   }
 
+  const isEditAppointmentEnabled = async (req: Request, res: Response, next: NextFunction) => {
+    const { appointmentId, prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const appointment = await services.appointmentService.getAppointment(clientToken, +appointmentId)
+    if (
+      appointment.appointment.appointmentTypeCode === 'VLB' &&
+      config.featureToggles.bookAVideoLinkEnabled &&
+      appointment.appointment.offenderNo === prisonerNumber
+    ) {
+      return next()
+    }
+    return next(new NotFoundError())
+  }
+
   get(
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.AddAppointment }),
@@ -46,6 +62,22 @@ export default function appointmentRouter(services: Services): Router {
   post(
     `${basePath}/add-appointment`,
     auditPageAccessAttempt({ services, page: Page.PostAddAppointment }),
+    validationMiddleware([AppointmentValidator]),
+    appointmentController.post(),
+  )
+  get(
+    `${basePath}/edit-appointment/:appointmentId`,
+    auditPageAccessAttempt({ services, page: Page.EditAppointment }),
+    isEditAppointmentEnabled,
+    isCreateIndividualAppointmentRolledOut,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    appointmentController.displayAddAppointment(),
+  )
+  post(
+    `${basePath}/edit-appointment/:appointmentId`,
+    auditPageAccessAttempt({ services, page: Page.PostEditAppointment }),
+    isEditAppointmentEnabled,
     validationMiddleware([AppointmentValidator]),
     appointmentController.post(),
   )
@@ -67,6 +99,21 @@ export default function appointmentRouter(services: Services): Router {
   post(
     `${basePath}/prepost-appointments`,
     auditPageAccessAttempt({ services, page: Page.PostPrePostAppointments }),
+    validationMiddleware([PrePostAppointmentValidator]),
+    appointmentController.postVideoLinkBooking(),
+  )
+  get(
+    `${basePath}/edit-prepost-appointments/:appointmentId`,
+    auditPageAccessAttempt({ services, page: Page.EditPrePostAppointments }),
+    isEditAppointmentEnabled,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getAppointmentPermissions),
+    appointmentController.displayPrePostAppointments(),
+  )
+  post(
+    `${basePath}/edit-prepost-appointments/:appointmentId`,
+    auditPageAccessAttempt({ services, page: Page.PostEditPrePostAppointments }),
+    isEditAppointmentEnabled,
     validationMiddleware([PrePostAppointmentValidator]),
     appointmentController.postVideoLinkBooking(),
   )

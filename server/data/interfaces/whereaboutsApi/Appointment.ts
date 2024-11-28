@@ -15,6 +15,25 @@ export default interface Appointment {
   bookingId: number
 }
 
+export interface AppointmentDetails {
+  appointment: {
+    id: number
+    agencyId: string
+    locationId: number
+    appointmentTypeCode: string
+    offenderNo: string
+    startTime: string
+    endTime?: string
+    comment?: string
+  }
+  recurring?: {
+    id: number
+    repeatPeriod: string
+    count: number
+    startTime: string
+  }
+}
+
 export interface AppointmentForm {
   appointmentType?: string
   location?: string

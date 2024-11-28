@@ -13,9 +13,11 @@ import {
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import {
   AppointmentDefaults,
+  AppointmentDetails,
   AppointmentForm,
   PrePostAppointmentDetails,
   repeatOptions,
+  RepeatPeriod,
 } from '../data/interfaces/whereaboutsApi/Appointment'
 import {
   calculateEndDate,
@@ -23,6 +25,7 @@ import {
   formatDate,
   formatDateISO,
   formatDateTimeISO,
+  formatDateToPattern,
   parseDate,
   timeFormat,
 } from '../utils/dateHelpers'
@@ -56,26 +59,61 @@ export default class AppointmentController {
   ) {}
 
   public displayAddAppointment(): RequestHandler {
+    const buildAppointmentForm = (
+      bookingId: number,
+      appointmentFromFlash: string[],
+      appointment: AppointmentDetails,
+      locations: Location[],
+    ): AppointmentForm => {
+      if (appointmentFromFlash.length) {
+        return appointmentFromFlash[0] as AppointmentForm
+      }
+
+      if (appointment) {
+        return {
+          appointmentType: appointment.appointment.appointmentTypeCode,
+          location:
+            appointment.appointment.appointmentTypeCode === 'VLB' && config.featureToggles.bookAVideoLinkEnabled
+              ? locations.find(l => l.locationId === appointment.appointment.locationId).locationPrefix
+              : appointment.appointment.locationId.toString(),
+          date: formatDate(appointment.appointment.startTime, 'short'),
+          startTimeHours: formatDateToPattern(appointment.appointment.startTime, 'HH'),
+          startTimeMinutes: formatDateToPattern(appointment.appointment.startTime, 'mm'),
+          endTimeHours: formatDateToPattern(appointment.appointment.endTime, 'HH'),
+          endTimeMinutes: formatDateToPattern(appointment.appointment.endTime, 'mm'),
+          recurring: appointment.recurring ? 'yes' : 'no',
+          repeats: appointment.recurring?.repeatPeriod as RepeatPeriod,
+          times: appointment.recurring?.count,
+          comments: appointment.appointment.comment,
+          bookingId,
+        }
+      }
+
+      return {
+        bookingId,
+        date: formatDate(new Date().toISOString(), 'short'),
+      }
+    }
+
     return async (req: Request, res: Response, next: NextFunction) => {
+      const { appointmentId } = req.params
       const { clientToken } = req.middleware
       const { prisonerNumber } = req.params
       const { firstName, lastName, bookingId, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.lastCommaFirst })
       const user = res.locals.user as PrisonUser
 
+      const appointment = appointmentId
+        ? await this.appointmentService.getAppointment(clientToken, +appointmentId)
+        : null
+
       const { appointmentTypes, locations } = await this.appointmentService.getAddAppointmentRefData(
         clientToken,
         user.activeCaseLoadId,
       )
 
-      const now = new Date()
       const appointmentFlash = req.flash('appointmentForm')
-      const formValues: AppointmentForm = appointmentFlash?.length
-        ? (appointmentFlash[0] as never)
-        : {
-            bookingId,
-            date: formatDate(now.toISOString(), 'short'),
-          }
+      const formValues: AppointmentForm = buildAppointmentForm(bookingId, appointmentFlash, appointment, locations)
       const errors = req.flash('errors')
 
       this.auditService
@@ -105,7 +143,7 @@ export default class AppointmentController {
             )
           : [],
         repeatOptions,
-        today: formatDate(now.toISOString(), 'short'),
+        today: formatDate(new Date().toISOString(), 'short'),
         formValues,
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
@@ -116,7 +154,7 @@ export default class AppointmentController {
 
   public post(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerNumber } = req.params
+      const { prisonerNumber, appointmentId } = req.params
       const { clientToken } = req.middleware
 
       const {
@@ -178,7 +216,9 @@ export default class AppointmentController {
             appointmentForm,
           })
 
-          return res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
+          return appointmentId
+            ? res.redirect(`/prisoner/${prisonerNumber}/edit-prepost-appointments/${appointmentId}`)
+            : res.redirect(`/prisoner/${prisonerNumber}/prepost-appointments`)
         }
 
         try {

@@ -3,7 +3,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import ReferenceCode from '../data/interfaces/prisonApi/ReferenceCode'
 import CourtHearingType from '../data/interfaces/bookAVideoLinkApi/ReferenceCode'
-import { AppointmentDefaults } from '../data/interfaces/whereaboutsApi/Appointment'
+import { AppointmentDefaults, AppointmentDetails } from '../data/interfaces/whereaboutsApi/Appointment'
 import { timeFormat } from '../utils/dateHelpers'
 import { sortByDateTime } from '../utils/utils'
 import Location from '../data/interfaces/prisonApi/Location'
@@ -119,6 +119,10 @@ export default class AppointmentService {
 
   public async createAppointments(token: string, appointments: AppointmentDefaults): Promise<unknown> {
     return this.whereaboutsApiClientBuilder(token).createAppointments(appointments)
+  }
+
+  public async getAppointment(token: string, appointmentId: number): Promise<AppointmentDetails> {
+    return this.whereaboutsApiClientBuilder(token).getAppointment(appointmentId)
   }
 
   public async addVideoLinkBooking(
