@@ -3,7 +3,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { appointmentTypesMock } from '../data/localMockData/appointmentTypesMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { locationsMock, locationsMockBavl } from '../data/localMockData/locationsMock'
+import { locationsMock } from '../data/localMockData/locationsMock'
 import { courtLocationsMock, courtLocationsMockBavl } from '../data/localMockData/courtLocationsMock'
 import { appointmentMock } from '../data/localMockData/appointmentMock'
 import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock'
@@ -56,8 +56,8 @@ describe('Appointment Service', () => {
     }
     bookAVideoLinkApiClient = {
       addVideoLinkBooking: jest.fn(async () => 12345),
+      amendVideoLinkBooking: jest.fn(),
       getVideoLinkBooking: jest.fn(),
-      getVideoLocations: jest.fn(async () => locationsMockBavl),
       getCourts: jest.fn(async () => courtLocationsMockBavl),
       getCourtHearingTypes: jest.fn(async () => courtHearingTypes),
     }
@@ -100,8 +100,8 @@ describe('Appointment Service', () => {
       const refData = await appointmentService.getPrePostAppointmentRefData('', 'MDI')
 
       expect(bookAVideoLinkApiClient.getCourts).toHaveBeenCalled()
-      expect(bookAVideoLinkApiClient.getVideoLocations).toHaveBeenCalled()
-      expect(refData).toEqual({ courts: courtLocationsMockBavl, locations: locationsMockBavl })
+      expect(prisonApiClient.getLocationsForAppointments).toHaveBeenCalled()
+      expect(refData).toEqual({ courts: courtLocationsMockBavl, locations: locationsMock })
     })
   })
 
@@ -129,15 +129,6 @@ describe('Appointment Service', () => {
 
       expect(bookAVideoLinkApiClient.addVideoLinkBooking).toHaveBeenCalledWith(videoLinkBookingMock)
       expect(response).toEqual(12345)
-    })
-  })
-
-  describe('getVideoLocations', () => {
-    it('should call API to get location', async () => {
-      const response = await appointmentService.getVideoLocations('', 'CODE')
-
-      expect(bookAVideoLinkApiClient.getVideoLocations).toHaveBeenCalledWith('CODE')
-      expect(response).toEqual(locationsMockBavl)
     })
   })
 
