@@ -144,6 +144,7 @@ export default class AppointmentController {
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
+        appointmentId,
       })
     }
   }
@@ -457,6 +458,7 @@ export default class AppointmentController {
         errors,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
         hearingTypes,
+        appointmentId,
       })
     }
   }

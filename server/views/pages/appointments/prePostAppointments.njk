@@ -66,6 +66,14 @@
                     rows: [
                         {
                             key: {
+                                text: "Court"
+                            },
+                            value: {
+                                text: (courts | find('value', formValues.court)).text
+                            }
+                        } if appointmentId,
+                        {
+                            key: {
                                 text: "Location"
                             },
                             value: {
@@ -179,16 +187,20 @@
 
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-full">
-                            {{ govukSelect({
-                                name: "court",
-                                id: "court",
-                                label: {
-                                    text: "Which court is the booking for?",
-                                    classes: 'govuk-!-font-weight-bold'
-                                },
-                                items: courts | addDefaultSelectedValue('Choose court') | setSelected(formValues.court),
-                                errorMessage: errors | findError("court")
-                            }) }}
+                            {% if appointmentId %}
+                                <input type="hidden" id="court" name="court" value="{{ formValues.court }}" />
+                            {% else %}
+                                {{ govukSelect({
+                                    name: "court",
+                                    id: "court",
+                                    label: {
+                                        text: "Which court is the booking for?",
+                                        classes: 'govuk-!-font-weight-bold'
+                                    },
+                                    items: courts | addDefaultSelectedValue('Choose court') | setSelected(formValues.court),
+                                    errorMessage: errors | findError("court")
+                                }) }}
+                            {% endif %}
 
                             {% if bookAVideoLinkEnabled %}
                                 {{ govukSelect({
