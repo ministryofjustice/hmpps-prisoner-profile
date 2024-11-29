@@ -360,12 +360,15 @@ export default class AppointmentController {
               const { preAppointment, postAppointment } = extractPrisonAppointmentsFromBooking(vlb)
 
               return {
+                bookingType: vlb.bookingType,
                 preAppointment: preAppointment ? 'yes' : 'no',
                 preAppointmentLocation: preAppointment?.prisonLocKey,
                 postAppointment: postAppointment ? 'yes' : 'no',
                 postAppointmentLocation: postAppointment?.prisonLocKey,
                 court: vlb.courtCode,
+                probationTeam: vlb.probationTeamCode,
                 hearingType: vlb.courtHearingType,
+                meetingType: vlb.probationMeetingType,
                 cvpRequired: vlb.videoLinkUrl ? 'yes' : 'no',
                 videoLinkUrl: vlb.videoLinkUrl,
               }
@@ -385,7 +388,7 @@ export default class AppointmentController {
         throw new ServerError('PrePostAppointmentDetails not found in request')
       }
 
-      const { courts, locations } = await this.appointmentService.getPrePostAppointmentRefData(
+      const { courts, probationTeams, locations } = await this.appointmentService.getPrePostAppointmentRefData(
         clientToken,
         user.activeCaseLoadId,
       )
@@ -413,6 +416,13 @@ export default class AppointmentController {
 
       const hearingTypes = config.featureToggles.bookAVideoLinkEnabled
         ? objectToSelectOptions(await this.appointmentService.getCourtHearingTypes(clientToken), 'code', 'description')
+        : []
+      const meetingTypes = config.featureToggles.bookAVideoLinkEnabled
+        ? objectToSelectOptions(
+            await this.appointmentService.getProbationMeetingTypes(clientToken),
+            'code',
+            'description',
+          )
         : []
 
       const appointmentData = {
@@ -451,6 +461,9 @@ export default class AppointmentController {
         courts: config.featureToggles.bookAVideoLinkEnabled
           ? objectToSelectOptions(courts as Court[], 'code', 'description')
           : objectToSelectOptions(courts as CourtLocation[], 'id', 'name'),
+        probationTeams: config.featureToggles.bookAVideoLinkEnabled
+          ? objectToSelectOptions(probationTeams, 'code', 'description')
+          : [],
         locations: config.featureToggles.bookAVideoLinkEnabled
           ? objectToSelectOptions(locations, 'locationPrefix', 'userDescription')
           : objectToSelectOptions(locations, 'locationId', 'userDescription'),
@@ -458,6 +471,7 @@ export default class AppointmentController {
         errors,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
         hearingTypes,
+        meetingTypes,
         appointmentId,
       })
     }
@@ -470,14 +484,17 @@ export default class AppointmentController {
 
       const {
         bookingId,
+        bookingType,
         prisonId,
         preAppointment,
         preAppointmentLocation,
         postAppointment,
         postAppointmentLocation,
         court,
+        probationTeam,
         otherCourt,
         hearingType,
+        meetingType,
         cvpRequired,
         videoLinkUrl,
       } = req.body
@@ -528,7 +545,7 @@ export default class AppointmentController {
                   : undefined,
             } as VideoLinkBookingForm)
           : ({
-              bookingType: 'COURT',
+              bookingType,
               prisoners: [
                 {
                   prisonCode: prisonId,
@@ -544,7 +561,7 @@ export default class AppointmentController {
                         }
                       : undefined,
                     {
-                      type: 'VLB_COURT_MAIN',
+                      type: bookingType === 'COURT' ? 'VLB_COURT_MAIN' : 'VLB_PROBATION',
                       locationKey: appointmentForm.location,
                       date: formatDateISO(parseDate(appointmentForm.date)),
                       startTime: timeFormat(appointmentDefaults.startTime),
@@ -563,9 +580,11 @@ export default class AppointmentController {
                 },
               ],
               courtCode: court,
+              probationTeamCode: probationTeam,
               courtHearingType: hearingType,
+              probationMeetingType: meetingType,
               comments: appointmentDefaults.comment.trim() || undefined,
-              videoLinkUrl: videoLinkUrl.trim() || undefined,
+              videoLinkUrl: videoLinkUrl?.trim() || undefined,
             } as CreateVideoBookingRequest)
 
         try {
@@ -593,13 +612,16 @@ export default class AppointmentController {
         appointmentDefaults,
         appointmentForm,
         formValues: {
+          bookingType,
           preAppointment,
           preAppointmentLocation,
           postAppointment,
           postAppointmentLocation,
           court,
           otherCourt,
+          probationTeam,
           hearingType,
+          meetingType,
           cvpRequired,
           videoLinkUrl,
         },

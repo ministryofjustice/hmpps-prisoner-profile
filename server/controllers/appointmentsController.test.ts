@@ -20,6 +20,7 @@ import {
   courtLocationsMockBavl,
   courtLocationsSelectOptionsMock,
   courtLocationsSelectOptionsMockBavl,
+  probationTeamsMock,
 } from '../data/localMockData/courtLocationsMock'
 import VideoLinkBookingForm from '../data/interfaces/whereaboutsApi/VideoLinkBookingForm'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
@@ -168,11 +169,13 @@ describe('Appointments Controller', () => {
       if (config.featureToggles.bookAVideoLinkEnabled) {
         return {
           courts: courtLocationsMockBavl,
+          probationTeams: probationTeamsMock,
           locations: locationsMock,
         }
       }
       return {
         courts: courtLocationsMock,
+        probationTeams: [],
         locations: locationsMock,
       }
     })

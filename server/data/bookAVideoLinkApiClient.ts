@@ -7,7 +7,7 @@ import CreateVideoBookingRequest, {
   VideoLinkBooking,
 } from './interfaces/bookAVideoLinkApi/VideoLinkBooking'
 import { mapToQueryString } from '../utils/utils'
-import Court from './interfaces/bookAVideoLinkApi/Court'
+import Court, { ProbationTeam } from './interfaces/bookAVideoLinkApi/Court'
 import ReferenceCode from './interfaces/bookAVideoLinkApi/ReferenceCode'
 
 export default class BookAVideoLinkRestApiClient implements BookAVideoLinkApiClient {
@@ -36,7 +36,18 @@ export default class BookAVideoLinkRestApiClient implements BookAVideoLinkApiCli
     })
   }
 
+  async getProbationTeams(): Promise<ProbationTeam[]> {
+    return this.restClient.get({
+      path: `/probation-teams`,
+      query: mapToQueryString({ enabledOnly: false }),
+    })
+  }
+
   async getCourtHearingTypes(): Promise<ReferenceCode[]> {
     return this.restClient.get({ path: `/reference-codes/group/COURT_HEARING_TYPE` })
+  }
+
+  async getProbationMeetingTypes(): Promise<ReferenceCode[]> {
+    return this.restClient.get({ path: `/reference-codes/group/PROBATION_MEETING_TYPE` })
   }
 }

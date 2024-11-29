@@ -67,13 +67,16 @@ export interface PrePostAppointmentDetails {
   appointmentForm: AppointmentForm // The original appointment form
   // PrePost Form values
   formValues?: {
+    bookingType: string
     preAppointment?: string
     preAppointmentLocation?: string
     postAppointment?: string
     postAppointmentLocation?: string
     court?: string
+    probationTeam?: string
     otherCourt?: string
     hearingType?: string
+    meetingType?: string
     videoLinkUrl?: string
   }
 }
