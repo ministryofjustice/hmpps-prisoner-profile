@@ -560,11 +560,13 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, code, fieldName, url } = smokerOrVaperFieldData
+        const { pageTitle, fieldName, url } = smokerOrVaperFieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousValue = prisonPerson?.health?.smokerOrVaper?.value?.id
 
         try {
           await this.personalPageService.updateSmokerOrVaper(clientToken, user, prisonerNumber, radioField)
@@ -575,8 +577,8 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, code, fieldName, radioField, url },
+              action: PostAction.EditSmokerOrVaper,
+              details: { fieldName, previous: previousValue, updated: radioField },
             })
             .catch(error => logger.error(error))
 

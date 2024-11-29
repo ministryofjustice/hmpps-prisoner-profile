@@ -13,6 +13,7 @@ import {
   medicalDietFieldData,
   RadioFieldData,
   shoeSizeFieldData,
+  smokerOrVaperFieldData,
 } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
@@ -50,7 +51,7 @@ describe('PersonalController', () => {
     inmateDetail: {
       birthPlace: 'SHEFFIELD',
       profileInformation: [
-        { question: 'Smoker of Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
+        { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
       ],
     } as InmateDetail,
   }
@@ -842,6 +843,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditSmokerOrVaper,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -853,14 +876,19 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { radioField: 'Yes' },
+          body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),
         } as any
       })
 
       it('Updates the smoker or vaper', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'Yes')
+        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          'A1234BC',
+          'SMOKE_NO',
+        )
       })
 
       it('Redirects to the personal page #personal-details on success', async () => {
@@ -887,6 +915,21 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/smoker-or-vaper')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { radioField: 'SMOKE_NO' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditSmokerOrVaper,
+          details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKE_SMOKER', updated: 'SMOKE_NO' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
