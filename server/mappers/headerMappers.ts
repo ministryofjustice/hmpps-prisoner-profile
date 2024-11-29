@@ -114,6 +114,8 @@ export function mapHeaderData(
     prisonId: prisonerData.prisonId,
     restrictedPatient: prisonerData.restrictedPatient,
     hideBanner: hideBanner || false,
+    newArrival24: prisonerData.newArrival24,
+    newArrival72: prisonerData.newArrival72,
   }
 }
 

@@ -19,6 +19,7 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
   cy.task('stubGetAlerts')
   cy.task('stubAlertDetails')
   cy.task('stubGetCurrentCsip', prisonerNumber)
+  cy.task('stubGetLatestArrivalDate', prisonerNumber)
 })
 
 Cypress.Commands.add(
@@ -66,6 +67,7 @@ Cypress.Commands.add(
     cy.task('stubGetAlerts')
     cy.task('stubComponentsMeta', componentsMock)
     cy.task('stubGetCurrentCsip', prisonerNumber)
+    cy.task('stubGetLatestArrivalDate', '2024-01-01')
   },
 )
 

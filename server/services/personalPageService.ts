@@ -8,7 +8,15 @@ import PersonalPage, {
   PropertyItem,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { addressToLines, calculateAge, camelToSnakeCase, formatHeight, formatName, formatWeight } from '../utils/utils'
+import {
+  addressToLines,
+  calculateAge,
+  camelToSnakeCase,
+  convertToTitleCase,
+  formatHeight,
+  formatName,
+  formatWeight,
+} from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
   getOffenderIdentifierValue,
@@ -219,7 +227,7 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      placeOfBirth: inmateDetail.birthPlace || 'Not entered',
+      placeOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
       preferredName: formatName(
         prisonerDetail?.currentWorkingFirstName,
         undefined,

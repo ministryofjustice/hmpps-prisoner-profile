@@ -98,6 +98,7 @@ export default class PersonalController {
           personalPageData.showFieldHistoryLink &&
           enablePrisonPerson(activeCaseLoadId) &&
           userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        // newArrival: true,
       })
     }
   }

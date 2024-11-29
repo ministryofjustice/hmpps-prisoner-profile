@@ -1304,4 +1304,20 @@ export default {
       },
     })
   },
+
+  stubGetLatestArrivalDate: (resp?: never) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/prison/api/movements/offenders/[a-zA-Z][0-9]{4}[a-zA-Z]{2}/latest-arrival-date',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: resp ?? '2000-01-01',
+      },
+    })
+  },
 }

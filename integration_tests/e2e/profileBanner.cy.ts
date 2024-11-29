@@ -1,7 +1,9 @@
+import { subDays } from 'date-fns'
 import Page from '../pages/page'
 import OverviewPage from '../pages/overviewPage'
 import IndexPage from '../pages'
 import { Role } from '../../server/data/enums/role'
+import { formatDateISO } from '../../server/utils/dateHelpers'
 
 const visitOverviewPage = (): OverviewPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU' })
@@ -31,21 +33,134 @@ context('Profile banner', () => {
         overviewPage.csraWithoutLink().should('exist')
       })
     })
+
+    context('Given the prisoner arrived today', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({
+          roles: ['ROLE_GLOBAL_SEARCH'],
+          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+        })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
+      })
+
+      it('Does not display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('not.exist')
+      })
+    })
+
+    context('Given the prisoner arrived 2 days ago', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({
+          roles: ['ROLE_GLOBAL_SEARCH'],
+          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+        })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
+      })
+
+      it('Does not display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('not.exist')
+      })
+    })
   })
 
   context('Given the prisoner is within the users caseload', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_PRISON'],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+    context('Given the prisoner arrived over 2 days ago', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({
+          roles: ['ROLE_PRISON'],
+          caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+        })
+        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 3)))
       })
-      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+
+      it('Hides the banner', () => {
+        visitOverviewPage()
+        cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+      })
+
+      it('Does not display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('not.exist')
+      })
+
+      it('Does not display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('not.exist')
+      })
     })
 
-    it('Hides the banner', () => {
-      visitOverviewPage()
-      cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+    context('Given the prisoner arrived 2 days ago', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({
+          roles: ['ROLE_PRISON'],
+          caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+        })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
+      })
+
+      it('Hides the banner', () => {
+        visitOverviewPage()
+        cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+      })
+
+      it('Does not display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('not.exist')
+      })
+
+      it('Does display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('be.visible')
+      })
+    })
+
+    context('Given the prisoner arrived today', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.setupUserAuth({
+          roles: ['ROLE_PRISON'],
+          caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+        })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+        })
+        cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
+      })
+
+      it('Hides the banner', () => {
+        visitOverviewPage()
+        cy.getDataQa('hidden-outside-establishment-banner').should('exist')
+      })
+
+      it('Does display the new arrival banner (24 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-24').should('be.visible')
+      })
+
+      it('Does not display the new arrival banner (72 hours)', () => {
+        visitOverviewPage()
+        cy.getDataQa('new-arrival-banner-72').should('not.exist')
+      })
     })
   })
 

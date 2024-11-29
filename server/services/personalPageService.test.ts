@@ -4,7 +4,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { Alias } from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { formatName } from '../utils/utils'
+import { convertToTitleCase, formatName } from '../utils/utils'
 import { secondaryLanguagesMock } from '../data/localMockData/secondaryLanguages'
 import { propertyMock } from '../data/localMockData/property'
 import { mockAddresses } from '../data/localMockData/addresses'
@@ -310,7 +310,7 @@ describe('PersonalPageService', () => {
         )
         expect(personalDetails.marriageOrCivilPartnership).toEqual(PrisonerMockDataA.maritalStatus)
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
-        expect(personalDetails.placeOfBirth).toEqual(inmateDetailMock.birthPlace)
+        expect(personalDetails.placeOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
         expect(personalDetails.preferredName).toEqual(
           formatName(prisonerDetailMock.currentWorkingFirstName, undefined, prisonerDetailMock.currentWorkingLastName),
         )
