@@ -3,11 +3,17 @@ import { auditServiceMock } from '../../../tests/mocks/auditServiceMock'
 import { careNeedsServiceMock } from '../../../tests/mocks/careNeedsServiceMock'
 import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { AuditService, Page } from '../../services/auditService'
+import { AuditService, Page, PostAction } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import { cityOrTownOfBirthFieldData, RadioFieldData, shoeSizeFieldData } from './fieldData'
+import {
+  cityOrTownOfBirthFieldData,
+  foodAllergiesFieldData,
+  medicalDietFieldData,
+  RadioFieldData,
+  shoeSizeFieldData,
+} from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
@@ -34,7 +40,13 @@ describe('PersonalController', () => {
 
   const defaultMiddleware = {
     clientToken: 'token',
-    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001', prisonerNumber: 'ABC123' },
+    prisonerData: {
+      firstName: 'First',
+      lastName: 'Last',
+      cellLocation: '2-3-001',
+      prisonerNumber: 'ABC123',
+      prisonId: 999,
+    },
     inmateDetail: {
       birthPlace: 'SHEFFIELD',
       profileInformation: [
@@ -1402,7 +1414,12 @@ describe('PersonalController', () => {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
             return key === 'requestBody'
-              ? [JSON.stringify({ medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['FREE_FROM_EGG'] })]
+              ? [
+                  JSON.stringify({
+                    medicalDiet: ['MEDICAL_DIET_FREE_FROM'],
+                    'MEDICAL_DIET_FREE_FROM-subvalues': ['FREE_FROM_EGG'],
+                  }),
+                ]
               : []
           },
           middleware: defaultMiddleware,
@@ -1411,9 +1428,31 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            checkedItems: ['FREE_FROM', 'FREE_FROM_EGG'],
+            checkedItems: ['MEDICAL_DIET_FREE_FROM', 'FREE_FROM_EGG'],
           }),
         )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditMedicalDiet,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
@@ -1426,7 +1465,7 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { medicalDiet: ['FREE_FROM'], 'FREE_FROM-subvalues': ['EGG'] },
+          body: { medicalDiet: ['MEDICAL_DIET_FREE_FROM'], 'MEDICAL_DIET_FREE_FROM-subvalues': ['FREE_FROM_EGG'] },
           flash: jest.fn(),
         } as any
       })
@@ -1452,7 +1491,7 @@ describe('PersonalController', () => {
           expect.anything(),
           expect.anything(),
           'A1234BC',
-          ['FREE_FROM', 'EGG'],
+          ['FREE_FROM_EGG', 'MEDICAL_DIET_FREE_FROM'],
         )
       })
 
@@ -1465,6 +1504,32 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/medical-diet')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: {
+            medicalDiet: ['MEDICAL_DIET_LOW_SALT', 'MEDICAL_DIET_FREE_FROM'],
+            'MEDICAL_DIET_FREE_FROM-subvalues': ['FREE_FROM_EGG'],
+          },
+        }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditMedicalDiet,
+          details: {
+            fieldName: medicalDietFieldData.fieldName,
+            previous: [] as string[],
+            updated: ['FREE_FROM_EGG', 'MEDICAL_DIET_FREE_FROM', 'MEDICAL_DIET_LOW_SALT'],
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
@@ -1534,6 +1599,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditFoodAllergies,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -1584,6 +1671,29 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/food-allergies')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { foodAllergies: ['FOOD_ALLERGY_PEANUTS', 'FOOD_ALLERGY_EGG'] },
+        }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditFoodAllergies,
+          details: {
+            fieldName: foodAllergiesFieldData.fieldName,
+            previous: [] as string[],
+            updated: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_PEANUTS'],
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
