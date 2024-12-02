@@ -188,7 +188,7 @@ describe('ageAsString', () => {
     expect(result).toEqual(expected)
   })
 
-  it('Defaults to 18', () => {
-    expect(ageAsString(undefined)).toEqual('18 years old')
+  it('Show not entered message', () => {
+    expect(ageAsString(undefined)).toEqual('date of birth not entered')
   })
 })
