@@ -175,12 +175,15 @@ export const calculateEndDate = (startDate: Date, repeatPeriod: string, times: n
 }
 
 /**
- * Formats the date of birth into an age string, defaulting to 18 if none is given
+ * Formats the date of birth into an age string
+ * Return 'date of birth not entered' if none is given
  * @param dateOfBirth date of birth in the format yyyy-MM-dd
  * @returns age with correct number of days and months
  */
 export const ageAsString = (dateOfBirth?: string): string => {
-  const ageInYears = dateOfBirth ? differenceInYears(new Date(), new Date(dateOfBirth)) : 18
+  if (!dateOfBirth) return 'date of birth not entered'
+
+  const ageInYears = differenceInYears(new Date(), new Date(dateOfBirth))
 
   if (ageInYears === 0) {
     const parsedDate = new Date(dateOfBirth)
