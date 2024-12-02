@@ -12,5 +12,4 @@ export default interface CuriousGoals {
   personalGoals: Array<GovSummaryItem>
   longTermGoals: Array<GovSummaryItem>
   shortTermGoals: Array<GovSummaryItem>
-  problemRetrievingData: boolean
 }

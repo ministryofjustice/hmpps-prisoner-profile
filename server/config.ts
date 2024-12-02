@@ -121,10 +121,10 @@ export default {
     curiousApiUrl: {
       url: get('CURIOUS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 20000)),
-        deadline: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 20000)),
+        response: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 3000)),
+        deadline: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 3000)),
       },
-      agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 20000))),
+      agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 3000))),
     },
     whereaboutsApi: {
       url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),

@@ -79,6 +79,9 @@ export default class WorkAndSkillsPage extends Page {
 
   ES_skillLevelOne = (): PageElement => cy.get('.govuk-grid-column-two-thirds > p')
 
+  ES_curious_unavailable_message = (): PageElement =>
+    cy.get('#employability-skills [data-qa=curious-unavailable-message]')
+
   // Goals card
   GoalsInfo = (): PageElement => cy.get('[data-qa="goals-info-text"]')
 
@@ -138,4 +141,7 @@ export default class WorkAndSkillsPage extends Page {
     cy.get(
       '#functional-skills-level > .hmpps-summary-card__body > :nth-child(4) > :nth-child(3) > .govuk-summary-list__value',
     )
+
+  FSL_curious_unavailable_message = (): PageElement =>
+    cy.get('#functional-skills-level [data-qa=curious-unavailable-message]')
 }

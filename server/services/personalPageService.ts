@@ -34,6 +34,7 @@ import {
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
+import { Result } from '../utils/result/result'
 
 export default class PersonalPageService {
   constructor(
@@ -74,7 +75,12 @@ export default class PersonalPageService {
     return response
   }
 
-  public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
+  public async get(
+    token: string,
+    prisonerData: Prisoner,
+    enablePrisonPerson: boolean = false,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     const { bookingId, prisonerNumber } = prisonerData
@@ -103,6 +109,10 @@ export default class PersonalPageService {
     ])
 
     const addresses: Addresses = this.addresses(addressList)
+    const learnerNeurodivergence = await Result.wrap(
+      this.getLearnerNeurodivergence(token, prisonerNumber),
+      apiErrorCallback,
+    )
     return {
       personalDetails: this.personalDetails(
         prisonerData,
@@ -127,7 +137,7 @@ export default class PersonalPageService {
           inmateDetail.profileInformation,
         ),
       },
-      learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
+      learnerNeurodivergence,
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
       distinguishingMarks,

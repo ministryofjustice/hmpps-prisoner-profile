@@ -570,10 +570,34 @@ describe('PersonalPageService', () => {
   })
 
   describe('Get Learner Neurodivergence information', () => {
-    it('Sets the address to empty', async () => {
+    it('Gets the neurodivergence information', async () => {
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
       const data = await constructService().get('token', PrisonerMockDataA)
-      expect(data.learnerNeurodivergence).toBe(LearnerNeurodivergenceMock)
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrNull()).toEqual(LearnerNeurodivergenceMock)
+    })
+
+    it('Handles a 404 from the Curious API, which is presented to the service as null', async () => {
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => null)
+      const data = await constructService().get('token', PrisonerMockDataA)
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrThrow()).toBeNull()
+    })
+
+    it('Handles a Curious API failure', async () => {
+      const curiousApiError = {
+        status: 501,
+        data: {
+          status: 501,
+          userMessage: 'An unexpected error occurred',
+          developerMessage: 'An unexpected error occurred',
+        },
+      }
+      const apiErrorCallback = jest.fn()
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
+      const data = await constructService().get('token', PrisonerMockDataA, false, apiErrorCallback)
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
+      expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })
   })
 
