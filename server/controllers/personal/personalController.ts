@@ -633,8 +633,10 @@ export default class PersonalController {
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
         const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousValue =
-          prisonPerson?.physicalAttributes?.[fieldName as keyof PrisonPersonPhysicalAttributes]?.value
+        const previousValue = (
+          prisonPerson?.physicalAttributes?.[code as keyof PrisonPersonPhysicalAttributes]
+            ?.value as PrisonPersonCharacteristic
+        )?.id
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -642,14 +644,13 @@ export default class PersonalController {
           })
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
-          const previous = this.isPrisonPersonCharacteristic(previousValue) ? previousValue?.id : previousValue
           this.auditService
             .sendPostSuccess({
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { fieldName, previous, updated: radioField },
+              details: { fieldName, previous: previousValue, updated: radioField },
             })
             .catch(error => logger.error(error))
 
@@ -661,12 +662,6 @@ export default class PersonalController {
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
-  }
-
-  private isPrisonPersonCharacteristic(
-    value: number | string | PrisonPersonCharacteristic,
-  ): value is PrisonPersonCharacteristic {
-    return (value as PrisonPersonCharacteristic).id !== undefined
   }
 
   /**
