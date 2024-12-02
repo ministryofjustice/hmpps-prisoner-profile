@@ -630,6 +630,9 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousValue =
+          prisonPerson?.physicalAttributes?.[fieldName as keyof PrisonPersonPhysicalAttributes]?.value
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -637,13 +640,14 @@ export default class PersonalController {
           })
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
+          const previous = this.isPrisonPersonCharacteristic(previousValue) ? previousValue?.id : previousValue
           this.auditService
             .sendPostSuccess({
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, code, fieldName, radioField, url },
+              details: { fieldName, previous, updated: radioField },
             })
             .catch(error => logger.error(error))
 
@@ -655,6 +659,12 @@ export default class PersonalController {
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
+  }
+
+  private isPrisonPersonCharacteristic(
+    value: number | string | PrisonPersonCharacteristic,
+  ): value is PrisonPersonCharacteristic {
+    return (value as PrisonPersonCharacteristic).id !== undefined
   }
 
   /**
@@ -713,14 +723,17 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Eye colour'
         const fieldName = 'eyeColour'
+        const pageTitle = 'Eye colour'
         const url = 'eye-colour'
 
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const eyeColour = req.body.eyeColour || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
+        const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -735,7 +748,11 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, fieldName, eyeColour, url },
+              details: {
+                fieldName,
+                previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
+                updated: { leftEyeColour: eyeColour, rightEyeColour: eyeColour },
+              },
             })
             .catch(error => logger.error(error))
 
@@ -801,7 +818,7 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Left and right eye colours'
+        const fieldName = 'eyeColour'
         const url = 'eye-colour-individual'
 
         const { prisonerNumber } = req.params
@@ -809,6 +826,9 @@ export default class PersonalController {
         const user = res.locals.user as PrisonUser
         const leftEyeColour = req.body.leftEyeColour || null
         const rightEyeColour = req.body.rightEyeColour || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
+        const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -827,7 +847,11 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, leftEyeColour, rightEyeColour, url },
+              details: {
+                fieldName,
+                previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
+                updated: { leftEyeColour, rightEyeColour },
+              },
             })
             .catch(error => logger.error(error))
 

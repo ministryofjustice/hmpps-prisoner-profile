@@ -691,6 +691,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: fieldData.auditPage,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -739,6 +761,20 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/build')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: validRequest.id,
+          action: PostAction.EditPhysicalCharacteristics,
+          details: { fieldName: fieldData.fieldName, previous: '', updated: 'CODE3' },
+        }
+
+        await action(validRequest, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
@@ -1150,6 +1186,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditEyeColour,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -1198,6 +1256,24 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: validRequest.id,
+          action: PostAction.EditPhysicalCharacteristics,
+          details: {
+            fieldName: 'eyeColour',
+            previous: { leftEyeColour: '', rightEyeColour: '' },
+            updated: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE3' },
+          },
+        }
+
+        await action(validRequest, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
@@ -1298,6 +1374,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditEyeColour,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -1346,6 +1444,25 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour-individual')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditPhysicalCharacteristics,
+          details: {
+            fieldName: 'eyeColour',
+            previous: { leftEyeColour: '', rightEyeColour: '' },
+            updated: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' },
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
