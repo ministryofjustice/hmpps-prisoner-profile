@@ -10,7 +10,7 @@ import {
 import { prisonerDetailMock } from '../data/localMockData/prisonerDetailMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 import { personalCareNeedsMock } from '../data/localMockData/personalCareNeedsMock'
-import WorkAndSkillsPageService from './workAndSkillsPageService'
+import WorkAndSkillsPageService, { WorkAndSkillsData } from './workAndSkillsPageService'
 import { OffenderActivitiesMock } from '../data/localMockData/offenderActivitiesMock'
 import { OffenderAttendanceHistoryMock } from '../data/localMockData/offenderAttendanceHistoryMock'
 import { learnerEmployabilitySkills } from '../data/localMockData/learnerEmployabilitySkills'
@@ -22,6 +22,7 @@ import toCuriousGoals from './mappers/curiousGoalsMapper'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
 import { Result } from '../utils/result/result'
 import { LearnerLatestAssessmentsSummary } from '../data/localMockData/learnerLatestAssessmentsSummary'
+import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 
 jest.mock('./mappers/curiousGoalsMapper')
 jest.mock('./educationAndWorkPlanApiPersonalLearningPlanService')
@@ -65,6 +66,7 @@ describe('WorkAndSkillsService', () => {
   const personalLearningPlanService = new EducationAndWorkPlanApiPersonalLearningPlanService(
     null,
   ) as jest.Mocked<EducationAndWorkPlanApiPersonalLearningPlanService>
+  personalLearningPlanService.getPrisonerActionPlan = jest.fn().mockReturnValue(null)
 
   const workAndSkillsPageServiceConstruct = jest.fn(() => {
     return new WorkAndSkillsPageService(
@@ -118,22 +120,19 @@ describe('WorkAndSkillsService', () => {
     ],
   }
 
-  const curiousApiError = {
-    status: 501,
-    data: {
-      status: 501,
-      userMessage: 'An unexpected error occurred',
-      developerMessage: 'An unexpected error occurred',
-    },
+  const curiousApiError: Error = {
+    name: 'unexpected error',
+    message: 'An unexpected error occurred',
   }
 
-  const expectedWorkAndSkills = {
-    learnerEmployabilitySkills: Result.fulfilled(learnerEmployabilitySkills).toPromiseSettledResult(),
-    learnerLatestAssessments: Result.fulfilled(LearnerLatestAssessmentsSummary).toPromiseSettledResult(),
-    curiousGoals: Result.fulfilled(expectedCuriousGoals).toPromiseSettledResult(),
+  const expectedWorkAndSkills: WorkAndSkillsData = {
+    learnerEmployabilitySkills: Result.fulfilled(learnerEmployabilitySkills),
+    learnerLatestAssessments: Result.fulfilled(LearnerLatestAssessmentsSummary),
+    curiousGoals: Result.fulfilled(expectedCuriousGoals),
     workAndSkillsPrisonerName: ' ',
     offenderActivitiesHistory: expectedActivitiesHistory,
     unacceptableAbsences: expectedUnacceptedAbsences,
+    personalLearningPlanActionPlan: null as PersonalLearningPlanActionPlan,
   }
 
   describe('Work and skills', () => {
@@ -148,7 +147,7 @@ describe('WorkAndSkillsService', () => {
 
       const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
 
-      expect(res).toEqual(expectedWorkAndSkills)
+      responseAssertions(res)
     })
 
     describe('Curious goals', () => {
@@ -166,9 +165,9 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          curiousGoals: Result.fulfilled(emptyCuriousGoals).toPromiseSettledResult(),
+          curiousGoals: Result.fulfilled(emptyCuriousGoals),
         })
       })
 
@@ -186,9 +185,9 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          curiousGoals: Result.fulfilled(emptyCuriousGoals).toPromiseSettledResult(),
+          curiousGoals: Result.fulfilled(emptyCuriousGoals),
         })
       })
 
@@ -199,9 +198,9 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner, apiErrorCallback)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          curiousGoals: Result.rejected(curiousApiError).toPromiseSettledResult(),
+          curiousGoals: Result.rejected(curiousApiError),
         })
         expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
       })
@@ -220,9 +219,9 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          learnerEmployabilitySkills: Result.fulfilled(null).toPromiseSettledResult(),
+          learnerEmployabilitySkills: Result.fulfilled(null),
         })
       })
 
@@ -234,9 +233,9 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner, apiErrorCallback)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          learnerEmployabilitySkills: Result.rejected(curiousApiError).toPromiseSettledResult(),
+          learnerEmployabilitySkills: Result.rejected(curiousApiError),
         })
         expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
       })
@@ -255,9 +254,9 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          learnerLatestAssessments: Result.fulfilled([]).toPromiseSettledResult(),
+          learnerLatestAssessments: Result.fulfilled([]),
         })
       })
 
@@ -269,12 +268,26 @@ describe('WorkAndSkillsService', () => {
 
         const res = await workAndSkillsPageService.get('token', { prisonerNumber } as Prisoner, apiErrorCallback)
 
-        expect(res).toEqual({
+        responseAssertions(res, {
           ...expectedWorkAndSkills,
-          learnerLatestAssessments: Result.rejected(curiousApiError).toPromiseSettledResult(),
+          learnerLatestAssessments: Result.rejected(curiousApiError),
         })
         expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
       })
     })
   })
+
+  const responseAssertions = (actual: WorkAndSkillsData, expected: WorkAndSkillsData = expectedWorkAndSkills) => {
+    expect(actual.workAndSkillsPrisonerName).toEqual(expected.workAndSkillsPrisonerName)
+    expect(actual.offenderActivitiesHistory).toEqual(expected.offenderActivitiesHistory)
+    expect(actual.unacceptableAbsences).toEqual(expected.unacceptableAbsences)
+    expect(actual.personalLearningPlanActionPlan).toEqual(expected.personalLearningPlanActionPlan)
+
+    expect(actual.curiousGoals.isFulfilled()).toEqual(expected.curiousGoals.isFulfilled())
+    expect(actual.curiousGoals.getOrNull()).toEqual(expected.curiousGoals.getOrNull())
+    expect(actual.learnerEmployabilitySkills.isFulfilled()).toEqual(expected.learnerEmployabilitySkills.isFulfilled())
+    expect(actual.learnerEmployabilitySkills.getOrNull()).toEqual(expected.learnerEmployabilitySkills.getOrNull())
+    expect(actual.learnerLatestAssessments.isFulfilled()).toEqual(expected.learnerLatestAssessments.isFulfilled())
+    expect(actual.learnerLatestAssessments.getOrNull()).toEqual(expected.learnerLatestAssessments.getOrNull())
+  }
 })

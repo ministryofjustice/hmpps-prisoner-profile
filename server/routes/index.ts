@@ -147,17 +147,16 @@ export default function routes(services: Services): Router {
 
       const { curiousGoals } = workAndSkillsPageData
       const hasVc2Goals =
-        curiousGoals.status === 'fulfilled' &&
-        (curiousGoals.value?.employmentGoals?.length > 0 ||
-          curiousGoals.value?.personalGoals?.length > 0 ||
-          curiousGoals.value?.shortTermGoals?.length > 0 ||
-          curiousGoals.value?.longTermGoals?.length > 0)
+        curiousGoals.isFulfilled() &&
+        (curiousGoals.getOrNull()?.employmentGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.personalGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.shortTermGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.longTermGoals?.length > 0)
 
       const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.goals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
-        curiousGoals.status === 'rejected' ||
-        workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
+        !curiousGoals.isFulfilled() || workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({
         user: res.locals.user,

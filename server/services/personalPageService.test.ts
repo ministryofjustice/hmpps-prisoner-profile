@@ -21,7 +21,6 @@ import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prison
 import MetricsService from './metrics/metricsService'
 import { prisonUserMock } from '../data/localMockData/user'
 import { distinguishingMarkMock } from '../data/localMockData/distinguishingMarksMock'
-import { Result } from '../utils/result/result'
 
 jest.mock('./metrics/metricsService')
 
@@ -574,13 +573,15 @@ describe('PersonalPageService', () => {
     it('Gets the neurodivergence information', async () => {
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
       const data = await constructService().get('token', PrisonerMockDataA)
-      expect(data.learnerNeurodivergence).toEqual(Result.fulfilled(LearnerNeurodivergenceMock).toPromiseSettledResult())
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrNull()).toEqual(LearnerNeurodivergenceMock)
     })
 
     it('Handles a 404 from the Curious API, which is presented to the service as null', async () => {
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => null)
       const data = await constructService().get('token', PrisonerMockDataA)
-      expect(data.learnerNeurodivergence).toEqual(Result.fulfilled(null).toPromiseSettledResult())
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
+      expect(data.learnerNeurodivergence.getOrThrow()).toBeNull()
     })
 
     it('Handles a Curious API failure', async () => {
@@ -595,7 +596,7 @@ describe('PersonalPageService', () => {
       const apiErrorCallback = jest.fn()
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
       const data = await constructService().get('token', PrisonerMockDataA, false, apiErrorCallback)
-      expect(data.learnerNeurodivergence).toEqual(Result.rejected(curiousApiError).toPromiseSettledResult())
+      expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
       expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })
   })

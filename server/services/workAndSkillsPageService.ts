@@ -17,10 +17,10 @@ import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 import { Result } from '../utils/result/result'
 
-interface WorkAndSkillsData {
-  learnerEmployabilitySkills: PromiseSettledResult<LearnerEmployabilitySkills>
-  learnerLatestAssessments: PromiseSettledResult<Array<Array<GovSummaryGroup>>>
-  curiousGoals: PromiseSettledResult<CuriousGoals>
+export interface WorkAndSkillsData {
+  learnerEmployabilitySkills: Result<LearnerEmployabilitySkills>
+  learnerLatestAssessments: Result<Array<Array<GovSummaryGroup>>>
+  curiousGoals: Result<CuriousGoals>
   workAndSkillsPrisonerName: string
   offenderActivitiesHistory: ActivitiesHistoryData
   unacceptableAbsences: UnacceptableAttendanceData
@@ -70,9 +70,9 @@ export default class WorkAndSkillsPageService {
     ])
 
     return {
-      learnerEmployabilitySkills: learnerEmployabilitySkills.toPromiseSettledResult(),
-      learnerLatestAssessments: learnerLatestAssessments.toPromiseSettledResult(),
-      curiousGoals: curiousGoals.toPromiseSettledResult(),
+      learnerEmployabilitySkills,
+      learnerLatestAssessments,
+      curiousGoals,
       workAndSkillsPrisonerName,
       offenderActivitiesHistory,
       unacceptableAbsences,

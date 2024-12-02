@@ -137,7 +137,7 @@ export default class PersonalPageService {
           inmateDetail.profileInformation,
         ),
       },
-      learnerNeurodivergence: learnerNeurodivergence.toPromiseSettledResult(),
+      learnerNeurodivergence,
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
       distinguishingMarks,
