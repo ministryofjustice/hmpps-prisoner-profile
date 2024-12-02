@@ -617,7 +617,7 @@ export default class AppointmentController {
       }
 
       // Send confirmation email
-      if (userEmailData && userEmailData.email) {
+      if (!config.featureToggles.bookAVideoLinkEnabled && userEmailData && userEmailData.email) {
         const personalisation = {
           startTime: appointmentData.startTime,
           endTime: appointmentData.endTime,

@@ -681,7 +681,6 @@ describe('Appointments Controller', () => {
     )
     expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
     expect(controller['appointmentService'].getUserEmail).toHaveBeenCalled()
-    expect(controller['notifyClient'].sendEmail).toHaveBeenCalled()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
       pageTitle: 'Video link has been booked',
       ...appointmentData,
