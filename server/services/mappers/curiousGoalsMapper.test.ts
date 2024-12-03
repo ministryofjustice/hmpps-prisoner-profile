@@ -20,7 +20,6 @@ describe('curiousGoalsMapper', () => {
       personalGoals: [{ key: { text: 'A personal goal' }, value: { text: '' } }],
       shortTermGoals: [{ key: { text: 'A short term goal' }, value: { text: '' } }],
       longTermGoals: [{ key: { text: 'A long term goal' }, value: { text: '' } }],
-      problemRetrievingData: false,
     }
     // When
     const actual = toCuriousGoals(learnerGoals)

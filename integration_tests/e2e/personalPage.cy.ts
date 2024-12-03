@@ -521,11 +521,12 @@ context('When signed in', () => {
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubComponentsMeta', componentsNoServicesMock)
-      visitPersonalDetailsPage()
     })
 
     context('Page section', () => {
       it('Displays neurodiversity sections', () => {
+        visitPersonalDetailsPage()
+
         const page = Page.verifyOnPage(PersonalPage)
         page.neurodiversity().fromNeurodiversityAssessment().should('be.visible')
         page.neurodiversity().neurodivergenceExists().should('be.visible')
@@ -533,6 +534,22 @@ context('When signed in', () => {
         page.neurodiversity().neurodiversitySelfAssessment().should('be.visible')
         page.neurodiversity().neurodiversityAssessed().should('be.visible')
         page.neurodiversity().neurodiversityTitle().should('be.visible')
+      })
+
+      it('Displays an error banner and not the neurodiversity sections when there was an error calling the Curious API', () => {
+        cy.task('stubGetLearnerNeurodivergence', { prisonerNumber, error: true })
+
+        visitPersonalDetailsPage()
+
+        const page = Page.verifyOnPage(PersonalPage)
+        page.apiErrorBanner().should('exist')
+        page.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+        page.neurodiversity().fromNeurodiversityAssessment().should('not.exist')
+        page.neurodiversity().neurodivergenceExists().should('not.exist')
+        page.neurodiversity().neurodivergenceSupport().should('not.exist')
+        page.neurodiversity().neurodiversitySelfAssessment().should('not.exist')
+        page.neurodiversity().neurodiversityAssessed().should('not.exist')
+        page.neurodiversity().neurodiversityTitle().should('not.exist')
       })
     })
   })

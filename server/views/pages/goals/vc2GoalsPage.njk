@@ -20,7 +20,7 @@
       <h1>{{ prisonerName | apostrophe }} goals in Virtual Campus (VC2)</h1>
     </div>
   </div>
-  <div class="govuk-grid-row">
+  <div id="vc2-goals-summary" class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% set bannerHtml %}
         <h2 class="govuk-heading-m">The learning and work progress service is replacing VC2 for recording goals</h2>
@@ -31,70 +31,75 @@
         html: bannerHtml
       }) }}
 
-      <p class="govuk-body hmpps-secondary-text">The careers information, advice and guidance (CIAG) team has previously recorded goals for this person in VC2. They do not include sentence plan targets.</p>
-      
-      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Employment goals</h3>
-      <div class="hmpps-goal-container">
-      {% if (curiousGoals.employmentGoals.length > 0) %}
-        {{ govukSummaryList({
-          classes: "hmpps-font-weight-normal",
-          rows: curiousGoals.employmentGoals,
-          attributes: {
-            'data-qa': 'employment-goals-list'
-          }
-        }) }}
-      {% else %}
-        <p class="govuk-body" data-qa="no-employment-goals-message">The prisoner does not have any employment goals.</p>
-      {% endif %}
-      </div>
+      {% if curiousGoals.status === 'fulfilled' %}
+        <p class="govuk-body hmpps-secondary-text">The careers information, advice and guidance (CIAG) team has previously recorded goals for this person in VC2. They do not include sentence plan targets.</p>
 
-      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Personal goals</h3>
-      <div class="hmpps-goal-container">
-      {% if (curiousGoals.personalGoals.length > 0) %}
-        {{ govukSummaryList({
-          classes: "hmpps-font-weight-normal",
-          rows: curiousGoals.personalGoals,
-          attributes: {
-            'data-qa': 'personal-goals-list'
-          }
-        }) }}
-      {% else %}
-        <p class="govuk-body" data-qa="no-personal-goals-message">The prisoner does not have any personal goals.</p>
-      {% endif %}
-      </div>
+        {% set goals = curiousGoals.value %}
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Employment goals</h3>
+        <div class="hmpps-goal-container">
+          {% if (goals.employmentGoals.length > 0) %}
+            {{ govukSummaryList({
+              classes: "hmpps-font-weight-normal",
+              rows: goals.employmentGoals,
+              attributes: {
+                'data-qa': 'employment-goals-list'
+              }
+            }) }}
+          {% else %}
+            <p class="govuk-body" data-qa="no-employment-goals-message">The prisoner does not have any employment goals.</p>
+          {% endif %}
+        </div>
 
-      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Short-term goals</h3>
-      <div class="hmpps-goal-container">
-        {% if (curiousGoals.shortTermGoals.length > 0) %}
-          {{ govukSummaryList({
-            classes: "hmpps-font-weight-normal",
-            rows: curiousGoals.shortTermGoals,
-            attributes: {
-              'data-qa': 'short-term-goals-list'
-            }
-          }) }}
-        {% else %}
-          <p class="govuk-body" data-qa="no-short-term-goals-message">The prisoner does not have any short-term goals.</p>
-        {% endif %}
-      </div>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Personal goals</h3>
+        <div class="hmpps-goal-container">
+          {% if (goals.personalGoals.length > 0) %}
+            {{ govukSummaryList({
+              classes: "hmpps-font-weight-normal",
+              rows: goals.personalGoals,
+              attributes: {
+                'data-qa': 'personal-goals-list'
+              }
+            }) }}
+          {% else %}
+            <p class="govuk-body" data-qa="no-personal-goals-message">The prisoner does not have any personal goals.</p>
+          {% endif %}
+        </div>
 
-      <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Long-term goals</h3>
-      <div class="hmpps-goal-container hmpps-goal-container--no-border">
-      {% if (curiousGoals.longTermGoals.length > 0) %}
-        {{ govukSummaryList({
-          classes: "hmpps-font-weight-normal",
-          rows: curiousGoals.longTermGoals,
-          attributes: {
-            'data-qa': 'long-term-goals-list'
-          }
-        }) }}
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Short-term goals</h3>
+        <div class="hmpps-goal-container">
+          {% if (goals.shortTermGoals.length > 0) %}
+            {{ govukSummaryList({
+              classes: "hmpps-font-weight-normal",
+              rows: goals.shortTermGoals,
+              attributes: {
+                'data-qa': 'short-term-goals-list'
+              }
+            }) }}
+          {% else %}
+            <p class="govuk-body" data-qa="no-short-term-goals-message">The prisoner does not have any short-term goals.</p>
+          {% endif %}
+        </div>
+
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Long-term goals</h3>
+        <div class="hmpps-goal-container hmpps-goal-container--no-border">
+          {% if (goals.longTermGoals.length > 0) %}
+            {{ govukSummaryList({
+              classes: "hmpps-font-weight-normal",
+              rows: goals.longTermGoals,
+              attributes: {
+                'data-qa': 'long-term-goals-list'
+              }
+            }) }}
+          {% else %}
+            <p class="govuk-body" data-qa="no-long-term-goals-message">The prisoner does not have any long term goals.</p>
+          {% endif %}
+        </div>
       {% else %}
-        <p class="govuk-body" data-qa="no-long-term-goals-message">The prisoner does not have any long term goals.</p>
+          {% include '../../partials/workAndSkillsPage/curiousApiError.njk' %}
       {% endif %}
-      </div>
 
       <p class="govuk-body">
-        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/work-and-skills">Return to the prisoner's profile</a>
+        <a class="govuk-link" href="/prisoner/{{ prisonerNumber }}/work-and-skills" data-qa="back-link">Return to the prisoner's profile</a>
       </p>
     </div>
   </div>

@@ -2,6 +2,7 @@ import Address from './Address'
 import GovSummaryItem from '../../../interfaces/GovSummaryItem'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { PrisonPersonDistinguishingMark } from '../../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { Result } from '../../../utils/result/result'
 
 export default interface PersonalPage {
   personalDetails: PersonalDetails
@@ -12,7 +13,7 @@ export default interface PersonalPage {
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
-  learnerNeurodivergence: LearnerNeurodivergence[]
+  learnerNeurodivergence: Result<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
   showFieldHistoryLink: boolean
   distinguishingMarks: PrisonPersonDistinguishingMark[] | null

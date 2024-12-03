@@ -19,11 +19,12 @@ export const checkboxInputToSelectedValues = (
 
   return selectedValues.reduce((res, val) => {
     res.push(val)
-    if (selectedOptions[`${res}-subvalues`]) {
-      res.push(selectedOptions[`${res}-subvalues`])
+    if (selectedOptions[`${val}-subvalues`]) {
+      res.push(selectedOptions[`${val}-subvalues`])
+      return res.flat()
     }
 
-    return res.flat()
+    return res
   }, [])
 }
 
