@@ -117,3 +117,19 @@ export const cityOrTownOfBirthFieldData: TextFieldData = {
   redirectAnchor: 'personal-details',
   inputClasses: 'govuk-!-width-one-third',
 }
+
+export const foodAllergiesFieldData: CheckboxFieldData = {
+  fieldName: 'foodAllergies',
+  auditPage: Page.EditFoodAllergies,
+  pageTitle: 'Food allergies',
+  url: 'food-allergies',
+  hintText: 'Select all that apply',
+}
+
+export const medicalDietFieldData: CheckboxFieldData = {
+  fieldName: 'medicalDiet',
+  auditPage: Page.EditMedicalDiet,
+  pageTitle: 'Medical diet',
+  url: 'medical-diet',
+  hintText: 'Select all that apply',
+}
