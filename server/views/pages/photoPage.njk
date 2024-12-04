@@ -11,11 +11,11 @@
 {% extends "../partials/layout.njk" %}
 {% block content %}
 <div class="govuk-grid-row govuk-!-padding-top-9" data-qa="prisoner-photo-page">
-    <div class="govuk-grid-column-full center-content">
+    <div class="govuk-grid-column-full center-content profile-photo">
         <img class="hmpps-profile-photo" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"  />
-        <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-padding-top-4" >
-            <img src="/assets/images/printer_icon.svg" role="presentation" alt="" width="23px" height="20px" class="hmpps-icon" data-qa="prisoner-photo-print-icon"/> Print this image
-        </a>   
+        <span class="govuk-!-padding-top-4">
+            <a href="#" id="profile-photo-print-link" class="govuk-link govuk-link--no-visited-state hmpps-print-link" >Print this image</a>
+        </span>
     </div>
   </div>
 {% endblock %}
