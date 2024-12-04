@@ -1,6 +1,6 @@
 import CourtLocation from '../interfaces/whereaboutsApi/CourtLocation'
 import { SelectOption } from '../../utils/utils'
-import Court from '../interfaces/bookAVideoLinkApi/Court'
+import Court, { ProbationTeam } from '../interfaces/bookAVideoLinkApi/Court'
 
 export const courtLocationsMock: CourtLocation[] = [
   {
@@ -30,6 +30,27 @@ export const courtLocationsMockBavl: Court[] = [
     courtId: 3,
     code: 'SHF',
     description: 'Sheffield Court',
+    enabled: false,
+  },
+]
+
+export const probationTeamsMock: ProbationTeam[] = [
+  {
+    probationTeamId: 1,
+    code: 'ABC',
+    description: 'Blackpool',
+    enabled: true,
+  },
+  {
+    probationTeamId: 2,
+    code: 'DEF',
+    description: 'Barnsley',
+    enabled: true,
+  },
+  {
+    probationTeamId: 3,
+    code: 'SHF',
+    description: 'Sheffield',
     enabled: false,
   },
 ]

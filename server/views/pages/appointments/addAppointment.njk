@@ -7,6 +7,7 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 {% from "components/scheduledEvents/scheduledEvents.njk" import scheduledEvents %}
 {% from "components/timePicker/timePicker.njk" import timePicker %}
@@ -77,15 +78,32 @@
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
                     <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
-                    {{ govukSelect({
-                        id: "appointmentType",
-                        name: "appointmentType",
-                        label: {
-                            text: "Type of appointment"
-                        },
-                        errorMessage: errors | findError('appointmentType'),
-                        items: appointmentTypes | addDefaultSelectedValue('Choose appointment type') | setSelected(formValues.appointmentType)
-                    }) }}
+                    {% if appointmentId %}
+                        <input type="hidden" id="appointmentType" name="appointmentType" value="{{ formValues.appointmentType }}" />
+                        {{ govukSummaryList({
+                            classes: "govuk-summary-list--no-border",
+                            rows: [
+                                {
+                                    key: {
+                                        text: "Type of appointment"
+                                    },
+                                    value: {
+                                        text: (appointmentTypes | find('value', formValues.appointmentType)).text
+                                    }
+                                }
+                            ]
+                        }) }}
+                    {% else %}
+                        {{ govukSelect({
+                            id: "appointmentType",
+                            name: "appointmentType",
+                            label: {
+                                text: "Type of appointment"
+                            },
+                            errorMessage: errors | findError('appointmentType'),
+                            items: appointmentTypes | addDefaultSelectedValue('Choose appointment type') | setSelected(formValues.appointmentType)
+                        }) }}
+                    {% endif %}
                     {{ govukSelect({
                         id: "location",
                         name: "location",

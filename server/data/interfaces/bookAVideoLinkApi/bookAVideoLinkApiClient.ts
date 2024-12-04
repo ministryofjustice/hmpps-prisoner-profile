@@ -1,11 +1,13 @@
-import CreateVideoBookingRequest from './CreateVideoBookingRequest'
-import Location from './Location'
-import Court from './Court'
+import CreateVideoBookingRequest, { VideoBookingSearchRequest, VideoLinkBooking } from './VideoLinkBooking'
+import Court, { ProbationTeam } from './Court'
 import ReferenceCode from './ReferenceCode'
 
 export interface BookAVideoLinkApiClient {
   addVideoLinkBooking(videoLinkBooking: CreateVideoBookingRequest): Promise<number>
-  getVideoLocations(prisonCode: string): Promise<Location[]>
+  amendVideoLinkBooking(videoBookingId: number, videoLinkBooking: CreateVideoBookingRequest): Promise<void>
+  getVideoLinkBooking(searchRequest: VideoBookingSearchRequest): Promise<VideoLinkBooking>
   getCourts(): Promise<Court[]>
+  getProbationTeams(): Promise<ProbationTeam[]>
   getCourtHearingTypes(): Promise<ReferenceCode[]>
+  getProbationMeetingTypes(): Promise<ReferenceCode[]>
 }

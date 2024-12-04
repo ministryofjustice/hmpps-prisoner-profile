@@ -3,8 +3,12 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { appointmentTypesMock } from '../data/localMockData/appointmentTypesMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { locationsMock, locationsMockBavl } from '../data/localMockData/locationsMock'
-import { courtLocationsMock, courtLocationsMockBavl } from '../data/localMockData/courtLocationsMock'
+import { locationsMock } from '../data/localMockData/locationsMock'
+import {
+  courtLocationsMock,
+  courtLocationsMockBavl,
+  probationTeamsMock,
+} from '../data/localMockData/courtLocationsMock'
 import { appointmentMock } from '../data/localMockData/appointmentMock'
 import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock'
 import { offenderSentenceDetailsMock } from '../data/localMockData/offenderSentenceDetailsMock'
@@ -14,7 +18,7 @@ import { ManageUsersApiClient } from '../data/interfaces/manageUsersApi/manageUs
 import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 import { BookAVideoLinkApiClient } from '../data/interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import config from '../config'
-import { courtHearingTypes } from '../data/localMockData/courtHearingsMock'
+import { courtHearingTypes, probationMeetingTypes } from '../data/localMockData/courtHearingsMock'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
@@ -44,6 +48,7 @@ describe('Appointment Service', () => {
       getAgencyDetails: jest.fn(async () => AgenciesMock),
     }
     whereaboutsApiClient = {
+      getAppointment: jest.fn(),
       getCourts: jest.fn(async () => courtLocationsMock),
       createAppointments: jest.fn(async () => appointmentMock),
       addVideoLinkBooking: jest.fn(async () => 12345),
@@ -55,9 +60,12 @@ describe('Appointment Service', () => {
     }
     bookAVideoLinkApiClient = {
       addVideoLinkBooking: jest.fn(async () => 12345),
-      getVideoLocations: jest.fn(async () => locationsMockBavl),
+      amendVideoLinkBooking: jest.fn(),
+      getVideoLinkBooking: jest.fn(),
       getCourts: jest.fn(async () => courtLocationsMockBavl),
+      getProbationTeams: jest.fn(async () => probationTeamsMock),
       getCourtHearingTypes: jest.fn(async () => courtHearingTypes),
+      getProbationMeetingTypes: jest.fn(async () => probationMeetingTypes),
     }
     appointmentService = new AppointmentService(
       () => prisonApiClient,
@@ -98,8 +106,8 @@ describe('Appointment Service', () => {
       const refData = await appointmentService.getPrePostAppointmentRefData('', 'MDI')
 
       expect(bookAVideoLinkApiClient.getCourts).toHaveBeenCalled()
-      expect(bookAVideoLinkApiClient.getVideoLocations).toHaveBeenCalled()
-      expect(refData).toEqual({ courts: courtLocationsMockBavl, locations: locationsMockBavl })
+      expect(prisonApiClient.getLocationsForAppointments).toHaveBeenCalled()
+      expect(refData).toEqual({ courts: courtLocationsMockBavl, locations: locationsMock })
     })
   })
 
@@ -127,15 +135,6 @@ describe('Appointment Service', () => {
 
       expect(bookAVideoLinkApiClient.addVideoLinkBooking).toHaveBeenCalledWith(videoLinkBookingMock)
       expect(response).toEqual(12345)
-    })
-  })
-
-  describe('getVideoLocations', () => {
-    it('should call API to get location', async () => {
-      const response = await appointmentService.getVideoLocations('', 'CODE')
-
-      expect(bookAVideoLinkApiClient.getVideoLocations).toHaveBeenCalledWith('CODE')
-      expect(response).toEqual(locationsMockBavl)
     })
   })
 
