@@ -240,4 +240,6 @@ export interface PrisonApiClient {
   getNextCourtEvent(bookingId: number): Promise<CourtEvent>
 
   getActiveCourtCasesCount(bookingId: number): Promise<number>
+
+  getLatestArrivalDate(prisonerNumber: string): Promise<string>
 }

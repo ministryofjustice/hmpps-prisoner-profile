@@ -43,8 +43,12 @@ const summaryListRowWithOptionalChangeLink = (
   const rowHidden = (options.hideIfEmpty && !value) || options.visible === false
 
   const valueResult = (): { text?: string; html?: string } => {
+    const isNotEntered = value.includes('Not entered')
+
     if (options.dataQa) {
-      return { html: `<span data-qa="${options.dataQa}">${value}</span>` }
+      return {
+        html: `<span data-qa="${options.dataQa}" ${isNotEntered ? 'class="not-entered-tag"' : ''}>${value}</span>`,
+      }
     }
 
     return options.html ? { html: value } : { text: value }

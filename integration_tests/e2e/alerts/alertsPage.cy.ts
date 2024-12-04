@@ -263,6 +263,7 @@ context('Alerts API Unavailable', () => {
     cy.task('stubAssessments', 1102484)
     cy.task('stubInmateDetail', { bookingId: 1102484 })
     cy.task('stubGetCurrentCsip', 'G6123VU')
+    cy.task('stubGetLatestArrivalDate', '2024-01-01')
     visitActiveAlertsPage()
     alertsPage = Page.verifyOnPageWithTitle(AlertsPage, 'Alerts')
   })

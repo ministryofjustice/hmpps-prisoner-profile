@@ -14,20 +14,24 @@
 {% endset %}
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro medicalDietHtml(personalDetails) %}
-  <span class="govuk-!-font-weight-bold">Medical diet</span><br />
+  <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
+  {% if personalDetails.medicalDietaryRequirements.length > 0 %}
     {% for requirement in personalDetails.medicalDietaryRequirements | formatMedicalDietaryRequirements %}
-      {{ requirement }}<br />
+      <span class="govuk-!-display-block">{{ requirement }}</span>
     {% endfor %}
+  {% else %}
+    <span class="govuk-!-margin-top-1">Not entered</span>
+  {% endif %}
 {% endmacro %}
 
 {% macro foodAllergiesHtml(personalDetails) %}
-  <span class="govuk-!-font-weight-bold">Food allergies</span><br />
+  <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
   {% if personalDetails.foodAllergies.length > 0 %}
     {% for allergy in personalDetails.foodAllergies %}
-      {{ allergy.description }}<br />
+      <span class="govuk-!-display-block">{{ allergy.description }}</span>
     {% endfor %}
   {% else %}
-    None
+    <span class="govuk-!-margin-top-1">Not entered</span>
   {% endif %}
 {% endmacro %}
 
@@ -59,7 +63,7 @@
         rows: toSummaryListRows([
             { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
             { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
-            { key: "Place of birth", value: personalDetails.placeOfBirth | title, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
+            { key: "Place of birth", value: personalDetails.placeOfBirth, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
             { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality" } },
             { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
             { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
