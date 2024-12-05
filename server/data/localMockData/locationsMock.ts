@@ -1,7 +1,12 @@
 import Location from '../interfaces/prisonApi/Location'
 import VideoLocation from '../interfaces/bookAVideoLinkApi/Location'
 import { SelectOption } from '../../utils/utils'
+import LocationsApiLocation from '../interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
+export const locationsApiMock: LocationsApiLocation[] = [
+  { id: 'location-1', localName: 'Local name one' },
+  { id: 'location-2', localName: 'Local name two' },
+]
 export const locationsMock: Location[] = [
   {
     locationId: 27000,
@@ -30,6 +35,13 @@ export const locationsMockBavl: VideoLocation[] = [
     key: 'VIDEO_LINK_ROOM',
     description: 'Video Link Room',
     enabled: true,
+  },
+]
+
+export const locationsApiSelectOptionsMock: SelectOption[] = [
+  {
+    text: 'Local name one',
+    value: 'location-1',
   },
 ]
 

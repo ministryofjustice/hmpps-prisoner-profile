@@ -23,6 +23,7 @@ export default function appointmentRouter(services: Services): Router {
     services.appointmentService,
     services.prisonerSearchService,
     services.auditService,
+    services.locationDetailsService,
     notifyClient,
   )
 

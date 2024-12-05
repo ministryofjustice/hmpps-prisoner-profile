@@ -3,7 +3,7 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereaboutsApiClient'
 import { appointmentTypesMock } from '../data/localMockData/appointmentTypesMock'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { locationsMock, locationsMockBavl } from '../data/localMockData/locationsMock'
+import { locationsApiMock, locationsMock, locationsMockBavl } from '../data/localMockData/locationsMock'
 import { courtLocationsMock, courtLocationsMockBavl } from '../data/localMockData/courtLocationsMock'
 import { appointmentMock } from '../data/localMockData/appointmentMock'
 import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock'
@@ -15,12 +15,15 @@ import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 import { BookAVideoLinkApiClient } from '../data/interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import config from '../config'
 import { courtHearingTypes } from '../data/localMockData/courtHearingsMock'
+import LocationDetailsService from './locationDetailsService'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsClient')
+jest.mock('./locationDetailsService')
 
 describe('Appointment Service', () => {
   let appointmentService: AppointmentService
+  let locationDetailsService: LocationDetailsService
   let prisonApiClient: PrisonApiClient
   let whereaboutsApiClient: WhereaboutsApiClient
   let manageUsersApiClient: ManageUsersApiClient
@@ -30,15 +33,15 @@ describe('Appointment Service', () => {
     prisonApiClient = {
       ...prisonApiClientMock(),
       getAppointmentTypes: jest.fn(async () => appointmentTypesMock),
-      getLocationsForAppointments: jest.fn(async () => locationsMock),
+      // getLocationsForAppointments: jest.fn(async () => locationsMock),
       getSentenceData: jest.fn(async () => offenderSentenceDetailsMock),
       getCourtEvents: jest.fn(async () => courtEventPrisonerSchedulesMock),
       getVisits: jest.fn(async () => prisonerSchedulesMock),
       getAppointments: jest.fn(async () => prisonerSchedulesMock),
       getExternalTransfers: jest.fn(async () => prisonerSchedulesMock),
       getActivities: jest.fn(async () => prisonerSchedulesMock),
-      getLocation: jest.fn(async () => locationsMock[0]),
-      getLocationByKey: jest.fn(async () => locationsMock[0]),
+      // getLocation: jest.fn(async () => locationsMock[0]),
+      // getLocationByKey: jest.fn(async () => locationsMock[0]),
       getActivitiesAtLocation: jest.fn(async () => prisonerSchedulesMock),
       getActivityList: jest.fn(async () => prisonerSchedulesMock),
       getAgencyDetails: jest.fn(async () => AgenciesMock),
@@ -59,7 +62,11 @@ describe('Appointment Service', () => {
       getCourts: jest.fn(async () => courtLocationsMockBavl),
       getCourtHearingTypes: jest.fn(async () => courtHearingTypes),
     }
+
+    locationDetailsService = new LocationDetailsService(null, null, null) as jest.Mocked<LocationDetailsService>
+
     appointmentService = new AppointmentService(
+      locationDetailsService,
       () => prisonApiClient,
       () => whereaboutsApiClient,
       () => manageUsersApiClient,
@@ -75,21 +82,23 @@ describe('Appointment Service', () => {
 
   describe('getAddAppointmentRefData', () => {
     it('should call API to get ref data', async () => {
+      locationDetailsService.getLocationsForAppointments = jest.fn().mockResolvedValue(locationsApiMock)
       const refData = await appointmentService.getAddAppointmentRefData('', 'MDI')
 
       expect(prisonApiClient.getAppointmentTypes).toHaveBeenCalled()
-      expect(prisonApiClient.getLocationsForAppointments).toHaveBeenCalled()
-      expect(refData).toEqual({ appointmentTypes: appointmentTypesMock, locations: locationsMock })
+      expect(locationDetailsService.getLocationsForAppointments).toHaveBeenCalled()
+      expect(refData).toEqual({ appointmentTypes: appointmentTypesMock, locations: locationsApiMock })
     })
   })
 
   describe('getPrePostAppointmentRefData', () => {
     it('should call API to get ref data', async () => {
+      locationDetailsService.getLocationsForAppointments = jest.fn().mockResolvedValue(locationsApiMock)
       const refData = await appointmentService.getPrePostAppointmentRefData('', 'MDI')
 
       expect(whereaboutsApiClient.getCourts).toHaveBeenCalled()
-      expect(prisonApiClient.getLocationsForAppointments).toHaveBeenCalled()
-      expect(refData).toEqual({ courts: courtLocationsMock, locations: locationsMock })
+      expect(locationDetailsService.getLocationsForAppointments).toHaveBeenCalled()
+      expect(refData).toEqual({ courts: courtLocationsMock, locations: locationsApiMock })
     })
 
     it('should call API to get ref data when BVL enabled', async () => {
@@ -285,23 +294,25 @@ describe('Appointment Service', () => {
     })
   })
 
-  describe('getLocation', () => {
-    it('should call API to get location', async () => {
-      const response = await appointmentService.getLocation('', 27000)
+  // TODO 1
+  // describe('getLocation', () => {
+  //   it('should call API to get location', async () => {
+  //     const response = await appointmentService.getLocation('', 27000)
 
-      expect(prisonApiClient.getLocation).toHaveBeenCalledWith(27000)
-      expect(response).toEqual(locationsMock[0])
-    })
-  })
+  //     expect(prisonApiClient.getLocation).toHaveBeenCalledWith(27000)
+  //     expect(response).toEqual(locationsMock[0])
+  //   })
+  // })
 
-  describe('getLocationByKey', () => {
-    it('should call API to get location', async () => {
-      const response = await appointmentService.getLocationByKey('', 'CODE')
+  // TODO 2
+  // describe('getLocationByKey', () => {
+  //   it('should call API to get location', async () => {
+  //     const response = await appointmentService.getLocationByKey('', 'CODE')
 
-      expect(prisonApiClient.getLocationByKey).toHaveBeenCalledWith('CODE')
-      expect(response).toEqual(locationsMock[0])
-    })
-  })
+  //     expect(prisonApiClient.getLocationByKey).toHaveBeenCalledWith('CODE')
+  //     expect(response).toEqual(locationsMock[0])
+  //   })
+  // })
 
   describe('getExistingEventsForLocation', () => {
     const agencyId = 'MDI'

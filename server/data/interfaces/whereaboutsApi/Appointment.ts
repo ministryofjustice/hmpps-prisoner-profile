@@ -28,6 +28,7 @@ export interface AppointmentForm {
   times?: number
   comments?: string
   bookingId?: number
+  dpsLocationId?: string
 }
 
 export interface AppointmentDefaults {
