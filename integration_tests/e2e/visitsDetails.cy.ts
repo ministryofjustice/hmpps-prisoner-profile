@@ -11,6 +11,7 @@ context('Visits details', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupVisitsDetailsPageStubs({ prisonerNumber, bookingId })
       cy.signIn({ redirectPath: '/prisoner/G6123VU/visits-details' })
@@ -39,6 +40,7 @@ context('Visits details', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupVisitsDetailsPageStubs({ prisonerNumber, bookingId, visitsOverrides: [] })
       cy.signIn({ redirectPath: '/prisoner/G6123VU/visits-details' })
@@ -62,6 +64,7 @@ context('Visits details', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.setupVisitsDetailsPageStubs({ prisonerNumber, bookingId })
       cy.signIn({ redirectPath: '/prisoner/G6123VU/visits-details' })

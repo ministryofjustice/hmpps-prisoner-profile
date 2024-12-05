@@ -39,6 +39,7 @@ context('Alerts API enabled prison', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
     })
 
@@ -224,10 +225,8 @@ context('Alerts API enabled prison', () => {
   context('Alerts Page - User has Update Alert role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.UpdateAlert],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.UpdateAlert] })
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubActiveAlerts')
       cy.setupAlertsPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
@@ -258,6 +257,7 @@ context('Alerts API Unavailable', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubEventsForProfileImage', 'G6123VU')
     cy.task('stubAssessments', 1102484)

@@ -19,18 +19,8 @@ context('Edit eye colour - both eyes the same colour', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
       cy.task('stubPrisonPerson', {
         prisonerNumber,
         overrides: {
@@ -70,18 +60,8 @@ context('Edit eye colour - left and right eyes different colours', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
       cy.task('stubPrisonPerson', {
         prisonerNumber,
         overrides: {
@@ -117,18 +97,8 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
 
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({
-      caseLoads: [
-        {
-          caseLoadId: 'MDI',
-          currentlyActive: true,
-          description: '',
-          type: '',
-          caseloadFunction: '',
-        },
-      ],
-      roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-    })
+    cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+    cy.setupComponentsData()
     cy.task('stubPrisonPerson', {
       prisonerNumber,
       overrides: {

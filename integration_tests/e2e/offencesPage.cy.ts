@@ -2,7 +2,6 @@ import OffencesPage from '../pages/offencesPage'
 import Page from '../pages/page'
 import { permissionsTests } from './permissionsTests'
 import NotFoundPage from '../pages/notFoundPage'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 context('Offenses page - Permissions', () => {
   const prisonerNumber = 'G6123VU'
@@ -24,9 +23,9 @@ context('Offences Page Sentenced', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber })
     cy.setupOffencesPageSentencedStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   it('Offences page is displayed', () => {

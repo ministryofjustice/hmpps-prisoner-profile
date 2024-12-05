@@ -39,7 +39,6 @@ context('SignIn', () => {
 
   it('User with neither prison or global search role denied access', () => {
     cy.setupUserAuth({ roles: ['ROLE_SOMETHING_ELSE'] })
-
     cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
     Page.verifyOnPage(AuthErrorPage)
   })

@@ -63,18 +63,7 @@ export function editPageTests<TPage extends EditPage>(options: {
 
     context('Permissions', () => {
       it('Doesnt let the user access if they dont have the permissions', () => {
-        cy.setupUserAuth({
-          caseLoads: [
-            {
-              caseLoadId: 'MDI',
-              currentlyActive: true,
-              description: '',
-              type: '',
-              caseloadFunction: '',
-            },
-          ],
-          roles: [Role.PrisonUser],
-        })
+        cy.setupUserAuth({ roles: [Role.PrisonUser] })
 
         cy.signIn({ failOnStatusCode: false, redirectPath: editUrl })
         Page.verifyOnPage(NotFoundPage)

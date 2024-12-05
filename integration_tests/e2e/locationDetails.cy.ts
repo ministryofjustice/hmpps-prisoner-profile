@@ -6,7 +6,6 @@ import {
   mockCellHistoryItem2,
   mockCellHistoryItem4,
 } from '../../server/data/localMockData/offenderCellHistoryMock'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitLocationDetailsPage = (prisonerNumber: string): LocationDetailsPage => {
   cy.signIn({
@@ -23,7 +22,7 @@ context('Location details page', () => {
 
   beforeEach(() => {
     cy.task('reset')
-
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber })
     cy.task('stubInmateDetail', { bookingId })
     cy.task('stubAssessments', bookingId)
@@ -40,7 +39,6 @@ context('Location details page', () => {
       ],
     })
     cy.task('stubDpsConsiderRisksReceptionPage', prisonerNumber)
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   it('should display the "Move to reception" link', () => {

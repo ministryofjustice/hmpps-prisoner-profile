@@ -1,6 +1,5 @@
 import Page from '../pages/page'
 import PastCareNeedsPage from '../pages/pastCareNeedsPage'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitPastCareNeedsPage = (): PastCareNeedsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/past-care-needs' })
@@ -13,8 +12,8 @@ context('Past care needs page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
     cy.task('stubPastCareNeeds', 1102484)
     cy.task('stubHealthReferenceDomain')
     cy.task('stubHealthTreatmentReferenceDomain')

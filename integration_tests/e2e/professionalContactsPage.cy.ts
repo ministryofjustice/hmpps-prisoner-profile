@@ -16,7 +16,7 @@ context('Professional contacts list page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetOffenderContacts')
     cy.task('stubGetCommunityManager')
@@ -78,7 +78,7 @@ context('Professional contacts list page - with address not entered', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
     cy.task('stubGetCommunityManager')
@@ -107,10 +107,18 @@ context('Professional contacts list page - youth estate', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({
-      caseLoads: [{ caseLoadId: 'WYI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
+    cy.setupUserAuth()
+    cy.setupComponentsData({
+      caseLoads: [
+        {
+          caseloadFunction: '',
+          caseLoadId: 'WYI',
+          currentlyActive: true,
+          description: '',
+          type: '',
+        },
+      ],
     })
-
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU', overrides: { prisonId: 'WYI' } })
     cy.task('stubGetOffenderContacts', mockContactDetailYouthEstate)
     cy.task('stubPersonAddresses', [])
@@ -173,7 +181,7 @@ context('Professional contacts list page - given API to get key worker name fail
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetOffenderContacts', mockContactDetailWithNotEntered)
     cy.task('stubGetCommunityManager')
@@ -201,7 +209,7 @@ context('Professional contacts list page - no contacts', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
-
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetOffenderContacts', [])
     cy.task('stubGetCommunityManagerNotFound')

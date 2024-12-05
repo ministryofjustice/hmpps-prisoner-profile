@@ -3,7 +3,6 @@ import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/Histo
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
-import { componentsMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -27,6 +26,15 @@ Cypress.Commands.add(
   ({
     bookingId,
     prisonerNumber,
+    caseLoads = [
+      {
+        caseLoadId: 'MDI',
+        currentlyActive: true,
+        description: '',
+        type: '',
+        caseloadFunction: '',
+      },
+    ],
     restrictedPatient = false,
     prisonerDataOverrides = {},
     staffRoles = [],
@@ -65,7 +73,7 @@ Cypress.Commands.add(
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
     cy.task('stubGetAlerts')
-    cy.task('stubComponentsMeta', componentsMock)
+    cy.setupComponentsData({ caseLoads })
     cy.task('stubGetCurrentCsip', prisonerNumber)
     cy.task('stubGetLatestArrivalDate', '2024-01-01')
   },
@@ -124,25 +132,14 @@ Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, boo
   cy.task('stubGetSentenceSummaryWithoutSentence', prisonerNumber)
 })
 
-Cypress.Commands.add(
-  'setupUserAuth',
-  (
-    options = {
-      caseLoads: [
-        {
-          caseLoadId: 'MDI',
-          currentlyActive: true,
-          description: '',
-          type: '',
-          caseloadFunction: '',
-        },
-      ],
-    },
-  ) => {
-    cy.task('stubSignIn', options)
-    cy.task('stubUserCaseLoads', options.caseLoads)
-  },
-)
+Cypress.Commands.add('setupUserAuth', (options = {}) => {
+  cy.task('stubSignIn', options)
+})
+
+Cypress.Commands.add('setupComponentsData', (options = {}) => {
+  cy.task('stubComponentsData', options)
+  cy.task('stubUserCaseLoads', options.caseLoads)
+})
 
 Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })

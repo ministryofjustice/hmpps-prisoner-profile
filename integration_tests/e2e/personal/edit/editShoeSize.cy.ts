@@ -13,18 +13,8 @@ context('Edit shoe size', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
