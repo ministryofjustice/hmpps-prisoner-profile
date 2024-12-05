@@ -3,6 +3,7 @@ import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import PrisonerSearchService from '../services/prisonerSearch'
 import AppointmentService from '../services/appointmentService'
+import LocationDetailsService from '../services/locationDetailsService'
 import AppointmentController from './appointmentController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { repeatOptions } from '../data/interfaces/whereaboutsApi/Appointment'
@@ -15,7 +16,13 @@ import {
   timeFormat,
 } from '../utils/dateHelpers'
 import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
-import { locationsApiMock, locationsMock, locationsSelectOptionsMock } from '../data/localMockData/locationsMock'
+import {
+  locationsApiMock,
+  locationsApiSelectOptionsMock,
+  locationsMock,
+  locationsSelectOptionsMock,
+} from '../data/localMockData/locationsMock'
+
 import HmppsError from '../interfaces/HmppsError'
 import { formatLocation, formatName } from '../utils/utils'
 import { courtLocationsMock, courtLocationsSelectOptionsMock } from '../data/localMockData/courtLocationsMock'
@@ -23,8 +30,9 @@ import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import { courtHearingTypes, courtHearingTypesSelectOptions } from '../data/localMockData/courtHearingsMock'
-import LocationDetailsService from '../services/locationDetailsService'
+import { courtHearingTypes } from '../data/localMockData/courtHearingsMock'
+
+jest.mock('../services/locationDetailsService.ts')
 
 let req: any
 let res: any
@@ -43,7 +51,7 @@ const today = formatDateTimeISO(new Date(), { startOfDay: true })
 
 const formBody = {
   appointmentType: appointmentTypesSelectOptionsMock[0].value,
-  location: locationsMock[0].locationId,
+  location: locationsApiSelectOptionsMock[0].value,
   date: formatDate(today, 'short'),
   startTimeHours: 23,
   startTimeMinutes: 15,
@@ -124,10 +132,17 @@ const videoLinkBookingForm = {
 
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/appointmentService.ts')
-jest.mock('../services/locationDetailsService.ts')
+jest.mock('../services/locationDetailsService')
 
 describe('Appointments Controller', () => {
+  const locationDetailsService: LocationDetailsService = new LocationDetailsService(
+    null,
+    null,
+    null,
+  ) as jest.Mocked<LocationDetailsService>
+
   const appointmentService: AppointmentService = new AppointmentService(
+    null,
     null,
     null,
     null,
@@ -135,11 +150,6 @@ describe('Appointments Controller', () => {
   const prisonerSearchService: PrisonerSearchService = new PrisonerSearchService(
     null,
   ) as jest.Mocked<PrisonerSearchService>
-  const locationDetailsService: LocationDetailsService = new LocationDetailsService(
-    null,
-    null,
-    null,
-  ) as jest.Mocked<LocationDetailsService>
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -171,27 +181,56 @@ describe('Appointments Controller', () => {
 
     appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
       appointmentTypes: appointmentTypesMock,
-      locations: locationsMock,
+      locations: locationsApiMock,
     }))
     appointmentService.getPrePostAppointmentRefData = jest.fn(async () => {
       return {
         courts: courtLocationsMock,
-        locations: locationsMock,
+        locations: locationsApiMock,
       }
     })
     appointmentService.getAgencyDetails = jest.fn(async () => AgenciesMock)
-    appointmentService.getLocation = jest.fn(async () => locationsMock[0])
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
     appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
-    locationDetailsService.getLocationByNomisLocationId = jest.fn(
-      async (_, locationId) =>
-        ({
-          [locationsMock[0].locationId]: locationsApiMock[0],
-          [locationsMock[1].locationId]: locationsApiMock[1],
-        })[locationId],
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(
+      // async (_, locationId) =>
+      //   ({
+      //     [locationsMock[0].locationId]: locationsApiMock[0],
+      //     [locationsMock[1].locationId]: locationsApiMock[1],
+      //   })[locationId],
     )
+  })
+
+  it('should display add appointment', async () => {
+    await controller.displayAddAppointment()(req, res)
+
+    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      res.locals.user.activeCaseLoadId,
+    )
+
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
+      pageTitle: 'Add an appointment',
+      miniBannerData: {
+        prisonerName: 'Saunders, John',
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        cellLocation: PrisonerMockDataA.cellLocation,
+      },
+      appointmentTypes: appointmentTypesSelectOptionsMock,
+      locations: locationsApiSelectOptionsMock,
+      repeatOptions,
+      today: formBody.date,
+      formValues: {
+        bookingId: 1102484,
+        date: formBody.date,
+      },
+      refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
+      errors: undefined,
+      bookAVideoLinkEnabled: false,
+      vlbLocations: [],
+    })
   })
 
   it('should display add appointment', async () => {
@@ -296,7 +335,7 @@ describe('Appointments Controller', () => {
       prisonerName: 'John Saunders',
       prisonerNumber,
       appointmentType: 'Activities',
-      location: 'CES',
+      location: 'Local name one',
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
       endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
@@ -371,7 +410,8 @@ describe('Appointments Controller', () => {
       locations: locationsSelectOptionsMock,
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
-      hearingTypes: courtHearingTypesSelectOptions,
+      bookAVideoLinkEnabled: false,
+      hearingTypes: [],
       prisonId: 'MDI',
     })
   })

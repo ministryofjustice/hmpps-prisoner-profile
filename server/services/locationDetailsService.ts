@@ -21,14 +21,20 @@ export default class LocationDetailsService {
     return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingNomisLocationId(locationId)
   }
 
+  getLocationMappingUsingDpsLocationId = (clientToken: string, locationId: string): Promise<NomisSyncLocation> => {
+    return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingDpsLocationId(locationId)
+  }
+
   public async getLocation(clientToken: string, locationId: string): Promise<LocationsApiLocation> {
     return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocation(locationId)
   }
 
-  getLocationByNomisLocationId = (clientToken: string, locationId: number): Promise<LocationsApiLocation> => {
-    return this.getLocationMappingUsingNomisLocationId(clientToken, locationId).then(map =>
-      this.getLocation(clientToken, map.dpsLocationId),
-    )
+  public async getLocationByKey(clientToken: string, locationKey: string): Promise<LocationsApiLocation> {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationByKey(locationKey)
+  }
+
+  public async getLocationsForAppointments(clientToken: string, prisonId: string): Promise<LocationsApiLocation[]> {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationsForAppointments(prisonId)
   }
 
   getInmatesAtLocation = (clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> => {

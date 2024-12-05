@@ -15,4 +15,14 @@ export default class LocationsInsidePrisonApiRestClient implements LocationsInsi
   async getLocation(id: string): Promise<LocationsApiLocation> {
     return this.restClient.get<LocationsApiLocation>({ path: `/locations/${id}?formatLocalName=true` })
   }
+
+  async getLocationByKey(key: string): Promise<LocationsApiLocation> {
+    return this.restClient.get<LocationsApiLocation>({ path: `/locations/key/${key}` })
+  }
+
+  async getLocationsForAppointments(id: string): Promise<LocationsApiLocation[]> {
+    return this.restClient.get<LocationsApiLocation[]>({
+      path: `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
+    })
+  }
 }
