@@ -6,7 +6,6 @@ import CourtHearingType from '../data/interfaces/bookAVideoLinkApi/ReferenceCode
 import { AppointmentDefaults } from '../data/interfaces/whereaboutsApi/Appointment'
 import { timeFormat } from '../utils/dateHelpers'
 import { sortByDateTime } from '../utils/utils'
-import Location from '../data/interfaces/prisonApi/Location'
 import VideoLinkLocation from '../data/interfaces/bookAVideoLinkApi/Location'
 import CourtLocation from '../data/interfaces/whereaboutsApi/CourtLocation'
 import VideoLinkBookingForm from '../data/interfaces/whereaboutsApi/VideoLinkBookingForm'
@@ -17,14 +16,16 @@ import config from '../config'
 import { BookAVideoLinkApiClient } from '../data/interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
 import Court from '../data/interfaces/bookAVideoLinkApi/Court'
+import LocationDetailsService from './locationDetailsService'
+import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
 export interface AddAppointmentRefData {
   appointmentTypes: ReferenceCode[]
-  locations: Location[]
+  locations: LocationsApiLocation[]
 }
 
 export interface PrePostAppointmentRefData {
-  locations: Location[] | VideoLinkLocation[]
+  locations: LocationsApiLocation[] | VideoLinkLocation[]
   courts: CourtLocation[] | Court[]
 }
 
@@ -66,6 +67,7 @@ const toEvent = (event: GenericEvent): OffenderEvent => ({
 
 export default class AppointmentService {
   constructor(
+    private readonly locationDetailsService: LocationDetailsService,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>,
     private readonly manageUsersApiClientBuilder: RestClientBuilder<ManageUsersApiClient>,
@@ -81,7 +83,7 @@ export default class AppointmentService {
   public async getAddAppointmentRefData(token: string, prisonId: string): Promise<AddAppointmentRefData> {
     const [appointmentTypes, locations] = await Promise.all([
       this.prisonApiClientBuilder(token).getAppointmentTypes(),
-      this.prisonApiClientBuilder(token).getLocationsForAppointments(prisonId),
+      this.locationDetailsService.getLocationsForAppointments(token, prisonId),
     ])
 
     return {
@@ -103,7 +105,7 @@ export default class AppointmentService {
         : this.bookAVideoLinkApiClientBuilder(token).getCourts(),
 
       !config.featureToggles.bookAVideoLinkEnabled
-        ? this.prisonApiClientBuilder(token).getLocationsForAppointments(prisonId)
+        ? this.locationDetailsService.getLocationsForAppointments(token, prisonId)
         : this.bookAVideoLinkApiClientBuilder(token).getVideoLocations(prisonId),
     ])
 
@@ -173,14 +175,6 @@ export default class AppointmentService {
     if (isReleaseDate) formattedEvents.unshift({ eventDescription: '**Due for release**' })
 
     return formattedEvents
-  }
-
-  public async getLocation(token: string, locationId: number): Promise<Location> {
-    return this.prisonApiClientBuilder(token).getLocation(locationId)
-  }
-
-  public async getLocationByKey(token: string, locationKey: string): Promise<Location> {
-    return this.prisonApiClientBuilder(token).getLocationByKey(locationKey)
   }
 
   public async getExistingEventsForLocation(

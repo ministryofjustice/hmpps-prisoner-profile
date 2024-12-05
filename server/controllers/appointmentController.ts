@@ -39,7 +39,9 @@ import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/Crea
 import CourtLocation from '../data/interfaces/whereaboutsApi/CourtLocation'
 import Court from '../data/interfaces/bookAVideoLinkApi/Court'
 import VideoLinkLocation from '../data/interfaces/bookAVideoLinkApi/Location'
-import Location from '../data/interfaces/prisonApi/Location'
+import LocationDetailsService from '../services/locationDetailsService'
+import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
+import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 const { confirmBookingPrisonTemplateId, emails } = config.notifications
@@ -52,6 +54,7 @@ export default class AppointmentController {
     private readonly appointmentService: AppointmentService,
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly auditService: AuditService,
+    private readonly locationDetailsService: LocationDetailsService,
     private readonly notifyClient: NotifyClient | { sendEmail(): void },
   ) {}
 
@@ -96,7 +99,7 @@ export default class AppointmentController {
           cellLocation: formatLocation(cellLocation),
         },
         appointmentTypes: refDataToSelectOptions(appointmentTypes),
-        locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        locations: objectToSelectOptions(locations, 'id', 'localName'),
         vlbLocations: config.featureToggles.bookAVideoLinkEnabled
           ? objectToSelectOptions(
               await this.appointmentService.getVideoLocations(clientToken, prisonId),
@@ -155,11 +158,16 @@ export default class AppointmentController {
       if (!errors.length) {
         const startTime = formatDateTimeISO(set(parseDate(date), { hours: startTimeHours, minutes: startTimeMinutes }))
         const endTime = formatDateTimeISO(set(parseDate(date), { hours: endTimeHours, minutes: endTimeMinutes }))
-
+        // non-bvl locations ideintified via UUID/integer form id.  BVL locations identified via key
+        let nomisLocationId
+        if (location) {
+          const result = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(clientToken, location)
+          nomisLocationId = result.nomisLocationId
+        }
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
-          locationId: Number(location),
+          locationId: nomisLocationId || 0,
           startTime,
           endTime,
           comment: comments,
@@ -248,7 +256,7 @@ export default class AppointmentController {
       const appointmentType = appointmentTypes.find(
         type => type.code === appointmentDetails.appointmentType,
       )?.description
-      const location = locations.find(loc => loc.locationId === Number(appointmentDetails.location))?.userDescription
+      const location = locations.find(loc => loc.id === appointmentDetails.location)?.localName
       const repeats = repeatOptions.find(type => type.value === appointmentDetails.repeats)?.text
 
       const appointmentData = {
@@ -320,9 +328,17 @@ export default class AppointmentController {
       const { appointmentDefaults, appointmentForm, formValues } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
+      let locationMap = {} as NomisSyncLocation
+      if (appointmentDefaults.locationId) {
+        locationMap = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+          clientToken,
+          appointmentDefaults.locationId,
+        )
+      }
+
       const location = config.featureToggles.bookAVideoLinkEnabled
         ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentForm.location)?.description
-        : (locations as Location[]).find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
+        : (locations as LocationsApiLocation[]).find(loc => loc.id === locationMap.dpsLocationId)?.localName
 
       const hearingTypes = config.featureToggles.bookAVideoLinkEnabled
         ? objectToSelectOptions(await this.appointmentService.getCourtHearingTypes(clientToken), 'code', 'description')
@@ -366,7 +382,7 @@ export default class AppointmentController {
           : objectToSelectOptions(courts as CourtLocation[], 'id', 'name'),
         locations: config.featureToggles.bookAVideoLinkEnabled
           ? objectToSelectOptions(locations as VideoLinkLocation[], 'key', 'description')
-          : objectToSelectOptions(locations as Location[], 'locationId', 'userDescription'),
+          : objectToSelectOptions(locations as LocationsApiLocation[], 'id', 'localName'),
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
@@ -547,17 +563,25 @@ export default class AppointmentController {
         this.appointmentService.getUserEmail(clientToken, username),
       ])
 
+      let apptDefaultsLocationMap = {} as NomisSyncLocation
+      if (appointmentDefaults.locationId) {
+        apptDefaultsLocationMap = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+          clientToken,
+          appointmentDefaults.locationId,
+        )
+      }
+
       const location = config.featureToggles.bookAVideoLinkEnabled
         ? (locations as VideoLinkLocation[]).find(loc => loc.key === appointmentForm.location)?.description
-        : (locations as Location[]).find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
+        : (locations as LocationsApiLocation[]).find(loc => loc.id === apptDefaultsLocationMap.dpsLocationId)?.localName
 
       const preLocation = config.featureToggles.bookAVideoLinkEnabled
         ? (locations as VideoLinkLocation[]).find(loc => loc.key === formValues.preAppointmentLocation)?.description
-        : (locations as Location[]).find(loc => loc.locationId === +formValues.preAppointmentLocation)?.userDescription
+        : (locations as LocationsApiLocation[]).find(loc => loc.id === formValues.preAppointmentLocation)?.localName
 
       const postLocation = config.featureToggles.bookAVideoLinkEnabled
         ? (locations as VideoLinkLocation[]).find(loc => loc.key === formValues.postAppointmentLocation)?.description
-        : (locations as Location[]).find(loc => loc.locationId === +formValues.postAppointmentLocation)?.userDescription
+        : (locations as LocationsApiLocation[]).find(loc => loc.id === formValues.postAppointmentLocation)?.localName
 
       const courtDescription = config.featureToggles.bookAVideoLinkEnabled
         ? (courts as Court[]).find(court => court.code === formValues.court)?.description
@@ -742,17 +766,23 @@ export default class AppointmentController {
       const user = res.locals.user as PrisonUser
 
       const isoDate = dateToIsoDate(req.query.date as string)
-      const locationId = +req.query.locationId
+      // eslint-disable-next-line prefer-destructuring
+      const locationId = req.query.locationId
       const locationKey = req.query.locationKey as string
 
       const location = locationId
-        ? await this.appointmentService.getLocation(clientToken, locationId)
-        : await this.appointmentService.getLocationByKey(clientToken, locationKey)
+        ? await this.locationDetailsService.getLocation(clientToken, locationId as string)
+        : await this.locationDetailsService.getLocationByKey(clientToken, locationKey)
+
+      const { nomisLocationId } = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(
+        clientToken,
+        location.id,
+      )
 
       const events = await this.appointmentService.getExistingEventsForLocation(
         clientToken,
         user.activeCaseLoadId,
-        location.locationId,
+        nomisLocationId,
         isoDate,
       )
 
@@ -769,7 +799,7 @@ export default class AppointmentController {
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events,
         date: formatDate(isoDate, 'long'),
-        header: `Schedule for ${location.userDescription}`,
+        header: `Schedule for ${location.localName}`,
         type: 'location',
       })
     }
