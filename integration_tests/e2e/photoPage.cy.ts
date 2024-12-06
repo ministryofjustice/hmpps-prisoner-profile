@@ -18,6 +18,7 @@ context('Photo Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber, bookingId })
     cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
   })

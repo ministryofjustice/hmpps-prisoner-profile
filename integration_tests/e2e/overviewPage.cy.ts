@@ -38,11 +38,20 @@ context('Overview Page', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_GLOBAL_SEARCH'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       })
 
       it('Does not display the sidebar', () => {
@@ -311,9 +320,7 @@ context('Overview Page', () => {
   context('Given the user has RELEASE_DATES_CALCULATOR role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ReleaseDatesCalculator] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
@@ -327,9 +334,7 @@ context('Overview Page', () => {
   context('Given the user has PF_LOCAL_READER role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PathfinderLocalReader],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PathfinderLocalReader] })
     })
 
     context('Prisoner is not currently in Pathfinder', () => {
@@ -348,9 +353,7 @@ context('Overview Page', () => {
   context('Given the user has PF_USER role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PathfinderUser],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PathfinderUser] })
     })
 
     context('Prisoner is not currently in Pathfinder', () => {
@@ -382,9 +385,7 @@ context('Overview Page', () => {
   context('Given the user has PF_STD_PRISON role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PathfinderStdPrison],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PathfinderStdPrison] })
     })
 
     context('Prisoner is not currently in Pathfinder', () => {
@@ -416,9 +417,7 @@ context('Overview Page', () => {
   context('Given the user has SOC_CUSTODY role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.SocCustody],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.SocCustody] })
     })
 
     context('Prisoner is not currently in SOC', () => {
@@ -450,9 +449,7 @@ context('Overview Page', () => {
   context('Given the user has CREATE_CATEGORISATION role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.CreateCategorisation],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.CreateCategorisation] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
@@ -466,9 +463,7 @@ context('Overview Page', () => {
   context('Given the user has POM role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PomUser],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PomUser] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
@@ -482,9 +477,7 @@ context('Overview Page', () => {
   context('Given the user has VIEW_PROBATION_DOCUMENTS role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.ViewProbationDocuments],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ViewProbationDocuments] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       visitOverviewPage()
     })
@@ -498,9 +491,7 @@ context('Overview Page', () => {
   context('Given the user has the KW staff role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.ViewProbationDocuments],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ViewProbationDocuments] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, staffRoles: [{ role: 'KW' }] })
       visitOverviewPage()
     })
@@ -514,9 +505,7 @@ context('Overview Page', () => {
   context('Given the prisoner is a restricted patient', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.PomUser],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.PomUser] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -549,9 +538,7 @@ context('Overview Page', () => {
   context('Given the prisoner is not on remand', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
-      })
+      cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
     })
 
     context('Main offence overview', () => {
@@ -601,9 +588,7 @@ context('Overview Page', () => {
   context('Given the prisoner is on remand', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
-      })
+      cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'X9999XX', bookingId: 1234568 })
     })
 
@@ -671,13 +656,20 @@ context('Overview Page', () => {
   context('Given the prisoner is in the youth estate', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseLoadId: 'WYI', currentlyActive: true, description: '', type: '', caseloadFunction: '' }],
-      })
+      cy.setupUserAuth()
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
         prisonerDataOverrides: { prisonId: 'WYI' },
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'WYI',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.task('stubGetOffenderContacts', mockContactDetailYouthEstate)
       visitOverviewPage()
@@ -789,11 +781,20 @@ context('Overview Page - Prisoner not found', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_GLOBAL_SEARCH'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       })
 
       it('The 404 page should display', () => {
@@ -808,9 +809,7 @@ context('Court cases and release dates', () => {
   context('Given the user has release dates calculator role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ReleaseDatesCalculator] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
 
@@ -881,9 +880,7 @@ context('Court cases and release dates', () => {
   context('Given the user has release dates calculator and adjustments maintainer role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.PrisonUser, Role.ReleaseDatesCalculator, Role.AdjustmentsMaintainer],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.ReleaseDatesCalculator, Role.AdjustmentsMaintainer] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
     })
 

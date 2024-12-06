@@ -23,18 +23,8 @@ context('New distinguishing feature', () => {
   context('Permissions', () => {
     it('Displays not found page if the user does not have permissions', () => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
       cy.task('stubPostNewDistinguishingMark')
@@ -47,18 +37,8 @@ context('New distinguishing feature', () => {
   context('Page contents', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
       cy.task('stubPostNewDistinguishingMark')

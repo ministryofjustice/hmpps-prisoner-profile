@@ -7,7 +7,6 @@ import { permissionsTests } from './permissionsTests'
 import { formatDate } from '../../server/utils/dateHelpers'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../server/data/localMockData/personalCareNeedsMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
@@ -32,9 +31,17 @@ context('When signed in', () => {
   context('As a global search user who does not have the prisoner in their case loads', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
@@ -51,7 +58,6 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       visitPersonalDetailsPage()
     })
@@ -96,9 +102,9 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
 
@@ -382,7 +388,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
     })
 
@@ -476,7 +482,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
@@ -514,13 +520,10 @@ context('When signed in', () => {
   context('Neurodiversity', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-        roles: [Role.GlobalSearch],
-      })
+      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
     })
 
     context('Page section', () => {
@@ -557,14 +560,15 @@ context('When signed in', () => {
   context('Prison person api is disabled', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
+      cy.setupUserAuth()
+      cy.setupComponentsData({
         caseLoads: [
           {
+            caseloadFunction: '',
             caseLoadId: 'DTI',
             currentlyActive: true,
             description: '',
             type: '',
-            caseloadFunction: '',
           },
         ],
       })
@@ -572,7 +576,6 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
 

@@ -12,6 +12,7 @@ context('Work and skills page - Employability Skills Card', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber })
       cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
     })

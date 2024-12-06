@@ -1,4 +1,4 @@
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
@@ -66,7 +66,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterMeta,
+          { services: availableServices } as HeaderFooterSharedData,
           perms,
         )
         expect(
@@ -263,7 +263,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterMeta,
+          { services: availableServices } as HeaderFooterSharedData,
           perms,
         )
         expect(

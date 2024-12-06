@@ -28,6 +28,7 @@ context('CSRA page', () => {
     const prisonerNumber = 'G6123VU'
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
 
     cy.task('stubPrisonerData', { prisonerNumber })
 

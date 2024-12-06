@@ -107,7 +107,7 @@ export default class OverviewController {
         this.offenderService.getPrisonerNonAssociationOverview(clientToken, prisonerNumber),
         res.locals.apiErrorCallback,
       ),
-      isServiceEnabled('csipUI', res.locals.feComponentsMeta) && permissions.csip?.view
+      isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), res.locals.apiErrorCallback)
         : null,
     ])

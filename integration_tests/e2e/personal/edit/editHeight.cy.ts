@@ -13,18 +13,8 @@ context('Edit height (metric)', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
@@ -78,18 +68,8 @@ context('Edit height (Imperial)', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [
-          {
-            caseLoadId: 'MDI',
-            currentlyActive: true,
-            description: '',
-            type: '',
-            caseloadFunction: '',
-          },
-        ],
-        roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'],
-      })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })

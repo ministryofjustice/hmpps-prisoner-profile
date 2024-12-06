@@ -57,7 +57,7 @@ describe('CheckUserCanEditMiddleware', () => {
       expect(next).toHaveBeenCalledWith()
     })
 
-    it('should return next() if prisoner is in caseload', async () => {
+    it('should return next() if prisoner is NOT in caseload', async () => {
       req.middleware = {
         prisonerData: { ...PrisonerMockDataA, prisonId: 'ZZZ', restrictedPatient: true },
       }

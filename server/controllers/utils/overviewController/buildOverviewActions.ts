@@ -1,4 +1,4 @@
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { Icon } from '../../../data/enums/icon'
@@ -15,7 +15,7 @@ export default (
   socNominal: Nominal | null,
   user: HmppsUser,
   config: typeof conf,
-  feComponentsMeta: HeaderFooterMeta | undefined,
+  feComponentsMeta: HeaderFooterSharedData | undefined,
   permissions: Permissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []

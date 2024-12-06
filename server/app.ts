@@ -45,7 +45,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH']))
   app.use(setUpCsrf())
-  app.use(setUpCurrentUser(services))
+  app.use(setUpCurrentUser())
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())
   app.use(apiErrorMiddleware())
@@ -55,10 +55,11 @@ export default function createApp(services: Services): express.Application {
     standardGetPaths,
     dpsComponents.getPageComponents({
       logger,
-      includeMeta: true,
+      includeSharedData: true,
       dpsUrl: config.serviceUrls.digitalPrison,
     }),
   )
+  app.use(dpsComponents.retrieveCaseLoadData({ logger }))
   app.use(routes(services))
 
   app.use(setUpPageNotFound)

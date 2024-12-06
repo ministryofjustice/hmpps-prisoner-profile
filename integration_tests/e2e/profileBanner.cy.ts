@@ -15,11 +15,20 @@ context('Profile banner', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_GLOBAL_SEARCH'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       })
 
       it('Displays the banner', () => {
@@ -37,13 +46,11 @@ context('Profile banner', () => {
     context('Given the prisoner arrived today', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_GLOBAL_SEARCH'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
-        })
+        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
+          caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
         })
         cy.task('stubGetLatestArrivalDate', formatDateISO(new Date()))
       })
@@ -57,13 +64,19 @@ context('Profile banner', () => {
     context('Given the prisoner arrived 2 days ago', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_GLOBAL_SEARCH'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
-        })
+        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
+          caseLoads: [
+            {
+              caseloadFunction: '',
+              caseLoadId: 'ZZZ',
+              currentlyActive: true,
+              description: '',
+              type: '',
+            },
+          ],
         })
         cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 2)))
       })
@@ -79,11 +92,11 @@ context('Profile banner', () => {
     context('Given the prisoner arrived over 2 days ago', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_PRISON'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
+        cy.setupOverviewPageStubs({
+          prisonerNumber: 'G6123VU',
+          bookingId: 1102484,
         })
-        cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
         cy.task('stubGetLatestArrivalDate', formatDateISO(subDays(new Date(), 3)))
       })
 
@@ -106,10 +119,7 @@ context('Profile banner', () => {
     context('Given the prisoner arrived 2 days ago', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_PRISON'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-        })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
@@ -136,10 +146,7 @@ context('Profile banner', () => {
     context('Given the prisoner arrived today', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({
-          roles: ['ROLE_PRISON'],
-          caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-        })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
@@ -167,10 +174,8 @@ context('Profile banner', () => {
   context('Given the prisoner is released from prison', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch, Role.InactiveBookings],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'OUT', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.InactiveBookings] })
+      cy.setupComponentsData()
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -200,10 +205,7 @@ context('Profile banner', () => {
   context('Given the prisoner is being transferred', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch, Role.InactiveBookings],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'TRN', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.InactiveBookings] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -239,10 +241,7 @@ context('Profile banner', () => {
   context('Given the prisoner has alerts', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_PRISON'],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-      })
+      cy.setupUserAuth({ roles: ['ROLE_PRISON'] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
       cy.task('stubAlertDetails')
     })

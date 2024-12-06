@@ -1,3 +1,5 @@
+import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
+import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
 import CaseLoad from '../server/data/interfaces/prisonApi/CaseLoad'
 import StaffRole from '../server/data/interfaces/prisonApi/StaffRole'
 import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
@@ -24,6 +26,7 @@ declare global {
       setupOverviewPageStubs(options: {
         prisonerNumber: string
         bookingId: number
+        caseLoads?: CaseLoad[]
         restrictedPatient?: boolean
         prisonerDataOverrides?: Partial<Prisoner>
         prisonId?: string
@@ -56,7 +59,14 @@ declare global {
 
       setupOffencesPageUnsentencedStubs(options: { prisonerNumber: string; bookingId: number }): Chainable<AUTWindow>
 
-      setupUserAuth(options?: UserToken & { caseLoads?: CaseLoad[] }): Chainable<AUTWindow>
+      setupUserAuth(options?: UserToken): Chainable<AUTWindow>
+
+      setupComponentsData(options?: {
+        header?: Component
+        footer?: Component
+        caseLoads?: CaseLoad[]
+        services?: Service[]
+      }): Chainable<AUTWindow>
 
       getDataQa(id: string): Chainable<JQuery<HTMLElement>>
 
