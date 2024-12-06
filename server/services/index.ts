@@ -58,6 +58,7 @@ export const services = () => {
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
     prisonPersonApiClientBuilder,
+    personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     prisonRegisterStore,
     featureToggleStore,
@@ -86,6 +87,7 @@ export const services = () => {
     prisonApiClientBuilder,
     curiousApiClientBuilder,
     prisonPersonApiClientBuilder,
+    personIntegrationApiClientBuilder,
     metricsService,
   )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)

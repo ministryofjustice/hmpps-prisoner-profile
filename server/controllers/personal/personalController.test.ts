@@ -1216,7 +1216,7 @@ describe('PersonalController', () => {
           hintText: cityOrTownOfBirthFieldData.hintText,
           inputClasses: cityOrTownOfBirthFieldData.inputClasses,
           fieldName: cityOrTownOfBirthFieldData.fieldName,
-          fieldValue: 'SHEFFIELD',
+          fieldValue: 'Sheffield',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -1260,14 +1260,14 @@ describe('PersonalController', () => {
         validRequest = {
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'ABC123' },
-          body: { cityOrTownOfBirth: 'SHEFFIELD' },
+          body: { cityOrTownOfBirth: 'Sheffield' },
           flash: jest.fn(),
         } as any
       })
 
       it.each([
         { cityOrTownOfBirth: '', updateRequest: null },
-        { cityOrTownOfBirth: 'ROTHERHAM', updateRequest: 'ROTHERHAM' },
+        { cityOrTownOfBirth: 'Rotherham', updateRequest: 'Rotherham' },
       ])('Valid request: %s', async ({ cityOrTownOfBirth, updateRequest }) => {
         const request = { ...validRequest, body: { cityOrTownOfBirth } }
         await action(request, res)
