@@ -6,11 +6,11 @@ import { PrisonPerson } from './interfaces/prisonPersonApi/prisonPersonApiClient
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('prisonPersonApiClient', () => {
-  let fakePrisonerSearchApi: nock.Scope
+  let fakePrisonPersonApi: nock.Scope
   let prisonPersonApiClient: PrisonPersonApiRestClient
 
   beforeEach(() => {
-    fakePrisonerSearchApi = nock(config.apis.prisonerSearchApi.url)
+    fakePrisonPersonApi = nock(config.apis.prisonPersonApi.url)
     prisonPersonApiClient = new PrisonPersonApiRestClient(token.access_token)
   })
 
@@ -100,7 +100,7 @@ describe('prisonPersonApiClient', () => {
           },
         },
       }
-      fakePrisonerSearchApi
+      fakePrisonPersonApi
         .get('/prisoners/A8469DY')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, prisonPerson)

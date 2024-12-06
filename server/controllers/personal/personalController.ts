@@ -12,6 +12,7 @@ import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import {
   CheckboxOptions,
+  convertToTitleCase,
   fieldHistoryToFormattedValue,
   fieldHistoryToRows,
   formatLocation,
@@ -393,7 +394,7 @@ export default class PersonalController {
     this.textInput(fieldData, this.getCityOrPlaceOfBirth.bind(this), this.setCityOrPlaceOfBirth.bind(this))
 
   private async getCityOrPlaceOfBirth(req: Request): Promise<string> {
-    return req.middleware?.inmateDetail?.birthPlace
+    return convertToTitleCase(req.middleware?.inmateDetail?.birthPlace)
   }
 
   private async setCityOrPlaceOfBirth(
