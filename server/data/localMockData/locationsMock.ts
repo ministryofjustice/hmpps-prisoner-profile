@@ -1,5 +1,4 @@
 import Location from '../interfaces/prisonApi/Location'
-import VideoLocation from '../interfaces/bookAVideoLinkApi/Location'
 import { SelectOption } from '../../utils/utils'
 
 export const locationsMock: Location[] = [
@@ -22,14 +21,6 @@ export const locationsMock: Location[] = [
     currentOccupancy: 0,
     locationPrefix: 'MDI-PROG_ACT-CHAP',
     userDescription: 'Chapel',
-  },
-]
-
-export const locationsMockBavl: VideoLocation[] = [
-  {
-    key: 'VIDEO_LINK_ROOM',
-    description: 'Video Link Room',
-    enabled: true,
   },
 ]
 

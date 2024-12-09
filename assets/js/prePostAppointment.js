@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  preAppointmentLocation.addEventListener('change', () => {
+  preAppointmentLocation?.addEventListener('change', () => {
     getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer)
   })
-  postAppointmentLocation.addEventListener('change', () => {
+  postAppointmentLocation?.addEventListener('change', () => {
     getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer)
   })
 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   // Initialise
-  getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer)
-  getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer)
+  preAppointmentLocation ? getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer) : null
+  postAppointmentLocation ? getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer) : null
   showHideOtherCourt()
 })

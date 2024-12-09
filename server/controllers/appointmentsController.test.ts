@@ -10,7 +10,6 @@ import { dateToIsoDate, formatDate, formatDateTimeISO, parseDate } from '../util
 import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
 import {
   locationsMock,
-  locationsMockBavl,
   locationsSelectOptionsMock,
   locationsSelectOptionsMockBavl,
 } from '../data/localMockData/locationsMock'
@@ -21,6 +20,7 @@ import {
   courtLocationsMockBavl,
   courtLocationsSelectOptionsMock,
   courtLocationsSelectOptionsMockBavl,
+  probationTeamsMock,
 } from '../data/localMockData/courtLocationsMock'
 import VideoLinkBookingForm from '../data/interfaces/whereaboutsApi/VideoLinkBookingForm'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
@@ -169,11 +169,13 @@ describe('Appointments Controller', () => {
       if (config.featureToggles.bookAVideoLinkEnabled) {
         return {
           courts: courtLocationsMockBavl,
-          locations: locationsMockBavl,
+          probationTeams: probationTeamsMock,
+          locations: locationsMock,
         }
       }
       return {
         courts: courtLocationsMock,
+        probationTeams: [],
         locations: locationsMock,
       }
     })
@@ -182,7 +184,6 @@ describe('Appointments Controller', () => {
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
     appointmentService.getUserEmail = jest.fn(async () => userEmailDataMock)
-    appointmentService.getVideoLocations = jest.fn(async () => locationsMockBavl)
     appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
   })
@@ -448,7 +449,7 @@ describe('Appointments Controller', () => {
     config.featureToggles.bookAVideoLinkEnabled = true
 
     const { prisonerNumber, bookingId, cellLocation } = PrisonerMockDataA
-    formBody.location = locationsMockBavl[0].key
+    formBody.location = locationsMock[0].locationPrefix
 
     const flash = {
       appointmentDefaults: {
@@ -474,7 +475,7 @@ describe('Appointments Controller', () => {
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
       },
-      location: locationsMockBavl[0].description,
+      location: locationsMock[0].userDescription,
       date: formBody.date,
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
       endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
@@ -640,7 +641,7 @@ describe('Appointments Controller', () => {
         comment: appointmentsToCreate.comment,
       },
       appointmentForm: {
-        location: locationsMockBavl[0].key,
+        location: locationsMock[0].locationPrefix,
       },
       formValues: {
         hearingType: courtHearingTypes[0].code,
@@ -662,7 +663,7 @@ describe('Appointments Controller', () => {
       prisonerName: 'John Saunders',
       prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
-      location: locationsMockBavl[0].description,
+      location: locationsMock[0].userDescription,
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
       endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,

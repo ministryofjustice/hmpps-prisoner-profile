@@ -2,7 +2,7 @@ import nock from 'nock'
 import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
-import CreateVideoBookingRequest from './interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
+import CreateVideoBookingRequest from './interfaces/bookAVideoLinkApi/VideoLinkBooking'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -38,17 +38,6 @@ describe('bookAVideoLinkApiClient', () => {
         bookingType: 'COURT',
       } as CreateVideoBookingRequest)
       expect(output).toEqual(1)
-    })
-  })
-
-  describe('getVideoLocations', () => {
-    it('should return data from the API', async () => {
-      mockSuccessfulBookAVideoLinkApiCall('/prisons/CODE/locations?videoLinkOnly=false', [
-        { description: 'VIDEO_LINK' },
-      ])
-
-      const output = await bookAVideoLinkApiClient.getVideoLocations('CODE')
-      expect(output).toEqual([{ description: 'VIDEO_LINK' }])
     })
   })
 
