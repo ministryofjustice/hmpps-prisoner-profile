@@ -103,7 +103,7 @@ export default class CaseNotesController {
         showingAll,
         hasCaseNotes,
         addCaseNoteLinkUrl,
-        canAddMoreDetails: isServiceEnabled('caseNotesApi', res.locals.feComponentsMeta),
+        canAddMoreDetails: isServiceEnabled('caseNotesApi', res.locals.feComponents?.sharedData),
       })
     }
   }

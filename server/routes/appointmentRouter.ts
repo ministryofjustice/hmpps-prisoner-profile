@@ -27,7 +27,7 @@ export default function appointmentRouter(services: Services): Router {
   )
 
   const isCreateIndividualAppointmentRolledOut = (req: Request, res: Response, next: NextFunction) => {
-    if (isServiceNavEnabled('activities', res.locals.feComponentsMeta)) {
+    if (isServiceNavEnabled('activities', res.locals.feComponents?.sharedData)) {
       const { prisonerNumber } = req.params
       res.redirect(`${config.serviceUrls.appointments}/create/start-prisoner/${prisonerNumber}`)
     } else {
