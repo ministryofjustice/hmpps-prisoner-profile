@@ -6,4 +6,9 @@ export const prisonerLocationDetailsServiceMock = (): Interface<LocationDetailsS
   isReceptionFull: jest.fn(),
   getLocationDetailsByLatestFirst: jest.fn(),
   getLocationDetailsGroupedByPeriodAtAgency: jest.fn(),
+  getLocationMappingUsingNomisLocationId: jest.fn(),
+  getLocationMappingUsingDpsLocationId: jest.fn(),
+  getLocation: jest.fn(),
+  getLocationByKey: jest.fn(),
+  getLocationsForAppointments: jest.fn(),
 })

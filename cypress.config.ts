@@ -4,6 +4,7 @@ import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import dpsPages from './integration_tests/mockApis/dpsPages'
 import prisonApi from './integration_tests/mockApis/prison'
+import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrison'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearch'
 import pomApi from './integration_tests/mockApis/pom'
 import keyWorkerApi from './integration_tests/mockApis/keyWorker'
@@ -48,6 +49,7 @@ export default defineConfig({
         ...tokenVerification,
         ...dpsPages,
         ...prisonApi,
+        ...locationsInsidePrisonApi,
         ...prisonerSearchApi,
         ...pomApi,
         ...keyWorkerApi,
