@@ -15,7 +15,7 @@ export default (
   socNominal: Nominal | null,
   user: HmppsUser,
   config: typeof conf,
-  feComponentsMeta: HeaderFooterSharedData | undefined,
+  feComponentsSharedData: HeaderFooterSharedData | undefined,
   permissions: Permissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
@@ -68,7 +68,7 @@ export default (
     })
   }
 
-  if (permissions.activity?.edit && isServiceNavEnabled('activities', feComponentsMeta)) {
+  if (permissions.activity?.edit && isServiceNavEnabled('activities', feComponentsSharedData)) {
     actions.push({
       text: 'Log an activity application',
       icon: Icon.LogActivityApplication,
@@ -104,7 +104,7 @@ export default (
     })
   }
 
-  if (isServiceNavEnabled('csipUI', feComponentsMeta) && permissions.csip?.view) {
+  if (isServiceNavEnabled('csipUI', feComponentsSharedData) && permissions.csip?.view) {
     actions.push({
       text: 'Make CSIP referral',
       icon: Icon.MakeCSIPReferral,
