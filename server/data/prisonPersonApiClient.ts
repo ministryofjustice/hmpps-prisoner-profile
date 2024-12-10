@@ -2,15 +2,15 @@ import { Readable } from 'stream'
 import config from '../config'
 import {
   FieldHistory,
-  PrisonPersonDistinguishingMark,
   PrisonPerson,
   PrisonPersonApiClient,
+  PrisonPersonDistinguishingMark,
+  PrisonPersonDistinguishingMarkRequest,
   PrisonPersonHealthUpdate,
   PrisonPersonPhysicalAttributes,
   PrisonPersonPhysicalAttributesUpdate,
   ReferenceDataCode,
   ReferenceDataDomain,
-  PrisonPersonDistinguishingMarkRequest,
 } from './interfaces/prisonPersonApi/prisonPersonApiClient'
 import RestClient from './restClient'
 import { mapToQueryString } from '../utils/utils'
@@ -89,6 +89,12 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
       path: '/distinguishing-marks/mark',
       data: distinguishingMarkRequest,
       file: photograph,
+    })
+  }
+
+  async getDistinguishingMark(markId: string): Promise<PrisonPersonDistinguishingMark> {
+    return this.restClient.get<PrisonPersonDistinguishingMark>({
+      path: `/distinguishing-marks/mark/${markId}`,
     })
   }
 

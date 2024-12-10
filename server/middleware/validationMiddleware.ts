@@ -19,7 +19,7 @@ export default function validationMiddleware(
       if (options.redirectTo) {
         return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectTo}`)
       }
-      return res.redirect(req.header('Referer'))
+      return res.redirect(req.originalUrl)
     }
 
     if (errors.length) {

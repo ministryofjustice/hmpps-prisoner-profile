@@ -48,7 +48,6 @@ export default function personalRouter(services: Services): Router {
     personalController.displayPersonalPage(),
   )
 
-  // Edit routes
   // Temporary edit check for now
   const editRouteChecks = () => (req: Request, res: Response, next: NextFunction) => {
     const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
@@ -58,6 +57,16 @@ export default function personalRouter(services: Services): Router {
     return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
   }
 
+  // Distinguishing marks
+  router.use(
+    `${basePath}/:markType(tattoo|scar|mark)`,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editRouteChecks(),
+    distinguishingMarksRouter(services),
+  )
+
+  // Edit routes
   const editRoute = ({
     path,
     edit,
@@ -336,14 +345,6 @@ export default function personalRouter(services: Services): Router {
       method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
     },
   })
-
-  router.use(
-    `${basePath}/edit/distinguishing-mark`,
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
-    distinguishingMarksRouter(services),
-  )
 
   return router
 }

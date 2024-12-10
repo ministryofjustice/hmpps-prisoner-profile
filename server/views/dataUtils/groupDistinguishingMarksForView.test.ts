@@ -627,7 +627,7 @@ describe('groupIdentifyingMarks', () => {
           ${'BODY_PART_TORSO'} | ${sideFront} | ${'Front'}
           ${'BODY_PART_TORSO'} | ${sideRight} | ${'Right side'}
           ${'BODY_PART_TORSO'} | ${sideLeft}  | ${'Left side'}
-          ${'BODY_PART_TORSO'} | ${null}      | ${'Torso - no specific location'}
+          ${'BODY_PART_TORSO'} | ${null}      | ${'Front and sides - no specific location'}
         `(
           'returns $locationText when body part id is $bodyPartId and side id is $side',
           ({ bodyPartId, side, locationText }) => {

@@ -1,5 +1,6 @@
 import {
   PrisonPerson,
+  PrisonPersonDistinguishingMarkPhotographUuid,
   PrisonPersonHealth,
   PrisonPersonPhysicalAttributes,
   ReferenceDataCode,
@@ -8,6 +9,7 @@ import {
 import { stubGetWithBody, stubPatchWithResponse } from './utils'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
+import { DistinguishingMark } from '../../server/services/interfaces/personalPageService/PersonalPage'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -117,11 +119,13 @@ export default {
       body: [distinguishingMarkMock],
     }),
 
-  stubPrisonPersonGetImage: (photoId: string = distinguishingMarkMock.photographUuids[0]) => {
+  stubPrisonPersonGetImage: (
+    photo: PrisonPersonDistinguishingMarkPhotographUuid = distinguishingMarkMock.photographUuids[0],
+  ) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `${baseUrl}photographs/${photoId}/file`,
+        urlPattern: `${baseUrl}photographs/${photo.id}/file`,
       },
       response: {
         status: 200,
@@ -148,6 +152,12 @@ export default {
       },
     })
   },
+
+  stubGetDistinguishingMark: (markResp: DistinguishingMark) =>
+    stubGetWithBody({
+      path: `${baseUrl}distinguishing-marks/mark/.*`,
+      body: markResp ?? distinguishingMarkMock,
+    }),
 
   // Reference data
   stubGetReferenceDataDomains: (resp: ReferenceDataDomain[]) =>

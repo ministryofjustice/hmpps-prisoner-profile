@@ -53,7 +53,8 @@
       }
 
       &__mark {
-        max-width: 350px;
+        display: flex;
+        justify-content: space-between;
 
         &:not(:last-of-type) {
           padding-bottom: govuk-spacing(3);
@@ -65,6 +66,10 @@
           &:not(:last-child) {
             margin-bottom: govuk-spacing(3);
           }
+        }
+
+        dd {
+          max-width: 350px;
         }
       }
 
