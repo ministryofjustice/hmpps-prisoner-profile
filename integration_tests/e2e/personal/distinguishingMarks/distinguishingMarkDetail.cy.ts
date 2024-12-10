@@ -9,11 +9,11 @@ const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 
 const visitNewTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/edit/distinguishing-mark/add/tattoo` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo` })
 }
 
 const visitNewScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/edit/distinguishing-mark/add/scar` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar` })
 }
 
 context('New distinguishing mark on face', () => {
@@ -150,7 +150,7 @@ context('New distinguishing mark on face', () => {
     context('Adding distinguishing mark detail for torso', () => {
       const specificBodyParts = ['torso', 'rightTorso', 'leftTorso']
 
-      const testMethod = testAddDistinguishingMarkDetailWithRadios('Add front and side scar details', 'Torso')
+      const testMethod = testAddDistinguishingMarkDetailWithRadios('Add front and side scar details', 'Front and sides')
       specificBodyParts.forEach(testMethod)
     })
 

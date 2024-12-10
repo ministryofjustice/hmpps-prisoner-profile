@@ -134,6 +134,11 @@ export type MarkTypeId = 'MARK_TYPE_MARK' | 'MARK_TYPE_SCAR' | 'MARK_TYPE_TAT' |
 export type BodyPartSideId = 'SIDE_B' | 'SIDE_F' | 'SIDE_L' | 'SIDE_R' | 'SIDE_S'
 export type PartOrientationId = 'PART_ORIENT_CENTR' | 'PART_ORIENT_FACE' | 'PART_ORIENT_LOW' | 'PART_ORIENT_UPP'
 
+export interface PrisonPersonDistinguishingMarkPhotographUuid {
+  id: string
+  latest: boolean
+}
+
 export interface PrisonPersonDistinguishingMark {
   id: string
   prisonerNumber: string
@@ -142,7 +147,7 @@ export interface PrisonPersonDistinguishingMark {
   side?: ReferenceDataCodeSimple & { id: BodyPartSideId }
   partOrientation?: ReferenceDataCodeSimple & { id: PartOrientationId }
   comment?: string
-  photographUuids?: string[]
+  photographUuids?: PrisonPersonDistinguishingMarkPhotographUuid[]
   createdBy: string
   createdAt: string
 }
@@ -182,6 +187,8 @@ export interface PrisonPersonApiClient {
     distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
     photograph?: MulterFile,
   ): Promise<PrisonPersonDistinguishingMark>
+
+  getDistinguishingMark(markId: string): Promise<PrisonPersonDistinguishingMark>
 
   getImage(imageId: string): Promise<Readable>
 }

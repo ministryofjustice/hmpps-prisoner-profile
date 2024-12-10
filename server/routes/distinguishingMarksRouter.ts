@@ -18,6 +18,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
   const get = getRequest(router)
   const post = postRequest(router)
 
+  // Define valid body parts
+  const validBodyParts =
+    'face|front-and-sides|right-arm|right-leg|right-hand|right-foot|left-arm|left-leg|left-hand|left-foot|back|neck'
+
   router.use((req, res, next) => {
     // set some prisoner data to use in the views
     const { firstName, lastName, prisonerNumber } = req.middleware.prisonerData
@@ -26,7 +30,7 @@ export default function distinguishingMarksRouter(services: Services): Router {
       prisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
       prisonerNumber,
     }
-    next()
+    return next()
   })
 
   router.get('*', (req, res, next) => {
@@ -36,29 +40,29 @@ export default function distinguishingMarksRouter(services: Services): Router {
 
   const distinguishingMarksController = new DistinguishingMarksController(services.distinguishingMarksService)
 
-  get('/add/:markType', distinguishingMarksController.newDistinguishingMark)
+  // Add distinguishing mark
+  get('/', distinguishingMarksController.newDistinguishingMark)
   post(
-    '/add/:markType',
+    '/',
     validationMiddleware([newDistinguishingMarkValidator], {
       redirectBackOnError: true,
-      redirectTo: 'personal/edit/distinguishing-mark/add/mark',
     }),
     distinguishingMarksController.postNewDistinguishingMark,
   )
-  get('/add/:markType/:bodyPart', distinguishingMarksController.newDistinguishingMarkWithDetail)
 
+  // Add distinguishing mark with detail
+  get(`/:bodyPart(${validBodyParts})`, distinguishingMarksController.newDistinguishingMarkWithDetail)
   post(
-    '/add/:markType/:bodyPart',
+    `/:bodyPart(${validBodyParts})`,
     multer().fields(allBodyParts.map(part => ({ name: `file-${part}`, maxCount: 1 }))),
-    (req, res, next) => {
-      const { bodyPart, markType } = req.params
-      validationMiddleware([newDetailedDistinguishingMarkValidator], {
-        redirectBackOnError: true,
-        redirectTo: `personal/edit/distinguishing-mark/add/${markType}/${bodyPart}`,
-      })(req, res, next)
-    },
+    validationMiddleware([newDetailedDistinguishingMarkValidator], {
+      redirectBackOnError: true,
+    }),
     distinguishingMarksController.postNewDistinguishingMarkWithDetail,
   )
+
+  // Edit distinguishing mark
+  get('/:markId', distinguishingMarksController.changeDistinguishingMark)
 
   return router
 }

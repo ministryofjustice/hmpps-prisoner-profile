@@ -47,6 +47,21 @@ const detailedBodyParts = [
   'upperRightArm',
 ] as const
 
+export const bodyPartMap: Record<string, string> = {
+  face: 'face',
+  'front-and-sides': 'torso',
+  'right-arm': 'rightArm',
+  'right-leg': 'rightLeg',
+  'right-hand': 'rightHand',
+  'right-foot': 'rightFoot',
+  'left-arm': 'leftArm',
+  'left-leg': 'leftLeg',
+  'left-hand': 'leftHand',
+  'left-foot': 'leftFoot',
+  back: 'back',
+  neck: 'neck',
+}
+
 export const allBodyParts = [...bodyPartSelections, ...detailedBodyParts] as const
 export type AllBodyPartSelection = (typeof allBodyParts)[number]
 

@@ -221,7 +221,7 @@ export const inmateDetailMock: InmateDetail = {
     {
       type: 'Tattoo',
       side: 'Front',
-      bodyPart: 'Torso',
+      bodyPart: 'Front and sides',
       comment: 'ARC reactor image',
       imageId: 1413020,
     },
@@ -236,7 +236,7 @@ export const inmateDetailMock: InmateDetail = {
     {
       type: 'Tattoo',
       side: 'Back',
-      bodyPart: 'Torso',
+      bodyPart: 'Front and sides',
       comment: 'Tribal',
       imageId: 1413017,
     },
