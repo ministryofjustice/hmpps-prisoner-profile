@@ -43,12 +43,14 @@ import {
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
+import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
+    private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly metricsService: MetricsService,
   ) {}
 
@@ -495,11 +497,20 @@ export default class PersonalPageService {
   }
 
   async updateCityOrTownOfBirth(
-    _clientToken: string,
-    _user: PrisonUser,
-    _prisonerNumber: string,
-    _cityOrTownOfBirth: string,
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    cityOrTownOfBirth: string,
   ) {
-    // TODO: Call new Prison API edit endpoint
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = personIntegrationApiClient.updateBirthPlace(prisonerNumber, cityOrTownOfBirth)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['cityOrTownOfBirth'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 }
