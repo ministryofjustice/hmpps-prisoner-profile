@@ -21,6 +21,9 @@ import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prison
 import MetricsService from './metrics/metricsService'
 import { prisonUserMock } from '../data/localMockData/user'
 import { distinguishingMarkMock } from '../data/localMockData/distinguishingMarksMock'
+import Address from '../data/interfaces/prisonApi/Address'
+import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 
 jest.mock('./metrics/metricsService')
 
@@ -271,7 +274,7 @@ describe('PersonalPageService', () => {
 
       describe('Other languages', () => {
         it('Correctly handles no secondary languages', async () => {
-          prisonApiClient.getSecondaryLanguages = jest.fn(async () => [])
+          prisonApiClient.getSecondaryLanguages = jest.fn(async (): Promise<SecondaryLanguage[]> => [])
           const response = await constructService().get('token', PrisonerMockDataA)
           expect(response.personalDetails.otherLanguages).toEqual([])
         })
@@ -349,7 +352,7 @@ describe('PersonalPageService', () => {
 
   describe('Addresses', () => {
     it('Handles the API returning 404 for addresses', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => null)
+      prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => null)
       const { addresses, addressSummary } = await constructService().get('token', PrisonerMockDataA)
       expect(addresses).toBe(undefined)
       expect(addressSummary).toEqual([])
@@ -496,7 +499,7 @@ describe('PersonalPageService', () => {
         ],
       }
       prisonApiClient.getOffenderContacts = jest.fn(async () => offenderContacts)
-      prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
+      prisonApiClient.getAddressesForPerson = jest.fn(async (): Promise<Address[]> => [])
       const { nextOfKin } = await constructService().get('token', PrisonerMockDataA)
       const contact = nextOfKin[0]
 
@@ -563,7 +566,7 @@ describe('PersonalPageService', () => {
 
   describe('Addresses returns undefined', () => {
     it('Sets the address to empty', async () => {
-      prisonApiClient.getAddresses = jest.fn(async () => undefined)
+      prisonApiClient.getAddresses = jest.fn(async (): Promise<Address[]> => undefined)
       const { addresses } = await constructService().get('token', PrisonerMockDataA)
       expect(addresses).toBeUndefined()
     })
@@ -578,7 +581,7 @@ describe('PersonalPageService', () => {
     })
 
     it('Handles a 404 from the Curious API, which is presented to the service as null', async () => {
-      curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => null)
+      curiousApiClient.getLearnerNeurodivergence = jest.fn(async (): Promise<LearnerNeurodivergence[]> => null)
       const data = await constructService().get('token', PrisonerMockDataA)
       expect(data.learnerNeurodivergence.isFulfilled()).toBe(true)
       expect(data.learnerNeurodivergence.getOrThrow()).toBeNull()

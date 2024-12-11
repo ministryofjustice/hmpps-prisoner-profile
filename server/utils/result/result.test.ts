@@ -15,14 +15,14 @@ describe('result', () => {
 
   describe('handle', () => {
     it('can handle a fulfilled result', () => {
-      expect(Result.fulfilled(1).handle({ fulfilled: i => i + 1, rejected: _e => null })).toEqual(2)
-      expect(Result.fulfilled('hello').handle({ fulfilled: s => `${s} there`, rejected: _e => null })).toEqual(
+      expect(Result.fulfilled(1).handle({ fulfilled: i => i + 1, rejected: _e => null as any })).toEqual(2)
+      expect(Result.fulfilled('hello').handle({ fulfilled: s => `${s} there`, rejected: _e => null as any })).toEqual(
         'hello there',
       )
       expect(
         Result.fulfilled({ some: 'object' }).handle({
           fulfilled: o => ({ ...o, another: 'field' }),
-          rejected: _e => null,
+          rejected: _e => null as any,
         }),
       ).toEqual({ some: 'object', another: 'field' })
     })

@@ -1,16 +1,17 @@
 import LocationDetailsService from './locationDetailsService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
-import { mockOffenderCellHistory, mockCellHistoryItem1 } from '../data/localMockData/offenderCellHistoryMock'
+import { mockCellHistoryItem1, mockOffenderCellHistory } from '../data/localMockData/offenderCellHistoryMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
-import { OffenderCellHistoryItem } from '../data/interfaces/prisonApi/OffenderCellHistoryInterface'
+import OffenderCellHistory, { OffenderCellHistoryItem } from '../data/interfaces/prisonApi/OffenderCellHistoryInterface'
 import ReceptionsWithCapacityMock from '../data/localMockData/receptionsWithCapacityMock'
 import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import StaffDetails from '../data/interfaces/prisonApi/StaffDetails'
 import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
 import LocationDetails from './interfaces/locationDetailsService/LocationDetails'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import Reception from '../data/interfaces/prisonApi/Reception'
 
 describe('prisonerLocationDetailsService', () => {
   let service: LocationDetailsService
@@ -37,7 +38,7 @@ describe('prisonerLocationDetailsService', () => {
 
   describe('isReceptionFull', () => {
     it('returns true when no receptions with capacity', async () => {
-      prisonApiClient.getReceptionsWithCapacity = jest.fn(async () => [])
+      prisonApiClient.getReceptionsWithCapacity = jest.fn(async (): Promise<Reception[]> => [])
       await expect(service.isReceptionFull('', 'LEI')).resolves.toEqual(true)
     })
 
@@ -49,7 +50,7 @@ describe('prisonerLocationDetailsService', () => {
 
   describe('getLocationDetailsByLatestFirst', () => {
     it('handles empty list of cell history', async () => {
-      prisonApiClient.getOffenderCellHistory = jest.fn(async () => ({ content: [] }))
+      prisonApiClient.getOffenderCellHistory = jest.fn(async (): Promise<OffenderCellHistory> => ({ content: [] }))
       await expect(service.getLocationDetailsByLatestFirst('', prisonerNumber, 123)).resolves.toEqual([])
     })
 

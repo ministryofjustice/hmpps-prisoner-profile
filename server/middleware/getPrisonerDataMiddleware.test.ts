@@ -14,6 +14,8 @@ import { AlertsApiClient } from '../data/interfaces/alertsApi/alertsApiClient'
 import { pagedActiveAlertsMock } from '../data/localMockData/pagedAlertsMock'
 import FeatureToggleService from '../services/featureToggleService'
 import FeatureToggleStore from '../data/featureToggleStore/featureToggleStore'
+import { Alert, AlertType } from '../data/interfaces/alertsApi/Alert'
+import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchClient')
@@ -56,10 +58,10 @@ describe('GetPrisonerDataMiddleware', () => {
     prisonApiClient.getAssessments = jest.fn(async () => assessmentsMock)
     prisonApiClient.getInmateDetail = jest.fn(async () => inmateDetailMock)
     alertsApiClient = {
-      createAlert: jest.fn(async () => null),
-      getAlertDetails: jest.fn(async () => null),
-      getAlertTypes: jest.fn(async () => null),
-      updateAlert: jest.fn(async () => null),
+      createAlert: jest.fn(async (): Promise<Alert> => null),
+      getAlertDetails: jest.fn(async (): Promise<Alert> => null),
+      getAlertTypes: jest.fn(async (): Promise<AlertType[]> => null),
+      updateAlert: jest.fn(async (): Promise<Alert> => null),
       getAlerts: jest.fn(async () => pagedActiveAlertsMock),
     }
 
@@ -92,10 +94,12 @@ describe('GetPrisonerDataMiddleware', () => {
   })
 
   it('should return NotFoundError if prisonerData.prisonerNumber is undefined', async () => {
-    prisonerSearchApiClient.getPrisonerDetails = jest.fn(async () => ({
-      ...PrisonerMockDataA,
-      prisonerNumber: undefined,
-    }))
+    prisonerSearchApiClient.getPrisonerDetails = jest.fn(
+      async (): Promise<Prisoner> => ({
+        ...PrisonerMockDataA,
+        prisonerNumber: undefined,
+      }),
+    )
 
     await getPrisonerData(services)(req, res, next)
 

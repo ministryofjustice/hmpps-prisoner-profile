@@ -14,6 +14,8 @@ import { inmateDetailMock, inmateDetailMockOverride } from '../data/localMockDat
 import { CellMoveReasonMock } from '../data/localMockData/getCellMoveReasonMock'
 import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
+import CellMoveReason from '../data/interfaces/whereaboutsApi/CellMoveReason'
+import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient
@@ -194,7 +196,7 @@ describe('prisonerLocationHistoryService', () => {
 
     describe('Given no cell move reason', () => {
       it('Returns null', async () => {
-        whereaboutsApiClient.getCellMoveReason = jest.fn(async () => null)
+        whereaboutsApiClient.getCellMoveReason = jest.fn(async (): Promise<CellMoveReason> => null)
         const res = await service.getPrisonerLocationHistory(
           'token',
           PrisonerMockDataA,
@@ -211,7 +213,7 @@ describe('prisonerLocationHistoryService', () => {
     describe('Given a cell move reason', () => {
       describe('and no relevant case note', () => {
         it('Returns null', async () => {
-          caseNotesApiClient.getCaseNote = jest.fn(async () => null)
+          caseNotesApiClient.getCaseNote = jest.fn(async (): Promise<CaseNote> => null)
           const res = await service.getPrisonerLocationHistory(
             'token',
             PrisonerMockDataA,

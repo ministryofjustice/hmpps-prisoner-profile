@@ -298,16 +298,17 @@ function mapCommunityManagerToProfessionalContact(
 
   return [
     communityManagerResult.map(
-      com => ({
-        ...comRelationship,
-        firstName: com.name.forename,
-        lastName: com.name.surname,
-        teamName: com.team.description,
-        emails: [com.email, com.team.email].filter(Boolean),
-        phones: [com.telephone, com.team.telephone].filter(Boolean),
-        address: undefined,
-        unallocated: com.unallocated,
-      }),
+      com =>
+        ({
+          ...comRelationship,
+          firstName: com.name.forename,
+          lastName: com.name.surname,
+          teamName: com.team.description,
+          emails: [com.email, com.team.email].filter(Boolean),
+          phones: [com.telephone, com.team.telephone].filter(Boolean),
+          address: undefined,
+          unallocated: com.unallocated,
+        }) as ProfessionalContact,
       _error => comRelationship,
     ),
   ]
@@ -322,14 +323,15 @@ function mapKeyWorkerToProfessionalContact(
 
   return [
     keyWorkerResult.map(
-      keyWorker => ({
-        ...keyworkerRelationship,
-        firstName: keyWorker.firstName,
-        lastName: keyWorker.lastName,
-        emails: [keyWorker.email].filter(Boolean),
-        phones: [],
-        address: undefined,
-      }),
+      keyWorker =>
+        ({
+          ...keyworkerRelationship,
+          firstName: keyWorker.firstName,
+          lastName: keyWorker.lastName,
+          emails: [keyWorker.email].filter(Boolean),
+          phones: [],
+          address: undefined,
+        }) as ProfessionalContact,
       _error => keyworkerRelationship,
     ),
   ]
