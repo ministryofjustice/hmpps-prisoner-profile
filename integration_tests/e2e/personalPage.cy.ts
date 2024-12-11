@@ -588,7 +588,7 @@ context('When signed in', () => {
       page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
       page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
 
-      page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Torso')
+      page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Front and sides')
       page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
       page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
       page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')

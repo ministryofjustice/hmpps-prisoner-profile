@@ -1,4 +1,8 @@
-import { allBodyParts, bodyPartSelections } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import {
+  allBodyParts,
+  bodyPartMap,
+  bodyPartSelections,
+} from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 
 interface BodySubmission {
   bodyPart?: string
@@ -10,7 +14,7 @@ interface BodySpecificSubmission {
 }
 
 export function newDistinguishingMarkValidator({ bodyPart }: BodySubmission) {
-  const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPart)
+  const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
   if (!verifiedBodyPart) {
     return [{ text: 'Select a body part' }]
   }
@@ -26,7 +30,12 @@ export function newDetailedDistinguishingMarkValidator(body: BodySpecificSubmiss
   }
 
   if (body[`description-${body.specificBodyPart}`].length > 240) {
-    return [{ text: 'The description must be 240 characters or less', href: `#description-${body.specificBodyPart}` }]
+    return [
+      {
+        text: 'The description must be 240 characters or less',
+        href: `#description-${body.specificBodyPart}`,
+      },
+    ]
   }
 
   return []

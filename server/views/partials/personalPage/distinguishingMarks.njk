@@ -27,14 +27,17 @@
                                         <dt class="personal-distinguishing-marks__row__mark__row__key">Description</dt>
                                         <dd class='govuk-!-margin-left-0'>{{ mark.comment or "Not entered" }}</dd>
                                     </div>
+                                    {% if mark.photographUuids.length %}
+                                        <div class="personal-distinguishing-marks__row__populated__row__image-list">
+                                            {% for photo in mark.photographUuids %}
+                                                <img src="/api/prison-person-image/{{ photo.id }}" alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </dl>
-                                {% if mark.photographUuids.length %}
-                                    <div class="personal-distinguishing-marks__row__populated__row__image-list">
-                                        {% for imageId in mark.photographUuids %}
-                                            <img src="/api/prison-person-image/{{ imageId }}" alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
+                                <div>
+                                    <a href="/prisoner/{{prisonerNumber}}/personal/{{ mark.markType.description | lower }}/{{ mark.id }}" class="govuk-link govuk-link--no-visited-state">Change</a>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
@@ -63,7 +66,7 @@
                 <dd data-qa="distinguishing-marks-tattoos">{{ distinguishingMarks('tattoo', groupedDistinguishingMarks.tattoos) }}</dd>
                 {% if editEnabled %}
                     <dd class='personal-distinguishing-marks__row__actions'>
-                        <a class='govuk-link govuk-link--no-visited-state' href='/prisoner/{{prisonerNumber}}/personal/edit/distinguishing-mark/add/tattoo'>Add tattoo</a>
+                        <a class='govuk-link govuk-link--no-visited-state' href='/prisoner/{{prisonerNumber}}/personal/tattoo'>Add tattoo</a>
                     </dd>
                 {% endif %}
             </div>
@@ -73,7 +76,7 @@
                 <dd data-qa="distinguishing-marks-scars">{{ distinguishingMarks('scar', groupedDistinguishingMarks.scars) }}</dd>
                 {% if editEnabled %}
                     <dd class='personal-distinguishing-marks__row__actions'>
-                        <a class='govuk-link govuk-link--no-visited-state' href='/prisoner/{{prisonerNumber}}/personal/edit/distinguishing-mark/add/scar'>Add scar</a>
+                        <a class='govuk-link govuk-link--no-visited-state' href='/prisoner/{{prisonerNumber}}/personal/scar'>Add scar</a>
                     </dd>
                 {% endif %}
             </div>
@@ -83,7 +86,7 @@
                 <dd data-qa="distinguishing-marks-others">{{ distinguishingMarks('other mark', groupedDistinguishingMarks.others) }}</dd>
                 {% if editEnabled %}
                     <dd class='personal-distinguishing-marks__row__actions'>
-                        <a class='govuk-link govuk-link--no-visited-state' href='/prisoner/{{prisonerNumber}}/personal/edit/distinguishing-mark/add/mark'>Add mark</a>
+                        <a class='govuk-link govuk-link--no-visited-state' href='/prisoner/{{prisonerNumber}}/personal/mark'>Add mark</a>
                     </dd>
                 {% endif %}
             </div>

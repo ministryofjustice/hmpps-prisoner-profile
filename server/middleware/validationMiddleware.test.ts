@@ -21,6 +21,7 @@ describe('Validation middleware', () => {
         }
         return '/'
       },
+      originalUrl: '/original/url',
       flash: jest.fn(),
     } as any
   })
@@ -71,7 +72,7 @@ describe('Validation middleware', () => {
     const alwaysFailsValidator: Validator = () => Promise.resolve([error])
 
     await validationMiddleware([alwaysFailsValidator], { redirectBackOnError: true })(req, res, next)
-    expect(res.redirect).toHaveBeenCalledWith('/path/to/referer')
+    expect(res.redirect).toHaveBeenCalledWith('/original/url')
     expect(req.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(req.body))
     expect(req.flash).toHaveBeenCalledWith('errors', [error])
   })

@@ -118,7 +118,7 @@ export default class OverviewController {
       socNominal,
       res.locals.user,
       config,
-      res.locals.feComponentsMeta,
+      res.locals.feComponents?.sharedData,
       permissions,
     )
 

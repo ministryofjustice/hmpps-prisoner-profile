@@ -24,6 +24,8 @@ import { distinguishingMarkMock } from '../data/localMockData/distinguishingMark
 import Address from '../data/interfaces/prisonApi/Address'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClientMock'
 
 jest.mock('./metrics/metricsService')
 
@@ -31,6 +33,7 @@ describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
   let prisonPersonApiClient: PrisonPersonApiClient
+  let personIntegrationApiClient: PersonIntegrationApiClient
   let metricsService: MetricsService
 
   beforeEach(() => {
@@ -45,82 +48,12 @@ describe('PersonalPageService', () => {
     prisonApiClient.getIdentifiers = jest.fn(async () => identifiersMock)
 
     curiousApiClient = curiousApiClientMock()
-
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
 
-    prisonPersonApiClient = {
-      getPrisonPerson: jest.fn(async () => ({
-        prisonerNumber: 'abc123',
-        physicalAttributes: {
-          height: { value: 100, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-          weight: { value: 100, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-          hair: {
-            value: { id: '', description: '' },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          facialHair: {
-            value: { id: '', description: '' },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          face: {
-            value: { id: '', description: '' },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          build: {
-            value: { id: '', description: '' },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          leftEyeColour: {
-            value: { id: '', description: '' },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          rightEyeColour: {
-            value: { id: '', description: '' },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-        },
-        health: {
-          smokerOrVaper: {
-            value: { id: 'SMOKE_SMOKER', description: 'Yes they smoke', listSequence: 0, isActive: true },
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          foodAllergies: {
-            value: [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten', listSequence: 0, isActive: true }],
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-          medicalDietaryRequirements: {
-            value: [
-              {
-                id: 'MEDICAL_DIET_LOW_FAT',
-                description: 'Low fat',
-                listSequence: 0,
-                isActive: true,
-              },
-            ],
-            lastModifiedAt: '2024-07-01T01:02:03+0100',
-            lastModifiedBy: 'USER1',
-          },
-        },
-      })),
-      updatePhysicalAttributes: jest.fn(),
-      getReferenceDataDomains: jest.fn(),
-      getReferenceDataDomain: jest.fn(),
-      getReferenceDataCodes: jest.fn(),
-      getReferenceDataCode: jest.fn(),
-      updateHealth: jest.fn(),
-      getFieldHistory: jest.fn(),
-      getDistinguishingMarks: jest.fn().mockResolvedValue([distinguishingMarkMock]),
-      getImage: jest.fn(),
-      postDistinguishingMark: jest.fn(),
+    prisonPersonApiClient = prisonPersonApiClientMock()
+
+    personIntegrationApiClient = {
+      updateBirthPlace: jest.fn(),
     }
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
@@ -131,6 +64,7 @@ describe('PersonalPageService', () => {
       () => prisonApiClient,
       () => curiousApiClient,
       () => prisonPersonApiClient,
+      () => personIntegrationApiClient,
       metricsService,
     )
 
@@ -675,6 +609,18 @@ describe('PersonalPageService', () => {
     it('should not get distinguishing marks from prison person api when not enabled', async () => {
       const { distinguishingMarks } = await constructService().get('token', PrisonerMockDataA, false)
       expect(distinguishingMarks).toEqual(null)
+    })
+  })
+
+  describe('Update city or town of birth', () => {
+    it('Updates the birth place using Person Integration API', async () => {
+      await constructService().updateCityOrTownOfBirth('token', prisonUserMock, 'A1234AA', 'London')
+      expect(personIntegrationApiClient.updateBirthPlace).toHaveBeenCalledWith('A1234AA', 'London')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['cityOrTownOfBirth'],
+        user: prisonUserMock,
+      })
     })
   })
 })

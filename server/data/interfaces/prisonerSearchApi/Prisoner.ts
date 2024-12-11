@@ -165,7 +165,7 @@ export interface BodyPartDetail {
     | 'Shoulder'
     | 'Thigh'
     | 'Toe'
-    | 'Torso'
+    | 'Front and side'
 
   comment?: string
 }

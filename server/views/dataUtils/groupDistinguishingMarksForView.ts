@@ -295,7 +295,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.side?.id === 'SIDE_F') return 'Front'
       if (mark.side?.id === 'SIDE_R') return 'Right side'
       if (mark.side?.id === 'SIDE_L') return 'Left side'
-      return 'Torso - no specific location'
+      return 'Front and sides - no specific location'
     },
   },
   back: {
@@ -346,6 +346,21 @@ export default (distinguishingMarks: PrisonPersonDistinguishingMark[]): Categori
     },
     { tattoos: {}, scars: {}, others: {}, highlights: [] },
   )
+}
+
+export const getMarkLocationDescription = (distinguishingMark: PrisonPersonDistinguishingMark): string => {
+  const bodyPartConfig = Object.values(bodyPartsConfig).find(partConfig =>
+    partConfig.markIsForBodyPart(distinguishingMark),
+  )
+
+  return bodyPartConfig?.getLocationDescription(distinguishingMark) ?? 'No specific location'
+}
+
+export const getBodyPartDescription = (distinguishingMark: PrisonPersonDistinguishingMark): string => {
+  const bodyPartConfig = Object.values(bodyPartsConfig).find(partConfig =>
+    partConfig.markIsForBodyPart(distinguishingMark),
+  )
+  return bodyPartConfig?.name ?? 'Uncategorised'
 }
 
 function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPartCategory]) {

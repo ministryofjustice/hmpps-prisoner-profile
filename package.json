@@ -33,7 +33,7 @@
     "postinstall": "npx patch-package"
   },
   "engines": {
-    "node": "^20",
+    "node": "^22",
     "npm": "^10"
   },
   "jest": {
@@ -100,7 +100,7 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "^3.12.2",
+    "@apollo/client": "3.12.2",
     "@aws-sdk/client-sqs": "^3.709.0",
     "@contentful/rich-text-html-renderer": "^16.6.10",
     "@contentful/rich-text-types": "^16.8.5",

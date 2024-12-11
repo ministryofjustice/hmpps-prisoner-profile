@@ -90,4 +90,8 @@ export default class DistinguishingMarksService {
       photograph,
     )
   }
+
+  getDistinguishingMark(token: string, markId: string): Promise<PrisonPersonDistinguishingMark> {
+    return this.prisonPersonApiClientBuilder(token).getDistinguishingMark(markId)
+  }
 }

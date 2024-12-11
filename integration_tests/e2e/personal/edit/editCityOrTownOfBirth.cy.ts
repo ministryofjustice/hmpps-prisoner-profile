@@ -17,6 +17,7 @@ context('Edit city or town of birth', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonIntegrationUpdateBirthPlace', { prisonerNumber })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/city-or-town-of-birth`,
     editPageWithTitle: EditPage,
