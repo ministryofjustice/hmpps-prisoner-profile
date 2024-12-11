@@ -118,6 +118,7 @@ describe('PersonalPageService', () => {
       getDistinguishingMarks: jest.fn().mockResolvedValue([distinguishingMarkMock]),
       getImage: jest.fn(),
       postDistinguishingMark: jest.fn(),
+      getDistinguishingMark: jest.fn(),
     }
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>

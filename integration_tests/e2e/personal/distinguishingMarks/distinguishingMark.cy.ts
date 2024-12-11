@@ -8,15 +8,15 @@ const bookingId = 1102484
 const prisonerName = 'Saunders, John'
 
 const visitNewTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/edit/distinguishing-mark/add/tattoo` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo` })
 }
 
 const visitNewScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/edit/distinguishing-mark/add/scar` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar` })
 }
 
 const visitNewMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/edit/distinguishing-mark/add/mark` })
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark` })
 }
 
 context('New distinguishing feature', () => {
@@ -94,15 +94,15 @@ context('New distinguishing feature', () => {
     context('Selecting body parts', () => {
       const areas = [
         { alt: 'Neck', description: 'Neck selected', value: 'neck' },
-        { alt: 'Left arm', description: 'Left arm selected', value: 'leftArm' },
-        { alt: 'Right arm', description: 'Right arm selected', value: 'rightArm' },
-        { alt: 'Left leg', description: 'Left leg selected', value: 'leftLeg' },
-        { alt: 'Right leg', description: 'Right leg selected', value: 'rightLeg' },
-        { alt: 'Torso', description: 'Torso selected', value: 'torso' },
-        { alt: 'Left foot', description: 'Left foot selected', value: 'leftFoot' },
-        { alt: 'Right foot', description: 'Right foot selected', value: 'rightFoot' },
-        { alt: 'Left hand', description: 'Left hand selected', value: 'leftHand' },
-        { alt: 'Right hand', description: 'Right hand selected', value: 'rightHand' },
+        { alt: 'Left arm', description: 'Left arm selected', value: 'left-arm' },
+        { alt: 'Right arm', description: 'Right arm selected', value: 'right-arm' },
+        { alt: 'Left leg', description: 'Left leg selected', value: 'left-leg' },
+        { alt: 'Right leg', description: 'Right leg selected', value: 'right-leg' },
+        { alt: 'Front and sides', description: 'Front and sides selected', value: 'front-and-sides' },
+        { alt: 'Left foot', description: 'Left foot selected', value: 'left-foot' },
+        { alt: 'Right foot', description: 'Right foot selected', value: 'right-foot' },
+        { alt: 'Left hand', description: 'Left hand selected', value: 'left-hand' },
+        { alt: 'Right hand', description: 'Right hand selected', value: 'right-hand' },
         { alt: 'Back', description: 'Back selected', value: 'back' },
         { alt: 'Face', description: 'Face selected', value: 'face' },
       ]
@@ -153,7 +153,7 @@ context('New distinguishing feature', () => {
 
       rightArmSelection.click({ force: true })
       page.selectionDescription().should('contain.text', 'Right arm selected')
-      page.formValue('bodyPart').should('have.value', 'rightArm')
+      page.formValue('bodyPart').should('have.value', 'right-arm')
     })
 
     it('User can submit selection', () => {

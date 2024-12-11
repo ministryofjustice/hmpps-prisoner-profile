@@ -74,8 +74,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="rightArm"] .tooltip,
-  area:focus-visible[data-area-value="rightArm"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="right-arm"] .tooltip,
+  area:focus-visible[data-area-value="right-arm"] ~ .tooltip {
     top: 130px;
     left: -15px;
 
@@ -84,8 +84,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="leftArm"] .tooltip,
-  area:focus-visible[data-area-value="leftArm"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="left-arm"] .tooltip,
+  area:focus-visible[data-area-value="left-arm"] ~ .tooltip {
     top: 130px;
     left: 110px;
 
@@ -94,8 +94,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="torso"] .tooltip,
-  area:focus-visible[data-area-value="torso"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="front-and-sides"] .tooltip,
+  area:focus-visible[data-area-value="front-and-sides"] ~ .tooltip {
     top: 130px;
     left: 25px;
 
@@ -104,8 +104,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="rightHand"] .tooltip,
-  area:focus-visible[data-area-value="rightHand"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="right-hand"] .tooltip,
+  area:focus-visible[data-area-value="right-hand"] ~ .tooltip {
     top: 300px;
     left: -30px;
 
@@ -114,8 +114,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="leftHand"] .tooltip,
-  area:focus-visible[data-area-value="leftHand"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="left-hand"] .tooltip,
+  area:focus-visible[data-area-value="left-hand"] ~ .tooltip {
     top: 300px;
     left: 110px;
 
@@ -124,8 +124,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="rightLeg"] .tooltip,
-  area:focus-visible[data-area-value="rightLeg"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="right-leg"] .tooltip,
+  area:focus-visible[data-area-value="right-leg"] ~ .tooltip {
     top: 320px;
     left: 20px;
 
@@ -134,8 +134,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="leftLeg"] .tooltip,
-  area:focus-visible[data-area-value="leftLeg"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="left-leg"] .tooltip,
+  area:focus-visible[data-area-value="left-leg"] ~ .tooltip {
     top: 320px;
     left: 75px;
 
@@ -144,8 +144,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="rightFoot"] .tooltip,
-  area:focus-visible[data-area-value="rightFoot"] ~ .tooltip {
+  &.dm-base-image-hover[data-hover-value="right-foot"] .tooltip,
+  area:focus-visible[data-area-value="right-foot"] ~ .tooltip {
     top: 580px;
     left: 20px;
 
@@ -154,8 +154,8 @@
     }
   }
 
-  &.dm-base-image-hover[data-hover-value="leftFoot"] .tooltip,
-  area:focus-visible[data-area-value="leftFoot"] ~ .tooltip{
+  &.dm-base-image-hover[data-hover-value="left-foot"] .tooltip,
+  area:focus-visible[data-area-value="left-foot"] ~ .tooltip{
     top: 580px;
     left: 70px;
 
@@ -231,8 +231,8 @@
     background: url("/assets/images/distinguishingMarks/neck-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="rightArm"]::after,
-  &.dm-base-image-selected[data-selected="rightArm"]::before {
+  &.dm-base-image-hover[data-hover-value="right-arm"]::after,
+  &.dm-base-image-selected[data-selected="right-arm"]::before {
     display: block;
     top: 127px;
     left: 0;
@@ -241,7 +241,7 @@
     background: url("/assets/images/distinguishingMarks/right-arm-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="rightArm"]:focus-visible {
+  area[data-area-value="right-arm"]:focus-visible {
     top: 127px;
     left: 0;
     height: 200px;
@@ -249,8 +249,8 @@
     background: url("/assets/images/distinguishingMarks/right-arm-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="leftArm"]::after,
-  &.dm-base-image-selected[data-selected="leftArm"]::before {
+  &.dm-base-image-hover[data-hover-value="left-arm"]::after,
+  &.dm-base-image-selected[data-selected="left-arm"]::before {
     display: block;
     top: 127px;
     left: 126px;
@@ -259,7 +259,7 @@
     background: url("/assets/images/distinguishingMarks/left-arm-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="leftArm"]:focus-visible {
+  area[data-area-value="left-arm"]:focus-visible {
     top: 127px;
     left: 126px;
     height: 200px;
@@ -267,8 +267,8 @@
     background: url("/assets/images/distinguishingMarks/left-arm-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="torso"]::after,
-  &.dm-base-image-selected[data-selected="torso"]::before {
+  &.dm-base-image-hover[data-hover-value="front-and-sides"]::after,
+  &.dm-base-image-selected[data-selected="front-and-sides"]::before {
     display: block;
     top: 109px;
     left: 31px;
@@ -277,7 +277,7 @@
     background: url("/assets/images/distinguishingMarks/torso-front-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="torso"]:focus-visible {
+  area[data-area-value="front-and-sides"]:focus-visible {
     top: 109px;
     left: 31px;
     height: 205px;
@@ -285,8 +285,8 @@
     background: url("/assets/images/distinguishingMarks/torso-front-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="rightHand"]::after,
-  &.dm-base-image-selected[data-selected="rightHand"]::before {
+  &.dm-base-image-hover[data-hover-value="right-hand"]::after,
+  &.dm-base-image-selected[data-selected="right-hand"]::before {
     display: block;
     top: 322px;
     left: 0;
@@ -295,7 +295,7 @@
     background: url("/assets/images/distinguishingMarks/right-hand-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="rightHand"]:focus-visible {
+  area[data-area-value="right-hand"]:focus-visible {
     top: 322px;
     left: 0;
     height: 55px;
@@ -303,8 +303,8 @@
     background: url("/assets/images/distinguishingMarks/right-hand-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="leftHand"]::after,
-  &.dm-base-image-selected[data-selected="leftHand"]::before {
+  &.dm-base-image-hover[data-hover-value="left-hand"]::after,
+  &.dm-base-image-selected[data-selected="left-hand"]::before {
     display: block;
     top: 322px;
     left: 135px;
@@ -313,7 +313,7 @@
     background: url("/assets/images/distinguishingMarks/left-hand-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="leftHand"]:focus-visible {
+  area[data-area-value="left-hand"]:focus-visible {
     top: 322px;
     left: 135px;
     height: 55px;
@@ -321,8 +321,8 @@
     background: url("/assets/images/distinguishingMarks/left-hand-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="leftLeg"]::after,
-  &.dm-base-image-selected[data-selected="leftLeg"]::before {
+  &.dm-base-image-hover[data-hover-value="left-leg"]::after,
+  &.dm-base-image-selected[data-selected="left-leg"]::before {
     display: block;
     top: 313px;
     left: 82px;
@@ -331,7 +331,7 @@
     background: url("/assets/images/distinguishingMarks/left-leg-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="leftLeg"]:focus-visible {
+  area[data-area-value="left-leg"]:focus-visible {
     top: 313px;
     left: 82px;
     height: 283px;
@@ -339,8 +339,8 @@
     background: url("/assets/images/distinguishingMarks/left-leg-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="rightLeg"]::after,
-  &.dm-base-image-selected[data-selected="rightLeg"]::before {
+  &.dm-base-image-hover[data-hover-value="right-leg"]::after,
+  &.dm-base-image-selected[data-selected="right-leg"]::before {
     display: block;
     top: 312px;
     left: 33px;
@@ -349,7 +349,7 @@
     background: url("/assets/images/distinguishingMarks/right-leg-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="rightLeg"]:focus-visible {
+  area[data-area-value="right-leg"]:focus-visible {
     top: 312px;
     left: 33px;
     height: 283px;
@@ -357,8 +357,8 @@
     background: url("/assets/images/distinguishingMarks/right-leg-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="rightFoot"]::after,
-  &.dm-base-image-selected[data-selected="rightFoot"]::before {
+  &.dm-base-image-hover[data-hover-value="right-foot"]::after,
+  &.dm-base-image-selected[data-selected="right-foot"]::before {
     display: block;
     top: 593px;
     left: 44px;
@@ -367,7 +367,7 @@
     background: url("/assets/images/distinguishingMarks/right-foot-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="rightFoot"]:focus-visible {
+  area[data-area-value="right-foot"]:focus-visible {
     top: 593px;
     left: 44px;
     height: 65px;
@@ -375,8 +375,8 @@
     background: url("/assets/images/distinguishingMarks/right-foot-focus.svg") no-repeat;
   }
 
-  &.dm-base-image-hover[data-hover-value="leftFoot"]::after,
-  &.dm-base-image-selected[data-selected="leftFoot"]::before {
+  &.dm-base-image-hover[data-hover-value="left-foot"]::after,
+  &.dm-base-image-selected[data-selected="left-foot"]::before {
     display: block;
     top: 593px;
     left: 92px;
@@ -385,7 +385,7 @@
     background: url("/assets/images/distinguishingMarks/left-foot-overlay.svg") no-repeat;
   }
 
-  area[data-area-value="leftFoot"]:focus-visible {
+  area[data-area-value="left-foot"]:focus-visible {
     top: 593px;
     left: 92px;
     height: 65px;

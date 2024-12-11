@@ -2,7 +2,7 @@ import { BodyPartSelection } from '../../controllers/interfaces/distinguishingMa
 
 const selectionsToText: Record<BodyPartSelection, string> = {
   face: 'Face',
-  torso: 'Torso',
+  torso: 'Front and side',
   rightArm: 'Right arm',
   rightLeg: 'Right leg',
   rightHand: 'Right hand',

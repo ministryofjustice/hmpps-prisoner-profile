@@ -4,6 +4,7 @@ import MulterFile from '../controllers/interfaces/MulterFile'
 
 const prisonPersonApiClient = {
   postDistinguishingMark: jest.fn(),
+  getDistinguishingMark: jest.fn(),
 } as undefined as PrisonPersonApiClient
 
 describe('distinguishingMarksService', () => {
@@ -113,6 +114,14 @@ describe('distinguishingMarksService', () => {
         },
         image,
       )
+    })
+  })
+
+  describe('postNewDistinguishingMark', () => {
+    it('should call getDistinguishingMark', () => {
+      service.getDistinguishingMark('token', 'markId')
+
+      expect(prisonPersonApiClient.getDistinguishingMark).toHaveBeenCalledWith('markId')
     })
   })
 })
