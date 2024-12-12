@@ -18,7 +18,7 @@
 {% endmacro %}
 {% macro languagesHtml(personalDetails) %}
   {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
-    <p class="govuk-body" data-qa="no-language-entered">No language entered</p>
+    <p class="govuk-body" data-qa="no-language-entered">Not entered</p>
   {% else %}
   <p class="govuk-body" data-qa="spoken-language">
     {% if personalDetails.languages.spoken %}

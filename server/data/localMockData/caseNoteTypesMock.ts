@@ -8,7 +8,7 @@ export const caseNoteTypesMock: CaseNoteType[] = [
       {
         code: 'ASSESSMENT',
         description: 'Assessment',
-        activeFlag: 'Y',
+        active: true,
         sensitive: false,
         restrictedUse: false,
       },
@@ -21,7 +21,7 @@ export const caseNoteTypesMock: CaseNoteType[] = [
       {
         code: 'OPEN_COMM',
         description: 'Open Case Note',
-        activeFlag: 'Y',
+        active: true,
         sensitive: true,
         restrictedUse: false,
       },
@@ -34,7 +34,7 @@ export const caseNoteTypesMock: CaseNoteType[] = [
       {
         code: 'IEP_ENC',
         description: 'Incentive Encouragement',
-        activeFlag: 'Y',
+        active: true,
         sensitive: false,
         restrictedUse: false,
       },
@@ -47,7 +47,7 @@ export const caseNoteTypesMock: CaseNoteType[] = [
       {
         code: 'IEP_WARN',
         description: 'Incentive warning',
-        activeFlag: 'Y',
+        active: true,
         sensitive: false,
         restrictedUse: false,
       },

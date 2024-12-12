@@ -4,7 +4,6 @@ import NotFoundPage from '../pages/notFoundPage'
 import { Role } from '../../server/data/enums/role'
 import AddCaseNotePage from '../pages/addCaseNotePage'
 import { formatDate } from '../../server/utils/dateHelpers'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitCaseNotesPage = (): CaseNotesPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/case-notes' })
@@ -15,11 +14,11 @@ context('Add Case Note Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU' })
     cy.task('stubGetCaseNotesUsage', 'G6123VU')
     cy.task('stubGetCaseNoteTypes')
     cy.task('stubAddCaseNote')
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
   })
 
   context('As a user with prisoner in their caseload', () => {
@@ -118,9 +117,17 @@ context('Add Case Note Page', () => {
   context('As a user without prisoner in their caseload', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.task('stubGetCaseNoteTypes')
     })

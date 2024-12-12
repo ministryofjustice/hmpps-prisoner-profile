@@ -36,6 +36,8 @@ import RedisFeatureToggleStore from './featureToggleStore/redisFeatureToggleStor
 import InMemoryFeatureToggleStore from './featureToggleStore/inMemoryFeatureToggleStore'
 import PrisonPersonApiRestClient from './prisonPersonApiClient'
 import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
+import CsipApiRestClient from './csipApiClient'
+import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -73,6 +75,8 @@ export const dataAccess = {
     ? new RedisFeatureToggleStore(createRedisClient())
     : new InMemoryFeatureToggleStore(),
   prisonPersonApiClientBuilder: (token: string) => new PrisonPersonApiRestClient(token),
+  personIntegrationApiClientBuilder: (token: string) => new PersonIntegrationApiRestClient(token),
+  csipApiClientBuilder: (token: string) => new CsipApiRestClient(token),
   telemetryClient,
 }
 

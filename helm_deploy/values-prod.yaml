@@ -40,6 +40,7 @@ generic-service:
     LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress.hmpps.service.justice.gov.uk"
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui.hmpps.service.justice.gov.uk"
+    CSIP_UI_URL: "https://csip.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities.prison.service.justice.gov.uk/activities"
@@ -69,6 +70,8 @@ generic-service:
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api.hmpps.service.justice.gov.uk"
     PRISON_PERSON_API_URL: "https://prison-person-api.prison.service.justice.gov.uk"
+    PERSON_INTEGRATION_API_URL: "https://person-integration-api.hmpps.service.justice.gov.uk"
+    CSIP_API_URL: "https://csip-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -81,7 +84,7 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     PRISON_PERSON_API_ENABLED: "false"
     PRISON_PERSON_API_ENABLED_PRISONS: ""
-    BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "false"
+    BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
@@ -90,10 +93,14 @@ generic-service:
     sscl-newcastle: 62.172.79.105/32
     sscl-newport: 217.38.237.212/32
     groups:
-    - internal
-    - prisons
-    - private_prisons
-    - home_office
+      - internal
+      - prisons
+      - private_prisons
+      - home_office
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-prod
+
+  elastiCacheAlertsClusterIds:
+    cp-15ac40963e3a4fbf-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
+    cp-15ac40963e3a4fbf-002: "HMPPS Prisoner Profile ElastiCache Cluster Node 2"

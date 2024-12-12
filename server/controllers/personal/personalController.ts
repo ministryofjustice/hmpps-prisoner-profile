@@ -11,6 +11,8 @@ import {
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page, PostAction } from '../../services/auditService'
 import {
+  CheckboxOptions,
+  convertToTitleCase,
   fieldHistoryToFormattedValue,
   fieldHistoryToRows,
   formatLocation,
@@ -22,7 +24,17 @@ import {
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
-import { RadioFieldData, smokerOrVaperFieldData, TextFieldData } from './fieldData'
+import {
+  CheckboxFieldData,
+  foodAllergiesFieldData,
+  heightFieldData,
+  medicalDietFieldData,
+  PhysicalAttributesTextFieldData,
+  RadioFieldData,
+  smokerOrVaperFieldData,
+  TextFieldData,
+  weightFieldData,
+} from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
@@ -35,6 +47,14 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
+import {
+  checkboxInputToSelectedValues,
+  referenceDataDomainToCheckboxFieldDataOptions,
+  referenceDataDomainToCheckboxOptions,
+} from '../../utils/checkboxUtils'
+
+type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
+type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
 
 export default class PersonalController {
   constructor(
@@ -46,19 +66,14 @@ export default class PersonalController {
 
   displayPersonalPage() {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const {
-        prisonerData,
-        inmateDetail,
-        alertSummaryData: { alertFlags },
-        clientToken,
-      } = req.middleware
+      const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
       const user = res.locals.user as PrisonUser
       const { activeCaseLoadId, userRoles } = user
       const prisonPersonEnabled = enablePrisonPerson(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
-        this.personalPageService.get(clientToken, prisonerData, prisonPersonEnabled),
+        this.personalPageService.get(clientToken, prisonerData, prisonPersonEnabled, res.locals.apiErrorCallback),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
@@ -73,7 +88,7 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'personal'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===
@@ -128,6 +143,8 @@ export default class PersonalController {
           const user = res.locals.user as PrisonUser
 
           const height = editField ? parseInt(editField, 10) : 0
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousHeight = prisonPerson?.physicalAttributes?.height?.value
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -142,7 +159,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Height' },
+                details: { fieldName: heightFieldData.fieldName, previous: previousHeight, updated: height },
               })
               .catch(error => logger.error(error))
 
@@ -196,6 +213,8 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousHeight = prisonPerson?.physicalAttributes?.height?.value
 
           const feet = feetString ? parseInt(feetString, 10) : 0
           const inches = inchesString ? parseInt(inchesString, 10) : 0
@@ -214,7 +233,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Height' },
+                details: { fieldName: heightFieldData.fieldName, previous: previousHeight, updated: height },
               })
               .catch(error => logger.error(error))
 
@@ -266,6 +285,8 @@ export default class PersonalController {
           const user = res.locals.user as PrisonUser
           const { kilograms } = req.body
           const weight = parseInt(kilograms, 10)
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
 
           try {
             await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -280,7 +301,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Weight' },
+                details: { fieldName: weightFieldData.fieldName, previous: previousWeight, updated: weight },
               })
               .catch(error => logger.error(error))
 
@@ -316,16 +337,6 @@ export default class PersonalController {
             page: Page.EditWeight,
           })
 
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle: 'Weight' },
-            })
-            .catch(error => logger.error(error))
-
           res.render('pages/edit/weightImperial', {
             pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber,
@@ -344,6 +355,8 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
           const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
+          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+          const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
 
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
@@ -362,7 +375,7 @@ export default class PersonalController {
                 prisonerNumber,
                 correlationId: req.id,
                 action: PostAction.EditPhysicalCharacteristics,
-                details: { pageTitle: 'Weight' },
+                details: { fieldName: weightFieldData.fieldName, previous: previousWeight, updated: weight },
               })
               .catch(error => logger.error(error))
 
@@ -377,22 +390,62 @@ export default class PersonalController {
     }
   }
 
-  textInput(fieldData: TextFieldData) {
-    const { pageTitle, hintText, auditPage, fieldName, url, inputClasses } = fieldData
+  cityOrPlaceOfBirthTextInput = (fieldData: TextFieldData) =>
+    this.textInput(fieldData, this.getCityOrPlaceOfBirth.bind(this), this.setCityOrPlaceOfBirth.bind(this))
+
+  private async getCityOrPlaceOfBirth(req: Request): Promise<string> {
+    return convertToTitleCase(req.middleware?.inmateDetail?.birthPlace)
+  }
+
+  private async setCityOrPlaceOfBirth(
+    req: Request,
+    res: Response,
+    _fieldData: TextFieldData,
+    value: string,
+  ): Promise<void> {
+    const { prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const user = res.locals.user as PrisonUser
+    await this.personalPageService.updateCityOrTownOfBirth(clientToken, user, prisonerNumber, value)
+  }
+
+  physicalAttributesTextInput = (fieldData: PhysicalAttributesTextFieldData) =>
+    this.textInput(fieldData, this.getPhysicalAttributesText.bind(this), this.setPhysicalAttributesText.bind(this))
+
+  private async getPhysicalAttributesText(req: Request, fieldData: PhysicalAttributesTextFieldData): Promise<string> {
+    const { prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+    return (prisonPerson?.physicalAttributes[fieldData.fieldName] as ValueWithMetadata<string>)?.value
+  }
+
+  private async setPhysicalAttributesText(
+    req: Request,
+    res: Response,
+    fieldData: PhysicalAttributesTextFieldData,
+    value: string,
+  ): Promise<void> {
+    const { prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const user = res.locals.user as PrisonUser
+    await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+      [fieldData.fieldName]: value,
+    })
+  }
+
+  private textInput(fieldData: TextFieldData, getter: TextFieldGetter, setter: TextFieldSetter) {
+    const { pageTitle, hintText, auditPage, fieldName, url, redirectAnchor, inputClasses } = fieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { clientToken, prisonerData } = req.middleware
+        const { prisonerData } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ [fieldName: string]: string }>(req)
         const errors = req.flash('errors')
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
 
-        const fieldValue = requestBodyFlash
-          ? requestBodyFlash[fieldName]
-          : (prisonPerson?.physicalAttributes[fieldName] as ValueWithMetadata<string>)?.value
+        const fieldValue = requestBodyFlash ? requestBodyFlash[fieldName] : await getter(req, fieldData)
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -418,14 +471,10 @@ export default class PersonalController {
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
         const fieldValue = req.body[fieldName] || null
 
         try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-            [fieldName]: fieldValue,
-          })
+          await setter(req, res, fieldData, fieldValue)
 
           req.flash('flashMessage', {
             text: `${pageTitle} updated`,
@@ -443,7 +492,7 @@ export default class PersonalController {
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('requestBody', JSON.stringify(req.body))
           req.flash('errors', [{ text: 'There was an error please try again' }])
@@ -455,7 +504,7 @@ export default class PersonalController {
 
   editRadioFields(formTitle: string, fieldData: RadioFieldData, options: RadioOption[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { pageTitle, hintText, auditPage } = fieldData
+      const { pageTitle, hintText, redirectAnchor, auditPage } = fieldData
       const { prisonerNumber } = req.params
       const { prisonerData } = req.middleware
       const { firstName, lastName, cellLocation } = prisonerData
@@ -479,6 +528,7 @@ export default class PersonalController {
         errors,
         hintText,
         options,
+        redirectAnchor,
         miniBannerData: {
           prisonerName: prisonerBannerName,
           prisonerNumber,
@@ -501,11 +551,7 @@ export default class PersonalController {
           this.personalPageService.getReferenceDataCodes(clientToken, 'smoke'),
         ])
 
-        const options: RadioOption[] = smokerOrVaperValues.map(({ description, id }) => ({
-          text: description,
-          value: id,
-          checked: fieldValue === id,
-        }))
+        const options = objectToRadioOptions(smokerOrVaperValues, 'id', 'description', fieldValue)
 
         return this.editRadioFields(
           `Does ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} smoke or vape?`,
@@ -515,11 +561,13 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, code, fieldName, url } = smokerOrVaperFieldData
+        const { pageTitle, fieldName, url } = smokerOrVaperFieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousValue = prisonPerson?.health?.smokerOrVaper?.value?.id
 
         try {
           await this.personalPageService.updateSmokerOrVaper(clientToken, user, prisonerNumber, radioField)
@@ -530,8 +578,8 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, code, fieldName, radioField, url },
+              action: PostAction.EditSmokerOrVaper,
+              details: { fieldName, previous: previousValue, updated: radioField },
             })
             .catch(error => logger.error(error))
 
@@ -585,6 +633,11 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousValue = (
+          prisonPerson?.physicalAttributes?.[code as keyof PrisonPersonPhysicalAttributes]
+            ?.value as PrisonPersonCharacteristic
+        )?.id
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -598,7 +651,7 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, code, fieldName, radioField, url },
+              details: { fieldName, previous: previousValue, updated: radioField },
             })
             .catch(error => logger.error(error))
 
@@ -668,14 +721,17 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Eye colour'
         const fieldName = 'eyeColour'
+        const pageTitle = 'Eye colour'
         const url = 'eye-colour'
 
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const eyeColour = req.body.eyeColour || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
+        const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -690,7 +746,11 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, fieldName, eyeColour, url },
+              details: {
+                fieldName,
+                previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
+                updated: { leftEyeColour: eyeColour, rightEyeColour: eyeColour },
+              },
             })
             .catch(error => logger.error(error))
 
@@ -756,7 +816,7 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Left and right eye colours'
+        const fieldName = 'eyeColour'
         const url = 'eye-colour-individual'
 
         const { prisonerNumber } = req.params
@@ -764,6 +824,9 @@ export default class PersonalController {
         const user = res.locals.user as PrisonUser
         const leftEyeColour = req.body.leftEyeColour || null
         const rightEyeColour = req.body.rightEyeColour || null
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
+        const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
 
         try {
           await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
@@ -782,7 +845,11 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle, leftEyeColour, rightEyeColour, url },
+              details: {
+                fieldName,
+                previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
+                updated: { leftEyeColour, rightEyeColour },
+              },
             })
             .catch(error => logger.error(error))
 
@@ -829,6 +896,180 @@ export default class PersonalController {
         currentAppliesFrom,
         miniBannerData: miniBannerData(prisonerData),
       })
+    }
+  }
+
+  editCheckboxes(
+    formTitle: string,
+    fieldData: CheckboxFieldData,
+    options: CheckboxOptions[],
+    selectedValues: string[] = [],
+  ) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { prisonerNumber } = req.params
+      const { prisonerData } = req.middleware
+      const { firstName, lastName, cellLocation } = prisonerData
+      const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
+      const checkedItems = requestBodyFlash
+        ? checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
+        : selectedValues
+
+      const errors = req.flash('errors')
+
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: fieldData.auditPage,
+      })
+
+      res.render('pages/edit/checkboxField', {
+        pageTitle: `${fieldData.pageTitle} - Prisoner personal details`,
+        formTitle,
+        formHint: fieldData.hintText || '',
+        fieldName: fieldData.fieldName,
+        formOptions: fieldData.options,
+        prisonerNumber,
+        prisonerName,
+        breadcrumbPrisonerName: prisonerBannerName,
+        errors,
+        checkboxInputs: options,
+        checkedItems,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  medicalDiet() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const formTitle = `Does ${prisonerName} have any of these medical dietary requirements?`
+        const [medicalDietaryRequirementValues, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataDomain(clientToken, 'medicalDiet'),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
+
+        return this.editCheckboxes(
+          formTitle,
+          {
+            ...medicalDietFieldData,
+            options: referenceDataDomainToCheckboxFieldDataOptions(medicalDietaryRequirementValues),
+          },
+          referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
+          prisonPerson?.health?.medicalDietaryRequirements?.value.map(code => code.id),
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const checkedItems = checkboxInputToSelectedValues(medicalDietFieldData.fieldName, req.body).sort()
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousValues = prisonPerson?.health?.foodAllergies?.value?.map(code => code.id)?.sort()
+
+        try {
+          await this.personalPageService.updateMedicalDietaryRequirements(
+            clientToken,
+            user,
+            prisonerNumber,
+            checkedItems,
+          )
+          req.flash('flashMessage', {
+            text: `Medical diet updated`,
+            type: FlashMessageType.success,
+            fieldName: medicalDietFieldData.fieldName,
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditMedicalDiet,
+              details: { fieldName: medicalDietFieldData.fieldName, previous: previousValues, updated: checkedItems },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${medicalDietFieldData.url}`)
+      },
+    }
+  }
+
+  foodAllergies() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const formTitle = `Does ${prisonerName} have any food allergies?`
+        const [foodAllergyValues, prisonPerson] = await Promise.all([
+          this.personalPageService.getReferenceDataDomain(clientToken, 'foodAllergy'),
+          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        ])
+
+        return this.editCheckboxes(
+          formTitle,
+          { ...foodAllergiesFieldData, options: referenceDataDomainToCheckboxFieldDataOptions(foodAllergyValues) },
+          referenceDataDomainToCheckboxOptions(foodAllergyValues),
+          prisonPerson?.health?.foodAllergies?.value.map(code => code.id),
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const checkedItems = checkboxInputToSelectedValues(foodAllergiesFieldData.fieldName, req.body).sort()
+        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+        const previousValues = prisonPerson?.health?.foodAllergies?.value?.map(code => code.id)?.sort()
+
+        try {
+          await this.personalPageService.updateFoodAllergies(clientToken, user, prisonerNumber, checkedItems)
+
+          req.flash('flashMessage', {
+            text: `Food allergies updated`,
+            type: FlashMessageType.success,
+            fieldName: 'foodAllergies',
+          })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditFoodAllergies,
+              details: {
+                fieldName: foodAllergiesFieldData.fieldName,
+                previous: previousValues,
+                updated: checkedItems,
+              },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${foodAllergiesFieldData.url}`)
+      },
     }
   }
 }

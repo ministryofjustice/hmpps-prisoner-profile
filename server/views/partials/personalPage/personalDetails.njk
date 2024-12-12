@@ -13,6 +13,27 @@
   ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month') }} old)
 {% endset %}
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
+{% macro medicalDietHtml(personalDetails) %}
+  <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
+  {% if personalDetails.medicalDietaryRequirements.length > 0 %}
+    {% for requirement in personalDetails.medicalDietaryRequirements | formatMedicalDietaryRequirements %}
+      <span class="govuk-!-display-block">{{ requirement }}</span>
+    {% endfor %}
+  {% else %}
+    <span class="govuk-!-margin-top-1">Not entered</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro foodAllergiesHtml(personalDetails) %}
+  <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
+  {% if personalDetails.foodAllergies.length > 0 %}
+    {% for allergy in personalDetails.foodAllergies %}
+      <span class="govuk-!-display-block">{{ allergy.description }}</span>
+    {% endfor %}
+  {% else %}
+    <span class="govuk-!-margin-top-1">Not entered</span>
+  {% endif %}
+{% endmacro %}
 
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
@@ -42,7 +63,7 @@
         rows: toSummaryListRows([
             { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
             { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
-            { key: "Place of birth", value: personalDetails.placeOfBirth | title, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad } },
+            { key: "Place of birth", value: personalDetails.placeOfBirth, options: { dataQa: "place-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
             { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality" } },
             { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
             { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
@@ -53,7 +74,9 @@
             { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
             { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
             { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad } },
-            { key: "Smoker or vaper", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
+            { key: "Diet and food allergies", value: medicalDietHtml(personalDetails), options: {dataQa: "medical-diet", visible: editEnabled, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/medical-diet', rowUpdated: flashMessage.fieldName === 'medicalDiet', mergeKeyDown: true } },
+            { key: "", value: foodAllergiesHtml(personalDetails), options: {dataQa: "food-allergies", visible: editEnabled, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/food-allergies', rowUpdated: flashMessage.fieldName === 'foodAllergies' } },
+            { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
             { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
             { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
             { key: "Domestic abuse victim", value: personalDetails.domesticAbuseVictim, options: { dataQa: "domestic-abuse-victim", hideIfEmpty: true, visible: inUsersCaseLoad } },

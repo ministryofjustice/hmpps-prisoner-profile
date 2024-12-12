@@ -1,7 +1,14 @@
 .hmpps-profile-banner-alert {
   padding: 20px 30px;
   margin: 0 -15px;
-  background-color: rgba(govuk-colour("orange"), 0.25);
+
+  &--warning {
+    background-color: rgba(govuk-colour("orange"), 0.25);
+  }
+
+  &--info {
+    background-color: rgba(govuk-colour("green"), 0.25);
+  }
 
   p {
     margin: 0 0 10px 0;

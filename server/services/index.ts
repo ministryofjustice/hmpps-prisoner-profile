@@ -35,6 +35,8 @@ import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
 import PrisonPersonService from './prisonPersonService'
 import MetricsService from './metrics/metricsService'
+import DistinguishingMarksService from './distinguishingMarksService'
+import CsipService from './csipService'
 
 export const services = () => {
   const {
@@ -56,6 +58,8 @@ export const services = () => {
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
     prisonPersonApiClientBuilder,
+    personIntegrationApiClientBuilder,
+    csipApiClientBuilder,
     prisonRegisterStore,
     featureToggleStore,
     telemetryClient,
@@ -74,16 +78,16 @@ export const services = () => {
   const personalLearningPlansService = PersonalLearningPlanServiceFactory.getInstance(dataAccess)
   const userService = new UserService(prisonApiClientBuilder)
   const offenderService = new OffenderService(prisonApiClientBuilder, nonAssociationsApiClientBuilder)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService)
   const caseNotesService = new CaseNotesService(caseNotesApiClientBuilder)
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchApiClientBuilder)
-  const alertsService = new AlertsService(prisonApiClientBuilder, alertsApiClientBuilder, featureToggleService)
+  const alertsService = new AlertsService(alertsApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
     prisonPersonApiClientBuilder,
+    personIntegrationApiClientBuilder,
     metricsService,
   )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
@@ -124,6 +128,9 @@ export const services = () => {
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
   const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
+  const distinguishingMarksService = new DistinguishingMarksService(prisonPersonApiClientBuilder)
+  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, prisonPersonService)
+  const csipService = new CsipService(csipApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -174,6 +181,8 @@ export const services = () => {
     careNeedsService,
     permissionsService,
     prisonPersonService,
+    distinguishingMarksService,
+    csipService,
   }
 }
 

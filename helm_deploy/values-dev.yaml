@@ -40,6 +40,7 @@ generic-service:
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell-dev.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk"
     CCRD_UI_URL: "https://court-cases-release-dates-dev.hmpps.service.justice.gov.uk"
+    CSIP_UI_URL: "https://csip-dev.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-dev.prison.service.justice.gov.uk/activities"
@@ -67,6 +68,8 @@ generic-service:
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"
     PRISON_PERSON_API_URL: "https://prison-person-api-dev.prison.service.justice.gov.uk"
+    PERSON_INTEGRATION_API_URL: "https://person-integration-api-dev.hmpps.service.justice.gov.uk"
+    CSIP_API_URL: "https://csip-api-dev.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -77,9 +80,19 @@ generic-service:
     PROFILE_ADD_APPOINTMENT_ENABLED: "true"
     USE_OF_FORCE_DISABLED_PRISONS: "FYI,WNI,WYI"
     COURT_CASES_SUMMARY_ENABLED: "true"
-    PRISON_PERSON_API_ENABLED: "false"
-    PRISON_PERSON_API_ENABLED_PRISONS: ""
+    PRISON_PERSON_API_ENABLED: "true"
+    PRISON_PERSON_API_ENABLED_PRISONS: "KMI"
     BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "true"
+
+  scheduledDowntime:
+    enabled: true
+    startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
+    shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+  businessHoursOnly: true
+
+  elastiCacheAlertsClusterIds:
+    cp-263d93efba298fad-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
+    cp-263d93efba298fad-002: "HMPPS Prisoner Profile ElastiCache Cluster Node 2"

@@ -24,9 +24,17 @@ context('Work and skills page', () => {
     beforeEach(() => {
       const prisonerNumber = 'G6123VU'
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: ['ROLE_GLOBAL_SEARCH'],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupBannerStubs({ prisonerNumber })
       cy.setupWorkAndSkillsPageStubs({ prisonerNumber })
@@ -42,6 +50,7 @@ context('Work and skills page', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
     })
 
     context('Default Prisoner State', () => {

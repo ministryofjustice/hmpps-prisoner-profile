@@ -1,4 +1,4 @@
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import buildOverviewActions from './buildOverviewActions'
 import { PrisonerMockDataA } from '../../../data/localMockData/prisoner'
 import { prisonUserMock } from '../../../data/localMockData/user'
@@ -66,7 +66,7 @@ describe('buildOverviewActions', () => {
           socNominal,
           prisonUserMock,
           config,
-          { services: availableServices } as HeaderFooterMeta,
+          { services: availableServices } as HeaderFooterSharedData,
           perms,
         )
         expect(
@@ -241,6 +241,35 @@ describe('buildOverviewActions', () => {
         expect(
           !!resp.find(
             action => action.url === `${config.serviceUrls.offenderCategorisation}/${PrisonerMockDataA.bookingId}`,
+          ),
+        ).toEqual(visible)
+      },
+    )
+  })
+
+  describe('Make CSIP referral', () => {
+    test.each`
+      perms                        | availableServices                        | visible
+      ${{ csip: { view: true } }}  | ${[{ id: 'csipUI', navEnabled: true }]}  | ${true}
+      ${{ csip: { view: true } }}  | ${[{ id: 'csipUI', navEnabled: false }]} | ${false}
+      ${{ csip: { view: true } }}  | ${[]}                                    | ${false}
+      ${{ csip: { view: false } }} | ${[{ id: 'csipUI', navEnabled: true }]}  | ${false}
+    `(
+      'user with csip.view: $perms.csip.view and navEnabled: $availableServices.0.navEnabled can see Make CSIP referral: $visible',
+      ({ perms, availableServices, visible }) => {
+        const resp = buildOverviewActions(
+          PrisonerMockDataA,
+          pathfinderNominal,
+          socNominal,
+          prisonUserMock,
+          config,
+          { services: availableServices } as HeaderFooterSharedData,
+          perms,
+        )
+        expect(
+          !!resp.find(
+            action =>
+              action.url === `${config.serviceUrls.csip}/prisoners/${PrisonerMockDataA.prisonerNumber}/referral/start`,
           ),
         ).toEqual(visible)
       },

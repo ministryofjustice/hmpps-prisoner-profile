@@ -1,11 +1,17 @@
 import {
   PrisonPerson,
+  PrisonPersonDistinguishingMarkPhotographUuid,
   PrisonPersonHealth,
   PrisonPersonPhysicalAttributes,
   ReferenceDataCode,
   ReferenceDataDomain,
 } from '../../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { stubGetWithBody, stubPatchWithResponse } from './utils'
+import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
+import { stubFor } from './wiremock'
+import { DistinguishingMark } from '../../server/services/interfaces/personalPageService/PersonalPage'
+
+const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   prisonerNumber,
@@ -35,6 +41,23 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   health: {
     smokerOrVaper: {
       value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
+      lastModifiedAt: '2024-07-01T01:02:03+0100',
+      lastModifiedBy: 'USER1',
+    },
+    foodAllergies: {
+      value: [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 }],
+      lastModifiedAt: '2024-07-01T01:02:03+0100',
+      lastModifiedBy: 'USER1',
+    },
+    medicalDietaryRequirements: {
+      value: [
+        {
+          id: 'MEDICAL_DIET_LOW_FAT',
+          description: 'Low fat',
+          isActive: true,
+          listSequence: 0,
+        },
+      ],
       lastModifiedAt: '2024-07-01T01:02:03+0100',
       lastModifiedBy: 'USER1',
     },
@@ -88,6 +111,52 @@ export default {
         ...mockPrisonPerson(prisonerNumber).health,
         ...overrides,
       },
+    }),
+
+  stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubGetWithBody({
+      path: `${baseUrl}distinguishing-marks/prisoner/${prisonerNumber}`,
+      body: [distinguishingMarkMock],
+    }),
+
+  stubPrisonPersonGetImage: (
+    photo: PrisonPersonDistinguishingMarkPhotographUuid = distinguishingMarkMock.photographUuids[0],
+  ) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `${baseUrl}photographs/${photo.id}/file`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+        bodyFileName: placeHolderImagePath,
+      },
+    })
+  },
+
+  stubPostNewDistinguishingMark: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}distinguishing-marks/mark`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: distinguishingMarkMock,
+      },
+    })
+  },
+
+  stubGetDistinguishingMark: (markResp: DistinguishingMark) =>
+    stubGetWithBody({
+      path: `${baseUrl}distinguishing-marks/mark/.*`,
+      body: markResp ?? distinguishingMarkMock,
     }),
 
   // Reference data

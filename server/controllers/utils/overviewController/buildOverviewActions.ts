@@ -1,4 +1,4 @@
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import type HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import HmppsAction from '../../interfaces/HmppsAction'
 import { Icon } from '../../../data/enums/icon'
@@ -15,7 +15,7 @@ export default (
   socNominal: Nominal | null,
   user: HmppsUser,
   config: typeof conf,
-  feComponentsMeta: HeaderFooterMeta | undefined,
+  feComponentsSharedData: HeaderFooterSharedData | undefined,
   permissions: Permissions,
 ): HmppsAction[] => {
   const actions: HmppsAction[] = []
@@ -68,7 +68,7 @@ export default (
     })
   }
 
-  if (permissions.activity?.edit && isServiceNavEnabled('activities', feComponentsMeta)) {
+  if (permissions.activity?.edit && isServiceNavEnabled('activities', feComponentsSharedData)) {
     actions.push({
       text: 'Log an activity application',
       icon: Icon.LogActivityApplication,
@@ -101,6 +101,15 @@ export default (
       icon: Icon.ManageCategory,
       url: `${config.serviceUrls.offenderCategorisation}/${prisonerData.bookingId}`,
       dataQA: 'manage-category-action-link',
+    })
+  }
+
+  if (isServiceNavEnabled('csipUI', feComponentsSharedData) && permissions.csip?.view) {
+    actions.push({
+      text: 'Make CSIP referral',
+      icon: Icon.MakeCSIPReferral,
+      url: `${config.serviceUrls.csip}/prisoners/${prisonerData.prisonerNumber}/referral/start`,
+      dataQA: 'make-csip-referral-action-link',
     })
   }
 

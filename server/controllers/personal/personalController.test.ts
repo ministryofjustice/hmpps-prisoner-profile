@@ -3,11 +3,20 @@ import { auditServiceMock } from '../../../tests/mocks/auditServiceMock'
 import { careNeedsServiceMock } from '../../../tests/mocks/careNeedsServiceMock'
 import { personalPageServiceMock } from '../../../tests/mocks/personalPageServiceMock'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { AuditService, Page } from '../../services/auditService'
+import { AuditService, Page, PostAction } from '../../services/auditService'
 import CareNeedsService from '../../services/careNeedsService'
 import PersonalPageService from '../../services/personalPageService'
 import PersonalController from './personalController'
-import { RadioFieldData, shoeSizeFieldData } from './fieldData'
+import {
+  cityOrTownOfBirthFieldData,
+  foodAllergiesFieldData,
+  heightFieldData,
+  medicalDietFieldData,
+  RadioFieldData,
+  shoeSizeFieldData,
+  smokerOrVaperFieldData,
+  weightFieldData,
+} from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
 import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
@@ -15,9 +24,14 @@ import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileI
 import {
   PrisonPersonCharacteristicCode,
   ReferenceDataCode,
+  ReferenceDataCodeSimple,
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { prisonPersonServiceMock } from '../../../tests/mocks/prisonPersonServiceMock'
+import {
+  mockFoodAllergiesReferenceDataDomain,
+  mockMedicalDietReferenceDataDomain,
+} from '../../data/localMockData/prisonPersonApi/referenceDataMocks'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -29,10 +43,17 @@ describe('PersonalController', () => {
 
   const defaultMiddleware = {
     clientToken: 'token',
-    prisonerData: { firstName: 'First', lastName: 'Last', cellLocation: '2-3-001', prisonerNumber: 'ABC123' },
+    prisonerData: {
+      firstName: 'First',
+      lastName: 'Last',
+      cellLocation: '2-3-001',
+      prisonerNumber: 'ABC123',
+      prisonId: 999,
+    },
     inmateDetail: {
+      birthPlace: 'SHEFFIELD',
       profileInformation: [
-        { question: 'Smoker of Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
+        { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
       ],
     } as InmateDetail,
   }
@@ -72,7 +93,17 @@ describe('PersonalController', () => {
     },
     health: {
       smokerOrVaper: {
-        value: { id: 'YES', description: '', listSequence: 0, isActive: true },
+        value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
+        lastModifiedAt: '2024-07-01T01:02:03+0100',
+        lastModifiedBy: 'USER1',
+      },
+      medicalDietaryRequirements: {
+        value: [] as ReferenceDataCodeSimple[],
+        lastModifiedAt: '2024-07-01T01:02:03+0100',
+        lastModifiedBy: 'USER1',
+      },
+      foodAllergies: {
+        value: [] as ReferenceDataCodeSimple[],
         lastModifiedAt: '2024-07-01T01:02:03+0100',
         lastModifiedBy: 'USER1',
       },
@@ -85,10 +116,15 @@ describe('PersonalController', () => {
     personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
       if (domain === 'smoke')
         return [
-          { id: 'Yes', description: 'Yes' },
-          { id: 'No', description: 'No' },
+          { id: 'SMOKE_SMOKER', description: 'Yes, they smoke' },
+          { id: 'SMOKE_NO', description: 'No, they do not smoke or vape' },
         ] as ReferenceDataCode[]
       return physicalCharacteristicsMock.field as ReferenceDataCode[]
+    })
+    personalPageService.getReferenceDataDomain = jest.fn(async (_, domain) => {
+      if (domain === 'medicalDiet') return mockMedicalDietReferenceDataDomain
+      if (domain === 'foodAllergy') return mockFoodAllergiesReferenceDataDomain
+      return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
@@ -151,13 +187,34 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ editField: '1234' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ editField: '1234' })] : []
             },
             middleware: defaultMiddleware,
           } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
+        })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditHeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
@@ -203,6 +260,21 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { editField: 157 } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })
@@ -253,8 +325,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ feet: '5', inches: '10' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ feet: '5', inches: '10' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -282,6 +353,28 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining({ feetValue: undefined, inchesValue: undefined }),
           )
+        })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditHeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
@@ -329,6 +422,21 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { feet: '5', inches: '2' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })
@@ -382,13 +490,34 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ kilograms: '1234' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ kilograms: '1234' })] : []
             },
             middleware: defaultMiddleware,
           } as any
           await action(req, res)
           expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: '1234' }))
+        })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditWeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
@@ -437,6 +566,21 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
+        })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { kilograms: '96' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
     })
@@ -487,8 +631,7 @@ describe('PersonalController', () => {
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (key: string): any => {
-              if (key === 'requestBody') return [JSON.stringify({ stone: '5', pounds: '10' })]
-              return []
+              return key === 'requestBody' ? [JSON.stringify({ stone: '5', pounds: '10' })] : []
             },
             middleware: defaultMiddleware,
           } as any
@@ -516,6 +659,28 @@ describe('PersonalController', () => {
             expect.anything(),
             expect.objectContaining({ stoneValue: undefined, poundsValue: undefined }),
           )
+        })
+
+        it('Sends a page view audit event', async () => {
+          const req = {
+            id: 1,
+            params: { prisonerNumber: 'ABC123' },
+            flash: (): any => {
+              return []
+            },
+            middleware: defaultMiddleware,
+          } as any
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            prisonId: 999,
+            correlationId: req.id,
+            page: Page.EditWeight,
+          }
+
+          await action(req, res)
+
+          expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
         })
       })
 
@@ -564,6 +729,21 @@ describe('PersonalController', () => {
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
         })
+
+        it('Sends a post success audit event', async () => {
+          const request = { ...validRequest, id: 1, body: { stone: '15', pounds: '2' } }
+          const expectedAuditEvent = {
+            user: prisonUserMock,
+            prisonerNumber: 'ABC123',
+            correlationId: request.id,
+            action: PostAction.EditPhysicalCharacteristics,
+            details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
+          }
+
+          await action(request, res)
+
+          expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+        })
       })
     })
   })
@@ -578,6 +758,7 @@ describe('PersonalController', () => {
       code: PrisonPersonCharacteristicCode.build,
       auditPage: 'PAGE' as Page,
       url: 'build',
+      redirectAnchor: 'appearance',
       hintText: 'Hint text',
     }
 
@@ -620,6 +801,7 @@ describe('PersonalController', () => {
               value: 'CODE3',
             },
           ],
+          redirectAnchor: 'appearance',
           miniBannerData: {
             prisonerName: 'Last, First',
             prisonerNumber: 'A1234BC',
@@ -659,6 +841,28 @@ describe('PersonalController', () => {
             options: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
           }),
         )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: fieldData.auditPage,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
@@ -709,6 +913,20 @@ describe('PersonalController', () => {
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/build')
       })
+
+      it('Sends a post success audit event', async () => {
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: validRequest.id,
+          action: PostAction.EditPhysicalCharacteristics,
+          details: { fieldName: fieldData.fieldName, previous: '', updated: 'CODE3' },
+        }
+
+        await action(validRequest, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
   })
 
@@ -734,9 +952,10 @@ describe('PersonalController', () => {
           hintText: undefined,
           errors: [],
           options: expect.arrayContaining([
-            expect.objectContaining({ value: 'Yes', checked: true }),
-            expect.objectContaining({ value: 'No', checked: false }),
+            expect.objectContaining({ value: 'SMOKE_SMOKER' }),
+            expect.objectContaining({ value: 'SMOKE_NO' }),
           ]),
+          redirectAnchor: 'personal-details',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -762,8 +981,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ radioField: 'No' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKE_NO' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -771,9 +989,31 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([expect.objectContaining({ value: 'No', checked: true })]),
+            options: expect.arrayContaining([expect.objectContaining({ value: 'SMOKE_NO', checked: true })]),
           }),
         )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditSmokerOrVaper,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
 
@@ -786,14 +1026,19 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { radioField: 'Yes' },
+          body: { radioField: 'SMOKE_NO' },
           flash: jest.fn(),
         } as any
       })
 
       it('Updates the smoker or vaper', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'Yes')
+        expect(personalPageService.updateSmokerOrVaper).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          'A1234BC',
+          'SMOKE_NO',
+        )
       })
 
       it('Redirects to the personal page #personal-details on success', async () => {
@@ -821,13 +1066,28 @@ describe('PersonalController', () => {
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/smoker-or-vaper')
       })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { radioField: 'SMOKE_NO' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditSmokerOrVaper,
+          details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKE_SMOKER', updated: 'SMOKE_NO' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
   })
 
-  describe('Text input', () => {
+  describe('physical attributes text input', () => {
     describe('edit', () => {
       const action = async (req: any, response: any) =>
-        controller.textInput(shoeSizeFieldData).edit(req, response, () => {})
+        controller.physicalAttributesTextInput(shoeSizeFieldData).edit(req, response, () => {})
 
       it('Renders the default edit page with the correct data from the prison person API', async () => {
         const req = {
@@ -875,8 +1135,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ shoeSize: '1234' })]
-            return []
+            return key === 'requestBody' ? [JSON.stringify({ shoeSize: '1234' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -888,7 +1147,7 @@ describe('PersonalController', () => {
     describe('submit', () => {
       let validRequest: any
       const action = async (req: any, response: any) =>
-        controller.textInput(shoeSizeFieldData).submit(req, response, () => {})
+        controller.physicalAttributesTextInput(shoeSizeFieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
@@ -929,6 +1188,112 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/shoe-size')
+      })
+    })
+  })
+
+  describe('city or town of birth text input', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) =>
+        controller.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
+          pageTitle: 'City or town of birth - Prisoner personal details',
+          formTitle: 'City or town of birth',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          hintText: cityOrTownOfBirthFieldData.hintText,
+          inputClasses: cityOrTownOfBirthFieldData.inputClasses,
+          fieldName: cityOrTownOfBirthFieldData.fieldName,
+          fieldValue: 'Sheffield',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ cityOrTownOfBirth: 'SHEFFIELD' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ fieldValue: 'SHEFFIELD' }))
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) =>
+        controller.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'ABC123' },
+          body: { cityOrTownOfBirth: 'Sheffield' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it.each([
+        { cityOrTownOfBirth: '', updateRequest: null },
+        { cityOrTownOfBirth: 'Rotherham', updateRequest: 'Rotherham' },
+      ])('Valid request: %s', async ({ cityOrTownOfBirth, updateRequest }) => {
+        const request = { ...validRequest, body: { cityOrTownOfBirth } }
+        await action(request, res)
+        expect(personalPageService.updateCityOrTownOfBirth).toHaveBeenCalledWith(
+          expect.anything(),
+          prisonUserMock,
+          expect.anything(),
+          updateRequest,
+        )
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'City or town of birth updated',
+          type: FlashMessageType.success,
+          fieldName: 'cityOrTownOfBirth',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateCityOrTownOfBirth = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/city-or-town-of-birth')
       })
     })
   })
@@ -1014,6 +1379,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditEyeColour,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -1062,6 +1449,24 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: validRequest.id,
+          action: PostAction.EditPhysicalCharacteristics,
+          details: {
+            fieldName: 'eyeColour',
+            previous: { leftEyeColour: '', rightEyeColour: '' },
+            updated: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE3' },
+          },
+        }
+
+        await action(validRequest, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })
@@ -1162,6 +1567,28 @@ describe('PersonalController', () => {
           }),
         )
       })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditEyeColour,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
     })
 
     describe('submit', () => {
@@ -1210,6 +1637,373 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour-individual')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditPhysicalCharacteristics,
+          details: {
+            fieldName: 'eyeColour',
+            previous: { leftEyeColour: '', rightEyeColour: '' },
+            updated: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' },
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Medical diet', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.medicalDiet().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/checkboxField', {
+          pageTitle: expect.anything(),
+          prisonerNumber: 'ABC123',
+          prisonerName: 'First Last',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          checkboxInputs: expect.arrayContaining([
+            expect.objectContaining({
+              subValues: expect.objectContaining({
+                options: expect.arrayContaining([
+                  {
+                    value: 'FREE_FROM_MONOAMINE',
+                    text: 'Any foods that interact with monoamine oxidase inhibitors',
+                  },
+                ]),
+              }),
+            }),
+            { text: 'Low fat', value: 'MEDICAL_DIET_LOW_FAT' },
+          ]),
+          checkedItems: [],
+          fieldName: 'medicalDiet',
+          formHint: 'Select all that apply',
+          formOptions: { showDontKnow: true, showNo: false },
+          formTitle: expect.anything(),
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody'
+              ? [
+                  JSON.stringify({
+                    medicalDiet: ['MEDICAL_DIET_FREE_FROM'],
+                    'MEDICAL_DIET_FREE_FROM-subvalues': ['FREE_FROM_EGG'],
+                  }),
+                ]
+              : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            checkedItems: ['MEDICAL_DIET_FREE_FROM', 'FREE_FROM_EGG'],
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditMedicalDiet,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.medicalDiet().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { medicalDiet: ['MEDICAL_DIET_FREE_FROM'], 'MEDICAL_DIET_FREE_FROM-subvalues': ['FREE_FROM_EGG'] },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Medical diet updated',
+          type: FlashMessageType.success,
+          fieldName: 'medicalDiet',
+        })
+      })
+
+      it('Updates the prisoner health on success', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateMedicalDietaryRequirements).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.anything(),
+          'A1234BC',
+          ['FREE_FROM_EGG', 'MEDICAL_DIET_FREE_FROM'],
+        )
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateMedicalDietaryRequirements = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/medical-diet')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: {
+            medicalDiet: ['MEDICAL_DIET_LOW_SALT', 'MEDICAL_DIET_FREE_FROM'],
+            'MEDICAL_DIET_FREE_FROM-subvalues': ['FREE_FROM_EGG'],
+          },
+        }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditMedicalDiet,
+          details: {
+            fieldName: medicalDietFieldData.fieldName,
+            previous: [] as string[],
+            updated: ['FREE_FROM_EGG', 'MEDICAL_DIET_FREE_FROM', 'MEDICAL_DIET_LOW_SALT'],
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Food allergies', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.foodAllergies().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/checkboxField', {
+          pageTitle: expect.anything(),
+          prisonerNumber: 'ABC123',
+          prisonerName: 'First Last',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          checkboxInputs: expect.arrayContaining([{ text: 'Cereals containing gluten', value: 'FOOD_ALLERGY_GLUTEN' }]),
+          checkedItems: [],
+          fieldName: 'foodAllergies',
+          formHint: 'Select all that apply',
+          formOptions: { showDontKnow: false, showNo: true },
+          formTitle: expect.anything(),
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody'
+              ? [JSON.stringify({ foodAllergies: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_GLUTEN'] })]
+              : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            checkedItems: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_GLUTEN'],
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditFoodAllergies,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.foodAllergies().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { foodAllergies: ['FOOD_ALLERGY_EGG'] },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Food allergies updated',
+          type: FlashMessageType.success,
+          fieldName: 'foodAllergies',
+        })
+      })
+
+      it('Updates the prisoner health on success', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateFoodAllergies).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.anything(),
+          'A1234BC',
+          ['FOOD_ALLERGY_EGG'],
+        )
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateFoodAllergies = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/food-allergies')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { foodAllergies: ['FOOD_ALLERGY_PEANUTS', 'FOOD_ALLERGY_EGG'] },
+        }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditFoodAllergies,
+          details: {
+            fieldName: foodAllergiesFieldData.fieldName,
+            previous: [] as string[],
+            updated: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_PEANUTS'],
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })

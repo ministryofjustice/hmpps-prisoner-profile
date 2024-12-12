@@ -121,10 +121,10 @@ export default {
     curiousApiUrl: {
       url: get('CURIOUS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 20000)),
-        deadline: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 20000)),
+        response: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 3000)),
+        deadline: Number(get('CURIOUS_API_URL_TIMEOUT_SECONDS', 3000)),
       },
-      agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 20000))),
+      agent: new AgentConfig(Number(get('CURIOUS_API_URL_TIMEOUT_DEADLINE', 3000))),
     },
     whereaboutsApi: {
       url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),
@@ -276,6 +276,22 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000))),
     },
+    personIntegrationApi: {
+      url: get('PERSON_INTEGRATION_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PERSON_INTEGRATION_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PRISON_INTEGRATION_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('PERSON_INTEGRATION_TIMEOUT_DEADLINE', 10000))),
+    },
+    csipApi: {
+      url: get('CSIP_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('CSIP_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('CSIP_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('CSIP_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
@@ -295,6 +311,7 @@ export default {
     changeSomeonesCell: get('CHANGE_SOMEONES_CELL_UI_URL', 'http://localhost:3001', requiredInProduction),
     incentives: get('INCENTIVES_UI_URL', 'http://localhost:3001', requiredInProduction),
     courtCaseReleaseDates: get('CCRD_UI_URL', 'http://localhost:3001', requiredInProduction),
+    csip: get('CSIP_UI_URL', 'http://localhost:3001', requiredInProduction),
   },
   analytics: {
     tagManagerContainerId: get('TAG_MANAGER_CONTAINER_ID', ''),

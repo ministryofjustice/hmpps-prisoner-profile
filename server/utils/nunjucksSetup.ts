@@ -24,6 +24,7 @@ import {
   toNonAssociationRows,
   userHasRoles,
 } from './utils'
+import { checkboxFieldDataToInputs } from './checkboxUtils'
 import { pluralise } from './pluralise'
 import { formatAddressDate, formatDate, formatDateTime, timeFormat } from './dateHelpers'
 import config from '../config'
@@ -40,6 +41,14 @@ import incentiveSummaryToMiniSummary from '../views/dataUtils/incentiveSummaryTo
 import summaryListRowWithOptionalChangeLink, {
   listToSummaryListRows,
 } from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
+import groupDistinguishingMarks, {
+  getBodyPartDescription,
+  getMarkLocationDescription,
+} from '../views/dataUtils/groupDistinguishingMarksForView'
+import { formatMedicalDietaryRequirements } from './referenceDataCodeUtils'
+import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
+import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
+import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -47,7 +56,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
-  app.locals.applicationName = 'Digital Prison Services'
+  app.locals.applicationName = 'DPS'
   app.locals.config = config
 
   // Cachebusting version string
@@ -159,8 +168,16 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
   njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
   njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
+  njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('fieldHistoryToRows', fieldHistoryToRows)
+  njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
+  njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
+  njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
+  njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)
+  njkEnv.addFilter('toMarkLocationDescription', getMarkLocationDescription)
+  njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
+  njkEnv.addFilter('formatMedicalDietaryRequirements', formatMedicalDietaryRequirements)
 }

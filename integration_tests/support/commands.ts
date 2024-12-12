@@ -1,11 +1,8 @@
+import 'cypress-file-upload'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
-import {
-  componentsMock,
-  componentsNoServicesMock,
-} from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -19,6 +16,9 @@ Cypress.Commands.add('setupBannerStubs', ({ prisonerNumber, prisonerDataOverride
   cy.task('stubAssessments', bookingId)
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubGetAlerts')
+  cy.task('stubAlertDetails')
+  cy.task('stubGetCurrentCsip', prisonerNumber)
+  cy.task('stubGetLatestArrivalDate', prisonerNumber)
 })
 
 Cypress.Commands.add(
@@ -26,6 +26,15 @@ Cypress.Commands.add(
   ({
     bookingId,
     prisonerNumber,
+    caseLoads = [
+      {
+        caseLoadId: 'MDI',
+        currentlyActive: true,
+        description: '',
+        type: '',
+        caseloadFunction: '',
+      },
+    ],
     restrictedPatient = false,
     prisonerDataOverrides = {},
     staffRoles = [],
@@ -61,30 +70,14 @@ Cypress.Commands.add(
     cy.task('stubGetCommunityManager')
     cy.task('stubScheduledTransfers', prisonerNumber)
     cy.task('stubPrisonerDetail', prisonerNumber)
-    cy.task('stubPrisonApiAlertDetails')
-    cy.task('stubGetAlerts')
-    cy.task('stubAlertDetails')
     cy.task('stubComplexityData', { prisonerNumber, complexityLevel })
     cy.task('stubGetLatestCalculation', { prisonerNumber })
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
+    cy.task('stubGetAlerts')
+    cy.setupComponentsData({ caseLoads })
+    cy.task('stubGetCurrentCsip', prisonerNumber)
+    cy.task('stubGetLatestArrivalDate', '2024-01-01')
   },
 )
-
-Cypress.Commands.add('setupPrisonApiAlertsPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides = {} }) => {
-  cy.task('stubEventsForProfileImage', prisonerNumber)
-  cy.task('stubPrisonerData', { prisonerNumber, overrides: prisonerDataOverrides })
-  cy.task('stubActivePrisonApiAlerts', bookingId)
-  cy.task('stubActivePrisonApiAlertsPage2', bookingId)
-  cy.task('stubActivePrisonApiAlertsSorted', bookingId)
-  cy.task('stubActivePrisonApiAlertsFiltered', bookingId)
-  cy.task('stubInactivePrisonApiAlerts', bookingId)
-  if (bookingId === 1234567) {
-    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 0, inactiveAlertCount: 0 } })
-  } else {
-    cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
-  }
-  cy.task('stubComponentsMeta', componentsNoServicesMock)
-})
 
 Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides = {} }) => {
   cy.task('stubEventsForProfileImage', prisonerNumber)
@@ -95,15 +88,14 @@ Cypress.Commands.add('setupAlertsPageStubs', ({ bookingId, prisonerNumber, priso
   } else {
     cy.task('stubInmateDetail', { bookingId, inmateDetail: { activeAlertCount: 80, inactiveAlertCount: 80 } })
   }
-  cy.task('stubComponentsMeta', componentsMock)
   cy.task('stubGetAlerts')
 })
 
 Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStates = false }) => {
-  cy.task('stubGetLearnerEmployabilitySkills', prisonerNumber)
+  cy.task('stubGetLearnerEmployabilitySkills', { prisonerNumber })
   cy.task('stubGetLearnerEducation', prisonerNumber)
   cy.task('stubGetLearnerProfile', prisonerNumber)
-  cy.task('stubGetLearnerLatestAssessments', prisonerNumber)
+  cy.task('stubGetLearnerLatestAssessments', { prisonerNumber })
   cy.task('stubGetCuriousGoals', prisonerNumber)
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
   cy.task('stubGetOffenderAttendanceHistory', prisonerNumber)
@@ -140,25 +132,14 @@ Cypress.Commands.add('setupOffencesPageUnsentencedStubs', ({ prisonerNumber, boo
   cy.task('stubGetSentenceSummaryWithoutSentence', prisonerNumber)
 })
 
-Cypress.Commands.add(
-  'setupUserAuth',
-  (
-    options = {
-      caseLoads: [
-        {
-          caseLoadId: 'MDI',
-          currentlyActive: true,
-          description: '',
-          type: '',
-          caseloadFunction: '',
-        },
-      ],
-    },
-  ) => {
-    cy.task('stubSignIn', options)
-    cy.task('stubUserCaseLoads', options.caseLoads)
-  },
-)
+Cypress.Commands.add('setupUserAuth', (options = {}) => {
+  cy.task('stubSignIn', options)
+})
+
+Cypress.Commands.add('setupComponentsData', (options = {}) => {
+  cy.task('stubComponentsData', options)
+  cy.task('stubUserCaseLoads', options.caseLoads)
+})
 
 Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
@@ -176,6 +157,8 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubGetIdentifiers', prisonerNumber)
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
   cy.task('stubBeliefHistory')
+  cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber })
+  cy.task('stubPrisonPersonGetImage', { prisonerNumber })
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {

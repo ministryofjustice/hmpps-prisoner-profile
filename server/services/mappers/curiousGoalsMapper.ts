@@ -13,7 +13,6 @@ const toCuriousGoals = (learnerGoals: LearnerGoals): CuriousGoals => {
     personalGoals: learnerGoals.personalGoals.map(toGovSummaryItem),
     shortTermGoals: learnerGoals.shortTermGoals.map(toGovSummaryItem),
     longTermGoals: learnerGoals.longTermGoals.map(toGovSummaryItem),
-    problemRetrievingData: false,
   }
 }
 

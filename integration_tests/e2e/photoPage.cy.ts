@@ -18,6 +18,7 @@ context('Photo Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber, bookingId })
     cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
   })
@@ -35,6 +36,18 @@ context('Photo Page', () => {
     photoPage.breadcrumbToOverview().should('exist')
     photoPage.breadcrumbToOverview().click()
     cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
+  })
+
+  it('Clicking the print link should open a print dialog', () => {
+    cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')
+    cy.window().then(win => {
+      cy.stub(win, 'print').as('Print')
+    })
+    const photoPage = new PrisonerPhotoPage()
+    photoPage.printLink().should('be.visible')
+    photoPage.printLink().click()
+    cy.get('@Print').should('have.been.called')
   })
 
   it('Photo page should go to 404 not found page', () => {

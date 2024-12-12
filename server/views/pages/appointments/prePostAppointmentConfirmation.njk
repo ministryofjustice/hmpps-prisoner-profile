@@ -1,5 +1,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% extends "../../partials/layout.njk" %}
 
@@ -26,6 +27,20 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h2>Video link details</h2>
+
+                {% if bookAVideoLinkEnabled and mustContactTheCourt %}
+                {% set html %}
+                  <h3 class="govuk-notification-banner__heading">
+                    You must email {{ court }} to confirm the booking.
+                  </h3>
+                  <p class="govuk-body">This is because they do not yet have access to the Book a video link service.</p>
+                {% endset %}
+
+                {{ govukNotificationBanner({
+                  html: html,
+                  titleText: 'Email ' + court + ' to confirm the booking'
+                }) }}
+                {% endif %}
 
                 {{ govukSummaryList({
                     classes: 'govuk-summary-list--no-border appointment-details-list',
@@ -144,6 +159,14 @@
                             },
                             value: {
                                 text: hearingType
+                            }
+                        } if bookAVideoLinkEnabled,
+                        {
+                            key: {
+                                text: "Court hearing link"
+                            },
+                            value: {
+                                text: videoLinkUrl
                             }
                         } if bookAVideoLinkEnabled
                     ]

@@ -54,4 +54,6 @@ export default class CaseNotesPage extends Page {
   warningPrintSlip = (): PageElement => cy.getDataQa('print-slip-warning')
 
   encouragementPrintSlip = (): PageElement => cy.getDataQa('print-slip-encouragement')
+
+  apiUnavailableBanner = (): PageElement => cy.get('.dps-banner__error')
 }

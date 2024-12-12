@@ -1,7 +1,6 @@
 import { CaseLoadsDummyDataA } from '../../server/data/localMockData/caseLoad'
 import Page from '../pages/page'
 import SpecificPrisonerLocationHistoryPage from '../pages/specificPrisonerLocationHistoryPage'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 context('Specific Prisoner Location History', () => {
   const url =
@@ -14,6 +13,7 @@ context('Specific Prisoner Location History', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupSpecificLocationHistoryPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -40,7 +40,6 @@ context('Specific Prisoner Location History', () => {
           },
         ],
       })
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
     })
 
     it('Specific prisoner location history page is displayed', () => {
@@ -80,6 +79,7 @@ context('Specific Prisoner Location History', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupSpecificLocationHistoryPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
@@ -89,7 +89,6 @@ context('Specific Prisoner Location History', () => {
         caseLoads: CaseLoadsDummyDataA,
         sharingHistory: [],
       })
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
     })
 
     it('Displays the notice that the prisoner has not shared with anyone', () => {

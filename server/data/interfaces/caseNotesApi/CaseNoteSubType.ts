@@ -1,7 +1,7 @@
 export default interface CaseNoteSubType {
   code: string
   description: string
-  activeFlag: string
+  active: boolean
   sensitive: boolean
   restrictedUse: boolean
 }

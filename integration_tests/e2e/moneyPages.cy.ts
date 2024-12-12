@@ -2,7 +2,6 @@ import Page from '../pages/page'
 import NotFoundPage from '../pages/notFoundPage'
 import { accountBalancesMock } from '../../server/data/localMockData/miniSummaryMock'
 import MoneyPage from '../pages/moneyPage'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 
 const visitSpendsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: '/prisoner/G6123VU/money/spends' })
@@ -22,14 +21,23 @@ const visitDamageObligationsPage = ({ failOnStatusCode = true } = {}) => {
 
 context('Money Pages - Permissions', () => {
   beforeEach(() => {
-    cy.task('stubComponentsMeta', componentsNoServicesMock)
+    cy.setupComponentsData()
   })
 
   context('Spends', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth()
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -43,8 +51,17 @@ context('Money Pages - Permissions', () => {
   context('Private Cash', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth()
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -58,8 +75,17 @@ context('Money Pages - Permissions', () => {
   context('Savings', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth()
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -73,8 +99,17 @@ context('Money Pages - Permissions', () => {
   context('Damage Obligations', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'ZZZ', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth()
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupMoneyStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484, prisonId: 'MDI' })
     })
@@ -90,6 +125,7 @@ context('Money Pages', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
   })
 
   context('Spends', () => {

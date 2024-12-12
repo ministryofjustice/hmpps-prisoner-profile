@@ -3,7 +3,7 @@
     "target": "es2018",
     "noEmit": true,
     "moduleResolution": "node",
-    "types": ["cypress"],
+    "types": ["cypress", "cypress-file-upload"],
     "esModuleInterop": true
   },
   "include": ["**/*.ts"]

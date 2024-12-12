@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import type HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import config from '../config'
 import { mapHeaderData } from '../mappers/headerMappers'
 import OverviewController from '../controllers/overviewController'
@@ -45,23 +44,6 @@ export default function routes(services: Services): Router {
     next()
   })
 
-  router.get(standardGetPaths, async (_req, res, next) => {
-    /* Set feature toggle for using Alerts API */
-    const feComponentsMeta = res.locals.feComponentsMeta as HeaderFooterMeta
-    if (!feComponentsMeta?.services || !('activeCaseLoadId' in res.locals.user)) return next()
-
-    try {
-      await services.featureToggleService.setFeatureToggle(
-        res.locals.user.activeCaseLoadId,
-        'alertsApiEnabled',
-        feComponentsMeta.services.some(service => service.id === 'alerts'),
-      )
-      return next()
-    } catch (_error) {
-      return next()
-    }
-  })
-
   const overviewController = new OverviewController(
     services.dataAccess.pathfinderApiClientBuilder,
     services.dataAccess.manageSocCasesApiClientBuilder,
@@ -75,6 +57,7 @@ export default function routes(services: Services): Router {
     services.personalPageService,
     services.offenderService,
     services.professionalContactsService,
+    services.csipService,
   )
 
   const prisonerScheduleController = new PrisonerScheduleController(
@@ -99,6 +82,12 @@ export default function routes(services: Services): Router {
   )
 
   get(
+    '/api/prison-person-image/:imageId',
+    auditPageAccessAttempt({ services, page: ApiAction.Image }),
+    services.commonApiRoutes.prisonPersonImage,
+  )
+
+  get(
     `${basePath}`,
     auditPageAccessAttempt({ services, page: Page.Overview }),
     getPrisonerData(services),
@@ -116,7 +105,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const alertSummaryData = req.middleware?.alertSummaryData
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -128,7 +117,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
       })
     },
   )
@@ -142,9 +131,13 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const alertSummaryData = req.middleware?.alertSummaryData
       const { workAndSkillsPageService } = services
-      const workAndSkillsPageData = await workAndSkillsPageService.get(req.middleware.clientToken, prisonerData)
+      const workAndSkillsPageData = await workAndSkillsPageService.get(
+        req.middleware.clientToken,
+        prisonerData,
+        res.locals.apiErrorCallback,
+      )
 
       const fullCourseHistoryLinkUrl = `${config.serviceUrls.learningAndWorkProgress}/prisoner/${prisonerData.prisonerNumber}/work-and-skills/in-prison-courses-and-qualifications`
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
@@ -152,17 +145,18 @@ export default function routes(services: Services): Router {
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
       const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
 
+      const { curiousGoals } = workAndSkillsPageData
       const hasVc2Goals =
-        workAndSkillsPageData.curiousGoals.employmentGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.personalGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.shortTermGoals?.length > 0 ||
-        workAndSkillsPageData.curiousGoals.longTermGoals?.length > 0
+        curiousGoals.isFulfilled() &&
+        (curiousGoals.getOrNull()?.employmentGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.personalGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.shortTermGoals?.length > 0 ||
+          curiousGoals.getOrNull()?.longTermGoals?.length > 0)
 
       const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.goals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
-        workAndSkillsPageData.curiousGoals.problemRetrievingData ||
-        workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
+        !curiousGoals.isFulfilled() || workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -173,7 +167,7 @@ export default function routes(services: Services): Router {
       })
 
       res.render('pages/workAndSkills', {
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'work-and-skills'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'work-and-skills'),
         ...workAndSkillsPageData,
         pageTitle: 'Work and skills',
         fullCourseHistoryLinkUrl,
@@ -196,7 +190,7 @@ export default function routes(services: Services): Router {
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
       const inmateDetail = req.middleware?.inmateDetail
-      const alertFlags = req.middleware?.alertSummaryData.alertFlags
+      const alertSummaryData = req.middleware?.alertSummaryData
       const { offencesPageService } = services
       const { courtCaseData, releaseDates } = await offencesPageService.get(req.middleware.clientToken, prisonerData)
 
@@ -210,7 +204,7 @@ export default function routes(services: Services): Router {
 
       res.render('pages/offences', {
         pageTitle: 'Offences',
-        ...mapHeaderData(prisonerData, inmateDetail, alertFlags, res.locals.user, 'offences'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'offences'),
         courtCaseData,
         releaseDates,
         activeTab: true,
@@ -253,7 +247,7 @@ export default function routes(services: Services): Router {
 
   get(
     `${basePath}/location-history`,
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getLocationPermissions),
     async (req, res, next) => {
       const prisonerData = req.middleware?.prisonerData
@@ -266,7 +260,7 @@ export default function routes(services: Services): Router {
 
   router.use(
     `${basePath}/money`,
-    getPrisonerData(services),
+    getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getMoneyPermissions),
     moneyRouter(services),
   )

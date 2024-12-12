@@ -38,6 +38,7 @@ generic-service:
     LEARNING_AND_WORK_PROGRESS_UI_URL: "https://learning-and-work-progress-preprod.hmpps.service.justice.gov.uk"
     CHANGE_SOMEONES_CELL_UI_URL: "https://change-someones-cell-preprod.prison.service.justice.gov.uk"
     INCENTIVES_UI_URL: "https://incentives-ui-preprod.hmpps.service.justice.gov.uk"
+    CSIP_UI_URL: "https://csip-preprod.hmpps.service.justice.gov.uk"
 
     # API Service urls
     ACTIVITIES_URL: "https://activities-preprod.prison.service.justice.gov.uk/activities"
@@ -66,6 +67,8 @@ generic-service:
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-preprod.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-preprod.hmpps.service.justice.gov.uk"
     PRISON_PERSON_API_URL: "https://prison-person-api-preprod.prison.service.justice.gov.uk"
+    PERSON_INTEGRATION_API_URL: "https://person-integration-api-preprod.hmpps.service.justice.gov.uk"
+    CSIP_API_URL: "https://csip-api-preprod.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -78,7 +81,7 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     PRISON_PERSON_API_ENABLED: "false"
     PRISON_PERSON_API_ENABLED_PRISONS: ""
-    BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "false"
+    BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
@@ -93,3 +96,7 @@ generic-service:
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+
+  elastiCacheAlertsClusterIds:
+    cp-546b408b8600f28d-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
+    cp-546b408b8600f28d-002: "HMPPS Prisoner Profile ElastiCache Cluster Node 2"

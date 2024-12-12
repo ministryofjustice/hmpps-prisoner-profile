@@ -83,7 +83,7 @@ export interface CreateAlert {
 
 export interface AlertsApiQueryParams extends QueryParams {
   isActive?: boolean
-  size: number
+  size?: number
   page?: number
   sort?: string[]
   activeFromEnd?: string
@@ -93,9 +93,19 @@ export interface AlertsApiQueryParams extends QueryParams {
 }
 
 export interface AlertSummaryData {
-  activeAlertCount: number
-  inactiveAlertCount: number
-  activeAlertTypesFilter: { [key: string]: AlertTypeFilter }
-  inactiveAlertTypesFilter: { [key: string]: AlertTypeFilter }
-  alertFlags: AlertFlagLabel[]
+  activeAlertCount?: number
+  inactiveAlertCount?: number
+  activeAlertTypesFilter?: { [key: string]: AlertTypeFilter }
+  inactiveAlertTypesFilter?: { [key: string]: AlertTypeFilter }
+  alertFlags?: AlertFlagLabel[]
+  apiUnavailable: boolean
+}
+
+export interface AlertForm {
+  existingAlerts?: string
+  alertType?: string
+  alertCode?: string
+  description?: string
+  activeFrom?: string
+  activeTo?: string
 }

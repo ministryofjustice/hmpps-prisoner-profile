@@ -10,6 +10,7 @@ import StaffContacts, { YouthStaffContacts } from '../../data/interfaces/prisonA
 import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import { Result } from '../../utils/result/result'
+import CurrentCsipDetail from '../../data/interfaces/csipApi/csip'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -26,6 +27,7 @@ export default interface OverviewPageData {
   csraSummary: CsraSummary
   categorySummary: CategorySummary
   incentiveSummary: IncentiveSummary | { error: true } | null
+  currentCsipDetail: Result<CurrentCsipDetail>
   statuses: OverviewStatus[]
   personalDetails: PersonalDetails
   staffContacts: YouthStaffContacts | StaffContacts

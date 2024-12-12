@@ -604,6 +604,16 @@ export interface RadioOption {
   }
 }
 
+export interface CheckboxOptions {
+  text: string
+  value: string
+  subValues?: {
+    title: string
+    hint: string
+    options: CheckboxOptions[]
+  }
+}
+
 export const refDataToSelectOptions = (refData: ReferenceCode[]): SelectOption[] => {
   return refData.map(r => ({
     text: r.description,

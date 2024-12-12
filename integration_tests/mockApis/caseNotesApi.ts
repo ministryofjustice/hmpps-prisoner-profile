@@ -27,7 +27,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20(&page=0)?${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC(&page=0)?${includeSensitive ? '&includeSensitive=true' : '&includeSensitive=false'}`,
       },
       response: {
         status: 200,
@@ -49,7 +49,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&page=1&includeSensitive=false`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&page=1&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -93,7 +93,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=ACP&includeSensitive=false`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=ACP&includeSensitive=false`,
       },
       response: {
         status: 200,
@@ -131,7 +131,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=OMIC&includeSensitive=true`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=OMIC&includeSensitive=true`,
       },
       response: {
         status: 200,
@@ -157,7 +157,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&type=${type}&includeSensitive=false`,
+        urlPattern: `/casenotes/case-notes/${prisonerNumber}\\?size=20&sort=creationDateTime%2CDESC&type=${type}&includeSensitive=false`,
       },
       response: {
         status: 200,

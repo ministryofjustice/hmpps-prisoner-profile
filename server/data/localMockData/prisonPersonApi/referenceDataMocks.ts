@@ -1,5 +1,106 @@
 import { ReferenceDataCode, ReferenceDataDomain } from '../../interfaces/prisonPersonApi/prisonPersonApiClient'
 
+export const mockMedicalDietReferenceDataDomain: ReferenceDataDomain = {
+  code: 'MEDICAL_DIET',
+  createdAt: '',
+  createdBy: '',
+  description: '',
+  isActive: true,
+  listSequence: 0,
+  subDomains: [
+    {
+      description: 'Which foods does this diet exclude',
+      code: 'FREE_FROM',
+      subDomains: [],
+      referenceDataCodes: [
+        {
+          description: 'Any foods that interact with monoamine oxidase inhibitors',
+          code: 'MONOAMINE',
+          id: 'FREE_FROM_MONOAMINE',
+        },
+        {
+          description: 'Cheese',
+          code: 'CHEESE',
+          id: 'FREE_FROM_CHEESE',
+        },
+        { description: 'Egg', code: 'EGG', id: 'FREE_FROM_EGG' },
+        { description: 'Fat', code: 'FAT', id: 'FREE_FROM_FAT' },
+        { description: 'Fried food', code: 'FRIED_FOOD', id: 'FREE_FROM_FRIED_FOOD' },
+        { description: 'Fish', code: 'FISH', id: 'FREE_FROM_FISH' },
+        { description: 'Garlic', code: 'GARLIC', id: 'FREE_FROM_GARLIC' },
+        { description: 'Lactose', code: 'LACTOSE', id: 'FREE_FROM_LACTOSE' },
+        { description: 'Onion', code: 'ONION', id: 'FREE_FROM_ONION' },
+        { description: 'Pork', code: 'PORK', id: 'FREE_FROM_PORK' },
+        { description: 'Potato', code: 'POTATO', id: 'FREE_FROM_POTATO' },
+      ].map(x => ({
+        ...x,
+        domain: 'FREE_FROM',
+        createdAt: '',
+        createdBy: '',
+        listSequence: 0,
+        isActive: true,
+      })),
+      createdAt: '',
+      createdBy: '',
+      listSequence: 0,
+      isActive: true,
+    },
+  ],
+  referenceDataCodes: [
+    { description: "A 'free from' diet", code: 'FREE_FROM', id: 'MEDICAL_DIET_FREE_FROM' },
+    { description: 'Low fat', code: 'LOW_FAT', id: 'MEDICAL_DIET_LOW_FAT' },
+    { description: 'Low salt', code: 'LOW_SALT', id: 'MEDICAL_DIET_LOW_SALT' },
+    { description: 'Diabetic', code: 'DIABETIC', id: 'MEDICAL_DIET_DIABETIC' },
+    { description: 'Low cholesterol', code: 'LOW_CHOLESTEROL', id: 'MEDICAL_DIET_LOW_CHOLESTEROL' },
+    { description: 'Coeliac', code: 'COELIAC', id: 'MEDICAL_DIET_COELIAC' },
+    { description: 'Pregnant', code: 'PREGNANT', id: 'MEDICAL_DIET_PREGNANT' },
+    { description: 'Disordered eating', code: 'DISORDERED_EATING', id: 'MEDICAL_DIET_DISORDERED_EATING' },
+    { description: 'No', code: 'DONT_KNOW', id: 'MEDICAL_DIET_DONT_KNOW' },
+  ].map(x => ({
+    ...x,
+    domain: 'MEDICAL_DIET',
+    createdAt: '',
+    createdBy: '',
+    listSequence: 0,
+    isActive: true,
+  })),
+}
+
+export const mockFoodAllergiesReferenceDataDomain: ReferenceDataDomain = {
+  code: 'FOOD_ALLERGY',
+  createdAt: '',
+  createdBy: '',
+  description: '',
+  isActive: true,
+  listSequence: 0,
+  subDomains: [],
+  referenceDataCodes: [
+    { description: 'Celery', code: 'CELERY' },
+    { description: 'Cereals containing gluten', code: 'GLUTEN' },
+    { description: 'Crustaceans', code: 'CRUSTACEANS' },
+    { description: 'Egg', code: 'EGG' },
+    { description: 'Fish', code: 'FISH' },
+    { description: 'Lupin', code: 'LUPIN' },
+    { description: 'Milk', code: 'MILK' },
+    { description: 'Molluscs', code: 'MOLLUSCS' },
+    { description: 'Mustard', code: 'MUSTARD' },
+    { description: 'Peanuts', code: 'PEANUTS' },
+    { description: 'Seasame', code: 'SEASAME' },
+    { description: 'Soya', code: 'SOYA' },
+    { description: 'Sulpur Dioxide', code: 'SULPUR_DIOXIDE' },
+    { description: 'Tree nuts', code: 'TREE_NUTS' },
+    { description: 'No', code: 'NO' },
+  ].map(x => ({
+    ...x,
+    id: `FOOD_ALLERGY_${x.code}`,
+    domain: 'MEDICAL_DIET',
+    createdAt: '',
+    createdBy: '',
+    listSequence: 0,
+    isActive: true,
+  })),
+}
+
 export const referenceDataDomainsMock: ReferenceDataDomain[] = [
   {
     code: 'BUILD',
@@ -12,6 +113,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     lastModifiedBy: null,
     deactivatedAt: null,
     deactivatedBy: null,
+    subDomains: [],
     referenceDataCodes: [
       {
         id: 'BUILD_FRAIL',
@@ -179,6 +281,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
     lastModifiedAt: null,
     lastModifiedBy: null,
     deactivatedAt: null,
+    subDomains: [],
     deactivatedBy: null,
     referenceDataCodes: [
       {
@@ -297,6 +400,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
   },
   {
     code: 'FACE',
+    subDomains: [],
     description: 'Face shape',
     listSequence: 0,
     isActive: true,
@@ -395,6 +499,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
   },
   {
     code: 'FACIAL_HAIR',
+    subDomains: [],
     description: 'Facial hair type',
     listSequence: 0,
     isActive: true,
@@ -493,6 +598,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
   },
   {
     code: 'HAIR',
+    subDomains: [],
     description: 'Hair type or colour',
     listSequence: 0,
     isActive: true,
@@ -705,6 +811,7 @@ export const referenceDataDomainsMock: ReferenceDataDomain[] = [
 
 export const referenceDataDomainMock: ReferenceDataDomain = {
   code: 'HAIR',
+  subDomains: [],
   description: 'Hair type or colour',
   listSequence: 0,
   isActive: true,

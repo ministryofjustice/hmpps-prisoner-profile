@@ -11,6 +11,7 @@ context('Work and skills page - Work And Activities Card', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
     })
 
     context('Default Prisoner State', () => {

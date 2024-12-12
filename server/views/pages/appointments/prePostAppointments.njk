@@ -183,7 +183,8 @@
                                 name: "court",
                                 id: "court",
                                 label: {
-                                    text: "Which court is the booking for?"
+                                    text: "Which court is the booking for?",
+                                    classes: 'govuk-!-font-weight-bold'
                                 },
                                 items: courts | addDefaultSelectedValue('Choose court') | setSelected(formValues.court),
                                 errorMessage: errors | findError("court")
@@ -194,11 +195,52 @@
                                     name: "hearingType",
                                     id: "hearingType",
                                     label: {
-                                        text: "What is the hearing type?"
+                                        text: "What is the hearing type?",
+                                        classes: 'govuk-!-font-weight-bold'
                                     },
                                     items: hearingTypes | addDefaultSelectedValue('Choose hearing type') | setSelected(formValues.hearingType),
                                     errorMessage: errors | findError("hearingType")
                                 }) }}
+
+                                {% set courtHearingLinkHtml %}
+                                    {{ govukInput({
+                                        name: "videoLinkUrl",
+                                        id: "videoLinkUrl",
+                                        label: {
+                                            text: "Court hearing link"
+                                        },
+                                        value: formValues.videoLinkUrl,
+                                        errorMessage: errors | findError("videoLinkUrl")
+                                    }) }}
+                                {% endset %}
+
+                                {{ govukRadios({
+                                    idPrefix: "cvpRequired",
+                                    name: "cvpRequired",
+                                    errorMessage: errors | findError('cvpRequired'),
+                                    fieldset: {
+                                        legend: {
+                                            text: "Do you know the link for this video link hearing?",
+                                            classes: "govuk-fieldset__legend--s"
+                                        }
+                                    },
+                                    items: [
+                                        {
+                                            value: "yes",
+                                            text: "Yes",
+                                            checked: formValues.cvpRequired == 'yes',
+                                            conditional: {
+                                                html: courtHearingLinkHtml
+                                            }
+                                        },
+                                        {
+                                            value: "no",
+                                            text: "No",
+                                            checked: formValues.cvpRequired == 'no'
+                                        }
+                                    ]
+                                }) }}
+
                             {% endif %}
                         </div>
                     </div>

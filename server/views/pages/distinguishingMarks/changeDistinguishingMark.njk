@@ -1,0 +1,83 @@
+{% extends "../index.njk" %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#appearance" %}
+{% set heading =  "Change "+ markType + " details" %}
+{% set pageTitle =  heading + " - Prisoner personal details" %}
+
+{% block body %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
+        </div>
+    </div>
+
+    <span class="govuk-caption-l">Distinguishing marks</span>
+    <h1 class='govuk-!-margin-top-0 govuk-!-font-size-36'>{{ heading }}</h1>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ govukSummaryList({
+                classes: 'govuk-!-margin-bottom-6',
+                rows: [
+                    { key: { text: "Body part", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark | toBodyPartDescription, classes: "hmpps-vertical-align-top" },
+                        actions: {
+                        items: [
+                            {
+                                href: "#",
+                                text: "Change",
+                                visuallyHiddenText: "body part",
+                                classes: "govuk-link--no-visited-state"
+                            }
+                        ], classes: "hmpps-vertical-align-top"
+                        }
+                    },
+                    { key: { text: "Location", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark | toMarkLocationDescription, classes: "hmpps-vertical-align-top" },
+                        actions: {
+                        items: [
+                            {
+                                href: "#",
+                                text: "Change",
+                                visuallyHiddenText: "location",
+                                classes: "govuk-link--no-visited-state"
+                            }
+                        ], classes: "hmpps-vertical-align-top"
+                        }
+                    },
+                    { key: { text: "Description", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark.comment | default("Not entered", true), classes: "hmpps-vertical-align-top" },
+                        actions: {
+                        items: [
+                            {
+                                href: "#",
+                                text: "Change",
+                                visuallyHiddenText: "description",
+                                classes: "govuk-link--no-visited-state"
+                            }
+                        ], classes: "hmpps-vertical-align-top"
+                        }
+                    },
+                    { key: { text: "Photo", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { html: photoHtml },
+                        actions: {
+                        items: [
+                            {
+                                href: "#",
+                                text: "Change",
+                                visuallyHiddenText: "photograph",
+                                classes: "govuk-link--no-visited-state"
+                            }
+                        ], classes: "hmpps-vertical-align-top"
+                        }
+                    }
+                ]
+            }) }}
+        </div>
+    </div>
+
+    <div class="govuk-button-group">
+        {{ govukButton({ text: "Return to the profile", href: refererUrl }) }}
+    </div>
+
+{% endblock %}

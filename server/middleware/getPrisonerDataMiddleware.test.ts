@@ -106,23 +106,7 @@ describe('GetPrisonerDataMiddleware', () => {
     expect(req.middleware.prisonerData).toBeUndefined()
   })
 
-  it('should populate prisonerData and inmateDetail in middleware', async () => {
-    await getPrisonerData(services)(req, res, next)
-
-    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalled()
-    expect(prisonApiClient.getInmateDetail).toHaveBeenCalled()
-    expect(prisonApiClient.getAssessments).toHaveBeenCalled()
-    expect(alertsApiClient.getAlerts).toHaveBeenCalledTimes(0)
-    expect(req.middleware.prisonerData).toEqual({
-      ...PrisonerMockDataA,
-      assessments: assessmentsMock,
-      csra: assessmentsMock[1].classification,
-    })
-    expect(req.middleware.inmateDetail).toEqual(inmateDetailMock)
-    expect(next).toHaveBeenCalledWith()
-  })
-
-  it('should populate prisonerData, inmateDetail and alertFlags in middleware when alerts API enabled', async () => {
+  it('should populate prisonerData, inmateDetail and alertSummaryData in middleware', async () => {
     featureToggleStoreMock = {
       getToggle: jest.fn(async () => true),
       setToggle: jest.fn(),
@@ -142,6 +126,14 @@ describe('GetPrisonerDataMiddleware', () => {
       csra: assessmentsMock[1].classification,
     })
     expect(req.middleware.inmateDetail).toEqual(inmateDetailMock)
+    expect(req.middleware.alertSummaryData).toEqual({
+      apiUnavailable: false,
+      activeAlertCount: 20,
+      inactiveAlertCount: 0,
+      alertFlags: expect.anything(),
+      activeAlertTypesFilter: expect.anything(),
+      inactiveAlertTypesFilter: {},
+    })
     expect(next).toHaveBeenCalledWith()
   })
 })

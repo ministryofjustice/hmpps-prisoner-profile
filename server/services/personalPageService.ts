@@ -8,7 +8,15 @@ import PersonalPage, {
   PropertyItem,
 } from './interfaces/personalPageService/PersonalPage'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
-import { addressToLines, calculateAge, camelToSnakeCase, formatHeight, formatName, formatWeight } from '../utils/utils'
+import {
+  addressToLines,
+  calculateAge,
+  camelToSnakeCase,
+  convertToTitleCase,
+  formatHeight,
+  formatName,
+  formatWeight,
+} from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
   getOffenderIdentifierValue,
@@ -28,16 +36,21 @@ import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import {
   PrisonPerson,
   PrisonPersonApiClient,
+  PrisonPersonDistinguishingMark,
   PrisonPersonPhysicalAttributesUpdate,
+  ReferenceDataCodeSimple,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
+import { Result } from '../utils/result/result'
+import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
+    private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly metricsService: MetricsService,
   ) {}
 
@@ -47,6 +60,11 @@ export default class PersonalPageService {
       return apiClient.getPrisonPerson(prisonerNumber)
     }
     return null
+  }
+
+  async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
+    const apiClient = this.prisonPersonApiClientBuilder(token)
+    return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
   async updatePhysicalAttributes(
@@ -67,7 +85,12 @@ export default class PersonalPageService {
     return response
   }
 
-  public async get(token: string, prisonerData: Prisoner, enablePrisonPerson: boolean = false): Promise<PersonalPage> {
+  public async get(
+    token: string,
+    prisonerData: Prisoner,
+    enablePrisonPerson: boolean = false,
+    apiErrorCallback: (error: Error) => void = () => null,
+  ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     const { bookingId, prisonerNumber } = prisonerData
@@ -81,6 +104,7 @@ export default class PersonalPageService {
       identifiers,
       beliefs,
       prisonPerson,
+      distinguishingMarks,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -91,9 +115,14 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
+      enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
+    const learnerNeurodivergence = await Result.wrap(
+      this.getLearnerNeurodivergence(token, prisonerNumber),
+      apiErrorCallback,
+    )
     return {
       personalDetails: this.personalDetails(
         prisonerData,
@@ -118,9 +147,10 @@ export default class PersonalPageService {
           inmateDetail.profileInformation,
         ),
       },
-      learnerNeurodivergence: await this.getLearnerNeurodivergence(token, prisonerNumber),
+      learnerNeurodivergence,
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
+      distinguishingMarks,
     }
   }
 
@@ -209,7 +239,7 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      placeOfBirth: inmateDetail.birthPlace || 'Not entered',
+      placeOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
       preferredName: formatName(
         prisonerDetail?.currentWorkingFirstName,
         undefined,
@@ -220,13 +250,28 @@ export default class PersonalPageService {
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
       smokerOrVaper: prisonPerson
-        ? prisonPerson.health?.smokerOrVaper?.value?.description || 'Not entered'
+        ? this.mapSmokerDescription(prisonPerson.health?.smokerOrVaper?.value) || 'Not entered'
         : getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
+      medicalDietaryRequirements:
+        prisonPerson?.health?.medicalDietaryRequirements?.value
+          ?.map(({ id, description }) => ({ id, description }))
+          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
+      foodAllergies:
+        prisonPerson?.health?.foodAllergies?.value
+          ?.map(({ id, description }) => ({ id, description }))
+          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
     }
   }
+
+  private mapSmokerDescription = (refData: ReferenceDataCodeSimple) =>
+    ({
+      SMOKE_SMOKER: 'Smoker',
+      SMOKE_VAPER: 'Vaper or uses nicotine replacement therapy (NRT)',
+      SMOKE_NO: 'Does not smoke or vape',
+    })[refData?.id] ?? null
 
   private identityNumbers(prisonerData: Prisoner, identifiers: OffenderIdentifier[]): IdentityNumbers {
     return {
@@ -403,12 +448,65 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
+  async getReferenceDataDomain(clientToken: string, domain: string) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    return prisonPersonApiClient.getReferenceDataDomain(camelToSnakeCase(domain))
+  }
+
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['smokerOrVaper'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateMedicalDietaryRequirements(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    medicalDietaryRequirements: string[],
+  ) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { medicalDietaryRequirements })
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['medicalDietaryRequirements'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateFoodAllergies(clientToken: string, user: PrisonUser, prisonerNumber: string, foodAllergies: string[]) {
+    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
+    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
+
+    this.metricsService.trackPrisonPersonUpdate({
+      fieldsUpdated: ['foodAllergies'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateCityOrTownOfBirth(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    cityOrTownOfBirth: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = personIntegrationApiClient.updateBirthPlace(prisonerNumber, cityOrTownOfBirth)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['cityOrTownOfBirth'],
       prisonerNumber,
       user,
     })

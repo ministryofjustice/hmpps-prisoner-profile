@@ -1,4 +1,3 @@
-import AlertFlagLabel from '@ministryofjustice/hmpps-connect-dps-shared-items/dist/alertFlags/types/AlertFlagLabel'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { tabLinks } from '../data/profileBanner/profileBanner'
 import {
@@ -15,6 +14,7 @@ import { Role } from '../data/enums/role'
 import { canViewCaseNotes } from '../utils/roleHelpers'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { HmppsUser } from '../interfaces/HmppsUser'
+import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: HmppsUser) {
   const { userRoles } = user
@@ -88,7 +88,7 @@ export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: I
 export function mapHeaderData(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
-  alertFlagLabels: AlertFlagLabel[],
+  alertSummaryData: AlertSummaryData,
   user?: HmppsUser,
   pageId?: string,
   hideBanner?: boolean,
@@ -107,13 +107,15 @@ export function mapHeaderData(
     }),
     prisonerNumber: prisonerData.prisonerNumber,
     profileBannerTopLinks: mapProfileBannerTopLinks(prisonerData, inmateDetail, user),
-    alerts: alertFlagLabels,
+    alertSummaryData,
     categoryLabel: formatCategoryALabel(prisonerData.category),
     tabLinks: tabs,
     photoType,
     prisonId: prisonerData.prisonId,
     restrictedPatient: prisonerData.restrictedPatient,
     hideBanner: hideBanner || false,
+    newArrival24: prisonerData.newArrival24,
+    newArrival72: prisonerData.newArrival72,
   }
 }
 

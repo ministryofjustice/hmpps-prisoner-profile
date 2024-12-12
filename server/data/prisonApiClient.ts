@@ -40,11 +40,6 @@ import { AgenciesEmail, AgencyDetails } from './interfaces/prisonApi/Agency'
 import StaffDetails from './interfaces/prisonApi/StaffDetails'
 import OffenderBooking from './interfaces/prisonApi/OffenderBooking'
 import OffenderCellHistory from './interfaces/prisonApi/OffenderCellHistoryInterface'
-import PrisonApiAlert, {
-  PrisonApiAlertChanges,
-  PrisonApiAlertType,
-  PrisonApiCreateAlert,
-} from './interfaces/prisonApi/PrisonApiAlert'
 import CsraAssessment, { CsraAssessmentSummary } from './interfaces/prisonApi/CsraAssessment'
 import Transaction from './interfaces/prisonApi/Transaction'
 import { DamageObligationContainer } from './interfaces/prisonApi/DamageObligation'
@@ -61,7 +56,7 @@ import Telephone from './interfaces/prisonApi/Telephone'
 import Belief from './interfaces/prisonApi/Belief'
 import Reception from './interfaces/prisonApi/Reception'
 import { OffenderContacts } from './interfaces/prisonApi/OffenderContact'
-import PagedList, { AlertsListQueryParams, VisitsListQueryParams } from './interfaces/prisonApi/PagedList'
+import PagedList, { VisitsListQueryParams } from './interfaces/prisonApi/PagedList'
 import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
 import CourtEvent from './interfaces/prisonApi/CourtEvent'
@@ -176,13 +171,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getSecondaryLanguages(bookingId: number): Promise<SecondaryLanguage[]> {
     return this.restClient.get<SecondaryLanguage[]>({ path: `/api/bookings/${bookingId}/secondary-languages` })
-  }
-
-  async getAlerts(bookingId: number, queryParams?: AlertsListQueryParams): Promise<PagedList<PrisonApiAlert>> {
-    return this.restClient.get<PagedList<PrisonApiAlert>>({
-      path: `/api/bookings/${bookingId}/alerts/v2`,
-      query: mapToQueryString(queryParams),
-    })
   }
 
   async getProperty(bookingId: number): Promise<PropertyContainer[]> {
@@ -320,28 +308,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<OffenderBooking[]>({
       path: `/api/locations/${locationId}/inmates`,
     })
-  }
-
-  async getAlertTypes(): Promise<PrisonApiAlertType[]> {
-    return this.restClient.get<PrisonApiAlertType[]>({
-      path: `/api/reference-domains/domains/ALERT?withSubCodes=true`,
-      headers: { 'page-limit': '1000' },
-    })
-  }
-
-  async createAlert(bookingId: number, alert: PrisonApiCreateAlert): Promise<PrisonApiAlert> {
-    return this.restClient.post<PrisonApiAlert>({
-      path: `/api/bookings/${bookingId}/alert`,
-      data: alert,
-    })
-  }
-
-  async updateAlert(bookingId: number, alertId: string, alertChanges: PrisonApiAlertChanges): Promise<PrisonApiAlert> {
-    return (await this.restClient.put({
-      path: `/api/bookings/${bookingId}/alert/${alertId}`,
-      query: mapToQueryString({ lockTimeout: true }),
-      data: alertChanges,
-    })) as PrisonApiAlert
   }
 
   async getCsraAssessment(bookingId: number, assessmentSeq: number): Promise<CsraAssessment> {
@@ -530,12 +496,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })
   }
 
-  async getAlertDetails(bookingId: number, alertId: string): Promise<PrisonApiAlert> {
-    return this.restClient.get<PrisonApiAlert>({
-      path: `/api/bookings/${bookingId}/alerts/${alertId}`,
-    })
-  }
-
   async getReceptionsWithCapacity(agencyId: string, attribute: string): Promise<Reception[]> {
     return this.restClient.get<Reception[]>({
       path: `/api/agencies/${agencyId}/receptionsWithCapacity${attribute ? `?attribute=${attribute}` : ''}`,
@@ -571,5 +531,11 @@ export default class PrisonApiRestClient implements PrisonApiClient {
 
   async getActiveCourtCasesCount(bookingId: number): Promise<number> {
     return this.restClient.get<number>({ path: `/api/court/${bookingId}/count-active-cases` })
+  }
+
+  async getLatestArrivalDate(prisonerNumber: string): Promise<string> {
+    return this.restClient.get<string>({
+      path: `/api/movements/offenders/${prisonerNumber}/latest-arrival-date`,
+    })
   }
 }

@@ -390,6 +390,8 @@ export default class AppointmentController {
         court,
         otherCourt,
         hearingType,
+        cvpRequired,
+        videoLinkUrl,
       } = req.body
       const appointmentFlash = req.flash('postVLBDetails')
       if (!appointmentFlash?.length) {
@@ -474,7 +476,8 @@ export default class AppointmentController {
               ],
               courtCode: court,
               courtHearingType: hearingType,
-              comments: appointmentDefaults.comment,
+              comments: appointmentDefaults.comment.trim() || undefined,
+              videoLinkUrl: videoLinkUrl.trim() || undefined,
             } as CreateVideoBookingRequest)
 
         try {
@@ -497,6 +500,8 @@ export default class AppointmentController {
           court,
           otherCourt,
           hearingType,
+          cvpRequired,
+          videoLinkUrl,
         },
       })
 
@@ -594,7 +599,11 @@ export default class AppointmentController {
               .getCourtHearingTypes(clientToken)
               .then(r => r.find(ht => ht.code === formValues.hearingType).description)
           : undefined,
+        videoLinkUrl: formValues.videoLinkUrl,
         bookAVideoLinkEnabled: config.featureToggles.bookAVideoLinkEnabled,
+        mustContactTheCourt:
+          config.featureToggles.bookAVideoLinkEnabled &&
+          !(courts as Court[]).find(court => court.code === formValues.court)?.enabled,
       }
 
       // Save appointment details to session for movement slips to pick up if needed
@@ -608,7 +617,7 @@ export default class AppointmentController {
       }
 
       // Send confirmation email
-      if (userEmailData && userEmailData.email) {
+      if (!config.featureToggles.bookAVideoLinkEnabled && userEmailData && userEmailData.email) {
         const personalisation = {
           startTime: appointmentData.startTime,
           endTime: appointmentData.endTime,

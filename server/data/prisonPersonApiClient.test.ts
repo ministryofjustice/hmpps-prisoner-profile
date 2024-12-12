@@ -6,11 +6,11 @@ import { PrisonPerson } from './interfaces/prisonPersonApi/prisonPersonApiClient
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('prisonPersonApiClient', () => {
-  let fakePrisonerSearchApi: nock.Scope
+  let fakePrisonPersonApi: nock.Scope
   let prisonPersonApiClient: PrisonPersonApiRestClient
 
   beforeEach(() => {
-    fakePrisonerSearchApi = nock(config.apis.prisonerSearchApi.url)
+    fakePrisonPersonApi = nock(config.apis.prisonPersonApi.url)
     prisonPersonApiClient = new PrisonPersonApiRestClient(token.access_token)
   })
 
@@ -81,9 +81,26 @@ describe('prisonPersonApiClient', () => {
             lastModifiedAt: '2024-07-01T01:02:03.456+0100',
             lastModifiedBy: 'USER1',
           },
+          foodAllergies: {
+            value: [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 }],
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
+          medicalDietaryRequirements: {
+            value: [
+              {
+                id: 'MEDICAL_DIET_LOW_FAT',
+                description: 'Low fat',
+                isActive: true,
+                listSequence: 0,
+              },
+            ],
+            lastModifiedAt: '2024-07-01T01:02:03.456+0100',
+            lastModifiedBy: 'USER1',
+          },
         },
       }
-      fakePrisonerSearchApi
+      fakePrisonPersonApi
         .get('/prisoners/A8469DY')
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, prisonPerson)

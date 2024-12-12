@@ -12,4 +12,6 @@ export default class PrisonerPhotoPage extends Page {
   prisonerPhotoPrintIcon = (): PageElement => cy.get('[prisoner-photo-print-icon]')
 
   breadcrumbToOverview = (): PageElement => cy.get('.govuk-breadcrumbs__link').last()
+
+  printLink = (): PageElement => cy.get('#profile-photo-print-link')
 }

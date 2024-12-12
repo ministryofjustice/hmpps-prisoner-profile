@@ -7,7 +7,6 @@ import { permissionsTests } from './permissionsTests'
 import { formatDate } from '../../server/utils/dateHelpers'
 import NotFoundPage from '../pages/notFoundPage'
 import { calculateAge } from '../../server/utils/utils'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../server/data/localMockData/personalCareNeedsMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
@@ -32,9 +31,17 @@ context('When signed in', () => {
   context('As a global search user who does not have the prisoner in their case loads', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        roles: [Role.GlobalSearch],
-        caseLoads: [{ caseloadFunction: '', caseLoadId: '123', currentlyActive: true, description: '', type: '' }],
+      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'ZZZ',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
       })
       cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
       cy.task('stubInmateDetail', { bookingId: 1102484 })
@@ -51,7 +58,7 @@ context('When signed in', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       visitPersonalDetailsPage()
     })
 
@@ -95,9 +102,9 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
       visitPersonalDetailsPage()
     })
 
@@ -292,25 +299,65 @@ context('When signed in', () => {
         page.appearance().shoeSize().should('include.text', '10')
         page.appearance().warnedAboutTattooing().should('include.text', 'Yes')
         page.appearance().warnedNotTochangeAppearance().should('include.text', 'Yes')
+      })
 
-        page.appearance().distinguishingMarks(0).bodyPart().should('include.text', 'Arm')
-        page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
-        page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
-        page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
-        page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
+      it('Displays the distinguishing marks', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.appearance().prisonPersonDistinguishingMarks().tattoos().should('include.text', 'Not entered')
+        page.appearance().prisonPersonDistinguishingMarks().others().should('include.text', 'Not entered')
 
-        page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Torso')
-        page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
-        page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
-        page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
-        page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().find('summary').click()
 
-        page.appearance().distinguishingMarks(2).bodyPart().should('include.text', 'Leg')
-        page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
-        page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
-        page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
-        page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
-        page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+        const scarsDetailHeaders = page
+          .appearance()
+          .prisonPersonDistinguishingMarks()
+          .scarsDetail()
+          .content()
+          .find('dt')
+
+        scarsDetailHeaders.each((element, index) => {
+          const expectedHeaders = ['Location', 'Description']
+          const expectedTexts = ['Arm - no specific location', 'Horrible arm scar']
+
+          cy.wrap(element).should('include.text', expectedHeaders[index])
+          cy.wrap(element).siblings('dd').should('include.text', expectedTexts[index])
+        })
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().content().find('img').should('have.length', 1)
+      })
+
+      it('Includes hide/show all functionality for a distinguishing mark type', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+
+        const button = page
+          .appearance()
+          .prisonPersonDistinguishingMarks()
+          .scars()
+          .find('button.hmpps-open-close-all__button')
+          .should('include.text', 'Show all scar details')
+
+        button.click()
+        button.should('include.text', 'Hide all scar details')
+
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+
+        button.click()
+        button.should('include.text', 'Show all scar details')
+
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+
+        // clicking the individual details should also update the button state
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().find('summary').click()
+        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+
+        page
+          .appearance()
+          .prisonPersonDistinguishingMarks()
+          .scars()
+          .find('button.hmpps-open-close-all__button')
+          .should('include.text', 'Hide all scar details')
       })
     })
 
@@ -341,7 +388,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
     })
 
@@ -435,7 +482,7 @@ context('When signed in', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
@@ -473,18 +520,16 @@ context('When signed in', () => {
   context('Neurodiversity', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({
-        caseLoads: [{ caseloadFunction: '', caseLoadId: 'MDI', currentlyActive: true, description: '', type: '' }],
-        roles: [Role.GlobalSearch],
-      })
+      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupComponentsData()
       cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubComponentsMeta', componentsNoServicesMock)
-      visitPersonalDetailsPage()
     })
 
     context('Page section', () => {
       it('Displays neurodiversity sections', () => {
+        visitPersonalDetailsPage()
+
         const page = Page.verifyOnPage(PersonalPage)
         page.neurodiversity().fromNeurodiversityAssessment().should('be.visible')
         page.neurodiversity().neurodivergenceExists().should('be.visible')
@@ -493,6 +538,68 @@ context('When signed in', () => {
         page.neurodiversity().neurodiversityAssessed().should('be.visible')
         page.neurodiversity().neurodiversityTitle().should('be.visible')
       })
+
+      it('Displays an error banner and not the neurodiversity sections when there was an error calling the Curious API', () => {
+        cy.task('stubGetLearnerNeurodivergence', { prisonerNumber, error: true })
+
+        visitPersonalDetailsPage()
+
+        const page = Page.verifyOnPage(PersonalPage)
+        page.apiErrorBanner().should('exist')
+        page.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+        page.neurodiversity().fromNeurodiversityAssessment().should('not.exist')
+        page.neurodiversity().neurodivergenceExists().should('not.exist')
+        page.neurodiversity().neurodivergenceSupport().should('not.exist')
+        page.neurodiversity().neurodiversitySelfAssessment().should('not.exist')
+        page.neurodiversity().neurodiversityAssessed().should('not.exist')
+        page.neurodiversity().neurodiversityTitle().should('not.exist')
+      })
+    })
+  })
+
+  context('Prison person api is disabled', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupComponentsData({
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'DTI',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
+      })
+      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.task('stubPersonalCareNeeds')
+      cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
+      cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
+      visitPersonalDetailsPage()
+    })
+
+    it('Displays distinguishingMarks information from inmate details', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+
+      page.appearance().distinguishingMarks(0).bodyPart().should('include.text', 'Arm')
+      page.appearance().distinguishingMarks(0).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(0).side().should('include.text', 'Left')
+      page.appearance().distinguishingMarks(0).comment().should('include.text', 'Red bull Logo')
+      page.appearance().distinguishingMarks(0).image().should('have.attr', 'src').and('include', '1413021')
+
+      page.appearance().distinguishingMarks(1).bodyPart().should('include.text', 'Front and sides')
+      page.appearance().distinguishingMarks(1).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(1).side().should('include.text', 'Front')
+      page.appearance().distinguishingMarks(1).comment().should('include.text', 'ARC reactor image')
+      page.appearance().distinguishingMarks(1).image().should('have.attr', 'src').and('include', '1413020')
+
+      page.appearance().distinguishingMarks(2).bodyPart().should('include.text', 'Leg')
+      page.appearance().distinguishingMarks(2).type().should('include.text', 'Tattoo')
+      page.appearance().distinguishingMarks(2).side().should('include.text', 'Right')
+      page.appearance().distinguishingMarks(2).comment().should('include.text', 'Monster drink logo')
+      page.appearance().distinguishingMarks(2).orientation().should('include.text', 'Facing')
+      page.appearance().distinguishingMarks(2).image().should('have.attr', 'src').and('include', '1413022')
     })
   })
 })

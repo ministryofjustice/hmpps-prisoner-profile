@@ -1,6 +1,8 @@
 import Address from './Address'
 import GovSummaryItem from '../../../interfaces/GovSummaryItem'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
+import { PrisonPersonDistinguishingMark } from '../../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { Result } from '../../../utils/result/result'
 
 export default interface PersonalPage {
   personalDetails: PersonalDetails
@@ -11,9 +13,10 @@ export default interface PersonalPage {
   nextOfKin: NextOfKin[]
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
-  learnerNeurodivergence: LearnerNeurodivergence[]
+  learnerNeurodivergence: Result<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
   showFieldHistoryLink: boolean
+  distinguishingMarks: PrisonPersonDistinguishingMark[] | null
 }
 
 export interface PersonalDetails {
@@ -52,6 +55,8 @@ export interface PersonalDetails {
   socialCareNeeded: string
   typeOfDiet: string
   youthOffender: string
+  medicalDietaryRequirements: { id: string; description: string }[]
+  foodAllergies: { id: string; description: string }[]
 }
 
 export interface IdentityNumber {
@@ -114,6 +119,7 @@ export interface DistinguishingMark {
   comment: string
   imageId: number
 }
+
 export interface PhysicalCharacteristics {
   height: string
   weight: string

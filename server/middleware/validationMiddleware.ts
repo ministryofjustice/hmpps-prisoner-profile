@@ -13,14 +13,13 @@ export default function validationMiddleware(
   return async (req, res, next) => {
     const validationResults = await Promise.all(validators.map(validator => validator(req.body)))
     const errors = validationResults.flat()
-
     if (hasLength(errors) && options.redirectBackOnError) {
       req.flash('requestBody', JSON.stringify(req.body))
       req.flash('errors', errors)
       if (options.redirectTo) {
         return res.redirect(`/prisoner/${req.params.prisonerNumber}/${options.redirectTo}`)
       }
-      return res.redirect(req.header('Referer'))
+      return res.redirect(req.originalUrl)
     }
 
     if (errors.length) {

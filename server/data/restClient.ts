@@ -23,6 +23,7 @@ interface PostRequest {
   data?: object | string[]
   raw?: boolean
   query?: object | string
+  file?: { buffer: Buffer; originalname: string }
 }
 
 interface PutRequest {
@@ -67,7 +68,6 @@ export default class RestClient {
     raw = false,
     ignore404 = false,
   }: GetRequest): Promise<T> {
-    logger.info(`Get using user credentials: calling ${this.name}: ${path} ${query}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -85,10 +85,8 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
-      if (ignore404 && error.response?.status === 404) {
-        logger.info(`Returned null for 404 not found when calling ${this.name}: ${path}`)
-        return null
-      }
+      if (ignore404 && error.response?.status === 404) return null
+
       const sanitisedError = sanitiseError(error, endpoint)
       logger.warn({ ...sanitisedError, query }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
       throw sanitisedError
@@ -103,7 +101,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PostRequest = {}): Promise<T> {
-    logger.info(`Post using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -128,6 +125,48 @@ export default class RestClient {
     }
   }
 
+  async postMultipart<T>({
+    path = null,
+    query = '',
+    headers = {},
+    responseType = '',
+    file = null,
+    data = {},
+    raw = false,
+  }: PostRequest = {}): Promise<T> {
+    const endpoint = `${this.apiUrl()}${path}`
+    const request = superagent
+      .post(endpoint)
+      .type('form')
+      .agent(this.agent)
+      .query(query)
+      .auth(this.token, { type: 'bearer' })
+      .set(headers)
+      .responseType(responseType)
+      .timeout(this.timeoutConfig())
+      .retry(2, (err, res) => {
+        if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+        return undefined // retry handler only for logging retries, not to influence retry logic
+      })
+
+    Object.entries(data).forEach(([key, value]) => {
+      request.field(key, value)
+    })
+
+    if (file) {
+      request.attach('file', file.buffer, file.originalname)
+    }
+
+    try {
+      const result = await request
+      return raw ? result : result.body
+    } catch (error) {
+      const sanitisedError = sanitiseError(error, endpoint)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
+      throw sanitisedError
+    }
+  }
+
   async put<T>({
     path = null,
     query = '',
@@ -136,7 +175,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PutRequest = {}): Promise<T> {
-    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -169,7 +207,6 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PutRequest = {}): Promise<T> {
-    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     try {
       const result = await superagent
@@ -195,7 +232,6 @@ export default class RestClient {
   }
 
   async stream({ path = null, headers = {} }: StreamRequest = {}): Promise<Readable> {
-    logger.info(`Get using user credentials: calling ${this.name}: ${path}`)
     const endpoint = `${this.apiUrl()}${path}`
     return new Promise((resolve, reject) => {
       superagent

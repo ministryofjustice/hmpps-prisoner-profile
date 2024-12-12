@@ -76,7 +76,11 @@ describe('Prisoner goals controller', () => {
 
       // Then
       expect(res.render).toHaveBeenCalledWith('pages/goals/vc2GoalsPage', expectedView)
-      expect(getGoals).toHaveBeenCalledWith(req.middleware.clientToken, req.middleware.prisonerData)
+      expect(getGoals).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        req.middleware.prisonerData,
+        res.locals.apiErrorCallback,
+      )
     })
   })
 })

@@ -46,17 +46,17 @@
 }
 
 .hmpps-grey-details-card {
-  border-left: 5px solid  govuk-colour("mid-grey");
+  border-left: 5px solid govuk-colour('mid-grey');
   margin: 0;
-  background-color:  govuk-colour("light-grey");
+  background-color: govuk-colour('light-grey');
 }
 
 .hmpps-dark-grey-font {
-  color: govuk-colour("dark-grey")
+  color: govuk-colour('dark-grey');
 }
 
 .hmpps-white-font {
-  color: govuk-colour("white")
+  color: govuk-colour('white');
 }
 
 @media (min-width: 40.0625em) {
@@ -77,7 +77,7 @@
     float: left;
 
     a::before {
-      content: "";
+      content: '';
       display: block;
       position: absolute;
       top: 0;
@@ -93,7 +93,8 @@
       border-color: govuk-colour('black');
     }
 
-    a:link, a:visited {
+    a:link,
+    a:visited {
       display: inline-block;
       position: relative;
       padding-left: 12px;
@@ -121,7 +122,6 @@
     margin-bottom: 0;
   }
 }
-
 
 .horizontal-information {
   @media print, (min-width: #{map-get($govuk-breakpoints, 'tablet')}) {
@@ -160,11 +160,34 @@
 // Classes created got from 1em to 40em
 @mixin hmpps-width-x {
   @for $i from 1 through 40 {
-    .hmpps-width-#{$i} { width: #{$i}em; }
+    .hmpps-width-#{$i} {
+      width: #{$i}em;
+    }
   }
 }
 @include hmpps-width-x;
 
 .hmpps-border-top {
   border-top: 1px solid $govuk-border-colour;
+}
+
+div.hmpps-merged-key-summary-list-row {
+  border-bottom: none !important;
+
+  > .govuk-summary-list__key {
+    vertical-align: top;
+    border-bottom: none;
+  }
+
+  > .govuk-summary-list__value {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+
+  > .govuk-summary-list__actions {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+}
+
+.hmpps-vertical-align-top {
+    vertical-align: top;
 }

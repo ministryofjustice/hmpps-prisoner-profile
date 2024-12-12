@@ -86,6 +86,8 @@ const formBodyVLB = {
   postAppointment: 'yes',
   postAppointmentLocation: locationsMock[1].locationId,
   court: courtLocationsMock[0].id,
+  cvpRequired: 'yes',
+  videoLinkUrl: 'http://test.url',
 }
 
 const videoLinkBookingForm: VideoLinkBookingForm = {
@@ -621,6 +623,72 @@ describe('Appointments Controller', () => {
       profileUrl: `/prisoner/${prisonerNumber}`,
       movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
       bookAVideoLinkEnabled: false,
+      videoLinkUrl: 'http://test.url',
+      mustContactTheCourt: false,
+    })
+  })
+
+  it('should display prepost appointment confirmation with BVLS enabled', async () => {
+    config.featureToggles.bookAVideoLinkEnabled = true
+
+    const { prisonerNumber } = PrisonerMockDataA
+    const flash = {
+      appointmentDefaults: {
+        startTime: appointmentsToCreate.startTime,
+        endTime: appointmentsToCreate.endTime,
+        locationId: appointmentsToCreate.locationId,
+        comment: appointmentsToCreate.comment,
+      },
+      appointmentForm: {
+        location: locationsMockBavl[0].key,
+      },
+      formValues: {
+        hearingType: courtHearingTypes[0].code,
+        court: courtLocationsMockBavl[2].code,
+        videoLinkUrl: 'http://bvls.test.url',
+        preAppointment: 'no',
+        postAppointment: 'no',
+      },
+    }
+
+    req.flash = (key: string) => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flash]
+      }
+      return []
+    }
+
+    const appointmentData = {
+      prisonerName: 'John Saunders',
+      prisonerNumber,
+      prisonName: 'Moorland (HMP & YOI)',
+      location: locationsMockBavl[0].description,
+      date: formatDate(dateToIsoDate(formBody.date), 'long'),
+      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
+      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
+      comments: formBody.comments,
+      pre: undefined as string,
+      post: undefined as string,
+      court: courtLocationsMockBavl[2].description,
+      hearingType: courtHearingTypes[0].description,
+    }
+
+    await controller.displayPrePostAppointmentConfirmation()(req, res)
+
+    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      res.locals.user.activeCaseLoadId,
+    )
+    expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
+    expect(controller['appointmentService'].getUserEmail).toHaveBeenCalled()
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
+      pageTitle: 'Video link has been booked',
+      ...appointmentData,
+      profileUrl: `/prisoner/${prisonerNumber}`,
+      movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
+      bookAVideoLinkEnabled: true,
+      videoLinkUrl: 'http://bvls.test.url',
+      mustContactTheCourt: true,
     })
   })
 

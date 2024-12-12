@@ -13,6 +13,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
   buildFieldData,
+  cityOrTownOfBirthFieldData,
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
@@ -24,6 +25,7 @@ import validationMiddleware, { Validator } from '../middleware/validationMiddlew
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
+import distinguishingMarksRouter from './distinguishingMarksRouter'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -46,7 +48,6 @@ export default function personalRouter(services: Services): Router {
     personalController.displayPersonalPage(),
   )
 
-  // Edit routes
   // Temporary edit check for now
   const editRouteChecks = () => (req: Request, res: Response, next: NextFunction) => {
     const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
@@ -56,6 +57,16 @@ export default function personalRouter(services: Services): Router {
     return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
   }
 
+  // Distinguishing marks
+  router.use(
+    `${basePath}/:markType(tattoo|scar|mark)`,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editRouteChecks(),
+    distinguishingMarksRouter(services),
+  )
+
+  // Edit routes
   const editRoute = ({
     path,
     edit,
@@ -181,11 +192,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/shoe-size',
     edit: {
       audit: Page.EditShoeSize,
-      method: personalController.textInput(shoeSizeFieldData).edit,
+      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).edit,
     },
     submit: {
       audit: Page.PostEditShoeSize,
-      method: personalController.textInput(shoeSizeFieldData).submit,
+      method: personalController.physicalAttributesTextInput(shoeSizeFieldData).submit,
       validation: {
         validators: [shoeSizeValidator],
         redirectBackOnError: true,
@@ -298,6 +309,42 @@ export default function personalRouter(services: Services): Router {
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     personalController.history(weightFieldData),
   )
+
+  editRoute({
+    path: 'edit/medical-diet',
+    edit: {
+      audit: Page.EditMedicalDiet,
+      method: personalController.medicalDiet().edit,
+    },
+    submit: {
+      audit: Page.PostEditMedicalDiet,
+      method: personalController.medicalDiet().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/food-allergies',
+    edit: {
+      audit: Page.EditFoodAllergies,
+      method: personalController.foodAllergies().edit,
+    },
+    submit: {
+      audit: Page.PostEditFoodAllergies,
+      method: personalController.foodAllergies().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/city-or-town-of-birth',
+    edit: {
+      audit: Page.EditCityOrTownOfBirth,
+      method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).edit,
+    },
+    submit: {
+      audit: Page.PostEditCityOrTownOfBirth,
+      method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
+    },
+  })
 
   return router
 }

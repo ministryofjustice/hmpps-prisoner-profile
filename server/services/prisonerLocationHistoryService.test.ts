@@ -35,7 +35,7 @@ describe('prisonerLocationHistoryService', () => {
       getCaseNoteTypes: jest.fn(),
       getCaseNotes: jest.fn(),
       addCaseNote: jest.fn(),
-      updateCaseNote: jest.fn(),
+      addCaseNoteAmendment: jest.fn(),
       getCaseNote: jest.fn(),
     }
 
@@ -239,6 +239,7 @@ describe('prisonerLocationHistoryService', () => {
           expect(whereaboutsApiClient.getCellMoveReason).toHaveBeenCalledWith(PrisonerMockDataA.bookingId, 10, true)
           expect(caseNotesApiClient.getCaseNote).toHaveBeenCalledWith(
             PrisonerMockDataA.prisonerNumber,
+            PrisonerMockDataA.prisonId,
             CellMoveReasonMock.cellMoveReason.caseNoteId.toString(),
             true,
           )

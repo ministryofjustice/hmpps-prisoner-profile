@@ -1,8 +1,30 @@
+import type Service from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Service'
+import type Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
 import { stubFor } from './wiremock'
-import { componentsNoServicesMock } from '../../server/data/localMockData/componentApi/componentsMetaMock'
+import {
+  componentsCaseLoadMock,
+  componentsFooterMock,
+  componentsHeaderMock,
+  componentsServicesMock,
+} from '../../server/data/localMockData/componentApi/componentsMock'
+import CaseLoad from '../../server/data/interfaces/prisonApi/CaseLoad'
 
 export default {
-  stubComponentsMeta: (resp = componentsNoServicesMock) => {
+  stubComponentsData: (
+    options: {
+      header?: Component
+      footer?: Component
+      caseLoads?: CaseLoad[]
+      services?: Service[]
+    } = {},
+  ) => {
+    const {
+      header = componentsHeaderMock,
+      footer = componentsFooterMock,
+      caseLoads = [componentsCaseLoadMock],
+      services = componentsServicesMock,
+    } = options
+
     return stubFor({
       request: {
         method: 'GET',
@@ -13,7 +35,15 @@ export default {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: resp,
+        jsonBody: {
+          header,
+          footer,
+          meta: {
+            caseLoads,
+            activeCaseLoad: caseLoads.find(caseLoad => caseLoad.currentlyActive === true),
+            services,
+          },
+        },
       },
     })
   },

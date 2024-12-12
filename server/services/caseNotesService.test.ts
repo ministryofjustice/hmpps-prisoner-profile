@@ -5,7 +5,6 @@ import { caseNoteTypesMock } from '../data/localMockData/caseNoteTypesMock'
 import PagedList from '../data/interfaces/prisonApi/PagedList'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
-import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
 import { HmppsUser } from '../interfaces/HmppsUser'
 
@@ -17,12 +16,12 @@ describe('Case Notes Page', () => {
   let caseNotesApiClientSpy: CaseNotesApiClient
 
   beforeEach(() => {
-    prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH' } as Prisoner
+    prisonerData = { bookingId: 123456, firstName: 'JOHN', lastName: 'SMITH', prisonId: 'MDI' } as Prisoner
     caseNotesApiClientSpy = {
       getCaseNoteTypes: jest.fn(async () => caseNoteTypesMock),
       getCaseNotes: jest.fn(async () => pagedCaseNotesMock),
       addCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
-      updateCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
+      addCaseNoteAmendment: jest.fn(async () => pagedCaseNotesMock.content[0]),
       getCaseNote: jest.fn(async () => pagedCaseNotesMock.content[0]),
     }
     caseNotesService = new CaseNotesService(() => caseNotesApiClientSpy)
@@ -45,9 +44,13 @@ describe('Case Notes Page', () => {
 
       expect(caseNotesPageData.fullName).toEqual('John Smith')
       expect(caseNotesApiClientSpy.getCaseNoteTypes).toHaveBeenCalled()
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
-        includeSensitive: 'false',
-      })
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(
+        prisonerData.prisonerNumber,
+        prisonerData.prisonId,
+        {
+          includeSensitive: 'false',
+        },
+      )
     })
 
     it('should allow inclusion of sensitive case notes', async () => {
@@ -61,9 +64,13 @@ describe('Case Notes Page', () => {
         canViewSensitiveCaseNotes: true,
       })
 
-      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(prisonerData.prisonerNumber, {
-        includeSensitive: 'true',
-      })
+      expect(caseNotesApiClientSpy.getCaseNotes).toHaveBeenCalledWith(
+        prisonerData.prisonerNumber,
+        prisonerData.prisonId,
+        {
+          includeSensitive: 'true',
+        },
+      )
     })
   })
 
@@ -87,9 +94,9 @@ describe('Case Notes Page', () => {
         minutes: '30',
       } as CaseNoteForm
       const occurrenceDateTime = '2023-01-01T12:30:00'
-      await caseNotesService.addCaseNote('', prisonerNumber, updateCaseNoteForm)
+      await caseNotesService.addCaseNote('', prisonerNumber, 'MDI', updateCaseNoteForm)
 
-      expect(caseNotesApiClientSpy.addCaseNote).toHaveBeenCalledWith(prisonerNumber, {
+      expect(caseNotesApiClientSpy.addCaseNote).toHaveBeenCalledWith(prisonerNumber, prisonerData.prisonId, {
         type: 'TYPE',
         subType: 'SUBTYPE',
         text: 'Text',
@@ -102,20 +109,14 @@ describe('Case Notes Page', () => {
     it('should call Case Notes API tp update case notes', async () => {
       const prisonerNumber = 'A9999AA'
       const caseNoteId = 'abc123'
-      const updateCaseNoteForm: UpdateCaseNoteForm = {
-        text: 'Text',
-        isExternal: false,
-        currentLength: 1,
-        username: 'AB123456',
-      }
-      await caseNotesService.updateCaseNote('', prisonerNumber, caseNoteId, updateCaseNoteForm)
+      await caseNotesService.addCaseNoteAmendment('', prisonerNumber, 'MDI', caseNoteId, 'Text')
 
-      expect(caseNotesApiClientSpy.updateCaseNote).toHaveBeenCalledWith(prisonerNumber, 'abc123', {
-        text: 'Text',
-        isExternal: false,
-        currentLength: 1,
-        username: 'AB123456',
-      })
+      expect(caseNotesApiClientSpy.addCaseNoteAmendment).toHaveBeenCalledWith(
+        prisonerNumber,
+        prisonerData.prisonId,
+        'abc123',
+        'Text',
+      )
     })
   })
 

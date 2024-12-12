@@ -12,6 +12,7 @@ context('Belief history page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
+    cy.setupComponentsData()
     cy.task('stubPrisonerData', { prisonerNumber: 'G6123VU' })
     cy.task('stubBeliefHistory', 1102484)
 

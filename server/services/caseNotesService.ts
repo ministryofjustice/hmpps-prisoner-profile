@@ -12,7 +12,6 @@ import validateDateRange from '../utils/validateDateRange'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CaseNote, { CaseNoteAmendment } from '../data/interfaces/caseNotesApi/CaseNote'
 import CaseNoteForm from '../data/interfaces/caseNotesApi/CaseNoteForm'
-import UpdateCaseNoteForm from '../data/interfaces/caseNotesApi/UpdateCaseNoteForm'
 import PagedList, { CaseNotesListQueryParams } from '../data/interfaces/prisonApi/PagedList'
 import { HmppsUser } from '../interfaces/HmppsUser'
 
@@ -72,10 +71,14 @@ export default class CaseNotesService {
     const prisonerFullName = formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName)
 
     if (!errors.length) {
-      const { content, ...rest } = await caseNotesApiClient.getCaseNotes(prisonerData.prisonerNumber, {
-        ...this.mapToApiParams(queryParams),
-        includeSensitive: String(canViewSensitiveCaseNotes),
-      })
+      const { content, ...rest } = await caseNotesApiClient.getCaseNotes(
+        prisonerData.prisonerNumber,
+        prisonerData.prisonId,
+        {
+          ...this.mapToApiParams(queryParams),
+          includeSensitive: String(canViewSensitiveCaseNotes),
+        },
+      )
 
       const pagedCaseNotesContent = content?.map((caseNote: CaseNote) => {
         return {
@@ -141,16 +144,21 @@ export default class CaseNotesService {
     })
   }
 
-  public async getCaseNote(token: string, prisonerNumber: string, caseNoteId: string): Promise<CaseNote> {
-    return this.caseNotesApiClientBuilder(token).getCaseNote(prisonerNumber, caseNoteId)
+  public async getCaseNote(
+    token: string,
+    prisonerNumber: string,
+    caseloadId: string,
+    caseNoteId: string,
+  ): Promise<CaseNote> {
+    return this.caseNotesApiClientBuilder(token).getCaseNote(prisonerNumber, caseloadId, caseNoteId)
   }
 
-  public async addCaseNote(token: string, prisonerNumber: string, caseNote: CaseNoteForm) {
+  public async addCaseNote(token: string, prisonerNumber: string, caseloadId: string, caseNote: CaseNoteForm) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
     const dateTime = parseDate(caseNote.date).setHours(+caseNote.hours, +caseNote.minutes, 0)
     const occurrenceDateTime = formatDateTimeISO(new Date(dateTime))
 
-    return caseNotesApiClient.addCaseNote(prisonerNumber, {
+    return caseNotesApiClient.addCaseNote(prisonerNumber, caseloadId, {
       type: caseNote.type,
       subType: caseNote.subType,
       text: caseNote.text,
@@ -158,14 +166,15 @@ export default class CaseNotesService {
     })
   }
 
-  public async updateCaseNote(
+  public async addCaseNoteAmendment(
     token: string,
     prisonerNumber: string,
+    caseloadId: string,
     caseNoteId: string,
-    updatedCaseNoteForm: UpdateCaseNoteForm,
+    text: string,
   ) {
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
 
-    return caseNotesApiClient.updateCaseNote(prisonerNumber, caseNoteId, updatedCaseNoteForm)
+    return caseNotesApiClient.addCaseNoteAmendment(prisonerNumber, caseloadId, caseNoteId, text)
   }
 }

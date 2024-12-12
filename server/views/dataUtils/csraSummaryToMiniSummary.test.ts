@@ -10,10 +10,8 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, true, prisonerNumber)
     expect(miniSummary).toEqual({
-      bottomLabel: 'CSRA',
-      bottomContentLine1: 'Standard',
-      bottomContentLine3: 'Last review: 01/01/2021',
-      bottomClass: 'small',
+      heading: 'CSRA',
+      items: [{ text: 'Standard' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
       linkLabel: 'CSRA history',
       linkHref: '/prisoner/A1234BC/csra-history',
     })
@@ -27,10 +25,8 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, true, prisonerNumber)
     expect(miniSummary).toEqual({
-      bottomLabel: 'CSRA',
-      bottomContentLine1: 'Not entered',
-      bottomContentLine3: 'Last review: 01/01/2021',
-      bottomClass: 'small',
+      heading: 'CSRA',
+      items: [{ text: 'Not entered' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
       linkLabel: 'CSRA history',
       linkHref: '/prisoner/A1234BC/csra-history',
     })
@@ -44,10 +40,8 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, false, prisonerNumber)
     expect(miniSummary).toEqual({
-      bottomLabel: 'CSRA',
-      bottomContentLine1: 'Standard',
-      bottomContentLine3: 'Last review: 01/01/2021',
-      bottomClass: 'small',
+      heading: 'CSRA',
+      items: [{ text: 'Standard' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
     })
   })
 
@@ -59,10 +53,8 @@ describe('csraSummaryToMiniSummary', () => {
     const prisonerNumber = 'A1234BC'
     const miniSummary = csraSummaryToMiniSummary(csraSummary, false, prisonerNumber)
     expect(miniSummary).toEqual({
-      bottomLabel: 'CSRA',
-      bottomContentLine1: 'Not entered',
-      bottomContentLine3: 'Last review: 01/01/2021',
-      bottomClass: 'small',
+      heading: 'CSRA',
+      items: [{ text: 'Not entered' }, { text: 'Last review: 01/01/2021', classes: 'hmpps-secondary-text' }],
     })
   })
 })
