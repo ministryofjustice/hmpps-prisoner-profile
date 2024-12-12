@@ -8,7 +8,6 @@ import { PrePostAppointmentValidator } from '../validators/prePostAppointmentVal
 import config from '../config'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
 import { ApiAction, Page } from '../services/auditService'
-import { notifyClient } from '../utils/notifyClient'
 import isServiceNavEnabled from '../utils/isServiceEnabled'
 import { getRequest, postRequest } from './routerUtils'
 import permissionsGuard from '../middleware/permissionsGuard'
@@ -23,7 +22,6 @@ export default function appointmentRouter(services: Services): Router {
     services.appointmentService,
     services.prisonerSearchService,
     services.auditService,
-    notifyClient,
   )
 
   const isCreateIndividualAppointmentRolledOut = (req: Request, res: Response, next: NextFunction) => {

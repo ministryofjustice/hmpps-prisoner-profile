@@ -3,8 +3,6 @@ import UnacceptableAbsences from './interfaces/whereaboutsApi/UnacceptableAbsenc
 import PageableQuery from './interfaces/whereaboutsApi/PageableQuery'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApi/whereaboutsApiClient'
 import { AppointmentDefaults } from './interfaces/whereaboutsApi/Appointment'
-import CourtLocation from './interfaces/whereaboutsApi/CourtLocation'
-import VideoLinkBookingForm from './interfaces/whereaboutsApi/VideoLinkBookingForm'
 import config from '../config'
 import CellMoveReason from './interfaces/whereaboutsApi/CellMoveReason'
 
@@ -15,19 +13,11 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
     this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApi, token)
   }
 
-  async getCourts(): Promise<CourtLocation[]> {
-    return this.restClient.get<CourtLocation[]>({ path: '/court/courts' })
-  }
-
   async createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults> {
     return this.restClient.post<AppointmentDefaults>({
       path: `/appointment`,
       data: appointments,
     })
-  }
-
-  async addVideoLinkBooking(videoLinkBooking: VideoLinkBookingForm): Promise<number> {
-    return this.restClient.post<number>({ path: '/court/video-link-bookings', data: videoLinkBooking })
   }
 
   getUnacceptableAbsences(

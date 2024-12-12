@@ -1,7 +1,6 @@
 import { addDays, addYears, subDays } from 'date-fns'
 import { AppointmentValidator } from './appointmentValidator'
 import { formatDate, formatDateISO } from '../utils/dateHelpers'
-import config from '../config'
 
 const todayStr = formatDate(formatDateISO(new Date()), 'short')
 const futureDate = formatDateISO(addDays(new Date(), 7))
@@ -82,32 +81,6 @@ describe('Validation middleware', () => {
       { text: 'Select the repeat period for this appointment', href: '#repeats' },
       { text: 'Enter the number of appointments using numbers only', href: '#times' },
       { text: 'Enter comments using 3,600 characters or less', href: '#comments' },
-    ])
-  })
-
-  it('should fail validation for missing vlb location when appointment type is VLB', async () => {
-    config.featureToggles.bookAVideoLinkEnabled = true
-
-    const appointmentForm = {
-      appointmentType: 'VLB',
-      date: formatDate(futureDate, 'short'),
-      startTimeHours: '10',
-      startTimeMinutes: '30',
-      endTimeHours: '11',
-      endTimeMinutes: '30',
-      recurring: 'yes',
-      repeats: 'DAILY',
-      times: '1',
-      comments: 'Comments',
-    }
-
-    const result = AppointmentValidator(appointmentForm)
-
-    expect(result).toEqual([
-      {
-        href: '#vlbLocation',
-        text: 'Select the location',
-      },
     ])
   })
 

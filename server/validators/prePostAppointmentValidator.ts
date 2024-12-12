@@ -1,6 +1,5 @@
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
-import config from '../config'
 
 // eslint-disable-next-line import/prefer-default-export
 export const PrePostAppointmentValidator: Validator = (body: Record<string, string>) => {
@@ -32,7 +31,7 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Select which court the hearing is for', href: '#court' })
   }
 
-  if (!body.hearingType && config.featureToggles.bookAVideoLinkEnabled) {
+  if (!body.hearingType) {
     errors.push({ text: 'Select the hearing type', href: '#hearingType' })
   }
 
@@ -40,7 +39,7 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Enter the name of the court', href: '#otherCourt' })
   }
 
-  if (!body.cvpRequired && config.featureToggles.bookAVideoLinkEnabled) {
+  if (!body.cvpRequired) {
     errors.push({ text: 'Select if you know the court hearing link', href: '#cvpRequired' })
   }
 

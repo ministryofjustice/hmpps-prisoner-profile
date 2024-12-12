@@ -318,59 +318,6 @@ export default {
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
-
-  notifications: {
-    enabled: process.env.NOTIFY_ENABLED ? process.env.NOTIFY_ENABLED === 'true' : true,
-    notifyKey: process.env.NOTIFY_API_KEY || '',
-    confirmBookingPrisonTemplateId: '391bb0e0-89b3-4aef-b11e-c6550b71fee8',
-    emails: {
-      WWI: {
-        omu: process.env.WANDSWORTH_OMU_EMAIL,
-      },
-      TSI: {
-        omu: process.env.THAMESIDE_OMU_EMAIL,
-      },
-      HEI: {
-        omu: process.env.HEWELL_OMU_EMAIL,
-      },
-      BWI: {
-        omu: process.env.BERWYN_OMU_EMAIL,
-      },
-      NMI: {
-        omu: process.env.NOTTINGHAM_OMU_EMAIL,
-      },
-      EYI: {
-        omu: process.env.ELMLEY_OMU_EMAIL,
-      },
-      BNI: {
-        omu: process.env.BULLINGDON_OMU_EMAIL,
-      },
-      PBI: {
-        omu: process.env.PETERBOROUGH_OMU_EMAIL,
-      },
-      BMI: {
-        omu: process.env.BIRMINGHAM_OMU_EMAIL,
-      },
-      NWI: {
-        omu: process.env.NORWICH_OMU_EMAIL,
-      },
-      PNI: {
-        omu: process.env.PRESTON_OMU_EMAIL,
-      },
-      BZI: {
-        omu: process.env.BRONZEFIELD_OMU_EMAIL,
-      },
-      PVI: {
-        omu: process.env.PENTONVILLE_OMU_EMAIL,
-      },
-      EXI: {
-        omu: process.env.EXETER_OMU_EMAIL,
-      },
-      WSI: {
-        omu: process.env.WORMWOOD_SCRUBS_OMU_EMAIL,
-      },
-    },
-  },
   featureToggles: {
     neurodiversityEnabledPrisons: process.env.NEURODIVERSITY_ENABLED_PRISONS || ['BLI', 'NHI', 'LII', 'SLI'],
     complexityEnabledPrisons: get(
@@ -380,7 +327,6 @@ export default {
     ),
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
-    bookAVideoLinkEnabled: toBoolean(get('BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED', 'false')),
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
     prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),

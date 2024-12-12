@@ -1,19 +1,7 @@
-import CourtLocation from '../interfaces/whereaboutsApi/CourtLocation'
 import { SelectOption } from '../../utils/utils'
 import Court from '../interfaces/bookAVideoLinkApi/Court'
 
-export const courtLocationsMock: CourtLocation[] = [
-  {
-    id: 'ABC',
-    name: 'Leeds Court',
-  },
-  {
-    id: 'DEF',
-    name: 'Barnsley Court',
-  },
-]
-
-export const courtLocationsMockBavl: Court[] = [
+export const courtLocationsMock: Court[] = [
   {
     courtId: 1,
     code: 'ABC',
@@ -35,17 +23,6 @@ export const courtLocationsMockBavl: Court[] = [
 ]
 
 export const courtLocationsSelectOptionsMock: SelectOption[] = [
-  {
-    value: 'ABC',
-    text: 'Leeds Court',
-  },
-  {
-    value: 'DEF',
-    text: 'Barnsley Court',
-  },
-]
-
-export const courtLocationsSelectOptionsMockBavl: SelectOption[] = [
   {
     value: 'ABC',
     text: 'Leeds Court',

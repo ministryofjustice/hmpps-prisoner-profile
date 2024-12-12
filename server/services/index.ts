@@ -51,7 +51,6 @@ export const services = () => {
     nonAssociationsApiClientBuilder,
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
-    manageUsersApiClientBuilder,
     bookAVideoLinkApiClientBuilder,
     complexityApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
@@ -103,7 +102,6 @@ export const services = () => {
   const appointmentService = new AppointmentService(
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
-    manageUsersApiClientBuilder,
     bookAVideoLinkApiClientBuilder,
   )
   const professionalContactsService = new ProfessionalContactsService(

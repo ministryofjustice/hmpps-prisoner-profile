@@ -6,30 +6,23 @@ import AppointmentService from '../services/appointmentService'
 import AppointmentController from './appointmentController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { repeatOptions } from '../data/interfaces/whereaboutsApi/Appointment'
-import { dateToIsoDate, formatDate, formatDateTimeISO, parseDate } from '../utils/dateHelpers'
-import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
 import {
-  locationsMock,
-  locationsMockBavl,
-  locationsSelectOptionsMock,
-  locationsSelectOptionsMockBavl,
-} from '../data/localMockData/locationsMock'
+  dateToIsoDate,
+  formatDate,
+  formatDateISO,
+  formatDateTimeISO,
+  parseDate,
+  timeFormat,
+} from '../utils/dateHelpers'
+import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
+import { locationsMock, locationsSelectOptionsMock } from '../data/localMockData/locationsMock'
 import HmppsError from '../interfaces/HmppsError'
 import { formatLocation, formatName } from '../utils/utils'
-import {
-  courtLocationsMock,
-  courtLocationsMockBavl,
-  courtLocationsSelectOptionsMock,
-  courtLocationsSelectOptionsMockBavl,
-} from '../data/localMockData/courtLocationsMock'
-import VideoLinkBookingForm from '../data/interfaces/whereaboutsApi/VideoLinkBookingForm'
+import { courtLocationsMock, courtLocationsSelectOptionsMock } from '../data/localMockData/courtLocationsMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { notifyClient } from '../utils/notifyClient'
-import { userEmailDataMock } from '../data/localMockData/userEmailDataMock'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import config from '../config'
 import { courtHearingTypes, courtHearingTypesSelectOptions } from '../data/localMockData/courtHearingsMock'
 
 let req: any
@@ -80,37 +73,52 @@ const appointmentsToCreate = {
 }
 
 const formBodyVLB = {
-  bookingId: PrisonerMockDataA.bookingId,
+  prisonId: 'MDI',
   preAppointment: 'yes',
   preAppointmentLocation: locationsMock[0].locationId,
   postAppointment: 'yes',
   postAppointmentLocation: locationsMock[1].locationId,
-  court: courtLocationsMock[0].id,
+  court: courtLocationsMock[0].code,
+  hearingType: courtHearingTypes[0].code,
   cvpRequired: 'yes',
   videoLinkUrl: 'http://test.url',
 }
 
-const videoLinkBookingForm: VideoLinkBookingForm = {
-  bookingId: formBodyVLB.bookingId,
-  courtId: formBodyVLB.court,
-  court: undefined,
-  comment: formBody.comments,
-  madeByTheCourt: false,
-  pre: {
-    locationId: formBodyVLB.preAppointmentLocation,
-    startTime: formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15)),
-    endTime: appointmentsToCreate.startTime,
-  },
-  main: {
-    locationId: formBody.location as number,
-    startTime: appointmentsToCreate.startTime,
-    endTime: appointmentsToCreate.endTime,
-  },
-  post: {
-    locationId: formBodyVLB.postAppointmentLocation,
-    startTime: appointmentsToCreate.endTime,
-    endTime: formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15)),
-  },
+const videoLinkBookingForm = {
+  bookingType: 'COURT',
+  prisoners: [
+    {
+      prisonerNumber: PrisonerMockDataA.prisonerNumber,
+      prisonCode: formBodyVLB.prisonId,
+      appointments: [
+        {
+          type: 'VLB_COURT_PRE',
+          locationKey: formBodyVLB.preAppointmentLocation,
+          date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+          startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
+          endTime: timeFormat(appointmentsToCreate.startTime),
+        },
+        {
+          type: 'VLB_COURT_MAIN',
+          locationKey: formBody.location,
+          date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+          startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+          endTime: timeFormat(appointmentsToCreate.endTime),
+        },
+        {
+          type: 'VLB_COURT_POST',
+          locationKey: formBodyVLB.postAppointmentLocation,
+          date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+          startTime: timeFormat(appointmentsToCreate.endTime),
+          endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
+        },
+      ],
+    },
+  ],
+  courtCode: 'ABC',
+  courtHearingType: 'APPEAL',
+  comments: 'Comment',
+  videoLinkUrl: 'http://test.url',
 }
 
 jest.mock('../services/prisonerSearch.ts')
@@ -121,7 +129,6 @@ describe('Appointments Controller', () => {
     null,
     null,
     null,
-    null,
   ) as jest.Mocked<AppointmentService>
   const prisonerSearchService: PrisonerSearchService = new PrisonerSearchService(
     null,
@@ -129,9 +136,6 @@ describe('Appointments Controller', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-
-    config.featureToggles.bookAVideoLinkEnabled = false
-
     req = {
       params: { prisonerNumber: PrisonerMockDataA.prisonerNumber },
       body: {},
@@ -151,27 +155,13 @@ describe('Appointments Controller', () => {
       redirect: jest.fn(),
     }
 
-    const notifyClientMock = notifyClient
-    notifyClientMock.sendEmail = jest.fn()
-
-    controller = new AppointmentController(
-      appointmentService,
-      prisonerSearchService,
-      auditServiceMock(),
-      notifyClientMock,
-    )
+    controller = new AppointmentController(appointmentService, prisonerSearchService, auditServiceMock())
 
     appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
       appointmentTypes: appointmentTypesMock,
       locations: locationsMock,
     }))
     appointmentService.getPrePostAppointmentRefData = jest.fn(async () => {
-      if (config.featureToggles.bookAVideoLinkEnabled) {
-        return {
-          courts: courtLocationsMockBavl,
-          locations: locationsMockBavl,
-        }
-      }
       return {
         courts: courtLocationsMock,
         locations: locationsMock,
@@ -181,8 +171,6 @@ describe('Appointments Controller', () => {
     appointmentService.getLocation = jest.fn(async () => locationsMock[0])
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
-    appointmentService.getUserEmail = jest.fn(async () => userEmailDataMock)
-    appointmentService.getVideoLocations = jest.fn(async () => locationsMockBavl)
     appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
   })
@@ -212,40 +200,6 @@ describe('Appointments Controller', () => {
       },
       refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
       errors: undefined,
-      bookAVideoLinkEnabled: false,
-      vlbLocations: [],
-    })
-  })
-
-  it('should display add appointment with BAVL enabled', async () => {
-    config.featureToggles.bookAVideoLinkEnabled = true
-
-    await controller.displayAddAppointment()(req, res)
-
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
-      req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
-    )
-
-    expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
-      pageTitle: 'Add an appointment',
-      miniBannerData: {
-        prisonerName: 'Saunders, John',
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        cellLocation: PrisonerMockDataA.cellLocation,
-      },
-      appointmentTypes: appointmentTypesSelectOptionsMock,
-      locations: locationsSelectOptionsMock,
-      repeatOptions,
-      today: formBody.date,
-      formValues: {
-        bookingId: 1102484,
-        date: formBody.date,
-      },
-      refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
-      errors: undefined,
-      bookAVideoLinkEnabled: true,
-      vlbLocations: locationsSelectOptionsMockBavl,
     })
   })
 
@@ -311,47 +265,6 @@ describe('Appointments Controller', () => {
       expect(req.flash).toHaveBeenCalledWith('refererUrl', 'http://referer')
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/add-appointment`)
     })
-
-    it('should call Notify with the correct data', async () => {
-      const flash = {
-        appointmentDefaults: {
-          startTime: appointmentsToCreate.startTime,
-          endTime: appointmentsToCreate.endTime,
-          locationId: appointmentsToCreate.locationId,
-          comment: appointmentsToCreate.comment,
-        },
-        formValues: formBodyVLB,
-      }
-      req.flash = (key: string) => {
-        if (key === 'prePostAppointmentDetails') {
-          return [flash]
-        }
-        return []
-      }
-
-      await controller.displayPrePostAppointmentConfirmation()(req, res)
-
-      expect(controller['notifyClient'].sendEmail).toHaveBeenCalledWith(
-        '391bb0e0-89b3-4aef-b11e-c6550b71fee8',
-        'jsmith@email.com',
-        {
-          personalisation: expect.objectContaining({
-            comments: 'Comment',
-            court: 'Leeds Court',
-            endTime: '23:30',
-            firstName: 'John',
-            lastName: 'Saunders',
-            location: 'CES',
-            offenderNo: 'G6123VU',
-            postAppointmentInfo: 'Chapel - 23:30 to 23:45',
-            preAppointmentInfo: 'CES - 23:00 to 23:15',
-            prison: 'Moorland (HMP & YOI)',
-            startTime: '23:15',
-          }),
-          reference: null,
-        },
-      )
-    })
   })
 
   it('should display appointment confirmation', async () => {
@@ -391,7 +304,9 @@ describe('Appointments Controller', () => {
   })
 
   it('should display prepost appointment', async () => {
-    const { prisonerNumber, bookingId, cellLocation } = PrisonerMockDataA
+    const { prisonerNumber, cellLocation } = PrisonerMockDataA
+    formBody.location = locationsMock[0].locationId
+
     const flash = {
       appointmentDefaults: {
         locationId: formBody.location,
@@ -410,7 +325,6 @@ describe('Appointments Controller', () => {
     }
 
     const appointmentData = {
-      bookingId,
       miniBannerData: {
         prisonerName: 'Saunders, John',
         prisonerNumber,
@@ -434,69 +348,10 @@ describe('Appointments Controller', () => {
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
       pageTitle: 'Video link booking details',
       ...appointmentData,
-      courts: [...courtLocationsSelectOptionsMock, { value: 'other', text: 'Other' }],
+      courts: courtLocationsSelectOptionsMock,
       locations: locationsSelectOptionsMock,
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
-      bookAVideoLinkEnabled: false,
-      hearingTypes: [],
-      prisonId: 'MDI',
-    })
-  })
-
-  it('should display prepost appointment when BAVL enabled', async () => {
-    config.featureToggles.bookAVideoLinkEnabled = true
-
-    const { prisonerNumber, bookingId, cellLocation } = PrisonerMockDataA
-    formBody.location = locationsMockBavl[0].key
-
-    const flash = {
-      appointmentDefaults: {
-        locationId: formBody.location,
-        startTime: formatDateTimeISO(
-          set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
-        ),
-      },
-      appointmentForm: formBody,
-      formValues: {},
-    }
-    req.flash = (key: string) => {
-      if (key === 'prePostAppointmentDetails') {
-        return [flash]
-      }
-      return []
-    }
-
-    const appointmentData = {
-      bookingId,
-      miniBannerData: {
-        prisonerName: 'Saunders, John',
-        prisonerNumber,
-        cellLocation: formatLocation(cellLocation),
-      },
-      location: locationsMockBavl[0].description,
-      date: formBody.date,
-      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
-      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
-      comments: formBody.comments,
-      appointmentDate: formatDate(today, 'long'),
-      formValues: {},
-    }
-
-    await controller.displayPrePostAppointments()(req, res)
-
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
-      req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
-    )
-    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
-      pageTitle: 'Video link booking details',
-      ...appointmentData,
-      courts: [...courtLocationsSelectOptionsMockBavl],
-      locations: locationsSelectOptionsMockBavl,
-      refererUrl: `/prisoner/${prisonerNumber}`,
-      errors: [],
-      bookAVideoLinkEnabled: true,
       hearingTypes: courtHearingTypesSelectOptions,
       prisonId: 'MDI',
     })
@@ -585,66 +440,12 @@ describe('Appointments Controller', () => {
         locationId: appointmentsToCreate.locationId,
         comment: appointmentsToCreate.comment,
       },
-      formValues: formBodyVLB,
-    }
-    req.flash = (key: string) => {
-      if (key === 'prePostAppointmentDetails') {
-        return [flash]
-      }
-      return []
-    }
-
-    const appointmentData = {
-      prisonerName: 'John Saunders',
-      prisonerNumber,
-      prisonName: 'Moorland (HMP & YOI)',
-      location: 'CES',
-      date: formatDate(dateToIsoDate(formBody.date), 'long'),
-      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
-      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
-      comments: formBody.comments,
-      pre: `${locationsMock[0].userDescription} - 23:00 to 23:15`,
-      post: `${locationsMock[1].userDescription} - 23:30 to 23:45`,
-      court: courtLocationsSelectOptionsMock[0].text,
-    }
-
-    await controller.displayPrePostAppointmentConfirmation()(req, res)
-
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
-      req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
-    )
-    expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
-    expect(controller['appointmentService'].getUserEmail).toHaveBeenCalled()
-    expect(controller['notifyClient'].sendEmail).toHaveBeenCalled()
-    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
-      pageTitle: 'Video link has been booked',
-      ...appointmentData,
-      profileUrl: `/prisoner/${prisonerNumber}`,
-      movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
-      bookAVideoLinkEnabled: false,
-      videoLinkUrl: 'http://test.url',
-      mustContactTheCourt: false,
-    })
-  })
-
-  it('should display prepost appointment confirmation with BVLS enabled', async () => {
-    config.featureToggles.bookAVideoLinkEnabled = true
-
-    const { prisonerNumber } = PrisonerMockDataA
-    const flash = {
-      appointmentDefaults: {
-        startTime: appointmentsToCreate.startTime,
-        endTime: appointmentsToCreate.endTime,
-        locationId: appointmentsToCreate.locationId,
-        comment: appointmentsToCreate.comment,
-      },
       appointmentForm: {
-        location: locationsMockBavl[0].key,
+        location: locationsMock[0].locationId,
       },
       formValues: {
         hearingType: courtHearingTypes[0].code,
-        court: courtLocationsMockBavl[2].code,
+        court: courtLocationsMock[2].code,
         videoLinkUrl: 'http://bvls.test.url',
         preAppointment: 'no',
         postAppointment: 'no',
@@ -662,14 +463,14 @@ describe('Appointments Controller', () => {
       prisonerName: 'John Saunders',
       prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
-      location: locationsMockBavl[0].description,
+      location: locationsMock[0].userDescription,
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
       endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
       comments: formBody.comments,
       pre: undefined as string,
       post: undefined as string,
-      court: courtLocationsMockBavl[2].description,
+      court: courtLocationsMock[2].description,
       hearingType: courtHearingTypes[0].description,
     }
 
@@ -680,13 +481,11 @@ describe('Appointments Controller', () => {
       res.locals.user.activeCaseLoadId,
     )
     expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
-    expect(controller['appointmentService'].getUserEmail).toHaveBeenCalled()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
       pageTitle: 'Video link has been booked',
       ...appointmentData,
       profileUrl: `/prisoner/${prisonerNumber}`,
       movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
-      bookAVideoLinkEnabled: true,
       videoLinkUrl: 'http://bvls.test.url',
       mustContactTheCourt: true,
     })

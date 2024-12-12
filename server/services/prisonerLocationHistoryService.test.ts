@@ -28,9 +28,7 @@ describe('prisonerLocationHistoryService', () => {
     whereaboutsApiClient = {
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
-      addVideoLinkBooking: jest.fn(),
       createAppointments: jest.fn(),
-      getCourts: jest.fn(),
     }
 
     caseNotesApiClient = {
