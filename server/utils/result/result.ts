@@ -19,6 +19,7 @@ export type Result<T, E = Error> = PromiseSettledResult<T> & {
  */
 interface ResultHandler<T, E, R1, R2> {
   fulfilled(value: T): R1
+
   rejected(e: E): R2
 }
 
@@ -88,7 +89,7 @@ export const Result = {
       throw error
     },
     getOrHandle: <R>(handler: (e: E) => R) => handler(error),
-    getOrNull: () => null,
+    getOrNull: () => null as T,
     toPromiseSettledResult: () => ({ status: 'rejected', reason: error }),
   }),
 }

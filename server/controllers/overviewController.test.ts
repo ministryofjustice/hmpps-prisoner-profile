@@ -43,6 +43,7 @@ import { OverviewStatus } from './interfaces/OverviewPageData'
 import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfersMock'
 import CsipService from '../services/csipService'
 import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
+import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSchedule'
 
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
@@ -643,7 +644,7 @@ describe('overviewController', () => {
       describe('Given no scheduled transfers', () => {
         it('Adds a status', async () => {
           offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
-          prisonerScheduleService.getScheduledTransfers = jest.fn(async () => [])
+          prisonerScheduleService.getScheduledTransfers = jest.fn(async (): Promise<PrisonerPrisonSchedule[]> => [])
 
           await controller.displayOverview(req, res)
           expect(res.render).toHaveBeenCalledWith(

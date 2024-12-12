@@ -2,6 +2,7 @@ import { PrisonerProfileDeliusApiClient } from '../data/interfaces/deliusApi/pri
 import ProbationDocumentsService from './probationDocumentsService'
 import { mockProbationDocumentsResponse } from '../data/localMockData/deliusApi/probationDocuments'
 import ServerError from '../utils/serverError'
+import ProbationDocuments from '../data/interfaces/deliusApi/ProbationDocuments'
 
 describe('probationDocumentsService', () => {
   let deliusApiClient: PrisonerProfileDeliusApiClient
@@ -40,10 +41,12 @@ describe('probationDocumentsService', () => {
     })
 
     it('Handles no documents being returned', async () => {
-      deliusApiClient.getProbationDocuments = jest.fn(async () => ({
-        ...mockProbationDocumentsResponse,
-        documents: undefined,
-      }))
+      deliusApiClient.getProbationDocuments = jest.fn(
+        async (): Promise<ProbationDocuments> => ({
+          ...mockProbationDocumentsResponse,
+          documents: undefined,
+        }),
+      )
 
       const response = await service.getDocuments('token', 'ABC')
       expect(response).toEqual(

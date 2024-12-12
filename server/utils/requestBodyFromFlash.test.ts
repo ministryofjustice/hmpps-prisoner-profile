@@ -7,7 +7,7 @@ describe('requestBodyFromFlash', () => {
   })
 
   it('Returns null when no request body', () => {
-    const res = requestBodyFromFlash({ flash: jest.fn(() => []) } as any)
+    const res = requestBodyFromFlash({ flash: jest.fn((): any[] => []) } as any)
     expect(res).toEqual(null)
   })
 })

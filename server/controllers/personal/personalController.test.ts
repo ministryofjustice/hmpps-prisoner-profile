@@ -22,6 +22,7 @@ import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPers
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
 import {
+  PrisonPerson,
   PrisonPersonCharacteristicCode,
   ReferenceDataCode,
   ReferenceDataCodeSimple,
@@ -337,10 +338,12 @@ describe('PersonalController', () => {
         })
 
         it('Keeps the inputs empty when no height exists', async () => {
-          personalPageService.getPrisonPerson = jest.fn(async () => ({
-            ...defaultPrisonPerson,
-            physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
-          }))
+          personalPageService.getPrisonPerson = jest.fn(
+            async (): Promise<PrisonPerson> => ({
+              ...defaultPrisonPerson,
+              physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
+            }),
+          )
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (): any => {
@@ -643,10 +646,12 @@ describe('PersonalController', () => {
         })
 
         it('Keeps the inputs empty when no weight exists', async () => {
-          personalPageService.getPrisonPerson = jest.fn(async () => ({
-            ...defaultPrisonPerson,
-            physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
-          }))
+          personalPageService.getPrisonPerson = jest.fn(
+            async (): Promise<PrisonPerson> => ({
+              ...defaultPrisonPerson,
+              physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
+            }),
+          )
           const req = {
             params: { prisonerNumber: 'ABC123' },
             flash: (): any => {

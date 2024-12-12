@@ -449,7 +449,7 @@ describe('professionalContactsService', () => {
         nextOfKin: [],
         otherContacts: [PrisonerContactBuilder()],
       }
-      prisonApiClient.getAddressesForPerson = jest.fn(async () => [])
+      prisonApiClient.getAddressesForPerson = jest.fn(async (): Promise<Address[]> => [])
       prisonApiClient.getBookingContacts = jest.fn(async () => mockPrisonerContacts)
 
       const service = new ProfessionalContactsService(
