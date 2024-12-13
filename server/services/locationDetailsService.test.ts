@@ -51,10 +51,20 @@ describe('prisonerLocationDetailsService', () => {
   })
 
   describe('getLocation', () => {
-    const response = { id: 'abc', localName: 'Local name' }
+    const response = { id: 'abc', key: 'ABC', localName: 'Local name' }
     it('returns data for single location', async () => {
       locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
       await expect(service.getLocation('', 'abc')).resolves.toEqual(response)
+    })
+  })
+
+  describe('getLocationByNomisLocationId', () => {
+    const response = { id: 'abc', key: 'ABC', localName: 'Local name' }
+    it('returns data for single location', async () => {
+      nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest.fn(async () => mappingResponse)
+      locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
+      await expect(service.getLocationByNomisLocationId('', 123)).resolves.toEqual(response)
+      expect(locationsInsidePrisonApiClient.getLocation).lastCalledWith('abc')
     })
   })
 

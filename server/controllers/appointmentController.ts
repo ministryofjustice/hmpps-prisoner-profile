@@ -26,6 +26,7 @@ import { ApiAction, AuditService, Page, PostAction, SubjectType } from '../servi
 import logger from '../../logger'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
+import LocationDetailsService from '../services/locationDetailsService'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -37,6 +38,7 @@ export default class AppointmentController {
     private readonly appointmentService: AppointmentService,
     private readonly prisonerSearchService: PrisonerSearchService,
     private readonly auditService: AuditService,
+    private readonly locationDetailsService: LocationDetailsService,
   ) {}
 
   public displayAddAppointment(): RequestHandler {
@@ -373,6 +375,16 @@ export default class AppointmentController {
           PRE_POST_APPOINTMENT_DURATION_MINS,
         )
 
+        const [preLocation, mainLocation, postLocation] = await Promise.all([
+          preAppointmentLocation
+            ? this.locationDetailsService.getLocationByNomisLocationId(clientToken, +preAppointmentLocation)
+            : undefined,
+          this.locationDetailsService.getLocationByNomisLocationId(clientToken, +appointmentForm.location),
+          postAppointmentLocation
+            ? this.locationDetailsService.getLocationByNomisLocationId(clientToken, +postAppointmentLocation)
+            : undefined,
+        ])
+
         const videoLinkBookingForm = {
           bookingType: 'COURT',
           prisoners: [
@@ -383,7 +395,7 @@ export default class AppointmentController {
                 preAppointment === 'yes'
                   ? {
                       type: 'VLB_COURT_PRE',
-                      locationKey: preAppointmentLocation,
+                      locationKey: preLocation.key,
                       date: formatDateISO(parseDate(appointmentForm.date)),
                       startTime: timeFormat(formatDateTimeISO(preAppointmentStartTime)),
                       endTime: timeFormat(appointmentDefaults.startTime),
@@ -391,7 +403,7 @@ export default class AppointmentController {
                   : undefined,
                 {
                   type: 'VLB_COURT_MAIN',
-                  locationKey: appointmentForm.location,
+                  locationKey: mainLocation.key,
                   date: formatDateISO(parseDate(appointmentForm.date)),
                   startTime: timeFormat(appointmentDefaults.startTime),
                   endTime: timeFormat(appointmentDefaults.endTime),
@@ -399,7 +411,7 @@ export default class AppointmentController {
                 postAppointment === 'yes'
                   ? {
                       type: 'VLB_COURT_POST',
-                      locationKey: postAppointmentLocation,
+                      locationKey: postLocation.key,
                       date: formatDateISO(parseDate(appointmentForm.date)),
                       startTime: timeFormat(appointmentDefaults.endTime),
                       endTime: timeFormat(formatDateTimeISO(postAppointmentEndTime)),

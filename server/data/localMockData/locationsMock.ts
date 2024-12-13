@@ -3,8 +3,8 @@ import { SelectOption } from '../../utils/utils'
 import LocationsApiLocation from '../interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
 export const locationsApiMock: LocationsApiLocation[] = [
-  { id: 'location-1', localName: 'Local name one' },
-  { id: 'location-2', localName: 'Local name two' },
+  { id: 'abc-123', key: 'MDI-WORK_IND-CES', localName: 'CES' },
+  { id: 'zyx-321', key: 'MDI-PROG_ACT-CHAP', localName: 'Chapel' },
 ]
 export const locationsMock: Location[] = [
   {

@@ -15,7 +15,7 @@ import {
   timeFormat,
 } from '../utils/dateHelpers'
 import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
-import { locationsMock, locationsSelectOptionsMock } from '../data/localMockData/locationsMock'
+import { locationsApiMock, locationsMock, locationsSelectOptionsMock } from '../data/localMockData/locationsMock'
 import HmppsError from '../interfaces/HmppsError'
 import { formatLocation, formatName } from '../utils/utils'
 import { courtLocationsMock, courtLocationsSelectOptionsMock } from '../data/localMockData/courtLocationsMock'
@@ -24,6 +24,7 @@ import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import { courtHearingTypes, courtHearingTypesSelectOptions } from '../data/localMockData/courtHearingsMock'
+import LocationDetailsService from '../services/locationDetailsService'
 
 let req: any
 let res: any
@@ -42,7 +43,7 @@ const today = formatDateTimeISO(new Date(), { startOfDay: true })
 
 const formBody = {
   appointmentType: appointmentTypesSelectOptionsMock[0].value,
-  location: locationsSelectOptionsMock[0].value,
+  location: locationsMock[0].locationId,
   date: formatDate(today, 'short'),
   startTimeHours: 23,
   startTimeMinutes: 15,
@@ -93,21 +94,21 @@ const videoLinkBookingForm = {
       appointments: [
         {
           type: 'VLB_COURT_PRE',
-          locationKey: formBodyVLB.preAppointmentLocation,
+          locationKey: locationsApiMock[0].key,
           date: formatDateISO(new Date(appointmentsToCreate.startTime)),
           startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
           endTime: timeFormat(appointmentsToCreate.startTime),
         },
         {
           type: 'VLB_COURT_MAIN',
-          locationKey: formBody.location,
+          locationKey: locationsApiMock[0].key,
           date: formatDateISO(new Date(appointmentsToCreate.startTime)),
           startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
           endTime: timeFormat(appointmentsToCreate.endTime),
         },
         {
           type: 'VLB_COURT_POST',
-          locationKey: formBodyVLB.postAppointmentLocation,
+          locationKey: locationsApiMock[1].key,
           date: formatDateISO(new Date(appointmentsToCreate.startTime)),
           startTime: timeFormat(appointmentsToCreate.endTime),
           endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
@@ -123,6 +124,7 @@ const videoLinkBookingForm = {
 
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/appointmentService.ts')
+jest.mock('../services/locationDetailsService.ts')
 
 describe('Appointments Controller', () => {
   const appointmentService: AppointmentService = new AppointmentService(
@@ -133,6 +135,11 @@ describe('Appointments Controller', () => {
   const prisonerSearchService: PrisonerSearchService = new PrisonerSearchService(
     null,
   ) as jest.Mocked<PrisonerSearchService>
+  const locationDetailsService: LocationDetailsService = new LocationDetailsService(
+    null,
+    null,
+    null,
+  ) as jest.Mocked<LocationDetailsService>
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -155,7 +162,12 @@ describe('Appointments Controller', () => {
       redirect: jest.fn(),
     }
 
-    controller = new AppointmentController(appointmentService, prisonerSearchService, auditServiceMock())
+    controller = new AppointmentController(
+      appointmentService,
+      prisonerSearchService,
+      auditServiceMock(),
+      locationDetailsService,
+    )
 
     appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
       appointmentTypes: appointmentTypesMock,
@@ -173,6 +185,13 @@ describe('Appointments Controller', () => {
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
     appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
+    locationDetailsService.getLocationByNomisLocationId = jest.fn(
+      async (_, locationId) =>
+        ({
+          [locationsMock[0].locationId]: locationsApiMock[0],
+          [locationsMock[1].locationId]: locationsApiMock[1],
+        })[locationId],
+    )
   })
 
   it('should display add appointment', async () => {

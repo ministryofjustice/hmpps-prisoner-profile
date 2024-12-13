@@ -5,7 +5,7 @@ import LocationDetailsController from './locationDetailsController'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { AuditService } from '../services/auditService'
 import config from '../config'
-import { prisonerLocationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
+import { locationDetailsServiceMock } from '../../tests/mocks/prisonerLocationDetailsServiceMock'
 import LocationDetailsService from '../services/locationDetailsService'
 import LocationDetailsPageData from '../services/interfaces/locationDetailsService/LocationDetailsPageData'
 import { Role } from '../data/enums/role'
@@ -49,7 +49,7 @@ describe('Prisoner Location Details', () => {
       redirect: jest.fn(),
     }
 
-    locationDetailsService = prisonerLocationDetailsServiceMock() as LocationDetailsService
+    locationDetailsService = locationDetailsServiceMock() as LocationDetailsService
     locationDetailsService.isReceptionFull = jest.fn().mockResolvedValue(false)
     locationDetailsService.getInmatesAtLocation = jest
       .fn()
