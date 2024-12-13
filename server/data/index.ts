@@ -13,6 +13,8 @@ import KeyWorkerRestClient from './keyWorkersApiClient'
 import ManageSocCasesApiRestClient from './manageSocCasesApiClient'
 import PathfinderApiRestClient from './pathfinderApiClient'
 import PrisonApiRestClient from './prisonApiClient'
+import LocationsInsidePrisonApiRestClient from './locationsInsidePrisonApiClient'
+import NomisSyncPrisonMappingRestClient from './nomisSyncPrisonerMappingClient'
 import PrisonerSearchClient from './prisonerSearchClient'
 
 import { createRedisClient } from './redisClient'
@@ -55,6 +57,8 @@ export const dataAccess = {
   pathfinderApiClientBuilder: (token: string) => new PathfinderApiRestClient(token),
   adjudicationsApiClientBuilder: (token: string) => new AdjudicationsApiRestClient(token),
   prisonApiClientBuilder: (token: string) => new PrisonApiRestClient(token),
+  locationsInsidePrisonApiClientBuilder: (token: string) => new LocationsInsidePrisonApiRestClient(token),
+  nomisSyncPrisonMappingClientBuilder: (token: string) => new NomisSyncPrisonMappingRestClient(token),
   prisonerSearchApiClientBuilder: (token: string) => new PrisonerSearchClient(token),
   systemToken: systemTokenBuilder(
     config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),

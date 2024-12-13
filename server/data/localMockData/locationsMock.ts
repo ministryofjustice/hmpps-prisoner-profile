@@ -1,6 +1,11 @@
 import Location from '../interfaces/prisonApi/Location'
 import { SelectOption } from '../../utils/utils'
+import LocationsApiLocation from '../interfaces/locationsInsidePrisonApi/LocationsApiLocation'
 
+export const locationsApiMock: LocationsApiLocation[] = [
+  { id: 'location-1', localName: 'Local name one' },
+  { id: 'location-2', localName: 'Local name two' },
+]
 export const locationsMock: Location[] = [
   {
     locationId: 27000,

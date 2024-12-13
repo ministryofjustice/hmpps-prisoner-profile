@@ -55,6 +55,16 @@ const apiChecks = [
     : []),
   service('prisonerSearchApi', `${config.apis.prisonerSearchApi.url}/health/ping`, config.apis.prisonerSearchApi.agent),
   service('prisonApi', `${config.apis.prisonApi.url}/health/ping`, config.apis.prisonApi.agent),
+  service(
+    'locationsInsidePrisonApi',
+    `${config.apis.locationsInsidePrisonApi.url}/health/ping`,
+    config.apis.locationsInsidePrisonApi.agent,
+  ),
+  service(
+    'nomisSyncPrisonerMappingApi',
+    `${config.apis.nomisSyncPrisonerMappingApi.url}/health/ping`,
+    config.apis.nomisSyncPrisonerMappingApi.agent,
+  ),
   service('bookAVideoLinkApi', `${config.apis.bookAVideoLinkApi.url}/health/ping`, config.apis.bookAVideoLinkApi.agent),
 ]
 

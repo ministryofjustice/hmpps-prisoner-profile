@@ -1,0 +1,37 @@
+import nock from 'nock'
+import config from '../config'
+import LocationsInsidePrisonApiClient from './locationsInsidePrisonApiClient'
+import { locationsApiMock } from './localMockData/locationsMock'
+
+const token = { access_token: 'token-1', expires_in: 300 }
+
+describe('locationsInsidePrisonApiClient', () => {
+  let fakeLocationsInsidePrisonApi: nock.Scope
+  let locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient
+
+  beforeEach(() => {
+    fakeLocationsInsidePrisonApi = nock(config.apis.locationsInsidePrisonApi.url)
+    locationsInsidePrisonApiClient = new LocationsInsidePrisonApiClient(token.access_token)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+    nock.cleanAll()
+  })
+
+  const mockSuccessfulApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
+    fakeLocationsInsidePrisonApi
+      .get(url)
+      .matchHeader('authorization', `Bearer ${token.access_token}`)
+      .reply(200, returnData)
+  }
+
+  describe('getLocation', () => {
+    it('Should return data from the API', async () => {
+      const id = 'MDI'
+      mockSuccessfulApiCall(`/locations/${id}?formatLocalName=true`, locationsApiMock[0])
+      const output = await locationsInsidePrisonApiClient.getLocation(id)
+      expect(output).toEqual(locationsApiMock[0])
+    })
+  })
+})
