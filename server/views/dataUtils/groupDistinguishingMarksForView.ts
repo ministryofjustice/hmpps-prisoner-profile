@@ -1,4 +1,5 @@
 import { PrisonPersonDistinguishingMark } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { bodyPartMap, BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 
 type DistinguishingMarkDecorated = PrisonPersonDistinguishingMark & { location: string }
 type MarkCategory = 'tattoos' | 'scars' | 'others'
@@ -109,7 +110,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
     }),
     getLocationDescription: () => 'Neck',
   },
-  faceAndHead: {
+  face: {
     name: 'Face and head',
     markIsForBodyPart: (mark: PrisonPersonDistinguishingMark) =>
       mark.bodyPart.id === 'BODY_PART_FACE' ||
@@ -282,7 +283,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       return 'Leg - no specific location'
     },
   },
-  frontAndSides: {
+  torso: {
     name: 'Front and sides',
     markIsForBodyPart: (mark: PrisonPersonDistinguishingMark) =>
       mark.bodyPart.id === 'BODY_PART_TORSO' && mark.side?.id !== 'SIDE_B',
@@ -361,6 +362,19 @@ export const getBodyPartDescription = (distinguishingMark: PrisonPersonDistingui
     partConfig.markIsForBodyPart(distinguishingMark),
   )
   return bodyPartConfig?.name ?? 'Uncategorised'
+}
+
+const findBodyPartToken = (map: Record<string, string>, value: BodyPartSelection): string | undefined => {
+  const entry = Object.entries(map).find(([_, mapValue]) => mapValue === value)
+  return entry ? entry[0] : undefined
+}
+
+export const getBodyPartToken = (distinguishingMark: PrisonPersonDistinguishingMark): string => {
+  const bodyPart = Object.entries(bodyPartsConfig).find(([, partConfig]) =>
+    partConfig.markIsForBodyPart(distinguishingMark),
+  )?.[0]
+
+  return findBodyPartToken(bodyPartMap, bodyPart as BodyPartSelection)
 }
 
 function mergeIn(mark: DistinguishingMarkDecorated, target: CategorisedMarks, path: [MarkCategory, BodyPartCategory]) {

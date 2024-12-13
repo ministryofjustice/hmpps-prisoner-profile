@@ -9,7 +9,11 @@ import {
   PrisonPersonDistinguishingMarkRequest,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import filterEmptyFieldsFromObject from '../utils/filterEmptyFieldsFromObject'
-import { AllBodyPartSelection, MarkTypeSelection } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
+import {
+  AllBodyPartSelection,
+  BodyPartSelection,
+  MarkTypeSelection,
+} from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from '../controllers/interfaces/MulterFile'
 
 const bodyPartConfig: Record<
@@ -64,6 +68,12 @@ const MarkTypeIds: Record<MarkTypeSelection, MarkTypeId> = {
   tattoo: 'MARK_TYPE_TAT',
 }
 
+export const findBodyPartByIdAndSide = (targetId: BodyPartId, targetSide: BodyPartSideId): BodyPartSelection => {
+  return Object.entries(bodyPartConfig)
+    .filter(([_, config]) => config.bodyPartId === targetId && config.side === targetSide)
+    .map(([key]) => key as BodyPartSelection)[0]
+}
+
 export default class DistinguishingMarksService {
   constructor(private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>) {}
 
@@ -93,5 +103,25 @@ export default class DistinguishingMarksService {
 
   getDistinguishingMark(token: string, markId: string): Promise<PrisonPersonDistinguishingMark> {
     return this.prisonPersonApiClientBuilder(token).getDistinguishingMark(markId)
+  }
+
+  updateDistinguishingMarkLocation(
+    token: string,
+    prisonerNumber: string,
+    markId: string,
+    markType: MarkTypeSelection,
+    bodyPart: AllBodyPartSelection,
+  ): Promise<PrisonPersonDistinguishingMark> {
+    const { bodyPartId, side, orientation } = bodyPartConfig[bodyPart]
+    const distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest = {
+      prisonerNumber,
+      markId,
+      markType: MarkTypeIds[markType],
+      bodyPart: bodyPartId,
+      side: side ?? null,
+      partOrientation: orientation ?? null,
+    }
+
+    return this.prisonPersonApiClientBuilder(token).patchDistinguishingMark(distinguishingMarkRequest)
   }
 }
