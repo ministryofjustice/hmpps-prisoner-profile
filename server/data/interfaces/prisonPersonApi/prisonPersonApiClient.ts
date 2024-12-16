@@ -153,6 +153,7 @@ export interface PrisonPersonDistinguishingMark {
 }
 
 export interface PrisonPersonDistinguishingMarkRequest {
+  markId?: string
   prisonerNumber: string
   bodyPart: BodyPartId
   markType: MarkTypeId
@@ -189,6 +190,10 @@ export interface PrisonPersonApiClient {
   ): Promise<PrisonPersonDistinguishingMark>
 
   getDistinguishingMark(markId: string): Promise<PrisonPersonDistinguishingMark>
+
+  patchDistinguishingMark(
+    distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
+  ): Promise<PrisonPersonDistinguishingMark>
 
   getImage(imageId: string): Promise<Readable>
 }

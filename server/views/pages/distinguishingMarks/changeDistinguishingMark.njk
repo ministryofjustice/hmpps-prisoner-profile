@@ -20,6 +20,7 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
+            {% set basePath = '/prisoner/' + prisonerNumber + '/personal/' + markType + '/' + mark.id %}
             {{ govukSummaryList({
                 classes: 'govuk-!-margin-bottom-6',
                 rows: [
@@ -27,7 +28,7 @@
                         actions: {
                         items: [
                             {
-                                href: "#",
+                                href: basePath + "/body-part",
                                 text: "Change",
                                 visuallyHiddenText: "body part",
                                 classes: "govuk-link--no-visited-state"
@@ -39,13 +40,14 @@
                         actions: {
                         items: [
                             {
-                                href: "#",
+                                href: basePath + "/location?bodyPart=" + mark | toBodyPartToken,
                                 text: "Change",
                                 visuallyHiddenText: "location",
                                 classes: "govuk-link--no-visited-state"
                             }
                         ], classes: "hmpps-vertical-align-top"
-                        }
+                        },
+                        classes:  "govuk-summary-list__row--hidden" if (mark | toBodyPartDescription === 'Neck' or mark | toBodyPartDescription === 'Back')
                     },
                     { key: { text: "Description", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark.comment | default("Not entered", true), classes: "hmpps-vertical-align-top" },
                         actions: {
@@ -77,7 +79,7 @@
     </div>
 
     <div class="govuk-button-group">
-        {{ govukButton({ text: "Return to the profile", href: refererUrl }) }}
+        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Return to the profile</a>
     </div>
 
 {% endblock %}

@@ -40,3 +40,13 @@ export function newDetailedDistinguishingMarkValidator(body: BodySpecificSubmiss
 
   return []
 }
+
+export function updateLocationValidator(body: BodySpecificSubmission) {
+  const verifiedBodyPart = allBodyParts.find(selection => selection === body.specificBodyPart)
+
+  if (!verifiedBodyPart) {
+    return [{ text: 'Select a body part', href: '#specific-body-part-selection' }]
+  }
+
+  return []
+}

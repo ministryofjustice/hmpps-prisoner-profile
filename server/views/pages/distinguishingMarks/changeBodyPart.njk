@@ -5,11 +5,12 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#appearance" %}
-{% set pageTitle =  "Select "+ markType + " location - Prisoner personal details" %}
+{% set pageTitle =  "Change body part - Prisoner personal details" %}
 
 {% block body %}
 
 {% if errors.length > 0 %}
+    {%  set selected = "" %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             {{
@@ -29,7 +30,7 @@
 </div>
 
     <span class="govuk-caption-l">Distinguishing marks</span>
-    <h1 class='govuk-!-margin-top-0'>Select where the {{ markType }} is</h1>
+    <h1 class='govuk-!-margin-top-0'>Change where the {{ markType }} is</h1>
     <p data-qa='explanation-text'>You can only select one body part at a time. You can add more {{ markType}}s for this person later.</p>
 
 <div class="new-dm-body-image-container {{ "dm-base-image-selected" if selected }}" {% if selected %} data-selected="{{ selected }}" {% endif %}>
@@ -52,15 +53,15 @@
     <p class='dm-base-label-front' aria-hidden="true">Front</p>
     <p class='dm-base-label-back' aria-hidden="true">Back</p>
 </div>
-<p id="distinguishing-mark-selection-text" class="govuk-!-margin-bottom-6">{{ verifiedSelection | toBodyPartDisplayText | capitalize + " selected"  if verifiedSelection else "No body part selected" }}</p>
+<p id="distinguishing-mark-selection-text" class="govuk-!-margin-bottom-6">{{ verifiedSelection | toBodyPartDisplayText | capitalize + " selected"  if verifiedSelection and errors.length === 0 else "No body part selected" }}</p>
 
 <form id="body-part-form" method="post" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
     <input type="hidden" name="bodyPart" value="{{ selected }}">
+    <input type="hidden" name="initialBodyPart" value="{{ verifiedSelection }}">
 
     <div class="govuk-button-group">
-        {{ govukButton({ text: "Continue to add details", attributes: { name: "action", value: "continue" }, type: "submit" }) }}
-        {{ govukButton({ text: "Save and return to profile", attributes: { name: "action", value: "returnToProfile" }, type: "submit", classes: "govuk-button--secondary"}) }}
+        {{ govukButton({ text: "Save and continue", type: "submit" }) }}
         <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
     </div>
 </form>
