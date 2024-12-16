@@ -98,6 +98,15 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
     })
   }
 
+  patchDistinguishingMark(
+    distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
+  ): Promise<PrisonPersonDistinguishingMark> {
+    return this.restClient.patch<PrisonPersonDistinguishingMark>({
+      path: `/distinguishing-marks/mark/${distinguishingMarkRequest.markId}`,
+      data: distinguishingMarkRequest,
+    })
+  }
+
   async getImage(imageId: string): Promise<Readable> {
     return this.restClient.stream({
       path: `/photographs/${imageId}/file`,

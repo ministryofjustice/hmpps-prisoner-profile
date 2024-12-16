@@ -43,6 +43,7 @@ import summaryListRowWithOptionalChangeLink, {
 } from '../views/dataUtils/summaryListRowWithOptionalChangeLink'
 import groupDistinguishingMarks, {
   getBodyPartDescription,
+  getBodyPartToken,
   getMarkLocationDescription,
 } from '../views/dataUtils/groupDistinguishingMarksForView'
 import { formatMedicalDietaryRequirements } from './referenceDataCodeUtils'
@@ -179,5 +180,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toBodyPartSpecificFormData', getDistinguishingFeatureDetailsFormData)
   njkEnv.addFilter('toMarkLocationDescription', getMarkLocationDescription)
   njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
+  njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
   njkEnv.addFilter('formatMedicalDietaryRequirements', formatMedicalDietaryRequirements)
 }

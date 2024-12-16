@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import DistinguishingMarksService from '../services/distinguishingMarksService'
+import DistinguishingMarksService, { findBodyPartByIdAndSide } from '../services/distinguishingMarksService'
 import {
   AllBodyPartSelection,
   bodyPartMap,
@@ -8,7 +8,7 @@ import {
   markTypeSelections,
 } from './interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from './interfaces/MulterFile'
-import { getBodyPartDescription } from '../views/dataUtils/groupDistinguishingMarksForView'
+import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]
@@ -20,6 +20,10 @@ export default class DistinguishingMarksController {
     this.postNewDistinguishingMark = this.postNewDistinguishingMark.bind(this)
     this.postNewDistinguishingMarkWithDetail = this.postNewDistinguishingMarkWithDetail.bind(this)
     this.changeDistinguishingMark = this.changeDistinguishingMark.bind(this)
+    this.changeBodyPart = this.changeBodyPart.bind(this)
+    this.updateBodyPart = this.updateBodyPart.bind(this)
+    this.changeLocation = this.changeLocation.bind(this)
+    this.updateLocation = this.updateLocation.bind(this)
   }
 
   public newDistinguishingMark(req: Request, res: Response) {
@@ -33,7 +37,8 @@ export default class DistinguishingMarksController {
 
     return res.render('pages/distinguishingMarks/addNewDistinguishingMark', {
       markType,
-      selected: verifiedSelection,
+      selected,
+      verifiedSelection,
     })
   }
 
@@ -110,5 +115,101 @@ export default class DistinguishingMarksController {
       mark,
       photoHtml,
     })
+  }
+
+  public async changeBodyPart(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+
+    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, markId)
+
+    const selected = (req.query.selected as string) || getBodyPartToken(mark)
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPartMap[selected])
+
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    return res.render('pages/distinguishingMarks/changeBodyPart', {
+      markType,
+      selected,
+      verifiedSelection,
+    })
+  }
+
+  public async updateBodyPart(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { bodyPart, initialBodyPart } = req.body
+    const { clientToken } = req.middleware
+    const bodyPartChanged = bodyPartMap[bodyPart] !== initialBodyPart
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    if (bodyPartChanged) {
+      await this.distinguishingMarksService.updateDistinguishingMarkLocation(
+        clientToken,
+        prisonerNumber,
+        markId,
+        verifiedMarkType,
+        bodyPartMap[bodyPart] as BodyPartSelection,
+      )
+    }
+
+    // Neck and back have no specific locations to choose from, so return to the change summary screen
+    if (bodyPart === 'neck' || bodyPart === 'back') {
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+    }
+
+    return res.redirect(
+      `/prisoner/${prisonerNumber}/personal/${markType}/${markId}/location?bodyPart=${bodyPart}&bodyPartChanged=${bodyPartChanged}&referer=body-part`,
+    )
+  }
+
+  public async changeLocation(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const bodyPart = req.query.bodyPart as string
+    const referer = req.query.referer as string
+    const bodyPartChanged = (req.query.bodyPartChanged as string) === 'true'
+    const { clientToken } = req.middleware
+
+    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, markId)
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
+    const specificBodyPart = findBodyPartByIdAndSide(mark.bodyPart.id, mark.side?.id)
+
+    if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+    const refererUrl = `${cancelUrl}${referer === 'body-part' ? `/body-part?selected=${bodyPart}` : ''}`
+
+    return res.render('pages/distinguishingMarks/changeLocation', {
+      markId,
+      markType,
+      bodyPart: verifiedBodyPart,
+      ...(bodyPartChanged ? {} : { specificBodyPart }),
+      refererUrl,
+      cancelUrl,
+    })
+  }
+
+  public async updateLocation(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { specificBodyPart } = req.body
+    const { clientToken } = req.middleware
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    await this.distinguishingMarksService.updateDistinguishingMarkLocation(
+      clientToken,
+      prisonerNumber,
+      markId,
+      verifiedMarkType,
+      specificBodyPart as AllBodyPartSelection,
+    )
+
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
   }
 }

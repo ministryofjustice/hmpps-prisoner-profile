@@ -1,5 +1,9 @@
 import { PrisonPersonDistinguishingMark } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import groupIdentifyingMarks from './groupDistinguishingMarksForView'
+import groupIdentifyingMarks, {
+  getBodyPartDescription,
+  getBodyPartToken,
+  getMarkLocationDescription,
+} from './groupDistinguishingMarksForView'
 
 const generateDistinguishingMarks = (
   override: Partial<PrisonPersonDistinguishingMark>,
@@ -683,5 +687,77 @@ describe('groupIdentifyingMarks', () => {
         )
       })
     })
+  })
+})
+
+const leftArmMock: PrisonPersonDistinguishingMark = {
+  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+  prisonerNumber: 'G4244UD',
+  bodyPart: {
+    id: 'BODY_PART_ARM',
+    description: 'Arm',
+    listSequence: 0,
+    isActive: true,
+  },
+  markType: {
+    id: 'MARK_TYPE_TAT',
+    description: 'Tattoo',
+    listSequence: 0,
+    isActive: true,
+  },
+  side: {
+    id: 'SIDE_L',
+    description: 'Left arm',
+    listSequence: 0,
+    isActive: true,
+  },
+  partOrientation: {
+    id: 'PART_ORIENT_LOW',
+    description: 'Lower arm',
+    listSequence: 0,
+    isActive: true,
+  },
+  comment: 'Comment',
+  photographUuids: [{ id: '019205c0-0f5f-7bef-9a24-d64db76ca24a', latest: true }],
+  createdAt: '2024-09-18T16:28:45+0100',
+  createdBy: 'test-user',
+}
+
+describe('getMarkLocationDescription', () => {
+  it('should return the location description for a valid body part', () => {
+    const result = getMarkLocationDescription(leftArmMock)
+    expect(result).toBe('Lower arm')
+  })
+
+  it('should return "No specific location" if no body part matches', () => {
+    const mockInvalidMark = { bodyPart: { id: 'INVALID_PART' } }
+    const result = getMarkLocationDescription(mockInvalidMark as PrisonPersonDistinguishingMark)
+    expect(result).toBe('No specific location')
+  })
+})
+
+describe('getBodyPartDescription', () => {
+  it('should return the body part name for a valid body part', () => {
+    const result = getBodyPartDescription(leftArmMock)
+    expect(result).toBe('Left arm')
+  })
+
+  it('should return "Uncategorised" if no body part matches', () => {
+    const mockInvalidMark = { bodyPart: { id: 'INVALID_PART' } }
+    const result = getBodyPartDescription(mockInvalidMark as PrisonPersonDistinguishingMark)
+    expect(result).toBe('Uncategorised')
+  })
+})
+
+describe('getBodyPartToken', () => {
+  it('should return the correct token for a matching body part', () => {
+    const result = getBodyPartToken(leftArmMock)
+    expect(result).toBe('left-arm')
+  })
+
+  it('should return undefined if no token matches the body part', () => {
+    const mockInvalidMark = { bodyPart: { id: 'INVALID_PART' } }
+    const result = getBodyPartToken(mockInvalidMark as PrisonPersonDistinguishingMark)
+    expect(result).toBeUndefined()
   })
 })
