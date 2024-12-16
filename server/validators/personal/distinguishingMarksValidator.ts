@@ -50,3 +50,16 @@ export function updateLocationValidator(body: BodySpecificSubmission) {
 
   return []
 }
+
+export function updateDescriptionValidator(body: BodySpecificSubmission) {
+  if (body.description?.length > 240) {
+    return [
+      {
+        text: 'The description must be 240 characters or less',
+        href: `#description`,
+      },
+    ]
+  }
+
+  return []
+}

@@ -192,4 +192,23 @@ describe('distinguishingMarksService', () => {
       },
     )
   })
+
+  describe('updateDistinguishingMarkDescription', () => {
+    it('should include comment if provided', () => {
+      service.updateDistinguishingMarkDescription(
+        'token',
+        'A12345',
+        '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        'tattoo',
+        'comment',
+      )
+
+      expect(prisonPersonApiClient.patchDistinguishingMark).toHaveBeenCalledWith({
+        prisonerNumber: 'A12345',
+        markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        markType: 'MARK_TYPE_TAT',
+        comment: 'comment',
+      })
+    })
+  })
 })

@@ -155,7 +155,7 @@ export interface PrisonPersonDistinguishingMark {
 export interface PrisonPersonDistinguishingMarkRequest {
   markId?: string
   prisonerNumber: string
-  bodyPart: BodyPartId
+  bodyPart?: BodyPartId
   markType: MarkTypeId
   side?: BodyPartSideId
   partOrientation?: PartOrientationId

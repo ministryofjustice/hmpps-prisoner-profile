@@ -24,6 +24,8 @@ export default class DistinguishingMarksController {
     this.updateBodyPart = this.updateBodyPart.bind(this)
     this.changeLocation = this.changeLocation.bind(this)
     this.updateLocation = this.updateLocation.bind(this)
+    this.changeDescription = this.changeDescription.bind(this)
+    this.updateDescription = this.updateDescription.bind(this)
   }
 
   public newDistinguishingMark(req: Request, res: Response) {
@@ -208,6 +210,49 @@ export default class DistinguishingMarksController {
       markId,
       verifiedMarkType,
       specificBodyPart as AllBodyPartSelection,
+    )
+
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+  }
+
+  public async changeDescription(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+
+    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, markId)
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+
+    const formValues = res.locals.formValues ?? {
+      description: mark.comment,
+    }
+
+    return res.render('pages/distinguishingMarks/changeDescription', {
+      markId,
+      markType,
+      formValues,
+      refererUrl,
+    })
+  }
+
+  public async updateDescription(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { description } = req.body
+    const { clientToken } = req.middleware
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    await this.distinguishingMarksService.updateDistinguishingMarkDescription(
+      clientToken,
+      prisonerNumber,
+      markId,
+      verifiedMarkType,
+      description,
     )
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
