@@ -16,6 +16,7 @@ import {
   formatHeight,
   formatName,
   formatWeight,
+  neurodiversityEnabled,
 } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
@@ -44,6 +45,7 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 
 export default class PersonalPageService {
   constructor(
@@ -93,7 +95,7 @@ export default class PersonalPageService {
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    const { bookingId, prisonerNumber } = prisonerData
+    const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
       inmateDetail,
       prisonerDetail,
@@ -105,6 +107,7 @@ export default class PersonalPageService {
       beliefs,
       prisonPerson,
       distinguishingMarks,
+      learnerNeurodivergence,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -116,13 +119,10 @@ export default class PersonalPageService {
       prisonApiClient.getBeliefHistory(prisonerNumber),
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
+      Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
-    const learnerNeurodivergence = await Result.wrap(
-      this.getLearnerNeurodivergence(token, prisonerNumber),
-      apiErrorCallback,
-    )
     return {
       personalDetails: this.personalDetails(
         prisonerData,
@@ -438,7 +438,12 @@ export default class PersonalPageService {
     }
   }
 
-  getLearnerNeurodivergence(clientToken: string, prisonerNumber: string) {
+  getLearnerNeurodivergence(
+    clientToken: string,
+    prisonId: string,
+    prisonerNumber: string,
+  ): Promise<LearnerNeurodivergence[]> {
+    if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
     const curiousApiClient = this.curiousApiClientBuilder(clientToken)
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
