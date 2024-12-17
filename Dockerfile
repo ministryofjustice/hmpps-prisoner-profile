@@ -41,6 +41,7 @@ COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 
 COPY . .
+RUN npm run postinstall
 RUN npm run build
 
 RUN export BUILD_NUMBER=${BUILD_NUMBER} && \

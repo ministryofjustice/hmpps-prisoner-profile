@@ -462,15 +462,9 @@ describe('overviewController', () => {
 
     it('should not return Neurodiversity if not at supported prison', async () => {
       offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
-      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue(LearnerNeurodivergenceMock)
+      personalPageService.getLearnerNeurodivergence = jest.fn().mockResolvedValue([])
 
-      await controller.displayOverview(
-        {
-          ...req,
-          middleware: { ...req.middleware, prisonerData: { ...PrisonerMockDataA, prisonId: 'LEI' } },
-        },
-        res,
-      )
+      await controller.displayOverview(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',

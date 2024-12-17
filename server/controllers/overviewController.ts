@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import config from '../config'
-import { formatName, isInUsersCaseLoad, neurodiversityEnabled } from '../utils/utils'
+import { formatName, isInUsersCaseLoad } from '../utils/utils'
 import { PathfinderApiClient } from '../data/interfaces/pathfinderApi/pathfinderApiClient'
 import { ManageSocCasesApiClient } from '../data/interfaces/manageSocCasesApi/manageSocCasesApiClient'
 import { RestClientBuilder } from '../data'
@@ -19,7 +19,6 @@ import PrisonerScheduleService from '../services/prisonerScheduleService'
 import IncentivesService from '../services/incentivesService'
 import PersonalPageService from '../services/personalPageService'
 import { Result } from '../utils/result/result'
-import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import OffenderService from '../services/offenderService'
 import ProfessionalContactsService from '../services/professionalContactsService'
 import { youthEstatePrisons } from '../data/constants/youthEstatePrisons'
@@ -94,7 +93,10 @@ export default class OverviewController {
       permissions.visits?.view ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
       permissions.incentives?.view ? this.incentivesService.getIncentiveOverview(clientToken, bookingId) : null,
-      Result.wrap(this.getLearnerNeurodivergence(clientToken, prisonId, prisonerNumber), res.locals.apiErrorCallback),
+      Result.wrap(
+        this.personalPageService.getLearnerNeurodivergence(clientToken, prisonId, prisonerNumber),
+        res.locals.apiErrorCallback,
+      ),
       this.prisonerScheduleService.getScheduledTransfers(clientToken, prisonerNumber),
       this.offenderService.getPrisoner(clientToken, prisonerNumber),
       this.professionalContactsService.getProfessionalContactsOverview(
@@ -165,15 +167,6 @@ export default class OverviewController {
     }
 
     res.render('pages/overviewPage', viewData)
-  }
-
-  private getLearnerNeurodivergence = async (
-    clientToken: string,
-    prisonId: string,
-    prisonerNumber: string,
-  ): Promise<LearnerNeurodivergence[]> => {
-    if (!neurodiversityEnabled(prisonId)) return []
-    return this.personalPageService.getLearnerNeurodivergence(clientToken, prisonerNumber)
   }
 
   private auditOverviewPageView = (req: Request, res: Response, prisonerData: Prisoner) => {
