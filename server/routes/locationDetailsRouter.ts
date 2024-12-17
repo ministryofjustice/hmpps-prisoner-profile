@@ -13,7 +13,7 @@ export default function locationDetailsRouter(services: Services): Router {
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
 
   const prisonerLocationDetailsController = new LocationDetailsController(
-    services.prisonerLocationDetailsPageService,
+    services.locationDetailsService,
     services.auditService,
   )
 

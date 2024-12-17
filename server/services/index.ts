@@ -41,6 +41,8 @@ import CsipService from './csipService'
 export const services = () => {
   const {
     prisonApiClientBuilder,
+    locationsInsidePrisonApiClientBuilder,
+    nomisSyncPrisonMappingClientBuilder,
     caseNotesApiClientBuilder,
     prisonerSearchApiClientBuilder,
     allocationManagerApiClientBuilder,
@@ -51,7 +53,6 @@ export const services = () => {
     nonAssociationsApiClientBuilder,
     whereaboutsApiClientBuilder,
     prisonerProfileDeliusApiClientBuilder,
-    manageUsersApiClientBuilder,
     bookAVideoLinkApiClientBuilder,
     complexityApiClientBuilder,
     calculateReleaseDatesApiClientBuilder,
@@ -97,13 +98,16 @@ export const services = () => {
     prisonApiClientBuilder,
     personalLearningPlansService,
   )
-  const prisonerLocationDetailsPageService = new LocationDetailsService(prisonApiClientBuilder)
+  const locationDetailsService = new LocationDetailsService(
+    prisonApiClientBuilder,
+    nomisSyncPrisonMappingClientBuilder,
+    locationsInsidePrisonApiClientBuilder,
+  )
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
   const appointmentService = new AppointmentService(
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
-    manageUsersApiClientBuilder,
     bookAVideoLinkApiClientBuilder,
   )
   const professionalContactsService = new ProfessionalContactsService(
@@ -162,7 +166,7 @@ export const services = () => {
     csraService,
     moneyService,
     appointmentService,
-    prisonerLocationDetailsPageService,
+    locationDetailsService,
     prisonerLocationHistoryService,
     professionalContactsService,
     beliefService,

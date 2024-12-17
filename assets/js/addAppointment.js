@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const appointmentDateInput = document.getElementById('date')
-  const appointmentLocationGroup = document.querySelector('.js-appointment-locations-group')
   const appointmentLocationSelect = document.getElementById('location')
-  const videoLocationGroup = document.querySelector('.js-video-locations-group')
-  const videoLocationSelect = document.querySelector('.js-video-location')
   const appointmentTypeSelect = document.getElementById('appointmentType')
   const recurringRadios = document.querySelector('.js-recurring-radios')
   const appointmentRepeatsSelect = document.getElementById('repeats')
@@ -14,12 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
-    const locationId = appointmentLocationGroup.style.display === 'block' && appointmentLocationSelect.value
-    const locationKey = videoLocationGroup?.style.display === 'block' && videoLocationSelect?.value
+    const locationId = appointmentLocationSelect.value
 
     const response =
-      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`)) ||
-      date && locationKey && (await fetch(`/api/get-location-events?date=${date}&locationKey=${locationKey}`))
+      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`))
 
     if (response?.ok) {
       locationEventsContainer.innerHTML = await response.text()
@@ -62,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showHideRecurring() {
     const appointmentType = appointmentTypeSelect.value
+
     if (appointmentType === 'VLB') {
       recurringRadios.style.display = 'none'
     } else {
@@ -69,28 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function showHideVlbLocations() {
-    const appointmentType = appointmentTypeSelect.value
-    if (appointmentType === 'VLB' && videoLocationGroup) {
-      appointmentLocationGroup.style.display = 'none'
-      videoLocationGroup.style.display = 'block'
-    } else {
-      appointmentLocationGroup.style.display = 'block'
-      videoLocationGroup ? videoLocationGroup.style.display = 'none' : null
-    }
-
-    getEventsForLocation()
-  }
-
   appointmentTypeSelect.addEventListener('change', () => {
     showHideRecurring()
-    showHideVlbLocations()
   })
 
   appointmentLocationSelect.addEventListener('change', () => {
-    getEventsForLocation()
-  })
-  videoLocationSelect?.addEventListener('change', () => {
     getEventsForLocation()
   })
   appointmentDateInput.addEventListener('change', () => {
@@ -116,5 +95,4 @@ document.addEventListener('DOMContentLoaded', () => {
   getEventsForLocation()
   getAppointmentEndDate()
   showHideRecurring()
-  showHideVlbLocations()
 })

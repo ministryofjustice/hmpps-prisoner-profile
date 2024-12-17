@@ -114,7 +114,6 @@
                 <form method="post">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <input type="hidden" id="date" name="date" value="{{ date }}"/>
-                    <input type="hidden" id="bookingId" name="bookingId" value="{{ bookingId }}"/>
                     <input type="hidden" id="prisonId" name="prisonId" value="{{ prisonId }}"/>
 
                     <div class="govuk-grid-row">
@@ -190,71 +189,54 @@
                                 errorMessage: errors | findError("court")
                             }) }}
 
-                            {% if bookAVideoLinkEnabled %}
-                                {{ govukSelect({
-                                    name: "hearingType",
-                                    id: "hearingType",
-                                    label: {
-                                        text: "What is the hearing type?",
-                                        classes: 'govuk-!-font-weight-bold'
-                                    },
-                                    items: hearingTypes | addDefaultSelectedValue('Choose hearing type') | setSelected(formValues.hearingType),
-                                    errorMessage: errors | findError("hearingType")
-                                }) }}
-
-                                {% set courtHearingLinkHtml %}
-                                    {{ govukInput({
-                                        name: "videoLinkUrl",
-                                        id: "videoLinkUrl",
-                                        label: {
-                                            text: "Court hearing link"
-                                        },
-                                        value: formValues.videoLinkUrl,
-                                        errorMessage: errors | findError("videoLinkUrl")
-                                    }) }}
-                                {% endset %}
-
-                                {{ govukRadios({
-                                    idPrefix: "cvpRequired",
-                                    name: "cvpRequired",
-                                    errorMessage: errors | findError('cvpRequired'),
-                                    fieldset: {
-                                        legend: {
-                                            text: "Do you know the link for this video link hearing?",
-                                            classes: "govuk-fieldset__legend--s"
-                                        }
-                                    },
-                                    items: [
-                                        {
-                                            value: "yes",
-                                            text: "Yes",
-                                            checked: formValues.cvpRequired == 'yes',
-                                            conditional: {
-                                                html: courtHearingLinkHtml
-                                            }
-                                        },
-                                        {
-                                            value: "no",
-                                            text: "No",
-                                            checked: formValues.cvpRequired == 'no'
-                                        }
-                                    ]
-                                }) }}
-
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div id="otherCourtContainer" class="govuk-grid-row">
-                        <div class="govuk-grid-column-full">
-                            {{ govukInput({
-                                id: "otherCourt",
-                                name: "otherCourt",
+                            {{ govukSelect({
+                                name: "hearingType",
+                                id: "hearingType",
                                 label: {
-                                    text: "What is the name of the court?"
+                                    text: "What is the hearing type?",
+                                    classes: 'govuk-!-font-weight-bold'
                                 },
-                                value: formValues.otherCourt,
-                                errorMessage: errors | findError('otherCourt')
+                                items: hearingTypes | addDefaultSelectedValue('Choose hearing type') | setSelected(formValues.hearingType),
+                                errorMessage: errors | findError("hearingType")
+                            }) }}
+
+                            {% set courtHearingLinkHtml %}
+                                {{ govukInput({
+                                    name: "videoLinkUrl",
+                                    id: "videoLinkUrl",
+                                    label: {
+                                        text: "Court hearing link"
+                                    },
+                                    value: formValues.videoLinkUrl,
+                                    errorMessage: errors | findError("videoLinkUrl")
+                                }) }}
+                            {% endset %}
+
+                            {{ govukRadios({
+                                idPrefix: "cvpRequired",
+                                name: "cvpRequired",
+                                errorMessage: errors | findError('cvpRequired'),
+                                fieldset: {
+                                    legend: {
+                                        text: "Do you know the link for this video link hearing?",
+                                        classes: "govuk-fieldset__legend--s"
+                                    }
+                                },
+                                items: [
+                                    {
+                                        value: "yes",
+                                        text: "Yes",
+                                        checked: formValues.cvpRequired == 'yes',
+                                        conditional: {
+                                            html: courtHearingLinkHtml
+                                        }
+                                    },
+                                    {
+                                        value: "no",
+                                        text: "No",
+                                        checked: formValues.cvpRequired == 'no'
+                                    }
+                                ]
                             }) }}
                         </div>
                     </div>

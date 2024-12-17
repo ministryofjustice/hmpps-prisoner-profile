@@ -12,14 +12,27 @@ import { mockInmateAtLocation } from '../data/localMockData/locationsInmates'
 import LocationDetails from './interfaces/locationDetailsService/LocationDetails'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import Reception from '../data/interfaces/prisonApi/Reception'
+import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
+import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
+import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
+import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
 
 describe('prisonerLocationDetailsService', () => {
   let service: LocationDetailsService
   let prisonApiClient: PrisonApiClient
+  let nomisSyncPrisonerMappingApiClient: NomisSyncPrisonerMappingApiClient
+  let locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
-    service = new LocationDetailsService(() => prisonApiClient)
+    nomisSyncPrisonerMappingApiClient = nomisSyncPrisonerMappingApiClientMock()
+    locationsInsidePrisonApiClient = locationsInsidePrisonApiClientMock()
+
+    service = new LocationDetailsService(
+      () => prisonApiClient,
+      () => nomisSyncPrisonerMappingApiClient,
+      () => locationsInsidePrisonApiClient,
+    )
 
     prisonApiClient.getStaffDetails = jest.fn(async (username: string) => generateStaffDetails(username))
     prisonApiClient.getAgencyDetails = jest.fn(async (agencyId: string) => generateAgencyDetails(agencyId))
@@ -27,6 +40,32 @@ describe('prisonerLocationDetailsService', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+  })
+
+  const mappingResponse = { nomisLocationId: 123, dpsLocationId: 'abc' }
+  describe('getLocationMappingUsingNomisLocationId', () => {
+    it('returns data mapping using Nomis locationId ', async () => {
+      nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest.fn(async () => mappingResponse)
+      await expect(service.getLocationMappingUsingNomisLocationId('', 123)).resolves.toEqual(mappingResponse)
+    })
+  })
+
+  describe('getLocation', () => {
+    const response = { id: 'abc', key: 'ABC', localName: 'Local name' }
+    it('returns data for single location', async () => {
+      locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
+      await expect(service.getLocation('', 'abc')).resolves.toEqual(response)
+    })
+  })
+
+  describe('getLocationByNomisLocationId', () => {
+    const response = { id: 'abc', key: 'ABC', localName: 'Local name' }
+    it('returns data for single location', async () => {
+      nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest.fn(async () => mappingResponse)
+      locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
+      await expect(service.getLocationByNomisLocationId('', 123)).resolves.toEqual(response)
+      expect(locationsInsidePrisonApiClient.getLocation).lastCalledWith('abc')
+    })
   })
 
   describe('getInmatesAtLocation', () => {

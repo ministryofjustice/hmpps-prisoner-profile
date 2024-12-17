@@ -4,6 +4,8 @@ import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import dpsPages from './integration_tests/mockApis/dpsPages'
 import prisonApi from './integration_tests/mockApis/prison'
+import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrisonApi'
+import nomisSyncPrisonerMappingApi from './integration_tests/mockApis/nomisSyncPrisonerMappingApi'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearch'
 import pomApi from './integration_tests/mockApis/pom'
 import keyWorkerApi from './integration_tests/mockApis/keyWorker'
@@ -27,6 +29,7 @@ import componentApi from './integration_tests/mockApis/componentApi'
 import prisonPersonApi from './integration_tests/mockApis/prisonPerson'
 import personIntegrationApi from './integration_tests/mockApis/personIntegrationApi'
 import csipApi from './integration_tests/mockApis/csipApi'
+import bookAVideoLinkApi from './integration_tests/mockApis/bookAVideoLinkApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -49,6 +52,8 @@ export default defineConfig({
         ...tokenVerification,
         ...dpsPages,
         ...prisonApi,
+        ...locationsInsidePrisonApi,
+        ...nomisSyncPrisonerMappingApi,
         ...prisonerSearchApi,
         ...pomApi,
         ...keyWorkerApi,
@@ -72,6 +77,7 @@ export default defineConfig({
         ...prisonPersonApi,
         ...personIntegrationApi,
         ...csipApi,
+        ...bookAVideoLinkApi,
       })
     },
     baseUrl: 'http://localhost:3007',
