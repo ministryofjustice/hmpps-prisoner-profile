@@ -1,0 +1,60 @@
+{% extends "../index.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+
+{% set pageTitle =  "Change " + markType + " description - Prisoner personal details" %}
+{% set heading = "Change the description of the " + markType %}
+
+{% block body %}
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+                govukErrorSummary({
+                    titleText: "There is a problem",
+                    errorList: errors,
+                    attributes: { 'data-qa-errors': true }
+                })
+            }}
+        </div>
+    </div>
+{% endif %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form id="mark-detail-form" method="post" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            <span class="govuk-caption-l">Distinguishing marks</span>
+            <h1 class="govuk-heading-l">
+                {{ heading }}
+            </h1>
+
+            {{ govukCharacterCount({
+                name: "description",
+                id: "description",
+                maxlength: 240,
+                rows: 10,
+                value: formValues.description,
+                errorMessage: errors | findError('description'),
+                attributes: { "data-qa": "description-field" }
+            }) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({ text: "Save", type: "submit" }) }}
+                <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

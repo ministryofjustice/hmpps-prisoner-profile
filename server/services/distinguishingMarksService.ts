@@ -124,4 +124,21 @@ export default class DistinguishingMarksService {
 
     return this.prisonPersonApiClientBuilder(token).patchDistinguishingMark(distinguishingMarkRequest)
   }
+
+  updateDistinguishingMarkDescription(
+    token: string,
+    prisonerNumber: string,
+    markId: string,
+    markType: MarkTypeSelection,
+    comment: string,
+  ): Promise<PrisonPersonDistinguishingMark> {
+    const distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest = {
+      prisonerNumber,
+      markId,
+      markType: MarkTypeIds[markType],
+      comment,
+    }
+
+    return this.prisonPersonApiClientBuilder(token).patchDistinguishingMark(distinguishingMarkRequest)
+  }
 }

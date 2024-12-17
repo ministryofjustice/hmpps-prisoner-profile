@@ -9,6 +9,7 @@ import validationMiddleware from '../middleware/validationMiddleware'
 import {
   newDetailedDistinguishingMarkValidator,
   newDistinguishingMarkValidator,
+  updateDescriptionValidator,
   updateLocationValidator,
 } from '../validators/personal/distinguishingMarksValidator'
 import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
@@ -83,6 +84,16 @@ export default function distinguishingMarksRouter(services: Services): Router {
       redirectBackOnError: true,
     }),
     distinguishingMarksController.updateLocation,
+  )
+
+  // Change description
+  get('/:markId/description', distinguishingMarksController.changeDescription)
+  post(
+    '/:markId/description',
+    validationMiddleware([updateDescriptionValidator], {
+      redirectBackOnError: true,
+    }),
+    distinguishingMarksController.updateDescription,
   )
 
   return router
