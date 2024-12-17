@@ -50,9 +50,7 @@ describe('Specific Prisoner Location History', () => {
     const whereaboutsApiClient: WhereaboutsApiClient = {
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
-      addVideoLinkBooking: jest.fn(),
       createAppointments: jest.fn(),
-      getCourts: jest.fn(),
     }
 
     const caseNotesApiClient = {

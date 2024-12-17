@@ -197,7 +197,6 @@ export interface PrisonApiClient {
   getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
 
   getLocation(locationId: number): Promise<Location>
-  getLocationByKey(locationKey: string): Promise<Location>
 
   getActivitiesAtLocation(
     locationId: number,

@@ -89,9 +89,6 @@
                     {{ govukSelect({
                         id: "location",
                         name: "location",
-                        formGroup: {
-                            classes: "js-appointment-locations-group"
-                        },
                         label: {
                             text: "Location"
                         },
@@ -99,21 +96,6 @@
                         errorMessage: errors | findError('location'),
                         items: locations | addDefaultSelectedValue('Choose location') | setSelected(formValues.location)
                     }) }}
-                    {% if bookAVideoLinkEnabled %}
-                        {{ govukSelect({
-                            id: "vlbLocation",
-                            name: "vlbLocation",
-                            formGroup: {
-                                classes: "js-video-locations-group"
-                            },
-                            label: {
-                                text: "Location"
-                            },
-                            classes: 'js-video-location govuk-!-width-one-half',
-                            errorMessage: errors | findError('vlbLocation'),
-                            items: vlbLocations | addDefaultSelectedValue('Choose location') | setSelected(formValues.location)
-                        }) }}
-                    {% endif %}
                     {{ hmppsDatepicker({
                         id: "date",
                         name: "date",

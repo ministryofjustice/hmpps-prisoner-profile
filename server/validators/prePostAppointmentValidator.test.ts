@@ -1,11 +1,6 @@
 import { PrePostAppointmentValidator } from './prePostAppointmentValidator'
-import config from '../config'
 
 describe('Validation middleware', () => {
-  beforeEach(() => {
-    config.featureToggles.bookAVideoLinkEnabled = true
-  })
-
   it('should pass validation with good data', async () => {
     const vlbForm = {
       preAppointment: 'no',

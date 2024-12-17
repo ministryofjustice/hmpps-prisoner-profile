@@ -41,17 +41,6 @@ describe('bookAVideoLinkApiClient', () => {
     })
   })
 
-  describe('getVideoLocations', () => {
-    it('should return data from the API', async () => {
-      mockSuccessfulBookAVideoLinkApiCall('/prisons/CODE/locations?videoLinkOnly=false', [
-        { description: 'VIDEO_LINK' },
-      ])
-
-      const output = await bookAVideoLinkApiClient.getVideoLocations('CODE')
-      expect(output).toEqual([{ description: 'VIDEO_LINK' }])
-    })
-  })
-
   describe('getCourts', () => {
     it('should return data from the API', async () => {
       mockSuccessfulBookAVideoLinkApiCall('/courts?enabledOnly=false', [{ description: 'COURT' }])

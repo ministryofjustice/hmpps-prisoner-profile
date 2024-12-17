@@ -2,13 +2,9 @@ import CellMoveReason from './CellMoveReason'
 import PageableQuery from './PageableQuery'
 import UnacceptableAbsences from './UnacceptableAbsences'
 import { AppointmentDefaults } from './Appointment'
-import CourtLocation from './CourtLocation'
-import VideoLinkBookingForm from './VideoLinkBookingForm'
 
 export interface WhereaboutsApiClient {
   createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults>
-  addVideoLinkBooking(videoLinkBooking: VideoLinkBookingForm): Promise<number>
-  getCourts(): Promise<CourtLocation[]>
   getUnacceptableAbsences(
     prisonerNumber: string,
     fromDate: string,

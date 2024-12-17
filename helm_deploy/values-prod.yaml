@@ -62,6 +62,8 @@ generic-service:
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api.prison.service.justice.gov.uk"
+    LOCATIONS_INSIDE_PRISON_API_URL: https://locations-inside-prison-api.hmpps.service.justice.gov.uk
+    NOMIS_SYNC_PRISONER_MAPPING_API_URL: https://nomis-sync-prisoner-mapping.hmpps.service.justice.gov.uk
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     EDUCATION_AND_WORK_PLAN_API_URL: "https://learningandworkprogress-api.hmpps.service.justice.gov.uk"
     RESTRICTED_PATIENT_API_URL: "https://restricted-patients-api.hmpps.service.justice.gov.uk"
@@ -84,7 +86,6 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     PRISON_PERSON_API_ENABLED: "false"
     PRISON_PERSON_API_ENABLED_PRISONS: ""
-    BOOK_A_VIDEO_LINK_FEATURE_TOGGLE_ENABLED: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32

@@ -28,7 +28,7 @@
             <div class="govuk-grid-column-two-thirds">
                 <h2>Video link details</h2>
 
-                {% if bookAVideoLinkEnabled and mustContactTheCourt %}
+                {% if mustContactTheCourt %}
                 {% set html %}
                   <h3 class="govuk-notification-banner__heading">
                     You must email {{ court }} to confirm the booking.
@@ -160,7 +160,7 @@
                             value: {
                                 text: hearingType
                             }
-                        } if bookAVideoLinkEnabled,
+                        },
                         {
                             key: {
                                 text: "Court hearing link"
@@ -168,7 +168,7 @@
                             value: {
                                 text: videoLinkUrl
                             }
-                        } if bookAVideoLinkEnabled
+                        }
                     ]
                 }) }}
 

@@ -3,7 +3,6 @@ import config from '../config'
 import { BookAVideoLinkApiClient } from './interfaces/bookAVideoLinkApi/bookAVideoLinkApiClient'
 import CreateVideoBookingRequest from './interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
 import { mapToQueryString } from '../utils/utils'
-import Location from './interfaces/bookAVideoLinkApi/Location'
 import Court from './interfaces/bookAVideoLinkApi/Court'
 import ReferenceCode from './interfaces/bookAVideoLinkApi/ReferenceCode'
 
@@ -16,13 +15,6 @@ export default class BookAVideoLinkRestApiClient implements BookAVideoLinkApiCli
 
   async addVideoLinkBooking(videoLinkBooking: CreateVideoBookingRequest): Promise<number> {
     return this.restClient.post<number>({ path: '/video-link-booking', data: videoLinkBooking })
-  }
-
-  async getVideoLocations(prisonCode: string): Promise<Location[]> {
-    return this.restClient.get({
-      path: `/prisons/${prisonCode}/locations`,
-      query: mapToQueryString({ videoLinkOnly: false }),
-    })
   }
 
   async getCourts(): Promise<Court[]> {
