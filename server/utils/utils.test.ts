@@ -40,6 +40,7 @@ import {
   SelectOption,
   snakeToCamelCase,
   sortArrayOfObjectsByDate,
+  sortByLatestAndUuid,
   SortType,
   summaryListOneHalfWidth,
   SummaryListRow,
@@ -935,6 +936,38 @@ describe('utils', () => {
       [null, 'Not entered'],
     ])('%s: formatWeight(%s)', (weight: number, expected: string) => {
       expect(formatWeight(weight)).toEqual(expected)
+    })
+  })
+
+  describe('sortByLatestAndUuid', () => {
+    test.each([
+      ['empty list', [], []],
+      ['list with one item', [{ id: 'abc', latest: true }], [{ id: 'abc', latest: true }]],
+      [
+        'list sorted by latest and then by id',
+        [
+          { id: 'a', latest: false },
+          { id: 'b', latest: true },
+          { id: 'c', latest: false },
+        ],
+        [
+          { id: 'b', latest: true },
+          { id: 'c', latest: false },
+          { id: 'a', latest: false },
+        ],
+      ],
+    ])('should sort %s', (_, input, expected) => {
+      expect(sortByLatestAndUuid(input)).toEqual(expected)
+    })
+
+    test('should not mutate the original array', () => {
+      const input = [
+        { id: 'b', latest: true },
+        { id: 'a', latest: false },
+      ]
+      const copy = [...input]
+      sortByLatestAndUuid(input)
+      expect(input).toEqual(copy)
     })
   })
 })

@@ -29,7 +29,7 @@
                                     </div>
                                     {% if mark.photographUuids.length %}
                                         <div class="personal-distinguishing-marks__row__populated__row__image-list">
-                                            {% for photo in mark.photographUuids %}
+                                            {% for photo in mark.photographUuids | sortByLatestAndUuid %}
                                                 <img src="/api/prison-person-image/{{ photo.id }}" alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
                                             {% endfor %}
                                         </div>

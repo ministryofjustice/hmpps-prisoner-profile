@@ -4,7 +4,7 @@ import {
   bodyPartSelections,
 } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 
-interface BodySubmission {
+export interface BodySubmission {
   bodyPart?: string
 }
 
@@ -12,6 +12,17 @@ interface BodySpecificSubmission {
   specificBodyPart?: string
   [key: string]: string
 }
+
+export interface FileUploadRequest extends Request {
+  file?: Express.Multer.File
+}
+
+// List of allowed MIME types
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif']
+
+// Max file size in bytes (e.g., 5MB)
+const maxSizeMB = 10
+const maxSize = maxSizeMB * 1024 * 1024
 
 export function newDistinguishingMarkValidator({ bodyPart }: BodySubmission) {
   const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
@@ -57,6 +68,28 @@ export function updateDescriptionValidator(body: BodySpecificSubmission) {
       {
         text: 'The description must be 240 characters or less',
         href: `#description`,
+      },
+    ]
+  }
+
+  return []
+}
+
+export function updatePhotoValidator(req: FileUploadRequest) {
+  if (!req.file) {
+    return [{ text: 'Select a photo', href: '#file' }]
+  }
+
+  if (req.file.size > maxSize) {
+    return [{ text: `The selected file must be smaller than ${maxSizeMB}MB`, href: '#file' }]
+  }
+
+  if (!allowedMimeTypes.includes(req.file.mimetype)) {
+    const allowedTypes = allowedMimeTypes.map(type => type.split('/')[1].toUpperCase())
+    return [
+      {
+        text: `The selected file must be a ${allowedTypes.slice(0, -1).join(', ')} or ${allowedTypes.slice(-1)}`,
+        href: '#file',
       },
     ]
   }

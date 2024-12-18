@@ -602,4 +602,91 @@ describe('Distinguishing Marks Controller', () => {
       )
     })
   })
+
+  describe('changePhoto', () => {
+    it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', async markType => {
+      const typeReq = {
+        params: {
+          prisonerNumber: 'A12345',
+          markType,
+          markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
+
+      await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
+
+      const photoHtml = `<img src="/api/prison-person-image/${distinguishingMarkMock.photographUuids[0].id}" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
+        markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        markType,
+        photoHtml,
+        refererUrl: `/prisoner/A12345/personal/${markType}/019205c0-0fd5-7c41-ae24-ede9eae05da5`,
+        upload: false,
+      })
+    })
+
+    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async () => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5' },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
+
+      const photoHtml = `<img src="/api/prison-person-image/${distinguishingMarkMock.photographUuids[0].id}" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
+        markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        markType: 'tattoo',
+        photoHtml,
+        refererUrl: `/prisoner/A12345/personal/tattoo/019205c0-0fd5-7c41-ae24-ede9eae05da5`,
+        upload: false,
+      })
+    })
+
+    it('redirects back if the mark type is invalid', async () => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.changePhoto(typeReq, res as Response)
+
+      expect(res.render).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+    })
+  })
+
+  describe('updatePhoto', () => {
+    it('should update distinguishing mark photo', async () => {
+      const req = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5' },
+        body: {},
+        file: { originalname: 'file.jpg' },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.updatePhoto(req, res as Response)
+
+      expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith(
+        'token',
+        '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        { originalname: 'file.jpg' },
+      )
+    })
+  })
 })

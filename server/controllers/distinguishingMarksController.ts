@@ -26,6 +26,8 @@ export default class DistinguishingMarksController {
     this.updateLocation = this.updateLocation.bind(this)
     this.changeDescription = this.changeDescription.bind(this)
     this.updateDescription = this.updateDescription.bind(this)
+    this.changePhoto = this.changePhoto.bind(this)
+    this.updatePhoto = this.updatePhoto.bind(this)
   }
 
   public newDistinguishingMark(req: Request, res: Response) {
@@ -254,6 +256,46 @@ export default class DistinguishingMarksController {
       verifiedMarkType,
       description,
     )
+
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+  }
+
+  public async changePhoto(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const upload = req.query.upload !== undefined
+
+    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, markId)
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    const latestPhotoId = mark.photographUuids?.find(photo => photo.latest)?.id || mark.photographUuids[0]?.id
+    const photoHtml = mark.photographUuids?.length
+      ? `<img src="/api/prison-person-image/${latestPhotoId}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
+      : null
+
+    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+
+    return res.render('pages/distinguishingMarks/changePhoto', {
+      markId,
+      markType,
+      photoHtml,
+      refererUrl,
+      upload,
+    })
+  }
+
+  public async updatePhoto(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { clientToken } = req.middleware
+    const file = req.file as MulterFile
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    await this.distinguishingMarksService.addDistinguishingMarkPhoto(clientToken, markId, file)
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
   }

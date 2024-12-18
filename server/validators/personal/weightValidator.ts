@@ -1,6 +1,6 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
-export const weightMetricValidator: Validator = body => {
+export const weightMetricValidator: Validator = (body: Record<string, string>) => {
   const { kilograms } = body
   const weight = parseInt(kilograms, 10)
 
@@ -20,7 +20,7 @@ export const weightMetricValidator: Validator = body => {
   return []
 }
 
-export const weightImperialValidator: Validator = body => {
+export const weightImperialValidator: Validator = (body: Record<string, string>) => {
   const { stone: stoneString, pounds: poundsString } = body
 
   const stone = stoneString ? parseInt(stoneString, 10) : 0

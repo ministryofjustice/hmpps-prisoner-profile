@@ -3,8 +3,6 @@
 {% from "components/miniBanner/miniBanner.njk" import miniBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 
 {% set pageTitle = "Change " + markType + " location - Prisoner personal details" %}
 {% set formConfig = bodyPart | toBodyPartSpecificFormData(markType) %}
