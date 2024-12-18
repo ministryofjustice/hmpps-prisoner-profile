@@ -28,9 +28,9 @@ export const AlertValidator: Validator = (body: Record<string, string>) => {
     })
   }
 
-  if (description && description.length > 1000) {
+  if (description && description.length > 4000) {
     errors.push({
-      text: 'Enter why you are creating this alert using 1,000 characters or less',
+      text: 'Enter why you are creating this alert using 4,000 characters or less',
       href: '#description',
     })
   }
@@ -84,9 +84,9 @@ export const AlertAddMoreDetailsValidator: Validator = (body: Record<string, str
   const errors: HmppsError[] = []
   const { description } = body
 
-  if (description && description.length > 1000) {
+  if (description && description.length > 4000) {
     errors.push({
-      text: 'Enter your comments using 1,000 characters or less',
+      text: 'Enter your comments using 4,000 characters or less',
       href: '#description',
     })
   }
@@ -105,9 +105,9 @@ export const AlertCloseValidator: Validator = (body: Record<string, string>) => 
   const errors: HmppsError[] = []
   const { description, activeTo, today } = body
 
-  if (description && description.length > 1000) {
+  if (description && description.length > 4000) {
     errors.push({
-      text: 'Enter your comments using 1,000 characters or less',
+      text: 'Enter your comments using 4,000 characters or less',
       href: '#description',
     })
   }
@@ -142,9 +142,9 @@ export const AlertChangeEndDateValidator: Validator = (body: Record<string, stri
   const errors: HmppsError[] = []
   const { description, activeTo, removeEndDate } = body
 
-  if (description && description.length > 1000) {
+  if (description && description.length > 4000) {
     errors.push({
-      text: 'Enter your comments using 1,000 characters or less',
+      text: 'Enter your comments using 4,000 characters or less',
       href: '#description',
     })
   }
