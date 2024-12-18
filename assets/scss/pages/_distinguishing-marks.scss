@@ -1,0 +1,28 @@
+.mark-photo-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  column-gap: 20px;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid $govuk-border-colour;
+  margin-bottom: 30px;
+}
+
+.mark-upload-control {
+  display: none;
+}
+
+
+.upload-visible .mark-photo-container {
+  display: none;
+}
+
+.upload-visible .mark-upload-control {
+  display: block;
+}
+
+label.govuk-link {
+  color: $govuk-link-colour;
+  cursor: pointer;
+}

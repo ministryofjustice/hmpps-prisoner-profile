@@ -1,17 +1,21 @@
 import { RequestHandler } from 'express'
 import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
+import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
 
-export type Validator = (body: Record<string, string>) => HmppsError[] | Promise<HmppsError[]>
+export type Validator = (
+  body: FileUploadRequest | Record<string, string> | BodySubmission,
+) => HmppsError[] | Promise<HmppsError[]>
 
 export default function validationMiddleware(
   validators: Validator[],
-  options: { redirectBackOnError: boolean; redirectTo?: string } = {
+  options: { redirectBackOnError: boolean; redirectTo?: string; useReq?: boolean } = {
     redirectBackOnError: false,
+    useReq: false,
   },
 ): RequestHandler {
   return async (req, res, next) => {
-    const validationResults = await Promise.all(validators.map(validator => validator(req.body)))
+    const validationResults = await Promise.all(validators.map(validator => validator(options.useReq ? req : req.body)))
     const errors = validationResults.flat()
     if (hasLength(errors) && options.redirectBackOnError) {
       req.flash('requestBody', JSON.stringify(req.body))

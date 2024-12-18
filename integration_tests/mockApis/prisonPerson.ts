@@ -169,6 +169,22 @@ export default {
     })
   },
 
+  stubPostDistinguishingMarkPhoto: () => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}distinguishing-marks/mark/.*/photo`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: distinguishingMarkMock,
+      },
+    })
+  },
+
   stubGetDistinguishingMark: (markResp: PrisonPersonDistinguishingMark) =>
     stubGetWithBody({
       path: `${baseUrl}distinguishing-marks/mark/.*`,

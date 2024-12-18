@@ -21,5 +21,6 @@ export const prisonPersonApiClientMock = (): PrisonPersonApiClient => ({
   getImage: jest.fn(),
   postDistinguishingMark: jest.fn(),
   patchDistinguishingMark: jest.fn(),
+  postDistinguishingMarkPhoto: jest.fn(),
   getDistinguishingMark: jest.fn(),
 })

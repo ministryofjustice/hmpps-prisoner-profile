@@ -1,6 +1,6 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
-export const shoeSizeValidator: Validator = body => {
+export const shoeSizeValidator: Validator = (body: Record<string, string>) => {
   const { shoeSize: shoeSizeInput } = body
 
   if (!shoeSizeInput) return []

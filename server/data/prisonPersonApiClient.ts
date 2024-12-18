@@ -107,6 +107,13 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
     })
   }
 
+  postDistinguishingMarkPhoto(markId: string, photograph: MulterFile): Promise<PrisonPersonDistinguishingMark> {
+    return this.restClient.postMultipart<PrisonPersonDistinguishingMark>({
+      path: `/distinguishing-marks/mark/${markId}/photo`,
+      file: photograph,
+    })
+  }
+
   async getImage(imageId: string): Promise<Readable> {
     return this.restClient.stream({
       path: `/photographs/${imageId}/file`,

@@ -141,4 +141,12 @@ export default class DistinguishingMarksService {
 
     return this.prisonPersonApiClientBuilder(token).patchDistinguishingMark(distinguishingMarkRequest)
   }
+
+  addDistinguishingMarkPhoto(
+    token: string,
+    markId: string,
+    file?: MulterFile,
+  ): Promise<PrisonPersonDistinguishingMark> {
+    return this.prisonPersonApiClientBuilder(token).postDistinguishingMarkPhoto(markId, file)
+  }
 }

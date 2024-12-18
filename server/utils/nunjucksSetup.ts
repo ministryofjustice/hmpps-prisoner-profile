@@ -20,6 +20,7 @@ import {
   prependHmppsAuthBaseUrl,
   prisonerIsOut,
   prisonerIsTRN,
+  sortByLatestAndUuid,
   summaryListOneHalfWidth,
   toNonAssociationRows,
   userHasRoles,
@@ -182,4 +183,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
   njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
   njkEnv.addFilter('formatMedicalDietaryRequirements', formatMedicalDietaryRequirements)
+  njkEnv.addFilter('sortByLatestAndUuid', sortByLatestAndUuid)
 }
