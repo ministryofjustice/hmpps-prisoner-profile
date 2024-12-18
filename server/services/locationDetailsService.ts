@@ -29,8 +29,10 @@ export default class LocationDetailsService {
     return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocation(locationId)
   }
 
-  public async getLocationByKey(clientToken: string, locationKey: string): Promise<LocationsApiLocation> {
-    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationByKey(locationKey)
+  getLocationByNomisLocationId = (clientToken: string, locationId: number): Promise<LocationsApiLocation> => {
+    return this.getLocationMappingUsingNomisLocationId(clientToken, locationId).then(map =>
+      this.getLocation(clientToken, map.dpsLocationId),
+    )
   }
 
   public async getLocationsForAppointments(clientToken: string, prisonId: string): Promise<LocationsApiLocation[]> {

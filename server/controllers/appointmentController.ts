@@ -300,17 +300,14 @@ export default class AppointmentController {
       const { appointmentDefaults, appointmentForm, formValues } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
-      let locationMap = {} as NomisSyncLocation
+      let location
       if (appointmentDefaults.locationId) {
-        locationMap = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+        const { dpsLocationId } = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
           clientToken,
           appointmentDefaults.locationId,
         )
+        location = (locations as LocationsApiLocation[]).find(loc => loc.id === dpsLocationId)?.localName
       }
-
-      const location = (locations as LocationsApiLocation[]).find(
-        loc => loc.id === locationMap.dpsLocationId,
-      )?.localName
 
       const hearingTypes = objectToSelectOptions(
         await this.appointmentService.getCourtHearingTypes(clientToken),
@@ -394,11 +391,11 @@ export default class AppointmentController {
 
         const [preLocation, mainLocation, postLocation] = await Promise.all([
           preAppointmentLocation
-            ? this.locationDetailsService.getLocationMappingUsingNomisLocationId(clientToken, +preAppointmentLocation)
+            ? this.locationDetailsService.getLocation(clientToken, preAppointmentLocation)
             : undefined,
-          this.locationDetailsService.getLocationMappingUsingNomisLocationId(clientToken, +appointmentForm.location),
+          this.locationDetailsService.getLocation(clientToken, appointmentForm.location),
           postAppointmentLocation
-            ? this.locationDetailsService.getLocationMappingUsingNomisLocationId(clientToken, +postAppointmentLocation)
+            ? this.locationDetailsService.getLocation(clientToken, postAppointmentLocation)
             : undefined,
         ])
 

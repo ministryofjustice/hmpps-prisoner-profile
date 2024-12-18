@@ -16,12 +16,7 @@ import {
   timeFormat,
 } from '../utils/dateHelpers'
 import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
-import {
-  locationsApiMock,
-  locationsApiSelectOptionsMock,
-  locationsMock,
-  locationsSelectOptionsMock,
-} from '../data/localMockData/locationsMock'
+import { locationsApiMock, locationsApiSelectOptionsMock, locationsMock } from '../data/localMockData/locationsMock'
 
 import HmppsError from '../interfaces/HmppsError'
 import { formatLocation, formatName } from '../utils/utils'
@@ -30,7 +25,7 @@ import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import { courtHearingTypes } from '../data/localMockData/courtHearingsMock'
+import { courtHearingTypes, courtHearingTypesSelectOptions } from '../data/localMockData/courtHearingsMock'
 
 jest.mock('../services/locationDetailsService.ts')
 
@@ -132,7 +127,7 @@ const videoLinkBookingForm = {
 
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/appointmentService.ts')
-jest.mock('../services/locationDetailsService')
+jest.mock('../services/locationDetailsService.ts')
 
 describe('Appointments Controller', () => {
   const locationDetailsService: LocationDetailsService = new LocationDetailsService(
@@ -194,12 +189,12 @@ describe('Appointments Controller', () => {
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
     appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
-    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(
-      // async (_, locationId) =>
-      //   ({
-      //     [locationsMock[0].locationId]: locationsApiMock[0],
-      //     [locationsMock[1].locationId]: locationsApiMock[1],
-      //   })[locationId],
+    locationDetailsService.getLocationByNomisLocationId = jest.fn(
+      async (_, locationId) =>
+        ({
+          [locationsMock[0].locationId]: locationsApiMock[0],
+          [locationsMock[1].locationId]: locationsApiMock[1],
+        })[locationId],
     )
   })
 
@@ -228,36 +223,6 @@ describe('Appointments Controller', () => {
       },
       refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
       errors: undefined,
-      bookAVideoLinkEnabled: false,
-      vlbLocations: [],
-    })
-  })
-
-  it('should display add appointment', async () => {
-    await controller.displayAddAppointment()(req, res)
-
-    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
-      req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
-    )
-
-    expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
-      pageTitle: 'Add an appointment',
-      miniBannerData: {
-        prisonerName: 'Saunders, John',
-        prisonerNumber: PrisonerMockDataA.prisonerNumber,
-        cellLocation: PrisonerMockDataA.cellLocation,
-      },
-      appointmentTypes: appointmentTypesSelectOptionsMock,
-      locations: locationsSelectOptionsMock,
-      repeatOptions,
-      today: formBody.date,
-      formValues: {
-        bookingId: 1102484,
-        date: formBody.date,
-      },
-      refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
-      errors: undefined,
     })
   })
 
@@ -273,14 +238,26 @@ describe('Appointments Controller', () => {
     })
 
     it('should create new appointment', async () => {
+      locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
+        nomisLocationId: 1234,
+        dpsLocationId: 'location-1',
+        key: 'ABC',
+      }))
+
       await controller.post()(req, res)
 
-      expect(controller['appointmentService'].createAppointments).toHaveBeenCalledWith(
-        req.middleware.clientToken,
-        appointmentsToCreate,
-      )
+      expect(controller['appointmentService'].createAppointments).toHaveBeenCalledWith(req.middleware.clientToken, {
+        ...appointmentsToCreate,
+        locationId: 1234,
+      })
 
       expect(req.flash).toHaveBeenCalledWith('appointmentForm', formBody)
+
+      expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        formBody.location,
+      )
+
       expect(res.redirect).toHaveBeenCalledWith(
         `/prisoner/${PrisonerMockDataA.prisonerNumber}/appointment-confirmation`,
       )
@@ -293,12 +270,18 @@ describe('Appointments Controller', () => {
         refererUrl: 'http://referer',
       }
 
+      locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
+        nomisLocationId: 1234,
+        dpsLocationId: 'location-1',
+        key: 'ABC',
+      }))
+
       await controller.post()(req, res)
 
       expect(controller['appointmentService'].createAppointments).not.toHaveBeenCalled()
 
       expect(req.flash).toHaveBeenCalledWith('prePostAppointmentDetails', {
-        appointmentDefaults: { ...appointmentsToCreate, appointmentType: 'VLB' },
+        appointmentDefaults: { ...appointmentsToCreate, locationId: 1234, appointmentType: 'VLB' },
         appointmentForm: { ...formBody, appointmentType: 'VLB' },
       })
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointments`)
@@ -388,7 +371,7 @@ describe('Appointments Controller', () => {
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
       },
-      location: locationsMock[0].userDescription,
+      location: locationsApiMock[0].localName,
       date: formBody.date,
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
       endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
@@ -396,6 +379,12 @@ describe('Appointments Controller', () => {
       appointmentDate: formatDate(today, 'long'),
       formValues: {},
     }
+
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+      key: 'ABC',
+    }))
 
     await controller.displayPrePostAppointments()(req, res)
 
@@ -407,11 +396,10 @@ describe('Appointments Controller', () => {
       pageTitle: 'Video link booking details',
       ...appointmentData,
       courts: courtLocationsSelectOptionsMock,
-      locations: locationsSelectOptionsMock,
+      locations: locationsApiSelectOptionsMock,
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
-      bookAVideoLinkEnabled: false,
-      hearingTypes: [],
+      hearingTypes: courtHearingTypesSelectOptions,
       prisonId: 'MDI',
     })
   })
@@ -443,6 +431,12 @@ describe('Appointments Controller', () => {
         }
         return []
       }
+
+      locationDetailsService.getLocation = jest.fn(async () => ({
+        id: 'location-1',
+        key: 'ABC',
+        localName: 'Local name one',
+      }))
 
       await controller.postVideoLinkBooking()(req, res)
 
@@ -517,12 +511,11 @@ describe('Appointments Controller', () => {
       }
       return []
     }
-
     const appointmentData = {
       prisonerName: 'John Saunders',
       prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
-      location: locationsMock[0].userDescription,
+      location: locationsApiMock[0].localName,
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
       endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
@@ -532,6 +525,12 @@ describe('Appointments Controller', () => {
       court: courtLocationsMock[2].description,
       hearingType: courtHearingTypes[0].description,
     }
+
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+      key: 'ABC',
+    }))
 
     await controller.displayPrePostAppointmentConfirmation()(req, res)
 
@@ -575,16 +574,43 @@ describe('Appointments Controller', () => {
     })
   })
 
-  it('should get location events', async () => {
+  it('should get location by id', async () => {
     req.query.date = '01/01/2023'
-    req.query.locationId = locationsMock[0].locationId
+    req.query.locationId = locationsApiMock[0].id
+
+    locationDetailsService.getLocation = jest.fn().mockResolvedValue({ id: 'location-1' })
+
+    locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn().mockResolvedValue({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+    })
 
     await controller.getLocationExistingEvents()(req, res)
+    expect(locationDetailsService.getLocation).toHaveBeenCalledWith(req.middleware.clientToken, req.query.locationId)
+  })
+
+  it('should get location events', async () => {
+    req.query.date = '01/01/2023'
+    req.query.locationId = locationsApiMock[0].id
+
+    locationDetailsService.getLocation = jest.fn(async () => locationsApiMock[0])
+
+    locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn().mockResolvedValue({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+    })
+
+    await controller.getLocationExistingEvents()(req, res)
+
+    expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      req.query.locationId,
+    )
 
     expect(res.render).toHaveBeenCalledWith('components/scheduledEvents/scheduledEvents.njk', {
       events: offenderEventsMock,
       date: formatDate(dateToIsoDate(req.query.date), 'long'),
-      header: `Schedule for ${locationsMock[0].userDescription}`,
+      header: 'Schedule for Local name one',
       type: 'location',
     })
   })

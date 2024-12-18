@@ -51,7 +51,13 @@ describe('prisonerLocationDetailsService', () => {
   })
 
   describe('getLocation', () => {
-    const response = { id: 'abc', key: 'ABC', localName: 'Local name' }
+    const response = { id: 'abc', localName: 'Local name', key: 'ABC' }
+    it('returns data for single location', async () => {
+      locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
+      await expect(service.getLocation('', 'abc')).resolves.toEqual(response)
+    })
+  })
+
   describe('getLocationMappingUsingDpsLocationId', () => {
     it('returns data mapping using Nomis locationId ', async () => {
       nomisSyncPrisonerMappingApiClient.getMappingUsingDpsLocationId = jest.fn(async () => mappingResponse)
@@ -59,34 +65,19 @@ describe('prisonerLocationDetailsService', () => {
     })
   })
 
-  describe('getLocation', () => {
-    const response = { id: 'abc', localName: 'Local name' }
-    it('returns data for single location', async () => {
-      locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
-      await expect(service.getLocation('', 'abc')).resolves.toEqual(response)
-    })
-  })
+  describe('getMappingUsingNomisLocationId', () => {
+    const response = { id: 'abc', localName: 'Local name', key: 'ABC' }
 
-  describe('getLocationByNomisLocationId', () => {
-    const response = { id: 'abc', localName: 'Local name' }
     it('returns data for single location', async () => {
       nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest.fn(async () => mappingResponse)
       locationsInsidePrisonApiClient.getLocation = jest.fn(async () => response)
-      await expect(service.getLocationMappingUsingNomisLocationId('', 123)).resolves.toEqual(response)
-      expect(locationsInsidePrisonApiClient.getLocation).lastCalledWith('abc')
-    })
-  })
-
-  describe('getLocationByKey', () => {
-    const response = { id: 'abc', localName: 'Local name' }
-    it('returns data for single location by key', async () => {
-      locationsInsidePrisonApiClient.getLocationByKey = jest.fn(async () => response)
-      await expect(service.getLocationByKey('', 'some-key')).resolves.toEqual(response)
+      await expect(service.getLocationMappingUsingNomisLocationId('', 123)).resolves.toEqual(mappingResponse)
+      expect(nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId).toHaveBeenCalledWith(123)
     })
   })
 
   describe('getLocationsForAppointments', () => {
-    const response = [{ id: 'abc', localName: 'Local name' }]
+    const response = [{ id: 'abc', localName: 'Local name', key: 'ABC' }]
     it('returns all location in prison having APPOINTMENT usage type ', async () => {
       locationsInsidePrisonApiClient.getLocationsForAppointments = jest.fn(async () => response)
       await expect(service.getLocationsForAppointments('', 'MDI')).resolves.toEqual(response)

@@ -70,7 +70,7 @@ describe('Appointment Service', () => {
       const refData = await appointmentService.getAddAppointmentRefData('', 'MDI')
 
       expect(prisonApiClient.getAppointmentTypes).toHaveBeenCalled()
-      expect(locationDetailsService.getLocationsForAppointments).toHaveBeenCalled()
+      expect(locationDetailsService.getLocationsForAppointments).toHaveBeenCalledWith('', 'MDI')
       expect(refData).toEqual({ appointmentTypes: appointmentTypesMock, locations: locationsApiMock })
     })
   })

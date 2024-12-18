@@ -8,7 +8,7 @@ export const locationDetailsServiceMock = (): Interface<LocationDetailsService> 
   getLocationDetailsGroupedByPeriodAtAgency: jest.fn(),
   getLocationMappingUsingNomisLocationId: jest.fn(),
   getLocation: jest.fn(),
+  getLocationByNomisLocationId: jest.fn(),
   getLocationMappingUsingDpsLocationId: jest.fn(),
-  getLocationByKey: jest.fn(),
   getLocationsForAppointments: jest.fn(),
 })
