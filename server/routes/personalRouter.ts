@@ -338,11 +338,11 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/city-or-town-of-birth',
     edit: {
       audit: Page.EditCityOrTownOfBirth,
-      method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).edit,
+      method: personalController.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).edit,
     },
     submit: {
       audit: Page.PostEditCityOrTownOfBirth,
-      method: personalController.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
+      method: personalController.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
     },
   })
 

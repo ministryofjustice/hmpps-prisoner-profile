@@ -46,6 +46,7 @@ import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
+import ReferenceDataService from './referenceDataService'
 
 export default class PersonalPageService {
   constructor(
@@ -53,6 +54,7 @@ export default class PersonalPageService {
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
+    private readonly referenceDataService: ReferenceDataService,
     private readonly metricsService: MetricsService,
   ) {}
 
@@ -123,6 +125,10 @@ export default class PersonalPageService {
     ])
 
     const addresses: Addresses = this.addresses(addressList)
+    const countryOfBirth =
+      inmateDetail.birthCountryCode &&
+      (await this.referenceDataService.getReferenceData('COUNTRY', inmateDetail.birthCountryCode, token)).description
+
     return {
       personalDetails: this.personalDetails(
         prisonerData,
@@ -130,6 +136,7 @@ export default class PersonalPageService {
         prisonerDetail,
         secondaryLanguages,
         prisonPerson,
+        countryOfBirth,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
@@ -188,6 +195,7 @@ export default class PersonalPageService {
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
     prisonPerson: PrisonPerson,
+    countryOfBirth: string,
   ): PersonalDetails {
     const { profileInformation } = inmateDetail
 
@@ -219,6 +227,8 @@ export default class PersonalPageService {
         profileInformation,
       ),
       domesticAbuseVictim: getProfileInformationValue(ProfileInformationType.DomesticAbuseVictim, profileInformation),
+      cityOrTownOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
+      countryOfBirth: countryOfBirth ? convertToTitleCase(countryOfBirth) : 'Not entered',
       ethnicGroup,
       fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
       languages: {
@@ -239,7 +249,6 @@ export default class PersonalPageService {
         canWrite,
       })),
       otherNationalities: getProfileInformationValue(ProfileInformationType.OtherNationalities, profileInformation),
-      placeOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
       preferredName: formatName(
         prisonerDetail?.currentWorkingFirstName,
         undefined,
