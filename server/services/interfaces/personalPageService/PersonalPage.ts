@@ -28,6 +28,8 @@ export interface PersonalDetails {
   dateOfBirth: string
   domesticAbusePerpetrator: string
   domesticAbuseVictim: string
+  cityOrTownOfBirth: string
+  countryOfBirth: string
   ethnicGroup: string
   fullName: string
   languages: {
@@ -46,7 +48,6 @@ export interface PersonalDetails {
     canWrite: boolean
   }[]
   otherNationalities: string
-  placeOfBirth: string
   preferredName: string
   religionOrBelief: string
   sex: string
