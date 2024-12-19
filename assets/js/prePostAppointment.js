@@ -4,13 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const postAppointmentEventsContainer = document.getElementById('postAppointmentEventsContainer')
   const postAppointmentLocation = document.getElementById('postAppointmentLocation')
   const courtSelect = document.getElementById('court')
+  const appointmentId = document.getElementById('appointment-id')?.innerText || ''
 
   async function getPrePostEventsForLocation(input, container) {
     const locationId = input.value
     const date = document.getElementById('date').value
 
     const response =
-      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`))
+      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
       container.innerHTML = await response.text()
@@ -20,10 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  preAppointmentLocation.addEventListener('change', () => {
+  preAppointmentLocation?.addEventListener('change', () => {
     getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer)
   })
-  postAppointmentLocation.addEventListener('change', () => {
+  postAppointmentLocation?.addEventListener('change', () => {
     getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer)
   })
 
@@ -32,6 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   // Initialise
-  getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer)
-  getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer)
+  preAppointmentLocation ? getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer) : null
+  postAppointmentLocation ? getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer) : null
 })

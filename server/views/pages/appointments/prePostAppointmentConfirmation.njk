@@ -55,44 +55,44 @@
                         },
                         {
                             key: {
-                            text: "Prison"
-                        },
+                                text: "Prison"
+                            },
                             value: {
-                            text: prisonName
-                        }
+                                text: prisonName
+                            }
                         },
                         {
                             key: {
-                            text: "Prison room",
-                            classes: 'govuk-!-padding-bottom-6'
-                        },
+                                text: "Prison room",
+                                classes: 'govuk-!-padding-bottom-6'
+                            },
                             value: {
-                            text: location
-                        }
+                                text: location
+                            }
                         },
                         {
                             key: {
-                            text: "Date"
-                        },
+                                text: "Date"
+                            },
                             value: {
-                            text: date
-                        }
+                                text: date
+                            }
                         },
                         {
                             key: {
-                            text: "Start time"
-                        },
+                                text: "Start time"
+                            },
                             value: {
-                            text: startTime
-                        }
+                                text: startTime
+                            }
                         },
                         {
                             key: {
-                            text: "End time"
-                        },
+                                text: "End time"
+                            },
                             value: {
-                            text: endTime
-                        }
+                                text: endTime
+                            }
                         }
                     ]
                 }) }}
@@ -116,11 +116,11 @@
                         rows: [
                             {
                                 key: {
-                                text: "Pre-court hearing briefing"
-                            },
+                                    text: "Pre-court hearing briefing"
+                                },
                                 value: {
-                                text: pre
-                            }
+                                    text: pre
+                                }
                             }
                         ]
                     }) }}
@@ -132,11 +132,11 @@
                         rows: [
                             {
                                 key: {
-                                text: "Post-court hearing briefing"
-                            },
+                                    text: "Post-court hearing briefing"
+                                },
                                 value: {
-                                text: post
-                            }
+                                    text: post
+                                }
                             }
                         ]
                     }) }}
@@ -147,18 +147,18 @@
                     rows: [
                         {
                             key: {
-                                text: "Court location"
+                                text: "Probation team" if bookingType === 'PROBATION' else "Court location"
                             },
                             value: {
-                                text: court
+                                text: probationTeam if bookingType === 'PROBATION' else court
                             }
                         },
                         {
                             key: {
-                                text: "Hearing type"
+                                text: "Meeting type" if bookingType === 'PROBATION' else "Hearing type"
                             },
                             value: {
-                                text: hearingType
+                                text: meetingType if bookingType === 'PROBATION' else hearingType
                             }
                         },
                         {
@@ -166,9 +166,9 @@
                                 text: "Court hearing link"
                             },
                             value: {
-                                text: videoLinkUrl
+                                text: videoLinkUrl or "Not yet known"
                             }
-                        }
+                        } if bookingType === 'COURT'
                     ]
                 }) }}
 

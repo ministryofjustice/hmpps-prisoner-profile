@@ -1,4 +1,4 @@
-import { AppointmentDefaults } from '../interfaces/whereaboutsApi/Appointment'
+import { AppointmentDefaults, AppointmentDetails } from '../interfaces/whereaboutsApi/Appointment'
 
 export const appointmentMock: AppointmentDefaults = {
   bookingId: 1,
@@ -10,5 +10,18 @@ export const appointmentMock: AppointmentDefaults = {
   repeat: {
     repeatPeriod: 'WEEKLY',
     count: 1,
+  },
+}
+
+export const vlbAppointmentMock: AppointmentDetails = {
+  appointment: {
+    id: 1,
+    agencyId: 'MDI',
+    locationId: 1,
+    appointmentTypeCode: 'VLB',
+    offenderNo: 'ABC123',
+    startTime: '2023-01-01T12:34:56',
+    endTime: '2023-01-01T13:34:56',
+    comment: 'Comment',
   },
 }

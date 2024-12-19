@@ -20,12 +20,25 @@ describe('whereaboutsClient', () => {
     nock.cleanAll()
   })
 
+  const mockSuccessfulWhereaboutsGetApiCall = <TReturnData>(url: string, returnData: TReturnData) => {
+    fakeWhereaboutsApi.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, returnData)
+  }
+
   const mockSuccessfulWhereaboutsPostApiCall = <TReturnData>(url: string, body: any, returnData: TReturnData) => {
     fakeWhereaboutsApi
       .post(url, body)
       .matchHeader('authorization', `Bearer ${token.access_token}`)
       .reply(200, returnData)
   }
+
+  describe('getAppointment', () => {
+    it('Should return data from the API', async () => {
+      mockSuccessfulWhereaboutsGetApiCall(`/appointment/1`, appointmentMock)
+
+      const output = await whereaboutsApiClient.getAppointment(1)
+      expect(output).toEqual(appointmentMock)
+    })
+  })
 
   describe('createAppointments', () => {
     it('Should return data from the API', async () => {

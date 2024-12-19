@@ -2,7 +2,7 @@ import RestClient from './restClient'
 import UnacceptableAbsences from './interfaces/whereaboutsApi/UnacceptableAbsences'
 import PageableQuery from './interfaces/whereaboutsApi/PageableQuery'
 import { WhereaboutsApiClient } from './interfaces/whereaboutsApi/whereaboutsApiClient'
-import { AppointmentDefaults } from './interfaces/whereaboutsApi/Appointment'
+import { AppointmentDefaults, AppointmentDetails } from './interfaces/whereaboutsApi/Appointment'
 import config from '../config'
 import CellMoveReason from './interfaces/whereaboutsApi/CellMoveReason'
 
@@ -11,6 +11,10 @@ export default class WhereaboutsRestApiClient implements WhereaboutsApiClient {
 
   constructor(token: string) {
     this.restClient = new RestClient('Whereabouts API', config.apis.whereaboutsApi, token)
+  }
+
+  async getAppointment(appointmentId: number): Promise<AppointmentDetails> {
+    return this.restClient.get<AppointmentDetails>({ path: `/appointment/${appointmentId}` })
   }
 
   async createAppointments(appointments: AppointmentDefaults): Promise<AppointmentDefaults> {

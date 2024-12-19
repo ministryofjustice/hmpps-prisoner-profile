@@ -89,9 +89,25 @@ export const courtHearingTypes: ReferenceCode[] = [
   },
 ]
 
+export const probationMeetingTypes: ReferenceCode[] = [
+  {
+    referenceCodeId: 1,
+    groupCode: 'PROBATION_MEETING_TYPE',
+    code: 'PSR',
+    description: 'Post-sentence report',
+  },
+]
+
 export const courtHearingTypesSelectOptions: SelectOption[] = [
   {
     value: 'APPEAL',
     text: 'Appeal',
+  },
+]
+
+export const probationMeetingTypesSelectOptions: SelectOption[] = [
+  {
+    value: 'PSR',
+    text: 'Post-sentence report',
   },
 ]
