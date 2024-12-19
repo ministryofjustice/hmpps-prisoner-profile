@@ -5,7 +5,7 @@ import HmppsError from '../interfaces/HmppsError'
 export const PrePostAppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
 
-  if (!body.preAppointment) {
+  if (body.bookingType === 'COURT' && !body.preAppointment) {
     errors.push({
       text: 'Select if a room is needed for the pre-court hearing briefing',
       href: '#preAppointment',
@@ -16,7 +16,7 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Select a room for the pre-court hearing briefing', href: '#preAppointmentLocation' })
   }
 
-  if (!body.postAppointment) {
+  if (body.bookingType === 'COURT' && !body.postAppointment) {
     errors.push({
       text: 'Select if a room is needed for the post-court hearing briefing',
       href: '#postAppointment',
@@ -27,19 +27,31 @@ export const PrePostAppointmentValidator: Validator = (body: Record<string, stri
     errors.push({ text: 'Select a room for the post-court hearing briefing', href: '#postAppointmentLocation' })
   }
 
-  if (!body.court) {
+  if (!body.bookingType) {
+    errors.push({ text: 'Select a booking type', href: '#bookingType' })
+  }
+
+  if (body.bookingType === 'COURT' && !body.court) {
     errors.push({ text: 'Select which court the hearing is for', href: '#court' })
   }
 
-  if (!body.hearingType) {
+  if (body.bookingType === 'PROBATION' && !body.probationTeam) {
+    errors.push({ text: 'Select which probation team the meeting is with', href: '#probationTeam' })
+  }
+
+  if (body.bookingType === 'COURT' && !body.hearingType) {
     errors.push({ text: 'Select the hearing type', href: '#hearingType' })
+  }
+
+  if (body.bookingType === 'PROBATION' && !body.meetingType) {
+    errors.push({ text: 'Select the meeting type', href: '#meetingType' })
   }
 
   if (body.court === 'other' && !body.otherCourt) {
     errors.push({ text: 'Enter the name of the court', href: '#otherCourt' })
   }
 
-  if (!body.cvpRequired) {
+  if (body.bookingType === 'COURT' && !body.cvpRequired) {
     errors.push({ text: 'Select if you know the court hearing link', href: '#cvpRequired' })
   }
 

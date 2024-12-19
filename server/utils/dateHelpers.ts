@@ -214,3 +214,9 @@ export const formatAddressDate = (isoDate: string): string => {
 
   return format(isoDate, 'MMMM yyyy')
 }
+
+export const formatDateToPattern = (isoDate: string, pattern: string): string => {
+  if (!isoDate) return ''
+
+  return format(isoDate, pattern)
+}

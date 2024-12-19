@@ -20,7 +20,11 @@ import { locationsApiMock, locationsApiSelectOptionsMock, locationsMock } from '
 
 import HmppsError from '../interfaces/HmppsError'
 import { formatLocation, formatName } from '../utils/utils'
-import { courtLocationsMock, courtLocationsSelectOptionsMock } from '../data/localMockData/courtLocationsMock'
+import {
+  courtLocationsMock,
+  courtLocationsSelectOptionsMock,
+  probationTeamsMock,
+} from '../data/localMockData/courtLocationsMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
@@ -181,6 +185,7 @@ describe('Appointments Controller', () => {
     appointmentService.getPrePostAppointmentRefData = jest.fn(async () => {
       return {
         courts: courtLocationsMock,
+        probationTeams: probationTeamsMock,
         locations: locationsApiMock,
       }
     })

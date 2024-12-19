@@ -5,3 +5,11 @@ export default interface Court {
   enabled: boolean
   notes?: string
 }
+
+export interface ProbationTeam {
+  probationTeamId: number
+  code: string
+  description: string
+  enabled: boolean
+  notes?: string
+}

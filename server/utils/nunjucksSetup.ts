@@ -109,6 +109,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
   njkEnv.addFilter('addressToLines', addressToLines)
+  njkEnv.addFilter('find', (l: never[], iteratee: string, eq: unknown) => l.find(o => o[iteratee] === eq))
   njkEnv.addFilter('findError', findError)
   njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
 
