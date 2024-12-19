@@ -57,3 +57,18 @@ export const courtLocationsSelectOptionsMock: SelectOption[] = [
     text: 'Sheffield Court',
   },
 ]
+
+export const probationTeamsSelectOptionsMock: SelectOption[] = [
+  {
+    value: 'ABC',
+    text: 'Blackpool',
+  },
+  {
+    value: 'DEF',
+    text: 'Barnsley',
+  },
+  {
+    value: 'SHF',
+    text: 'Sheffield',
+  },
+]

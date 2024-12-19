@@ -54,7 +54,7 @@ export default class AppointmentController {
       appointmentFromFlash: string[],
       appointment: AppointmentDetails,
     ): Promise<AppointmentForm> => {
-      if (appointmentFromFlash.length) {
+      if (appointmentFromFlash?.length) {
         return appointmentFromFlash[0] as AppointmentForm
       }
 

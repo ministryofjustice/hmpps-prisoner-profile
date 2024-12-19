@@ -24,12 +24,18 @@ import {
   courtLocationsMock,
   courtLocationsSelectOptionsMock,
   probationTeamsMock,
+  probationTeamsSelectOptionsMock,
 } from '../data/localMockData/courtLocationsMock'
 import AgenciesMock from '../data/localMockData/agenciesDetails'
 import { offenderEventsMock } from '../data/localMockData/offenderEventsMock'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { HmppsUser } from '../interfaces/HmppsUser'
-import { courtHearingTypes, courtHearingTypesSelectOptions } from '../data/localMockData/courtHearingsMock'
+import {
+  courtHearingTypes,
+  courtHearingTypesSelectOptions,
+  probationMeetingTypes,
+  probationMeetingTypesSelectOptions,
+} from '../data/localMockData/courtHearingsMock'
 
 jest.mock('../services/locationDetailsService.ts')
 
@@ -81,6 +87,7 @@ const appointmentsToCreate = {
 }
 
 const formBodyVLB = {
+  bookingType: 'COURT',
   prisonId: 'MDI',
   preAppointment: 'yes',
   preAppointmentLocation: locationsMock[0].locationId,
@@ -193,6 +200,7 @@ describe('Appointments Controller', () => {
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
     appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
+    appointmentService.getProbationMeetingTypes = jest.fn(async () => probationMeetingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
     locationDetailsService.getLocationByNomisLocationId = jest.fn(
       async (_, locationId) =>
@@ -401,10 +409,12 @@ describe('Appointments Controller', () => {
       pageTitle: 'Video link booking details',
       ...appointmentData,
       courts: courtLocationsSelectOptionsMock,
+      probationTeams: probationTeamsSelectOptionsMock,
       locations: locationsApiSelectOptionsMock,
       refererUrl: `/prisoner/${prisonerNumber}`,
       errors: [],
       hearingTypes: courtHearingTypesSelectOptions,
+      meetingTypes: probationMeetingTypesSelectOptions,
       prisonId: 'MDI',
     })
   })
@@ -504,6 +514,7 @@ describe('Appointments Controller', () => {
       formValues: {
         hearingType: courtHearingTypes[0].code,
         court: courtLocationsMock[2].code,
+        cvpRequired: 'yes',
         videoLinkUrl: 'http://bvls.test.url',
         preAppointment: 'no',
         postAppointment: 'no',

@@ -104,3 +104,10 @@ export const courtHearingTypesSelectOptions: SelectOption[] = [
     text: 'Appeal',
   },
 ]
+
+export const probationMeetingTypesSelectOptions: SelectOption[] = [
+  {
+    value: 'PSR',
+    text: 'Post-sentence report',
+  },
+]
