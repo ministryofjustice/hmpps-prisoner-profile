@@ -26,14 +26,17 @@ import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClientMock'
+import ReferenceDataService from './referenceDataService'
 
 jest.mock('./metrics/metricsService')
+jest.mock('./referenceDataService')
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
   let prisonPersonApiClient: PrisonPersonApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
+  let referenceDataService: ReferenceDataService
   let metricsService: MetricsService
 
   beforeEach(() => {
@@ -54,7 +57,10 @@ describe('PersonalPageService', () => {
 
     personIntegrationApiClient = {
       updateBirthPlace: jest.fn(),
+      getReferenceDataCodes: jest.fn(),
     }
+
+    referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
   })
@@ -65,6 +71,7 @@ describe('PersonalPageService', () => {
       () => curiousApiClient,
       () => prisonPersonApiClient,
       () => personIntegrationApiClient,
+      referenceDataService,
       metricsService,
     )
 
@@ -247,7 +254,8 @@ describe('PersonalPageService', () => {
         )
         expect(personalDetails.marriageOrCivilPartnership).toEqual(PrisonerMockDataA.maritalStatus)
         expect(personalDetails.nationality).toEqual(PrisonerMockDataA.nationality)
-        expect(personalDetails.placeOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
+        expect(personalDetails.cityOrTownOfBirth).toEqual(convertToTitleCase(inmateDetailMock.birthPlace))
+        expect(personalDetails.countryOfBirth).toEqual('TODO')
         expect(personalDetails.preferredName).toEqual(
           formatName(prisonerDetailMock.currentWorkingFirstName, undefined, prisonerDetailMock.currentWorkingLastName),
         )

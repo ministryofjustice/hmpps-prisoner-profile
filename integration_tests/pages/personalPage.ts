@@ -35,7 +35,7 @@ export default class PersonalPage extends Page {
       aliasList: (): PageElement => cardData('alias-list'),
       preferredName: (): PageElement => cardData('preferred-name'),
       dateOfBirth: () => cardData('date-of-birth'),
-      placeOfBirth: () => cardData('place-of-birth'),
+      cityOrTownOfBirth: () => cardData('city-or-town-of-birth'),
       nationality: () => cardData('nationality'),
       otherNationalities: () => cardData('other-nationalities'),
       ethnicGroup: () => cardData('ethnic-group'),
