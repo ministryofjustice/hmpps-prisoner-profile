@@ -15,6 +15,7 @@ import {
   parseDate,
   timeFormat,
 } from '../utils/dateHelpers'
+import { vlbAppointmentMock } from '../data/localMockData/appointmentMock'
 import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
 import { locationsApiMock, locationsApiSelectOptionsMock, locationsMock } from '../data/localMockData/locationsMock'
 
@@ -36,6 +37,8 @@ import {
   probationMeetingTypes,
   probationMeetingTypesSelectOptions,
 } from '../data/localMockData/courtHearingsMock'
+import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
+import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock'
 
 jest.mock('../services/locationDetailsService.ts')
 
@@ -209,6 +212,24 @@ describe('Appointments Controller', () => {
           [locationsMock[1].locationId]: locationsApiMock[1],
         })[locationId],
     )
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      dpsLocationId: 'abc-123',
+      nomisLocationId: 1,
+    }))
+    locationDetailsService.getLocationByKey = jest.fn(
+      async () =>
+        ({
+          id: 'abc-123',
+          key: 'ABC',
+        }) as LocationsApiLocation,
+    )
+    locationDetailsService.getLocationByNomisLocationId = jest.fn(
+      async () =>
+        ({
+          id: 'abc-123',
+          key: 'ABC',
+        }) as LocationsApiLocation,
+    )
   })
 
   it('should display add appointment', async () => {
@@ -233,6 +254,47 @@ describe('Appointments Controller', () => {
       formValues: {
         bookingId: 1102484,
         date: formBody.date,
+      },
+      refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
+      errors: undefined,
+    })
+  })
+
+  it('should display add appointment with data prepopulated when editing', async () => {
+    req.params.appointmentId = 1 // editing appointment with ID 1
+    appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
+    appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(videoLinkBookingMock)
+
+    await controller.displayAddAppointment()(req, res)
+
+    expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      res.locals.user.activeCaseLoadId,
+    )
+
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
+      appointmentId: 1,
+      pageTitle: 'Add an appointment',
+      miniBannerData: {
+        prisonerName: 'Saunders, John',
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        cellLocation: PrisonerMockDataA.cellLocation,
+      },
+      appointmentTypes: appointmentTypesSelectOptionsMock,
+      locations: locationsApiSelectOptionsMock,
+      repeatOptions,
+      today: formBody.date,
+      formValues: {
+        appointmentType: 'VLB',
+        bookingId: 1102484,
+        date: '01/01/2023',
+        comments: 'Comment',
+        endTimeHours: '13',
+        endTimeMinutes: '34',
+        location: 'abc-123',
+        recurring: 'no',
+        startTimeHours: '12',
+        startTimeMinutes: '34',
       },
       refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
       errors: undefined,
@@ -391,6 +453,82 @@ describe('Appointments Controller', () => {
       comments: formBody.comments,
       appointmentDate: formatDate(today, 'long'),
       formValues: {},
+    }
+
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+      key: 'ABC',
+    }))
+
+    await controller.displayPrePostAppointments()(req, res)
+
+    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      res.locals.user.activeCaseLoadId,
+    )
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
+      pageTitle: 'Video link booking details',
+      ...appointmentData,
+      courts: courtLocationsSelectOptionsMock,
+      probationTeams: probationTeamsSelectOptionsMock,
+      locations: locationsApiSelectOptionsMock,
+      refererUrl: `/prisoner/${prisonerNumber}`,
+      errors: [],
+      hearingTypes: courtHearingTypesSelectOptions,
+      meetingTypes: probationMeetingTypesSelectOptions,
+      prisonId: 'MDI',
+    })
+  })
+
+  it('should display prepost appointment with data prepopulated when editing', async () => {
+    req.params.appointmentId = 1
+    appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
+    appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(videoLinkBookingMock)
+
+    const { prisonerNumber, cellLocation } = PrisonerMockDataA
+    formBody.location = locationsMock[0].locationId
+
+    const flash = {
+      appointmentDefaults: {
+        locationId: formBody.location,
+        startTime: formatDateTimeISO(
+          set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
+        ),
+      },
+      appointmentForm: formBody,
+    }
+    req.flash = (key: string) => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flash]
+      }
+      return []
+    }
+
+    const appointmentData = {
+      appointmentId: 1,
+      miniBannerData: {
+        prisonerName: 'Saunders, John',
+        prisonerNumber,
+        cellLocation: formatLocation(cellLocation),
+      },
+      location: locationsApiMock[0].localName,
+      date: formBody.date,
+      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
+      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
+      comments: formBody.comments,
+      appointmentDate: formatDate(today, 'long'),
+      formValues: {
+        bookingType: 'COURT',
+        court: 'ABERCV',
+        cvpRequired: 'yes',
+        hearingType: 'APPEAL',
+        postAppointment: 'yes',
+        postAppointmentLocation: 'abc-123',
+        preAppointment: 'yes',
+        preAppointmentLocation: 'abc-123',
+        videoLinkUrl: 'http://bvls.test.url',
+      },
     }
 
     locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
