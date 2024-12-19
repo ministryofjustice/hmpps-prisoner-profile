@@ -40,6 +40,7 @@ import PrisonPersonApiRestClient from './prisonPersonApiClient'
 import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
 import CsipApiRestClient from './csipApiClient'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
+import ReferenceDataStore from './referenceDataStore/referenceDataStore'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -73,6 +74,7 @@ export const dataAccess = {
   restrictedPatientApiClientBuilder: (token: string) => new RestrictedPatientApiRestClient(token),
   prisonRegisterApiClientBuilder: (token: string) => new PrisonRegisterApiRestClient(token),
   prisonRegisterStore: new PrisonRegisterStore(createRedisClient()),
+  referenceDataStore: new ReferenceDataStore(createRedisClient()),
   calculateReleaseDatesApiClientBuilder: (token: string) => new CalculateReleaseDatesApiClient(token),
   alertsApiClientBuilder: (token: string) => new AlertsApiRestClient(token),
   featureToggleStore: config.redis.enabled

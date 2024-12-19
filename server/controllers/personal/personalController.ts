@@ -390,14 +390,14 @@ export default class PersonalController {
     }
   }
 
-  cityOrPlaceOfBirthTextInput = (fieldData: TextFieldData) =>
-    this.textInput(fieldData, this.getCityOrPlaceOfBirth.bind(this), this.setCityOrPlaceOfBirth.bind(this))
+  cityOrTownOfBirthTextInput = (fieldData: TextFieldData) =>
+    this.textInput(fieldData, this.getCityOrTownOfBirth.bind(this), this.setCityOrTownOfBirth.bind(this))
 
-  private async getCityOrPlaceOfBirth(req: Request): Promise<string> {
+  private async getCityOrTownOfBirth(req: Request): Promise<string> {
     return convertToTitleCase(req.middleware?.inmateDetail?.birthPlace)
   }
 
-  private async setCityOrPlaceOfBirth(
+  private async setCityOrTownOfBirth(
     req: Request,
     res: Response,
     _fieldData: TextFieldData,

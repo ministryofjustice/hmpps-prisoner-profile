@@ -1,5 +1,8 @@
 import RestClient from './restClient'
-import { PersonIntegrationApiClient } from './interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  PersonIntegrationApiClient,
+  ReferenceDataCodeDto,
+} from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 
 export default class PersonIntegrationApiRestClient implements PersonIntegrationApiClient {
@@ -15,5 +18,9 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       query: { prisonerNumber },
       data: { fieldName: 'BIRTHPLACE', value: birthPlace },
     })
+  }
+
+  getReferenceDataCodes(domain: string): Promise<ReferenceDataCodeDto[]> {
+    return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
   }
 }
