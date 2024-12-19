@@ -4,10 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const postAppointmentEventsContainer = document.getElementById('postAppointmentEventsContainer')
   const postAppointmentLocation = document.getElementById('postAppointmentLocation')
   const courtSelect = document.getElementById('court')
-  const otherCourtContainer = document.getElementById('otherCourtContainer')
 
   async function getPrePostEventsForLocation(input, container) {
-    const locationId = Number(input.value)
+    const locationId = input.value
     const date = document.getElementById('date').value
 
     const response =
@@ -18,15 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
       container.style.display = 'block'
     } else {
       container.style.display = 'none'
-    }
-  }
-
-  function showHideOtherCourt() {
-    const courtId = courtSelect.value
-    if (courtId === 'other') {
-      otherCourtContainer.style.display = 'block'
-    } else {
-      otherCourtContainer.style.display = 'none'
     }
   }
 
@@ -44,5 +34,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialise
   getPrePostEventsForLocation(preAppointmentLocation, preAppointmentEventsContainer)
   getPrePostEventsForLocation(postAppointmentLocation, postAppointmentEventsContainer)
-  showHideOtherCourt()
 })

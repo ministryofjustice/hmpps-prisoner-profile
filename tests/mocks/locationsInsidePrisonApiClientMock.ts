@@ -2,4 +2,5 @@ import { LocationsInsidePrisonApiClient } from '../../server/data/interfaces/loc
 
 export const locationsInsidePrisonApiClientMock = (): LocationsInsidePrisonApiClient => ({
   getLocation: jest.fn(),
+  getLocationsForAppointments: jest.fn(),
 })

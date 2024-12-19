@@ -95,7 +95,7 @@ export default {
       agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_DEADLINE', 20000))),
     },
     locationsInsidePrisonApi: {
-      url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8080', requiredInProduction),
+      url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_DEADLINE', 10000)),
@@ -103,7 +103,7 @@ export default {
       agent: new AgentConfig(Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_DEADLINE', 20000))),
     },
     nomisSyncPrisonerMappingApi: {
-      url: get('NOMIS_SYNC_PRISONER_MAPPING_API_URL', 'http://localhost:8080', requiredInProduction),
+      url: get('NOMIS_SYNC_PRISONER_MAPPING_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('NOMIS_SYNC_PRISONER_MAPPING_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('NOMIS_SYNC_PRISONER_MAPPING_API_TIMEOUT_DEADLINE', 10000)),

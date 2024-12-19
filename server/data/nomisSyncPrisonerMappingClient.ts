@@ -17,4 +17,10 @@ export default class NomisSyncPrisonMappingRestClient implements NomisSyncPrison
       path: `/api/locations/nomis/${nomisLocationId}`,
     })
   }
+
+  async getMappingUsingDpsLocationId(dpsLocationId: string): Promise<NomisSyncLocation> {
+    return this.restClient.get({
+      path: `/api/locations/dps/${dpsLocationId}`,
+    })
+  }
 }

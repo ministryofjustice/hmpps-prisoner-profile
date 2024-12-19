@@ -106,6 +106,7 @@ export const services = () => {
   const csraService = new CsraService(prisonApiClientBuilder)
   const moneyService = new MoneyService(prisonApiClientBuilder)
   const appointmentService = new AppointmentService(
+    locationDetailsService,
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
     bookAVideoLinkApiClientBuilder,

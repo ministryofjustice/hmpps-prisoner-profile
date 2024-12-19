@@ -36,7 +36,6 @@ import { AccountCode } from './enums/accountCode'
 import { damageObligationContainerMock } from './localMockData/damageObligationsMock'
 import { MovementType } from './enums/movementType'
 import movementsMock from './localMockData/movementsData'
-import { locationsMock } from './localMockData/locationsMock'
 import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
@@ -399,15 +398,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getLocationsForAppointments', () => {
-    it('Should return data from the API', async () => {
-      const agencyId = 'MDI'
-      mockSuccessfulPrisonApiCall(`/api/agencies/${agencyId}/locations?eventType=APP`, locationsMock)
-      const output = await prisonApiClient.getLocationsForAppointments(agencyId)
-      expect(output).toEqual(locationsMock)
-    })
-  })
-
   describe('getAppointmentTypes', () => {
     it('Should return data from the API', async () => {
       mockSuccessfulPrisonApiCall(`/api/reference-domains/scheduleReasons?eventType=APP`, appointmentTypesMock)
@@ -500,15 +490,6 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getExternalTransfers(offenderNumbers, agencyId, date)
       expect(output).toEqual(prisonerSchedulesMock)
-    })
-  })
-
-  describe('getLocation', () => {
-    it('Should return data from the API', async () => {
-      const locationId = 27000
-      mockSuccessfulPrisonApiCall(`/api/locations/${locationId}`, locationsMock[0])
-      const output = await prisonApiClient.getLocation(locationId)
-      expect(output).toEqual(locationsMock[0])
     })
   })
 

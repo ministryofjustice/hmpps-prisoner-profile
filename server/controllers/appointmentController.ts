@@ -27,6 +27,8 @@ import logger from '../../logger'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import CreateVideoBookingRequest from '../data/interfaces/bookAVideoLinkApi/CreateVideoBookingRequest'
 import LocationDetailsService from '../services/locationDetailsService'
+import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
+import NomisSyncLocation from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncLocation'
 
 const PRE_POST_APPOINTMENT_DURATION_MINS = 15
 
@@ -82,7 +84,7 @@ export default class AppointmentController {
           cellLocation: formatLocation(cellLocation),
         },
         appointmentTypes: refDataToSelectOptions(appointmentTypes),
-        locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        locations: objectToSelectOptions(locations, 'id', 'localName'),
         repeatOptions,
         today: formatDate(now.toISOString(), 'short'),
         formValues,
@@ -132,11 +134,16 @@ export default class AppointmentController {
       if (!errors.length) {
         const startTime = formatDateTimeISO(set(parseDate(date), { hours: startTimeHours, minutes: startTimeMinutes }))
         const endTime = formatDateTimeISO(set(parseDate(date), { hours: endTimeHours, minutes: endTimeMinutes }))
-
+        // non-bvl locations ideintified via UUID/integer form id.  BVL locations identified via key
+        let nomisLocationId
+        if (location) {
+          const result = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(clientToken, location)
+          nomisLocationId = result.nomisLocationId
+        }
         const appointmentsToCreate: AppointmentDefaults = {
           bookingId,
           appointmentType,
-          locationId: Number(location),
+          locationId: nomisLocationId || 0,
           startTime,
           endTime,
           comment: comments,
@@ -225,7 +232,7 @@ export default class AppointmentController {
       const appointmentType = appointmentTypes.find(
         type => type.code === appointmentDetails.appointmentType,
       )?.description
-      const location = locations.find(loc => loc.locationId === Number(appointmentDetails.location))?.userDescription
+      const location = locations.find(loc => loc.id === appointmentDetails.location)?.localName
       const repeats = repeatOptions.find(type => type.value === appointmentDetails.repeats)?.text
 
       const appointmentData = {
@@ -293,7 +300,14 @@ export default class AppointmentController {
       const { appointmentDefaults, appointmentForm, formValues } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
-      const location = locations.find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
+      let location
+      if (appointmentDefaults.locationId) {
+        const { dpsLocationId } = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+          clientToken,
+          appointmentDefaults.locationId,
+        )
+        location = (locations as LocationsApiLocation[]).find(loc => loc.id === dpsLocationId)?.localName
+      }
 
       const hearingTypes = objectToSelectOptions(
         await this.appointmentService.getCourtHearingTypes(clientToken),
@@ -334,7 +348,7 @@ export default class AppointmentController {
         pageTitle: 'Video link booking details',
         ...appointmentData,
         courts: objectToSelectOptions(courts, 'code', 'description'),
-        locations: objectToSelectOptions(locations, 'locationId', 'userDescription'),
+        locations: objectToSelectOptions(locations, 'id', 'localName'),
         refererUrl: `/prisoner/${prisonerNumber}`,
         errors,
         hearingTypes,
@@ -377,11 +391,11 @@ export default class AppointmentController {
 
         const [preLocation, mainLocation, postLocation] = await Promise.all([
           preAppointmentLocation
-            ? this.locationDetailsService.getLocationByNomisLocationId(clientToken, +preAppointmentLocation)
+            ? this.locationDetailsService.getLocation(clientToken, preAppointmentLocation)
             : undefined,
-          this.locationDetailsService.getLocationByNomisLocationId(clientToken, +appointmentForm.location),
+          this.locationDetailsService.getLocation(clientToken, appointmentForm.location),
           postAppointmentLocation
-            ? this.locationDetailsService.getLocationByNomisLocationId(clientToken, +postAppointmentLocation)
+            ? this.locationDetailsService.getLocation(clientToken, postAppointmentLocation)
             : undefined,
         ])
 
@@ -490,13 +504,19 @@ export default class AppointmentController {
         this.appointmentService.getAgencyDetails(clientToken, prisonId),
       ])
 
-      const location = locations.find(loc => loc.locationId === +appointmentDefaults.locationId)?.userDescription
+      let apptDefaultsLocationMap = {} as NomisSyncLocation
+      if (appointmentDefaults.locationId) {
+        apptDefaultsLocationMap = await this.locationDetailsService.getLocationMappingUsingNomisLocationId(
+          clientToken,
+          appointmentDefaults.locationId,
+        )
+      }
 
-      const preLocation = locations.find(loc => loc.locationId === +formValues.preAppointmentLocation)?.userDescription
+      const location = locations.find(loc => loc.id === apptDefaultsLocationMap.dpsLocationId)?.localName
 
-      const postLocation = locations.find(
-        loc => loc.locationId === +formValues.postAppointmentLocation,
-      )?.userDescription
+      const preLocation = locations.find(loc => loc.id === formValues.preAppointmentLocation)?.localName
+
+      const postLocation = locations.find(loc => loc.id === formValues.postAppointmentLocation)?.localName
 
       const courtDescription = courts.find(court => court.code === formValues.court)?.description
 
@@ -640,13 +660,23 @@ export default class AppointmentController {
       const user = res.locals.user as PrisonUser
 
       const isoDate = dateToIsoDate(req.query.date as string)
-      const locationId = +req.query.locationId
+      // eslint-disable-next-line prefer-destructuring
+      const locationId = req.query.locationId
+
+      const { nomisLocationId } = await this.locationDetailsService.getLocationMappingUsingDpsLocationId(
+        clientToken,
+        locationId as string,
+      )
 
       const [location, events] = await Promise.all([
-        this.appointmentService.getLocation(clientToken, locationId),
-        this.appointmentService.getExistingEventsForLocation(clientToken, user.activeCaseLoadId, locationId, isoDate),
+        this.locationDetailsService.getLocation(clientToken, locationId as string),
+        this.appointmentService.getExistingEventsForLocation(
+          clientToken,
+          user.activeCaseLoadId,
+          nomisLocationId,
+          isoDate,
+        ),
       ])
-
       this.auditService
         .sendEvent({
           who: res.locals.user.username,
@@ -660,7 +690,7 @@ export default class AppointmentController {
       return res.render('components/scheduledEvents/scheduledEvents.njk', {
         events,
         date: formatDate(isoDate, 'long'),
-        header: `Schedule for ${location.userDescription}`,
+        header: `Schedule for ${location.localName}`,
         type: 'location',
       })
     }

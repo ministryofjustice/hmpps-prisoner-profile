@@ -1,5 +1,5 @@
 export default interface LocationsApiLocation {
-  id: string
   key: string
+  id: string
   localName: string
 }
