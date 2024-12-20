@@ -59,6 +59,7 @@ describe('PersonalPageService', () => {
     personIntegrationApiClient = {
       updateBirthPlace: jest.fn(),
       updateCountryOfBirth: jest.fn(),
+      updateNationality: jest.fn(),
       getReferenceDataCodes: jest.fn(),
     }
 
