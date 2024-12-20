@@ -18,7 +18,10 @@ import { HmppsUser } from '../interfaces/HmppsUser'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
-import { FieldHistory } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import {
+  FieldHistory,
+  PrisonPersonDistinguishingMarkPhotographUuid,
+} from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { formatDateTime } from './dateHelpers'
 
 const properCase = (word: string): string =>
@@ -778,4 +781,13 @@ export const fieldHistoryToRows = (
     { text: formatDateTime(field.appliesTo, 'short') },
     { text: field.createdBy },
   ])
+}
+
+export const sortByLatestAndUuid = (list: PrisonPersonDistinguishingMarkPhotographUuid[]) => {
+  return list.sort((a, b) => {
+    if (b.latest === a.latest) {
+      return b.id.localeCompare(a.id)
+    }
+    return b.latest ? 1 : -1
+  })
 }

@@ -1,6 +1,6 @@
 import { Validator } from '../../middleware/validationMiddleware'
 
-export const heightMetricValidator: Validator = body => {
+export const heightMetricValidator: Validator = (body: Record<string, string>) => {
   const { editField } = body
 
   const height = editField ? parseInt(editField, 10) : 0
@@ -21,7 +21,7 @@ export const heightMetricValidator: Validator = body => {
   return []
 }
 
-export const heightImperialValidator: Validator = body => {
+export const heightImperialValidator: Validator = (body: Record<string, string>) => {
   const { feet: feetString, inches: inchesString } = body
 
   const feet = feetString ? parseInt(feetString, 10) : 0

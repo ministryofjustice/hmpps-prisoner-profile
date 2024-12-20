@@ -11,6 +11,7 @@ import {
   newDistinguishingMarkValidator,
   updateDescriptionValidator,
   updateLocationValidator,
+  updatePhotoValidator,
 } from '../validators/personal/distinguishingMarksValidator'
 import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
@@ -94,6 +95,18 @@ export default function distinguishingMarksRouter(services: Services): Router {
       redirectBackOnError: true,
     }),
     distinguishingMarksController.updateDescription,
+  )
+
+  // Change photo
+  get('/:markId/photo', distinguishingMarksController.changePhoto)
+  post(
+    '/:markId/photo',
+    multer().single('file'),
+    validationMiddleware([updatePhotoValidator], {
+      redirectBackOnError: true,
+      useReq: true,
+    }),
+    distinguishingMarksController.updatePhoto,
   )
 
   return router

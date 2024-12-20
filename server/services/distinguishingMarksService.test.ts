@@ -6,6 +6,7 @@ const prisonPersonApiClient = {
   postDistinguishingMark: jest.fn(),
   getDistinguishingMark: jest.fn(),
   patchDistinguishingMark: jest.fn(),
+  postDistinguishingMarkPhoto: jest.fn(),
 } as undefined as PrisonPersonApiClient
 
 describe('distinguishingMarksService', () => {
@@ -209,6 +210,19 @@ describe('distinguishingMarksService', () => {
         markType: 'MARK_TYPE_TAT',
         comment: 'comment',
       })
+    })
+  })
+
+  describe('addDistinguishingMarkPhoto', () => {
+    it('should add correct photo', () => {
+      service.addDistinguishingMarkPhoto('token', '019205c0-0fd5-7c41-ae24-ede9eae05da5', {
+        originalname: 'photo',
+      } as MulterFile)
+
+      expect(prisonPersonApiClient.postDistinguishingMarkPhoto).toHaveBeenCalledWith(
+        '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        { originalname: 'photo' },
+      )
     })
   })
 })
