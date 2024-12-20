@@ -694,7 +694,74 @@ describe('Appointments Controller', () => {
     )
     expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
-      pageTitle: 'Video link has been booked',
+      pageTitle: 'The video link has been booked',
+      ...appointmentData,
+      profileUrl: `/prisoner/${prisonerNumber}`,
+      movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
+      videoLinkUrl: 'http://bvls.test.url',
+      mustContactTheCourt: true,
+    })
+  })
+
+  it('should display prepost appointment confirmation when amending', async () => {
+    const { prisonerNumber } = PrisonerMockDataA
+    const flash = {
+      appointmentId: 1,
+      appointmentDefaults: {
+        startTime: appointmentsToCreate.startTime,
+        endTime: appointmentsToCreate.endTime,
+        locationId: appointmentsToCreate.locationId,
+        comment: appointmentsToCreate.comment,
+      },
+      appointmentForm: {
+        location: locationsMock[0].locationId,
+      },
+      formValues: {
+        hearingType: courtHearingTypes[0].code,
+        court: courtLocationsMock[2].code,
+        cvpRequired: 'yes',
+        videoLinkUrl: 'http://bvls.test.url',
+        preAppointment: 'no',
+        postAppointment: 'no',
+      },
+    }
+
+    req.flash = (key: string) => {
+      if (key === 'prePostAppointmentDetails') {
+        return [flash]
+      }
+      return []
+    }
+    const appointmentData = {
+      prisonerName: 'John Saunders',
+      prisonerNumber,
+      prisonName: 'Moorland (HMP & YOI)',
+      location: locationsApiMock[0].localName,
+      date: formatDate(dateToIsoDate(formBody.date), 'long'),
+      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
+      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
+      comments: formBody.comments,
+      pre: undefined as string,
+      post: undefined as string,
+      court: courtLocationsMock[2].description,
+      hearingType: courtHearingTypes[0].description,
+    }
+
+    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+      nomisLocationId: 1234,
+      dpsLocationId: 'location-1',
+      key: 'ABC',
+    }))
+
+    await controller.displayPrePostAppointmentConfirmation()(req, res)
+
+    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+      req.middleware.clientToken,
+      res.locals.user.activeCaseLoadId,
+    )
+    expect(controller['appointmentService'].getAgencyDetails).toHaveBeenCalled()
+    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointmentConfirmation', {
+      pageTitle: 'The video link has been updated',
       ...appointmentData,
       profileUrl: `/prisoner/${prisonerNumber}`,
       movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,

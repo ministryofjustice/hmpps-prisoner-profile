@@ -587,6 +587,7 @@ export default class AppointmentController {
       }
 
       req.flash('prePostAppointmentDetails', {
+        appointmentId,
         appointmentDefaults,
         appointmentForm,
         formValues: {
@@ -636,7 +637,8 @@ export default class AppointmentController {
       if (!appointmentFlash?.length) {
         return new ServerError('PrePostAppointmentDetails not found in request')
       }
-      const { appointmentDefaults, formValues } = appointmentFlash[0] as unknown as PrePostAppointmentDetails
+      const { appointmentId, appointmentDefaults, formValues } =
+        appointmentFlash[0] as unknown as PrePostAppointmentDetails
 
       const { firstName, lastName, cellLocation, prisonId } = req.middleware.prisonerData
       const prisonerName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
@@ -729,7 +731,7 @@ export default class AppointmentController {
         .catch(error => logger.error(error))
 
       return res.render('pages/appointments/prePostAppointmentConfirmation', {
-        pageTitle: 'Video link has been booked',
+        pageTitle: appointmentId ? 'The video link has been updated' : 'The video link has been booked',
         ...appointmentData,
         profileUrl: `/prisoner/${prisonerNumber}`,
         movementSlipUrl: `/prisoner/${prisonerNumber}/movement-slips`,
