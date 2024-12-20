@@ -64,6 +64,7 @@ export interface AppointmentDefaults {
 }
 
 export interface PrePostAppointmentDetails {
+  appointmentId?: number
   appointmentDefaults: AppointmentDefaults // Summary details
   appointmentForm: AppointmentForm // The original appointment form
   // PrePost Form values
