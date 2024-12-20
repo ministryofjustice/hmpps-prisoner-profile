@@ -13,14 +13,10 @@ export default class NomisSyncPrisonMappingRestClient implements NomisSyncPrison
   }
 
   async getMappingUsingNomisLocationId(nomisLocationId: number): Promise<NomisSyncLocation> {
-    return this.restClient.get({
-      path: `/api/locations/nomis/${nomisLocationId}`,
-    })
+    return this.restClient.get({ path: `/api/locations/nomis/${nomisLocationId}` })
   }
 
   async getMappingUsingDpsLocationId(dpsLocationId: string): Promise<NomisSyncLocation> {
-    return this.restClient.get({
-      path: `/api/locations/dps/${dpsLocationId}`,
-    })
+    return this.restClient.get({ path: `/api/locations/dps/${dpsLocationId}` })
   }
 }

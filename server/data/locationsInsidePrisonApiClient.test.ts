@@ -46,4 +46,13 @@ describe('locationsInsidePrisonApiClient', () => {
       expect(output).toEqual(locationsApiMock[0])
     })
   })
+
+  describe('getLocationByKey', () => {
+    it('Should return data from the API', async () => {
+      const key = 'LOCATION_KEY'
+      mockSuccessfulApiCall(`/locations/key/${key}`, locationsApiMock[0])
+      const output = await locationsInsidePrisonApiClient.getLocationByKey('LOCATION_KEY')
+      expect(output).toEqual(locationsApiMock[0])
+    })
+  })
 })

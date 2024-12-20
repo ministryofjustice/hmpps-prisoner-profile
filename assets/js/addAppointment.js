@@ -8,13 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastAppointmentDate = document.getElementById('last-appointment-date')
   const locationEventsContainer = document.getElementById('location-events')
   const offenderEventsContainer = document.getElementById('offender-events')
+  const appointmentId = document.getElementById('appointment-id')?.innerText || ''
 
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
     const locationId = appointmentLocationSelect.value
 
     const response =
-      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}`))
+      date && locationId && (await fetch(`/api/get-location-events?date=${date}&locationId=${locationId}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
       locationEventsContainer.innerHTML = await response.text()
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prisonerNumber = document.getElementById('prisonerNumber').textContent
 
     const response =
-      prisonerNumber && date && (await fetch(`/api/get-offender-events?date=${date}&prisonerNumber=${prisonerNumber}`))
+      prisonerNumber && date && (await fetch(`/api/get-offender-events?date=${date}&prisonerNumber=${prisonerNumber}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
       offenderEventsContainer.style.display = 'block'
