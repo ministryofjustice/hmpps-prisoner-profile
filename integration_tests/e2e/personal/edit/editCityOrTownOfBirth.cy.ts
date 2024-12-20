@@ -15,7 +15,7 @@ context('Edit city or town of birth', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdateBirthPlace', { prisonerNumber })
     },

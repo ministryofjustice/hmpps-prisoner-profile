@@ -22,7 +22,7 @@ context('New distinguishing mark on face', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
       cy.task('stubPostNewDistinguishingMark')
 
@@ -36,10 +36,10 @@ context('New distinguishing mark on face', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
       cy.task('stubPostNewDistinguishingMark')
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
 

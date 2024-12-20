@@ -46,7 +46,7 @@ declare global {
         prisonerDataOverrides?: Partial<Prisoner>
       }): Chainable<AUTWindow>
 
-      setupPersonalPageSubs(options: {
+      setupPersonalPageStubs(options: {
         prisonerNumber: string
         bookingId: number
         prisonerDataOverrides?: Partial<Prisoner>
