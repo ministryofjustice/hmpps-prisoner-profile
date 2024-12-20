@@ -15,6 +15,25 @@ export default interface Appointment {
   bookingId: number
 }
 
+export interface AppointmentDetails {
+  appointment: {
+    id: number
+    agencyId: string
+    locationId: number
+    appointmentTypeCode: string
+    offenderNo: string
+    startTime: string
+    endTime?: string
+    comment?: string
+  }
+  recurring?: {
+    id: number
+    repeatPeriod: string
+    count: number
+    startTime: string
+  }
+}
+
 export interface AppointmentForm {
   appointmentType?: string
   location?: string
@@ -28,6 +47,7 @@ export interface AppointmentForm {
   times?: number
   comments?: string
   bookingId?: number
+  dpsLocationId?: string
 }
 
 export interface AppointmentDefaults {
@@ -48,13 +68,17 @@ export interface PrePostAppointmentDetails {
   appointmentForm: AppointmentForm // The original appointment form
   // PrePost Form values
   formValues?: {
+    bookingType: string
     preAppointment?: string
     preAppointmentLocation?: string
     postAppointment?: string
     postAppointmentLocation?: string
     court?: string
+    probationTeam?: string
     otherCourt?: string
     hearingType?: string
+    meetingType?: string
+    cvpRequired?: string
     videoLinkUrl?: string
   }
 }

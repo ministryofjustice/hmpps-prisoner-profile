@@ -3,6 +3,7 @@ import { PrePostAppointmentValidator } from './prePostAppointmentValidator'
 describe('Validation middleware', () => {
   it('should pass validation with good data', async () => {
     const vlbForm = {
+      bookingType: 'COURT',
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'CODE',
@@ -17,6 +18,7 @@ describe('Validation middleware', () => {
 
   it('should fail validation with no data', async () => {
     const vlbForm = {
+      bookingType: 'COURT',
       preAppointment: '',
       postAppointment: '',
       court: '',
@@ -35,6 +37,7 @@ describe('Validation middleware', () => {
 
   it('should fail validation with missing locations', async () => {
     const vlbForm = {
+      bookingType: 'COURT',
       preAppointment: 'yes',
       preAppointmentLocation: '',
       postAppointment: 'yes',
@@ -54,6 +57,7 @@ describe('Validation middleware', () => {
 
   it('should fail validation with missing court name', async () => {
     const vlbForm = {
+      bookingType: 'COURT',
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'other',
@@ -69,6 +73,7 @@ describe('Validation middleware', () => {
 
   it('should fail validation for a missing video link URL', async () => {
     const vlbForm = {
+      bookingType: 'COURT',
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'CODE',
@@ -83,6 +88,7 @@ describe('Validation middleware', () => {
 
   it('should fail validation for a video link URL which is too long', async () => {
     const vlbForm = {
+      bookingType: 'COURT',
       preAppointment: 'no',
       postAppointment: 'no',
       court: 'CODE',
@@ -95,6 +101,27 @@ describe('Validation middleware', () => {
 
     expect(result).toEqual([
       { text: 'Enter a court hearing link which is 120 characters or less', href: '#videoLinkUrl' },
+    ])
+  })
+
+  it('should fail validation for meeting type and probation team missing', async () => {
+    const vlbForm = {
+      bookingType: 'PROBATION',
+      probationTeam: '',
+      meetingType: '',
+    }
+
+    const result = PrePostAppointmentValidator(vlbForm)
+
+    expect(result).toEqual([
+      {
+        href: '#probationTeam',
+        text: 'Select which probation team the meeting is with',
+      },
+      {
+        href: '#meetingType',
+        text: 'Select the meeting type',
+      },
     ])
   })
 })

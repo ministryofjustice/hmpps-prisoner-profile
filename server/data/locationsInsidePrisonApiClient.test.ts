@@ -26,11 +26,32 @@ describe('locationsInsidePrisonApiClient', () => {
       .reply(200, returnData)
   }
 
+  describe('getLocationsForAppointments', () => {
+    it('Should return data from the API', async () => {
+      const id = 'MDI'
+      mockSuccessfulApiCall(
+        `/locations/prison/${id}/non-residential-usage-type/APPOINTMENT?sortByLocalName=true&formatLocalName=true`,
+        locationsApiMock,
+      )
+      const output = await locationsInsidePrisonApiClient.getLocationsForAppointments(id)
+      expect(output).toEqual(locationsApiMock)
+    })
+  })
+
   describe('getLocation', () => {
     it('Should return data from the API', async () => {
       const id = 'MDI'
       mockSuccessfulApiCall(`/locations/${id}?formatLocalName=true`, locationsApiMock[0])
       const output = await locationsInsidePrisonApiClient.getLocation(id)
+      expect(output).toEqual(locationsApiMock[0])
+    })
+  })
+
+  describe('getLocationByKey', () => {
+    it('Should return data from the API', async () => {
+      const key = 'LOCATION_KEY'
+      mockSuccessfulApiCall(`/locations/key/${key}`, locationsApiMock[0])
+      const output = await locationsInsidePrisonApiClient.getLocationByKey('LOCATION_KEY')
       expect(output).toEqual(locationsApiMock[0])
     })
   })

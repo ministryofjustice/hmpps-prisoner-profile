@@ -26,6 +26,7 @@ describe('prisonerLocationHistoryService', () => {
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
     whereaboutsApiClient = {
+      getAppointment: jest.fn(),
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
       createAppointments: jest.fn(),

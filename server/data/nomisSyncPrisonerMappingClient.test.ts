@@ -37,4 +37,13 @@ describe('nomisSyncPrisonerMappingClient', () => {
       expect(output).toEqual(apiResponse)
     })
   })
+
+  describe('getMappingUsingDpsLocationId', () => {
+    it('Should return data from the API', async () => {
+      const dpsLocationId = 'abcdefg'
+      mockSuccessfulApiCall(`/api/locations/dps/${dpsLocationId}`, apiResponse)
+      const output = await nomisSyncPrisonerMappingClient.getMappingUsingDpsLocationId(dpsLocationId)
+      expect(output).toEqual(apiResponse)
+    })
+  })
 })

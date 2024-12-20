@@ -21,14 +21,33 @@ export default class LocationDetailsService {
     return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingNomisLocationId(locationId)
   }
 
-  public async getLocation(clientToken: string, locationId: string): Promise<LocationsApiLocation> {
+  getLocationMappingUsingDpsLocationId = (clientToken: string, locationId: string): Promise<NomisSyncLocation> => {
+    return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingDpsLocationId(locationId)
+  }
+
+  getLocationMappingUsingDpsLocationKey = async (
+    clientToken: string,
+    locationKey: string,
+  ): Promise<NomisSyncLocation> => {
+    const location = await this.getLocationByKey(clientToken, locationKey)
+    return this.nomisSyncPrisonMappingClientBuilder(clientToken).getMappingUsingDpsLocationId(location.id)
+  }
+
+  getLocation = async (clientToken: string, locationId: string): Promise<LocationsApiLocation> => {
     return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocation(locationId)
   }
 
-  getLocationByNomisLocationId = (clientToken: string, locationId: number): Promise<LocationsApiLocation> => {
-    return this.getLocationMappingUsingNomisLocationId(clientToken, locationId).then(map =>
-      this.getLocation(clientToken, map.dpsLocationId),
-    )
+  getLocationByKey = async (clientToken: string, locationKey: string): Promise<LocationsApiLocation> => {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationByKey(locationKey)
+  }
+
+  getLocationByNomisLocationId = async (clientToken: string, locationId: number): Promise<LocationsApiLocation> => {
+    const map = await this.getLocationMappingUsingNomisLocationId(clientToken, locationId)
+    return this.getLocation(clientToken, map.dpsLocationId)
+  }
+
+  getLocationsForAppointments = async (clientToken: string, prisonId: string): Promise<LocationsApiLocation[]> => {
+    return this.locationsInsidePrisonApiClientBuilder(clientToken).getLocationsForAppointments(prisonId)
   }
 
   getInmatesAtLocation = (clientToken: string, livingUnitId: number): Promise<OffenderBooking[]> => {

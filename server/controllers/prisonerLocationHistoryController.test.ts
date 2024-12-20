@@ -48,6 +48,7 @@ describe('Specific Prisoner Location History', () => {
 
     const prisonApiClient = prisonApiClientMock()
     const whereaboutsApiClient: WhereaboutsApiClient = {
+      getAppointment: jest.fn(),
       getCellMoveReason: jest.fn(),
       getUnacceptableAbsences: jest.fn(),
       createAppointments: jest.fn(),

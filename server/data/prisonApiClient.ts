@@ -47,7 +47,6 @@ import Movement from './interfaces/prisonApi/Movement'
 import { MovementType } from './enums/movementType'
 import OffenderSentenceDetail from './interfaces/prisonApi/OffenderSentenceDetail'
 import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces/prisonApi/PrisonerSchedule'
-import Location from './interfaces/prisonApi/Location'
 import Details from './interfaces/prisonApi/Details'
 import AttributesForLocation from './interfaces/prisonApi/AttributesForLocation'
 import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
@@ -356,10 +355,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     })) as Movement[]
   }
 
-  async getLocationsForAppointments(agencyId: string): Promise<Location[]> {
-    return this.restClient.get<Location[]>({ path: `/api/agencies/${agencyId}/locations?eventType=APP` })
-  }
-
   async getAppointmentTypes(): Promise<ReferenceCode[]> {
     return this.restClient.get<ReferenceCode[]>({ path: '/api/reference-domains/scheduleReasons?eventType=APP' })
   }
@@ -422,10 +417,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
       path: `/api/schedules/${agencyId}/externalTransfers?date=${date}`,
       data: offenderNumbers,
     })) as PrisonerSchedule[]
-  }
-
-  async getLocation(locationId: number): Promise<Location> {
-    return this.restClient.get<Location>({ path: `/api/locations/${locationId}` })
   }
 
   async getActivitiesAtLocation(

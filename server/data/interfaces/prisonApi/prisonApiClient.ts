@@ -38,7 +38,6 @@ import Movement from './Movement'
 import { MovementType } from '../../enums/movementType'
 import OffenderSentenceDetail from './OffenderSentenceDetail'
 import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './PrisonerSchedule'
-import Location from './Location'
 import Details from './Details'
 import AttributesForLocation from './AttributesForLocation'
 import HistoryForLocationItem from './HistoryForLocationItem'
@@ -170,8 +169,6 @@ export interface PrisonApiClient {
 
   getMovements(prisonerNumbers: string[], movementTypes: MovementType[], latestOnly?: boolean): Promise<Movement[]>
 
-  getLocationsForAppointments(agencyId: string): Promise<Location[]>
-
   getAppointmentTypes(): Promise<ReferenceCode[]>
 
   getSentenceData(offenderNumbers: string[]): Promise<OffenderSentenceDetail[]>
@@ -195,8 +192,6 @@ export interface PrisonApiClient {
   ): Promise<PrisonerSchedule[]>
 
   getExternalTransfers(offenderNumbers: string[], agencyId: string, date: string): Promise<PrisonerSchedule[]>
-
-  getLocation(locationId: number): Promise<Location>
 
   getActivitiesAtLocation(
     locationId: number,
