@@ -21,6 +21,7 @@ export enum ProfileInformationType {
   SocialCareNeeded = 'PERSC',
   NumberOfChildren = 'CHILD',
   SexualOrientation = 'SEXO',
+  Nationality = 'NAT',
   OtherNationalities = 'NATIO',
   WarnedAboutTattooing = 'TAT',
   WarnedNotToChangeAppearance = 'APPEAR',

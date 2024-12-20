@@ -204,6 +204,11 @@ export default class PersonalPageService {
       }
     }
 
+    let nationality = 'Not entered'
+    if (inmateDetail?.profileInformation?.some(entry => entry.type === 'NAT')) {
+      nationality = inmateDetail.profileInformation.filter(entry => entry.type === 'NAT')[0].resultValue
+    }
+
     const formatNumberOfChildren = (count: string) => {
       if (count === null) return 'Not entered'
       if (count === '0') return 'None'
@@ -227,7 +232,7 @@ export default class PersonalPageService {
         written: inmateDetail.writtenLanguage,
       },
       marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
-      nationality: prisonerData.nationality || 'Not entered',
+      nationality,
       numberOfChildren: formatNumberOfChildren(
         getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation),
       ),
@@ -458,6 +463,12 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataDomain(camelToSnakeCase(domain))
   }
 
+  // TODO switch this out
+  async getReferenceDataCodesFromProxy(clientToken: string, domain: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    return personIntegrationApiClient.getReferenceDataCodes(domain.toUpperCase())
+  }
+
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
@@ -512,6 +523,19 @@ export default class PersonalPageService {
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['cityOrTownOfBirth'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateNationality(clientToken: string, user: PrisonUser, prisonerNumber: string, nationality: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = personIntegrationApiClient.updateNationality(prisonerNumber, nationality)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['nationality'],
       prisonerNumber,
       user,
     })

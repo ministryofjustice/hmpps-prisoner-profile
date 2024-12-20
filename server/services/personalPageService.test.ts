@@ -54,6 +54,8 @@ describe('PersonalPageService', () => {
 
     personIntegrationApiClient = {
       updateBirthPlace: jest.fn(),
+      updateNationality: jest.fn(),
+      getReferenceDataCodes: jest.fn(),
     }
 
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>

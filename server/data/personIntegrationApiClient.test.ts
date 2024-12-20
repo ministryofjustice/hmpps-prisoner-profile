@@ -24,4 +24,11 @@ describe('personIntegrationApiClient', () => {
       await personIntegrationApiClient.updateBirthPlace('A1234AA', 'London')
     })
   })
+
+  describe('updateNationality', () => {
+    it('should update nationality', async () => {
+      fakePersonIntegrationApi.patch('/v1/core-person-record?prisonerNumber=A1234AA').reply(204)
+      await personIntegrationApiClient.updateNationality('A1234AA', 'BRIT')
+    })
+  })
 })
