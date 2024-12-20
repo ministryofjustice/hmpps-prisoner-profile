@@ -18,7 +18,7 @@ context('Edit height (metric)', () => {
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height`,
@@ -73,7 +73,7 @@ context('Edit height (Imperial)', () => {
       cy.setupBannerStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height/imperial`,

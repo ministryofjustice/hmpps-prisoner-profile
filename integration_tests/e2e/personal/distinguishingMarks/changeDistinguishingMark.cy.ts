@@ -27,7 +27,7 @@ context('Change distinguishing mark', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser] })
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
       cy.task('stubGetDistinguishingMark', tattooMock)
 
@@ -41,7 +41,7 @@ context('Change distinguishing mark', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
     })
 

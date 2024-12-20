@@ -1200,7 +1200,7 @@ describe('PersonalController', () => {
   describe('city or town of birth text input', () => {
     describe('edit', () => {
       const action = async (req: any, response: any) =>
-        controller.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).edit(req, response, () => {})
+        controller.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).edit(req, response, () => {})
 
       it('Renders the default edit page with the correct data from the prison API', async () => {
         const req = {
@@ -1259,7 +1259,7 @@ describe('PersonalController', () => {
     describe('submit', () => {
       let validRequest: any
       const action = async (req: any, response: any) =>
-        controller.cityOrPlaceOfBirthTextInput(cityOrTownOfBirthFieldData).submit(req, response, () => {})
+        controller.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
