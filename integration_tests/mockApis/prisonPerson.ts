@@ -173,7 +173,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}distinguishing-marks/mark/.*/photo`,
+        urlPattern: `${baseUrl}/distinguishing-marks/mark/.*/photo`,
       },
       response: {
         status: 200,
