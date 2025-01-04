@@ -18,7 +18,9 @@ import {
   formatLocation,
   formatName,
   objectToRadioOptions,
+  objectToSelectOptions,
   RadioOption,
+  SelectOption,
   userHasRoles,
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
@@ -26,6 +28,8 @@ import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { enablePrisonPerson } from '../../utils/featureToggles'
 import {
   CheckboxFieldData,
+  cityOrTownOfBirthFieldData,
+  countryOfBirthFieldData,
   foodAllergiesFieldData,
   heightFieldData,
   medicalDietFieldData,
@@ -52,6 +56,7 @@ import {
   referenceDataDomainToCheckboxFieldDataOptions,
   referenceDataDomainToCheckboxOptions,
 } from '../../utils/checkboxUtils'
+import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -390,8 +395,12 @@ export default class PersonalController {
     }
   }
 
-  cityOrTownOfBirthTextInput = (fieldData: TextFieldData) =>
-    this.textInput(fieldData, this.getCityOrTownOfBirth.bind(this), this.setCityOrTownOfBirth.bind(this))
+  cityOrTownOfBirthTextInput = () =>
+    this.textInput(
+      cityOrTownOfBirthFieldData,
+      this.getCityOrTownOfBirth.bind(this),
+      this.setCityOrTownOfBirth.bind(this),
+    )
 
   private async getCityOrTownOfBirth(req: Request): Promise<string> {
     return convertToTitleCase(req.middleware?.inmateDetail?.birthPlace)
@@ -528,6 +537,62 @@ export default class PersonalController {
         errors,
         hintText,
         options,
+        redirectAnchor,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  editRadioFieldsWithAutocomplete({
+    formTitle,
+    fieldData,
+    radioOptions,
+    autocompleteOptions,
+    autocompleteSelected,
+    autocompleteOptionTitle,
+    autocompleteOptionLabel,
+  }: {
+    formTitle: string
+    fieldData: RadioFieldData
+    radioOptions: RadioOption[]
+    autocompleteOptions: SelectOption[]
+    autocompleteSelected: boolean
+    autocompleteOptionTitle: string
+    autocompleteOptionLabel: string
+  }) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { pageTitle, hintText, redirectAnchor, auditPage } = fieldData
+      const { prisonerNumber } = req.params
+      const { prisonerData } = req.middleware
+      const { firstName, lastName, cellLocation } = prisonerData
+      const errors = req.flash('errors')
+
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+
+      await this.auditService.sendPageView({
+        user: res.locals.user,
+        prisonerNumber: prisonerData.prisonerNumber,
+        prisonId: prisonerData.prisonId,
+        correlationId: req.id,
+        page: auditPage,
+      })
+
+      res.render('pages/edit/radioFieldWithAutocomplete', {
+        pageTitle: `${pageTitle} - Prisoner personal details`,
+        formTitle,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerBannerName,
+        errors,
+        hintText,
+        radioOptions,
+        autocompleteOptions,
+        autocompleteSelected,
+        autocompleteOptionTitle,
+        autocompleteOptionLabel,
         redirectAnchor,
         miniBannerData: {
           prisonerName: prisonerBannerName,
@@ -1069,6 +1134,87 @@ export default class PersonalController {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${foodAllergiesFieldData.url}`)
+      },
+    }
+  }
+
+  countryOfBirth() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { inmateDetail, prisonerData, clientToken } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
+        const countryReferenceData = await this.personalPageService.getReferenceDataCodesFromProxy(
+          clientToken,
+          ProxyReferenceDataDomain.country,
+        )
+
+        const fieldValue =
+          requestBodyFlash?.autocompleteField ||
+          requestBodyFlash?.radioField ||
+          countryReferenceData.find(country => country.code === inmateDetail.birthCountryCode)?.code
+
+        const countriesAsRadioOptions = ['ENG', 'SCOT', 'WALES', 'NI']
+          .map(code => countryReferenceData.find(val => val.code === code))
+          .filter(Boolean)
+
+        const countriesAsAutocompleteOptions = countryReferenceData.filter(
+          val => !countriesAsRadioOptions.includes(val),
+        )
+
+        return this.editRadioFieldsWithAutocomplete({
+          formTitle: `What country was ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })} born in?`,
+          fieldData: countryOfBirthFieldData,
+          radioOptions: objectToRadioOptions(countriesAsRadioOptions, 'code', 'description', fieldValue),
+          autocompleteOptions: objectToSelectOptions(countriesAsAutocompleteOptions, 'code', 'description', fieldValue),
+          autocompleteSelected: ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(fieldValue),
+          autocompleteOptionTitle: 'A different country',
+          autocompleteOptionLabel: 'Country name',
+        })(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { pageTitle, fieldName, url, redirectAnchor } = countryOfBirthFieldData
+        const { prisonerNumber } = req.params
+        const { clientToken, inmateDetail } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const radioField = req.body.radioField || null
+        const autocompleteField = (radioField === 'OTHER' && req.body.autocompleteField) || null
+        const previousValue = inmateDetail.birthCountryCode
+
+        if (!autocompleteField && ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(radioField)) {
+          const validationText = radioField === 'OTHER' ? 'Enter country name' : 'This is not a valid country'
+          req.flash('errors', [{ href: '#autocomplete', text: validationText }])
+          req.flash('requestBody', JSON.stringify(req.body))
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        }
+
+        try {
+          await this.personalPageService.updateCountryOfBirth(
+            clientToken,
+            user,
+            prisonerNumber,
+            autocompleteField || radioField,
+          )
+
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditCountryOfBirth,
+              details: { fieldName, previous: previousValue, updated: radioField },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
   }

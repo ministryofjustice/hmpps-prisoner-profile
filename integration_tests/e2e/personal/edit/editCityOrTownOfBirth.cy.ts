@@ -17,14 +17,14 @@ context('Edit city or town of birth', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubPersonIntegrationUpdateBirthPlace', { prisonerNumber })
+      cy.task('stubPersonIntegrationUpdate', { prisonerNumber })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/city-or-town-of-birth`,
     editPageWithTitle: EditPage,
     editPageTitle: 'City or town of birth',
     successfulFlashMessage: 'City or town of birth updated',
-    validInputs: { textInputs: { cityOrTownOfBirth: 'SHEFFIELD' } },
-    invalidResponses: [],
+    validInputs: [{ textInputs: { cityOrTownOfBirth: 'SHEFFIELD' } }],
+    invalidInputs: [],
     redirectAnchor: 'personal-details',
   })
 })

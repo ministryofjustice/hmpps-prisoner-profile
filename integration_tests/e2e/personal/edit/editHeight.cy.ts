@@ -22,31 +22,31 @@ context('Edit height (metric)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height`,
-    validInputs: { textInputs: { editField: '125' } },
-    invalidResponses: [
+    validInputs: [{ textInputs: { editField: '125' } }],
+    invalidInputs: [
       {
         testDescription: 'Negative number',
-        inputs: { textInputs: { editField: '-10' } },
+        input: { textInputs: { editField: '-10' } },
         errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
       },
       {
         testDescription: 'Zero',
-        inputs: { textInputs: { editField: '0' } },
+        input: { textInputs: { editField: '0' } },
         errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
       },
       {
         testDescription: 'Non-number',
-        inputs: { textInputs: { editField: 'Example' } },
+        input: { textInputs: { editField: 'Example' } },
         errorMessages: ["Enter this person's height"],
       },
       {
         testDescription: 'Lower bound',
-        inputs: { textInputs: { editField: '49' } },
+        input: { textInputs: { editField: '49' } },
         errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
       },
       {
         testDescription: 'Upper bound',
-        inputs: { textInputs: { editField: '281' } },
+        input: { textInputs: { editField: '281' } },
         errorMessages: ['Height must be between 50 centimetres and 280 centimetres'],
       },
     ],
@@ -77,16 +77,16 @@ context('Edit height (Imperial)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height/imperial`,
-    validInputs: { textInputs: { feet: '5', inches: '3' } },
-    invalidResponses: [
+    validInputs: [{ textInputs: { feet: '5', inches: '3' } }],
+    invalidInputs: [
       {
         testDescription: 'Feet: Empty',
-        inputs: { textInputs: { feet: '', inches: '5' } },
+        input: { textInputs: { feet: '', inches: '5' } },
         errorMessages: ['Feet must be between 1 and 9. Inches must be between 0 and 11'],
       },
       {
         testDescription: 'Inches: Negative number',
-        inputs: { textInputs: { feet: '5', inches: '-1' } },
+        input: { textInputs: { feet: '5', inches: '-1' } },
         errorMessages: ['Feet must be between 1 and 9. Inches must be between 0 and 11'],
       },
     ],

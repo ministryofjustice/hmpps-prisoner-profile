@@ -118,6 +118,14 @@ export const cityOrTownOfBirthFieldData: TextFieldData = {
   inputClasses: 'govuk-!-width-one-third',
 }
 
+export const countryOfBirthFieldData: RadioFieldData = {
+  pageTitle: 'Country of birth',
+  fieldName: 'countryOfBirth',
+  auditPage: Page.EditCountryOfBirth,
+  url: 'country-of-birth',
+  redirectAnchor: 'personal-details',
+}
+
 export const foodAllergiesFieldData: CheckboxFieldData = {
   fieldName: 'foodAllergies',
   auditPage: Page.EditFoodAllergies,

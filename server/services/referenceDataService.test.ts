@@ -5,12 +5,13 @@ import {
   ActiveCountryReferenceDataCodesMock,
   CountryReferenceDataCodesMock,
 } from '../data/localMockData/personIntegrationReferenceDataMock'
+import { ProxyReferenceDataDomain } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 jest.mock('../data/referenceDataStore/referenceDataStore')
 jest.mock('../data/personIntegrationApiClient')
 
 describe('referenceDataService', () => {
-  const domain = 'COUNTRY'
+  const domain = ProxyReferenceDataDomain.country
   const code = 'ENG'
   const systemToken = 'a-system-token'
   const referenceDataStore = new ReferenceDataStore(null) as jest.Mocked<ReferenceDataStore>
