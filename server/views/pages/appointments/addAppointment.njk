@@ -66,7 +66,12 @@
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">Add an appointment</h1>
+                {# Editing a video link booking appointment will have a pre-existing appointmentId present #}
+                {% if appointmentId %}
+                    <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">Change video link booking</h1>
+                 {% else %}
+                    <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">Add an appointment</h1>
+                 {% endif %}
             </div>
         </div>
 
@@ -75,6 +80,7 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <form method="post" novalidate="novalidate" autocomplete="off" class="add-appointment-form">
+                    {# When editing a video link booking include the appointmentId in the hidden form attributes #}
                     {% if appointmentId %}
                         <span class="govuk-visually-hidden" id="appointment-id">{{ appointmentId }}</span>
                     {% endif %}
@@ -82,6 +88,8 @@
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
                     <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
+
+                    {# When editing a video link booking you cannot change the type of appointment - display only #}
                     {% if appointmentId %}
                         <input type="hidden" id="appointmentType" name="appointmentType" value="{{ formValues.appointmentType }}" />
                         {{ govukSummaryList({
