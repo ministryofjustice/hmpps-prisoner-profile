@@ -18,7 +18,7 @@ context('Edit medical diet', () => {
       cy.setupComponentsData()
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPrisonPersonUpdateHealth', { prisonerNumber })
       cy.task('stubGetReferenceDataDomain', mockFoodAllergiesReferenceDataDomain)
@@ -27,9 +27,11 @@ context('Edit medical diet', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Does John Saunders have any food allergies?',
     successfulFlashMessage: 'Food allergies updated',
-    validInputs: {
-      checkboxInputs: { foodAllergies: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_GLUTEN'] },
-    },
+    validInputs: [
+      {
+        checkboxInputs: { foodAllergies: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_GLUTEN'] },
+      },
+    ],
     redirectAnchor: 'personal-details',
   })
 })

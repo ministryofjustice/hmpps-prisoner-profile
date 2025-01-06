@@ -22,7 +22,7 @@ context('Edit build', () => {
       cy.setupComponentsData()
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.setupPersonRefDataStubs({
         domainsResp: referenceDataDomainsMock,
@@ -35,7 +35,7 @@ context('Edit build', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Build',
     successfulFlashMessage: 'Build updated',
-    validInputs: { radioInputs: { radioField: 'BUILD_PROP' } },
+    validInputs: [{ radioInputs: { radioField: 'BUILD_PROP' } }],
     redirectAnchor: 'appearance',
   })
 })

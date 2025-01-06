@@ -22,7 +22,7 @@ context('Edit face shape', () => {
       cy.setupComponentsData()
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.setupPersonRefDataStubs({
         domainsResp: referenceDataDomainsMock,
@@ -35,7 +35,7 @@ context('Edit face shape', () => {
     editPageWithTitle: EditPage,
     editPageTitle: 'Face shape',
     successfulFlashMessage: 'Face shape updated',
-    validInputs: { radioInputs: { radioField: 'FACE_ANGULAR' } },
+    validInputs: [{ radioInputs: { radioField: 'FACE_ANGULAR' } }],
     redirectAnchor: 'appearance',
   })
 })

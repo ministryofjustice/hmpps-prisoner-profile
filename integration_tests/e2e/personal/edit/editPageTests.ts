@@ -4,10 +4,11 @@ import EditPage from '../../../pages/editPages/editPage'
 import NotFoundPage from '../../../pages/notFoundPage'
 import Page from '../../../pages/page'
 
-export interface EditPageInputs {
+export interface EditPageInput {
   textInputs?: { [key: string]: string }
   radioInputs?: { [key: string]: string }
   checkboxInputs?: { [key: string]: (string | { value: string; subValues: string[] })[] }
+  autocompleteInput?: { value: string }
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
@@ -20,10 +21,10 @@ export function editPageTests<TPage extends EditPage>(options: {
   editPageWithTitle?: new (title: string) => TPage
   editPageTitle?: string
   successfulFlashMessage: string
-  validInputs: EditPageInputs
-  invalidResponses?: {
+  validInputs: EditPageInput[]
+  invalidInputs?: {
     testDescription: string
-    inputs: EditPageInputs
+    input: EditPageInput
     errorMessages: string[]
   }[]
   redirectAnchor: string
@@ -38,16 +39,17 @@ export function editPageTests<TPage extends EditPage>(options: {
     editPageWithTitle,
     editPageTitle,
     successfulFlashMessage,
-    invalidResponses,
+    invalidInputs,
     redirectAnchor,
   } = options
 
   let page: TPage
 
-  const fillWithInputs = (inputs: EditPageInputs) => {
-    if (inputs.textInputs) page.fillInTextFields(inputs.textInputs)
-    if (inputs.radioInputs) page.selectRadios(inputs.radioInputs)
-    if (inputs.checkboxInputs) page.selectCheckboxes(inputs.checkboxInputs)
+  const fillWithInputs = (input: EditPageInput) => {
+    if (input.textInputs) page.fillInTextFields(input.textInputs)
+    if (input.radioInputs) page.selectRadios(input.radioInputs)
+    if (input.checkboxInputs) page.selectCheckboxes(input.checkboxInputs)
+    if (input.autocompleteInput) page.fillInAutocompleteField(input.autocompleteInput)
   }
 
   context('Edit page tests', () => {
@@ -56,11 +58,10 @@ export function editPageTests<TPage extends EditPage>(options: {
     })
 
     /* 
-    Permissions tests
-    For now we just do permissions based on the role so this can be shared
-    across multiple tests easily, it might need its own option in the future
-  */
-
+      Permissions tests
+      For now we just do permissions based on the role so this can be shared
+      across multiple tests easily, it might need its own option in the future
+    */
     context('Permissions', () => {
       it('Doesnt let the user access if they dont have the permissions', () => {
         cy.setupUserAuth({ roles: [Role.PrisonUser] })
@@ -95,25 +96,27 @@ export function editPageTests<TPage extends EditPage>(options: {
           page.miniBanner().name().should('contain.text', prisonerNumber)
         })
 
-        it('Can submit a valid response', () => {
-          page = getPage()
-          fillWithInputs(validInputs)
-          page.submit()
+        validInputs.forEach((validInput, index) => {
+          it(`Can submit a valid input (${index + 1} of ${validInputs.length})`, () => {
+            page = getPage()
+            fillWithInputs(validInput)
+            page.submit()
 
-          cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
-          cy.location('hash').should('eq', `#${redirectAnchor}`)
+            cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
+            cy.location('hash').should('eq', `#${redirectAnchor}`)
 
-          page.flashMessage().should('include.text', successfulFlashMessage)
+            page.flashMessage().should('include.text', successfulFlashMessage)
+          })
         })
       })
 
-      if (hasLength(invalidResponses)) {
+      if (hasLength(invalidInputs)) {
         context('It handles invalid responses', () => {
-          invalidResponses.forEach(({ testDescription, inputs, errorMessages }) => {
+          invalidInputs.forEach(({ testDescription, input, errorMessages }) => {
             it(`Handles invalid input: ${testDescription}`, () => {
               cy.signIn({ redirectPath: editUrl })
               page = getPage()
-              fillWithInputs(inputs)
+              fillWithInputs(input)
               cy.url().then(url => {
                 cy.intercept('POST', url, req => {
                   req.headers.Referrer = url
@@ -124,8 +127,8 @@ export function editPageTests<TPage extends EditPage>(options: {
                 })
 
                 // Ensure inputted values are persisted across errors
-                if (inputs.textInputs) {
-                  Object.entries(inputs.textInputs).forEach(([key, value]) => {
+                if (input.textInputs) {
+                  Object.entries(input.textInputs).forEach(([key, value]) => {
                     cy.get(`input[name='${key}']`).should('have.value', value)
                   })
                 }

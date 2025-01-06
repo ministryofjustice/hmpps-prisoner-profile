@@ -17,32 +17,32 @@ context('Edit shoe size', () => {
       cy.setupComponentsData()
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/shoe-size`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Shoe size',
     successfulFlashMessage: 'Shoe size updated',
-    validInputs: { textInputs: { shoeSize: '10.0' } },
-    invalidResponses: [
+    validInputs: [{ textInputs: { shoeSize: '10.0' } }],
+    invalidInputs: [
       {
-        inputs: { textInputs: { shoeSize: '0' } },
+        input: { textInputs: { shoeSize: '0' } },
         errorMessages: ['Enter a whole or half number between 1 and 25'],
         testDescription: '0 input',
       },
       {
-        inputs: { textInputs: { shoeSize: '10.34' } },
+        input: { textInputs: { shoeSize: '10.34' } },
         errorMessages: ['Enter a whole or half number between 1 and 25'],
         testDescription: 'Invalid decimal',
       },
       {
-        inputs: { textInputs: { shoeSize: '123' } },
+        input: { textInputs: { shoeSize: '123' } },
         errorMessages: ['Enter a whole or half number between 1 and 25'],
         testDescription: 'Number too high',
       },
       {
-        inputs: { textInputs: { shoeSize: 'Example' } },
+        input: { textInputs: { shoeSize: 'Example' } },
         errorMessages: ["Enter this person's shoe size"],
         testDescription: 'Input with letters',
       },

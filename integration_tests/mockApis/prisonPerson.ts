@@ -64,7 +64,7 @@ const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   },
 })
 
-const baseUrl = '/prisonPerson/'
+const baseUrl = '/prisonPerson'
 
 export default {
   stubPrisonPerson: ({
@@ -75,7 +75,7 @@ export default {
     overrides: Partial<PrisonPerson>
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}prisoners/${prisonerNumber}`,
+      path: `${baseUrl}/prisoners/${prisonerNumber}`,
       body: {
         ...mockPrisonPerson(prisonerNumber),
         ...overrides,
@@ -91,7 +91,7 @@ export default {
     overrides: Partial<PrisonPersonPhysicalAttributes>
   }) =>
     stubPatchWithResponse<PrisonPersonPhysicalAttributes>({
-      path: `${baseUrl}prisoners/${prisonerNumber}/physical-attributes`,
+      path: `${baseUrl}/prisoners/${prisonerNumber}/physical-attributes`,
       responseBody: {
         ...mockPrisonPerson(prisonerNumber).physicalAttributes,
         ...overrides,
@@ -106,7 +106,7 @@ export default {
     overrides: Partial<PrisonPersonHealth>
   }) =>
     stubPatchWithResponse<PrisonPersonHealth>({
-      path: `${baseUrl}prisoners/${prisonerNumber}/health`,
+      path: `${baseUrl}/prisoners/${prisonerNumber}/health`,
       responseBody: {
         ...mockPrisonPerson(prisonerNumber).health,
         ...overrides,
@@ -115,7 +115,7 @@ export default {
 
   stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
     stubGetWithBody({
-      path: `${baseUrl}distinguishing-marks/prisoner/${prisonerNumber}`,
+      path: `${baseUrl}/distinguishing-marks/prisoner/${prisonerNumber}`,
       body: [distinguishingMarkMock],
     }),
 
@@ -125,7 +125,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `${baseUrl}photographs/${photo.id}/file`,
+        urlPattern: `${baseUrl}/photographs/${photo.id}/file`,
       },
       response: {
         status: 200,
@@ -141,7 +141,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}distinguishing-marks/mark`,
+        urlPattern: `${baseUrl}/distinguishing-marks/mark`,
       },
       response: {
         status: 200,
@@ -157,7 +157,7 @@ export default {
     return stubFor({
       request: {
         method: 'PATCH',
-        urlPattern: `${baseUrl}distinguishing-marks/mark/.*`,
+        urlPattern: `${baseUrl}/distinguishing-marks/mark/.*`,
       },
       response: {
         status: 200,
@@ -173,7 +173,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: `${baseUrl}distinguishing-marks/mark/.*/photo`,
+        urlPattern: `${baseUrl}/distinguishing-marks/mark/.*/photo`,
       },
       response: {
         status: 200,
@@ -187,32 +187,32 @@ export default {
 
   stubGetDistinguishingMark: (markResp: PrisonPersonDistinguishingMark) =>
     stubGetWithBody({
-      path: `${baseUrl}distinguishing-marks/mark/.*`,
+      path: `${baseUrl}/distinguishing-marks/mark/.*`,
       body: markResp ?? distinguishingMarkMock,
     }),
 
   // Reference data
   stubGetReferenceDataDomains: (resp: ReferenceDataDomain[]) =>
     stubGetWithBody({
-      path: `${baseUrl}reference-data/domains\\?includeInactive=false`,
+      path: `${baseUrl}/reference-data/domains\\?includeInactive=false`,
       body: resp,
     }),
 
   stubGetReferenceDataDomain: (resp: ReferenceDataDomain) =>
     stubGetWithBody({
-      path: `${baseUrl}reference-data/domains/[^/]*`,
+      path: `${baseUrl}/reference-data/domains/[^/]*`,
       body: resp,
     }),
 
   stubGetReferenceDataCodes: (resp: ReferenceDataCode[]) =>
     stubGetWithBody({
-      path: `${baseUrl}reference-data/domains/[^/]*/codes\\?includeInactive=false`,
+      path: `${baseUrl}/reference-data/domains/[^/]*/codes\\?includeInactive=false`,
       body: resp,
     }),
 
   stubGetReferenceDataCode: (resp: ReferenceDataCode) =>
     stubGetWithBody({
-      path: `${baseUrl}reference-data/domains/[^/]*/codes/[^/]*`,
+      path: `${baseUrl}/reference-data/domains/[^/]*/codes/[^/]*`,
       body: resp,
     }),
 }

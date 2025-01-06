@@ -31,7 +31,7 @@ context('Edit eye colour - both eyes the same colour', () => {
         },
       })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.setupPersonRefDataStubs({
         domainsResp: referenceDataDomainsMock,
@@ -44,7 +44,7 @@ context('Edit eye colour - both eyes the same colour', () => {
     editPageWithTitle: EditEyeColour,
     editPageTitle: 'Eye colour',
     successfulFlashMessage: 'Eye colour updated',
-    validInputs: { radioInputs: { eyeColour: 'EYE_BLUE' } },
+    validInputs: [{ radioInputs: { eyeColour: 'EYE_BLUE' } }],
     redirectAnchor: 'appearance',
   })
 })
@@ -72,7 +72,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
         },
       })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.setupPersonRefDataStubs({
         domainsResp: referenceDataDomainsMock,
@@ -85,7 +85,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
     editPageWithTitle: EditEyeColour,
     editPageTitle: 'Left and right eye colour',
     successfulFlashMessage: 'Eye colour updated',
-    validInputs: { radioInputs: { leftEyeColour: 'EYE_BROWN', rightEyeColour: 'EYE_HAZEL' } },
+    validInputs: [{ radioInputs: { leftEyeColour: 'EYE_BROWN', rightEyeColour: 'EYE_HAZEL' } }],
     redirectAnchor: 'appearance',
   })
 })
@@ -109,7 +109,7 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
       },
     })
     cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-    cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+    cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     cy.task('stubPersonalCareNeeds')
     cy.setupPersonRefDataStubs({
       domainsResp: referenceDataDomainsMock,

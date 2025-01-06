@@ -26,6 +26,14 @@ export default class EditPage extends Page {
     })
   }
 
+  fillInAutocompleteField = ({ value }: { value: string }) => {
+    cy.get('.autocomplete__input').clear()
+    if (value) {
+      // The trailing {esc} is to explicitly close the autocomplete dropdown allowing testing invalid inputs
+      cy.get('.autocomplete__input').type(`${value}{esc}`)
+    }
+  }
+
   selectCheckboxes = (fields: { [key: string]: CheckboxValue[] }) => {
     Object.entries(fields).forEach(([name, values]) => {
       values.forEach(value => {
@@ -42,6 +50,6 @@ export default class EditPage extends Page {
   }
 
   submit = () => {
-    cy.get('form').submit()
+    cy.get('button[type="submit"]').click()
   }
 }

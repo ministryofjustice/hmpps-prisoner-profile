@@ -1,13 +1,13 @@
 import { startOfYear } from 'date-fns'
-import { Role } from '../../server/data/enums/role'
-import { mockAddresses } from '../../server/data/localMockData/addresses'
-import Page from '../pages/page'
-import PersonalPage from '../pages/personalPage'
-import { permissionsTests } from './permissionsTests'
-import { formatDate } from '../../server/utils/dateHelpers'
-import NotFoundPage from '../pages/notFoundPage'
-import { calculateAge } from '../../server/utils/utils'
-import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../server/data/localMockData/personalCareNeedsMock'
+import { Role } from '../../../server/data/enums/role'
+import { mockAddresses } from '../../../server/data/localMockData/addresses'
+import Page from '../../pages/page'
+import PersonalPage from '../../pages/personalPage'
+import { permissionsTests } from '../permissionsTests'
+import { formatDate } from '../../../server/utils/dateHelpers'
+import NotFoundPage from '../../pages/notFoundPage'
+import { calculateAge } from '../../../server/utils/utils'
+import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -19,7 +19,7 @@ context('When signed in', () => {
 
   context('Permissions', () => {
     const visitPage = prisonerDataOverrides => {
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId, prisonerDataOverrides })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides })
       cy.task('stubPersonalCareNeeds')
 
       visitPersonalDetailsPage({ failOnStatusCode: false })
@@ -78,7 +78,8 @@ context('When signed in', () => {
     })
 
     it('Hides the fields within personal details', () => {
-      cy.getDataQa('hidden-place-of-birth-key').should('exist')
+      cy.getDataQa('hidden-city-or-town-of-birth-key').should('exist')
+      cy.getDataQa('hidden-country-of-birth-key').should('exist')
       cy.getDataQa('hidden-religion-or-belief-key').should('exist')
       cy.getDataQa('hidden-sexual-orientation-key').should('exist')
       cy.getDataQa('hidden-marriage-or-civil-partnership-key').should('exist')
@@ -103,7 +104,7 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       visitPersonalDetailsPage()
     })
@@ -128,6 +129,8 @@ context('When signed in', () => {
         page.personalDetails().aliases().row(2).dateOfBirth().should('have.text', '17/06/1983')
         page.personalDetails().preferredName().should('have.text', 'Working Name')
         page.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
+        page.personalDetails().cityOrTownOfBirth().should('have.text', 'La La Land')
+        page.personalDetails().countryOfBirth().should('have.text', 'England')
         const expectedAge = calculateAge('1990-10-12')
         page
           .personalDetails()
@@ -389,7 +392,7 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     })
 
     context('Prisoner has current care needs and no past care needs', () => {
@@ -483,7 +486,7 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth()
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
 
@@ -522,7 +525,7 @@ context('When signed in', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.GlobalSearch] })
       cy.setupComponentsData()
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
 
@@ -572,7 +575,7 @@ context('When signed in', () => {
           },
         ],
       })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
