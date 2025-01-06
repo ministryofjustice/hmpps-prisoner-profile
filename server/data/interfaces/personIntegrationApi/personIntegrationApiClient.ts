@@ -11,8 +11,15 @@ export interface ReferenceDataCodeDto {
   isActive: boolean
 }
 
+// eslint-disable-next-line no-shadow
+export enum ProxyReferenceDataDomain {
+  country = 'COUNTRY',
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
-  getReferenceDataCodes(domain: string): Promise<ReferenceDataCodeDto[]>
+  updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void>
+
+  getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]>
 }

@@ -44,7 +44,10 @@ import {
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
-import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  PersonIntegrationApiClient,
+  ProxyReferenceDataDomain,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import ReferenceDataService from './referenceDataService'
 
@@ -127,7 +130,8 @@ export default class PersonalPageService {
     const addresses: Addresses = this.addresses(addressList)
     const countryOfBirth =
       inmateDetail.birthCountryCode &&
-      (await this.referenceDataService.getReferenceData('COUNTRY', inmateDetail.birthCountryCode, token)).description
+      (await this.getReferenceDataFromProxy(token, ProxyReferenceDataDomain.country, inmateDetail.birthCountryCode))
+        .description
 
     return {
       personalDetails: this.personalDetails(
@@ -467,6 +471,14 @@ export default class PersonalPageService {
     return prisonPersonApiClient.getReferenceDataDomain(camelToSnakeCase(domain))
   }
 
+  async getReferenceDataCodesFromProxy(clientToken: string, domain: ProxyReferenceDataDomain) {
+    return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
+  }
+
+  async getReferenceDataFromProxy(clientToken: string, domain: ProxyReferenceDataDomain, code: string) {
+    return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
+  }
+
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
@@ -521,6 +533,19 @@ export default class PersonalPageService {
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['cityOrTownOfBirth'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateCountryOfBirth(clientToken: string, user: PrisonUser, prisonerNumber: string, countryOfBirth: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = personIntegrationApiClient.updateCountryOfBirth(prisonerNumber, countryOfBirth)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['countryOfBirth'],
       prisonerNumber,
       user,
     })

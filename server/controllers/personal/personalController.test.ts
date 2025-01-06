@@ -33,6 +33,7 @@ import {
   mockFoodAllergiesReferenceDataDomain,
   mockMedicalDietReferenceDataDomain,
 } from '../../data/localMockData/prisonPersonApi/referenceDataMocks'
+import { ActiveCountryReferenceDataCodesMock } from '../../data/localMockData/personIntegrationReferenceDataMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -125,6 +126,10 @@ describe('PersonalController', () => {
     personalPageService.getReferenceDataDomain = jest.fn(async (_, domain) => {
       if (domain === 'medicalDiet') return mockMedicalDietReferenceDataDomain
       if (domain === 'foodAllergy') return mockFoodAllergiesReferenceDataDomain
+      return null
+    })
+    personalPageService.getReferenceDataCodesFromProxy = jest.fn(async (_, domain) => {
+      if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
       return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
@@ -1197,10 +1202,10 @@ describe('PersonalController', () => {
     })
   })
 
-  describe('city or town of birth text input', () => {
+  describe('city or town of birth', () => {
     describe('edit', () => {
       const action = async (req: any, response: any) =>
-        controller.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).edit(req, response, () => {})
+        controller.cityOrTownOfBirthTextInput().edit(req, response, () => {})
 
       it('Renders the default edit page with the correct data from the prison API', async () => {
         const req = {
@@ -1259,7 +1264,7 @@ describe('PersonalController', () => {
     describe('submit', () => {
       let validRequest: any
       const action = async (req: any, response: any) =>
-        controller.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).submit(req, response, () => {})
+        controller.cityOrTownOfBirthTextInput().submit(req, response, () => {})
 
       beforeEach(() => {
         validRequest = {
@@ -1299,6 +1304,165 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/city-or-town-of-birth')
+      })
+    })
+  })
+
+  describe('country of birth', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) => controller.countryOfBirth().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioFieldWithAutocomplete', {
+          pageTitle: 'Country of birth - Prisoner personal details',
+          formTitle: 'What country was First Last born in?',
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          radioOptions: [{ value: 'ENG', text: 'England' }],
+          autocompleteOptions: [{ value: 'FRA', text: 'France' }],
+          autocompleteOptionTitle: 'A different country',
+          autocompleteOptionLabel: 'Country name',
+          autocompleteSelected: false,
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+          redirectAnchor: 'personal-details',
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the radio buttons from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'ENG' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            autocompleteSelected: false,
+            radioOptions: [{ checked: true, text: 'England', value: 'ENG' }],
+          }),
+        )
+      })
+
+      it('Populates the autocomplete from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ autocompleteField: 'FRA' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            autocompleteOptions: [{ selected: true, text: 'France', value: 'FRA' }],
+          }),
+        )
+      })
+
+      it('Selects the autocomplete radio when the flash indicates an empty autocomplete field', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({ autocompleteSelected: true }),
+        )
+      })
+
+      it('Selects the autocomplete radio when the flash indicates an invalid autocomplete field', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER__VALIDATION_ERROR' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({ autocompleteSelected: true }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.countryOfBirth().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'ABC123' },
+          body: { radioField: 'ENG' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it.each([
+        { body: { radioField: 'ENG' }, updateRequest: 'ENG' },
+        { body: { radioField: 'OTHER', autocompleteField: 'FRA' }, updateRequest: 'FRA' },
+      ])('Valid request: %s', async ({ body, updateRequest }) => {
+        const request = { ...validRequest, body }
+        await action(request, res)
+        expect(personalPageService.updateCountryOfBirth).toHaveBeenCalledWith(
+          expect.anything(),
+          prisonUserMock,
+          expect.anything(),
+          updateRequest,
+        )
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Country of birth updated',
+          type: FlashMessageType.success,
+          fieldName: 'countryOfBirth',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateCountryOfBirth = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/country-of-birth')
       })
     })
   })

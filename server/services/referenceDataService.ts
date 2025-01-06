@@ -3,6 +3,7 @@ import { RestClientBuilder } from '../data'
 import ReferenceDataStore from '../data/referenceDataStore/referenceDataStore'
 import {
   PersonIntegrationApiClient,
+  ProxyReferenceDataDomain,
   ReferenceDataCodeDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
@@ -17,14 +18,14 @@ export default class ReferenceDataService {
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
   ) {}
 
-  async getReferenceData(domain: string, code: string, token: string): Promise<ReferenceDataCodeDto> {
+  async getReferenceData(domain: ProxyReferenceDataDomain, code: string, token: string): Promise<ReferenceDataCodeDto> {
     const cachedCode = (await this.referenceDataStore.getReferenceData(domain)).find(c => c.code === code)
     if (cachedCode) return cachedCode
 
     return (await this.retrieveAndCacheReferenceDataCodes(domain, token)).find(c => c.code === code)
   }
 
-  async getActiveReferenceDataCodes(domain: string, token: string): Promise<ReferenceDataCodeDto[]> {
+  async getActiveReferenceDataCodes(domain: ProxyReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
     const cachedReferenceDataCodes = await this.referenceDataStore.getReferenceData(domain)
 
     const allReferenceDataCodes = cachedReferenceDataCodes.length
@@ -34,7 +35,10 @@ export default class ReferenceDataService {
     return allReferenceDataCodes.filter(c => c.isActive)
   }
 
-  private async retrieveAndCacheReferenceDataCodes(domain: string, token: string): Promise<ReferenceDataCodeDto[]> {
+  private async retrieveAndCacheReferenceDataCodes(
+    domain: ProxyReferenceDataDomain,
+    token: string,
+  ): Promise<ReferenceDataCodeDto[]> {
     logger.info(`Retrieving and caching reference data codes for domain: ${domain}`)
     const referenceData = await this.personIntegrationApiClientBuilder(token).getReferenceDataCodes(domain)
     try {

@@ -13,7 +13,6 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
   buildFieldData,
-  cityOrTownOfBirthFieldData,
   faceShapeFieldData,
   facialHairFieldData,
   hairFieldData,
@@ -338,11 +337,23 @@ export default function personalRouter(services: Services): Router {
     path: 'edit/city-or-town-of-birth',
     edit: {
       audit: Page.EditCityOrTownOfBirth,
-      method: personalController.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).edit,
+      method: personalController.cityOrTownOfBirthTextInput().edit,
     },
     submit: {
       audit: Page.PostEditCityOrTownOfBirth,
-      method: personalController.cityOrTownOfBirthTextInput(cityOrTownOfBirthFieldData).submit,
+      method: personalController.cityOrTownOfBirthTextInput().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/country-of-birth',
+    edit: {
+      audit: Page.EditCountryOfBirth,
+      method: personalController.countryOfBirth().edit,
+    },
+    submit: {
+      audit: Page.PostEditCountryOfBirth,
+      method: personalController.countryOfBirth().submit,
     },
   })
 

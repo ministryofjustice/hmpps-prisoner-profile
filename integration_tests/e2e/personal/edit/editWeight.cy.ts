@@ -22,21 +22,21 @@ context('Edit height (metric)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/weight`,
-    validInputs: { textInputs: { kilograms: '65' } },
-    invalidResponses: [
+    validInputs: [{ textInputs: { kilograms: '65' } }],
+    invalidInputs: [
       {
         testDescription: 'Negative number',
-        inputs: { textInputs: { kilograms: '-10' } },
+        input: { textInputs: { kilograms: '-10' } },
         errorMessages: ['Weight must be between 12 kilograms and 640 kilograms'],
       },
       {
         testDescription: 'Zero',
-        inputs: { textInputs: { kilograms: '0' } },
+        input: { textInputs: { kilograms: '0' } },
         errorMessages: ['Weight must be between 12 kilograms and 640 kilograms'],
       },
       {
         testDescription: 'Invalid',
-        inputs: { textInputs: { kilograms: 'Example' } },
+        input: { textInputs: { kilograms: 'Example' } },
         errorMessages: ["Enter this person's weight"],
       },
     ],
@@ -67,16 +67,16 @@ context('Edit weight (Imperial)', () => {
       cy.task('stubPersonalCareNeeds')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/weight/imperial`,
-    validInputs: { textInputs: { stone: '5', pounds: '3' } },
-    invalidResponses: [
+    validInputs: [{ textInputs: { stone: '5', pounds: '3' } }],
+    invalidInputs: [
       {
         testDescription: 'Invalid',
-        inputs: { textInputs: { stone: 'Example', pounds: '5' } },
+        input: { textInputs: { stone: 'Example', pounds: '5' } },
         errorMessages: ["Enter this person's weight"],
       },
       {
         testDescription: 'Invalid',
-        inputs: { textInputs: { stone: '5', pounds: 'Example' } },
+        input: { textInputs: { stone: '5', pounds: 'Example' } },
         errorMessages: ["Enter this person's weight"],
       },
     ],

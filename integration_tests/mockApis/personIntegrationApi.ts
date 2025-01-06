@@ -16,7 +16,7 @@ export default {
       body: referenceData,
     }),
 
-  stubPersonIntegrationUpdateBirthPlace: () =>
+  stubPersonIntegrationUpdate: () =>
     stubPatchWithResponse<void>({
       path: `${baseUrl}/v1/core-person-record\\?prisonerNumber=.*`,
       responseBody: null,
