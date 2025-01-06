@@ -18,7 +18,7 @@ context('Edit medical diet', () => {
       cy.setupComponentsData()
       cy.task('stubPrisonPerson', { prisonerNumber })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPrisonPersonUpdateHealth', { prisonerNumber })
       cy.task('stubGetReferenceDataDomain', mockMedicalDietReferenceDataDomain)

@@ -3,6 +3,7 @@ import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/Histo
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
+import { CountryReferenceDataCodesMock } from '../../server/data/localMockData/personIntegrationReferenceDataMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -141,7 +142,7 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
   cy.task('stubUserCaseLoads', options.caseLoads)
 })
 
-Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
+Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubPrisonerDetail', prisonerNumber)
@@ -159,6 +160,10 @@ Cypress.Commands.add('setupPersonalPageSubs', ({ bookingId, prisonerNumber, pris
   cy.task('stubBeliefHistory')
   cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber })
   cy.task('stubPrisonPersonGetImage', { prisonerNumber })
+  cy.task('stubPersonIntegrationGetReferenceData', {
+    domain: 'COUNTRY',
+    referenceData: CountryReferenceDataCodesMock,
+  })
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {

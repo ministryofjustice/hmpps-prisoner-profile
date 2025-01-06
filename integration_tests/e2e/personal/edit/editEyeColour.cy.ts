@@ -31,7 +31,7 @@ context('Edit eye colour - both eyes the same colour', () => {
         },
       })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.setupPersonRefDataStubs({
         domainsResp: referenceDataDomainsMock,
@@ -72,7 +72,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
         },
       })
       cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-      cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+      cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.setupPersonRefDataStubs({
         domainsResp: referenceDataDomainsMock,
@@ -109,7 +109,7 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
       },
     })
     cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
-    cy.setupPersonalPageSubs({ prisonerNumber, bookingId })
+    cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     cy.task('stubPersonalCareNeeds')
     cy.setupPersonRefDataStubs({
       domainsResp: referenceDataDomainsMock,

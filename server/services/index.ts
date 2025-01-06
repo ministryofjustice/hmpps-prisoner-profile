@@ -37,6 +37,7 @@ import PrisonPersonService from './prisonPersonService'
 import MetricsService from './metrics/metricsService'
 import DistinguishingMarksService from './distinguishingMarksService'
 import CsipService from './csipService'
+import ReferenceDataService from './referenceDataService'
 
 export const services = () => {
   const {
@@ -62,6 +63,7 @@ export const services = () => {
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     prisonRegisterStore,
+    referenceDataStore,
     featureToggleStore,
     telemetryClient,
   } = dataAccess
@@ -84,11 +86,13 @@ export const services = () => {
   const alertsService = new AlertsService(alertsApiClientBuilder)
   const offencesPageService = new OffencesPageService(prisonApiClientBuilder)
   const offencesService = new OffencesService(prisonApiClientBuilder, calculateReleaseDatesApiClientBuilder)
+  const referenceDataService = new ReferenceDataService(referenceDataStore, personIntegrationApiClientBuilder)
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
     prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
+    referenceDataService,
     metricsService,
   )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
