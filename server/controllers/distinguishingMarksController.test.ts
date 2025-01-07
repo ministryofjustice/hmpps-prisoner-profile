@@ -42,7 +42,7 @@ describe('Distinguishing Marks Controller', () => {
       controller.newDistinguishingMark(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
 
     it.each(Object.keys(bodyPartMap))('should add a valid selection (%s)', bodyPart => {
@@ -82,6 +82,7 @@ describe('Distinguishing Marks Controller', () => {
           params: { prisonerNumber: 'A12345', markType: 'tattoo' },
           body: { bodyPart },
           middleware: { clientToken: 'token' },
+          flash: jest.fn(),
         } as undefined as Request
 
         jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
@@ -94,7 +95,7 @@ describe('Distinguishing Marks Controller', () => {
           'tattoo',
           bodyPartMap[bodyPart],
         )
-        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#appearance`)
+        expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#marks`)
       },
     )
 
@@ -103,6 +104,7 @@ describe('Distinguishing Marks Controller', () => {
         params: { prisonerNumber: 'A12345', markType },
         body: { bodyPart: 'left-leg' },
         middleware: { clientToken: 'token' },
+        flash: jest.fn(),
       } as undefined as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
@@ -115,7 +117,7 @@ describe('Distinguishing Marks Controller', () => {
         markType,
         'leftLeg',
       )
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#appearance`)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/personal#marks`)
     })
 
     it('redirects back if the mark type is invalid', async () => {
@@ -129,7 +131,7 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.postNewDistinguishingMark(typeReq as Request, res as Response)
       expect(distinguishingMarksService.postNewDistinguishingMark).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 
@@ -168,7 +170,7 @@ describe('Distinguishing Marks Controller', () => {
       controller.newDistinguishingMarkWithDetail(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
 
     it('redirects back if the body part is invalid', () => {
@@ -179,7 +181,7 @@ describe('Distinguishing Marks Controller', () => {
       controller.newDistinguishingMarkWithDetail(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 
@@ -194,6 +196,7 @@ describe('Distinguishing Marks Controller', () => {
         files: {},
         middleware: { clientToken: 'token' },
         query: {},
+        flash: jest.fn(),
       } as undefined as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
@@ -220,6 +223,7 @@ describe('Distinguishing Marks Controller', () => {
         files: { 'file-lowerLeftArm': [{ originalname: 'file.jpg' }] },
         middleware: { clientToken: 'token' },
         query: {},
+        flash: jest.fn(),
       } as undefined as Request
 
       jest.spyOn(distinguishingMarksService, 'postNewDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
@@ -335,7 +339,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeBodyPart(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 
@@ -409,7 +413,7 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.updateBodyPart(typeReq as Request, res as Response)
       expect(distinguishingMarksService.updateDistinguishingMarkLocation).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 
@@ -471,7 +475,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeLocation(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
 
     it('redirects back if the body part is invalid', async () => {
@@ -486,7 +490,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeLocation(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 
@@ -572,7 +576,7 @@ describe('Distinguishing Marks Controller', () => {
       await controller.changeDescription(typeReq, res as Response)
 
       expect(res.render).not.toHaveBeenCalled()
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#marks')
     })
   })
 

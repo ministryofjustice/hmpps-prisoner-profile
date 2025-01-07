@@ -275,7 +275,7 @@ describe('groupIdentifyingMarks', () => {
         test.each`
           bodyPartId           | locationText
           ${'BODY_PART_FOOT'}  | ${'Right foot'}
-          ${'BODY_PART_TOE'}   | ${'Toe on right foot'}
+          ${'BODY_PART_TOE'}   | ${'Toes on right foot'}
           ${'BODY_PART_ANKLE'} | ${'Right ankle'}
         `('returns $locationText when body part id is $bodyPartId', ({ bodyPartId, locationText }) => {
           const grouped = groupIdentifyingMarks([
@@ -315,7 +315,7 @@ describe('groupIdentifyingMarks', () => {
         test.each`
           bodyPartId           | locationText
           ${'BODY_PART_FOOT'}  | ${'Left foot'}
-          ${'BODY_PART_TOE'}   | ${'Toe on left foot'}
+          ${'BODY_PART_TOE'}   | ${'Toes on left foot'}
           ${'BODY_PART_ANKLE'} | ${'Left ankle'}
         `('returns $locationText when body part id is $bodyPartId', ({ bodyPartId, locationText }) => {
           const grouped = groupIdentifyingMarks([
@@ -389,7 +389,7 @@ describe('groupIdentifyingMarks', () => {
 
         test.each`
           bodyPartId            | locationText
-          ${'BODY_PART_FINGER'} | ${'Finger on right hand'}
+          ${'BODY_PART_FINGER'} | ${'Fingers on right hand'}
           ${'BODY_PART_HAND'}   | ${'Right hand'}
         `('returns $locationText when body part id is $bodyPartId', ({ bodyPartId, locationText }) => {
           const grouped = groupIdentifyingMarks([
@@ -427,7 +427,7 @@ describe('groupIdentifyingMarks', () => {
 
         test.each`
           bodyPartId            | locationText
-          ${'BODY_PART_FINGER'} | ${'Finger on left hand'}
+          ${'BODY_PART_FINGER'} | ${'Fingers on left hand'}
           ${'BODY_PART_HAND'}   | ${'Left hand'}
         `('returns $locationText when body part id is $bodyPartId', ({ bodyPartId, locationText }) => {
           const grouped = groupIdentifyingMarks([
@@ -504,7 +504,7 @@ describe('groupIdentifyingMarks', () => {
           ${'BODY_PART_LEG'}   | ${orientationLow} | ${'Lower right leg'}
           ${'BODY_PART_THIGH'} | ${orientationLow} | ${'Right thigh'}
           ${'BODY_PART_KNEE'}  | ${orientationLow} | ${'Right knee'}
-          ${'BODY_PART_LEG'}   | ${null}           | ${'Right leg'}
+          ${'BODY_PART_LEG'}   | ${null}           | ${'Leg (general)'}
         `(
           'returns $locationText when body part id is $bodyPartId and orientation id is $orientation',
           ({ bodyPartId, orientation, locationText }) => {
@@ -546,7 +546,7 @@ describe('groupIdentifyingMarks', () => {
           ${'BODY_PART_LEG'}   | ${orientationLow} | ${'Lower left leg'}
           ${'BODY_PART_THIGH'} | ${orientationLow} | ${'Left thigh'}
           ${'BODY_PART_KNEE'}  | ${orientationLow} | ${'Left knee'}
-          ${'BODY_PART_LEG'}   | ${null}           | ${'Left leg'}
+          ${'BODY_PART_LEG'}   | ${null}           | ${'Leg (general)'}
         `(
           'returns $locationText when body part id is $bodyPartId and orientation id is $orientation',
           ({ bodyPartId, orientation, locationText }) => {
@@ -631,7 +631,7 @@ describe('groupIdentifyingMarks', () => {
           ${'BODY_PART_TORSO'} | ${sideFront} | ${'Front'}
           ${'BODY_PART_TORSO'} | ${sideRight} | ${'Right side'}
           ${'BODY_PART_TORSO'} | ${sideLeft}  | ${'Left side'}
-          ${'BODY_PART_TORSO'} | ${null}      | ${'Front and sides - no specific location'}
+          ${'BODY_PART_TORSO'} | ${null}      | ${'Not entered'}
         `(
           'returns $locationText when body part id is $bodyPartId and side id is $side',
           ({ bodyPartId, side, locationText }) => {
@@ -670,7 +670,7 @@ describe('groupIdentifyingMarks', () => {
           bodyPartId           | orientation        | locationText
           ${'BODY_PART_TORSO'} | ${orientationLow}  | ${'Lower back'}
           ${'BODY_PART_TORSO'} | ${orientationHigh} | ${'Upper back'}
-          ${'BODY_PART_TORSO'} | ${null}            | ${'Back - no specific location'}
+          ${'BODY_PART_TORSO'} | ${null}            | ${'Back'}
         `(
           'returns $locationText when body part id is $bodyPartId and orientation id is $orientation',
           ({ bodyPartId, orientation, locationText }) => {

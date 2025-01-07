@@ -55,7 +55,7 @@ context('Change distinguishing mark', () => {
 
       page.h1().should('contain.text', 'Change tattoo details')
       page.markDetails().bodyPart().should('contain.text', 'Front and sides')
-      page.markDetails().location().should('contain.text', 'Front and sides - no specific location')
+      page.markDetails().location().should('contain.text', 'Not entered')
       page.markDetails().description().should('contain.text', 'Hand sewn mickey mouse stormtrooper')
       page
         .markDetails()
@@ -73,7 +73,7 @@ context('Change distinguishing mark', () => {
 
       page.h1().should('contain.text', 'Change scar details')
       page.markDetails().bodyPart().should('contain.text', 'Left arm')
-      page.markDetails().location().should('contain.text', 'Arm - no specific location')
+      page.markDetails().location().should('contain.text', 'Arm (general)')
       page.markDetails().description().should('contain.text', 'Horrible arm scar')
       page
         .markDetails()
@@ -91,7 +91,7 @@ context('Change distinguishing mark', () => {
 
       page.h1().should('contain.text', 'Change mark details')
       page.markDetails().bodyPart().should('contain.text', 'Left leg')
-      page.markDetails().location().should('contain.text', 'Left leg')
+      page.markDetails().location().should('contain.text', 'Leg (general)')
       page.markDetails().description().should('contain.text', 'Bump')
       page
         .markDetails()
