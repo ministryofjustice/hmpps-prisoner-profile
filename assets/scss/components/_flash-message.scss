@@ -13,6 +13,7 @@
 
 .hmpps-flash-message {
   position: absolute;
+  z-index: 1;
   top: 75px;
   left: 50%;
   visibility: hidden;

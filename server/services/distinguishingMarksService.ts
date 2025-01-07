@@ -33,6 +33,7 @@ const bodyPartConfig: Record<
   rightHand: { bodyPartId: 'BODY_PART_HAND', side: 'SIDE_R' },
   rightLeg: { bodyPartId: 'BODY_PART_LEG', side: 'SIDE_R' },
   torso: { bodyPartId: 'BODY_PART_TORSO' },
+  frontTorso: { bodyPartId: 'BODY_PART_TORSO', side: 'SIDE_F' },
   rightTorso: { bodyPartId: 'BODY_PART_TORSO', side: 'SIDE_R' },
   leftTorso: { bodyPartId: 'BODY_PART_TORSO', side: 'SIDE_L' },
   leftAnkle: { bodyPartId: 'BODY_PART_ANKLE', side: 'SIDE_L' },

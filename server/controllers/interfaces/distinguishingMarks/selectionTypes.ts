@@ -19,6 +19,7 @@ export type BodyPartSelection = (typeof bodyPartSelections)[number]
 const detailedBodyParts = [
   'ear',
   'head',
+  'frontTorso',
   'leftAnkle',
   'leftElbow',
   'leftFinger',
