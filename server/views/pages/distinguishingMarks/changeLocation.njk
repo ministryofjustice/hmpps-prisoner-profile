@@ -9,25 +9,25 @@
 {% set heading = "Change the location of the " + markType %}
 
 {% block body %}
-{% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-                govukErrorSummary({
-                    titleText: "There is a problem",
-                    errorList: errors,
-                    attributes: { 'data-qa-errors': true }
-                })
-            }}
-        </div>
-    </div>
-{% endif %}
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
     </div>
 </div>
+
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+            govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })
+            }}
+        </div>
+    </div>
+{% endif %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">

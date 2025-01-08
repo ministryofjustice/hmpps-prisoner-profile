@@ -8,57 +8,67 @@
 {% set pageTitle =  "Change body part - Prisoner personal details" %}
 
 {% block body %}
-
-{% if errors.length > 0 %}
-    {%  set selected = "" %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-                govukErrorSummary({
-                    titleText: "There is a problem",
-                    errorList: errors,
-                    attributes: { 'data-qa-errors': true }
-                })
-            }}
-        </div>
-    </div>
-{% endif %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
     </div>
 </div>
 
-    <span class="govuk-caption-l">Distinguishing marks</span>
-    <h1 class='govuk-!-margin-top-0'>Change where the {{ markType }} is</h1>
-    <p data-qa='explanation-text'>You can only select one body part at a time. You can add more {{ markType}}s for this person later.</p>
+{% if errors.length > 0 %}
+    {%  set selected = "" %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+            govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })
+            }}
+        </div>
+    </div>
+{% endif %}
 
-<div class="new-dm-body-image-container {{ "dm-base-image-selected" if selected }}" {% if selected %} data-selected="{{ selected }}" {% endif %}>
-    <img src='/assets/images/distinguishingMarks/base-person.svg' alt="" usemap="#body-part-map" aria-describedby="selection-text" />
-    <map name="body-part-map">
-        <area shape="rect" coords="54, 0, 110, 73" alt="Face" href="?{{ "selected=face" if selected !== "face" }}" data-area-value="face">
-        <area shape="rect" coords="66, 66, 99, 84" alt="Neck" href="?{{ "selected=neck" if selected !== "neck" }}" data-area-value="neck">
-        <area shape="poly" coords="32, 101, 67, 87, 100, 87, 133, 103, 120, 215, 134, 288, 33, 287, 45, 209" href="?{{ "selected=front-and-sides" if selected !== "front-and-sides" }}" alt="Front and sides" data-area-value="front-and-sides">
-        <area shape="poly" coords="11, 115, 32, 101, 40, 163, 18, 300, -2, 301" href="?{{ "selected=right-arm" if selected !== "right-arm" }}" alt="Right arm" data-area-value="right-arm">
-        <area shape="poly" coords="134, 103, 154, 112, 166, 301, 151, 299, 126, 163" href="?{{ "selected=left-arm" if selected !== "left-arm" }}" alt="Left arm" data-area-value="left-arm">
-        <area shape="poly" coords="82, 288, 70, 568, 49, 569, 31, 288" href="?{{ "selected=right-leg" if selected !== "right-leg" }}" alt="Right leg" data-area-value="right-leg">
-        <area shape="poly" coords="133, 288, 123, 567, 96, 568, 82, 288" href="?{{ "selected=left-leg" if selected !== "left-leg" }}" alt="Left leg" data-area-value="left-leg">
-        <area shape="poly" coords="216, 101, 251, 87, 284, 87, 317, 103, 304, 215, 318, 288, 217, 287, 229, 209" href="?{{ "selected=back" if selected !== "back" }}" alt="Back" data-area-value="back">
-        <area shape="poly" coords="-2, 300, 17, 298, 32, 317, 30, 354, 0, 334" href="?{{ "selected=right-hand" if selected !== "right-hand" }}" alt="Right hand" data-area-value="right-hand">
-        <area shape="poly" coords="134, 338, 145, 299, 168, 302, 167, 331, 136, 357" href="?{{ "selected=left-hand" if selected !== "left-hand" }}" alt="Left hand" data-area-value="left-hand">
-        <area shape="rect" coords="45, 570, 74, 632" href="?{{ "selected=right-foot" if selected !== "right-foot" }}" alt="Right foot" data-area-value="right-foot">
-        <area shape="rect" coords="92, 568, 121, 633" href="?{{ "selected=left-foot" if selected !== "left-foot" }}" alt="Left foot" data-area-value="left-foot">
-        <div class="tooltip"><div class="tooltip-content"></div></div>
-    </map>
-    <p class='dm-base-label-front' aria-hidden="true">Front</p>
-    <p class='dm-base-label-back' aria-hidden="true">Back</p>
-</div>
-<p id="distinguishing-mark-selection-text" class="govuk-!-margin-bottom-6">{{ verifiedSelection | toBodyPartDisplayText | capitalize + " selected"  if verifiedSelection and errors.length === 0 else "No body part selected" }}</p>
+<span class="govuk-caption-l">Distinguishing marks</span>
+<h1 class='govuk-!-margin-top-0'>Change where the {{ markType }} is</h1>
 
 <form id="body-part-form" method="post" autocomplete="off">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
     <input type="hidden" name="bodyPart" value="{{ selected }}">
     <input type="hidden" name="initialBodyPart" value="{{ verifiedSelection }}">
+
+    <div id="body-part-selection" class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+
+        <p data-qa='explanation-text'>You can only select one body part at a time. You can add more {{ markType}}s for this person later.</p>
+
+        {% if errors.length > 0 %}
+            <p id="body-part-selection-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Select a body part.
+            </p>
+        {% endif %}
+
+        <div class="new-dm-body-image-container {{ "dm-base-image-selected" if selected }}" {% if selected %} data-selected="{{ selected }}" {% endif %}>
+            <img src='/assets/images/distinguishingMarks/base-person.svg' alt="" usemap="#body-part-map" aria-describedby="selection-text" />
+            <map name="body-part-map">
+                <area shape="rect" coords="54, 0, 110, 73" alt="Face and head" href="?{{ "selected=face" if selected !== "face" }}" data-area-value="face">
+                <area shape="rect" coords="66, 66, 99, 84" alt="Neck" href="?{{ "selected=neck" if selected !== "neck" }}" data-area-value="neck">
+                <area shape="poly" coords="32, 101, 67, 87, 100, 87, 133, 103, 120, 215, 134, 288, 33, 287, 45, 209" href="?{{ "selected=front-and-sides" if selected !== "front-and-sides" }}" alt="Front and sides" data-area-value="front-and-sides">
+                <area shape="poly" coords="11, 115, 32, 101, 40, 163, 18, 300, -2, 301" href="?{{ "selected=right-arm" if selected !== "right-arm" }}" alt="Right arm" data-area-value="right-arm">
+                <area shape="poly" coords="-2, 300, 17, 298, 32, 317, 30, 354, 0, 334" href="?{{ "selected=right-hand" if selected !== "right-hand" }}" alt="Right hand" data-area-value="right-hand">
+                <area shape="poly" coords="134, 103, 154, 112, 166, 301, 151, 299, 126, 163" href="?{{ "selected=left-arm" if selected !== "left-arm" }}" alt="Left arm" data-area-value="left-arm">
+                <area shape="poly" coords="134, 338, 145, 299, 168, 302, 167, 331, 136, 357" href="?{{ "selected=left-hand" if selected !== "left-hand" }}" alt="Left hand" data-area-value="left-hand">
+                <area shape="poly" coords="82, 288, 70, 568, 49, 569, 31, 288" href="?{{ "selected=right-leg" if selected !== "right-leg" }}" alt="Right leg" data-area-value="right-leg">
+                <area shape="rect" coords="45, 570, 74, 632" href="?{{ "selected=right-foot" if selected !== "right-foot" }}" alt="Right foot" data-area-value="right-foot">
+                <area shape="poly" coords="133, 288, 123, 567, 96, 568, 82, 288" href="?{{ "selected=left-leg" if selected !== "left-leg" }}" alt="Left leg" data-area-value="left-leg">
+                <area shape="rect" coords="92, 568, 121, 633" href="?{{ "selected=left-foot" if selected !== "left-foot" }}" alt="Left foot" data-area-value="left-foot">
+                <area shape="poly" coords="216, 101, 251, 87, 284, 87, 317, 103, 304, 215, 318, 288, 217, 287, 229, 209" href="?{{ "selected=back" if selected !== "back" }}" alt="Back" data-area-value="back">
+                <div class="tooltip"><div class="tooltip-content"></div></div>
+            </map>
+            <p class='dm-base-label-front' aria-hidden="true">Front</p>
+            <p class='dm-base-label-back' aria-hidden="true">Back</p>
+        </div>
+        <p id="distinguishing-mark-selection-text" class="govuk-!-margin-bottom-6">{{ verifiedSelection | toBodyPartDisplayText | capitalize + " selected"  if verifiedSelection and errors.length === 0 else "No body part selected" }}</p>
+    </div>
 
     <div class="govuk-button-group">
         {{ govukButton({ text: "Save and continue", type: "submit" }) }}

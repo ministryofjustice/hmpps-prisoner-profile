@@ -87,7 +87,7 @@ context('New distinguishing mark on face', () => {
     context('Adding distinguishing mark detail for face and head', () => {
       const specificBodyParts = ['face', 'ear', 'nose', 'lip', 'head']
 
-      const testMethod = testAddDistinguishingMarkDetailWithRadios('Add face and head scar details', 'Face')
+      const testMethod = testAddDistinguishingMarkDetailWithRadios('Add face and head scar details', 'Face and head')
       specificBodyParts.forEach(testMethod)
     })
 

@@ -15,8 +15,7 @@
         name: "description-"+postfix,
         id: "description-"+postfix,
         maxlength: 240,
-        rows: 10,
-        value: formValues.description,
+        rows: 5,
         errorMessage: errors | findError('description-'+postfix),
         label: {
             text: "Description (optional)",
@@ -28,36 +27,37 @@
     {{ govukFileUpload({
         id: "file-"+postfix,
         name: "file-"+postfix,
+        errorMessage: errors | findError('file-'+postfix),
         label: {
             text: "Add a photo (optional)",
             classes: "govuk-!-font-weight-bold"
         },
         hint: {
-            text: "Images can be JPEG, PNG or GIF files."
+            text: "Photos can be JPG or GIF files."
         }
     }) }}
 {% endmacro %}
 
 {% block body %}
-{% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-                govukErrorSummary({
-                    titleText: "There is a problem",
-                    errorList: errors,
-                    attributes: { 'data-qa-errors': true }
-                })
-            }}
-        </div>
-    </div>
-{% endif %}
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
     </div>
 </div>
+
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+            govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true }
+            })
+            }}
+        </div>
+    </div>
+{% endif %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -82,14 +82,14 @@
                                 {{ formConfig.title }}
                             </h1>
                         </legend>
-                        {% if errors.length > 0 %}
-                            <p id="whereDoYouLive-error" class="govuk-error-message">
-                                <span class="govuk-visually-hidden">Error:</span> Select a body part.
+                        {% if errors[0].href === '#specific-body-part-selection' %}
+                            <p id="select-a-body-part-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> Select a body part
                             </p>
                         {% endif %}
                             <div class="govuk-radios" data-module="govuk-radios">
                                 {% for part in formConfig.specificParts %}
-                                    {% set errorOnDesc = errors.length > 0 and errors[0].href === "#description-"+part.name %}
+                                    {% set errorOnDescOrPhoto = errors.length > 0 and (errors[0].href === "#description-"+part.name or errors[0].href === "#file-"+part.name) %}
 
                                     <div class="govuk-radios__item">
                                         <input class="govuk-radios__input" id="{{ part.name }}"
@@ -97,7 +97,7 @@
                                                type="radio"
                                                value="{{ part.name }}" {% if part.hint %} aria-describedby="{{ part.name }}-hint"{% endif %}
                                                data-aria-controls="conditional-details-form-{{ part.name }}"
-                                                {% if errorOnDesc %} checked aria-expanded="true" {% endif %}
+                                                {% if errorOnDescOrPhoto %} checked aria-expanded="true" {% endif %}
                                         >
                                         <label class="govuk-label govuk-radios__label" for="{{ part.name }}">
                                             {{ part.desc }}
@@ -108,7 +108,7 @@
                                             </div>
                                         {% endif %}
                                     </div>
-                                    <div class="govuk-radios__conditional {% if not errorOnDesc %}govuk-radios__conditional--hidden {% endif %}" id="conditional-details-form-{{ part.name }}">
+                                    <div class="govuk-radios__conditional {% if not errorOnDescOrPhoto %}govuk-radios__conditional--hidden {% endif %}" id="conditional-details-form-{{ part.name }}">
                                         {{ formSet(part.name) }}
                                     </div>
                                 {% endfor %}
