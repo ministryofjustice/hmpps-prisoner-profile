@@ -9,6 +9,8 @@ import {
 } from './interfaces/distinguishingMarks/selectionTypes'
 import MulterFile from './interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
+import { FlashMessageType } from '../data/enums/flashMessageType'
+import { convertToTitleCase } from '../utils/utils'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]
@@ -37,7 +39,7 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPartMap[selected])
 
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     return res.render('pages/distinguishingMarks/addNewDistinguishingMark', {
       markType,
@@ -52,7 +54,7 @@ export default class DistinguishingMarksController {
     const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     if (action === 'continue') {
       return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${bodyPart}`)
@@ -65,7 +67,13 @@ export default class DistinguishingMarksController {
       bodyPartMap[bodyPart] as BodyPartSelection,
     )
 
-    return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    req.flash('flashMessage', {
+      text: `${convertToTitleCase(verifiedMarkType)} added`,
+      type: FlashMessageType.success,
+      fieldName: 'distinguishing-mark',
+    })
+
+    return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
   }
 
   public newDistinguishingMarkWithDetail(req: Request, res: Response) {
@@ -74,7 +82,7 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
 
-    if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     return res.render('pages/distinguishingMarks/addNewDistinguishingMarkDetail', {
       markType,
@@ -89,7 +97,7 @@ export default class DistinguishingMarksController {
     const files = req.files as MulterFiles
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     await this.distinguishingMarksService.postNewDistinguishingMark(
       clientToken,
@@ -100,8 +108,14 @@ export default class DistinguishingMarksController {
       files[`file-${specificBodyPart}`]?.[0],
     )
 
+    req.flash('flashMessage', {
+      text: `${convertToTitleCase(verifiedMarkType)} added`,
+      type: FlashMessageType.success,
+      fieldName: 'distinguishing-mark',
+    })
+
     return action === 'returnToProfile'
-      ? res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+      ? res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
       : res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}`)
   }
 
@@ -132,7 +146,7 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPartMap[selected])
 
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     return res.render('pages/distinguishingMarks/changeBodyPart', {
       markType,
@@ -148,7 +162,7 @@ export default class DistinguishingMarksController {
     const bodyPartChanged = bodyPartMap[bodyPart] !== initialBodyPart
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     if (bodyPartChanged) {
       await this.distinguishingMarksService.updateDistinguishingMarkLocation(
@@ -183,7 +197,7 @@ export default class DistinguishingMarksController {
     const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
     const specificBodyPart = findBodyPartByIdAndSide(mark.bodyPart.id, mark.side?.id)
 
-    if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const cancelUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
     const refererUrl = `${cancelUrl}${referer === 'body-part' ? `/body-part?selected=${bodyPart}` : ''}`
@@ -204,7 +218,7 @@ export default class DistinguishingMarksController {
     const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     await this.distinguishingMarksService.updateDistinguishingMarkLocation(
       clientToken,
@@ -225,7 +239,7 @@ export default class DistinguishingMarksController {
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
 
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
@@ -247,7 +261,7 @@ export default class DistinguishingMarksController {
     const { clientToken } = req.middleware
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
-    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     await this.distinguishingMarksService.updateDistinguishingMarkDescription(
       clientToken,

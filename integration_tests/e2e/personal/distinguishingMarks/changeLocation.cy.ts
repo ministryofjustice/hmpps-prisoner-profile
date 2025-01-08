@@ -134,7 +134,7 @@ context('Change location of distinguishing mark on face', () => {
     })
 
     context('Change distinguishing mark detail for torso', () => {
-      const specificBodyParts = ['torso', 'rightTorso', 'leftTorso']
+      const specificBodyParts = ['frontTorso', 'rightTorso', 'leftTorso']
 
       const testMethod = testChangeDistinguishingMarkDetailWithRadios('Front and sides')
       specificBodyParts.forEach(testMethod)

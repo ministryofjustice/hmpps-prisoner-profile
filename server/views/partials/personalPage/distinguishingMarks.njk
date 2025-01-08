@@ -11,18 +11,19 @@
                 <details class="govuk-details">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
-                            {{ bodyPart | capitalize }}
+                            {{ bodyPart }}
                         </span>
                     </summary>
                     <div class="govuk-details__text">
                         {% for mark in marks %}
                             <div class="personal-distinguishing-marks__row__populated__mark">
                                 <dl>
+                                    {% if not (bodyPart === 'Neck' or bodyPart === 'Back') %}
                                     <div class="personal-distinguishing-marks__row__populated__row">
                                         <dt class="personal-distinguishing-marks__row__mark__row__key">Location</dt>
-                                        <dd class='govuk-!-margin-left-0'>{{ mark.location }} </dd>
+                                        <dd class='govuk-!-margin-left-0'>{{ mark.location }}</dd>
                                     </div>
-
+                                    {% endif %}
                                     <div class="personal-distinguishing-marks__row__populated__row">
                                         <dt class="personal-distinguishing-marks__row__mark__row__key">Description</dt>
                                         <dd class='govuk-!-margin-left-0'>{{ mark.comment or "Not entered" }}</dd>
@@ -49,15 +50,15 @@
     {% endif %}
 {% endmacro %}
 
-<h3 class="govuk-heading-m">Distinguishing marks</h3>
+<h3 id="marks" class="govuk-heading-m">Distinguishing marks</h3>
 <div class='personal-distinguishing-marks'>
-    <div class='personal-distinguishing-marks__image-container govuk-!-padding-left-3 govuk-!-padding-right-8' aria-hidden='true'>
-        <img src='/assets/images/distinguishingMarks/base-person.svg' class='dm-base-image' width='300' height='572' alt=""/>
-        {% for highlight in highlightConfig %}
-            <img src="{{ highlight.asset }}" class="{{ highlight.class }}" alt="" />
-        {% endfor %}
-        <p class='dm-base-label-front'>Front</p>
-        <p class='dm-base-label-back'>Back</p>
+    <div class='personal-distinguishing-marks__image-container' aria-hidden='true'>
+            <img src='/assets/images/distinguishingMarks/base-person.svg' class='dm-base-image' alt=""/>
+            {% for highlight in highlightConfig %}
+                <img src="{{ highlight.asset }}" class="{{ highlight.class }}" alt="" />
+            {% endfor %}
+            <p class='dm-base-label-front'>Front</p>
+            <p class='dm-base-label-back'>Back</p>
     </div>
     <div class='personal-distinguishing-marks__info'>
         <dl>

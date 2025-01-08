@@ -60,7 +60,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.bodyPart.id === 'BODY_PART_SHOULDER') return 'Shoulder'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower arm'
       if (mark.partOrientation?.id === 'PART_ORIENT_UPP') return 'Upper arm'
-      return 'Arm - no specific location'
+      return 'Arm (general)'
     },
   },
   rightArm: {
@@ -80,7 +80,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.bodyPart.id === 'BODY_PART_SHOULDER') return 'Shoulder'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower arm'
       if (mark.partOrientation?.id === 'PART_ORIENT_UPP') return 'Upper arm'
-      return 'Arm - no specific location'
+      return 'Not entered'
     },
   },
   arm: {
@@ -118,18 +118,11 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       mark.bodyPart.id === 'BODY_PART_EAR' ||
       mark.bodyPart.id === 'BODY_PART_LIP' ||
       mark.bodyPart.id === 'BODY_PART_NOSE',
-    getHighlightConfig: (mark: PrisonPersonDistinguishingMark) =>
-      mark.bodyPart.id === 'BODY_PART_HEAD'
-        ? {
-            asset: '/assets/images/distinguishingMarks/back-head-overlay.svg',
-            class: 'dm-overlay-back-head',
-            name: 'back of the head',
-          }
-        : {
-            asset: '/assets/images/distinguishingMarks/face-overlay.svg',
-            class: 'dm-overlay-face',
-            name: 'face',
-          },
+    getHighlightConfig: (_mark: PrisonPersonDistinguishingMark) => ({
+      asset: '/assets/images/distinguishingMarks/face-overlay.svg',
+      class: 'dm-overlay-face',
+      name: 'face',
+    }),
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
       if (mark.bodyPart.id === 'BODY_PART_FACE') return 'Face'
       if (mark.bodyPart.id === 'BODY_PART_EAR') return 'Ear'
@@ -151,7 +144,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       name: 'right foot',
     }),
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
-      if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toe on right foot'
+      if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toes on right foot'
       if (mark.bodyPart.id === 'BODY_PART_ANKLE') return 'Right ankle'
       return 'Right foot'
     },
@@ -169,7 +162,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       name: 'left foot',
     }),
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
-      if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toe on left foot'
+      if (mark.bodyPart.id === 'BODY_PART_TOE') return 'Toes on left foot'
       if (mark.bodyPart.id === 'BODY_PART_ANKLE') return 'Left ankle'
       return 'Left foot'
     },
@@ -199,7 +192,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       name: 'right hand',
     }),
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
-      if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Finger on right hand'
+      if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Fingers on right hand'
       return 'Right hand'
     },
   },
@@ -213,7 +206,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       name: 'left hand',
     }),
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
-      if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Finger on left hand'
+      if (mark.bodyPart.id === 'BODY_PART_FINGER') return 'Fingers on left hand'
       return 'Left hand'
     },
   },
@@ -245,7 +238,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.bodyPart.id === 'BODY_PART_THIGH') return 'Right thigh'
       if (mark.bodyPart.id === 'BODY_PART_KNEE') return 'Right knee'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower right leg'
-      return 'Right leg'
+      return 'Leg (general)'
     },
   },
   leftLeg: {
@@ -264,7 +257,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.bodyPart.id === 'BODY_PART_THIGH') return 'Left thigh'
       if (mark.bodyPart.id === 'BODY_PART_KNEE') return 'Left knee'
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower left leg'
-      return 'Left leg'
+      return 'Leg (general)'
     },
   },
   leg: {
@@ -296,7 +289,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
       if (mark.side?.id === 'SIDE_F') return 'Front'
       if (mark.side?.id === 'SIDE_R') return 'Right side'
       if (mark.side?.id === 'SIDE_L') return 'Left side'
-      return 'Front and sides - no specific location'
+      return 'Not entered'
     },
   },
   back: {
@@ -311,7 +304,7 @@ const bodyPartsConfig: Record<string, BodyPartConfig> = {
     getLocationDescription: (mark: PrisonPersonDistinguishingMark) => {
       if (mark.partOrientation?.id === 'PART_ORIENT_LOW') return 'Lower back'
       if (mark.partOrientation?.id === 'PART_ORIENT_UPP') return 'Upper back'
-      return 'Back - no specific location'
+      return 'Back'
     },
   },
 }
@@ -324,7 +317,7 @@ export default (distinguishingMarks: PrisonPersonDistinguishingMark[]): Categori
     MARK_TYPE_MARK: 'others',
   }
 
-  return distinguishingMarks.reduce<CategorisedMarksForView>(
+  const unsortedMarks = distinguishingMarks.reduce<CategorisedMarksForView>(
     ({ highlights, ...outputMark }, mark) => {
       const markCategory = categoryForMarkTypeId[mark.markType.id]
       const bodyPartConfig = Object.values(bodyPartsConfig).find(partConfig => partConfig.markIsForBodyPart(mark))
@@ -347,6 +340,37 @@ export default (distinguishingMarks: PrisonPersonDistinguishingMark[]): Categori
     },
     { tattoos: {}, scars: {}, others: {}, highlights: [] },
   )
+
+  return {
+    tattoos: sortMarks(unsortedMarks.tattoos),
+    scars: sortMarks(unsortedMarks.scars),
+    others: sortMarks(unsortedMarks.others),
+    highlights: unsortedMarks.highlights,
+  }
+}
+
+const sortMarks = (marks: Partial<Record<BodyPartCategory, DistinguishingMarkDecorated[]>>) => {
+  const markOrder: BodyPartCategory[] = [
+    'Face and head',
+    'Neck',
+    'Front and sides',
+    'Right arm',
+    'Right hand',
+    'Left arm',
+    'Left hand',
+    'Right leg',
+    'Right foot',
+    'Left leg',
+    'Left foot',
+    'Back',
+  ]
+
+  return Object.keys(marks)
+    .sort((a: BodyPartCategory, b: BodyPartCategory) => markOrder.indexOf(a) - markOrder.indexOf(b))
+    .reduce(
+      (sortedObj, key: BodyPartCategory) => ({ ...sortedObj, [key]: marks[key] }),
+      {} as Partial<Record<BodyPartCategory, DistinguishingMarkDecorated[]>>,
+    )
 }
 
 export const getMarkLocationDescription = (distinguishingMark: PrisonPersonDistinguishingMark): string => {
