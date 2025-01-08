@@ -10,6 +10,7 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   getReferenceDataDomain: jest.fn(),
   updateSmokerOrVaper: jest.fn(),
   updateCityOrTownOfBirth: jest.fn(),
+  updateNationality: jest.fn(),
   getDistinguishingMarks: jest.fn(),
   updateMedicalDietaryRequirements: jest.fn(),
   updateFoodAllergies: jest.fn(),

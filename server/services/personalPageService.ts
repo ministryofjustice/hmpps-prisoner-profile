@@ -216,6 +216,9 @@ export default class PersonalPageService {
       }
     }
 
+    const nationality =
+      inmateDetail?.profileInformation?.find(entry => entry.type === 'NAT')?.resultValue || 'Not entered'
+
     const formatNumberOfChildren = (count: string) => {
       if (count === null) return 'Not entered'
       if (count === '0') return 'None'
@@ -241,7 +244,7 @@ export default class PersonalPageService {
         written: inmateDetail.writtenLanguage,
       },
       marriageOrCivilPartnership: prisonerData.maritalStatus || 'Not entered',
-      nationality: prisonerData.nationality || 'Not entered',
+      nationality,
       numberOfChildren: formatNumberOfChildren(
         getProfileInformationValue(ProfileInformationType.NumberOfChildren, profileInformation),
       ),
@@ -481,7 +484,7 @@ export default class PersonalPageService {
 
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
+    const response = await prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['smokerOrVaper'],
@@ -499,7 +502,7 @@ export default class PersonalPageService {
     medicalDietaryRequirements: string[],
   ) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { medicalDietaryRequirements })
+    const response = await prisonPersonApiClient.updateHealth(prisonerNumber, { medicalDietaryRequirements })
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['medicalDietaryRequirements'],
       prisonerNumber,
@@ -511,7 +514,7 @@ export default class PersonalPageService {
 
   async updateFoodAllergies(clientToken: string, user: PrisonUser, prisonerNumber: string, foodAllergies: string[]) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
+    const response = await prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['foodAllergies'],
@@ -529,7 +532,7 @@ export default class PersonalPageService {
     cityOrTownOfBirth: string,
   ) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = personIntegrationApiClient.updateBirthPlace(prisonerNumber, cityOrTownOfBirth)
+    const response = await personIntegrationApiClient.updateBirthPlace(prisonerNumber, cityOrTownOfBirth)
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['cityOrTownOfBirth'],
@@ -542,10 +545,23 @@ export default class PersonalPageService {
 
   async updateCountryOfBirth(clientToken: string, user: PrisonUser, prisonerNumber: string, countryOfBirth: string) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = personIntegrationApiClient.updateCountryOfBirth(prisonerNumber, countryOfBirth)
+    const response = await personIntegrationApiClient.updateCountryOfBirth(prisonerNumber, countryOfBirth)
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['countryOfBirth'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateNationality(clientToken: string, user: PrisonUser, prisonerNumber: string, nationality: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateNationality(prisonerNumber, nationality)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['nationality'],
       prisonerNumber,
       user,
     })

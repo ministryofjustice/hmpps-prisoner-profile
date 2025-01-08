@@ -21,6 +21,7 @@ export enum Page {
   EditBuild = 'EDIT_BUILD',
   EditCityOrTownOfBirth = 'EDIT_CITY_OR_TOWN_OF_BIRTH',
   EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
+  EditNationality = 'EDIT_NATIONALITY',
   EditEyeColour = 'EDIT_EYE_COLOUR',
   EditFaceShape = 'EDIT_FACE_SHAPE',
   EditFacialHair = 'EDIT_FACIAL_HAIR',
@@ -51,6 +52,7 @@ export enum Page {
   PostEditBuild = 'POST_EDIT_BUILD',
   PostEditCityOrTownOfBirth = 'POST_EDIT_CITY_OR_TOWN_OF_BIRTH',
   PostEditCountryOfBirth = 'POST_EDIT_COUNTRY_OF_BIRTH',
+  PostEditNationality = 'POST_EDIT_NATIONALITY',
   PostEditEyeColour = 'POST_EDIT_EYE_COLOUR',
   PostEditFaceShape = 'POST_EDIT_FACE_SHAPE',
   PostEditFacialHair = 'POST_EDIT_FACIAL_HAIR',
@@ -103,6 +105,7 @@ export enum PostAction {
   EditMedicalDiet = 'EDIT_MEDICAL_DIET',
   EditFoodAllergies = 'EDIT_FOOD_ALLERGIES',
   EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
+  EditNationality = 'EDIT_NATIONALITY',
 }
 
 // eslint-disable-next-line no-shadow

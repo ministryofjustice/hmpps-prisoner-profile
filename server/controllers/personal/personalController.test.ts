@@ -12,6 +12,7 @@ import {
   foodAllergiesFieldData,
   heightFieldData,
   medicalDietFieldData,
+  nationalityFieldData,
   RadioFieldData,
   shoeSizeFieldData,
   smokerOrVaperFieldData,
@@ -33,7 +34,10 @@ import {
   mockFoodAllergiesReferenceDataDomain,
   mockMedicalDietReferenceDataDomain,
 } from '../../data/localMockData/prisonPersonApi/referenceDataMocks'
-import { ActiveCountryReferenceDataCodesMock } from '../../data/localMockData/personIntegrationReferenceDataMock'
+import {
+  ActiveCountryReferenceDataCodesMock,
+  NationalityReferenceDataCodesMock,
+} from '../../data/localMockData/personIntegrationReferenceDataMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -56,6 +60,7 @@ describe('PersonalController', () => {
       birthPlace: 'SHEFFIELD',
       profileInformation: [
         { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
+        { question: 'Nationality', resultValue: 'BRIT', type: ProfileInformationType.Nationality },
       ],
     } as InmateDetail,
   }
@@ -130,6 +135,7 @@ describe('PersonalController', () => {
     })
     personalPageService.getReferenceDataCodesFromProxy = jest.fn(async (_, domain) => {
       if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
+      if (domain === 'NAT') return NationalityReferenceDataCodesMock
       return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
@@ -1085,6 +1091,155 @@ describe('PersonalController', () => {
           correlationId: request.id,
           action: PostAction.EditSmokerOrVaper,
           details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKE_SMOKER', updated: 'SMOKE_NO' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('Nationality', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.nationality().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Nationality - Prisoner personal details',
+          formTitle: `What is First Last's nationality?`,
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          hintText: undefined,
+          errors: [],
+          options: expect.arrayContaining([
+            expect.objectContaining({ text: 'British', value: 'BRIT' }),
+            expect.objectContaining({ text: 'French', value: 'FREN' }),
+          ]),
+          redirectAnchor: 'personal-details',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'BRIT' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([expect.objectContaining({ value: 'BRIT', checked: true })]),
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditNationality,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.nationality().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { radioField: 'FREN' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the nationality', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateNationality).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'FREN')
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Nationality updated',
+          type: FlashMessageType.success,
+          fieldName: 'nationality',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateNationality = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/nationality')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { radioField: 'FREN' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditNationality,
+          details: { fieldName: nationalityFieldData.fieldName, previous: 'BRIT', updated: 'FREN' },
         }
 
         await action(request, res)
