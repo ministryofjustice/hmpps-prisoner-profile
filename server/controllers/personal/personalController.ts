@@ -33,6 +33,7 @@ import {
   foodAllergiesFieldData,
   heightFieldData,
   medicalDietFieldData,
+  nationalityFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
   smokerOrVaperFieldData,
@@ -649,6 +650,68 @@ export default class PersonalController {
             .catch(error => logger.error(error))
 
           return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
+
+  nationality() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { inmateDetail, prisonerData, clientToken } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
+        const [nationalityValues] = await Promise.all([
+          this.personalPageService.getReferenceDataCodesFromProxy(clientToken, ProxyReferenceDataDomain.nationality),
+        ])
+        const fieldValue =
+          requestBodyFlash?.radioField ||
+          nationalityValues.filter(
+            nationality =>
+              nationality.description ===
+              getProfileInformationValue(ProfileInformationType.Nationality, inmateDetail.profileInformation),
+          )[0]?.code
+
+        const options = objectToRadioOptions(nationalityValues, 'code', 'description', fieldValue)
+
+        return this.editRadioFields(
+          `What is ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })}'s nationality?`,
+          nationalityFieldData,
+          options,
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { pageTitle, fieldName, url, redirectAnchor } = nationalityFieldData
+        const { prisonerNumber } = req.params
+        const { clientToken, inmateDetail } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const radioField = req.body.radioField || null
+
+        const previousValue = getProfileInformationValue(
+          ProfileInformationType.Nationality,
+          inmateDetail.profileInformation,
+        )
+
+        try {
+          await this.personalPageService.updateNationality(clientToken, user, prisonerNumber, radioField)
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditNationality,
+              details: { fieldName, previous: previousValue, updated: radioField },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }

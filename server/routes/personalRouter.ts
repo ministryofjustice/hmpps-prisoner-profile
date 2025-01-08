@@ -357,5 +357,17 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
+  editRoute({
+    path: 'edit/nationality',
+    edit: {
+      audit: Page.EditNationality,
+      method: personalController.nationality().edit,
+    },
+    submit: {
+      audit: Page.PostEditNationality,
+      method: personalController.nationality().submit,
+    },
+  })
+
   return router
 }
