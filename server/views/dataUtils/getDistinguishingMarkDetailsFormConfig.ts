@@ -43,7 +43,7 @@ const bodyPartConfig: Record<BodyPartSelection, BodyPartConfig> = {
     tab: 'Left arm %s',
     title: 'Add left arm %s details',
     specificParts: [
-      { name: 'leftArm', desc: 'Arm', hint: 'The %s spans more than one area, or the location is unknown.' },
+      { name: 'leftArm', desc: 'Arm (general)', hint: 'The %s spans more than one area, or the location is unknown.' },
       { name: 'leftShoulder', desc: 'Shoulder' },
       { name: 'upperLeftArm', desc: 'Upper arm' },
       { name: 'leftElbow', desc: 'Elbow' },
@@ -116,9 +116,9 @@ const bodyPartConfig: Record<BodyPartSelection, BodyPartConfig> = {
     tab: 'Front and side %s',
     title: 'Add front and side %s details',
     specificParts: [
-      { name: 'frontTorso', desc: 'Front', hint: 'The abdomen, chest or pelvis' },
-      { name: 'rightTorso', desc: 'Right side', hint: 'The left side of the abdomen, chest or pelvis' },
-      { name: 'leftTorso', desc: 'Left side', hint: 'The right side of the abdomen, chest or pelvis' },
+      { name: 'frontTorso', desc: 'Front', hint: 'The abdomen, chest or pelvis.' },
+      { name: 'rightTorso', desc: 'Right side', hint: 'The left side of the abdomen, chest or pelvis.' },
+      { name: 'leftTorso', desc: 'Left side', hint: 'The right side of the abdomen, chest or pelvis.' },
     ],
   },
 }

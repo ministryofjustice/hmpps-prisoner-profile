@@ -13,8 +13,8 @@ import {
   updateLocationValidator,
   updatePhotoValidator,
 } from '../validators/personal/distinguishingMarksValidator'
-import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -60,6 +60,7 @@ export default function distinguishingMarksRouter(services: Services): Router {
     multer().fields(allBodyParts.map(part => ({ name: `file-${part}`, maxCount: 1 }))),
     validationMiddleware([newDetailedDistinguishingMarkValidator], {
       redirectBackOnError: true,
+      useReq: true,
     }),
     distinguishingMarksController.postNewDistinguishingMarkWithDetail,
   )

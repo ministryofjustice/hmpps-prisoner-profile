@@ -1,7 +1,7 @@
 import { BodyPartSelection } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
 
 const selectionsToText: Record<BodyPartSelection, string> = {
-  face: 'Face',
+  face: 'Face and head',
   torso: 'Front and sides',
   rightArm: 'Right arm',
   rightLeg: 'Right leg',
