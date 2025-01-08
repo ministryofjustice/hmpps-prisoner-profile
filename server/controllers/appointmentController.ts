@@ -627,7 +627,7 @@ export default class AppointmentController {
   }
 
   public displayPrePostAppointmentConfirmation(): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
       const user = res.locals.user as PrisonUser
@@ -635,7 +635,7 @@ export default class AppointmentController {
 
       const appointmentFlash = req.flash('prePostAppointmentDetails')
       if (!appointmentFlash?.length) {
-        return new ServerError('PrePostAppointmentDetails not found in request')
+        throw new ServerError('PrePostAppointmentDetails not found in request')
       }
       const { appointmentId, appointmentDefaults, formValues } =
         appointmentFlash[0] as unknown as PrePostAppointmentDetails
@@ -929,7 +929,7 @@ export default class AppointmentController {
 
       const endDate = formatDateISO(calculateEndDate(date, repeats, times))
 
-      return res.send(formatDate(endDate, 'full'))
+      res.send(formatDate(endDate, 'full'))
     }
   }
 
