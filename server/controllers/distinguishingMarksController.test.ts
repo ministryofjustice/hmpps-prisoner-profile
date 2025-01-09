@@ -304,6 +304,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType,
+        refererUrl: `/prisoner/A12345/personal/${markType}/019205c0-0fd5-7c41-ae24-ede9eae05da5`,
         selected: 'left-leg',
         verifiedSelection: 'leftLeg',
       })
@@ -322,6 +323,7 @@ describe('Distinguishing Marks Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeBodyPart', {
         markType: 'tattoo',
+        refererUrl: '/prisoner/A12345/personal/tattoo/019205c0-0fd5-7c41-ae24-ede9eae05da5',
         selected: bodyPart,
         verifiedSelection: bodyPartMap[bodyPart],
       })
