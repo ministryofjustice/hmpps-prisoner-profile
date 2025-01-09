@@ -241,8 +241,9 @@ export default class CaseNotesController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { caseNoteId } = req.params
       const { clientToken, permissions } = req.middleware
-      const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
+      const { firstName, lastName, prisonerNumber, prisonId, cellLocation } = req.middleware.prisonerData
       const prisonerDisplayName = formatName(firstName, undefined, lastName, { style: NameFormatStyle.firstLast })
+      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
       const currentCaseNote = await this.caseNotesService.getCaseNote(clientToken, prisonerNumber, prisonId, caseNoteId)
 
@@ -285,6 +286,11 @@ export default class CaseNotesController {
         maxLength,
         isOMICOpen,
         isExternal,
+        miniBannerData: {
+          prisonerName: prisonerBannerName,
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
         errors,
       })
     }

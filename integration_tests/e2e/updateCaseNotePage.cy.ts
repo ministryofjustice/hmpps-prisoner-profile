@@ -40,8 +40,7 @@ context('Update Case Note Page', () => {
         updateCaseNotePage = new UpdateCaseNotePage('Add more details to John Saunders’ case note')
       })
 
-      it('should show correct prisoner number and current case note values', () => {
-        updateCaseNotePage.prisonerNumber().contains('G6123VU')
+      it('should show current case note values', () => {
         updateCaseNotePage.moreDetailsText().contains('Additional case note text, part one.')
         updateCaseNotePage.textField().should('have.value', '')
       })
