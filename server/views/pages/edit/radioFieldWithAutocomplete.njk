@@ -21,22 +21,26 @@
         href: "/prisoner/" + prisonerNumber + "/personal"
     }
 ] %}
-{% set mainClasses = 'govuk-body dps-edit-container' %}
+{% set mainClasses = 'govuk-body' %}
 
 {% block content %}
 
     {% block body %}
 
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
+
         {% if errors.length > 0 %}
-            {{ govukErrorSummary({
+            {{
+            govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errors,
                 attributes: { 'data-qa-errors': true },
                 classes: 'govuk-!-margin-bottom-6'
-            }) }}
+            })
+            }}
         {% endif %}
-
-        {{ miniBanner(miniBannerData) }}
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-three-quarters">

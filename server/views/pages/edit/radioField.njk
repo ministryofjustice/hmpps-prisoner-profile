@@ -22,11 +22,14 @@
   }
   ]
 %}
-{% set mainClasses = 'govuk-body dps-edit-container' %}
+{% set mainClasses = 'govuk-body' %}
 
 {% block content %}
 
 {% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
 
   {% if errors.length > 0 %}
     {{
@@ -39,13 +42,11 @@
     }}
   {% endif %}
 
-      {{ miniBanner(miniBannerData) }}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <form method="post" novalidate="novalidate" autocomplete="off">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <div class="govuk-form-group">
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
           {{ govukRadios({
             idPrefix: "radio",
             name: "radioField",

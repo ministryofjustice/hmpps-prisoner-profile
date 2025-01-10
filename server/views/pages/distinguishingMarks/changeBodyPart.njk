@@ -4,7 +4,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#marks" %}
 {% set pageTitle =  "Change body part - Prisoner personal details" %}
 
 {% block body %}
@@ -22,7 +21,8 @@
             govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errors,
-                attributes: { 'data-qa-errors': true }
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
             })
             }}
         </div>

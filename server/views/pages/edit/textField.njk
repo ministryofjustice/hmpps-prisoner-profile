@@ -14,6 +14,9 @@
   ]
 %}
 {% block body %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
 
   {% if errors.length > 0 %}
     <div class="govuk-grid-row">
@@ -22,16 +25,13 @@
           govukErrorSummary({
               titleText: "There is a problem",
               errorList: errors,
-              attributes: { 'data-qa-errors': true }
+              attributes: { 'data-qa-errors': true },
+              classes: 'govuk-!-margin-bottom-6'
           })
         }}
       </div>
     </div>
   {% endif %}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
-  </div>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">

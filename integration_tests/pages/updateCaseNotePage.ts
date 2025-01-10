@@ -3,8 +3,6 @@ import Page, { PageElement } from './page'
 export default class UpdateCaseNotePage extends Page {
   h1 = (): PageElement => cy.get('h1')
 
-  prisonerNumber = (): PageElement => cy.get('[data-qa=prison-number]')
-
   moreDetailsText = (): PageElement => cy.get('[data-qa=more-details-text]')
 
   textField = (): PageElement => cy.get('#text')
