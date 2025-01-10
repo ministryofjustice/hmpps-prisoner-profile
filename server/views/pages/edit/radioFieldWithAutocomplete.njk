@@ -32,14 +32,12 @@
         </div>
 
         {% if errors.length > 0 %}
-            {{
-            govukErrorSummary({
+            {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errors,
                 attributes: { 'data-qa-errors': true },
                 classes: 'govuk-!-margin-bottom-6'
-            })
-            }}
+            }) }}
         {% endif %}
 
         <div class="govuk-grid-row">
@@ -58,7 +56,7 @@
                                 },
                                 items: autocompleteOptions,
                                 errorMessage: errors | findError("autocomplete"),
-                                classes: "govuk-!-width-one-third js-autocomplete-select",
+                                classes: "js-autocomplete-select",
                                 attributes: {
                                     "data-test": "select-autocomplete-input"
                                 }

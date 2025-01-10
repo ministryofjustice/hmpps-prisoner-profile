@@ -1,6 +1,8 @@
 accessibleAutocomplete.enhanceSelectElement({
   defaultValue: '',
   selectElement: document.querySelector('#autocomplete'),
+  inputClasses: 'govuk-input--width-30',
+  menuClasses: 'govuk-input--width-30',
 })
 
 $(function() {
