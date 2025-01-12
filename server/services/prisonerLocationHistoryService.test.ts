@@ -3,7 +3,6 @@ import { WhereaboutsApiClient } from '../data/interfaces/whereaboutsApi/whereabo
 import { prisonApiClientMock } from '../../tests/mocks/prisonApiClientMock'
 import PrisonerLocationHistoryService from './prisonerLocationHistoryService'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
-import { GetAttributesForLocation } from '../data/localMockData/getAttributesForLocationMock'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { mockHistoryForLocation } from '../data/localMockData/getHistoryForLocationMock'
 import StaffDetailsMock from '../data/localMockData/staffDetails'
@@ -16,12 +15,20 @@ import { pagedCaseNotesMock } from '../data/localMockData/pagedCaseNotesMock'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
 import CellMoveReason from '../data/interfaces/whereaboutsApi/CellMoveReason'
 import CaseNote from '../data/interfaces/caseNotesApi/CaseNote'
+import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
+import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
+import { locationsInsidePrisonApiClientMock } from '../../tests/mocks/locationsInsidePrisonApiClientMock'
+import { nomisSyncPrisonerMappingApiClientMock } from '../../tests/mocks/nomisSyncPrisonerMappingApiClientMock'
 
 describe('prisonerLocationHistoryService', () => {
   let prisonApiClient: PrisonApiClient
   let whereaboutsApiClient: WhereaboutsApiClient
   let caseNotesApiClient: CaseNotesApiClient
   let service: PrisonerLocationHistoryService
+  const locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient = locationsInsidePrisonApiClientMock()
+  const nomisSyncPrisonerMappingApiClient: NomisSyncPrisonerMappingApiClient = nomisSyncPrisonerMappingApiClientMock()
+
+  let locationAttributesForView = {}
 
   beforeEach(() => {
     prisonApiClient = prisonApiClientMock()
@@ -42,7 +49,6 @@ describe('prisonerLocationHistoryService', () => {
 
     prisonApiClient.getDetails = jest.fn().mockResolvedValue(GetDetailsMock)
     prisonApiClient.getStaffDetails = jest.fn().mockResolvedValue(StaffDetailsMock)
-    prisonApiClient.getAttributesForLocation = jest.fn().mockResolvedValue(GetAttributesForLocation)
     prisonApiClient.getHistoryForLocation = jest
       .fn()
       .mockResolvedValue(mockHistoryForLocation([{ bookingId: PrisonerMockDataA.bookingId }]))
@@ -56,11 +62,39 @@ describe('prisonerLocationHistoryService', () => {
     const prisonApiClientBuilder = () => prisonApiClient
     const caseNotesApiClientBuilder = () => caseNotesApiClient
     const whereaboutsApiClientBuilder = () => whereaboutsApiClient
+    const locationsInsidePrisonApiClientBuilder = () => locationsInsidePrisonApiClient
+    const nomisSyncPrisonerMappingApiClientBuilder = () => nomisSyncPrisonerMappingApiClient
+
+    nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId = jest
+      .fn()
+      .mockResolvedValue({ dpsLocationId: 'abcdefg' })
+
+    locationsInsidePrisonApiClient.getLocation = jest
+      .fn()
+      .mockResolvedValue({ localName: 'Location 1', key: 'LEI-1-1' })
+
+    locationsInsidePrisonApiClient.getLocationAttributes = jest.fn().mockResolvedValue([
+      { code: 'CAT_A', description: 'Cat A Cell' },
+      { code: 'SO', description: 'Single occupancy' },
+    ])
+
+    locationAttributesForView = {
+      attributes: [
+        {
+          code: 'CAT_A',
+          description: 'Cat A Cell',
+        },
+        { code: 'SO', description: 'Single occupancy' },
+      ],
+      description: 'LEI-1-1',
+    }
 
     service = new PrisonerLocationHistoryService(
       prisonApiClientBuilder,
       whereaboutsApiClientBuilder,
       caseNotesApiClientBuilder,
+      locationsInsidePrisonApiClientBuilder,
+      nomisSyncPrisonerMappingApiClientBuilder,
     )
   })
 
@@ -69,11 +103,13 @@ describe('prisonerLocationHistoryService', () => {
       'token',
       PrisonerMockDataA,
       'LEI',
-      'locationId',
+      '123456',
       '2023-01-01',
       '2024-01-01',
     )
 
+    expect(nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId).toHaveBeenCalledWith(123456)
+    expect(locationsInsidePrisonApiClient.getLocation).toHaveBeenCalledWith('abcdefg')
     expect(prisonApiClient.getAgencyDetails).toHaveBeenCalledWith('LEI')
     expect(res.agencyDetails).toEqual(agencyDetailsMock)
   })
@@ -83,7 +119,7 @@ describe('prisonerLocationHistoryService', () => {
       'token',
       PrisonerMockDataA,
       'LEI',
-      'locationId',
+      '123456',
       '2023-01-01',
       '2024-01-01',
     )
@@ -114,17 +150,45 @@ describe('prisonerLocationHistoryService', () => {
   })
 
   it('Returns the location attributes from the API', async () => {
+    locationsInsidePrisonApiClient.getLocation = jest.fn().mockResolvedValue({
+      localName: 'Cell 1',
+      key: 'LEI-1-1',
+      specialistCellTypes: ['LISTENER_CRISIS'],
+    })
+
     const res = await service.getPrisonerLocationHistory(
       'token',
       PrisonerMockDataA,
       'LEI',
-      'locationId',
+      '123456',
       '2023-01-01',
       '2024-01-01',
     )
 
-    expect(prisonApiClient.getAttributesForLocation).toHaveBeenCalledWith('locationId')
-    expect(res.locationAttributes).toEqual(GetAttributesForLocation)
+    expect(nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId).toHaveBeenCalledWith(123456)
+    expect(locationsInsidePrisonApiClient.getLocation).toHaveBeenCalledWith('abcdefg')
+    expect(res.locationAttributes).toEqual(locationAttributesForView)
+  })
+
+  it('Should only include known specialist cell types', async () => {
+    locationsInsidePrisonApiClient.getLocation = jest.fn().mockResolvedValue({
+      localName: 'Cell 1',
+      key: 'LEI-1-1',
+      specialistCellTypes: ['LISTENER_CRISIS', 'UNKNOWN_TYPE'],
+    })
+
+    const res = await service.getPrisonerLocationHistory(
+      'token',
+      PrisonerMockDataA,
+      'LEI',
+      '123456',
+      '2023-01-01',
+      '2024-01-01',
+    )
+
+    expect(nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId).toHaveBeenCalledWith(123456)
+    expect(locationsInsidePrisonApiClient.getLocation).toHaveBeenCalledWith('abcdefg')
+    expect(res.locationAttributes).toEqual(locationAttributesForView)
   })
 
   it('Gets the location history and populates it with details of the prisoner', async () => {
