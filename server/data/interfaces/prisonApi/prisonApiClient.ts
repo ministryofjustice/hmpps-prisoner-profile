@@ -39,7 +39,6 @@ import { MovementType } from '../../enums/movementType'
 import OffenderSentenceDetail from './OffenderSentenceDetail'
 import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './PrisonerSchedule'
 import Details from './Details'
-import AttributesForLocation from './AttributesForLocation'
 import HistoryForLocationItem from './HistoryForLocationItem'
 import CellMoveReasonType from './CellMoveReasonTypes'
 import Telephone from './Telephone'
@@ -209,8 +208,6 @@ export interface PrisonApiClient {
   ): Promise<PrisonerSchedule[]>
 
   getDetails(prisonerNumber: string, fullInfo: boolean): Promise<Details>
-
-  getAttributesForLocation(locationId: string): Promise<AttributesForLocation>
 
   getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]>
 

@@ -59,7 +59,6 @@ export const prisonApiClientMock = (): PrisonApiClient => ({
   getVisitSummary: jest.fn(),
   getVisits: jest.fn(),
   getDetails: jest.fn(),
-  getAttributesForLocation: jest.fn(),
   getHistoryForLocation: jest.fn(),
   getCellMoveReasonTypes: jest.fn(),
   getBeliefHistory: jest.fn(),

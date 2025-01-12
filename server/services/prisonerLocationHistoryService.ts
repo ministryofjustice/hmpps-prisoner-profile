@@ -5,10 +5,12 @@ import HistoryForLocationItem from '../data/interfaces/prisonApi/HistoryForLocat
 import { formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import CaseNotesApiClient from '../data/interfaces/caseNotesApi/caseNotesApiClient'
-import AttributesForLocation from '../data/interfaces/prisonApi/AttributesForLocation'
+import AttributesForLocation from '../data/interfaces/locationsInsidePrisonApi/AttributesForLocation'
 import { AgencyDetails } from '../data/interfaces/prisonApi/Agency'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import CellMoveReasonType from '../data/interfaces/prisonApi/CellMoveReasonTypes'
+import { LocationsInsidePrisonApiClient } from '../data/interfaces/locationsInsidePrisonApi/LocationsInsidePrisonApiClient'
+import { NomisSyncPrisonerMappingApiClient } from '../data/interfaces/nomisSyncPrisonerMappingApi/NomisSyncPrisonerMappingApiClient'
 
 type PrisonerLocationHistoryResponse = {
   agencyDetails: AgencyDetails
@@ -24,6 +26,8 @@ export default class PrisonerLocationHistoryService {
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly whereaboutsApiClientBuilder: RestClientBuilder<WhereaboutsApiClient>,
     private readonly caseNotesApiClientBuilder: RestClientBuilder<CaseNotesApiClient>,
+    private readonly locationsInsidePrisonApiClientBuilder: RestClientBuilder<LocationsInsidePrisonApiClient>,
+    private readonly nomisSyncPrisonerMappingApiClientBuilder: RestClientBuilder<NomisSyncPrisonerMappingApiClient>,
   ) {}
 
   public async getPrisonerLocationHistory(
@@ -79,17 +83,29 @@ export default class PrisonerLocationHistoryService {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
     const caseNotesApiClient = this.caseNotesApiClientBuilder(token)
+    const locationsInsidePrisonApiClient = this.locationsInsidePrisonApiClientBuilder(token)
+    const nomisSyncPrisonerMappingApiClient = this.nomisSyncPrisonerMappingApiClientBuilder(token)
 
     const { bookingId } = prisonerData
 
     const offenderNo = prisonerData.prisonerNumber
 
-    const [locationAttributes, locationHistory, agencyDetails, cellMoveReasonTypes] = await Promise.all([
-      prisonApiClient.getAttributesForLocation(locationId.toString()),
-      prisonApiClient.getHistoryForLocation(locationId as string, fromDate as string, toDate as string),
+    const { dpsLocationId } = await nomisSyncPrisonerMappingApiClient.getMappingUsingNomisLocationId(
+      parseInt(locationId, 10),
+    )
+
+    const [location, locationAtrbts, locationHistory, agencyDetails, cellMoveReasonTypes] = await Promise.all([
+      locationsInsidePrisonApiClient.getLocation(dpsLocationId),
+      locationsInsidePrisonApiClient.getLocationAttributes(dpsLocationId),
+      prisonApiClient.getHistoryForLocation(locationId, fromDate as string, toDate as string),
       prisonApiClient.getAgencyDetails(agencyId.toString()),
       prisonApiClient.getCellMoveReasonTypes(),
     ])
+
+    const locationAttributes = {
+      attributes: locationAtrbts.map(attribute => ({ code: attribute.code, description: attribute.description })),
+      description: location.key,
+    }
 
     const currentPrisonerDetails =
       locationHistory.find((record: HistoryForLocationItem) => record.bookingId.toString() === bookingId.toString()) ||
