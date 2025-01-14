@@ -197,5 +197,5 @@ export interface PrisonPersonApiClient {
 
   postDistinguishingMarkPhoto(markId: string, photograph: MulterFile): Promise<PrisonPersonDistinguishingMark>
 
-  getImage(imageId: string): Promise<Readable>
+  getImage(imageId: string): Promise<{ stream: Readable; contentType: string }>
 }

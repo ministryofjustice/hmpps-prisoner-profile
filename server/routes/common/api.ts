@@ -81,11 +81,11 @@ export default class CommonApiRoutes {
 
     this.prisonPersonService
       .getImage(req.middleware.clientToken, imageId)
-      .then(data => {
+      .then(({ stream, contentType }) => {
         res.set('Cache-control', 'private, max-age=86400')
         res.removeHeader('pragma')
-        res.type('image/jpeg')
-        data.pipe(res)
+        res.type(contentType || 'image/jpeg')
+        stream.pipe(res)
       })
       .catch(_error => {
         res.redirect(placeHolderImage)
