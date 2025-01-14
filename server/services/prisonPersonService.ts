@@ -16,7 +16,7 @@ export default class PrisonPersonService {
     return this.prisonPersonApiClientBuilder(token).getFieldHistory(prisonerNumber, field)
   }
 
-  getImage(token: string, imageId: string): Promise<Readable> {
+  getImage(token: string, imageId: string): Promise<{ stream: Readable; contentType: string }> {
     return this.prisonPersonApiClientBuilder(token).getImage(imageId)
   }
 }

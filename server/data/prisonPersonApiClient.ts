@@ -114,9 +114,11 @@ export default class PrisonPersonApiRestClient implements PrisonPersonApiClient 
     })
   }
 
-  async getImage(imageId: string): Promise<Readable> {
-    return this.restClient.stream({
-      path: `/photographs/${imageId}/file`,
+  async getImage(photoUuid: string): Promise<{ stream: Readable; contentType: string }> {
+    const { stream, contentType } = await this.restClient.streamWithContentType({
+      path: `/distinguishing-marks/photo/${photoUuid}`,
     })
+
+    return { stream, contentType }
   }
 }
