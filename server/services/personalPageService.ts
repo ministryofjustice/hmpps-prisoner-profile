@@ -568,4 +568,23 @@ export default class PersonalPageService {
 
     return response
   }
+
+  async updateReligion(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    religionCode: string,
+    reasonForChange?: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['religion'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
 }
