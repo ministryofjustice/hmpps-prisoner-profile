@@ -369,5 +369,17 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
+  editRoute({
+    path: 'edit/religion',
+    edit: {
+      audit: Page.EditReligion,
+      method: personalController.religion().edit,
+    },
+    submit: {
+      audit: Page.PostEditReligion,
+      method: personalController.religion().submit,
+    },
+  })
+
   return router
 }

@@ -22,6 +22,7 @@ export enum ProfileInformationType {
   NumberOfChildren = 'CHILD',
   SexualOrientation = 'SEXO',
   Nationality = 'NAT',
+  Religion = 'RELF',
   OtherNationalities = 'NATIO',
   WarnedAboutTattooing = 'TAT',
   WarnedNotToChangeAppearance = 'APPEAR',

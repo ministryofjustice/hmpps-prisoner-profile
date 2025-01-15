@@ -10,11 +10,13 @@ export interface ReferenceDataCodeDto {
 export enum ProxyReferenceDataDomain {
   country = 'COUNTRY',
   nationality = 'NAT',
+  religion = 'RELF',
 }
 
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
   updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void>
   updateNationality(prisonerNumber: string, nationality: string): Promise<void>
+  updateReligion(prisonerNumber: string, religion: string, reasonForChange?: string): Promise<void>
   getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]>
 }

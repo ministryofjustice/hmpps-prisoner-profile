@@ -1281,4 +1281,134 @@ export default class PersonalController {
       },
     }
   }
+
+  religion() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Religion, faith or belief'
+        const { prisonerNumber } = req.params
+        const { clientToken, inmateDetail, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{
+          religion: string
+          reasonKnown: string
+          reasonForChange: string
+          reasonForChangeUnknown: string
+        }>(req)
+        const errors = req.flash('errors')
+
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const otherReligionCodes = ['OTH', 'NIL', 'UNKN']
+        const religionReferenceData = await this.personalPageService.getReferenceDataCodesFromProxy(
+          clientToken,
+          ProxyReferenceDataDomain.religion,
+        )
+        const religionOptions = religionReferenceData.filter(it => !otherReligionCodes.includes(it.code))
+        const otherReligionOptions = otherReligionCodes.map(code => religionReferenceData.find(it => it.code === code))
+        const profileInformationValue = getProfileInformationValue(
+          ProfileInformationType.Religion,
+          inmateDetail.profileInformation,
+        )
+        const currentReligion = religionReferenceData.filter(
+          religion => religion.code === profileInformationValue || religion.description === profileInformationValue,
+        )[0]
+        const fieldValue = requestBodyFlash?.religion
+        const currentReasonKnown = requestBodyFlash?.reasonKnown
+        const currentReasonForChange = requestBodyFlash?.reasonForChange
+        const currentReasonForChangeUnknown = requestBodyFlash?.reasonForChangeUnknown
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: Page.EditReligion,
+        })
+
+        res.render('pages/edit/religion', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: `Select ${prisonerName}'s religion, faith or belief`,
+          prisonerNumber,
+          currentReligion,
+          currentReasonKnown,
+          currentReasonForChange,
+          currentReasonForChangeUnknown,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          options: [
+            ...objectToRadioOptions(religionOptions, 'code', 'description', fieldValue),
+            { divider: 'Or other, none or unknown' },
+            ...objectToRadioOptions(otherReligionOptions, 'code', 'description', fieldValue),
+          ],
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const fieldName = 'religion'
+        const pageTitle = 'Religion, faith or belief'
+        const url = 'religion'
+        const redirectAnchor = 'personal-details'
+
+        const { prisonerNumber } = req.params
+        const { clientToken, inmateDetail } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const religion = req.body.religion || null
+        const currentReligion = req.body.currentReligion || null
+        const reasonForChangeKnown = req.body.reasonKnown || null
+        const reasonForChange =
+          reasonForChangeKnown === 'NO' ? req.body.reasonForChangeUnknown : req.body.reasonForChange
+        const errors = []
+        if (!religion) {
+          errors.push({ href: '#religion', text: 'Choose a religion, faith or belief' })
+        }
+        if (currentReligion && reasonForChangeKnown === null) {
+          errors.push({ href: '#reasonKnown', text: 'Indicate whether or not the reason for change is known' })
+        }
+        if (reasonForChangeKnown === 'YES' && !req.body.reasonForChange) {
+          errors.push({ href: '#reasonForChange', text: 'Provide a reason for the change' })
+        }
+        if (errors.length > 0) {
+          req.flash('errors', errors)
+          req.flash('requestBody', JSON.stringify(req.body))
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        }
+
+        const previousValue = getProfileInformationValue(
+          ProfileInformationType.Religion,
+          inmateDetail.profileInformation,
+        )
+
+        try {
+          await this.personalPageService.updateReligion(clientToken, user, prisonerNumber, religion, reasonForChange)
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditReligion,
+              details: {
+                fieldName,
+                previous: previousValue,
+                updated: religion,
+              },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
 }

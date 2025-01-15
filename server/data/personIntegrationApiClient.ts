@@ -25,6 +25,14 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.updateCorePersonRecord(prisonerNumber, 'COUNTRY_OF_BIRTH', countryOfBirth)
   }
 
+  updateReligion(prisonerNumber: string, religionCode: string, reasonForChange?: string): Promise<void> {
+    return this.restClient.put({
+      path: '/v1/person-protected-characteristics/religion',
+      query: { prisonerNumber },
+      data: { religionCode, reasonForChange },
+    })
+  }
+
   getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]> {
     return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
   }

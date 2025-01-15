@@ -37,6 +37,7 @@ import {
 import {
   ActiveCountryReferenceDataCodesMock,
   NationalityReferenceDataCodesMock,
+  ReligionReferenceDataCodesMock,
 } from '../../data/localMockData/personIntegrationReferenceDataMock'
 
 describe('PersonalController', () => {
@@ -61,6 +62,7 @@ describe('PersonalController', () => {
       profileInformation: [
         { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
         { question: 'Nationality', resultValue: 'BRIT', type: ProfileInformationType.Nationality },
+        { question: 'Religion', resultValue: 'DRU', type: ProfileInformationType.Religion },
       ],
     } as InmateDetail,
   }
@@ -136,6 +138,7 @@ describe('PersonalController', () => {
     personalPageService.getReferenceDataCodesFromProxy = jest.fn(async (_, domain) => {
       if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
       if (domain === 'NAT') return NationalityReferenceDataCodesMock
+      if (domain === 'RELF') return ReligionReferenceDataCodesMock
       return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
@@ -2328,6 +2331,279 @@ describe('PersonalController', () => {
         await action(request, res)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
+
+  describe('religion, faith or belief', () => {
+    describe('edit', () => {
+      const action = async (req: any, response: any) => controller.religion().edit(req, response, () => {})
+
+      it('Renders the default edit page with the correct data from the prison API', async () => {
+        const expectedOptions = [
+          { text: 'Druid', value: 'DRU' },
+          { text: 'Pagan', value: 'PAG' },
+          { text: 'Zoroastrian', value: 'ZORO' },
+          { divider: 'Or other, none or unknown' },
+          { text: 'Other religion', value: 'OTH' },
+          { text: 'No religion', value: 'NIL' },
+          { text: 'Unknown', value: 'UNKN' },
+        ]
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/religion', {
+          pageTitle: 'Religion, faith or belief - Prisoner personal details',
+          formTitle: `Select First Last's religion, faith or belief`,
+          prisonerNumber: 'ABC123',
+          currentReasonForChange: undefined,
+          currentReasonForChangeUnknown: undefined,
+          currentReasonKnown: undefined,
+          currentReligion: {
+            id: 'RELF_DRU',
+            code: 'DRU',
+            description: 'Druid',
+            isActive: true,
+            listSequence: 1,
+          },
+          breadcrumbPrisonerName: 'Last, First',
+          errors: [],
+          options: expectedOptions,
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the religion radio buttons from the flash', async () => {
+        const expectedOptions = [
+          { text: 'Druid', value: 'DRU' },
+          { text: 'Pagan', value: 'PAG' },
+          { text: 'Zoroastrian', value: 'ZORO', checked: true },
+          { divider: 'Or other, none or unknown' },
+          { text: 'Other religion', value: 'OTH' },
+          { text: 'No religion', value: 'NIL' },
+          { text: 'Unknown', value: 'UNKN' },
+        ]
+
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ religion: 'ZORO' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expectedOptions,
+          }),
+        )
+      })
+
+      it('Populates the reason for change radio from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ reasonKnown: 'YES' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            currentReasonKnown: 'YES',
+          }),
+        )
+      })
+
+      it('Populates the text areas from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody'
+              ? [JSON.stringify({ reasonForChange: 'Reason 1', reasonForChangeUnknown: 'Reason 2' })]
+              : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            currentReasonForChange: 'Reason 1',
+            currentReasonForChangeUnknown: 'Reason 2',
+          }),
+        )
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.religion().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'ABC123' },
+          body: { religion: 'ZORO', reasonKnown: 'NO' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it.each([
+        { body: { religion: 'ZORO', reasonKnown: 'NO' }, updatedReligion: 'ZORO' },
+        {
+          body: { religion: 'ZORO', reasonKnown: 'NO', reasonForChangeUnknown: 'Not sure' },
+          updatedReligion: 'ZORO',
+          reason: 'Not sure',
+        },
+        {
+          body: {
+            religion: 'ZORO',
+            reasonKnown: 'NO',
+            reasonForChange: 'Some reason',
+            reasonForChangeUnknown: 'Not sure',
+          },
+          updatedReligion: 'ZORO',
+          reason: 'Not sure',
+        },
+        {
+          body: { religion: 'ZORO', reasonKnown: 'YES', reasonForChange: 'Some reason' },
+          updatedReligion: 'ZORO',
+          reason: 'Some reason',
+        },
+        {
+          body: {
+            religion: 'ZORO',
+            reasonKnown: 'YES',
+            reasonForChange: 'Some reason',
+            reasonForChangeUnknown: 'Not sure',
+          },
+          updatedReligion: 'ZORO',
+          reason: 'Some reason',
+        },
+      ])('Prisoner with existing religion - valid request: %s', async ({ body, updatedReligion, reason }) => {
+        const request = { ...validRequest, body }
+        await action(request, res)
+        expect(personalPageService.updateReligion).toHaveBeenCalledWith(
+          expect.anything(),
+          prisonUserMock,
+          expect.anything(),
+          updatedReligion,
+          reason,
+        )
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Religion, faith or belief updated',
+          type: FlashMessageType.success,
+          fieldName: 'religion',
+        })
+      })
+
+      it.each([
+        {
+          body: { religion: 'ZORO' },
+          updatedReligion: 'ZORO',
+        },
+        {
+          body: { religion: 'ZORO', reasonForChange: 'Some reason' },
+          updatedReligion: 'ZORO',
+          reason: 'Some reason',
+        },
+      ])('Prisoner without existing religion - valid request: %s', async ({ body, updatedReligion, reason }) => {
+        const request = {
+          middleware: {
+            clientToken: 'token',
+            prisonerData: {
+              firstName: 'First',
+              lastName: 'Last',
+              cellLocation: '2-3-001',
+              prisonerNumber: 'ABC123',
+              prisonId: 999,
+            },
+            inmateDetail: {
+              birthPlace: 'SHEFFIELD',
+              profileInformation: [],
+            } as InmateDetail,
+          },
+          params: { prisonerNumber: 'ABC123' },
+          body,
+          flash: jest.fn(),
+        } as any
+
+        await action(request, res)
+
+        expect(personalPageService.updateReligion).toHaveBeenCalledWith(
+          expect.anything(),
+          prisonUserMock,
+          expect.anything(),
+          updatedReligion,
+          reason,
+        )
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#personal-details')
+        expect(request.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Religion, faith or belief updated',
+          type: FlashMessageType.success,
+          fieldName: 'religion',
+        })
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { religion: 'ZORO', reasonKnown: 'NO' },
+        }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          correlationId: request.id,
+          action: PostAction.EditReligion,
+          details: {
+            fieldName: 'religion',
+            previous: 'DRU',
+            updated: 'ZORO',
+          },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateReligion = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/religion')
       })
     })
   })
