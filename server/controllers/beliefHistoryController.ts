@@ -12,10 +12,10 @@ export default class BeliefHistoryController {
   ) {}
 
   public async displayBeliefHistory(req: Request, res: Response) {
-    const { firstName, lastName, prisonerNumber, bookingId, prisonId } = req.middleware.prisonerData
+    const { firstName, lastName, prisonerNumber, prisonId } = req.middleware.prisonerData
     const { clientToken } = req.middleware
 
-    const beliefs = await this.beliefService.getBeliefHistory(clientToken, prisonerNumber, bookingId)
+    const beliefs = await this.beliefService.getBeliefHistory(clientToken, prisonerNumber)
 
     this.auditService
       .sendPageView({
