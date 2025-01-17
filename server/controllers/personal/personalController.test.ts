@@ -62,7 +62,7 @@ describe('PersonalController', () => {
       profileInformation: [
         { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
         { question: 'Nationality', resultValue: 'BRIT', type: ProfileInformationType.Nationality },
-        { question: 'Religion', resultValue: 'DRU', type: ProfileInformationType.Religion },
+        { question: 'Religion', resultValue: 'Druid', type: ProfileInformationType.Religion },
       ],
     } as InmateDetail,
   }
@@ -2576,7 +2576,7 @@ describe('PersonalController', () => {
         const request = {
           ...validRequest,
           id: 1,
-          body: { religion: 'ZORO', reasonKnown: 'NO' },
+          body: { religion: 'ZORO', currentReligionCode: 'DRU', reasonKnown: 'NO' },
         }
         const expectedAuditEvent = {
           user: prisonUserMock,
@@ -2593,6 +2593,19 @@ describe('PersonalController', () => {
         await action(request, res)
 
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+
+      it('Does not submit a request if no religion was selected', async () => {
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: {},
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).not.toHaveBeenCalled()
+        expect(personalPageService.updateReligion).not.toHaveBeenCalled()
       })
 
       it('Handles API errors', async () => {

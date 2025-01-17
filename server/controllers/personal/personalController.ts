@@ -1312,7 +1312,7 @@ export default class PersonalController {
         )
         const currentReligion = religionReferenceData.filter(
           religion => religion.code === profileInformationValue || religion.description === profileInformationValue,
-        )[0]
+        )[0] || { description: profileInformationValue }
         const fieldValue = requestBodyFlash?.religion
         const currentReasonKnown = requestBodyFlash?.reasonKnown
         const currentReasonForChange = requestBodyFlash?.reasonForChange
@@ -1356,22 +1356,40 @@ export default class PersonalController {
         const redirectAnchor = 'personal-details'
 
         const { prisonerNumber } = req.params
-        const { clientToken, inmateDetail } = req.middleware
+        const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
-        const religion = req.body.religion || null
-        const currentReligion = req.body.currentReligion || null
+        const religionCode = req.body.religion || null
+        const currentReligionCode = req.body.currentReligionCode || null
         const reasonForChangeKnown = req.body.reasonKnown || null
         const reasonForChange =
           reasonForChangeKnown === 'NO' ? req.body.reasonForChangeUnknown : req.body.reasonForChange
         const errors = []
-        if (!religion) {
-          errors.push({ href: '#religion', text: 'Choose a religion, faith or belief' })
+        if (currentReligionCode && !religionCode) {
+          errors.push({ href: '#religion', text: `Select this person's religion, faith or belief` })
         }
-        if (currentReligion && reasonForChangeKnown === null) {
-          errors.push({ href: '#reasonKnown', text: 'Indicate whether or not the reason for change is known' })
+        if (currentReligionCode && reasonForChangeKnown === null) {
+          errors.push({
+            href: '#reasonKnown',
+            text: `Select yes if you know why this person's religion, faith or belief has changed`,
+          })
         }
         if (reasonForChangeKnown === 'YES' && !req.body.reasonForChange) {
-          errors.push({ href: '#reasonForChange', text: 'Provide a reason for the change' })
+          errors.push({
+            href: '#reasonForChange',
+            text: `Enter why this person's religion, faith or belief has changed`,
+          })
+        }
+        if (req.body.reasonForChange?.length > 4000) {
+          errors.push({
+            href: '#reasonForChange',
+            text: `The reason why this person's religion, faith or belief has changed must be 4,000 characters or less`,
+          })
+        }
+        if (req.body.reasonForChangeUnknown?.length > 4000) {
+          errors.push({
+            href: '#reasonForChange',
+            text: `The details about this change must be 4,000 characters or less`,
+          })
         }
         if (errors.length > 0) {
           req.flash('errors', errors)
@@ -1379,13 +1397,18 @@ export default class PersonalController {
           return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
         }
 
-        const previousValue = getProfileInformationValue(
-          ProfileInformationType.Religion,
-          inmateDetail.profileInformation,
-        )
+        if (!religionCode) {
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+        }
 
         try {
-          await this.personalPageService.updateReligion(clientToken, user, prisonerNumber, religion, reasonForChange)
+          await this.personalPageService.updateReligion(
+            clientToken,
+            user,
+            prisonerNumber,
+            religionCode,
+            reasonForChange,
+          )
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
           this.auditService
@@ -1396,8 +1419,8 @@ export default class PersonalController {
               action: PostAction.EditReligion,
               details: {
                 fieldName,
-                previous: previousValue,
-                updated: religion,
+                previous: currentReligionCode,
+                updated: religionCode,
               },
             })
             .catch(error => logger.error(error))

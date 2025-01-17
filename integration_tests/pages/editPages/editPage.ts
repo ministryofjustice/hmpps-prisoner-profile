@@ -24,7 +24,9 @@ export default class EditPage extends Page {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`textarea[name='${key}']`).clear()
       if (value) {
-        cy.get(`textarea[name='${key}']`).type(value)
+        cy.get(`textarea[name='${key}']`)
+          .invoke('val', value.substring(0, value.length - 1))
+          .type(value.slice(-1))
       }
     })
   }

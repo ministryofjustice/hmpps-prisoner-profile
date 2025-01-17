@@ -32,7 +32,14 @@
 {% block body %}
   {% set currentReligionHtml %}
     {% if currentReligion %}
-      <span><b>Current religion, faith or belief:</b> {{ currentReligion.description }}</span>
+      <span>
+        <b>Current religion, faith or belief:</b>
+        {% if currentReligion.description %}
+          {{ currentReligion.description }}
+        {% else %}
+          {{ currentReligion }}
+        {% endif %}
+      </span>
     {% else %}
     {% endif %}
   {% endset %}
@@ -42,7 +49,6 @@
       id: "reason-for-change-known",
       value: currentReasonForChange,
       errorMessage: errors | findError('reasonForChange'),
-      classes: 'govuk-!-width-three-quarters',
       label: {
         text: "Give details"
       }
@@ -53,7 +59,6 @@
       name: "reasonForChangeUnknown",
       id: "reason-for-change-unknown",
       value: currentReasonForChangeUnknown,
-      classes: 'govuk-!-width-three-quarters',
       label: {
         text: "Give details (optional)"
       }
@@ -89,7 +94,7 @@
       {% endif %}
       <form method="post" novalidate="novalidate" autocomplete="off">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-        <input type="hidden" name="currentReligion" value="{{ currentReligion.code }}" />
+        <input type="hidden" name="currentReligionCode" value="{{ currentReligion.code }}" />
         <div class="govuk-form-group">
           {{ govukRadios({
             idPrefix: "radio",
@@ -112,7 +117,7 @@
 
         {% if currentReligion %}
           {{ govukRadios({
-            idPrefix: "radio",
+            idPrefix: "radio-yes-no",
             name: "reasonKnown",
             errorMessage: errors | findError("reasonKnown"),
             fieldset: {
@@ -143,18 +148,7 @@
             ]
           }) }}
           {{ govukWarningText({
-            text: "This will record a new religion. The current religion, faith or belief will be made inactive."
-          }) }}
-        {% else %}
-          {{ govukTextarea({
-            name: "reasonForChange",
-            id: "comments",
-            value: currentReasonForChange,
-            errorMessage: errors | findError('reasonForChange'),
-            classes: 'govuk-!-width-three-quarters',
-            label: {
-              text: "Comments"
-            }
+            text: "This will record a new religion, faith or belief. The current religion, faith or belief will be made inactive."
           }) }}
         {% endif %}
 
