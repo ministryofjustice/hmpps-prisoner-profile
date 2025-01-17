@@ -58,6 +58,7 @@ import {
   referenceDataDomainToCheckboxOptions,
 } from '../../utils/checkboxUtils'
 import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -1073,6 +1074,73 @@ export default class PersonalController {
           cellLocation: formatLocation(cellLocation),
         },
       })
+    }
+  }
+
+  dietAndFoodAllergies() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const errors = validationErrorsFromFlash(req)
+
+        const requestBodyFlash = requestBodyFromFlash<{
+          medical?: string[] | string
+          medicalOther: string
+          allergies?: string[] | string
+          allergiesOther: string
+          personal?: string[] | string
+          personalOther: string
+        }>(req)
+
+        const requestBodyToChecked = (body: string[] | string) => {
+          if (typeof body === 'string') return [body]
+          return body
+        }
+
+        // This will need to be updated to account for existing data/new values in the future
+        const checked = [
+          ...(requestBodyFlash?.medical ? requestBodyToChecked(requestBodyFlash.medical) : []),
+          ...(requestBodyFlash?.allergies ? requestBodyToChecked(requestBodyFlash.allergies) : []),
+          ...(requestBodyFlash?.personal ? requestBodyToChecked(requestBodyFlash.personal) : []),
+        ]
+
+        res.render('pages/edit/dietAndFoodAllergies', {
+          pageTitle: 'Diet and food allergies - Prisoner personal details',
+          prisonerNumber,
+          prisonerName,
+          breadcrumbPrisonerName: prisonerBannerName,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+          errors,
+          errorsForForms: {
+            medical: errors.filter(e => e.href === '#medical')[0]?.text,
+            allergies: errors.filter(e => e.href === '#allergies')[0]?.text,
+            personal: errors.filter(e => e.href === '#personal')[0]?.text,
+          },
+          checked,
+          medicalOtherValue: requestBodyFlash?.medicalOther || null,
+          allergyOtherValue: requestBodyFlash?.allergiesOther || null,
+          personalOtherValue: requestBodyFlash?.personalOther || null,
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+
+        req.flash('flashMessage', {
+          text: `Diet and food allergies updated`,
+          type: FlashMessageType.success,
+          fieldName: 'dietAndFoodAllergies',
+        })
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      },
     }
   }
 
