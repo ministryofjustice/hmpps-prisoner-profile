@@ -187,12 +187,15 @@ Cypress.Commands.add('setupPrisonerSchedulePageStubs', ({ bookingId }) => {
 
 Cypress.Commands.add(
   'setupSpecificLocationHistoryPageStubs',
-  ({ prisonerNumber, bookingId, locationId, staffId, prisonId, caseLoads, sharingHistory }) => {
+  ({ prisonerNumber, bookingId, nomisLocationId, dpsLocationId, staffId, prisonId, caseLoads, sharingHistory }) => {
     cy.task('stubPrisonerData', { prisonerNumber })
     cy.task('stubGetDetails', prisonerNumber)
-    cy.task('stubGetAttributesForLocation', locationId)
+    cy.task('stubGetAttributesForLocation', dpsLocationId)
+    cy.task('stubGetMappingUsingNomisLocationId', nomisLocationId)
+    cy.task('stubGetLocation', dpsLocationId)
+
     cy.task('stubGetHistoryForLocation', {
-      locationId,
+      nomisLocationId,
       locationHistories: [
         { bookingId },
         ...sharingHistory.map(i => {
