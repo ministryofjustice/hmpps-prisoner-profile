@@ -60,6 +60,7 @@ describe('PersonalPageService', () => {
       updateBirthPlace: jest.fn(),
       updateCountryOfBirth: jest.fn(),
       updateNationality: jest.fn(),
+      updateReligion: jest.fn(),
       getReferenceDataCodes: jest.fn(),
     }
 
@@ -642,6 +643,18 @@ describe('PersonalPageService', () => {
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['cityOrTownOfBirth'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update religion', () => {
+    it('Updates the religion using Person Integration API', async () => {
+      await constructService().updateReligion('token', prisonUserMock, 'A1234AA', 'ZORO', 'Some comment')
+      expect(personIntegrationApiClient.updateReligion).toHaveBeenCalledWith('A1234AA', 'ZORO', 'Some comment')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['religion'],
         user: prisonUserMock,
       })
     })

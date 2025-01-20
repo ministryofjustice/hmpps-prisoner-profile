@@ -41,6 +41,13 @@ describe('personIntegrationApiClient', () => {
     })
   })
 
+  describe('updateReligion', () => {
+    it('should update religion', async () => {
+      fakePersonIntegrationApi.put('/v1/person-protected-characteristics/religion?prisonerNumber=A1234AA').reply(204)
+      await personIntegrationApiClient.updateReligion('A1234AA', 'ZORO', 'Some comment')
+    })
+  })
+
   describe('getReferenceDataCodes', () => {
     it('should return reference data codes', async () => {
       fakePersonIntegrationApi

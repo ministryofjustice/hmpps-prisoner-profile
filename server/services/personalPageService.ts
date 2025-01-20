@@ -261,7 +261,7 @@ export default class PersonalPageService {
         undefined,
         prisonerDetail?.currentWorkingLastName,
       ),
-      religionOrBelief: prisonerData.religion || 'Not entered',
+      religionOrBelief: inmateDetail.religion || 'Not entered',
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
@@ -562,6 +562,25 @@ export default class PersonalPageService {
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['nationality'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async updateReligion(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    religionCode: string,
+    reasonForChange?: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['religion'],
       prisonerNumber,
       user,
     })

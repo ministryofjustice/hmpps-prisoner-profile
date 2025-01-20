@@ -23,6 +23,7 @@ import {
 import validationMiddleware, { Validator } from '../middleware/validationMiddleware'
 import { heightImperialValidator, heightMetricValidator } from '../validators/personal/heightValidator'
 import { weightImperialValidator, weightMetricValidator } from '../validators/personal/weightValidator'
+import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 
@@ -366,6 +367,22 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditNationality,
       method: personalController.nationality().submit,
+    },
+  })
+
+  editRoute({
+    path: 'edit/religion',
+    edit: {
+      audit: Page.EditReligion,
+      method: personalController.religion().edit,
+    },
+    submit: {
+      audit: Page.PostEditReligion,
+      method: personalController.religion().submit,
+      validation: {
+        validators: [religionValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 

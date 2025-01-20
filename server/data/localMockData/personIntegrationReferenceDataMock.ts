@@ -53,3 +53,48 @@ export const NationalityReferenceDataCodesMock: ReferenceDataCodeDto[] = [
     isActive: false,
   },
 ]
+
+export const ReligionReferenceDataCodesMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'RELF_DRU',
+    code: 'DRU',
+    description: 'Druid',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'RELF_PAG',
+    code: 'PAG',
+    description: 'Pagan',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'RELF_ZORO',
+    code: 'ZORO',
+    description: 'Zoroastrian',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'RELF_OTH',
+    code: 'OTH',
+    description: 'Other religion',
+    listSequence: 4,
+    isActive: true,
+  },
+  {
+    id: 'RELF_NIL',
+    code: 'NIL',
+    description: 'No religion',
+    listSequence: 5,
+    isActive: true,
+  },
+  {
+    id: 'RELF_UNKN',
+    code: 'UNKN',
+    description: 'Unknown',
+    listSequence: 6,
+    isActive: true,
+  },
+]

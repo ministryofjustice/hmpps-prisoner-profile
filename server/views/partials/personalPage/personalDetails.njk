@@ -67,7 +67,7 @@
                     { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality", visible: inUsersCaseLoad, changeHref: "personal/edit/nationality", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'nationality' } },
                     { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
                     { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
-                    { key: "Religion or belief", value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), options: { dataQa: "religion-or-belief", html: true, visible: inUsersCaseLoad } },
+                    { key: "Religion or belief", value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), options: { dataQa: "religion-or-belief", html: true, visible: inUsersCaseLoad, changeHref: "personal/edit/religion", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'religion' } },
                     { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
                     { key: "Sexual orientation", value: personalDetails.sexualOrientation, options: { dataQa: "sexual-orientation", visible: inUsersCaseLoad } },
                     { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
