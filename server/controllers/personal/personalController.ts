@@ -1310,9 +1310,11 @@ export default class PersonalController {
           ProfileInformationType.Religion,
           inmateDetail.profileInformation,
         )
-        const currentReligion = religionReferenceData.filter(
-          religion => religion.code === profileInformationValue || religion.description === profileInformationValue,
-        )[0] || { description: profileInformationValue }
+        const currentReligion = profileInformationValue
+          ? religionReferenceData.filter(
+              religion => religion.description === profileInformationValue || religion.code === profileInformationValue,
+            )[0] || { code: '?', description: profileInformationValue }
+          : profileInformationValue
         const fieldValue = requestBodyFlash?.religion
         const currentReasonKnown = requestBodyFlash?.reasonKnown
         const currentReasonForChange = requestBodyFlash?.reasonForChange
@@ -1363,39 +1365,6 @@ export default class PersonalController {
         const reasonForChangeKnown = req.body.reasonKnown || null
         const reasonForChange =
           reasonForChangeKnown === 'NO' ? req.body.reasonForChangeUnknown : req.body.reasonForChange
-        const errors = []
-        if (currentReligionCode && !religionCode) {
-          errors.push({ href: '#religion', text: `Select this person's religion, faith or belief` })
-        }
-        if (currentReligionCode && reasonForChangeKnown === null) {
-          errors.push({
-            href: '#reasonKnown',
-            text: `Select yes if you know why this person's religion, faith or belief has changed`,
-          })
-        }
-        if (reasonForChangeKnown === 'YES' && !req.body.reasonForChange) {
-          errors.push({
-            href: '#reasonForChange',
-            text: `Enter why this person's religion, faith or belief has changed`,
-          })
-        }
-        if (req.body.reasonForChange?.length > 4000) {
-          errors.push({
-            href: '#reasonForChange',
-            text: `The reason why this person's religion, faith or belief has changed must be 4,000 characters or less`,
-          })
-        }
-        if (req.body.reasonForChangeUnknown?.length > 4000) {
-          errors.push({
-            href: '#reasonForChange',
-            text: `The details about this change must be 4,000 characters or less`,
-          })
-        }
-        if (errors.length > 0) {
-          req.flash('errors', errors)
-          req.flash('requestBody', JSON.stringify(req.body))
-          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
-        }
 
         if (!religionCode) {
           return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
@@ -1427,10 +1396,10 @@ export default class PersonalController {
 
           return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
+          req.flash('requestBody', JSON.stringify(req.body))
           req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
         }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
       },
     }
   }

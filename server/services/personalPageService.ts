@@ -261,7 +261,7 @@ export default class PersonalPageService {
         undefined,
         prisonerDetail?.currentWorkingLastName,
       ),
-      religionOrBelief: prisonerData.religion || 'Not entered',
+      religionOrBelief: inmateDetail.religion || 'Not entered',
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
