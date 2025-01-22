@@ -20,6 +20,17 @@ export default class EditPage extends Page {
     })
   }
 
+  fillInTextAreaFields = (fields: { [key: string]: string }) => {
+    Object.entries(fields).forEach(([key, value]) => {
+      cy.get(`textarea[name='${key}']`).clear()
+      if (value) {
+        cy.get(`textarea[name='${key}']`)
+          .invoke('val', value.substring(0, value.length - 1))
+          .type(value.slice(-1))
+      }
+    })
+  }
+
   selectRadios = (fields: { [key: string]: string }) => {
     Object.entries(fields).forEach(([key, value]) => {
       cy.get(`input[name=${key}][value=${value}]`).click()
