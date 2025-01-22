@@ -41,6 +41,7 @@ import BookAVideoLinkRestApiClient from './bookAVideoLinkApiClient'
 import CsipApiRestClient from './csipApiClient'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 import ReferenceDataStore from './referenceDataStore/referenceDataStore'
+import HealthAndMedicationApiRestClient from './healthAndMedicationApiRestClient'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -83,6 +84,7 @@ export const dataAccess = {
   prisonPersonApiClientBuilder: (token: string) => new PrisonPersonApiRestClient(token),
   personIntegrationApiClientBuilder: (token: string) => new PersonIntegrationApiRestClient(token),
   csipApiClientBuilder: (token: string) => new CsipApiRestClient(token),
+  healthAndMedicationApiClientBuilder: (token: string) => new HealthAndMedicationApiRestClient(token),
   telemetryClient,
 }
 

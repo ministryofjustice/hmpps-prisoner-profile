@@ -111,6 +111,7 @@ export enum PostAction {
   EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
   EditNationality = 'EDIT_NATIONALITY',
   EditReligion = 'EDIT_RELIGION',
+  EditDietAndFoodAllergies = 'EDIT_DIET_AND_FOOD_ALLERGIES',
 }
 
 // eslint-disable-next-line no-shadow

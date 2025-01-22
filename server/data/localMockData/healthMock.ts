@@ -1,6 +1,6 @@
-import { PrisonPersonHealth } from '../interfaces/prisonPersonApi/prisonPersonApiClient'
+import { HealthAndMedication } from '../interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
-export const healthMock: PrisonPersonHealth = {
+export const healthMock: HealthAndMedication = {
   smokerOrVaper: {
     value: { id: 'SMOKE_SMOKER', description: 'Yes they smoke', listSequence: 0, isActive: true },
     lastModifiedAt: '2024-07-01T01:02:03+0100',

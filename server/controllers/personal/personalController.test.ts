@@ -39,6 +39,8 @@ import {
   NationalityReferenceDataCodesMock,
   ReligionReferenceDataCodesMock,
 } from '../../data/localMockData/personIntegrationReferenceDataMock'
+import { healthMock } from '../../data/localMockData/healthMock'
+import { HealthAndMedication } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -122,6 +124,7 @@ describe('PersonalController', () => {
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
+    personalPageService.getHealthAndMedication = jest.fn(async () => ({ ...healthMock }))
     personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
       if (domain === 'smoke')
         return [
@@ -1987,6 +1990,229 @@ describe('PersonalController', () => {
     })
   })
 
+  describe('Diet and food allergies', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.dietAndFoodAllergies().edit(req, response, () => {})
+
+      it('Renders the edit page with the correct data from the health and medications api when no existing data is present', async () => {
+        personalPageService.getHealthAndMedication = jest.fn(async () => null as HealthAndMedication)
+
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
+          pageTitle: expect.anything(),
+          prisonerNumber: 'ABC123',
+          prisonerName: 'First Last',
+          breadcrumbPrisonerName: 'Last, First',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+          errors: [],
+          checked: [],
+          errorsForForms: {
+            allergies: null,
+            medical: null,
+            personal: null,
+          },
+          allergyOtherValue: null,
+          medicalOtherValue: null,
+          personalOtherValue: null,
+        })
+      })
+
+      it('Renders the edit page with the correct data from the health and medications api when data is present', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(personalPageService.getHealthAndMedication).toHaveBeenCalledWith(expect.anything(), 'ABC123')
+        expect(res.render).toHaveBeenCalledWith('pages/edit/dietAndFoodAllergies', {
+          pageTitle: expect.anything(),
+          prisonerNumber: 'ABC123',
+          prisonerName: 'First Last',
+          breadcrumbPrisonerName: 'Last, First',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+          errors: [],
+          checked: ['MEDICAL_DIET_LOW_FAT', 'FOOD_ALLERGY_GLUTEN'],
+          errorsForForms: {
+            allergies: null,
+            medical: null,
+            personal: null,
+          },
+          allergyOtherValue: null,
+          medicalOtherValue: null,
+          personalOtherValue: null,
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody'
+              ? [
+                  JSON.stringify({
+                    medical: ['MEDICAL_DIET_FREE_FROM', 'MEDICAL_DIET_OTHER'],
+                    allergies: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_OTHER'],
+                    personal: ['PERSONAL_DIET_KOSHER', 'PERSONAL_DIET_OTHER'],
+                    medicalOther: 'other1',
+                    allergiesOther: 'other2',
+                    personalOther: 'other3',
+                  }),
+                ]
+              : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            checked: [
+              'MEDICAL_DIET_FREE_FROM',
+              'MEDICAL_DIET_OTHER',
+              'FOOD_ALLERGY_EGG',
+              'FOOD_ALLERGY_OTHER',
+              'PERSONAL_DIET_KOSHER',
+              'PERSONAL_DIET_OTHER',
+            ],
+            medicalOtherValue: 'other1',
+            allergyOtherValue: 'other2',
+            personalOtherValue: 'other3',
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditDietAndFoodAllergies,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) =>
+        controller.dietAndFoodAllergies().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { medical: ['MEDICAL_DIET_DIABETES_TYPE_1'], allergies: ['FOOD_ALLERGIES_EGG'] },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Diet and food allergies updated',
+          type: FlashMessageType.success,
+          fieldName: 'dietAndFoodAllergies',
+        })
+      })
+
+      it('Updates the prisoner health on success', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateDietAndFoodAllergies).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.anything(),
+          'A1234BC',
+          { medicalDietaryRequirements: ['MEDICAL_DIET_DIABETES_TYPE_1'], foodAllergies: ['FOOD_ALLERGIES_EGG'] },
+        )
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateDietAndFoodAllergies = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/diet-and-food-allergies')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: validRequest.id,
+          action: PostAction.EditDietAndFoodAllergies,
+          details: {
+            fieldName: 'dietAndFoodAllergies',
+            previous: {
+              medicalDietaryRequirements: ['MEDICAL_DIET_LOW_FAT'],
+              foodAllergies: ['FOOD_ALLERGY_GLUTEN'],
+            },
+            updated: {
+              medicalDietaryRequirements: ['MEDICAL_DIET_DIABETES_TYPE_1'],
+              foodAllergies: ['FOOD_ALLERGIES_EGG'],
+            },
+          },
+        }
+
+        await action(validRequest, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+  })
   describe('Medical diet', () => {
     describe('Edit', () => {
       const action = async (req: any, response: any) => controller.medicalDiet().edit(req, response, () => {})
