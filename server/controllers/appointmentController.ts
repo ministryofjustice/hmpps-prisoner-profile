@@ -140,7 +140,7 @@ export default class AppointmentController {
         .catch(error => logger.error(error))
 
       return res.render('pages/appointments/addAppointment', {
-        pageTitle: 'Add an appointment',
+        pageTitle: appointmentId ? 'Change appointment details' : 'Add an appointment',
         miniBannerData: {
           prisonerName,
           prisonerNumber,
@@ -466,7 +466,7 @@ export default class AppointmentController {
         .catch(error => logger.error(error))
 
       return res.render('pages/appointments/prePostAppointments', {
-        pageTitle: 'Video link booking details',
+        pageTitle: appointmentId ? 'Change appointment details' : 'Video link booking details',
         ...appointmentData,
         courts: objectToSelectOptions(courts, 'code', 'description'),
         probationTeams: objectToSelectOptions(probationTeams, 'code', 'description'),

@@ -73,12 +73,7 @@
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                {# Editing a video link booking appointment will have a pre-existing appointmentId present #}
-                {% if appointmentId %}
-                    <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-0">Change video link booking</h1>
-                 {% else %}
-                    <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-0">Add an appointment</h1>
-                 {% endif %}
+                <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-0">{{ pageTitle }}</h1>
             </div>
         </div>
 

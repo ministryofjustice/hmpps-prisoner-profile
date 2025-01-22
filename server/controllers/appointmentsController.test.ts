@@ -274,7 +274,7 @@ describe('Appointments Controller', () => {
 
     expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
       appointmentId: 1,
-      pageTitle: 'Add an appointment',
+      pageTitle: 'Change appointment details',
       miniBannerData: {
         prisonerName: 'Saunders, John',
         prisonerNumber: PrisonerMockDataA.prisonerNumber,
@@ -544,7 +544,7 @@ describe('Appointments Controller', () => {
       res.locals.user.activeCaseLoadId,
     )
     expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
-      pageTitle: 'Video link booking details',
+      pageTitle: 'Change appointment details',
       ...appointmentData,
       courts: courtLocationsSelectOptionsMock,
       probationTeams: probationTeamsSelectOptionsMock,
