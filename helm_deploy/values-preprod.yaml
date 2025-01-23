@@ -71,6 +71,7 @@ generic-service:
     PRISON_PERSON_API_URL: "https://prison-person-api-preprod.prison.service.justice.gov.uk"
     PERSON_INTEGRATION_API_URL: "https://person-integration-api-preprod.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api-preprod.hmpps.service.justice.gov.uk"
+    HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-preprod.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"

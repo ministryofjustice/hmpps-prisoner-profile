@@ -26,6 +26,7 @@ import { weightImperialValidator, weightMetricValidator } from '../validators/pe
 import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
+import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -309,6 +310,22 @@ export default function personalRouter(services: Services): Router {
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     personalController.history(weightFieldData),
   )
+
+  editRoute({
+    path: 'diet-and-food-allergies',
+    edit: {
+      audit: Page.EditDietAndFoodAllergies,
+      method: personalController.dietAndFoodAllergies().edit,
+    },
+    submit: {
+      audit: Page.PostEditDietAndFoodAllergies,
+      method: personalController.dietAndFoodAllergies().submit,
+      validation: {
+        validators: [dietAndFoodAllergiesValidator],
+        redirectBackOnError: true,
+      },
+    },
+  })
 
   editRoute({
     path: 'edit/medical-diet',

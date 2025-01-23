@@ -8,7 +8,11 @@ export const prisonPersonApiClientMock = (): PrisonPersonApiClient => ({
   getPrisonPerson: jest.fn(async () => ({
     prisonerNumber: PrisonerMockDataA.prisonerNumber,
     physicalAttributes: physicalAttributesMock,
-    health: healthMock,
+    health: {
+      smokerOrVaper: healthMock.smokerOrVaper,
+      foodAllergies: healthMock.foodAllergies,
+      medicalDietaryRequirements: healthMock.medicalDietaryRequirements,
+    },
   })),
   updatePhysicalAttributes: jest.fn(),
   getReferenceDataDomains: jest.fn(),

@@ -62,6 +62,7 @@ export const services = () => {
     prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
     prisonRegisterStore,
     referenceDataStore,
     featureToggleStore,
@@ -92,6 +93,7 @@ export const services = () => {
     curiousApiClientBuilder,
     prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
+    healthAndMedicationApiClientBuilder,
     referenceDataService,
     metricsService,
   )

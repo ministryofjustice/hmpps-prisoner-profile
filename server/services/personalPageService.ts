@@ -50,6 +50,11 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import ReferenceDataService from './referenceDataService'
+import {
+  HealthAndMedication,
+  HealthAndMedicationApiClient,
+  HealthAndMedicationUpdate,
+} from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 export default class PersonalPageService {
   constructor(
@@ -57,6 +62,7 @@ export default class PersonalPageService {
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
+    private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
     private readonly metricsService: MetricsService,
   ) {}
@@ -67,6 +73,29 @@ export default class PersonalPageService {
       return apiClient.getPrisonPerson(prisonerNumber)
     }
     return null
+  }
+
+  async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
+    const apiClient = this.healthAndMedicationApiClientBuilder(token)
+    return apiClient.getHealthAndMedicationForPrisoner(prisonerNumber)
+  }
+
+  async updateDietAndFoodAllergies(
+    token: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    dietAndFoodAllergies: Partial<HealthAndMedicationUpdate>,
+  ): Promise<HealthAndMedication> {
+    const apiClient = this.healthAndMedicationApiClientBuilder(token)
+    const response = apiClient.updateHealthAndMedicationForPrisoner(prisonerNumber, dietAndFoodAllergies)
+
+    this.metricsService.trackHealthAndMedicationUpdate({
+      fieldsUpdated: Object.keys(dietAndFoodAllergies),
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 
   async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
@@ -113,6 +142,7 @@ export default class PersonalPageService {
       prisonPerson,
       distinguishingMarks,
       learnerNeurodivergence,
+      healthAndMedication,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -125,6 +155,7 @@ export default class PersonalPageService {
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
+      enablePrisonPerson ? this.getHealthAndMedication(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -141,6 +172,7 @@ export default class PersonalPageService {
         secondaryLanguages,
         prisonPerson,
         countryOfBirth,
+        healthAndMedication,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
@@ -200,6 +232,7 @@ export default class PersonalPageService {
     secondaryLanguages: SecondaryLanguage[],
     prisonPerson: PrisonPerson,
     countryOfBirth: string,
+    healthAndMedication: HealthAndMedication,
   ): PersonalDetails {
     const { profileInformation } = inmateDetail
 
@@ -272,11 +305,11 @@ export default class PersonalPageService {
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
       medicalDietaryRequirements:
-        prisonPerson?.health?.medicalDietaryRequirements?.value
+        healthAndMedication?.medicalDietaryRequirements?.value
           ?.map(({ id, description }) => ({ id, description }))
           .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
       foodAllergies:
-        prisonPerson?.health?.foodAllergies?.value
+        healthAndMedication?.foodAllergies?.value
           ?.map(({ id, description }) => ({ id, description }))
           .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
     }

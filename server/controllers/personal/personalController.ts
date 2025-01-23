@@ -58,6 +58,9 @@ import {
   referenceDataDomainToCheckboxOptions,
 } from '../../utils/checkboxUtils'
 import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
+import { checkedItemsFromRequestBodyField } from '../../utils/checkedItemsFromRequestBodyField'
+import { HealthAndMedicationUpdate } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -1073,6 +1076,126 @@ export default class PersonalController {
           cellLocation: formatLocation(cellLocation),
         },
       })
+    }
+  }
+
+  dietAndFoodAllergies() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+
+        const healthAndMedication = await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber)
+
+        const errors = validationErrorsFromFlash(req)
+        const requestBodyFlash = requestBodyFromFlash<{
+          medical?: string[] | string
+          medicalOther: string
+          allergies?: string[] | string
+          allergiesOther: string
+          personal?: string[] | string
+          personalOther: string
+        }>(req)
+
+        const medicalDietChecked = () => {
+          if (requestBodyFlash?.medical) return checkedItemsFromRequestBodyField(requestBodyFlash.medical)
+          if (healthAndMedication?.medicalDietaryRequirements) {
+            return healthAndMedication.medicalDietaryRequirements.value.map(code => code.id)
+          }
+          return []
+        }
+
+        const allergiesChecked = () => {
+          if (requestBodyFlash?.allergies) return checkedItemsFromRequestBodyField(requestBodyFlash.allergies)
+          if (healthAndMedication?.foodAllergies) {
+            return healthAndMedication.foodAllergies.value.map(code => code.id)
+          }
+          return []
+        }
+
+        const checked = [
+          ...medicalDietChecked(),
+          ...allergiesChecked(),
+          // TODO: When the API returns personal data
+          ...(requestBodyFlash?.personal ? checkedItemsFromRequestBodyField(requestBodyFlash.personal) : []),
+        ]
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: Page.EditDietAndFoodAllergies,
+        })
+
+        res.render('pages/edit/dietAndFoodAllergies', {
+          pageTitle: 'Diet and food allergies - Prisoner personal details',
+          prisonerNumber,
+          prisonerName,
+          breadcrumbPrisonerName: prisonerBannerName,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+          errors: errors ?? [],
+          errorsForForms: {
+            medical: errors?.filter(e => e.href === '#medical')[0]?.text ?? null,
+            allergies: errors?.filter(e => e.href === '#allergies')[0]?.text ?? null,
+            personal: errors?.filter(e => e.href === '#personal')[0]?.text ?? null,
+          },
+          checked,
+          medicalOtherValue: requestBodyFlash?.medicalOther || null,
+          allergyOtherValue: requestBodyFlash?.allergiesOther || null,
+          personalOtherValue: requestBodyFlash?.personalOther || null,
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const { prisonerNumber } = req.params
+        const healthAndMedication = await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber)
+
+        const update: Partial<HealthAndMedicationUpdate> = {
+          medicalDietaryRequirements: req.body.medical ? checkedItemsFromRequestBodyField(req.body.medical) : [],
+          foodAllergies: req.body.allergies ? checkedItemsFromRequestBodyField(req.body.allergies) : [],
+        }
+
+        const previousValues: Partial<HealthAndMedicationUpdate> = {
+          medicalDietaryRequirements:
+            healthAndMedication?.medicalDietaryRequirements?.value?.map(code => code.id) ?? [],
+          foodAllergies: healthAndMedication?.foodAllergies?.value?.map(code => code.id) ?? [],
+        }
+
+        try {
+          await this.personalPageService.updateDietAndFoodAllergies(clientToken, user, prisonerNumber, update)
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditDietAndFoodAllergies,
+              details: { fieldName: 'dietAndFoodAllergies', previous: previousValues, updated: update },
+            })
+            .catch(error => logger.error(error))
+
+          req.flash('flashMessage', {
+            text: `Diet and food allergies updated`,
+            type: FlashMessageType.success,
+            fieldName: 'dietAndFoodAllergies',
+          })
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/diet-and-food-allergies`)
+      },
     }
   }
 

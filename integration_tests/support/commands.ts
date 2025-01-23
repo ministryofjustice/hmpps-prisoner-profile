@@ -164,6 +164,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     domain: 'COUNTRY',
     referenceData: CountryReferenceDataCodesMock,
   })
+  cy.task('stubHealthAndMedication', { prisonerNumber })
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {

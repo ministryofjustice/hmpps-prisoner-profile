@@ -1,0 +1,209 @@
+{% extends "../index.njk" %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{%
+  set breadCrumbs = [
+    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
+    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
+    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
+  ]
+%}
+
+{% macro otherHtml(id, name) %}
+{% endmacro %}: 
+
+{% set medicalOther %}
+  {{ govukInput({
+    id: "medical-other",
+    name: "medicalOther",
+    type: "text",
+    value: medicalOtherValue,
+    label: { text: "This information may be seen by prisoners working in the kitchen." }
+  }) }} 
+{% endset -%}
+
+{% set allergiesOther %}
+  {{ govukInput({
+    id: "allergies-other",
+    name: "allergiesOther",
+    type: "text",
+    value: allergyOtherValue,
+    label: { text: "This information may be seen by prisoners working in the kitchen." }
+  }) }} 
+{% endset -%}
+
+{% set personalOther %}
+  {{ govukInput({
+    id: "personal-other",
+    name: "personalOther",
+    type: "text",
+    value: personalOtherValue,
+    label: { text: "This information may be seen by prisoners working in the kitchen." }
+  }) }} 
+{% endset -%}
+
+{% block body %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+  </div>
+
+  {% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{
+          govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true },
+              classes: 'govuk-!-margin-bottom-6'
+          })
+        }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">Diet and food allergies</h1>
+      </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form method="post" novalidate="novalidate" autocomplete="off">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errorsForForms.medical }}">
+          {%
+            call govukFieldset({
+              legend: {
+                text: 'Does ' + prisonerName + ' have any of these medical dietary requirements?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+              }
+            })
+          %}
+            {{
+              govukCheckboxes({
+                name: 'medical',
+                hint: {
+                  text: 'Select all that apply.'
+                },
+                errorMessage: {
+                  text: errorsForForms.medical
+                } if errorsForForms.medical,
+                items: [
+                  {text: "Coeliac (Cannot eat gluten)", value: "MEDICAL_DIET_COELIAC", checked: true if 'MEDICAL_DIET_COELIAC' in checked},
+                  {text: "Diabetic Type 1", value: "MEDICAL_DIET_DIABETIC_TYPE_1", checked: true if 'MEDICAL_DIET_DIABETIC_TYPE_1' in checked},
+                  {text: "Diabetic Type 2", value: "MEDICAL_DIET_DIABETIC_TYPE_2", checked: true if 'MEDICAL_DIET_DIABETIC_TYPE_2' in checked},
+                  {text: "Dysphagia (has problems swallowing food)", value: "MEDICAL_DIET_DYSPHAGIA", checked: true if 'MEDICAL_DIET_DYSPHAGIA' in checked},
+                  {text: "Eating disorder", value: "MEDICAL_DIET_EATING_DISORDER", checked: true if 'MEDICAL_DIET_EATING_DISORDER' in checked},
+                  {text: "Lactose intolerant", value: "MEDICAL_DIET_LACTOSE_INTOLERANT", checked: true if 'MEDICAL_DIET_LACTOSE_INTOLERANT' in checked},
+                  {text: "Low cholesterol", value: "MEDICAL_DIET_LOW_CHOLESTEROL", checked: true if 'MEDICAL_DIET_LOW_CHOLESTEROL' in checked},
+                  {text: "Low phosphorous Diet", value: "MEDICAL_DIET_LOW_PHOSPHOROUS", checked: true if 'MEDICAL_DIET_LOW_PHOSPHOROUS' in checked},
+                  {text: "Nutrient deficiency", value: "MEDICAL_DIET_NUTRIENT_DEFICIENCY", checked: true if 'MEDICAL_DIET_NUTRIENT_DEFICIENCY' in checked},
+                  {text: "Other", value: "MEDICAL_DIET_OTHER", checked: true if 'MEDICAL_DIET_OTHER' in checked, conditional: { html: medicalOther } }
+                ]
+              })
+            }}
+          {% endcall %}
+        </div>
+
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errorsForForms.allergies }}">
+          {%
+            call govukFieldset({
+              legend: {
+                text: 'Does ' + prisonerName + ' have any food allergies?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+              }
+            })
+          %}
+            {{
+              govukCheckboxes({
+                name: 'allergies',
+                hint: {
+                  text: 'Select all that apply.'
+                },
+                errorMessage: {
+                  text: errorsForForms.allergies
+                } if errorsForForms.allergies,
+                items: [
+                  {text: "Celery", value: "FOOD_ALLERGY_CELERY", checked: true if 'FOOD_ALLERGY_CELERY' in checked},
+                  {text: "Cereals containing gluten", value: "FOOD_ALLERGY_GLUTEN", checked: true if 'FOOD_ALLERGY_GLUTEN' in checked},
+                  {text: "Crustaceans", value: "FOOD_ALLERGY_CRUSTACEANS", checked: true if 'FOOD_ALLERGY_CRUSTACEANS' in checked},
+                  {text: "Egg", value: "FOOD_ALLERGY_EGG", checked: true if 'FOOD_ALLERGY_EGG' in checked},
+                  {text: "Fish", value: "FOOD_ALLERGY_FISH", checked: true if 'FOOD_ALLERGY_FISH' in checked},
+                  {text: "Lupin", value: "FOOD_ALLERGY_LUPIN", checked: true if 'FOOD_ALLERGY_LUPIN' in checked},
+                  {text: "Milk", value: "FOOD_ALLERGY_MILK", checked: true if 'FOOD_ALLERGY_MILK' in checked},
+                  {text: "Molluscs", value: "FOOD_ALLERGY_MOLLUSCS", checked: true if 'FOOD_ALLERGY_MOLLUSCS' in checked},
+                  {text: "Mustard", value: "FOOD_ALLERGY_MUSTARD", checked: true if 'FOOD_ALLERGY_MUSTARD' in checked},
+                  {text: "Peanuts", value: "FOOD_ALLERGY_PEANUTS", checked: true if 'FOOD_ALLERGY_PEANUTS' in checked},
+                  {text: "Sesame", value: "FOOD_ALLERGY_SESAME", checked: true if 'FOOD_ALLERGY_SESAME' in checked},
+                  {text: "Soya", value: "FOOD_ALLERGY_SOYA", checked: true if 'FOOD_ALLERGY_SOYA' in checked},
+                  {text: "Sulphur Dioxide", value: "FOOD_ALLERGY_SULPHUR_DIOXIDE", checked: true if 'FOOD_ALLERGY_SULPHUR_DIOXIDE' in checked},
+                  {text: "Tree nuts", value: "FOOD_ALLERGY_TREE_NUTS", checked: true if 'FOOD_ALLERGY_TREE_NUTS' in checked},
+                  {text: "Other", value: "FOOD_ALLERGY_OTHER", checked: true if 'FOOD_ALLERGY_OTHER' in checked, conditional: { html: allergiesOther } }
+                ]
+              })
+            }}
+          {% endcall %}
+        </div>
+
+        <div class="govuk-form-group {{ "govuk-form-group--error" if errorsForForms.personal }}">
+          {%
+            call govukFieldset({
+              legend: {
+                text: 'Does ' + prisonerName + ' have any personalised dietary requirements?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+              }
+            })
+          %}
+            {{
+              govukCheckboxes({
+                name: 'personal',
+                hint: {
+                  text: 'Select all that apply.'
+                },
+                errorMessage: {
+                  text: errorsForForms.personal
+                } if errorsForForms.personal,
+                items: [
+                  {text: "Kosher", value: "PERSONAL_DIET_KOSHER", checked: true if 'PERSONAL_DIET_KOSHER' in checked},
+                  {text: "Vegan", value: "PERSONAL_DIET_VEGAN", checked: true if 'PERSONAL_DIET_VEGAN' in checked},
+                  {text: "Other", value: "PERSONAL_DIET_OTHER", checked: true if 'PERSONAL_DIET_OTHER' in checked, conditional: { html: personalOther } }
+                ]
+              })
+            }}
+          {% endcall %}
+        </div>
+
+        <div class="govuk-button-group">
+          {{
+            govukButton({
+            text: "Save",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "edit-submit-button" }
+            })
+          }}
+          <a
+            href="/prisoner/{{ prisonerNumber }}/personal#personal-details"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button"
+            >Cancel</a
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

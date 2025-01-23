@@ -30,6 +30,7 @@ import prisonPersonApi from './integration_tests/mockApis/prisonPerson'
 import personIntegrationApi from './integration_tests/mockApis/personIntegrationApi'
 import csipApi from './integration_tests/mockApis/csipApi'
 import bookAVideoLinkApi from './integration_tests/mockApis/bookAVideoLinkApi'
+import healthAndMedicationApi from './integration_tests/mockApis/healthAndMedication'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -78,6 +79,7 @@ export default defineConfig({
         ...personIntegrationApi,
         ...csipApi,
         ...bookAVideoLinkApi,
+        ...healthAndMedicationApi,
       })
     },
     baseUrl: 'http://localhost:3007',

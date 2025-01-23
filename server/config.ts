@@ -308,6 +308,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('CSIP_TIMEOUT_DEADLINE', 10000))),
     },
+    healthAndMedicationApi: {
+      url: get('HEALTH_AND_MEDICATION_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('HEALTH_AND_MEDICATION_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('HEALTH_AND_MEDICATION_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('HEALTH_AND_MEDICATION_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
