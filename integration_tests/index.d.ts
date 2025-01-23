@@ -79,7 +79,8 @@ declare global {
       setupSpecificLocationHistoryPageStubs(options?: {
         prisonerNumber?: string
         bookingId?: number
-        locationId?: string
+        nomisLocationId?: number
+        dpsLocationId?: string
         staffId?: string
         prisonId: string
         caseLoads: CaseLoad[]
