@@ -95,8 +95,14 @@ generic-service:
       - prisons
       - private_prisons
 
+  scheduledDowntime:
+    enabled: true
+    startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
+    shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
+
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+  businessHoursOnly: true
 
   elastiCacheAlertsClusterIds:
     cp-546b408b8600f28d-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"
