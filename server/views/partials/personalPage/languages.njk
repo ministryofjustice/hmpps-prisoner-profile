@@ -18,20 +18,20 @@
 {% endmacro %}
 {% macro languagesHtml(personalDetails) %}
   {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
-    <p class="govuk-body" data-qa="no-language-entered">Not entered</p>
+    <span data-qa="no-language-entered">Not entered</span>
   {% else %}
-  <p class="govuk-body" data-qa="spoken-language">
+  <span data-qa="spoken-language">
     {% if personalDetails.languages.spoken %}
       {{ personalDetails.languages.spoken }}
       {{ "(interpreter required)" if personalDetails.languages.interpreterRequired }}
     {% endif %}
-  </p>
-  <p class="govuk-body" data-qa="written-language">
+  </span>
+  <span data-qa="written-language">
     {% if personalDetails.languages.written and personalDetails.languages.written != personalDetails.languages.spoken %}
       {{ personalDetails.languages.written }}
       (written)
     {% endif %}
-  </p>
+  </span>
   {% endif %}
   {% if personalDetails.otherLanguages.length %}
   <details class="govuk-details" data-module="govuk-details">

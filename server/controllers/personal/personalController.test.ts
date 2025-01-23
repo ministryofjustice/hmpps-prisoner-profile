@@ -2085,7 +2085,7 @@ describe('PersonalController', () => {
                   JSON.stringify({
                     medical: ['MEDICAL_DIET_FREE_FROM', 'MEDICAL_DIET_OTHER'],
                     allergies: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_OTHER'],
-                    personal: ['PERSONAL_DIET_KOSHER', 'PERSONAL_DIET_OTHER'],
+                    personal: 'PERSONAL_DIET_OTHER',
                     medicalOther: 'other1',
                     allergiesOther: 'other2',
                     personalOther: 'other3',
@@ -2104,7 +2104,6 @@ describe('PersonalController', () => {
               'MEDICAL_DIET_OTHER',
               'FOOD_ALLERGY_EGG',
               'FOOD_ALLERGY_OTHER',
-              'PERSONAL_DIET_KOSHER',
               'PERSONAL_DIET_OTHER',
             ],
             medicalOtherValue: 'other1',

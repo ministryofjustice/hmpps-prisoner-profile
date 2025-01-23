@@ -1166,8 +1166,9 @@ export default class PersonalController {
         }
 
         const previousValues: Partial<HealthAndMedicationUpdate> = {
-          medicalDietaryRequirements: healthAndMedication.medicalDietaryRequirements?.value?.map(code => code.id) ?? [],
-          foodAllergies: healthAndMedication.foodAllergies?.value?.map(code => code.id) ?? [],
+          medicalDietaryRequirements:
+            healthAndMedication?.medicalDietaryRequirements?.value?.map(code => code.id) ?? [],
+          foodAllergies: healthAndMedication?.foodAllergies?.value?.map(code => code.id) ?? [],
         }
 
         try {
