@@ -27,4 +27,10 @@ export default {
       path: `${baseUrl}/v1/person-protected-characteristics/religion\\?prisonerNumber=.*`,
       responseBody: null,
     }),
+
+  stubPersonIntegrationNationalityUpdate: () =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/nationality\\?prisonerNumber=.*`,
+      responseBody: null,
+    }),
 }

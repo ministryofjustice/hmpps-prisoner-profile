@@ -18,7 +18,7 @@ context('Edit nationality', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubPersonIntegrationUpdate', { prisonerNumber })
+      cy.task('stubPersonIntegrationNationalityUpdate', { prisonerNumber })
       cy.task('stubPersonIntegrationGetReferenceData', {
         domain: 'NAT',
         referenceData: NationalityReferenceDataCodesMock,
@@ -26,9 +26,36 @@ context('Edit nationality', () => {
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/nationality`,
     editPageWithTitle: EditPage,
-    editPageTitle: `What is John Saunders's nationality?`,
+    editPageTitle: `Nationality`,
     successfulFlashMessage: 'Nationality updated',
-    validInputs: [{ radioInputs: { radioField: 'FREN' } }],
+    validInputs: [
+      {},
+      { radioInputs: { radioField: 'BRIT' } },
+      { radioInputs: { radioField: 'BRIT' }, textAreaInputs: { additionalNationalities: 'Dual nationality' } },
+      { radioInputs: { radioField: 'OTHER' }, autocompleteInput: { value: 'French' } },
+      {
+        radioInputs: { radioField: 'OTHER' },
+        autocompleteInput: { value: 'French' },
+        textAreaInputs: { additionalNationalities: 'Dual nationality' },
+      },
+    ],
+    invalidInputs: [
+      {
+        testDescription: 'Other nationality selected but not specified',
+        input: { radioInputs: { radioField: 'OTHER' }, autocompleteInput: { value: null } },
+        errorMessages: [`Enter nationality`],
+      },
+      {
+        testDescription: 'Invalid nationality entered',
+        input: { radioInputs: { radioField: 'OTHER' }, autocompleteInput: { value: 'badvalue' } },
+        errorMessages: [`This is not a valid nationality`],
+      },
+      {
+        testDescription: 'Other nationality too long',
+        input: { radioInputs: { radioField: 'BRIT' }, textAreaInputs: { additionalNationalities: 'a'.repeat(41) } },
+        errorMessages: [`Additional nationalities must be 40 characters or less`],
+      },
+    ],
     redirectAnchor: 'personal-details',
   })
 })
