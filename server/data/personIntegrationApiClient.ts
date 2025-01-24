@@ -18,8 +18,12 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.updateCorePersonRecord(prisonerNumber, 'BIRTHPLACE', birthPlace)
   }
 
-  updateNationality(prisonerNumber: string, nationality: string): Promise<void> {
-    return this.updateCorePersonRecord(prisonerNumber, 'NATIONALITY', nationality)
+  updateNationality(prisonerNumber: string, nationality: string, otherNationalities: string): Promise<void> {
+    return this.restClient.put({
+      path: '/v1/core-person-record/nationality',
+      query: { prisonerNumber },
+      data: { nationality, otherNationalities },
+    })
   }
 
   updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void> {

@@ -64,6 +64,11 @@ describe('PersonalController', () => {
       profileInformation: [
         { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },
         { question: 'Nationality', resultValue: 'BRIT', type: ProfileInformationType.Nationality },
+        {
+          question: 'Other Nationality',
+          resultValue: 'Some other nationality',
+          type: ProfileInformationType.OtherNationalities,
+        },
         { question: 'Religion', resultValue: 'Druid', type: ProfileInformationType.Religion },
       ],
     } as InmateDetail,
@@ -1120,18 +1125,21 @@ describe('PersonalController', () => {
         } as any
         await action(req, res)
 
-        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+        expect(res.render).toHaveBeenCalledWith('pages/edit/nationality', {
           pageTitle: 'Nationality - Prisoner personal details',
           formTitle: `What is First Last's nationality?`,
-          prisonerNumber: 'ABC123',
           breadcrumbPrisonerName: 'Last, First',
-          hintText: undefined,
+          prisonerNumber: 'ABC123',
           errors: [],
-          options: expect.arrayContaining([
-            expect.objectContaining({ text: 'British', value: 'BRIT' }),
+          radioOptions: expect.arrayContaining([expect.objectContaining({ text: 'British', value: 'BRIT' })]),
+          autocompleteOptions: expect.arrayContaining([
             expect.objectContaining({ text: 'French', value: 'FREN' }),
+            expect.objectContaining({ text: 'German', value: 'GERM' }),
           ]),
-          redirectAnchor: 'personal-details',
+          additionalNationalitiesValue: 'Some other nationality',
+          autocompleteSelected: false,
+          autocompleteOptionTitle: 'A different nationality',
+          autocompleteOptionLabel: 'Select nationality',
           miniBannerData: {
             cellLocation: '2-3-001',
             prisonerName: 'Last, First',
@@ -1153,7 +1161,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
-      it('Populates the field value from the flash', async () => {
+      it('Populates the field value from the radio field using the flash', async () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
@@ -1165,7 +1173,64 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([expect.objectContaining({ value: 'BRIT', checked: true })]),
+            radioOptions: expect.arrayContaining([expect.objectContaining({ value: 'BRIT', checked: true })]),
+          }),
+        )
+      })
+
+      it('Populates the autocompleteSelected value from the flash when no autocomplete option is chosen', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            radioOptions: expect.arrayContaining([expect.objectContaining({ value: 'BRIT' })]),
+            autocompleteSelected: true,
+          }),
+        )
+      })
+
+      it('Populates the field value from the autocomplete field using the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'OTHER', autocompleteField: 'FREN' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            radioOptions: expect.arrayContaining([expect.objectContaining({ value: 'BRIT' })]),
+            autocompleteOptions: expect.arrayContaining([
+              expect.objectContaining({ value: 'FREN', selected: true }),
+              expect.objectContaining({ value: 'GERM' }),
+            ]),
+            autocompleteSelected: false,
+          }),
+        )
+      })
+
+      it('Populates the additional nationalities value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ additionalNationalities: 'Some info' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            additionalNationalitiesValue: 'Some info',
           }),
         )
       })
@@ -1202,14 +1267,50 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { radioField: 'FREN' },
+          body: { radioField: 'BRIT' },
           flash: jest.fn(),
         } as any
       })
 
       it('Updates the nationality', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updateNationality).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 'FREN')
+        expect(personalPageService.updateNationality).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          'A1234BC',
+          'BRIT',
+          null,
+        )
+      })
+
+      it('Updates the nationality from the autocomplete field', async () => {
+        const request = {
+          ...validRequest,
+          body: { radioField: 'OTHER', autocompleteField: 'FREN' },
+        }
+        await action(request, res)
+        expect(personalPageService.updateNationality).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          'A1234BC',
+          'FREN',
+          null,
+        )
+      })
+
+      it('Updates the other nationalities', async () => {
+        const request = {
+          ...validRequest,
+          body: { radioField: 'BRIT', additionalNationalities: 'Updated nationalities' },
+        }
+        await action(request, res)
+        expect(personalPageService.updateNationality).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          'A1234BC',
+          'BRIT',
+          'Updated nationalities',
+        )
       })
 
       it('Redirects to the personal page #personal-details on success', async () => {
@@ -1239,13 +1340,20 @@ describe('PersonalController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { radioField: 'FREN' } }
+        const request = {
+          ...validRequest,
+          id: 1,
+          body: { radioField: 'FREN', additionalNationalities: 'Updated nationalities' },
+        }
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
           correlationId: request.id,
           action: PostAction.EditNationality,
-          details: { fieldName: nationalityFieldData.fieldName, previous: 'BRIT', updated: 'FREN' },
+          details: [
+            { fieldName: nationalityFieldData.fieldName, previous: 'BRIT', updated: 'FREN' },
+            { fieldName: 'otherNationalities', previous: 'Some other nationality', updated: 'Updated nationalities' },
+          ],
         }
 
         await action(request, res)

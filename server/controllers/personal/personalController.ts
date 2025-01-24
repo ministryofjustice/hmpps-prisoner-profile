@@ -683,27 +683,75 @@ export default class PersonalController {
   nationality() {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
         const { inmateDetail, prisonerData, clientToken } = req.middleware
-        const { firstName, lastName } = prisonerData
-        const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const [nationalityValues] = await Promise.all([
+        const { firstName, lastName, cellLocation } = prisonerData
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const requestBodyFlash = requestBodyFromFlash<{
+          autocompleteField: string
+          radioField: string
+          additionalNationalities: string
+        }>(req)
+        const errors = req.flash('errors')
+
+        const [nationalityReferenceData] = await Promise.all([
           this.personalPageService.getReferenceDataCodesFromProxy(clientToken, ProxyReferenceDataDomain.nationality),
         ])
+
         const fieldValue =
+          requestBodyFlash?.autocompleteField ||
           requestBodyFlash?.radioField ||
-          nationalityValues.filter(
+          nationalityReferenceData.find(
             nationality =>
               nationality.description ===
               getProfileInformationValue(ProfileInformationType.Nationality, inmateDetail.profileInformation),
-          )[0]?.code
+          )?.code
+        const additionalNationalitiesValue =
+          requestBodyFlash?.additionalNationalities ||
+          getProfileInformationValue(ProfileInformationType.OtherNationalities, inmateDetail.profileInformation)
 
-        const options = objectToRadioOptions(nationalityValues, 'code', 'description', fieldValue)
+        const britishNationality = ['BRIT']
+          .map(code => nationalityReferenceData.find(val => val.code === code))
+          .filter(Boolean)
+        const nationalitiesAsAutocompleteOptions = nationalityReferenceData.filter(
+          val => !britishNationality.includes(val),
+        )
+        const britishRadioOption = objectToRadioOptions(britishNationality, 'code', 'description', fieldValue).map(
+          option => ({ ...option, hint: { text: 'Including English, Welsh, Scottish and Northern Irish' } }),
+        )
 
-        return this.editRadioFields(
-          `What is ${formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast })}'s nationality?`,
-          nationalityFieldData,
-          options,
-        )(req, res, next)
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: nationalityFieldData.auditPage,
+        })
+
+        res.render('pages/edit/nationality', {
+          pageTitle: `${nationalityFieldData.pageTitle} - Prisoner personal details`,
+          formTitle: `What is ${prisonerName}'s nationality?`,
+          breadcrumbPrisonerName: prisonerBannerName,
+          prisonerNumber,
+          errors,
+          radioOptions: britishRadioOption,
+          autocompleteOptions: objectToSelectOptions(
+            nationalitiesAsAutocompleteOptions,
+            'code',
+            'description',
+            fieldValue,
+          ),
+          additionalNationalitiesValue,
+          autocompleteSelected: ['OTHER', 'OTHER__VALIDATION_ERROR'].includes(fieldValue),
+          autocompleteOptionTitle: 'A different nationality',
+          autocompleteOptionLabel: 'Select nationality',
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
@@ -712,14 +760,25 @@ export default class PersonalController {
         const { clientToken, inmateDetail } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
-
+        const autocompleteField = (radioField === 'OTHER' && req.body.autocompleteField) || null
+        const otherNationalities = req.body.additionalNationalities || null
         const previousValue = getProfileInformationValue(
           ProfileInformationType.Nationality,
           inmateDetail.profileInformation,
         )
+        const previousOtherNationalitiesValue = getProfileInformationValue(
+          ProfileInformationType.OtherNationalities,
+          inmateDetail.profileInformation,
+        )
 
         try {
-          await this.personalPageService.updateNationality(clientToken, user, prisonerNumber, radioField)
+          await this.personalPageService.updateNationality(
+            clientToken,
+            user,
+            prisonerNumber,
+            autocompleteField || radioField,
+            otherNationalities,
+          )
           req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
 
           this.auditService
@@ -728,7 +787,14 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditNationality,
-              details: { fieldName, previous: previousValue, updated: radioField },
+              details: [
+                { fieldName, previous: previousValue, updated: autocompleteField || radioField },
+                {
+                  fieldName: 'otherNationalities',
+                  previous: previousOtherNationalitiesValue,
+                  updated: otherNationalities,
+                },
+              ],
             })
             .catch(error => logger.error(error))
 
@@ -1455,7 +1521,7 @@ export default class PersonalController {
               prisonerNumber,
               correlationId: req.id,
               action: PostAction.EditCountryOfBirth,
-              details: { fieldName, previous: previousValue, updated: radioField },
+              details: { fieldName, previous: previousValue, updated: autocompleteField || radioField },
             })
             .catch(error => logger.error(error))
 
@@ -1491,7 +1557,9 @@ export default class PersonalController {
           clientToken,
           ProxyReferenceDataDomain.religion,
         )
-        const religionOptions = religionReferenceData.filter(it => !otherReligionCodes.includes(it.code))
+        const religionOptions = religionReferenceData
+          .filter(it => !otherReligionCodes.includes(it.code))
+          .sort((a, b) => a.description.localeCompare(b.description))
         const otherReligionOptions = otherReligionCodes.map(code => religionReferenceData.find(it => it.code === code))
         const profileInformationValue = getProfileInformationValue(
           ProfileInformationType.Religion,

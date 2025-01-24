@@ -31,6 +31,12 @@ export default {
       responseBody: null,
     }),
 
+  stubPersonIntegrationNationalityUpdate: () =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/nationality\\?prisonerNumber=.*`,
+      responseBody: null,
+    }),
+
   stubPersonIntegrationGetMilitaryRecords: (militaryRecords: MilitaryRecord[]) =>
     stubGetWithBody({
       path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,

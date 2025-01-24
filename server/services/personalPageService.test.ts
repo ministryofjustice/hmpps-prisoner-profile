@@ -745,6 +745,22 @@ describe('PersonalPageService', () => {
     })
   })
 
+  describe('Update nationality', () => {
+    it('Updates the nationality using Person Integration API', async () => {
+      await constructService().updateNationality('token', prisonUserMock, 'A1234AA', 'BRIT', 'Some other nationality')
+      expect(personIntegrationApiClient.updateNationality).toHaveBeenCalledWith(
+        'A1234AA',
+        'BRIT',
+        'Some other nationality',
+      )
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['nationality', 'otherNationalities'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
   describe('getMilitaryRecords', () => {
     it('should get military records from the API', async () => {
       const service = constructService()

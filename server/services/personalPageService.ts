@@ -610,12 +610,18 @@ export default class PersonalPageService {
     return response
   }
 
-  async updateNationality(clientToken: string, user: PrisonUser, prisonerNumber: string, nationality: string) {
+  async updateNationality(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    nationality: string,
+    otherNationalities: string,
+  ) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
-    const response = await personIntegrationApiClient.updateNationality(prisonerNumber, nationality)
+    const response = await personIntegrationApiClient.updateNationality(prisonerNumber, nationality, otherNationalities)
 
     this.metricsService.trackPersonIntegrationUpdate({
-      fieldsUpdated: ['nationality'],
+      fieldsUpdated: ['nationality', 'otherNationalities'],
       prisonerNumber,
       user,
     })
