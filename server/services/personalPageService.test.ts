@@ -28,6 +28,8 @@ import { PersonIntegrationApiClient } from '../data/interfaces/personIntegration
 import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClientMock'
 import ReferenceDataService from './referenceDataService'
 import { EnglandCountryReferenceDataCodeMock } from '../data/localMockData/personIntegrationReferenceDataMock'
+import { HealthAndMedicationApiClient } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { healthMock } from '../data/localMockData/healthMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceDataService')
@@ -37,6 +39,7 @@ describe('PersonalPageService', () => {
   let curiousApiClient: CuriousApiClient
   let prisonPersonApiClient: PrisonPersonApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
+  let healthAndMedicationApiClient: HealthAndMedicationApiClient
   let referenceDataService: ReferenceDataService
   let metricsService: MetricsService
 
@@ -64,6 +67,11 @@ describe('PersonalPageService', () => {
       getReferenceDataCodes: jest.fn(),
     }
 
+    healthAndMedicationApiClient = {
+      getHealthAndMedicationForPrisoner: jest.fn(async () => healthMock),
+      updateHealthAndMedicationForPrisoner: jest.fn(async () => healthMock),
+    }
+
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
     referenceDataService.getReferenceData = jest.fn(async () => EnglandCountryReferenceDataCodeMock)
 
@@ -76,6 +84,7 @@ describe('PersonalPageService', () => {
       () => curiousApiClient,
       () => prisonPersonApiClient,
       () => personIntegrationApiClient,
+      () => healthAndMedicationApiClient,
       referenceDataService,
       metricsService,
     )
@@ -619,6 +628,49 @@ describe('PersonalPageService', () => {
       expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['foodAllergies'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Get health and medications', () => {
+    it('Gets the data from the API when the prison person API is enabled', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true)
+
+      expect(healthAndMedicationApiClient.getHealthAndMedicationForPrisoner).toHaveBeenCalledWith(
+        PrisonerMockDataA.prisonerNumber,
+      )
+
+      expect(personalDetails.foodAllergies).toEqual([{ description: 'Gluten', id: 'FOOD_ALLERGY_GLUTEN' }])
+      expect(personalDetails.medicalDietaryRequirements).toEqual([
+        { description: 'Low fat', id: 'MEDICAL_DIET_LOW_FAT' },
+      ])
+    })
+
+    it('Does not get the data from the API when the prison person API is enabled', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, false)
+
+      expect(healthAndMedicationApiClient.getHealthAndMedicationForPrisoner).not.toHaveBeenCalledWith(
+        PrisonerMockDataA.prisonerNumber,
+      )
+
+      expect(personalDetails.foodAllergies).toEqual([])
+      expect(personalDetails.medicalDietaryRequirements).toEqual([])
+    })
+  })
+
+  describe('Update diet and food allergies', () => {
+    it('Updates the diet and food allergies on the health and medication api', async () => {
+      const update = {
+        medicalDietaryRequirements: ['MEDICAL_NEED'],
+        foodAllergies: ['FOOD_ALLERGY'],
+      }
+
+      await constructService().updateDietAndFoodAllergies('token', prisonUserMock, 'ABC123', update)
+      expect(healthAndMedicationApiClient.updateHealthAndMedicationForPrisoner).toHaveBeenCalledWith('ABC123', update)
+      expect(metricsService.trackHealthAndMedicationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'ABC123',
+        fieldsUpdated: ['medicalDietaryRequirements', 'foodAllergies'],
         user: prisonUserMock,
       })
     })
