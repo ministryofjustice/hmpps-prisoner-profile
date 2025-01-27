@@ -132,6 +132,8 @@ export const services = () => {
     prisonApiClientBuilder,
     whereaboutsApiClientBuilder,
     caseNotesApiClientBuilder,
+    locationsInsidePrisonApiClientBuilder,
+    nomisSyncPrisonMappingClientBuilder,
   )
   const adjudicationsService = new AdjudicationsService(adjudicationsApiClientBuilder)
   const prisonerScheduleService = new PrisonerScheduleService(prisonApiClientBuilder)

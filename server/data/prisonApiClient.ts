@@ -48,7 +48,6 @@ import { MovementType } from './enums/movementType'
 import OffenderSentenceDetail from './interfaces/prisonApi/OffenderSentenceDetail'
 import PrisonerSchedule, { PrisonerPrisonSchedule, TimeSlot } from './interfaces/prisonApi/PrisonerSchedule'
 import Details from './interfaces/prisonApi/Details'
-import AttributesForLocation from './interfaces/prisonApi/AttributesForLocation'
 import HistoryForLocationItem from './interfaces/prisonApi/HistoryForLocationItem'
 import CellMoveReasonType from './interfaces/prisonApi/CellMoveReasonTypes'
 import Telephone from './interfaces/prisonApi/Telephone'
@@ -448,10 +447,6 @@ export default class PrisonApiRestClient implements PrisonApiClient {
     return this.restClient.get<Details>({
       path: `/api/bookings/offenderNo/${prisonerNumber}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
     })
-  }
-
-  async getAttributesForLocation(locationId: string): Promise<AttributesForLocation> {
-    return this.restClient.get<AttributesForLocation>({ path: `/api/cell/${locationId}/attributes` })
   }
 
   async getHistoryForLocation(locationId: string, fromDate: string, toDate: string): Promise<HistoryForLocationItem[]> {
