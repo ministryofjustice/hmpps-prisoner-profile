@@ -206,15 +206,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('HMPPS_NON_ASSOCIATIONS_API_TIMEOUT_DEADLINE', 20000))),
     },
-    frontendComponents: {
-      url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000)),
-        deadline: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000)),
-      },
-      agent: new AgentConfig(Number(get('COMPONENT_API_TIMEOUT_SECONDS', 20000))),
-      latest: get('COMPONENT_API_LATEST', 'false') === 'true',
-    },
     prisonerProfileDeliusApi: {
       url: get('PRISONER_PROFILE_DELIUS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
