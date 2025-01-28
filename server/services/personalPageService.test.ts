@@ -29,7 +29,7 @@ import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClie
 import ReferenceDataService from './referenceDataService'
 import { EnglandCountryReferenceDataCodeMock } from '../data/localMockData/personIntegrationReferenceDataMock'
 import { HealthAndMedicationApiClient } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { healthMock } from '../data/localMockData/healthMock'
+import { dietAndAllergyMock, healthMock } from '../data/localMockData/healthMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceDataService')
@@ -68,8 +68,9 @@ describe('PersonalPageService', () => {
     }
 
     healthAndMedicationApiClient = {
+      getReferenceDataCodes: jest.fn(),
       getHealthAndMedicationForPrisoner: jest.fn(async () => healthMock),
-      updateHealthAndMedicationForPrisoner: jest.fn(async () => healthMock),
+      updateDietAndAllergyDataForPrisoner: jest.fn(async () => dietAndAllergyMock),
     }
 
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
@@ -661,13 +662,10 @@ describe('PersonalPageService', () => {
 
   describe('Update diet and food allergies', () => {
     it('Updates the diet and food allergies on the health and medication api', async () => {
-      const update = {
-        medicalDietaryRequirements: ['MEDICAL_NEED'],
-        foodAllergies: ['FOOD_ALLERGY'],
-      }
+      const update = {}
 
       await constructService().updateDietAndFoodAllergies('token', prisonUserMock, 'ABC123', update)
-      expect(healthAndMedicationApiClient.updateHealthAndMedicationForPrisoner).toHaveBeenCalledWith('ABC123', update)
+      expect(healthAndMedicationApiClient.updateDietAndAllergyDataForPrisoner).toHaveBeenCalledWith('ABC123', update)
       expect(metricsService.trackHealthAndMedicationUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'ABC123',
         fieldsUpdated: ['medicalDietaryRequirements', 'foodAllergies'],

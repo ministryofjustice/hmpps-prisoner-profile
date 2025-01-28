@@ -2,17 +2,11 @@ import { PrisonPersonApiClient } from '../../server/data/interfaces/prisonPerson
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 import { physicalAttributesMock } from '../../server/data/localMockData/physicalAttributesMock'
-import { healthMock } from '../../server/data/localMockData/healthMock'
 
 export const prisonPersonApiClientMock = (): PrisonPersonApiClient => ({
   getPrisonPerson: jest.fn(async () => ({
     prisonerNumber: PrisonerMockDataA.prisonerNumber,
     physicalAttributes: physicalAttributesMock,
-    health: {
-      smokerOrVaper: healthMock.smokerOrVaper,
-      foodAllergies: healthMock.foodAllergies,
-      medicalDietaryRequirements: healthMock.medicalDietaryRequirements,
-    },
   })),
   updatePhysicalAttributes: jest.fn(),
   getReferenceDataDomains: jest.fn(),

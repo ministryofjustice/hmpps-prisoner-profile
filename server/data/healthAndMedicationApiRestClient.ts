@@ -1,10 +1,13 @@
 import config from '../config'
 import RestClient from './restClient'
 import {
+  DietAndAllergy,
+  DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
-  HealthAndMedicationUpdate,
+  ReferenceDataCode,
 } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { mapToQueryString } from '../utils/utils'
 
 export default class HealthAndMedicationApiRestClient implements HealthAndMedicationApiClient {
   private readonly restClient: RestClient
@@ -13,17 +16,24 @@ export default class HealthAndMedicationApiRestClient implements HealthAndMedica
     this.restClient = new RestClient('Health and medication API', config.apis.healthAndMedicationApi, token)
   }
 
+  async getReferenceDataCodes(domain: string, includeInactive = false): Promise<ReferenceDataCode[]> {
+    return this.restClient.get<ReferenceDataCode[]>({
+      path: `/reference-data/domains/${domain}/codes`,
+      query: mapToQueryString({ includeInactive }),
+    })
+  }
+
   getHealthAndMedicationForPrisoner(prisonerNumber: string): Promise<HealthAndMedication> {
     return this.restClient.get<HealthAndMedication>({ path: `/prisoners/${prisonerNumber}`, ignore404: true })
   }
 
-  updateHealthAndMedicationForPrisoner(
+  updateDietAndAllergyDataForPrisoner(
     prisonerNumber: string,
-    healthData: Partial<HealthAndMedicationUpdate>,
-  ): Promise<HealthAndMedication> {
-    return this.restClient.patch<HealthAndMedication>({
-      path: `/prisoners/${prisonerNumber}`,
-      data: healthData,
+    dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
+  ): Promise<DietAndAllergy> {
+    return this.restClient.put<DietAndAllergy>({
+      path: `/prisoners/${prisonerNumber}/diet-and-allergy`,
+      data: dietAndAllergyUpdate,
     })
   }
 }
