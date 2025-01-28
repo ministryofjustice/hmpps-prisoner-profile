@@ -59,8 +59,13 @@ import {
 } from '../../utils/checkboxUtils'
 import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
-import { checkedItemsFromRequestBodyField } from '../../utils/checkedItemsFromRequestBodyField'
-import { HealthAndMedicationUpdate } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import {
+  DietAndAllergy,
+  DietAndAllergyUpdate,
+  HealthAndMedicationReferenceDataDomain,
+  ReferenceDataCode,
+  ReferenceDataIdSelection,
+} from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -1080,6 +1085,39 @@ export default class PersonalController {
   }
 
   dietAndFoodAllergies() {
+    const mapDietAndAllergy = (
+      dietAndAllergy: DietAndAllergy,
+      field: keyof DietAndAllergy,
+    ): ReferenceDataIdSelection[] => {
+      if (dietAndAllergy && dietAndAllergy[field]) {
+        return dietAndAllergy[field].value.map(selection => ({
+          value: selection.value.id,
+          comment: selection.comment,
+        }))
+      }
+      return []
+    }
+
+    const checkboxOptions = (
+      namePrefix: string,
+      referenceDataCodes: ReferenceDataCode[],
+      selectedItems: ReferenceDataIdSelection[],
+    ) => {
+      return referenceDataCodes
+        .sort((a, b) => a.listSequence - b.listSequence)
+        .map(code => {
+          const selectedItem = selectedItems.find(item => item.value === code.id)
+          return {
+            name: `${namePrefix}[${code.listSequence}][value]`,
+            text: code.description,
+            value: code.id,
+            listSequence: code.listSequence,
+            checked: !!selectedItem,
+            comment: selectedItem?.comment,
+          }
+        })
+    }
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
@@ -1088,40 +1126,45 @@ export default class PersonalController {
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
 
-        const healthAndMedication = await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber)
+        const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
+          this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber),
+          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+            clientToken,
+            HealthAndMedicationReferenceDataDomain.foodAllergy,
+          ),
+          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+            clientToken,
+            HealthAndMedicationReferenceDataDomain.medicalDiet,
+          ),
+          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+            clientToken,
+            HealthAndMedicationReferenceDataDomain.personalisedDiet,
+          ),
+        ])
 
         const errors = validationErrorsFromFlash(req)
         const requestBodyFlash = requestBodyFromFlash<{
-          medical?: string[] | string
-          medicalOther: string
-          allergies?: string[] | string
-          allergiesOther: string
-          personal?: string[] | string
-          personalOther: string
+          allergy?: ReferenceDataIdSelection[]
+          medical?: ReferenceDataIdSelection[]
+          personalised?: ReferenceDataIdSelection[]
         }>(req)
 
+        const dietAndAllergy = healthAndMedication?.dietAndAllergy
+
+        const allergiesSelected = () => {
+          if (requestBodyFlash?.allergy) return requestBodyFlash.allergy.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, 'foodAllergies')
+        }
+
         const medicalDietChecked = () => {
-          if (requestBodyFlash?.medical) return checkedItemsFromRequestBodyField(requestBodyFlash.medical)
-          if (healthAndMedication?.medicalDietaryRequirements) {
-            return healthAndMedication.medicalDietaryRequirements.value.map(code => code.id)
-          }
-          return []
+          if (requestBodyFlash?.medical) return requestBodyFlash.medical.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, 'medicalDietaryRequirements')
         }
 
-        const allergiesChecked = () => {
-          if (requestBodyFlash?.allergies) return checkedItemsFromRequestBodyField(requestBodyFlash.allergies)
-          if (healthAndMedication?.foodAllergies) {
-            return healthAndMedication.foodAllergies.value.map(code => code.id)
-          }
-          return []
+        const personalisedDietChecked = () => {
+          if (requestBodyFlash?.personalised) return requestBodyFlash.personalised.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements')
         }
-
-        const checked = [
-          ...medicalDietChecked(),
-          ...allergiesChecked(),
-          // TODO: When the API returns personal data
-          ...(requestBodyFlash?.personal ? checkedItemsFromRequestBodyField(requestBodyFlash.personal) : []),
-        ]
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -1141,16 +1184,15 @@ export default class PersonalController {
             prisonerNumber,
             cellLocation: formatLocation(cellLocation),
           },
+          allergyOptions: checkboxOptions('allergy', allergyCodes, allergiesSelected()),
+          medicalDietOptions: checkboxOptions('medical', medicalDietCodes, medicalDietChecked()),
+          personalisedDietOptions: checkboxOptions('personalised', personalisedDietCodes, personalisedDietChecked()),
           errors: errors ?? [],
           errorsForForms: {
-            medical: errors?.filter(e => e.href === '#medical')[0]?.text ?? null,
-            allergies: errors?.filter(e => e.href === '#allergies')[0]?.text ?? null,
-            personal: errors?.filter(e => e.href === '#personal')[0]?.text ?? null,
+            medical: errors?.filter(e => e.href === '#medical-other')[0]?.text ?? null,
+            allergy: errors?.filter(e => e.href === '#allergy-other')[0]?.text ?? null,
+            personalised: errors?.filter(e => e.href === '#personalised-other')[0]?.text ?? null,
           },
-          checked,
-          medicalOtherValue: requestBodyFlash?.medicalOther || null,
-          allergyOtherValue: requestBodyFlash?.allergiesOther || null,
-          personalOtherValue: requestBodyFlash?.personalOther || null,
         })
       },
 
@@ -1158,17 +1200,25 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const { prisonerNumber } = req.params
-        const healthAndMedication = await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber)
+        const dietAndAllergy = (await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber))
+          ?.dietAndAllergy
 
-        const update: Partial<HealthAndMedicationUpdate> = {
-          medicalDietaryRequirements: req.body.medical ? checkedItemsFromRequestBodyField(req.body.medical) : [],
-          foodAllergies: req.body.allergies ? checkedItemsFromRequestBodyField(req.body.allergies) : [],
+        const update: Partial<DietAndAllergyUpdate> = {
+          foodAllergies: req.body.allergy
+            ? req.body.allergy.filter((item: ReferenceDataIdSelection) => !!item.value)
+            : [],
+          medicalDietaryRequirements: req.body.medical
+            ? req.body.medical.filter((item: ReferenceDataIdSelection) => !!item.value)
+            : [],
+          personalisedDietaryRequirements: req.body.personalised
+            ? req.body.personalised.filter((item: ReferenceDataIdSelection) => !!item.value)
+            : [],
         }
 
-        const previousValues: Partial<HealthAndMedicationUpdate> = {
-          medicalDietaryRequirements:
-            healthAndMedication?.medicalDietaryRequirements?.value?.map(code => code.id) ?? [],
-          foodAllergies: healthAndMedication?.foodAllergies?.value?.map(code => code.id) ?? [],
+        const previousValues: Partial<DietAndAllergyUpdate> = {
+          foodAllergies: mapDietAndAllergy(dietAndAllergy, 'foodAllergies'),
+          medicalDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'medicalDietaryRequirements'),
+          personalisedDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements'),
         }
 
         try {

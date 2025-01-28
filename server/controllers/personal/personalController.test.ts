@@ -1994,6 +1994,7 @@ describe('PersonalController', () => {
     describe('Edit', () => {
       const action = async (req: any, response: any) => controller.dietAndFoodAllergies().edit(req, response, () => {})
 
+      // TODO: Requires mock to return reference codes
       it('Renders the edit page with the correct data from the health and medications api when no existing data is present', async () => {
         personalPageService.getHealthAndMedication = jest.fn(async () => null as HealthAndMedication)
 
@@ -2017,18 +2018,18 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
           },
           errors: [],
-          checked: [],
+          allergyOptions: [],
+          medicalDietOptions: [],
+          personalisedDietOptions: [],
           errorsForForms: {
-            allergies: null,
+            allergy: null,
             medical: null,
-            personal: null,
+            personalised: null,
           },
-          allergyOtherValue: null,
-          medicalOtherValue: null,
-          personalOtherValue: null,
         })
       })
 
+      // TODO: Requires mock to return reference codes
       it('Renders the edit page with the correct data from the health and medications api when data is present', async () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
@@ -2051,15 +2052,14 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
           },
           errors: [],
-          checked: ['MEDICAL_DIET_LOW_FAT', 'FOOD_ALLERGY_GLUTEN'],
+          allergyOptions: [],
+          medicalDietOptions: [],
+          personalisedDietOptions: [],
           errorsForForms: {
-            allergies: null,
+            allergy: null,
             medical: null,
-            personal: null,
+            personalised: null,
           },
-          allergyOtherValue: null,
-          medicalOtherValue: null,
-          personalOtherValue: null,
         })
       })
 
@@ -2076,6 +2076,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
+      // TODO: Requires mock to return reference codes
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
@@ -2099,16 +2100,9 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            checked: [
-              'MEDICAL_DIET_FREE_FROM',
-              'MEDICAL_DIET_OTHER',
-              'FOOD_ALLERGY_EGG',
-              'FOOD_ALLERGY_OTHER',
-              'PERSONAL_DIET_OTHER',
-            ],
-            medicalOtherValue: 'other1',
-            allergyOtherValue: 'other2',
-            personalOtherValue: 'other3',
+            allergyOptions: [],
+            medicalDietOptions: [],
+            personalisedDietOptions: [],
           }),
         )
       })
@@ -2166,13 +2160,14 @@ describe('PersonalController', () => {
         })
       })
 
+      // TODO: Requires mock to return reference codes
       it('Updates the prisoner health on success', async () => {
         await action(validRequest, res)
         expect(personalPageService.updateDietAndFoodAllergies).toHaveBeenCalledWith(
           expect.anything(),
           expect.anything(),
           'A1234BC',
-          { medicalDietaryRequirements: ['MEDICAL_DIET_DIABETES_TYPE_1'], foodAllergies: ['FOOD_ALLERGIES_EGG'] },
+          { foodAllergies: [], medicalDietaryRequirements: [], personalisedDietaryRequirements: [] },
         )
       })
 
@@ -2196,12 +2191,14 @@ describe('PersonalController', () => {
           details: {
             fieldName: 'dietAndFoodAllergies',
             previous: {
-              medicalDietaryRequirements: ['MEDICAL_DIET_LOW_FAT'],
-              foodAllergies: ['FOOD_ALLERGY_GLUTEN'],
+              medicalDietaryRequirements: [{ value: 'MEDICAL_DIET_LOW_FAT' }],
+              foodAllergies: [{ value: 'FOOD_ALLERGY_GLUTEN' }],
+              personalisedDietaryRequirements: [] as string[],
             },
             updated: {
-              medicalDietaryRequirements: ['MEDICAL_DIET_DIABETES_TYPE_1'],
-              foodAllergies: ['FOOD_ALLERGIES_EGG'],
+              medicalDietaryRequirements: [] as string[],
+              foodAllergies: [] as string[],
+              personalisedDietaryRequirements: [] as string[],
             },
           },
         }

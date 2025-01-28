@@ -48,7 +48,7 @@ export interface PrisonPersonCharacteristic {
 export interface PrisonPerson {
   prisonerNumber: string
   physicalAttributes: PrisonPersonPhysicalAttributes
-  health: PrisonPersonHealth
+  health?: PrisonPersonHealth
 }
 
 export interface ReferenceDataDomain {

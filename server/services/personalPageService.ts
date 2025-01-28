@@ -51,9 +51,11 @@ import {
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import ReferenceDataService from './referenceDataService'
 import {
+  DietAndAllergy,
+  DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
-  HealthAndMedicationUpdate,
+  HealthAndMedicationReferenceDataDomain,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 export default class PersonalPageService {
@@ -84,10 +86,10 @@ export default class PersonalPageService {
     token: string,
     user: PrisonUser,
     prisonerNumber: string,
-    dietAndFoodAllergies: Partial<HealthAndMedicationUpdate>,
-  ): Promise<HealthAndMedication> {
+    dietAndFoodAllergies: Partial<DietAndAllergyUpdate>,
+  ): Promise<DietAndAllergy> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    const response = apiClient.updateHealthAndMedicationForPrisoner(prisonerNumber, dietAndFoodAllergies)
+    const response = apiClient.updateDietAndAllergyDataForPrisoner(prisonerNumber, dietAndFoodAllergies)
 
     this.metricsService.trackHealthAndMedicationUpdate({
       fieldsUpdated: Object.keys(dietAndFoodAllergies),
@@ -304,15 +306,21 @@ export default class PersonalPageService {
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
-      medicalDietaryRequirements:
-        healthAndMedication?.medicalDietaryRequirements?.value
-          ?.map(({ id, description }) => ({ id, description }))
-          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
-      foodAllergies:
-        healthAndMedication?.foodAllergies?.value
-          ?.map(({ id, description }) => ({ id, description }))
-          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
+      foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
+      medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
+      personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
     }
+  }
+
+  private mapDietAndAllergy = (healthAndMedication: HealthAndMedication, field: keyof DietAndAllergy) => {
+    const dietAndAllergy = healthAndMedication?.dietAndAllergy
+    return (
+      (dietAndAllergy &&
+        dietAndAllergy[field]?.value
+          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
+          .sort((a, b) => a.description.localeCompare(b.description))) ??
+      []
+    )
   }
 
   private mapSmokerDescription = (refData: ReferenceDataCodeSimple) =>
@@ -509,6 +517,11 @@ export default class PersonalPageService {
 
   async getReferenceDataCodesFromProxy(clientToken: string, domain: ProxyReferenceDataDomain) {
     return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
+  }
+
+  async getHealthAndMedicationReferenceDataCodes(clientToken: string, domain: HealthAndMedicationReferenceDataDomain) {
+    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
+    return healthAndMedicationApiClient.getReferenceDataCodes(domain)
   }
 
   async getReferenceDataFromProxy(clientToken: string, domain: ProxyReferenceDataDomain, code: string) {
