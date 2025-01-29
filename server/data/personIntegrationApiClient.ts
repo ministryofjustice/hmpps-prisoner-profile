@@ -1,5 +1,6 @@
 import RestClient from './restClient'
 import {
+  MilitaryRecord,
   PersonIntegrationApiClient,
   ProxyReferenceDataDomain,
   ReferenceDataCodeDto,
@@ -35,6 +36,10 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
 
   getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]> {
     return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
+  }
+
+  getMilitaryRecords(prisonerNumber: string): Promise<MilitaryRecord[]> {
+    return this.restClient.get({ path: `/v1/core-person-record/military-records`, query: { prisonerNumber } })
   }
 
   private updateCorePersonRecord(prisonerNumber: string, fieldName: string, value: string): Promise<void> {

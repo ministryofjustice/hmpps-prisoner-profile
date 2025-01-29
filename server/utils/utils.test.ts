@@ -28,6 +28,7 @@ import {
   isActiveCaseLoad,
   isInUsersCaseLoad,
   isTemporaryLocation,
+  lengthOfService,
   mapToQueryString,
   neurodiversityEnabled,
   objectToSelectOptions,
@@ -968,6 +969,20 @@ describe('utils', () => {
       const copy = [...input]
       sortByLatestAndUuid(input)
       expect(input).toEqual(copy)
+    })
+  })
+
+  describe('lengthOfService', () => {
+    it('should return correct length of service in years and months', () => {
+      expect(lengthOfService('2020-01-01', '2023-01-01')).toEqual('3 years')
+      expect(lengthOfService('2020-01-01', '2021-01-01')).toEqual('1 year')
+      expect(lengthOfService('2020-01-01', '2023-04-01')).toEqual('3 years 3 months')
+      expect(lengthOfService('2020-01-01', '2021-04-01')).toEqual('1 year 3 months')
+      expect(lengthOfService('2020-01-01', '2023-02-01')).toEqual('3 years 1 month')
+      expect(lengthOfService('2020-01-01', '2021-02-01')).toEqual('1 year 1 month')
+      expect(lengthOfService('2020-01-01', '2020-04-01')).toEqual('3 months')
+      expect(lengthOfService('2020-01-01', '2020-02-01')).toEqual('1 month')
+      expect(lengthOfService('2020-01-01', '2020-01-01')).toEqual('0 years')
     })
   })
 })

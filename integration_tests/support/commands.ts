@@ -3,7 +3,10 @@ import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/Histo
 import InmateDetail from '../../server/data/interfaces/prisonApi/InmateDetail'
 import { ComplexityLevel } from '../../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/ReferenceCode'
-import { CountryReferenceDataCodesMock } from '../../server/data/localMockData/personIntegrationReferenceDataMock'
+import {
+  CountryReferenceDataCodesMock,
+  MilitaryRecordsMock,
+} from '../../server/data/localMockData/personIntegrationReferenceDataMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -165,6 +168,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
     referenceData: CountryReferenceDataCodesMock,
   })
   cy.task('stubHealthAndMedication', { prisonerNumber })
+  cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
@@ -253,4 +257,10 @@ Cypress.Commands.add('setupPersonRefDataStubs', ({ domainsResp, domainResp, code
   cy.task('stubGetReferenceDataDomain', domainResp)
   cy.task('stubGetReferenceDataCodes', codesResp)
   cy.task('stubGetReferenceDataCode', codeResp)
+})
+
+Cypress.Commands.add('setupHealthAndMedicationRefDataStubs', ({ foodAllergies, medicalDiets, personalisedDiets }) => {
+  cy.task('stubHealthAndMedicationReferenceDataCodes', { domain: 'FOOD_ALLERGY', resp: foodAllergies })
+  cy.task('stubHealthAndMedicationReferenceDataCodes', { domain: 'MEDICAL_DIET', resp: medicalDiets })
+  cy.task('stubHealthAndMedicationReferenceDataCodes', { domain: 'PERSONALISED_DIET', resp: personalisedDiets })
 })

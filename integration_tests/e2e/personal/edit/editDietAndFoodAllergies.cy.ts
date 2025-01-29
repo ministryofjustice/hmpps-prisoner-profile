@@ -2,6 +2,11 @@ import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
 import { mockMedicalDietReferenceDataDomain } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
+import {
+  foodAllergyCodesMock,
+  medicalDietCodesMock,
+  personalisedDietCodesMock,
+} from '../../../../server/data/localMockData/healthAndMedicationApi/referenceDataMocks'
 
 context('Edit medical diet', () => {
   const prisonerNumber = 'G6123VU'
@@ -16,8 +21,13 @@ context('Edit medical diet', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
+      cy.setupHealthAndMedicationRefDataStubs({
+        foodAllergies: foodAllergyCodesMock,
+        medicalDiets: medicalDietCodesMock,
+        personalisedDiets: personalisedDietCodesMock,
+      })
       cy.task('stubHealthAndMedication', { prisonerNumber })
-      cy.task('stubHealthAndMedicationUpdate', { prisonerNumber })
+      cy.task('stubDietAndAllergyUpdate', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubGetReferenceDataDomain', mockMedicalDietReferenceDataDomain)
@@ -29,29 +39,10 @@ context('Edit medical diet', () => {
     validInputs: [
       {
         checkboxInputs: {
-          medical: ['MEDICAL_DIET_COELIAC'],
-          allergies: ['FOOD_ALLERGY_EGG'],
-          personal: [
-            { value: 'PERSONAL_DIET_OTHER', conditionals: { textInputs: { personalOther: 'Some other text' } } },
-          ],
+          '"medical[0][value]"': ['MEDICAL_DIET_COELIAC'],
+          '"allergy[0][value]"': ['FOOD_ALLERGY_EGG'],
+          '"personalised[0][value]"': ['PERSONALISED_DIET_VEGAN'],
         },
-      },
-    ],
-    invalidInputs: [
-      {
-        testDescription: 'Medical diet other: No text',
-        input: { checkboxInputs: { medical: ['MEDICAL_DIET_OTHER'] } },
-        errorMessages: ['Enter the other medical dietary requirements.'],
-      },
-      {
-        testDescription: 'Food allergies other: No text',
-        input: { checkboxInputs: { allergies: ['FOOD_ALLERGY_OTHER'] } },
-        errorMessages: ['Enter the other food allergies.'],
-      },
-      {
-        testDescription: 'Personal diet other: No text',
-        input: { checkboxInputs: { personal: ['PERSONAL_DIET_OTHER'] } },
-        errorMessages: ['Enter the other personalised dietary requirements.'],
       },
     ],
     redirectAnchor: 'personal-details',

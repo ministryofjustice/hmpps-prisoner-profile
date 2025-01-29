@@ -1,7 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
-import { CountryReferenceDataCodesMock } from './localMockData/personIntegrationReferenceDataMock'
+import { CountryReferenceDataCodesMock, MilitaryRecordsMock } from './localMockData/personIntegrationReferenceDataMock'
 import { ProxyReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -56,6 +56,17 @@ describe('personIntegrationApiClient', () => {
 
       const output = await personIntegrationApiClient.getReferenceDataCodes(ProxyReferenceDataDomain.country)
       expect(output).toEqual(CountryReferenceDataCodesMock)
+    })
+  })
+
+  describe('getMilitaryRecords', () => {
+    it('should get military records from the API', async () => {
+      fakePersonIntegrationApi
+        .get('/v1/core-person-record/military-records?prisonerNumber=A1234AA')
+        .reply(200, MilitaryRecordsMock)
+
+      const result = await personIntegrationApiClient.getMilitaryRecords('A1234AA')
+      expect(result).toEqual(MilitaryRecordsMock)
     })
   })
 })

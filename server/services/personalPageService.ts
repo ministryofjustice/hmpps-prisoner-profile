@@ -51,10 +51,13 @@ import {
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import ReferenceDataService from './referenceDataService'
 import {
+  DietAndAllergy,
+  DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
-  HealthAndMedicationUpdate,
+  HealthAndMedicationReferenceDataDomain,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { militaryHistoryEnabled } from '../utils/featureToggles'
 
 export default class PersonalPageService {
   constructor(
@@ -84,10 +87,10 @@ export default class PersonalPageService {
     token: string,
     user: PrisonUser,
     prisonerNumber: string,
-    dietAndFoodAllergies: Partial<HealthAndMedicationUpdate>,
-  ): Promise<HealthAndMedication> {
+    dietAndFoodAllergies: Partial<DietAndAllergyUpdate>,
+  ): Promise<DietAndAllergy> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    const response = apiClient.updateHealthAndMedicationForPrisoner(prisonerNumber, dietAndFoodAllergies)
+    const response = apiClient.updateDietAndAllergyDataForPrisoner(prisonerNumber, dietAndFoodAllergies)
 
     this.metricsService.trackHealthAndMedicationUpdate({
       fieldsUpdated: Object.keys(dietAndFoodAllergies),
@@ -143,6 +146,7 @@ export default class PersonalPageService {
       distinguishingMarks,
       learnerNeurodivergence,
       healthAndMedication,
+      militaryRecords,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -156,6 +160,7 @@ export default class PersonalPageService {
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
       enablePrisonPerson ? this.getHealthAndMedication(token, prisonerNumber) : null,
+      militaryHistoryEnabled ? this.getMilitaryRecords(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -194,6 +199,7 @@ export default class PersonalPageService {
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
       distinguishingMarks,
+      militaryRecords: militaryRecords.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
     }
   }
 
@@ -298,21 +304,30 @@ export default class PersonalPageService {
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
-      smokerOrVaper: prisonPerson
-        ? this.mapSmokerDescription(prisonPerson.health?.smokerOrVaper?.value) || 'Not entered'
-        : getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
+      smokerOrVaper:
+        getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
-      medicalDietaryRequirements:
-        healthAndMedication?.medicalDietaryRequirements?.value
-          ?.map(({ id, description }) => ({ id, description }))
-          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
-      foodAllergies:
-        healthAndMedication?.foodAllergies?.value
-          ?.map(({ id, description }) => ({ id, description }))
-          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
+      foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
+      medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
+      personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
     }
+  }
+
+  private mapDietAndAllergy = (healthAndMedication: HealthAndMedication, field: keyof DietAndAllergy) => {
+    const dietAndAllergy = healthAndMedication?.dietAndAllergy
+    return (
+      (dietAndAllergy &&
+        dietAndAllergy[field]?.value
+          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
+          .sort((a, b) => {
+            if (a.id?.endsWith('OTHER')) return 1
+            if (b.id?.endsWith('OTHER')) return -1
+            return a.description.localeCompare(b.description)
+          })) ??
+      []
+    )
   }
 
   private mapSmokerDescription = (refData: ReferenceDataCodeSimple) =>
@@ -511,6 +526,11 @@ export default class PersonalPageService {
     return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
   }
 
+  async getHealthAndMedicationReferenceDataCodes(clientToken: string, domain: HealthAndMedicationReferenceDataDomain) {
+    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
+    return healthAndMedicationApiClient.getReferenceDataCodes(domain)
+  }
+
   async getReferenceDataFromProxy(clientToken: string, domain: ProxyReferenceDataDomain, code: string) {
     return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
   }
@@ -619,5 +639,10 @@ export default class PersonalPageService {
     })
 
     return response
+  }
+
+  async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
   }
 }

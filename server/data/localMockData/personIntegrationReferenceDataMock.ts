@@ -1,4 +1,4 @@
-import { ReferenceDataCodeDto } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
+import { MilitaryRecord, ReferenceDataCodeDto } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -96,5 +96,39 @@ export const ReligionReferenceDataCodesMock: ReferenceDataCodeDto[] = [
     description: 'Unknown',
     listSequence: 6,
     isActive: true,
+  },
+]
+
+export const MilitaryRecordsMock: MilitaryRecord[] = [
+  {
+    prisonerNumber: 'A1234BC',
+    militarySeq: 1,
+    warZoneCode: 'AFG',
+    warZoneDescription: 'Afghanistan',
+    startDate: '2020-01-01',
+    militaryDischargeCode: 'HON',
+    militaryDischargeDescription: 'Honourable',
+    militaryBranchCode: 'ARM',
+    militaryBranchDescription: 'Army',
+    description: 'Description',
+    unitNumber: 'Unit 1',
+    enlistmentLocation: 'Location 1',
+    dischargeLocation: 'Location 2',
+    selectiveServicesFlag: false,
+    militaryRankCode: 'CPL_ARM',
+    militaryRankDescription: 'Corporal',
+    serviceNumber: '123456789',
+    disciplinaryActionCode: 'CM',
+    disciplinaryActionDescription: 'Court Martial',
+  },
+  {
+    prisonerNumber: 'A1234BC',
+    militarySeq: 2,
+    warZoneCode: 'AFG',
+    warZoneDescription: 'Afghanistan',
+    startDate: '2020-03-01',
+    militaryBranchCode: 'RMA',
+    militaryBranchDescription: 'Royal Marines',
+    selectiveServicesFlag: false,
   },
 ]
