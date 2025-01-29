@@ -48,7 +48,6 @@ import groupDistinguishingMarks, {
   getBodyPartToken,
   getMarkLocationDescription,
 } from '../views/dataUtils/groupDistinguishingMarksForView'
-import { formatMedicalDietaryRequirements } from './referenceDataCodeUtils'
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
@@ -187,7 +186,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toMarkLocationDescription', getMarkLocationDescription)
   njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
   njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
-  njkEnv.addFilter('formatMedicalDietaryRequirements', formatMedicalDietaryRequirements)
   njkEnv.addFilter('sortByLatestAndUuid', sortByLatestAndUuid)
   njkEnv.addFilter('lengthOfService', lengthOfService)
 }
