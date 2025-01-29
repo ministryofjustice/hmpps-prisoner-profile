@@ -20,4 +20,5 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   getReferenceDataFromProxy: jest.fn(),
   getHealthAndMedication: jest.fn(),
   updateDietAndFoodAllergies: jest.fn(),
+  getMilitaryRecords: jest.fn(),
 })

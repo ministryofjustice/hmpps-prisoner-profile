@@ -51,6 +51,23 @@
       border-bottom: 1px solid $govuk-border-colour;
     }
   }
+
+  .govuk-summary-list--sub-list {
+    margin-top: 5px;
+
+    &.govuk-summary-list--bottom-border .govuk-summary-list__row:last-of-type {
+      border-bottom: 1px solid $govuk-border-colour !important;
+    }
+
+    .govuk-summary-list__key {
+      font-weight: normal;
+      min-width: 10rem;
+    }
+  }
+
+  .govuk-summary-list--sub-list--bottom-border {
+    border-bottom: 2px solid $govuk-border-colour;
+  }
 }
 
 @keyframes greenToTransparent {

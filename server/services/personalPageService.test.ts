@@ -27,7 +27,10 @@ import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodi
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClientMock'
 import ReferenceDataService from './referenceDataService'
-import { EnglandCountryReferenceDataCodeMock } from '../data/localMockData/personIntegrationReferenceDataMock'
+import {
+  EnglandCountryReferenceDataCodeMock,
+  MilitaryRecordsMock,
+} from '../data/localMockData/personIntegrationReferenceDataMock'
 import { HealthAndMedicationApiClient } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { healthMock } from '../data/localMockData/healthMock'
 
@@ -65,6 +68,7 @@ describe('PersonalPageService', () => {
       updateNationality: jest.fn(),
       updateReligion: jest.fn(),
       getReferenceDataCodes: jest.fn(),
+      getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
     }
 
     healthAndMedicationApiClient = {
@@ -709,6 +713,17 @@ describe('PersonalPageService', () => {
         fieldsUpdated: ['religion'],
         user: prisonUserMock,
       })
+    })
+  })
+
+  describe('getMilitaryRecords', () => {
+    it('should get military records from the API', async () => {
+      const service = constructService()
+      personIntegrationApiClient.getMilitaryRecords = jest.fn(async () => MilitaryRecordsMock)
+
+      const result = await service.getMilitaryRecords('token', 'A1234AA')
+      expect(result).toEqual(MilitaryRecordsMock)
+      expect(personIntegrationApiClient.getMilitaryRecords).toHaveBeenCalledWith('A1234AA')
     })
   })
 })

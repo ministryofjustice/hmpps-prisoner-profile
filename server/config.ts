@@ -354,5 +354,6 @@ export default {
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
     prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),
+    militaryHistoryEnabled: toBoolean(get('MILITARY_HISTORY_ENABLED', 'false')),
   },
 }
