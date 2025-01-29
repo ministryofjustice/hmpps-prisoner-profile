@@ -3,6 +3,7 @@ import GovSummaryItem from '../../../interfaces/GovSummaryItem'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { PrisonPersonDistinguishingMark } from '../../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Result } from '../../../utils/result/result'
+import { MilitaryRecord } from '../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export default interface PersonalPage {
   personalDetails: PersonalDetails
@@ -17,6 +18,7 @@ export default interface PersonalPage {
   hasCurrentBelief: boolean
   showFieldHistoryLink: boolean
   distinguishingMarks: PrisonPersonDistinguishingMark[] | null
+  militaryRecords: MilitaryRecord[] | null
 }
 
 export interface PersonalDetails {

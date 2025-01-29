@@ -1,5 +1,8 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPutWithResponse } from './utils'
-import { ReferenceDataCodeDto } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  MilitaryRecord,
+  ReferenceDataCodeDto,
+} from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 const baseUrl = '/personIntegration'
 
@@ -26,5 +29,11 @@ export default {
     stubPutWithResponse<void>({
       path: `${baseUrl}/v1/person-protected-characteristics/religion\\?prisonerNumber=.*`,
       responseBody: null,
+    }),
+
+  stubPersonIntegrationGetMilitaryRecords: (militaryRecords: MilitaryRecord[]) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      body: militaryRecords,
     }),
 }

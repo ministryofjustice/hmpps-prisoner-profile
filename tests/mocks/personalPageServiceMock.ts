@@ -39,4 +39,5 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
       }
     },
   ),
+  getMilitaryRecords: jest.fn(),
 })

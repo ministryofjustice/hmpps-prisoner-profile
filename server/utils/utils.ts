@@ -23,6 +23,7 @@ import {
   PrisonPersonDistinguishingMarkPhotographUuid,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { formatDateTime } from './dateHelpers'
+import { pluralise } from './pluralise'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -790,4 +791,22 @@ export const sortByLatestAndUuid = (list: PrisonPersonDistinguishingMarkPhotogra
     }
     return b.latest ? 1 : -1
   })
+}
+
+export const lengthOfService = (startDate: string, endDate: string): string => {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  const years = end.getFullYear() - start.getFullYear()
+  const months = end.getMonth() - start.getMonth()
+
+  if (months === 0) {
+    return pluralise(years, 'year')
+  }
+
+  if (years) {
+    return `${pluralise(years, 'year')} ${pluralise(months, 'month')}`
+  }
+
+  return pluralise(months, 'month')
 }

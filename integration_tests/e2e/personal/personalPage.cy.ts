@@ -8,6 +8,7 @@ import { formatDate } from '../../../server/utils/dateHelpers'
 import NotFoundPage from '../../pages/notFoundPage'
 import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
+import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationReferenceDataMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -59,6 +60,7 @@ context('When signed in', () => {
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
+      cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
       visitPersonalDetailsPage()
     })
 
@@ -186,6 +188,22 @@ context('When signed in', () => {
         page.personalDetails().languages().otherLanguages('MAN').language().should('include.text', 'Mandarin')
         page.personalDetails().languages().otherLanguages('URD').language().should('include.text', 'Urdu')
         page.personalDetails().languages().otherLanguages('URD').proficiency().should('include.text', 'reads only')
+      })
+
+      it('Displays all the information from the API: Military Records', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.personalDetails().militaryRecords().serviceNumber().should('include.text', '123456789')
+        page.personalDetails().militaryRecords().branch().should('include.text', 'Army')
+        page.personalDetails().militaryRecords().unitNumber().should('include.text', 'Unit 1')
+        page.personalDetails().militaryRecords().rank().should('include.text', 'Corporal')
+        page.personalDetails().militaryRecords().comments().should('include.text', 'Description')
+        page.personalDetails().militaryRecords().enlistmentDate().should('include.text', '01/01/2020')
+        page.personalDetails().militaryRecords().enlistmentLocation().should('include.text', 'Location 1')
+        page.personalDetails().militaryRecords().conflict().should('include.text', 'Afghanistan')
+        page.personalDetails().militaryRecords().disciplinaryAction().should('include.text', 'Court Martial')
+        page.personalDetails().militaryRecords().dischargeDate().should('include.text', 'Not entered')
+        page.personalDetails().militaryRecords().dischargeLocation().should('include.text', 'Location 2')
+        page.personalDetails().militaryRecords().dischargeDescription().should('include.text', 'Honourable')
       })
     })
 
