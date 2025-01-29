@@ -58,8 +58,9 @@ export interface PersonalDetails {
   socialCareNeeded: string
   typeOfDiet: string
   youthOffender: string
-  medicalDietaryRequirements: { id: string; description: string }[]
   foodAllergies: { id: string; description: string }[]
+  medicalDietaryRequirements: { id: string; description: string; comment?: string }[]
+  personalisedDietaryRequirements: { id: string; description: string; comment?: string }[]
 }
 
 export interface IdentityNumber {

@@ -255,3 +255,9 @@ Cypress.Commands.add('setupPersonRefDataStubs', ({ domainsResp, domainResp, code
   cy.task('stubGetReferenceDataCodes', codesResp)
   cy.task('stubGetReferenceDataCode', codeResp)
 })
+
+Cypress.Commands.add('setupHealthAndMedicationRefDataStubs', ({ foodAllergies, medicalDiets, personalisedDiets }) => {
+  cy.task('stubHealthAndMedicationReferenceDataCodes', { domain: 'FOOD_ALLERGY', resp: foodAllergies })
+  cy.task('stubHealthAndMedicationReferenceDataCodes', { domain: 'MEDICAL_DIET', resp: medicalDiets })
+  cy.task('stubHealthAndMedicationReferenceDataCodes', { domain: 'PERSONALISED_DIET', resp: personalisedDiets })
+})

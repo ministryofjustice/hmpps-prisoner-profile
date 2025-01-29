@@ -1,24 +1,39 @@
-import { HealthAndMedication } from '../../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
-import { stubGetWithBody, stubPatchWithResponse } from './utils'
+import {
+  DietAndAllergy,
+  HealthAndMedication,
+  ReferenceDataCode,
+} from '../../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { stubGetWithBody, stubPutWithResponse } from './utils'
 
-const mockHealthAndMedication = (): HealthAndMedication => ({
-  smokerOrVaper: {
-    value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
-    lastModifiedAt: '2024-07-01T01:02:03+0100',
-    lastModifiedBy: 'USER1',
-  },
+const mockDietAndAllergy = (): DietAndAllergy => ({
   foodAllergies: {
-    value: [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 }],
+    value: [{ value: { id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 } }],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
   },
   medicalDietaryRequirements: {
     value: [
       {
-        id: 'MEDICAL_DIET_LOW_FAT',
-        description: 'Low fat',
-        isActive: true,
-        listSequence: 0,
+        value: {
+          id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY',
+          description: 'Nutrient deficiency',
+          isActive: true,
+          listSequence: 0,
+        },
+      },
+    ],
+    lastModifiedAt: '2024-07-01T01:02:03+0100',
+    lastModifiedBy: 'USER1',
+  },
+  personalisedDietaryRequirements: {
+    value: [
+      {
+        value: {
+          id: 'PERSONALISED_DIET_VEGAN',
+          description: 'Vegan',
+          isActive: true,
+          listSequence: 0,
+        },
       },
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
@@ -26,9 +41,20 @@ const mockHealthAndMedication = (): HealthAndMedication => ({
   },
 })
 
+const mockHealthAndMedication = (): HealthAndMedication => ({
+  dietAndAllergy: mockDietAndAllergy(),
+})
+
 const baseUrl = '/healthAndMedication'
 
 export default {
+  // GET routes
+  stubHealthAndMedicationReferenceDataCodes: ({ domain, resp }: { domain: string; resp: ReferenceDataCode[] }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/reference-data/domains/${domain}/codes\\?includeInactive=false`,
+      body: resp,
+    }),
+
   stubHealthAndMedication: ({
     prisonerNumber,
     overrides = {},
@@ -44,18 +70,18 @@ export default {
       },
     }),
 
-  // PATCH routes
-  stubHealthAndMedicationUpdate: ({
+  // PUT routes
+  stubDietAndAllergyUpdate: ({
     prisonerNumber,
     overrides = {},
   }: {
     prisonerNumber: string
     overrides: Partial<HealthAndMedication>
   }) =>
-    stubPatchWithResponse<HealthAndMedication>({
-      path: `${baseUrl}/prisoners/${prisonerNumber}`,
+    stubPutWithResponse<HealthAndMedication>({
+      path: `${baseUrl}/prisoners/${prisonerNumber}/diet-and-allergy`,
       responseBody: {
-        ...mockHealthAndMedication(),
+        ...mockDietAndAllergy(),
         ...overrides,
       },
     }),

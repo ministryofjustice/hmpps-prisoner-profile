@@ -1,3 +1,10 @@
+// eslint-disable-next-line no-shadow
+export enum HealthAndMedicationReferenceDataDomain {
+  foodAllergy = 'FOOD_ALLERGY',
+  medicalDiet = 'MEDICAL_DIET',
+  personalisedDiet = 'PERSONALISED_DIET',
+}
+
 export interface ValueWithMetadata<T> {
   value?: T
   lastModifiedAt: string
@@ -41,32 +48,39 @@ export interface ReferenceDataCodeSimple {
   isActive: boolean
 }
 
-export interface FieldHistory {
-  valueInt: number
-  valueString: string
-  valueRef: ReferenceDataCodeSimple
-  appliesFrom: string
-  appliesTo: string
-  createdBy: string
-  source: string
+export interface ReferenceDataSelection {
+  value: ReferenceDataCodeSimple
+  comment?: string
+}
+
+export interface ReferenceDataIdSelection {
+  value: string
+  comment?: string
+}
+
+export interface DietAndAllergy {
+  foodAllergies: ValueWithMetadata<ReferenceDataSelection[]>
+  medicalDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
+  personalisedDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
 }
 
 export interface HealthAndMedication {
-  smokerOrVaper: ValueWithMetadata<ReferenceDataCodeSimple>
-  foodAllergies: ValueWithMetadata<ReferenceDataCodeSimple[]>
-  medicalDietaryRequirements: ValueWithMetadata<ReferenceDataCodeSimple[]>
+  dietAndAllergy?: DietAndAllergy
 }
 
-export interface HealthAndMedicationUpdate {
-  smokerOrVaper?: string
-  foodAllergies?: string[]
-  medicalDietaryRequirements?: string[]
+export interface DietAndAllergyUpdate {
+  foodAllergies?: ReferenceDataIdSelection[]
+  medicalDietaryRequirements?: ReferenceDataIdSelection[]
+  personalisedDietaryRequirements?: ReferenceDataIdSelection[]
 }
 
 export interface HealthAndMedicationApiClient {
+  getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>
+
   getHealthAndMedicationForPrisoner(prisonerNumber: string): Promise<HealthAndMedication>
-  updateHealthAndMedicationForPrisoner(
+
+  updateDietAndAllergyDataForPrisoner(
     prisonerNumber: string,
-    healthData: Partial<HealthAndMedicationUpdate>,
-  ): Promise<HealthAndMedication>
+    dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
+  ): Promise<DietAndAllergy>
 }
