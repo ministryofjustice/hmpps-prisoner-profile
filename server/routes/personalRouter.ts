@@ -27,6 +27,7 @@ import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
+import { Role } from '../data/enums/role'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -50,13 +51,15 @@ export default function personalRouter(services: Services): Router {
   )
 
   // Temporary edit check for now
-  const editRouteChecks = () => (req: Request, res: Response, next: NextFunction) => {
-    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
-    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && enablePrisonPerson(activeCaseLoadId)) {
-      return next()
+  const editRouteChecks =
+    (requiredRoles: string[] = ['DPS_APPLICATION_DEVELOPER']) =>
+    (req: Request, res: Response, next: NextFunction) => {
+      const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+      if (userHasRoles(requiredRoles, userRoles) && enablePrisonPerson(activeCaseLoadId)) {
+        return next()
+      }
+      return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
     }
-    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
-  }
 
   // Distinguishing marks
   router.use(
@@ -69,10 +72,12 @@ export default function personalRouter(services: Services): Router {
 
   // Edit routes
   const editRoute = ({
+    requiredRoles = ['DPS_APPLICATION_DEVELOPER'],
     path,
     edit,
     submit,
   }: {
+    requiredRoles?: string[]
     path: string
     edit: {
       method: RequestHandler
@@ -94,7 +99,7 @@ export default function personalRouter(services: Services): Router {
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
-      editRouteChecks(),
+      editRouteChecks(requiredRoles),
       edit.method,
     )
 
@@ -104,7 +109,7 @@ export default function personalRouter(services: Services): Router {
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
-        editRouteChecks(),
+        editRouteChecks(requiredRoles),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
           redirectTo: `personal/${path}`,
@@ -117,7 +122,7 @@ export default function personalRouter(services: Services): Router {
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
-        editRouteChecks(),
+        editRouteChecks(requiredRoles),
         submit.method,
       )
     }
@@ -312,6 +317,7 @@ export default function personalRouter(services: Services): Router {
   )
 
   editRoute({
+    requiredRoles: [Role.DietAndAllergiesEdit],
     path: 'diet-and-food-allergies',
     edit: {
       audit: Page.EditDietAndFoodAllergies,

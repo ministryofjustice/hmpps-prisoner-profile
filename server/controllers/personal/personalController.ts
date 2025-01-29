@@ -66,6 +66,7 @@ import {
   ReferenceDataCode,
   ReferenceDataIdSelection,
 } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { Role } from '../../data/enums/role'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -113,6 +114,7 @@ export default class PersonalController {
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        editDietAndAllergiesEnabled: userHasRoles([Role.DietAndAllergiesEdit], userRoles),
         historyEnabled:
           personalPageData.showFieldHistoryLink &&
           enablePrisonPerson(activeCaseLoadId) &&
