@@ -1,4 +1,7 @@
-import { DietAndAllergy, HealthAndMedication } from '../interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import {
+  DietAndAllergy,
+  HealthAndMedication,
+} from '../../interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 export const dietAndAllergyMock: DietAndAllergy = {
   foodAllergies: {
@@ -10,8 +13,8 @@ export const dietAndAllergyMock: DietAndAllergy = {
     value: [
       {
         value: {
-          id: 'MEDICAL_DIET_LOW_FAT',
-          description: 'Low fat',
+          id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY',
+          description: 'Nutrient deficiency',
           listSequence: 0,
           isActive: true,
         },
@@ -27,6 +30,6 @@ export const dietAndAllergyMock: DietAndAllergy = {
   },
 }
 
-export const healthMock: HealthAndMedication = {
+export const healthAndMedicationMock: HealthAndMedication = {
   dietAndAllergy: dietAndAllergyMock,
 }

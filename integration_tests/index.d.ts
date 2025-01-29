@@ -107,6 +107,12 @@ declare global {
         codesResp: ReferenceDataCode[]
         codeResp: ReferenceDataCode
       }): Chainable<AUTWindow>
+
+      setupHealthAndMedicationRefDataStubs(options: {
+        foodAllergies: ReferenceDataCode[]
+        medicalDiets: ReferenceDataCode[]
+        personalisedDiets: ReferenceDataCode[]
+      }): Chainable<AUTWindow>
     }
   }
 }

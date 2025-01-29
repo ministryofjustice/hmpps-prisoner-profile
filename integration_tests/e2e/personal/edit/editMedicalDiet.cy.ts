@@ -4,7 +4,7 @@ import { editPageTests } from './editPageTests'
 import { mockMedicalDietReferenceDataDomain } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 
 // Skipped for now
-context.skip('Edit medical diet', () => {
+context('Edit medical diet', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
