@@ -14,12 +14,16 @@
 {% endset %}
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro dietAndFoodAllergiesHtml(personalDetails) %}
-    {% if personalDetails.medicalDietaryRequirements.length > 0 or personalDetails.foodAllergies.length > 0 %}
+    {% if personalDetails.medicalDietaryRequirements.length > 0
+        or personalDetails.foodAllergies.length > 0
+        or personalDetails.personalisedDietaryRequirements.length > 0 %}
         {% if personalDetails.medicalDietaryRequirements.length > 0 %}
             <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
             <div class="govuk-!-margin-bottom-2">
-                {% for requirement in personalDetails.medicalDietaryRequirements | formatMedicalDietaryRequirements %}
-                    <span class="govuk-!-display-block">{{ requirement }}</span>
+                {% for requirement in personalDetails.medicalDietaryRequirements %}
+                    <span class="govuk-!-display-block">
+                        {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+                    </span>
                 {% endfor %}
             </div>
         {% endif %}
@@ -28,7 +32,20 @@
             <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
             <div class="govuk-!-margin-bottom-2">
                 {% for allergy in personalDetails.foodAllergies %}
-                    <span class="govuk-!-display-block">{{ allergy.description }}</span>
+                    <span class="govuk-!-display-block">
+                        {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
+                    </span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if personalDetails.personalisedDietaryRequirements.length > 0 %}
+            <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
+            <div class="govuk-!-margin-bottom-2">
+                {% for requirement in personalDetails.personalisedDietaryRequirements %}
+                    <span class="govuk-!-display-block">
+                        {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+                    </span>
                 {% endfor %}
             </div>
         {% endif %}

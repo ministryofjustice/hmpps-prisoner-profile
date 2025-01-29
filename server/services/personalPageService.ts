@@ -321,7 +321,11 @@ export default class PersonalPageService {
       (dietAndAllergy &&
         dietAndAllergy[field]?.value
           ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
-          .sort((a, b) => a.description.localeCompare(b.description))) ??
+          .sort((a, b) => {
+            if (a.id?.endsWith('OTHER')) return 1
+            if (b.id?.endsWith('OTHER')) return -1
+            return a.description.localeCompare(b.description)
+          })) ??
       []
     )
   }
