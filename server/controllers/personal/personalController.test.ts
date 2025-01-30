@@ -2193,7 +2193,7 @@ describe('PersonalController', () => {
             previous: {
               medicalDietaryRequirements: [{ value: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY' }],
               foodAllergies: [{ value: 'FOOD_ALLERGY_GLUTEN' }],
-              personalisedDietaryRequirements: [] as string[],
+              personalisedDietaryRequirements: [{ value: 'PERSONALISED_DIET_VEGAN' }],
             },
             updated: {
               medicalDietaryRequirements: [] as string[],

@@ -8,7 +8,7 @@ import permissionsGuard from '../middleware/permissionsGuard'
 import { userHasRoles } from '../utils/utils'
 import NotFoundError from '../utils/notFoundError'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { enablePrisonPerson } from '../utils/featureToggles'
+import { dietAndAllergyEnabled, enablePrisonPerson } from '../utils/featureToggles'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
@@ -27,6 +27,7 @@ import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
+import { Role } from '../data/enums/role'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -49,8 +50,16 @@ export default function personalRouter(services: Services): Router {
     personalController.displayPersonalPage(),
   )
 
+  const dietAndAllergiesEditCheck = () => (req: Request, res: Response, next: NextFunction) => {
+    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+    if (dietAndAllergyEnabled(activeCaseLoadId) && userHasRoles([Role.DietAndAllergiesEdit], userRoles)) {
+      return next()
+    }
+    return next(new NotFoundError('User cannot access diet and food allergies edit route', HmppsStatusCode.NOT_FOUND))
+  }
+
   // Temporary edit check for now
-  const editRouteChecks = () => (req: Request, res: Response, next: NextFunction) => {
+  const editProfileChecks = () => (req: Request, res: Response, next: NextFunction) => {
     const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
     if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && enablePrisonPerson(activeCaseLoadId)) {
       return next()
@@ -63,7 +72,7 @@ export default function personalRouter(services: Services): Router {
     `${basePath}/:markType(tattoo|scar|mark)`,
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
+    editProfileChecks(),
     distinguishingMarksRouter(services),
   )
 
@@ -72,7 +81,9 @@ export default function personalRouter(services: Services): Router {
     path,
     edit,
     submit,
+    permissionsCheck = editProfileChecks,
   }: {
+    requiredRoles?: string[]
     path: string
     edit: {
       method: RequestHandler
@@ -86,6 +97,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError?: boolean
       }
     }
+    permissionsCheck?: () => RequestHandler
   }) => {
     const routePath = `${basePath}/${path}`
 
@@ -94,7 +106,7 @@ export default function personalRouter(services: Services): Router {
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
-      editRouteChecks(),
+      permissionsCheck(),
       edit.method,
     )
 
@@ -104,7 +116,7 @@ export default function personalRouter(services: Services): Router {
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
-        editRouteChecks(),
+        permissionsCheck(),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
           redirectTo: `personal/${path}`,
@@ -117,7 +129,7 @@ export default function personalRouter(services: Services): Router {
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
-        editRouteChecks(),
+        permissionsCheck(),
         submit.method,
       )
     }
@@ -325,6 +337,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    permissionsCheck: dietAndAllergiesEditCheck,
   })
 
   editRoute({
