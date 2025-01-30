@@ -8,7 +8,7 @@ import permissionsGuard from '../middleware/permissionsGuard'
 import { userHasRoles } from '../utils/utils'
 import NotFoundError from '../utils/notFoundError'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import { enablePrisonPerson } from '../utils/featureToggles'
+import { dietAndAllergyEnabled, enablePrisonPerson } from '../utils/featureToggles'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import PersonalController from '../controllers/personal/personalController'
 import {
@@ -50,32 +50,38 @@ export default function personalRouter(services: Services): Router {
     personalController.displayPersonalPage(),
   )
 
-  // Temporary edit check for now
-  const editRouteChecks =
-    (requiredRoles: string[] = ['DPS_APPLICATION_DEVELOPER']) =>
-    (req: Request, res: Response, next: NextFunction) => {
-      const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
-      if (userHasRoles(requiredRoles, userRoles) && enablePrisonPerson(activeCaseLoadId)) {
-        return next()
-      }
-      return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
+  const dietAndAllergiesEditCheck = () => (req: Request, res: Response, next: NextFunction) => {
+    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+    if (dietAndAllergyEnabled(activeCaseLoadId) && userHasRoles([Role.DietAndAllergiesEdit], userRoles)) {
+      return next()
     }
+    return next(new NotFoundError('User cannot access diet and food allergies edit route', HmppsStatusCode.NOT_FOUND))
+  }
+
+  // Temporary edit check for now
+  const editProfileChecks = () => (req: Request, res: Response, next: NextFunction) => {
+    const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
+    if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && enablePrisonPerson(activeCaseLoadId)) {
+      return next()
+    }
+    return next(new NotFoundError('User cannot access edit routes', HmppsStatusCode.NOT_FOUND))
+  }
 
   // Distinguishing marks
   router.use(
     `${basePath}/:markType(tattoo|scar|mark)`,
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editRouteChecks(),
+    editProfileChecks(),
     distinguishingMarksRouter(services),
   )
 
   // Edit routes
   const editRoute = ({
-    requiredRoles = ['DPS_APPLICATION_DEVELOPER'],
     path,
     edit,
     submit,
+    permissionsCheck = editProfileChecks,
   }: {
     requiredRoles?: string[]
     path: string
@@ -91,6 +97,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError?: boolean
       }
     }
+    permissionsCheck?: () => RequestHandler
   }) => {
     const routePath = `${basePath}/${path}`
 
@@ -99,7 +106,7 @@ export default function personalRouter(services: Services): Router {
       auditPageAccessAttempt({ services, page: edit.audit }),
       getPrisonerData(services),
       permissionsGuard(services.permissionsService.getOverviewPermissions),
-      editRouteChecks(requiredRoles),
+      permissionsCheck(),
       edit.method,
     )
 
@@ -109,7 +116,7 @@ export default function personalRouter(services: Services): Router {
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
-        editRouteChecks(requiredRoles),
+        permissionsCheck(),
         validationMiddleware(submit.validation.validators, {
           redirectBackOnError: submit.validation.redirectBackOnError || false,
           redirectTo: `personal/${path}`,
@@ -122,7 +129,7 @@ export default function personalRouter(services: Services): Router {
         auditPageAccessAttempt({ services, page: submit.audit }),
         getPrisonerData(services),
         permissionsGuard(services.permissionsService.getOverviewPermissions),
-        editRouteChecks(requiredRoles),
+        permissionsCheck(),
         submit.method,
       )
     }
@@ -317,7 +324,6 @@ export default function personalRouter(services: Services): Router {
   )
 
   editRoute({
-    requiredRoles: [Role.DietAndAllergiesEdit],
     path: 'diet-and-food-allergies',
     edit: {
       audit: Page.EditDietAndFoodAllergies,
@@ -331,6 +337,7 @@ export default function personalRouter(services: Services): Router {
         redirectBackOnError: true,
       },
     },
+    permissionsCheck: dietAndAllergiesEditCheck,
   })
 
   editRoute({

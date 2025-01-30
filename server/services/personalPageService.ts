@@ -128,6 +128,7 @@ export default class PersonalPageService {
     token: string,
     prisonerData: Prisoner,
     enablePrisonPerson: boolean = false,
+    dietAndAllergyIsEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
@@ -159,7 +160,7 @@ export default class PersonalPageService {
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
-      enablePrisonPerson ? this.getHealthAndMedication(token, prisonerNumber) : null,
+      dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled ? this.getMilitaryRecords(token, prisonerNumber) : null,
     ])
 

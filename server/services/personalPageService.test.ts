@@ -196,24 +196,43 @@ describe('PersonalPageService', () => {
         })
       })
 
-      describe('Medical diet', () => {
-        it.each([
-          [true, [{ id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY', description: 'Nutrient deficiency' }]],
-          [false, []],
-        ])('Maps the medical diet field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
-          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
-          expect(response.personalDetails.medicalDietaryRequirements).toEqual(expectedValue)
-        })
-      })
-
       describe('Food allergies', () => {
         it.each([
           [true, [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten' }]],
           [false, []],
-        ])('Maps the food allergies field (Prison person enabled: %s)', async (prisonPersonEnabled, expectedValue) => {
-          const response = await constructService().get('token', PrisonerMockDataA, prisonPersonEnabled)
-          expect(response.personalDetails.foodAllergies).toEqual(expectedValue)
-        })
+        ])(
+          'Maps the food allergies field (Diet and allergies enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            const response = await constructService().get('token', PrisonerMockDataA, false, dietAndAllergiesEnabled)
+            expect(response.personalDetails.foodAllergies).toEqual(expectedValue)
+          },
+        )
+      })
+
+      describe('Medical diet', () => {
+        it.each([
+          [true, [{ id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY', description: 'Nutrient deficiency' }]],
+          [false, []],
+        ])(
+          'Maps the medical diet field (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            const response = await constructService().get('token', PrisonerMockDataA, false, dietAndAllergiesEnabled)
+            expect(response.personalDetails.medicalDietaryRequirements).toEqual(expectedValue)
+          },
+        )
+      })
+
+      describe('Personalised diet', () => {
+        it.each([
+          [true, [{ id: 'PERSONALISED_DIET_VEGAN', description: 'Vegan' }]],
+          [false, []],
+        ])(
+          'Maps the medical diet field (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            const response = await constructService().get('token', PrisonerMockDataA, false, dietAndAllergiesEnabled)
+            expect(response.personalDetails.personalisedDietaryRequirements).toEqual(expectedValue)
+          },
+        )
       })
 
       it('Maps the social care needed field', async () => {
@@ -567,7 +586,7 @@ describe('PersonalPageService', () => {
       }
       const apiErrorCallback = jest.fn()
       curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => Promise.reject(curiousApiError))
-      const data = await constructService().get('token', prisonerData, false, apiErrorCallback)
+      const data = await constructService().get('token', prisonerData, false, false, apiErrorCallback)
       expect(data.learnerNeurodivergence.isFulfilled()).toBe(false)
       expect(apiErrorCallback).toHaveBeenCalledWith(curiousApiError)
     })
@@ -642,9 +661,9 @@ describe('PersonalPageService', () => {
     })
   })
 
-  describe('Get health and medications', () => {
-    it('Gets the data from the API when the prison person API is enabled', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true)
+  describe('Get diet and allergy data', () => {
+    it('Gets the data from the API when diet and allergy is enabled', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, false, true)
 
       expect(healthAndMedicationApiClient.getHealthAndMedicationForPrisoner).toHaveBeenCalledWith(
         PrisonerMockDataA.prisonerNumber,
@@ -654,10 +673,13 @@ describe('PersonalPageService', () => {
       expect(personalDetails.medicalDietaryRequirements).toEqual([
         { description: 'Nutrient deficiency', id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY' },
       ])
+      expect(personalDetails.personalisedDietaryRequirements).toEqual([
+        { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },
+      ])
     })
 
-    it('Does not get the data from the API when the prison person API is enabled', async () => {
-      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, false)
+    it('Does not get the data from the API when diet and allergy is disabled', async () => {
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, false, false)
 
       expect(healthAndMedicationApiClient.getHealthAndMedicationForPrisoner).not.toHaveBeenCalledWith(
         PrisonerMockDataA.prisonerNumber,
@@ -665,6 +687,7 @@ describe('PersonalPageService', () => {
 
       expect(personalDetails.foodAllergies).toEqual([])
       expect(personalDetails.medicalDietaryRequirements).toEqual([])
+      expect(personalDetails.personalisedDietaryRequirements).toEqual([])
     })
   })
 

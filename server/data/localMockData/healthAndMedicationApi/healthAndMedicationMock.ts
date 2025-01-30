@@ -24,7 +24,16 @@ export const dietAndAllergyMock: DietAndAllergy = {
     lastModifiedBy: 'USER1',
   },
   personalisedDietaryRequirements: {
-    value: [],
+    value: [
+      {
+        value: {
+          id: 'PERSONALISED_DIET_VEGAN',
+          description: 'Vegan',
+          listSequence: 0,
+          isActive: true,
+        },
+      },
+    ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
   },
