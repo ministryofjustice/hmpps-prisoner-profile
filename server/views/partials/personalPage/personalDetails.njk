@@ -95,7 +95,7 @@
                     { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
                     { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
                     { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
-                    { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not editEnabled } },
+                    { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not dietAndAllergiesEnabled } },
                     { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: dietAndAllergiesEnabled, changeLinkEnabled: editDietAndAllergiesEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
                     { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
                     { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
