@@ -120,9 +120,12 @@ export default class PersonalController {
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
-        dietAndAllergiesEnabled: dietAndAllergyEnabled(activeCaseLoadId),
+        dietAndAllergiesEnabled:
+          dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
         editDietAndAllergiesEnabled:
-          dietAndAllergyEnabled(activeCaseLoadId) && userHasRoles([Role.DietAndAllergiesEdit], userRoles),
+          dietAndAllergyEnabled(activeCaseLoadId) &&
+          userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
+          prisonerData.prisonId === activeCaseLoadId,
         historyEnabled:
           personalPageData.showFieldHistoryLink &&
           enablePrisonPerson(activeCaseLoadId) &&
