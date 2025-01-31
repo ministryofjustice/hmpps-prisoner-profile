@@ -44,7 +44,11 @@ const leftArmConfig = {
   tab: 'Left arm tattoos',
   title: 'Add left arm tattoo details',
   specificParts: [
-    { name: 'leftArm', desc: 'Arm', hint: 'The tattoo spans more than one area, or the location is unknown.' },
+    {
+      name: 'leftArm',
+      desc: 'Arm (general)',
+      hint: 'The tattoo spans more than one area, or the location is unknown.',
+    },
     { name: 'leftShoulder', desc: 'Shoulder' },
     { name: 'upperLeftArm', desc: 'Upper arm' },
     { name: 'leftElbow', desc: 'Elbow' },
@@ -124,9 +128,9 @@ const torsoDetailsConfig = {
   tab: 'Front and side tattoos',
   title: 'Add front and side tattoo details',
   specificParts: [
-    { name: 'frontTorso', desc: 'Front', hint: 'The abdomen, chest or pelvis' },
-    { name: 'rightTorso', desc: 'Right side', hint: 'The left side of the abdomen, chest or pelvis' },
-    { name: 'leftTorso', desc: 'Left side', hint: 'The right side of the abdomen, chest or pelvis' },
+    { name: 'frontTorso', desc: 'Front', hint: 'The abdomen, chest or pelvis.' },
+    { name: 'rightTorso', desc: 'Right side', hint: 'The left side of the abdomen, chest or pelvis.' },
+    { name: 'leftTorso', desc: 'Left side', hint: 'The right side of the abdomen, chest or pelvis.' },
   ],
 }
 describe('getDistinguishingMarkDetailsFormConfig', () => {

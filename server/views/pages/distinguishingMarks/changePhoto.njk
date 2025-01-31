@@ -10,25 +10,26 @@
 {% set heading = "Change the photo of the " + markType %}
 
 {% block body %}
-{% if errors.length > 0 %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{
-                govukErrorSummary({
-                    titleText: "There is a problem",
-                    errorList: errors,
-                    attributes: { 'data-qa-errors': true }
-                })
-            }}
-        </div>
-    </div>
-{% endif %}
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {{ miniBanner({prisonerName: prisonerName, prisonerNumber: prisonerNumber}) }}
     </div>
 </div>
+
+{% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{
+            govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            })
+            }}
+        </div>
+    </div>
+{% endif %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds {{ "upload-visible" if upload or errors.length > 0 or not photoHtml }}">
@@ -50,7 +51,7 @@
                     id: "file",
                     name: "file",
                     hint: {
-                        text: "Images can be JPEG, PNG or GIF files."
+                        text: "Photos can be JPG or GIF files."
                     },
                     errorMessage: errors | findError("file")
                 }) }}

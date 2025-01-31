@@ -351,6 +351,11 @@ describe('Case Notes Controller', () => {
         caseNoteText: '',
         currentCaseNote,
         maxLength: 4000 - currentLength - prisonApiAdditionalCaseNoteTextLength - res.locals.user.username.length,
+        miniBannerData: {
+          cellLocation: '1-1-035',
+          prisonerName: 'Saunders, John',
+          prisonerNumber: 'G6123VU',
+        },
         isOMICOpen: false,
         isExternal: false,
         prisonerDisplayName: 'John Saunders',

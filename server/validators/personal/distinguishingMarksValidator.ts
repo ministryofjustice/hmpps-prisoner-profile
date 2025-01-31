@@ -3,6 +3,7 @@ import {
   bodyPartMap,
   bodyPartSelections,
 } from '../../controllers/interfaces/distinguishingMarks/selectionTypes'
+import MulterFile from '../../controllers/interfaces/MulterFile'
 
 export interface BodySubmission {
   bodyPart?: string
@@ -13,43 +14,57 @@ interface BodySpecificSubmission {
   [key: string]: string
 }
 
-export interface FileUploadRequest extends Request {
+export interface FileUploadRequest {
   file?: Express.Multer.File
+  files?: Record<string, MulterFile[]>
+  body?: BodySpecificSubmission
 }
 
 // List of allowed MIME types
-const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif']
+const allowedMimeTypes = ['image/jpeg', 'image/gif']
 
-// Max file size in bytes (e.g., 5MB)
-const maxSizeMB = 10
+// Max file size in bytes (e.g. 200MB)
+const maxSizeMB = 200
 const maxSize = maxSizeMB * 1024 * 1024
 
 export function newDistinguishingMarkValidator({ bodyPart }: BodySubmission) {
   const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
   if (!verifiedBodyPart) {
-    return [{ text: 'Select a body part' }]
+    return [{ text: 'Select a body part', href: '#body-part-selection' }]
   }
 
   return []
 }
 
-export function newDetailedDistinguishingMarkValidator(body: BodySpecificSubmission) {
-  const verifiedBodyPart = allBodyParts.find(selection => selection === body.specificBodyPart)
+export function newDetailedDistinguishingMarkValidator(req: FileUploadRequest) {
+  const verifiedBodyPart = allBodyParts.find(selection => selection === req.body.specificBodyPart)
 
   if (!verifiedBodyPart) {
     return [{ text: 'Select a body part', href: '#specific-body-part-selection' }]
   }
 
-  if (body[`description-${body.specificBodyPart}`].length > 240) {
-    return [
-      {
-        text: 'The description must be 240 characters or less',
-        href: `#description-${body.specificBodyPart}`,
-      },
-    ]
+  const errors = []
+
+  if (req.body[`description-${req.body.specificBodyPart}`]?.length > 240) {
+    errors.push({
+      text: 'The description must be 240 characters or less',
+      href: `#description-${req.body.specificBodyPart}`,
+    })
   }
 
-  return []
+  const fileName = `file-${verifiedBodyPart}`
+
+  if (req.files[fileName]?.[0].size > maxSize) {
+    errors.push({ text: `The photo file size must be less than ${maxSizeMB}MB`, href: `#${fileName}` })
+  } else if (req.files[fileName]?.[0] && !allowedMimeTypes.includes(req.files[fileName][0].mimetype)) {
+    const allowedTypes = allowedMimeTypes.map(type => type.split('/')[1].toUpperCase().replace('JPEG', 'JPG'))
+    errors.push({
+      text: `The photo must be a ${allowedTypes.slice(0, -1).join(', ')} or ${allowedTypes.slice(-1)}`,
+      href: `#${fileName}`,
+    })
+  }
+
+  return errors
 }
 
 export function updateLocationValidator(body: BodySpecificSubmission) {
@@ -81,14 +96,14 @@ export function updatePhotoValidator(req: FileUploadRequest) {
   }
 
   if (req.file.size > maxSize) {
-    return [{ text: `The selected file must be smaller than ${maxSizeMB}MB`, href: '#file' }]
+    return [{ text: `The photo file size must be less than ${maxSizeMB}MB`, href: '#file' }]
   }
 
   if (!allowedMimeTypes.includes(req.file.mimetype)) {
-    const allowedTypes = allowedMimeTypes.map(type => type.split('/')[1].toUpperCase())
+    const allowedTypes = allowedMimeTypes.map(type => type.split('/')[1].toUpperCase().replace('JPEG', 'JPG'))
     return [
       {
-        text: `The selected file must be a ${allowedTypes.slice(0, -1).join(', ')} or ${allowedTypes.slice(-1)}`,
+        text: `The photo must be a ${allowedTypes.slice(0, -1).join(', ')} or ${allowedTypes.slice(-1)}`,
         href: '#file',
       },
     ]

@@ -36,4 +36,24 @@ describe('Metrics Service', () => {
       })
     })
   })
+
+  describe('trackHealthAndMedicationsUpdate', () => {
+    it('should call telemetry client', async () => {
+      metricsService.trackHealthAndMedicationUpdate({
+        fieldsUpdated: ['field1', 'field2'],
+        prisonerNumber: 'A1234AA',
+        user: { username: 'USER1', activeCaseLoadId: 'MDI' } as PrisonUser,
+      })
+
+      expect(telemetryClient.trackEvent).toHaveBeenCalledWith({
+        name: 'prisoner-profile-health-and-medication-updated',
+        properties: {
+          prisonerNumber: 'A1234AA',
+          fieldsUpdated: ['field1', 'field2'],
+          username: 'USER1',
+          activeCaseLoad: 'MDI',
+        },
+      })
+    })
+  })
 })

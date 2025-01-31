@@ -100,16 +100,24 @@ describe('isRealDate', () => {
 
 describe('format date', () => {
   it.each([
-    [null, null, undefined, ''],
-    ['[default]', '2023-01-20', undefined, '20 January 2023'],
-    ['long', '2023-01-20', 'long', '20 January 2023'],
-    ['short', '2023-01-20', 'short', '20/01/2023'],
-    ['full', '2023-01-20', 'full', 'Friday 20 January 2023'],
-    ['medium', '2023-01-20', 'medium', '20 Jan 2023'],
+    [null, null, undefined, undefined, ''],
+    ['null with return value', null, undefined, 'Not entered', 'Not entered'],
+    ['[default]', '2023-01-20', undefined, undefined, '20 January 2023'],
+    ['[default]', '2023-01-20', undefined, 'Not entered', '20 January 2023'],
+    ['long', '2023-01-20', 'long', undefined, '20 January 2023'],
+    ['short', '2023-01-20', 'short', undefined, '20/01/2023'],
+    ['full', '2023-01-20', 'full', undefined, 'Friday 20 January 2023'],
+    ['medium', '2023-01-20', 'medium', undefined, '20 Jan 2023'],
   ])(
     '%s: formatDate(%s, %s)',
-    (_: string, a: string, b: undefined | 'short' | 'full' | 'long' | 'medium', expected: string) => {
-      expect(formatDate(a, b)).toEqual(expected)
+    (
+      _: string,
+      isoDate: string,
+      style: undefined | 'short' | 'full' | 'long' | 'medium',
+      emptyReturnValue: string,
+      expected: string,
+    ) => {
+      expect(formatDate(isoDate, style, emptyReturnValue)).toEqual(expected)
     },
   )
 })

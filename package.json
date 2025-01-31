@@ -34,7 +34,7 @@
   },
   "engines": {
     "node": "^22",
-    "npm": "^10"
+    "npm": "^11"
   },
   "jest": {
     "coverageReporters": [
@@ -105,7 +105,7 @@
     "@contentful/rich-text-html-renderer": "^16.6.10",
     "@contentful/rich-text-types": "^16.8.5",
     "@ministryofjustice/frontend": "^2.2.5",
-    "@ministryofjustice/hmpps-connect-dps-components": "2.0.0-beta",
+    "@ministryofjustice/hmpps-connect-dps-components": "^2.0.0",
     "@ministryofjustice/hmpps-connect-dps-shared-items": "^1.2.1",
     "@types/multer": "^1.4.12",
     "agentkeepalive": "^4.5.0",

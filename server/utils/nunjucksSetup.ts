@@ -15,6 +15,7 @@ import {
   formatScheduleItem,
   initialiseName,
   isInUsersCaseLoad,
+  lengthOfService,
   neurodiversityEnabled,
   prependBaseUrl,
   prependHmppsAuthBaseUrl,
@@ -47,10 +48,10 @@ import groupDistinguishingMarks, {
   getBodyPartToken,
   getMarkLocationDescription,
 } from '../views/dataUtils/groupDistinguishingMarksForView'
-import { formatMedicalDietaryRequirements } from './referenceDataCodeUtils'
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
+import { militaryHistoryEnabled } from './featureToggles'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -101,6 +102,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('neurodiversityEnabled', neurodiversityEnabled)
   njkEnv.addGlobal('standardApiErrorText', () => apiErrorMessage)
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
+  njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)
@@ -184,6 +186,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toMarkLocationDescription', getMarkLocationDescription)
   njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
   njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
-  njkEnv.addFilter('formatMedicalDietaryRequirements', formatMedicalDietaryRequirements)
   njkEnv.addFilter('sortByLatestAndUuid', sortByLatestAndUuid)
+  njkEnv.addFilter('lengthOfService', lengthOfService)
 }

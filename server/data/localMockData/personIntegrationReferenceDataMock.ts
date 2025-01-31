@@ -1,4 +1,4 @@
-import { ReferenceDataCodeDto } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
+import { MilitaryRecord, ReferenceDataCodeDto } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -51,5 +51,84 @@ export const NationalityReferenceDataCodesMock: ReferenceDataCodeDto[] = [
     description: 'German',
     listSequence: 3,
     isActive: false,
+  },
+]
+
+export const ReligionReferenceDataCodesMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'RELF_DRU',
+    code: 'DRU',
+    description: 'Druid',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'RELF_PAG',
+    code: 'PAG',
+    description: 'Pagan',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'RELF_ZORO',
+    code: 'ZORO',
+    description: 'Zoroastrian',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'RELF_OTH',
+    code: 'OTH',
+    description: 'Other religion',
+    listSequence: 4,
+    isActive: true,
+  },
+  {
+    id: 'RELF_NIL',
+    code: 'NIL',
+    description: 'No religion',
+    listSequence: 5,
+    isActive: true,
+  },
+  {
+    id: 'RELF_UNKN',
+    code: 'UNKN',
+    description: 'Unknown',
+    listSequence: 6,
+    isActive: true,
+  },
+]
+
+export const MilitaryRecordsMock: MilitaryRecord[] = [
+  {
+    prisonerNumber: 'A1234BC',
+    militarySeq: 1,
+    warZoneCode: 'AFG',
+    warZoneDescription: 'Afghanistan',
+    startDate: '2020-01-01',
+    militaryDischargeCode: 'HON',
+    militaryDischargeDescription: 'Honourable',
+    militaryBranchCode: 'ARM',
+    militaryBranchDescription: 'Army',
+    description: 'Description',
+    unitNumber: 'Unit 1',
+    enlistmentLocation: 'Location 1',
+    dischargeLocation: 'Location 2',
+    selectiveServicesFlag: false,
+    militaryRankCode: 'CPL_ARM',
+    militaryRankDescription: 'Corporal',
+    serviceNumber: '123456789',
+    disciplinaryActionCode: 'CM',
+    disciplinaryActionDescription: 'Court Martial',
+  },
+  {
+    prisonerNumber: 'A1234BC',
+    militarySeq: 2,
+    warZoneCode: 'AFG',
+    warZoneDescription: 'Afghanistan',
+    startDate: '2020-03-01',
+    militaryBranchCode: 'RMA',
+    militaryBranchDescription: 'Royal Marines',
+    selectiveServicesFlag: false,
   },
 ]

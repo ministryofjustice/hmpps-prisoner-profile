@@ -1,0 +1,86 @@
+// eslint-disable-next-line no-shadow
+export enum HealthAndMedicationReferenceDataDomain {
+  foodAllergy = 'FOOD_ALLERGY',
+  medicalDiet = 'MEDICAL_DIET',
+  personalisedDiet = 'PERSONALISED_DIET',
+}
+
+export interface ValueWithMetadata<T> {
+  value?: T
+  lastModifiedAt: string
+  lastModifiedBy: string
+}
+
+export interface ReferenceDataDomain {
+  code: string
+  description: string
+  listSequence: number
+  createdAt: string
+  createdBy: string
+  isActive: boolean
+  lastModifiedAt?: string
+  lastModifiedBy?: string
+  deactivatedAt?: string
+  deactivatedBy?: string
+  referenceDataCodes?: ReferenceDataCode[]
+  subDomains: ReferenceDataDomain[]
+}
+
+export interface ReferenceDataCode {
+  id: string
+  domain: string
+  code: string
+  description: string
+  listSequence: number
+  createdAt: string
+  createdBy: string
+  isActive: boolean
+  lastModifiedAt?: string
+  lastModifiedBy?: string
+  deactivatedAt?: string
+  deactivatedBy?: string
+}
+
+export interface ReferenceDataCodeSimple {
+  id: string
+  description: string
+  listSequence: number
+  isActive: boolean
+}
+
+export interface ReferenceDataSelection {
+  value: ReferenceDataCodeSimple
+  comment?: string
+}
+
+export interface ReferenceDataIdSelection {
+  value: string
+  comment?: string
+}
+
+export interface DietAndAllergy {
+  foodAllergies: ValueWithMetadata<ReferenceDataSelection[]>
+  medicalDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
+  personalisedDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
+}
+
+export interface HealthAndMedication {
+  dietAndAllergy?: DietAndAllergy
+}
+
+export interface DietAndAllergyUpdate {
+  foodAllergies?: ReferenceDataIdSelection[]
+  medicalDietaryRequirements?: ReferenceDataIdSelection[]
+  personalisedDietaryRequirements?: ReferenceDataIdSelection[]
+}
+
+export interface HealthAndMedicationApiClient {
+  getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>
+
+  getHealthAndMedicationForPrisoner(prisonerNumber: string): Promise<HealthAndMedication>
+
+  updateDietAndAllergyDataForPrisoner(
+    prisonerNumber: string,
+    dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
+  ): Promise<DietAndAllergy>
+}

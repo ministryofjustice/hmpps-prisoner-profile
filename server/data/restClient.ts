@@ -259,4 +259,37 @@ export default class RestClient {
         })
     })
   }
+
+  async streamWithContentType({ path = null, headers = {} }: StreamRequest = {}): Promise<{
+    stream: Readable
+    contentType: string
+  }> {
+    const endpoint = `${this.apiUrl()}${path}`
+    return new Promise((resolve, reject) => {
+      superagent
+        .get(endpoint)
+        .agent(this.agent)
+        .auth(this.token, { type: 'bearer' })
+        .retry(2, (err, res) => {
+          if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+          return undefined
+        })
+        .timeout(this.timeoutConfig())
+        .set(headers)
+        .end((error, response) => {
+          if (error) {
+            logger.warn(sanitiseError(error, endpoint), `Error calling ${this.name}: ${path}`)
+            reject(error)
+          } else if (response) {
+            const s = new Readable()
+            // eslint-disable-next-line no-underscore-dangle,no-empty-function
+            s._read = () => {}
+            s.push(response.body)
+            s.push(null)
+            const contentType = response.header['content-type'] || ''
+            resolve({ stream: s, contentType })
+          }
+        })
+    })
+  }
 }

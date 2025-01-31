@@ -46,11 +46,27 @@ export default class PersonalPage extends Page {
       numberOfChildren: () => cardData('number-of-children'),
       otherLanguages: () => cardData('other-languages'),
       typeOfDiet: () => cardData('type-of-diet'),
+      dietAndFoodAllergies: () => cardData('diet-and-food-allergies'),
       smokeOrVaper: () => cardData('smoker-or-vaper'),
       domesticAbusePerpetrator: () => cardData('domestic-abuse-perpetrator'),
       domesticAbuseVictim: () => cardData('domestic-abuse-victim'),
       socialCareNeeded: () => cardData('social-care-needed'),
       youthOffender: () => cardData('youth-offender'),
+      militaryRecords: () => ({
+        serviceNumber: (): PageElement => cardData('military-records').find('[data-qa=service-number]'),
+        branch: (): PageElement => cardData('military-records').find('[data-qa=branch]'),
+        unitNumber: (): PageElement => cardData('military-records').find('[data-qa=unit-number]'),
+        rank: (): PageElement => cardData('military-records').find('[data-qa=rank]'),
+        comments: (): PageElement => cardData('military-records').find('[data-qa=comments]'),
+        enlistmentDate: (): PageElement => cardData('military-records').find('[data-qa=enlistment-date]'),
+        enlistmentLocation: (): PageElement => cardData('military-records').find('[data-qa=enlistment-location]'),
+        conflict: (): PageElement => cardData('military-records').find('[data-qa=conflict]'),
+        disciplinaryAction: (): PageElement => cardData('military-records').find('[data-qa=disciplinary-action]'),
+        dischargeDate: (): PageElement => cardData('military-records').find('[data-qa=discharge-date]'),
+        dischargeLocation: (): PageElement => cardData('military-records').find('[data-qa=discharge-location]'),
+        dischargeDescription: (): PageElement => cardData('military-records').find('[data-qa=discharge-description]'),
+        lengthOfService: (): PageElement => cardData('military-records').find('[data-qa=length-of-service]'),
+      }),
     }
   }
 

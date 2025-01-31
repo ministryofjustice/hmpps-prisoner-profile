@@ -25,7 +25,7 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { enablePrisonPerson } from '../../utils/featureToggles'
+import { dietAndAllergyEnabled, enablePrisonPerson } from '../../utils/featureToggles'
 import {
   CheckboxFieldData,
   cityOrTownOfBirthFieldData,
@@ -58,6 +58,15 @@ import {
   referenceDataDomainToCheckboxOptions,
 } from '../../utils/checkboxUtils'
 import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
+import {
+  DietAndAllergy,
+  DietAndAllergyUpdate,
+  HealthAndMedicationReferenceDataDomain,
+  ReferenceDataCode,
+  ReferenceDataIdSelection,
+} from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { Role } from '../../data/enums/role'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -79,7 +88,13 @@ export default class PersonalController {
       const prisonPersonEnabled = enablePrisonPerson(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
-        this.personalPageService.get(clientToken, prisonerData, prisonPersonEnabled, res.locals.apiErrorCallback),
+        this.personalPageService.get(
+          clientToken,
+          prisonerData,
+          prisonPersonEnabled,
+          dietAndAllergyEnabled(activeCaseLoadId),
+          res.locals.apiErrorCallback,
+        ),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
       ])
@@ -105,6 +120,9 @@ export default class PersonalController {
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
         editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        dietAndAllergiesEnabled: dietAndAllergyEnabled(activeCaseLoadId),
+        editDietAndAllergiesEnabled:
+          dietAndAllergyEnabled(activeCaseLoadId) && userHasRoles([Role.DietAndAllergiesEdit], userRoles),
         historyEnabled:
           personalPageData.showFieldHistoryLink &&
           enablePrisonPerson(activeCaseLoadId) &&
@@ -1076,6 +1094,172 @@ export default class PersonalController {
     }
   }
 
+  dietAndFoodAllergies() {
+    const mapDietAndAllergy = (
+      dietAndAllergy: DietAndAllergy,
+      field: keyof DietAndAllergy,
+    ): ReferenceDataIdSelection[] => {
+      if (dietAndAllergy && dietAndAllergy[field]) {
+        return dietAndAllergy[field].value.map(selection => ({
+          value: selection.value.id,
+          comment: selection.comment,
+        }))
+      }
+      return []
+    }
+
+    const checkboxOptions = (
+      namePrefix: string,
+      referenceDataCodes: ReferenceDataCode[],
+      selectedItems: ReferenceDataIdSelection[],
+    ) => {
+      return referenceDataCodes
+        .sort((a, b) => a.listSequence - b.listSequence)
+        .map(code => {
+          const selectedItem = selectedItems.find(item => item.value === code.id)
+          return {
+            name: `${namePrefix}[${code.listSequence}][value]`,
+            text: code.description,
+            value: code.id,
+            id: code.id,
+            listSequence: code.listSequence,
+            checked: !!selectedItem,
+            comment: selectedItem?.comment,
+          }
+        })
+    }
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+
+        const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
+          this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber),
+          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+            clientToken,
+            HealthAndMedicationReferenceDataDomain.foodAllergy,
+          ),
+          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+            clientToken,
+            HealthAndMedicationReferenceDataDomain.medicalDiet,
+          ),
+          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+            clientToken,
+            HealthAndMedicationReferenceDataDomain.personalisedDiet,
+          ),
+        ])
+
+        const errors = validationErrorsFromFlash(req)
+        const requestBodyFlash = requestBodyFromFlash<{
+          allergy?: ReferenceDataIdSelection[]
+          medical?: ReferenceDataIdSelection[]
+          personalised?: ReferenceDataIdSelection[]
+        }>(req)
+
+        const dietAndAllergy = healthAndMedication?.dietAndAllergy
+
+        const allergiesSelected = () => {
+          if (requestBodyFlash?.allergy) return requestBodyFlash.allergy.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, 'foodAllergies')
+        }
+
+        const medicalDietChecked = () => {
+          if (requestBodyFlash?.medical) return requestBodyFlash.medical.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, 'medicalDietaryRequirements')
+        }
+
+        const personalisedDietChecked = () => {
+          if (requestBodyFlash?.personalised) return requestBodyFlash.personalised.filter(item => !!item.value)
+          return mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements')
+        }
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: Page.EditDietAndFoodAllergies,
+        })
+
+        res.render('pages/edit/dietAndFoodAllergies', {
+          pageTitle: 'Diet and food allergies - Prisoner personal details',
+          prisonerNumber,
+          prisonerName,
+          breadcrumbPrisonerName: prisonerBannerName,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+          allergyOptions: checkboxOptions('allergy', allergyCodes, allergiesSelected()),
+          medicalDietOptions: checkboxOptions('medical', medicalDietCodes, medicalDietChecked()),
+          personalisedDietOptions: checkboxOptions('personalised', personalisedDietCodes, personalisedDietChecked()),
+          errors: errors ?? [],
+          errorsForForms: {
+            medical: errors?.filter(e => e.href === '#medical-other')[0]?.text ?? null,
+            allergy: errors?.filter(e => e.href === '#allergy-other')[0]?.text ?? null,
+            personalised: errors?.filter(e => e.href === '#personalised-other')[0]?.text ?? null,
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const { prisonerNumber } = req.params
+        const dietAndAllergy = (await this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber))
+          ?.dietAndAllergy
+
+        const update: Partial<DietAndAllergyUpdate> = {
+          foodAllergies: req.body.allergy
+            ? req.body.allergy.filter((item: ReferenceDataIdSelection) => !!item.value)
+            : [],
+          medicalDietaryRequirements: req.body.medical
+            ? req.body.medical.filter((item: ReferenceDataIdSelection) => !!item.value)
+            : [],
+          personalisedDietaryRequirements: req.body.personalised
+            ? req.body.personalised.filter((item: ReferenceDataIdSelection) => !!item.value)
+            : [],
+        }
+
+        const previousValues: Partial<DietAndAllergyUpdate> = {
+          foodAllergies: mapDietAndAllergy(dietAndAllergy, 'foodAllergies'),
+          medicalDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'medicalDietaryRequirements'),
+          personalisedDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements'),
+        }
+
+        try {
+          await this.personalPageService.updateDietAndFoodAllergies(clientToken, user, prisonerNumber, update)
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditDietAndFoodAllergies,
+              details: { fieldName: 'dietAndFoodAllergies', previous: previousValues, updated: update },
+            })
+            .catch(error => logger.error(error))
+
+          req.flash('flashMessage', {
+            text: `Diet and food allergies updated`,
+            type: FlashMessageType.success,
+            fieldName: 'dietAndFoodAllergies',
+          })
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+        } catch (e) {
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+        }
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/diet-and-food-allergies`)
+      },
+    }
+  }
+
   medicalDiet() {
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -1278,6 +1462,128 @@ export default class PersonalController {
         }
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+      },
+    }
+  }
+
+  religion() {
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const pageTitle = 'Religion, faith or belief'
+        const { prisonerNumber } = req.params
+        const { clientToken, inmateDetail, prisonerData } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{
+          religion: string
+          reasonKnown: string
+          reasonForChange: string
+          reasonForChangeUnknown: string
+        }>(req)
+        const errors = req.flash('errors')
+
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const otherReligionCodes = ['OTH', 'NIL', 'UNKN']
+        const religionReferenceData = await this.personalPageService.getReferenceDataCodesFromProxy(
+          clientToken,
+          ProxyReferenceDataDomain.religion,
+        )
+        const religionOptions = religionReferenceData.filter(it => !otherReligionCodes.includes(it.code))
+        const otherReligionOptions = otherReligionCodes.map(code => religionReferenceData.find(it => it.code === code))
+        const profileInformationValue = getProfileInformationValue(
+          ProfileInformationType.Religion,
+          inmateDetail.profileInformation,
+        )
+        const currentReligion = profileInformationValue
+          ? religionReferenceData.filter(
+              religion => religion.description === profileInformationValue || religion.code === profileInformationValue,
+            )[0] || { code: '?', description: profileInformationValue }
+          : profileInformationValue
+        const fieldValue = requestBodyFlash?.religion
+        const currentReasonKnown = requestBodyFlash?.reasonKnown
+        const currentReasonForChange = requestBodyFlash?.reasonForChange
+        const currentReasonForChangeUnknown = requestBodyFlash?.reasonForChangeUnknown
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: Page.EditReligion,
+        })
+
+        res.render('pages/edit/religion', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: `Select ${prisonerName}'s religion, faith or belief`,
+          prisonerNumber,
+          currentReligion,
+          currentReasonKnown,
+          currentReasonForChange,
+          currentReasonForChangeUnknown,
+          breadcrumbPrisonerName: prisonerBannerName,
+          errors,
+          options: [
+            ...objectToRadioOptions(religionOptions, 'code', 'description', fieldValue),
+            { divider: 'Or other, none or unknown' },
+            ...objectToRadioOptions(otherReligionOptions, 'code', 'description', fieldValue),
+          ],
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const fieldName = 'religion'
+        const pageTitle = 'Religion, faith or belief'
+        const url = 'religion'
+        const redirectAnchor = 'personal-details'
+
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const religionCode = req.body.religion || null
+        const currentReligionCode = req.body.currentReligionCode || null
+        const reasonForChangeKnown = req.body.reasonKnown || null
+        const reasonForChange =
+          reasonForChangeKnown === 'NO' ? req.body.reasonForChangeUnknown : req.body.reasonForChange
+
+        if (!religionCode) {
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+        }
+
+        try {
+          await this.personalPageService.updateReligion(
+            clientToken,
+            user,
+            prisonerNumber,
+            religionCode,
+            reasonForChange,
+          )
+          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
+
+          this.auditService
+            .sendPostSuccess({
+              user: res.locals.user,
+              prisonerNumber,
+              correlationId: req.id,
+              action: PostAction.EditReligion,
+              details: {
+                fieldName,
+                previous: currentReligionCode,
+                updated: religionCode,
+              },
+            })
+            .catch(error => logger.error(error))
+
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+        } catch (e) {
+          req.flash('requestBody', JSON.stringify(req.body))
+          req.flash('errors', [{ text: 'There was an error please try again' }])
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        }
       },
     }
   }

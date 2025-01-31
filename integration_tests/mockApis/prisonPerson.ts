@@ -125,7 +125,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `${baseUrl}/photographs/${photo.id}/file`,
+        urlPattern: `${baseUrl}/distinguishing-marks/photo/${photo.id}`,
       },
       response: {
         status: 200,

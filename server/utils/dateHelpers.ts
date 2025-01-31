@@ -101,10 +101,15 @@ export const isRealDate = (date: string): boolean => {
  *
  * @param isoDate ISO-8601 format date string
  * @param style formatting style to use - long (default), short, full, medium
+ * @param emptyReturnValue optional string to return if the input date is empty
  * @returns formatted date string
  */
-export const formatDate = (isoDate: string, style: 'short' | 'full' | 'long' | 'medium' = 'long'): string => {
-  if (!isoDate) return ''
+export const formatDate = (
+  isoDate: string,
+  style: 'short' | 'full' | 'long' | 'medium' = 'long',
+  emptyReturnValue: string = '',
+): string => {
+  if (!isoDate) return emptyReturnValue
 
   return new Date(isoDate).toLocaleDateString('en-gb', { dateStyle: style })?.replaceAll(',', '')
 }

@@ -74,6 +74,7 @@ generic-service:
     PRISON_PERSON_API_URL: "https://prison-person-api.prison.service.justice.gov.uk"
     PERSON_INTEGRATION_API_URL: "https://person-integration-api.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api.hmpps.service.justice.gov.uk"
+    HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -86,6 +87,9 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     PRISON_PERSON_API_ENABLED: "false"
     PRISON_PERSON_API_ENABLED_PRISONS: ""
+    DIET_AND_ALLERGY_ENABLED: "false"
+    DIET_AND_ALLERGY_ENABLED_PRISONS: ""
+    MILITARY_HISTORY_ENABLED: "false"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32

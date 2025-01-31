@@ -48,7 +48,7 @@ export interface PrisonPersonCharacteristic {
 export interface PrisonPerson {
   prisonerNumber: string
   physicalAttributes: PrisonPersonPhysicalAttributes
-  health: PrisonPersonHealth
+  health?: PrisonPersonHealth
 }
 
 export interface ReferenceDataDomain {
@@ -197,5 +197,5 @@ export interface PrisonPersonApiClient {
 
   postDistinguishingMarkPhoto(markId: string, photograph: MulterFile): Promise<PrisonPersonDistinguishingMark>
 
-  getImage(imageId: string): Promise<Readable>
+  getImage(imageId: string): Promise<{ stream: Readable; contentType: string }>
 }

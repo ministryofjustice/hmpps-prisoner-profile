@@ -148,10 +148,13 @@ export default class DistinguishingMarksController {
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
+    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+
     return res.render('pages/distinguishingMarks/changeBodyPart', {
       markType,
       selected,
       verifiedSelection,
+      refererUrl,
     })
   }
 

@@ -21,11 +21,15 @@
         href: "/prisoner/" + prisonerNumber + "/personal"
     }
 ] %}
-{% set mainClasses = 'govuk-body dps-edit-container' %}
+{% set mainClasses = 'govuk-body' %}
 
 {% block content %}
 
     {% block body %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
 
         {% if errors.length > 0 %}
             {{ govukErrorSummary({
@@ -35,8 +39,6 @@
                 classes: 'govuk-!-margin-bottom-6'
             }) }}
         {% endif %}
-
-        {{ miniBanner(miniBannerData) }}
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-three-quarters">
@@ -54,7 +56,7 @@
                                 },
                                 items: autocompleteOptions,
                                 errorMessage: errors | findError("autocomplete"),
-                                classes: "govuk-!-width-one-third js-autocomplete-select",
+                                classes: "js-autocomplete-select",
                                 attributes: {
                                     "data-test": "select-autocomplete-input"
                                 }

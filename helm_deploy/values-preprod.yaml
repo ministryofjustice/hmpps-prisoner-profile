@@ -71,6 +71,7 @@ generic-service:
     PRISON_PERSON_API_URL: "https://prison-person-api-preprod.prison.service.justice.gov.uk"
     PERSON_INTEGRATION_API_URL: "https://person-integration-api-preprod.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api-preprod.hmpps.service.justice.gov.uk"
+    HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-preprod.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -83,6 +84,9 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     PRISON_PERSON_API_ENABLED: "true"
     PRISON_PERSON_API_ENABLED_PRISONS: "KMI"
+    DIET_AND_ALLERGY_ENABLED: "true"
+    DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
+    MILITARY_HISTORY_ENABLED: "true"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32
@@ -95,8 +99,14 @@ generic-service:
       - prisons
       - private_prisons
 
+  scheduledDowntime:
+    enabled: true
+    startup: '30 6 * * 1-5' # Start at 6.30am UTC Monday-Friday
+    shutdown: '30 21 * * 1-5' # Stop at 9.30pm UTC Monday-Friday
+
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-profile-non-prod
+  businessHoursOnly: true
 
   elastiCacheAlertsClusterIds:
     cp-546b408b8600f28d-001: "HMPPS Prisoner Profile ElastiCache Cluster Node 1"

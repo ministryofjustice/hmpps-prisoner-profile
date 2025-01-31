@@ -50,6 +50,14 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import ReferenceDataService from './referenceDataService'
+import {
+  DietAndAllergy,
+  DietAndAllergyUpdate,
+  HealthAndMedication,
+  HealthAndMedicationApiClient,
+  HealthAndMedicationReferenceDataDomain,
+} from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { militaryHistoryEnabled } from '../utils/featureToggles'
 
 export default class PersonalPageService {
   constructor(
@@ -57,6 +65,7 @@ export default class PersonalPageService {
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
+    private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
     private readonly metricsService: MetricsService,
   ) {}
@@ -67,6 +76,29 @@ export default class PersonalPageService {
       return apiClient.getPrisonPerson(prisonerNumber)
     }
     return null
+  }
+
+  async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
+    const apiClient = this.healthAndMedicationApiClientBuilder(token)
+    return apiClient.getHealthAndMedicationForPrisoner(prisonerNumber)
+  }
+
+  async updateDietAndFoodAllergies(
+    token: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    dietAndFoodAllergies: Partial<DietAndAllergyUpdate>,
+  ): Promise<DietAndAllergy> {
+    const apiClient = this.healthAndMedicationApiClientBuilder(token)
+    const response = apiClient.updateDietAndAllergyDataForPrisoner(prisonerNumber, dietAndFoodAllergies)
+
+    this.metricsService.trackHealthAndMedicationUpdate({
+      fieldsUpdated: Object.keys(dietAndFoodAllergies),
+      prisonerNumber,
+      user,
+    })
+
+    return response
   }
 
   async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
@@ -96,6 +128,7 @@ export default class PersonalPageService {
     token: string,
     prisonerData: Prisoner,
     enablePrisonPerson: boolean = false,
+    dietAndAllergyIsEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
@@ -113,6 +146,8 @@ export default class PersonalPageService {
       prisonPerson,
       distinguishingMarks,
       learnerNeurodivergence,
+      healthAndMedication,
+      militaryRecords,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -125,6 +160,8 @@ export default class PersonalPageService {
       this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
+      dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
+      militaryHistoryEnabled ? this.getMilitaryRecords(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -141,6 +178,7 @@ export default class PersonalPageService {
         secondaryLanguages,
         prisonPerson,
         countryOfBirth,
+        healthAndMedication,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
@@ -162,6 +200,7 @@ export default class PersonalPageService {
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
       distinguishingMarks,
+      militaryRecords: militaryRecords.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
     }
   }
 
@@ -200,6 +239,7 @@ export default class PersonalPageService {
     secondaryLanguages: SecondaryLanguage[],
     prisonPerson: PrisonPerson,
     countryOfBirth: string,
+    healthAndMedication: HealthAndMedication,
   ): PersonalDetails {
     const { profileInformation } = inmateDetail
 
@@ -261,25 +301,34 @@ export default class PersonalPageService {
         undefined,
         prisonerDetail?.currentWorkingLastName,
       ),
-      religionOrBelief: prisonerData.religion || 'Not entered',
+      religionOrBelief: inmateDetail.religion || 'Not entered',
       sex: prisonerData.gender,
       sexualOrientation:
         getProfileInformationValue(ProfileInformationType.SexualOrientation, profileInformation) || 'Not entered',
-      smokerOrVaper: prisonPerson
-        ? this.mapSmokerDescription(prisonPerson.health?.smokerOrVaper?.value) || 'Not entered'
-        : getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
+      smokerOrVaper:
+        getProfileInformationValue(ProfileInformationType.SmokerOrVaper, profileInformation) || 'Not entered',
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
-      medicalDietaryRequirements:
-        prisonPerson?.health?.medicalDietaryRequirements?.value
-          ?.map(({ id, description }) => ({ id, description }))
-          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
-      foodAllergies:
-        prisonPerson?.health?.foodAllergies?.value
-          ?.map(({ id, description }) => ({ id, description }))
-          .sort((a, b) => a.description.localeCompare(b.description)) ?? [],
+      foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
+      medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
+      personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
     }
+  }
+
+  private mapDietAndAllergy = (healthAndMedication: HealthAndMedication, field: keyof DietAndAllergy) => {
+    const dietAndAllergy = healthAndMedication?.dietAndAllergy
+    return (
+      (dietAndAllergy &&
+        dietAndAllergy[field]?.value
+          ?.map(({ value: { id, description }, comment }) => ({ id, description, comment }))
+          .sort((a, b) => {
+            if (a.id?.endsWith('OTHER')) return 1
+            if (b.id?.endsWith('OTHER')) return -1
+            return a.description.localeCompare(b.description)
+          })) ??
+      []
+    )
   }
 
   private mapSmokerDescription = (refData: ReferenceDataCodeSimple) =>
@@ -478,6 +527,11 @@ export default class PersonalPageService {
     return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
   }
 
+  async getHealthAndMedicationReferenceDataCodes(clientToken: string, domain: HealthAndMedicationReferenceDataDomain) {
+    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
+    return healthAndMedicationApiClient.getReferenceDataCodes(domain)
+  }
+
   async getReferenceDataFromProxy(clientToken: string, domain: ProxyReferenceDataDomain, code: string) {
     return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
   }
@@ -567,5 +621,29 @@ export default class PersonalPageService {
     })
 
     return response
+  }
+
+  async updateReligion(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    religionCode: string,
+    reasonForChange?: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateReligion(prisonerNumber, religionCode, reasonForChange)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['religion'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
   }
 }

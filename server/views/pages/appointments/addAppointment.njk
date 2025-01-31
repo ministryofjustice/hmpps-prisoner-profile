@@ -56,26 +56,26 @@
 {% set mainClasses = "govuk-body" %}
 {% block content %}
     {% block body %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                {{ miniBanner(miniBannerData) }}
+            </div>
+        </div>
+
         {% if errors.length > 0 %}
             {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errors,
-                attributes: { 'data-qa-errors': true }
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
             })}}
         {% endif %}
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                {# Editing a video link booking appointment will have a pre-existing appointmentId present #}
-                {% if appointmentId %}
-                    <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">Change video link booking</h1>
-                 {% else %}
-                    <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-1">Add an appointment</h1>
-                 {% endif %}
+                <h1 class="govuk-!-margin-bottom-3 govuk-!-margin-top-0">{{ pageTitle }}</h1>
             </div>
         </div>
-
-        {{ miniBanner(miniBannerData) }}
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">

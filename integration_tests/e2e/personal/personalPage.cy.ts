@@ -8,6 +8,7 @@ import { formatDate } from '../../../server/utils/dateHelpers'
 import NotFoundPage from '../../pages/notFoundPage'
 import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
+import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationReferenceDataMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -59,6 +60,7 @@ context('When signed in', () => {
       cy.task('stubGetIdentifiers', 'G6123VU')
       cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
+      cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
       visitPersonalDetailsPage()
     })
 
@@ -86,6 +88,7 @@ context('When signed in', () => {
       cy.getDataQa('hidden-number-of-children-key').should('exist')
       cy.getDataQa('hidden-languages-key').should('exist')
       cy.getDataQa('hidden-type-of-diet-key').should('exist')
+      cy.getDataQa('hidden-diet-and-food-allergies-key').should('exist')
       cy.getDataQa('hidden-smoker-or-vaper-key').should('exist')
       cy.getDataQa('hidden-youth-offender-key').should('exist')
       cy.getDataQa('hidden-domestic-abuse-perpetrator-key').should('exist')
@@ -151,7 +154,13 @@ context('When signed in', () => {
         page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual / Straight')
         page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
         page.personalDetails().numberOfChildren().should('have.text', '2')
-        page.personalDetails().typeOfDiet().should('have.text', 'Voluntary - Pork Free/Fish Free')
+        page.personalDetails().typeOfDiet().should('not.exist')
+        page
+          .personalDetails()
+          .dietAndFoodAllergies()
+          .should('include.text', 'Egg')
+          .and('include.text', 'Nutrient deficiency')
+          .and('include.text', 'Vegan')
         page.personalDetails().smokeOrVaper().should('have.text', 'No')
         page.personalDetails().domesticAbusePerpetrator().should('have.text', 'Not stated')
         page.personalDetails().domesticAbuseVictim().should('have.text', 'Not stated')
@@ -186,6 +195,22 @@ context('When signed in', () => {
         page.personalDetails().languages().otherLanguages('MAN').language().should('include.text', 'Mandarin')
         page.personalDetails().languages().otherLanguages('URD').language().should('include.text', 'Urdu')
         page.personalDetails().languages().otherLanguages('URD').proficiency().should('include.text', 'reads only')
+      })
+
+      it('Displays all the information from the API: Military Records', () => {
+        const page = Page.verifyOnPage(PersonalPage)
+        page.personalDetails().militaryRecords().serviceNumber().should('include.text', '123456789')
+        page.personalDetails().militaryRecords().branch().should('include.text', 'Army')
+        page.personalDetails().militaryRecords().unitNumber().should('include.text', 'Unit 1')
+        page.personalDetails().militaryRecords().rank().should('include.text', 'Corporal')
+        page.personalDetails().militaryRecords().comments().should('include.text', 'Description')
+        page.personalDetails().militaryRecords().enlistmentDate().should('include.text', '01/01/2020')
+        page.personalDetails().militaryRecords().enlistmentLocation().should('include.text', 'Location 1')
+        page.personalDetails().militaryRecords().conflict().should('include.text', 'Afghanistan')
+        page.personalDetails().militaryRecords().disciplinaryAction().should('include.text', 'Court Martial')
+        page.personalDetails().militaryRecords().dischargeDate().should('include.text', 'Not entered')
+        page.personalDetails().militaryRecords().dischargeLocation().should('include.text', 'Location 2')
+        page.personalDetails().militaryRecords().dischargeDescription().should('include.text', 'Honourable')
       })
     })
 
@@ -560,7 +585,7 @@ context('When signed in', () => {
     })
   })
 
-  context('Prison person api is disabled', () => {
+  context('Profile editing and diet and allergy is disabled', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.setupUserAuth()
@@ -580,6 +605,13 @@ context('When signed in', () => {
       cy.task('stubInmateDetail', { bookingId, inmateDetail: { agencyId: 'DTI' } })
       cy.task('stubPrisonerData', { prisonerNumber, overrides: { prisonId: 'DTI' } })
       visitPersonalDetailsPage()
+    })
+
+    it('Displays old type of diet', () => {
+      const page = Page.verifyOnPage(PersonalPage)
+
+      page.personalDetails().typeOfDiet().should('have.text', 'Voluntary - Pork Free/Fish Free')
+      page.personalDetails().dietAndFoodAllergies().should('not.exist')
     })
 
     it('Displays distinguishingMarks information from inmate details', () => {

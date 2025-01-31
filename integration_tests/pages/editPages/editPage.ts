@@ -1,6 +1,9 @@
 import Page, { PageElement } from '../page'
 
-type CheckboxValue = string | { value: string; subValues: string[] }
+export type CheckboxValue =
+  | string
+  | { value: string; subValues?: string[]; conditionals?: { textInputs: { [key: string]: string } } }
+
 export default class EditPage extends Page {
   constructor(pageTitle: string) {
     super(pageTitle)
@@ -16,6 +19,17 @@ export default class EditPage extends Page {
       cy.get(`input[name='${key}']`).clear()
       if (value) {
         cy.get(`input[name='${key}']`).type(value)
+      }
+    })
+  }
+
+  fillInTextAreaFields = (fields: { [key: string]: string }) => {
+    Object.entries(fields).forEach(([key, value]) => {
+      cy.get(`textarea[name='${key}']`).clear()
+      if (value) {
+        cy.get(`textarea[name='${key}']`)
+          .invoke('val', value.substring(0, value.length - 1))
+          .type(value.slice(-1))
       }
     })
   }
@@ -41,9 +55,14 @@ export default class EditPage extends Page {
           cy.get(`input[name=${name}][value=${value}]`).click()
         } else {
           cy.get(`input[name=${name}][value=${value.value}]`).click()
-          value.subValues.forEach(subValue => {
-            cy.get(`input[name=${value.value}-subvalues][value=${subValue}]`).click()
-          })
+          if (value.subValues) {
+            value.subValues.forEach(subValue => {
+              cy.get(`input[name=${value.value}-subvalues][value=${subValue}]`).click()
+            })
+          }
+          if (value.conditionals) {
+            if (value.conditionals.textInputs) this.fillInTextFields(value.conditionals.textInputs)
+          }
         }
       })
     })

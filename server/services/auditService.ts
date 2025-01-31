@@ -22,6 +22,7 @@ export enum Page {
   EditCityOrTownOfBirth = 'EDIT_CITY_OR_TOWN_OF_BIRTH',
   EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
   EditNationality = 'EDIT_NATIONALITY',
+  EditReligion = 'EDIT_RELIGION',
   EditEyeColour = 'EDIT_EYE_COLOUR',
   EditFaceShape = 'EDIT_FACE_SHAPE',
   EditFacialHair = 'EDIT_FACIAL_HAIR',
@@ -32,6 +33,7 @@ export enum Page {
   EditShoeSize = 'EDIT_SHOE_SIZE',
   EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
   EditWeight = 'EDIT_WEIGHT',
+  EditDietAndFoodAllergies = 'EDIT_DIET_AND_FOOD_ALLERGIES',
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
@@ -53,6 +55,7 @@ export enum Page {
   PostEditCityOrTownOfBirth = 'POST_EDIT_CITY_OR_TOWN_OF_BIRTH',
   PostEditCountryOfBirth = 'POST_EDIT_COUNTRY_OF_BIRTH',
   PostEditNationality = 'POST_EDIT_NATIONALITY',
+  PostEditReligion = 'POST_EDIT_RELIGION',
   PostEditEyeColour = 'POST_EDIT_EYE_COLOUR',
   PostEditFaceShape = 'POST_EDIT_FACE_SHAPE',
   PostEditFacialHair = 'POST_EDIT_FACIAL_HAIR',
@@ -63,6 +66,7 @@ export enum Page {
   PostEditShoeSize = 'POST_EDIT_SHOE_SIZE',
   PostEditSmokerOrVaper = 'POST_EDIT_SMOKER_OR_VAPER',
   PostEditWeight = 'POST_EDIT_WEIGHT',
+  PostEditDietAndFoodAllergies = 'POST_EDIT_DIET_AND_FOOD_ALLERGIES',
   PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
   PostEditPrePostAppointments = 'POST_EDIT_PRE_POST_APPOINTMENTS',
   PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
@@ -106,6 +110,8 @@ export enum PostAction {
   EditFoodAllergies = 'EDIT_FOOD_ALLERGIES',
   EditCountryOfBirth = 'EDIT_COUNTRY_OF_BIRTH',
   EditNationality = 'EDIT_NATIONALITY',
+  EditReligion = 'EDIT_RELIGION',
+  EditDietAndFoodAllergies = 'EDIT_DIET_AND_FOOD_ALLERGIES',
 }
 
 // eslint-disable-next-line no-shadow

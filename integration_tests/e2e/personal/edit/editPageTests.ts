@@ -1,13 +1,14 @@
 import { Role } from '../../../../server/data/enums/role'
 import { hasLength } from '../../../../server/utils/utils'
-import EditPage from '../../../pages/editPages/editPage'
+import EditPage, { CheckboxValue } from '../../../pages/editPages/editPage'
 import NotFoundPage from '../../../pages/notFoundPage'
 import Page from '../../../pages/page'
 
 export interface EditPageInput {
   textInputs?: { [key: string]: string }
+  textAreaInputs?: { [key: string]: string }
   radioInputs?: { [key: string]: string }
-  checkboxInputs?: { [key: string]: (string | { value: string; subValues: string[] })[] }
+  checkboxInputs?: { [key: string]: CheckboxValue[] }
   autocompleteInput?: { value: string }
 }
 
@@ -50,6 +51,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     if (input.radioInputs) page.selectRadios(input.radioInputs)
     if (input.checkboxInputs) page.selectCheckboxes(input.checkboxInputs)
     if (input.autocompleteInput) page.fillInAutocompleteField(input.autocompleteInput)
+    if (input.textAreaInputs) page.fillInTextAreaFields(input.textAreaInputs)
   }
 
   context('Edit page tests', () => {
