@@ -46,6 +46,7 @@ export default class PersonalPage extends Page {
       numberOfChildren: () => cardData('number-of-children'),
       otherLanguages: () => cardData('other-languages'),
       typeOfDiet: () => cardData('type-of-diet'),
+      dietAndFoodAllergies: () => cardData('diet-and-food-allergies'),
       smokeOrVaper: () => cardData('smoker-or-vaper'),
       domesticAbusePerpetrator: () => cardData('domestic-abuse-perpetrator'),
       domesticAbuseVictim: () => cardData('domestic-abuse-victim'),

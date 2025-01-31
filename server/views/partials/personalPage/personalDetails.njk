@@ -95,8 +95,8 @@
                     { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
                     { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
                     { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
-                    { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not editEnabled } },
-                    { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: editEnabled, changeLinkEnabled: editEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
+                    { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not dietAndAllergiesEnabled } },
+                    { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: dietAndAllergiesEnabled, changeLinkEnabled: editDietAndAllergiesEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
                     { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
                     { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
                     { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
@@ -131,7 +131,8 @@
                             </div>
                         </dd>
                         <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span class="govuk-visually-hidden"> service information</span></a>
+                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
+                                        class="govuk-visually-hidden"> service information</span></a>
                         </dd>
                     </div>
 
@@ -140,13 +141,15 @@
                         <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
                             <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
                             <div class="govuk-!-margin-bottom-2">
-                                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border" data-qa="conflict">
+                                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+                                    data-qa="conflict">
                                     {{ militaryRecords[0].warZoneDescription | d('Not entered') }}
                                 </dl>
                             </div>
                         </dd>
                         <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span class="govuk-visually-hidden"> conflict</span></a>
+                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
+                                        class="govuk-visually-hidden"> conflict</span></a>
                         </dd>
                     </div>
 
@@ -155,13 +158,15 @@
                         <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
                             <span class="govuk-!-font-weight-bold govuk-!-display-block">Disciplinary action</span>
                             <div class="govuk-!-margin-bottom-2">
-                                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border" data-qa="disciplinary-action">
+                                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+                                    data-qa="disciplinary-action">
                                     {{ militaryRecords[0].disciplinaryActionDescription | d('Not entered') }}
                                 </dl>
                             </div>
                         </dd>
                         <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span class="govuk-visually-hidden"> disciplinary action</span></a>
+                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
+                                        class="govuk-visually-hidden"> disciplinary action</span></a>
                         </dd>
                     </div>
 
@@ -175,13 +180,14 @@
                                     {{ summaryListRow("Location", militaryRecords[0].dischargeLocation | d('Not entered'), "discharge-location") }}
                                     {{ summaryListRow("Type", militaryRecords[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
                                     {% if militaryRecords[0].endDate %}
-                                    {{ summaryListRow("Length of service", militaryRecords[0].startDate | lengthOfService(militaryRecords[0].endDate), "length-of-service") }}
+                                        {{ summaryListRow("Length of service", militaryRecords[0].startDate | lengthOfService(militaryRecords[0].endDate), "length-of-service") }}
                                     {% endif %}
                                 </dl>
                             </div>
                         </dd>
                         <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span class="govuk-visually-hidden"> discharge</span></a>
+                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
+                                        class="govuk-visually-hidden"> discharge</span></a>
                         </dd>
                     </div>
                 </dl>

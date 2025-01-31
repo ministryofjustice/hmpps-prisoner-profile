@@ -19,7 +19,7 @@ context('Edit medical diet', () => {
     bookingId,
     testSetup: () => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.DietAndAllergiesEdit] })
       cy.setupComponentsData()
       cy.setupHealthAndMedicationRefDataStubs({
         foodAllergies: foodAllergyCodesMock,
