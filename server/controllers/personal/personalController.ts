@@ -1121,6 +1121,7 @@ export default class PersonalController {
             name: `${namePrefix}[${code.listSequence}][value]`,
             text: code.description,
             value: code.id,
+            id: code.id,
             listSequence: code.listSequence,
             checked: !!selectedItem,
             comment: selectedItem?.comment,
