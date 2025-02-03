@@ -44,7 +44,7 @@ export default function createApp(services: Services): express.Application {
   setUpEnvironmentName(app)
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH']))
-  app.use(setUpCsrf())
+  // app.use(setUpCsrf())
   app.use(setUpCurrentUser())
   app.use(populateClientToken())
   app.use(flashMessageMiddleware())

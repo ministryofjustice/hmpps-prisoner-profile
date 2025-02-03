@@ -12,6 +12,7 @@ import alertsRouter from './alertsRouter'
 import PrisonerScheduleController from '../controllers/prisonerScheduleController'
 import csraRouter from './csraRouter'
 import moneyRouter from './moneyRouter'
+import spikeRouter from './spikeRouter'
 import appointmentRouter from './appointmentRouter'
 import PrisonerLocationHistoryController from '../controllers/prisonerLocationHistoryController'
 import professionalContactsRouter from './professionalContactsRouter'
@@ -223,6 +224,7 @@ export default function routes(services: Services): Router {
   router.use(visitsRouter(services))
   router.use(addressRouter(services))
   router.use(personalRouter(services))
+  router.use(spikeRouter())
 
   get(
     `${basePath}/schedule`,

@@ -1,0 +1,47 @@
+{%- from "govuk/components/file-upload/macro.njk" import govukFileUpload -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "govuk/components/error-summary/macro.njk" import govukErrorSummary -%}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% extends "../index.njk" %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    }
+]%}
+{% block body %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Upload images</h1>
+
+        <form action="?_csrf={{ csrfToken }}" method="post" enctype="multipart/form-data">
+            <div class="dps-multi-image-upload">
+                <div class="dps-multi-image-upload__uploaded-files ">
+                    <h2 class="govuk-heading-m">Images added</h2>
+                    <div class="govuk-summary-list dps-multi-image-upload__list">
+
+                    </div>
+                </div>
+
+                <div class="dps-multi-image-upload__upload">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="documents">Upload an image</label>
+                        <input class="govuk-file-upload dps-multi-image-upload__input" id="documents" name="documents" type="file" multiple="">
+                    </div>
+                    <button type="submit" class="govuk-button govuk-button--secondary dps-multi-image-upload__button" data-module="govuk-button">
+                        Upload image
+                    </button>
+
+                </div>
+            </div>
+
+            <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+{% block pageScripts %}
+<script src="/assets/js/dpsMultiImageUpload/dpsMultiImageUpload.js"></script>
+{% endblock %}
