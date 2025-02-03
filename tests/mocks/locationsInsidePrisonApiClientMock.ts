@@ -4,4 +4,5 @@ export const locationsInsidePrisonApiClientMock = (): LocationsInsidePrisonApiCl
   getLocation: jest.fn(),
   getLocationByKey: jest.fn(),
   getLocationsForAppointments: jest.fn(),
+  getLocationAttributes: jest.fn(),
 })

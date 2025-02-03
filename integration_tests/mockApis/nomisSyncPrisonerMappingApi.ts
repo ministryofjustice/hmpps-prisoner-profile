@@ -11,4 +11,22 @@ export default {
         status: httpStatus,
       },
     }),
+
+  stubGetMappingUsingNomisLocationId: (nomisLocationId: number) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/nomissyncprisonermapping/api/locations/nomis/${nomisLocationId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          dpsLocationId: 'abcde',
+          nomisLocationId,
+        },
+      },
+    }),
 }

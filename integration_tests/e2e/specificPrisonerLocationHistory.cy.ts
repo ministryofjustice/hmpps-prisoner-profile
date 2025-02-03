@@ -17,7 +17,8 @@ context('Specific Prisoner Location History', () => {
       cy.setupSpecificLocationHistoryPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
-        locationId: '25762',
+        nomisLocationId: 25762,
+        dpsLocationId: 'abcde',
         staffId: 'KQJ74F',
         prisonId: 'LEI',
         caseLoads: CaseLoadsDummyDataA,
@@ -83,7 +84,8 @@ context('Specific Prisoner Location History', () => {
       cy.setupSpecificLocationHistoryPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
-        locationId: '25762',
+        nomisLocationId: 25762,
+        dpsLocationId: 'abcde',
         staffId: 'KQJ74F',
         prisonId: 'LEI',
         caseLoads: CaseLoadsDummyDataA,

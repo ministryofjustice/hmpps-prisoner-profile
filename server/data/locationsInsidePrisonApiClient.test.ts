@@ -55,4 +55,15 @@ describe('locationsInsidePrisonApiClient', () => {
       expect(output).toEqual(locationsApiMock[0])
     })
   })
+
+  describe('getLocationAttributes', () => {
+    it('Should return data from the API', async () => {
+      const locationId = 'AB1234C'
+      const locationAttributes = [{ code: 'SO', description: 'Single Occupancy' }]
+
+      mockSuccessfulApiCall(`/locations/${locationId}/attributes`, locationAttributes)
+      const output = await locationsInsidePrisonApiClient.getLocationAttributes(locationId)
+      expect(output).toEqual(locationAttributes)
+    })
+  })
 })

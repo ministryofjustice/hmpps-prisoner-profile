@@ -70,7 +70,6 @@ import { OffenderAttendanceHistoryMock } from '../../server/data/localMockData/o
 import { scheduledTransfersMock } from '../../server/data/localMockData/scheduledTransfersMock'
 
 import { GetDetailsMock } from '../../server/data/localMockData/getDetailsMock'
-import { GetAttributesForLocation } from '../../server/data/localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from '../../server/data/localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from '../../server/data/localMockData/getCellMoveReasonTypesMock'
 import HistoryForLocationItem from '../../server/data/interfaces/prisonApi/HistoryForLocationItem'
@@ -1109,22 +1108,6 @@ export default {
     })
   },
 
-  stubGetAttributesForLocation: (locationId: string) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `/prison/api/cell/${locationId}/attributes`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: GetAttributesForLocation,
-      },
-    })
-  },
-
   stubScheduledTransfers: (prisonerNumber: string) => {
     return stubFor({
       request: {
@@ -1142,16 +1125,16 @@ export default {
   },
 
   stubGetHistoryForLocation: ({
-    locationId,
+    nomisLocationId,
     locationHistories,
   }: {
-    locationId: string
+    nomisLocationId: number
     locationHistories: Partial<HistoryForLocationItem>[]
   }) => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/cell/${locationId}/history\\?fromDate=2023-07-11T14:56:16&toDate=2023-08-17T12:00:00`,
+        urlPattern: `/prison/api/cell/${nomisLocationId}/history\\?fromDate=2023-07-11T14:56:16&toDate=2023-08-17T12:00:00`,
       },
       response: {
         status: 200,

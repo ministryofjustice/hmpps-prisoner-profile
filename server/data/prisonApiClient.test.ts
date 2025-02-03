@@ -40,7 +40,6 @@ import { appointmentTypesMock } from './localMockData/appointmentTypesMock'
 import { offenderSentenceDetailsMock } from './localMockData/offenderSentenceDetailsMock'
 import { prisonerSchedulesMock } from './localMockData/prisonerSchedulesMock'
 import { GetDetailsMock } from './localMockData/getDetailsMock'
-import { GetAttributesForLocation } from './localMockData/getAttributesForLocationMock'
 import { mockHistoryForLocation } from './localMockData/getHistoryForLocationMock'
 import { getCellMoveReasonTypesMock } from './localMockData/getCellMoveReasonTypesMock'
 import { scheduledTransfersMock } from './localMockData/scheduledTransfersMock'
@@ -535,16 +534,6 @@ describe('prisonApiClient', () => {
       )
       const output = await prisonApiClient.getDetails(prisonerNumber, true)
       expect(output).toEqual(GetDetailsMock)
-    })
-  })
-
-  describe('getAttributesForLocation', () => {
-    it('Should return data from the API', async () => {
-      const locationId = 'AB1234C'
-
-      mockSuccessfulPrisonApiCall(`/api/cell/${locationId}/attributes`, GetAttributesForLocation)
-      const output = await prisonApiClient.getAttributesForLocation(locationId)
-      expect(output).toEqual(GetAttributesForLocation)
     })
   })
 
