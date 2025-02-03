@@ -161,7 +161,7 @@ export default class PersonalPageService {
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
-      militaryHistoryEnabled ? this.getMilitaryRecords(token, prisonerNumber) : null,
+      militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -200,7 +200,7 @@ export default class PersonalPageService {
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
       showFieldHistoryLink: !!prisonPerson,
       distinguishingMarks,
-      militaryRecords: militaryRecords.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
+      militaryRecords: militaryRecords?.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
     }
   }
 
