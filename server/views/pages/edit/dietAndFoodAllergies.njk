@@ -70,6 +70,7 @@
                                         name: diet.name,
                                         text: diet.text,
                                         value: diet.value,
+                                        id: diet.id,
                                         checked: diet.checked,
                                         conditional: { html: otherHtml("medical", diet.listSequence, diet.comment) }
                                     }
@@ -104,6 +105,7 @@
                                         text: allergy.text,
                                         value: allergy.value,
                                         checked: allergy.checked,
+                                        id: allergy.id,
                                         conditional: { html: otherHtml("allergy", allergy.listSequence, allergy.comment) }
                                     }
                                 ), allergies) %}
@@ -137,6 +139,7 @@
                                         text: diet.text,
                                         value: diet.value,
                                         checked: diet.checked,
+                                        id: diet.id,
                                         conditional: { html: otherHtml("personalised", diet.listSequence, diet.comment) }
                                     }
                                 ), personalisedDiets) %}
