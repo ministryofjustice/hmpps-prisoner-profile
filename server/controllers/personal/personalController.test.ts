@@ -268,7 +268,7 @@ describe('PersonalController', () => {
           )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-            text: 'Height edited',
+            text: 'Height updated',
             type: FlashMessageType.success,
             fieldName: 'height',
           })
@@ -431,7 +431,7 @@ describe('PersonalController', () => {
           )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-            text: 'Height edited',
+            text: 'Height updated',
             type: FlashMessageType.success,
             fieldName: 'height',
           })
@@ -574,7 +574,7 @@ describe('PersonalController', () => {
           )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-            text: 'Weight edited',
+            text: 'Weight updated',
             type: FlashMessageType.success,
             fieldName: 'weight',
           })
@@ -738,7 +738,7 @@ describe('PersonalController', () => {
           )
           expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal#appearance')
           expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-            text: 'Weight edited',
+            text: 'Weight updated',
             type: FlashMessageType.success,
             fieldName: 'weight',
           })
@@ -784,7 +784,7 @@ describe('PersonalController', () => {
       code: PrisonPersonCharacteristicCode.build,
       auditEditPageLoad: 'PAGE' as Page,
       auditEditPostAction: 'ACTION' as PostAction,
-      url: 'build',
+      url: 'edit/build',
       redirectAnchor: 'appearance',
       hintText: 'Hint text',
     }
@@ -2060,7 +2060,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
-          text: 'Eye colour updated',
+          text: 'Left and right eye colours updated',
           type: FlashMessageType.success,
           fieldName: 'eyeColour',
         })

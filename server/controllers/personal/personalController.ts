@@ -33,8 +33,10 @@ import {
   dietAndFoodAllergiesFieldData,
   eyeColourFieldData,
   eyeColourIndividualFieldData,
+  FieldData,
   foodAllergiesFieldData,
   heightFieldData,
+  heightImperialFieldData,
   medicalDietFieldData,
   nationalityFieldData,
   PhysicalAttributesTextFieldData,
@@ -43,6 +45,7 @@ import {
   smokerOrVaperFieldData,
   TextFieldData,
   weightFieldData,
+  weightImperialFieldData,
 } from './fieldData'
 import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
@@ -82,6 +85,50 @@ export default class PersonalController {
     private readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
   ) {}
+
+  private async submit({
+    req,
+    res,
+    prisonerNumber,
+    submit,
+    fieldData,
+    auditDetails,
+  }: {
+    req: Request
+    res: Response
+    prisonerNumber: string
+    submit: () => Promise<void>
+    fieldData: FieldData
+    auditDetails: object
+  }) {
+    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor } = fieldData
+
+    try {
+      await submit()
+
+      req.flash('flashMessage', {
+        text: `${pageTitle} updated`,
+        type: FlashMessageType.success,
+        fieldName,
+      })
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: auditEditPostAction,
+          details: auditDetails,
+        })
+        .catch(error => logger.error(error))
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+    } catch (e) {
+      req.flash('errors', [{ text: 'There was an error please try again' }])
+      req.flash('requestBody', JSON.stringify(req.body))
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
+    }
+  }
 
   displayPersonalPage() {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -139,7 +186,7 @@ export default class PersonalController {
   }
 
   height() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = heightFieldData
+    const { pageTitle, fieldName, auditEditPageLoad } = heightFieldData
 
     return {
       metric: {
@@ -179,29 +226,18 @@ export default class PersonalController {
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
           const previousHeight = prisonPerson?.physicalAttributes?.height?.value
 
-          try {
-            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              height: editField ? height : null,
-            })
-
-            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
-
-            this.auditService
-              .sendPostSuccess({
-                user,
-                prisonerNumber,
-                correlationId: req.id,
-                action: auditEditPostAction,
-                details: { fieldName, previous: previousHeight, updated: height },
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+                height: editField ? height : null,
               })
-              .catch(error => logger.error(error))
-
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-          } catch (e) {
-            req.flash('requestBody', JSON.stringify(req.body))
-            req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
-          }
+            },
+            fieldData: heightFieldData,
+            auditDetails: { fieldName, previous: previousHeight, updated: height },
+          })
         },
       },
 
@@ -248,41 +284,28 @@ export default class PersonalController {
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
           const previousHeight = prisonPerson?.physicalAttributes?.height?.value
-
           const feet = feetString ? parseInt(feetString, 10) : 0
           const inches = inchesString ? parseInt(inchesString, 10) : 0
-
-          try {
-            const height = feetAndInchesToCentimetres(feet, inches)
-            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              height: !feetString && !inchesString ? null : height,
-            })
-
-            req.flash('flashMessage', { text: 'Height edited', type: FlashMessageType.success, fieldName: 'height' })
-
-            this.auditService
-              .sendPostSuccess({
-                user,
-                prisonerNumber,
-                correlationId: req.id,
-                action: auditEditPostAction,
-                details: { fieldName, previous: previousHeight, updated: height },
+          const height = feetAndInchesToCentimetres(feet, inches)
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+                height: !feetString && !inchesString ? null : height,
               })
-              .catch(error => logger.error(error))
-
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-          } catch (e) {
-            req.flash('requestBody', JSON.stringify(req.body))
-            req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}/imperial`)
-          }
+            },
+            fieldData: heightImperialFieldData,
+            auditDetails: { fieldName, previous: previousHeight, updated: height },
+          })
         },
       },
     }
   }
 
   weight() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = weightFieldData
+    const { pageTitle, fieldName, auditEditPageLoad } = weightFieldData
 
     return {
       metric: {
@@ -321,30 +344,18 @@ export default class PersonalController {
           const weight = parseInt(kilograms, 10)
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
           const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
-
-          try {
-            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              weight: kilograms ? weight : null,
-            })
-
-            req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
-
-            this.auditService
-              .sendPostSuccess({
-                user,
-                prisonerNumber,
-                correlationId: req.id,
-                action: auditEditPostAction,
-                details: { fieldName, previous: previousWeight, updated: weight },
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+                weight: kilograms ? weight : null,
               })
-              .catch(error => logger.error(error))
-
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-          } catch (e) {
-            req.flash('requestBody', JSON.stringify(req.body))
-            req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
-          }
+            },
+            fieldData: weightFieldData,
+            auditDetails: { fieldName, previous: previousWeight, updated: weight },
+          })
         },
       },
 
@@ -391,34 +402,21 @@ export default class PersonalController {
           const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
           const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
           const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
-
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
-
-          try {
-            const weight = stoneAndPoundsToKilograms(stone, pounds)
-            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              weight: !stoneString && !poundsString ? null : weight,
-            })
-
-            req.flash('flashMessage', { text: 'Weight edited', type: FlashMessageType.success, fieldName: 'weight' })
-
-            this.auditService
-              .sendPostSuccess({
-                user: res.locals.user,
-                prisonerNumber,
-                correlationId: req.id,
-                action: auditEditPostAction,
-                details: { fieldName, previous: previousWeight, updated: weight },
+          const weight = stoneAndPoundsToKilograms(stone, pounds)
+          return this.submit({
+            req,
+            res,
+            prisonerNumber,
+            submit: async () => {
+              await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+                weight: !stoneString && !poundsString ? null : weight,
               })
-              .catch(error => logger.error(error))
-
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-          } catch (e) {
-            req.flash('requestBody', JSON.stringify(req.body))
-            req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}/imperial`)
-          }
+            },
+            fieldData: weightImperialFieldData,
+            auditDetails: { fieldName, previous: previousWeight, updated: weight },
+          })
         },
       },
     }
@@ -472,16 +470,7 @@ export default class PersonalController {
   }
 
   private textInput(fieldData: TextFieldData, getter: TextFieldGetter, setter: TextFieldSetter) {
-    const {
-      pageTitle,
-      hintText,
-      auditEditPageLoad,
-      auditEditPostAction,
-      fieldName,
-      url,
-      redirectAnchor,
-      inputClasses,
-    } = fieldData
+    const { pageTitle, hintText, auditEditPageLoad, fieldName, inputClasses } = fieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -519,33 +508,17 @@ export default class PersonalController {
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
         const updatedValue = req.body[fieldName] || null
-
-        try {
-          const previousValue = await getter(req, fieldData)
-          await setter(req, res, fieldData, updatedValue)
-
-          req.flash('flashMessage', {
-            text: `${pageTitle} updated`,
-            type: FlashMessageType.success,
-            fieldName,
-          })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: { fieldName, previous: previousValue, updated: updatedValue },
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('requestBody', JSON.stringify(req.body))
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
-        }
+        const previousValue = await getter(req, fieldData)
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await setter(req, res, fieldData, updatedValue)
+          },
+          fieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: updatedValue },
+        })
       },
     }
   }
@@ -643,8 +616,6 @@ export default class PersonalController {
   }
 
   smokerOrVaper() {
-    const { pageTitle, fieldName, auditEditPostAction, url, redirectAnchor } = smokerOrVaperFieldData
-
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
@@ -673,33 +644,22 @@ export default class PersonalController {
         const radioField = req.body.radioField || null
         const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
         const previousValue = prisonPerson?.health?.smokerOrVaper?.value?.id
-
-        try {
-          await this.personalPageService.updateSmokerOrVaper(clientToken, user, prisonerNumber, radioField)
-          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: { fieldName, previous: previousValue, updated: radioField },
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateSmokerOrVaper(clientToken, user, prisonerNumber, radioField)
+          },
+          fieldData: smokerOrVaperFieldData,
+          auditDetails: { fieldName: smokerOrVaperFieldData.fieldName, previous: previousValue, updated: radioField },
+        })
       },
     }
   }
 
   nationality() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = nationalityFieldData
+    const { fieldName, auditEditPageLoad } = nationalityFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -789,40 +749,29 @@ export default class PersonalController {
           ProfileInformationType.OtherNationalities,
           inmateDetail.profileInformation,
         )
-
-        try {
-          await this.personalPageService.updateNationality(
-            clientToken,
-            user,
-            prisonerNumber,
-            autocompleteField || radioField,
-            otherNationalities,
-          )
-          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateNationality(
+              clientToken,
+              user,
               prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: [
-                { fieldName, previous: previousValue, updated: autocompleteField || radioField },
-                {
-                  fieldName: 'otherNationalities',
-                  previous: previousOtherNationalitiesValue,
-                  updated: otherNationalities,
-                },
-              ],
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+              autocompleteField || radioField,
+              otherNationalities,
+            )
+          },
+          fieldData: nationalityFieldData,
+          auditDetails: [
+            { fieldName, previous: previousValue, updated: autocompleteField || radioField },
+            {
+              fieldName: 'otherNationalities',
+              previous: previousOtherNationalitiesValue,
+              updated: otherNationalities,
+            },
+          ],
+        })
       },
     }
   }
@@ -839,7 +788,7 @@ export default class PersonalController {
    *   Build
    */
   physicalCharacteristicRadioField(fieldData: RadioFieldData) {
-    const { pageTitle, code, fieldName, url, auditEditPostAction } = fieldData
+    const { pageTitle, code, fieldName } = fieldData
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { clientToken } = req.middleware
@@ -871,29 +820,18 @@ export default class PersonalController {
           prisonPerson?.physicalAttributes?.[code as keyof PrisonPersonPhysicalAttributes]
             ?.value as PrisonPersonCharacteristic
         )?.id
-
-        try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-            [code]: radioField,
-          })
-          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: { fieldName, previous: previousValue, updated: radioField },
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+              [code]: radioField,
             })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+          },
+          fieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: radioField },
+        })
       },
     }
   }
@@ -902,7 +840,7 @@ export default class PersonalController {
    * Handler for editing eye colour.
    */
   eyeColour() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = eyeColourFieldData
+    const { pageTitle, fieldName, auditEditPageLoad } = eyeColourFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -961,34 +899,23 @@ export default class PersonalController {
         const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
         const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
         const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
-
-        try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-            leftEyeColour: eyeColour,
-            rightEyeColour: eyeColour,
-          })
-          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: {
-                fieldName,
-                previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
-                updated: { leftEyeColour: eyeColour, rightEyeColour: eyeColour },
-              },
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+              leftEyeColour: eyeColour,
+              rightEyeColour: eyeColour,
             })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+          },
+          fieldData: eyeColourFieldData,
+          auditDetails: {
+            fieldName,
+            previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
+            updated: { leftEyeColour: eyeColour, rightEyeColour: eyeColour },
+          },
+        })
       },
     }
   }
@@ -997,8 +924,7 @@ export default class PersonalController {
    * Handler for editing left and right eye colour individually.
    */
   eyeColourIndividual() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } =
-      eyeColourIndividualFieldData
+    const { pageTitle, auditEditPageLoad } = eyeColourIndividualFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -1053,38 +979,23 @@ export default class PersonalController {
         const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
         const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
         const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
-
-        try {
-          await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-            leftEyeColour,
-            rightEyeColour,
-          })
-          req.flash('flashMessage', {
-            text: `Eye colour updated`,
-            type: FlashMessageType.success,
-            fieldName: 'eyeColour',
-          })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: {
-                fieldName,
-                previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
-                updated: { leftEyeColour, rightEyeColour },
-              },
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
+              leftEyeColour,
+              rightEyeColour,
             })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+          },
+          fieldData: eyeColourIndividualFieldData,
+          auditDetails: {
+            fieldName: 'eyeColour',
+            previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
+            updated: { leftEyeColour, rightEyeColour },
+          },
+        })
       },
     }
   }
@@ -1175,8 +1086,7 @@ export default class PersonalController {
   }
 
   dietAndFoodAllergies() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } =
-      dietAndFoodAllergiesFieldData
+    const { pageTitle, fieldName, auditEditPageLoad } = dietAndFoodAllergiesFieldData
 
     const mapDietAndAllergy = (
       dietAndAllergy: DietAndAllergy,
@@ -1315,30 +1225,16 @@ export default class PersonalController {
           personalisedDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements'),
         }
 
-        try {
-          await this.personalPageService.updateDietAndFoodAllergies(clientToken, user, prisonerNumber, update)
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: { fieldName, previous: previousValues, updated: update },
-            })
-            .catch(error => logger.error(error))
-
-          req.flash('flashMessage', {
-            text: `Diet and food allergies updated`,
-            type: FlashMessageType.success,
-            fieldName,
-          })
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateDietAndFoodAllergies(clientToken, user, prisonerNumber, update)
+          },
+          fieldData: dietAndFoodAllergiesFieldData,
+          auditDetails: { fieldName, previous: previousValues, updated: update },
+        })
       },
     }
   }
@@ -1402,7 +1298,7 @@ export default class PersonalController {
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${medicalDietFieldData.url}`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${medicalDietFieldData.url}`)
       },
     }
   }
@@ -1463,13 +1359,13 @@ export default class PersonalController {
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${foodAllergiesFieldData.url}`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${foodAllergiesFieldData.url}`)
       },
     }
   }
 
   countryOfBirth() {
-    const { pageTitle, fieldName, auditEditPostAction, url, redirectAnchor } = countryOfBirthFieldData
+    const { fieldName, url } = countryOfBirthFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -1517,41 +1413,30 @@ export default class PersonalController {
           const validationText = radioField === 'OTHER' ? 'Enter country name' : 'This is not a valid country'
           req.flash('errors', [{ href: '#autocomplete', text: validationText }])
           req.flash('requestBody', JSON.stringify(req.body))
-          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
         }
 
-        try {
-          await this.personalPageService.updateCountryOfBirth(
-            clientToken,
-            user,
-            prisonerNumber,
-            autocompleteField || radioField,
-          )
-
-          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateCountryOfBirth(
+              clientToken,
+              user,
               prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: { fieldName, previous: previousValue, updated: autocompleteField || radioField },
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
+              autocompleteField || radioField,
+            )
+          },
+          fieldData: countryOfBirthFieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: autocompleteField || radioField },
+        })
       },
     }
   }
 
   religion() {
-    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = religionFieldData
+    const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = religionFieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -1636,36 +1521,26 @@ export default class PersonalController {
           return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         }
 
-        try {
-          await this.personalPageService.updateReligion(
-            clientToken,
-            user,
-            prisonerNumber,
-            religionCode,
-            reasonForChange,
-          )
-          req.flash('flashMessage', { text: `${pageTitle} updated`, type: FlashMessageType.success, fieldName })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateReligion(
+              clientToken,
+              user,
               prisonerNumber,
-              correlationId: req.id,
-              action: auditEditPostAction,
-              details: {
-                fieldName,
-                previous: currentReligionCode,
-                updated: religionCode,
-              },
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-        } catch (e) {
-          req.flash('requestBody', JSON.stringify(req.body))
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-          return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
-        }
+              religionCode,
+              reasonForChange,
+            )
+          },
+          fieldData: religionFieldData,
+          auditDetails: {
+            fieldName,
+            previous: currentReligionCode,
+            updated: religionCode,
+          },
+        })
       },
     }
   }

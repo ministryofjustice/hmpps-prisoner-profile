@@ -83,8 +83,8 @@ context('Edit eye colour - left and right eyes different colours', () => {
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/eye-colour-individual`,
     editPageWithTitle: EditEyeColour,
-    editPageTitle: 'Left and right eye colour',
-    successfulFlashMessage: 'Eye colour updated',
+    editPageTitle: 'Left and right eye colours',
+    successfulFlashMessage: 'Left and right eye colours updated',
     validInputs: [{ radioInputs: { leftEyeColour: 'EYE_BROWN', rightEyeColour: 'EYE_HAZEL' } }],
     redirectAnchor: 'appearance',
   })
