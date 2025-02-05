@@ -99,7 +99,6 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
     this.fileInput.replaceWith($(e.currentTarget).val('').clone(true))
     this.setupFileInput()
     this.fileInput.get(0).focus()
-    this.fileInput.get(0).focus()
   }
 
   MultiFileUpload.prototype.onFileFocus = function (e) {
@@ -120,12 +119,14 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
 
   MultiFileUpload.prototype.getFileRowHtml = function (file) {
     const html = `
-    <div class="govuk-summary-list__row dps-multi-file-upload__row">;
-      <div class="govuk-summary-list__value dps-multi-file-upload__message">;
-    <span class="dps-multi-file-upload__filename">${file.name}</span>;
-    <span class="dps-multi-file-upload__progress">0%</span>;
-      </div>';
-      <div class="govuk-summary-list__actions dps-multi-file-upload__actions"></div>;
+    <div class="govuk-summary-list__row dps-multi-file-upload__row" dps-filename=${file.name}>
+      <div class="govuk-summary-list__value dps-multi-file-upload__message">
+        <span class="dps-multi-file-upload__filename">${file.name}</span>
+        <span class="dps-multi-file-upload__progress">0%</span>
+      </div>
+      <div class="govuk-summary-list__actions dps-multi-file-upload__actions">
+        <span class="dps-multi-file-upload__remove-button">X</span>
+      </div>
     </div>`
     return html
   }
@@ -138,10 +139,15 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
 
   MultiFileUpload.prototype.uploadFile = function (file) {
     this.params.uploadFileEntryHook(this, file)
-    const item = $(this.getFileRowHtml(file))
+    const item = this.getFileRowHtml(file)
     const formData = new FormData()
     formData.append('documents', file)
-    this.feedbackContainer.find('.dps-multi-file-upload__list').append(item)
+    const fbContainer = $('.dps-multi-file-upload__list')
+    fbContainer.append(item)
+    const btn = $(`div[dps-filename="${file.name}"]`)
+    btn.on('click', function(event) {
+      btn.remove()
+    })
 
     $.ajax({
       url: this.params.uploadUrl,
@@ -174,7 +180,7 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
             if (e.lengthComputable) {
               let percentComplete = e.loaded / e.total
               percentComplete = parseInt(percentComplete * 100, 10)
-              item.find('.dps-multi-file-upload__progress').text(` ${percentComplete}%`)
+              $('.dps-multi-file-upload__progress').text(` ${percentComplete}%`)
             }
           },
           false,

@@ -1,3 +1,8 @@
+@keyframes delete-button-fade {
+  0%   {color: black; background-color: rgba(0, 0, 0, 0);}
+  100% {color: red; background-color: #DDD;}
+}
+
 .dps-multi-file-upload {
   margin-bottom: 40px;
 
@@ -61,6 +66,24 @@
       fill: currentColor;
       float: left;
       margin-right: govuk-spacing(2);
+    }
+  }
+
+  &__filename {
+    display: inline-block;
+    width: 80%;
+  }
+
+  &__remove-button {
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 10px;
+
+    &:hover {
+      color: red;
+      background-color: #DDD;
+      animation-name: delete-button-fade;
+      animation-duration: 0.25s;
     }
   }
 }
