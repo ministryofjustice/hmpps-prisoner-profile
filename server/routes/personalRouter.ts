@@ -28,6 +28,7 @@ import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
 import { Role } from '../data/enums/role'
+import { nationalityValidator } from '../validators/personal/nationalityValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -397,6 +398,10 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditNationality,
       method: personalController.nationality().submit,
+      validation: {
+        validators: [nationalityValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 
