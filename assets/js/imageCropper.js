@@ -62,17 +62,20 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
 
     this.cropper = new window.Cropper(this.$image, {
       // eslint-disable-line
-      viewMode: 2,
+      viewMode: 1,
       aspectRatio: 427 / 570,
       autoCrop: true,
       autoCropArea: 1,
+      background: false,
       guides: false,
       zoomable: false,
       highlight: false,
-      minCropBoxWidth,
-      minCropBoxHeight,
-      rotatable: false,
+      // minCropBoxWidth,
+      // minCropBoxHeight,
+      rotatable: true,
       scalable: false,
+      cropBoxMovable: true,
+      cropBoxResizable: true,
     })
     this.setupFormListener()
   }
@@ -81,8 +84,7 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
     this.$imageCropper.addEventListener(
       'keydown',
       function (e) {
-        const cropBoxData = this.cropper.getCropBoxData()
-
+        let cropBoxData = this.cropper.getCropBoxData()
         switch (e.keyCode) {
           case 37:
             e.preventDefault()
@@ -115,7 +117,18 @@ window.GOVUK.Modules = window.GOVUK.Modules || {}
             cropBoxData.height /= 1.05
             cropBoxData.width /= 1.05
             break
+
+          case 188:
+            e.preventDefault()
+            this.cropper.rotate(-5)
+            break
+
+          case 190:
+            e.preventDefault()
+            this.cropper.rotate(5)
+            break
         }
+        this.cropper.crop()
         this.cropper.setCropBoxData(cropBoxData)
       }.bind(this),
     )

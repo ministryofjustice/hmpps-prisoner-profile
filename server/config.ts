@@ -308,7 +308,7 @@ export default {
       agent: new AgentConfig(Number(get('HEALTH_AND_MEDICATION_TIMEOUT_DEADLINE', 10000))),
     },
     documentsServiceApi: {
-      url: get('DOCUMENTS_SERVICE_API', 'http://localhost:8082', requiredInProduction),
+      url: get('DOCUMENTS_SERVICE_API', 'https://document-api-dev.hmpps.service.justice.gov.uk', requiredInProduction),
       timeout: {
         response: Number(get('DOCUMENTS_SERVICE_API_RESPONSE', 10000)),
         deadline: Number(get('DOCUMENTS_SERVICE_API_DEADLINE', 10000)),
@@ -356,6 +356,6 @@ export default {
     dietAndAllergyEnabled: toBoolean(get('DIET_AND_ALLERGY_ENABLED', 'false')),
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     militaryHistoryEnabled: toBoolean(get('MILITARY_HISTORY_ENABLED', 'false')),
-    usePhotoRoutes: get('PHOTO_ROUTES_ENABLED', false),
+    usePhotoRoutes: get('PHOTO_ROUTES_ENABLED', true),
   },
 }
