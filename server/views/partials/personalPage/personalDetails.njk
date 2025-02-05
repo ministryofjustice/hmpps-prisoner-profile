@@ -6,152 +6,160 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set aliases = [] %}
 {% for alias in personalDetails.aliases %}
-    {% set aliases = (aliases.push([{text: alias.alias | title}, {text: alias.dateOfBirth}]), aliases) %}
+  {% set aliases = (aliases.push([{text: alias.alias | title}, {text: alias.dateOfBirth}]), aliases) %}
 {% endfor %}
 {% set dateOfBirthText %}
-    {{ personalDetails.dateOfBirth }}
-    ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month') }} old)
+  {{ personalDetails.dateOfBirth }}
+  ({{ personalDetails.age.years }} years, {{ personalDetails.age.months | pluralise('month') }} old)
 {% endset %}
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro dietAndFoodAllergiesHtml(personalDetails) %}
-    {% if personalDetails.medicalDietaryRequirements.length > 0
-        or personalDetails.foodAllergies.length > 0
-        or personalDetails.personalisedDietaryRequirements.length > 0 %}
-        {% if personalDetails.medicalDietaryRequirements.length > 0 %}
-            <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
-            <div class="govuk-!-margin-bottom-2">
-                {% for requirement in personalDetails.medicalDietaryRequirements %}
-                    <span class="govuk-!-display-block">
-                        {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
-                    </span>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if personalDetails.foodAllergies.length > 0 %}
-            <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
-            <div class="govuk-!-margin-bottom-2">
-                {% for allergy in personalDetails.foodAllergies %}
-                    <span class="govuk-!-display-block">
-                        {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
-                    </span>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if personalDetails.personalisedDietaryRequirements.length > 0 %}
-            <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
-            <div class="govuk-!-margin-bottom-2">
-                {% for requirement in personalDetails.personalisedDietaryRequirements %}
-                    <span class="govuk-!-display-block">
-                        {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
-                    </span>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% else %}
-        <span class="govuk-!-margin-top-1">Not entered</span>
+  {%
+    if personalDetails.medicalDietaryRequirements.length > 0
+    or personalDetails.foodAllergies.length > 0
+    or personalDetails.personalisedDietaryRequirements.length > 0
+  %}
+    {% if personalDetails.medicalDietaryRequirements.length > 0 %}
+      <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
+      <div class="govuk-!-margin-bottom-2">
+        {% for requirement in personalDetails.medicalDietaryRequirements %}
+          <span class="govuk-!-display-block">
+            {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+          </span>
+        {% endfor %}
+      </div>
     {% endif %}
+
+    {% if personalDetails.foodAllergies.length > 0 %}
+      <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
+      <div class="govuk-!-margin-bottom-2">
+        {% for allergy in personalDetails.foodAllergies %}
+          <span class="govuk-!-display-block">
+            {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if personalDetails.personalisedDietaryRequirements.length > 0 %}
+      <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
+      <div class="govuk-!-margin-bottom-2">
+        {% for requirement in personalDetails.personalisedDietaryRequirements %}
+          <span class="govuk-!-display-block">
+            {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% else %}
+    <span class="govuk-!-margin-top-1">Not entered</span>
+  {% endif %}
 {% endmacro %}
 
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
-    <div class="govuk-grid-row" data-qa="personal-details">
-        <div class="govuk-grid-column-full">
-            <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
-                {{ summaryListRow("Full name", personalDetails.fullName | title, "full-name") }}
-            </dl>
+  <div class="govuk-grid-row" data-qa="personal-details">
+    <div class="govuk-grid-column-full">
+      <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
+        {{ summaryListRow("Full name", personalDetails.fullName | title, "full-name") }}
+      </dl>
 
-            {% if aliases.length > 0 %}
-                <details class="govuk-details hmpps-alias-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary govuk-!-display-none-print">
-                        <span class="govuk-details__summary-text">View aliases</span>
-                    </summary>
-                    <div class="govuk-details__text" data-qa="alias-list">
-                        {{ govukTable({ head: [ { text: "Alias" }, { text: "Alias date of birth" } ], rows: aliases }) }}
-                    </div>
-                </details>
-            {% else %}
-                <p class="govuk-body hmpps-secondary-text">No aliases have been entered</p>
-            {% endif %}
+      {% if aliases.length > 0 %}
+        <details class="govuk-details hmpps-alias-details" data-module="govuk-details">
+          <summary class="govuk-details__summary govuk-!-display-none-print">
+            <span class="govuk-details__summary-text">View aliases</span>
+          </summary>
+          <div class="govuk-details__text" data-qa="alias-list">
+            {{ govukTable({ head: [ { text: "Alias" }, { text: "Alias date of birth" } ], rows: aliases }) }}
+          </div>
+        </details>
+      {% else %}
+        <p class="govuk-body hmpps-secondary-text">No aliases have been entered</p>
+      {% endif %}
 
-            <hr class="govuk-section-break govuk-section-break--visible" />
+      <hr class="govuk-section-break govuk-section-break--visible" />
 
-            {# Put a border at the bottom of the main list if there are additional details to be shown - currently only when militaryHistoryEnabled #}
-            {% set listClasses = 'govuk-summary-list--bottom-border govuk-!-margin-bottom-0' if militaryHistoryEnabled %}
+      {# Put a border at the bottom of the main list if there are additional details to be shown - currently only when militaryHistoryEnabled #}
+      {% set listClasses = 'govuk-summary-list--bottom-border govuk-!-margin-bottom-0' if militaryHistoryEnabled %}
 
-            {{ govukSummaryList({
-                classes: listClasses,
-                rows: toSummaryListRows([
-                    { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
-                    { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
-                    { key: "City or town of birth", value: personalDetails.cityOrTownOfBirth, options: { dataQa: "city-or-town-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
-                    { key: "Country of birth", value: personalDetails.countryOfBirth, options: { dataQa: "country-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/country-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'countryOfBirth' } },
-                    { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality", visible: inUsersCaseLoad, changeHref: "personal/edit/nationality", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'nationality' } },
-                    { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
-                    { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
-                    { key: "Religion or belief", value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), options: { dataQa: "religion-or-belief", html: true, visible: inUsersCaseLoad, changeHref: "personal/edit/religion", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'religion' } },
-                    { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
-                    { key: "Sexual orientation", value: personalDetails.sexualOrientation, options: { dataQa: "sexual-orientation", visible: inUsersCaseLoad } },
-                    { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
-                    { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
-                    { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
-                    { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not dietAndAllergiesEnabled } },
-                    { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: dietAndAllergiesEnabled, changeLinkEnabled: editDietAndAllergiesEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
-                    { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
-                    { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
-                    { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
-                    { key: "Domestic abuse victim", value: personalDetails.domesticAbuseVictim, options: { dataQa: "domestic-abuse-victim", hideIfEmpty: true, visible: inUsersCaseLoad } },
-                    { key: "Social care needed", value: personalDetails.socialCareNeeded, options: { dataQa: "social-care-needed", hideIfEmpty: true, visible: inUsersCaseLoad } }
-                ])
-            }) }}
+      {{
+        govukSummaryList({
+            classes: listClasses,
+            rows: toSummaryListRows([
+                { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
+                { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
+                { key: "City or town of birth", value: personalDetails.cityOrTownOfBirth, options: { dataQa: "city-or-town-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
+                { key: "Country of birth", value: personalDetails.countryOfBirth, options: { dataQa: "country-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/country-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'countryOfBirth' } },
+                { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality", visible: inUsersCaseLoad, changeHref: "personal/edit/nationality", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'nationality' } },
+                { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
+                { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
+                { key: "Religion or belief", value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), options: { dataQa: "religion-or-belief", html: true, visible: inUsersCaseLoad, changeHref: "personal/edit/religion", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'religion' } },
+                { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
+                { key: "Sexual orientation", value: personalDetails.sexualOrientation, options: { dataQa: "sexual-orientation", visible: inUsersCaseLoad } },
+                { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
+                { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
+                { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
+                { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not dietAndAllergiesEnabled } },
+                { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: dietAndAllergiesEnabled, changeLinkEnabled: editDietAndAllergiesEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
+                { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
+                { key: "Youth offender", value: personalDetails.youthOffender, options: { dataQa: "youth-offender", visible: inUsersCaseLoad } },
+                { key: "Domestic abuse perpetrator", value: personalDetails.domesticAbusePerpetrator, options: { dataQa: "domestic-abuse-perpetrator", hideIfEmpty: true, visible: inUsersCaseLoad } },
+                { key: "Domestic abuse victim", value: personalDetails.domesticAbuseVictim, options: { dataQa: "domestic-abuse-victim", hideIfEmpty: true, visible: inUsersCaseLoad } },
+                { key: "Social care needed", value: personalDetails.socialCareNeeded, options: { dataQa: "social-care-needed", hideIfEmpty: true, visible: inUsersCaseLoad } }
+            ])
+        })
+      }}
 
-            {% if militaryHistoryEnabled and militaryRecords.length > 0 %}
-                <dl class="govuk-summary-list" data-qa="military-records">
-                    <div class="govuk-summary-list__row govuk-!-border-none">
-                        <dt class="govuk-summary-list__key">
-                            UK military service record
-                        </dt>
-                        <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-                            <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
-                            <div class="govuk-!-margin-bottom-2">
-                                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
-                                    {{ summaryListRow("Service number", militaryRecords[0].serviceNumber | d('Not entered'), "service-number") }}
-                                    {{ summaryListRow("Branch", militaryRecords[0].militaryBranchDescription | d('Not entered'), "branch") }}
-                                    {{ summaryListRow("Unit", militaryRecords[0].unitNumber | d('Not entered'), "unit-number") }}
-                                    {{ summaryListRow("Rank at discharge", militaryRecords[0].militaryRankDescription | d('Not entered'), "rank") }}
-                                    {{ summaryListRow("Comments", militaryRecords[0].description | d('Not entered'), "comments") }}
-                                </dl>
-                            </div>
-                            <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
-                            <div class="govuk-!-margin-bottom-2">
-                                <dl class="govuk-summary-list--sub-list">
-                                    {{ summaryListRow("Date", militaryRecords[0].startDate | formatDate('short', 'Not entered'), "enlistment-date") }}
-                                    {{ summaryListRow("Location", militaryRecords[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
-                                </dl>
-                            </div>
-                        </dd>
-                        <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
-                                        class="govuk-visually-hidden"> service information</span></a>
-                        </dd>
-                    </div>
+      {% if militaryHistoryEnabled and militaryRecords.length > 0 %}
+        <dl class="govuk-summary-list" data-qa="military-records">
+          <div class="govuk-summary-list__row govuk-!-border-none">
+            <dt class="govuk-summary-list__key">UK military service record</dt>
+            <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+              <span id="military-service-information" class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
+              <div class="govuk-!-margin-bottom-2">
+                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
+                  {{ summaryListRow("Service number", militaryRecords[0].serviceNumber | d('Not entered'), "service-number") }}
+                  {{ summaryListRow("Branch", militaryRecords[0].militaryBranchDescription | d('Not entered'), "branch") }}
+                  {{ summaryListRow("Unit", militaryRecords[0].unitNumber | d('Not entered'), "unit-number") }}
+                  {{ summaryListRow("Rank at discharge", militaryRecords[0].militaryRankDescription | d('Not entered'), "rank") }}
+                  {{ summaryListRow("Comments", militaryRecords[0].description | d('Not entered'), "comments") }}
+                </dl>
+              </div>
+              <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
+              <div class="govuk-!-margin-bottom-2">
+                <dl class="govuk-summary-list--sub-list">
+                  {{ summaryListRow("Date", militaryRecords[0].startDate | formatDate('short', 'Not entered'), "enlistment-date") }}
+                  {{ summaryListRow("Location", militaryRecords[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
+                </dl>
+              </div>
+            </dd>
+            <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
+              <a class="govuk-link govuk-link--no-visited-state"
+                 href="/prisoner/{{ prisonerNumber }}/personal/military-service-information/{{ militaryRecords[0].militarySeq }}">
+                  Change<span class="govuk-visually-hidden"> service information</span>
+              </a>
+            </dd>
+          </div>
 
-                    <div class="govuk-summary-list__row govuk-!-border-none">
-                        <dt class="govuk-summary-list__key"></dt>
-                        <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-                            <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
-                            <div class="govuk-!-margin-bottom-2">
-                                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
+          <div class="govuk-summary-list__row govuk-!-border-none">
+            <dt class="govuk-summary-list__key"></dt>
+            <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
+              <span class="govuk-!-font-weight-bold govuk-!-display-block">Conflict</span>
+              <div class="govuk-!-margin-bottom-2">
+                <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border"
                                     data-qa="conflict">
-                                    {{ militaryRecords[0].warZoneDescription | d('Not entered') }}
-                                </dl>
-                            </div>
-                        </dd>
-                        <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
-                                        class="govuk-visually-hidden"> conflict</span></a>
-                        </dd>
-                    </div>
+                  {{ militaryRecords[0].warZoneDescription | d('Not entered') }}
+                </dl>
+              </div>
+            </dd>
+            <dd
+              class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border"
+            >
+              <a class="govuk-link govuk-link--no-visited-state" href="#"
+                >Change<span
+                                        class="govuk-visually-hidden"> conflict</span></a
+              >
+            </dd>
+          </div>
 
                     <div class="govuk-summary-list__row  govuk-!-border-none">
                         <dt class="govuk-summary-list__key"></dt>
@@ -164,8 +172,8 @@
                                 </dl>
                             </div>
                         </dd>
-                        <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border">
-                            <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
+                        <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border"
+            >              <a class="govuk-link govuk-link--no-visited-state" href="#">Change<span
                                         class="govuk-visually-hidden"> disciplinary action</span></a>
                         </dd>
                     </div>
@@ -193,12 +201,14 @@
                 </dl>
             {% endif %}
 
-            {% if militaryHistoryEnabled and militaryRecords.length === 0 %}
-                <h3 class="govuk-!-font-size-24 govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional details</h3>
-                <div class="govuk-!-margin-bottom-4">
-                    <a href="#TODO" class="govuk-link govuk-link--no-visited-state">Add UK military service details</a>
-                </div>
-            {% endif %}
+      {% if militaryHistoryEnabled and militaryRecords.length === 0 %}
+        <h3 class="govuk-!-font-size-24 govuk-!-margin-top-6 govuk-!-margin-bottom-3">Additional details</h3>
+        <div class="govuk-!-margin-bottom-4">
+          <a href="/prisoner/{{ prisonerNumber }}/personal/military-service-information" class="govuk-link govuk-link--no-visited-state"
+            >Add UK military service details</a
+          >
         </div>
+      {% endif %}
     </div>
+  </div>
 {%- endcall -%}

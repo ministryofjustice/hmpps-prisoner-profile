@@ -86,6 +86,8 @@ export enum Page {
   PastCareNeeds = 'PAST_CARE_NEEDS',
   HeightHistory = 'HEIGHT_HISTORY',
   WeightHistory = 'WEIGHT_HISTORY',
+  AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
+  EditMilitaryServiceInformation = 'EDIT_MILITARY_SERVICE_INFORMATION',
 }
 
 // eslint-disable-next-line no-shadow
@@ -98,6 +100,7 @@ export enum ApiAction {
 
 // eslint-disable-next-line no-shadow
 export enum PostAction {
+  AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
   Alert = 'ADD_ALERT',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
   AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
@@ -115,6 +118,7 @@ export enum PostAction {
   EditHairTypeOrColour = 'EDIT_HAIR_TYPE_OR_COLOUR',
   EditHeight = 'EDIT_HEIGHT',
   EditMedicalDiet = 'EDIT_MEDICAL_DIET',
+  EditMilitaryServiceInformation = 'EDIT_MILITARY_SERVICE_INFORMATION',
   EditNationality = 'EDIT_NATIONALITY',
   EditReligion = 'EDIT_RELIGION',
   EditShoeSize = 'EDIT_SHOE_SIZE',
