@@ -1,4 +1,4 @@
-import { stubGetWithBody, stubPatchWithResponse, stubPutWithResponse } from './utils'
+import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
   MilitaryRecord,
   ReferenceDataCodeDto,
@@ -41,5 +41,17 @@ export default {
     stubGetWithBody({
       path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
       body: militaryRecords,
+    }),
+
+  stubPersonIntegrationUpdateMilitaryRecord: () =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      responseBody: null,
+    }),
+
+  stubPersonIntegrationCreateMilitaryRecord: () =>
+    stubPostWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      responseBody: null,
     }),
 }
