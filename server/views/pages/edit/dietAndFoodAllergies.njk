@@ -1,13 +1,14 @@
 {% extends "../index.njk" %}
-{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
-{% from '../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "../../components/miniBanner/miniBanner.njk" import miniBanner %}
+{% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+
 {% set hideBackLink = true %}
 {% set breadCrumbs = [
     { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
@@ -16,10 +17,11 @@
 ] %}
 
 {% macro otherHtml(type, sequence, comment) %}
-    {{ govukInput({
+    {{ govukCharacterCount({
         id: type + "-other",
         name: type + "[" + sequence + "][comment]",
-        type: "text",
+        maxlength: 100,
+        rows: 2,
         value: comment,
         label: { text: "This information may be seen by prisoners working in the kitchen." }
     }) }}
