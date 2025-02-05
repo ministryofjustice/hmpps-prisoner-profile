@@ -30,12 +30,16 @@ import {
   CheckboxFieldData,
   cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
+  dietAndFoodAllergiesFieldData,
+  eyeColourFieldData,
+  eyeColourIndividualFieldData,
   foodAllergiesFieldData,
   heightFieldData,
   medicalDietFieldData,
   nationalityFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
+  religionFieldData,
   smokerOrVaperFieldData,
   TextFieldData,
   weightFieldData,
@@ -135,6 +139,8 @@ export default class PersonalController {
   }
 
   height() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = heightFieldData
+
     return {
       metric: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -150,11 +156,11 @@ export default class PersonalController {
             prisonerNumber: prisonerData.prisonerNumber,
             prisonId: prisonerData.prisonId,
             correlationId: req.id,
-            page: Page.EditHeight,
+            page: auditEditPageLoad,
           })
 
           res.render('pages/edit/heightMetric', {
-            pageTitle: 'Height - Prisoner personal details',
+            pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
             breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
             errors,
@@ -185,16 +191,16 @@ export default class PersonalController {
                 user,
                 prisonerNumber,
                 correlationId: req.id,
-                action: PostAction.EditPhysicalCharacteristics,
-                details: { fieldName: heightFieldData.fieldName, previous: previousHeight, updated: height },
+                action: auditEditPostAction,
+                details: { fieldName, previous: previousHeight, updated: height },
               })
               .catch(error => logger.error(error))
 
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
           } catch (e) {
             req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
           }
         },
       },
@@ -219,11 +225,11 @@ export default class PersonalController {
             prisonerNumber: prisonerData.prisonerNumber,
             prisonId: prisonerData.prisonId,
             correlationId: req.id,
-            page: Page.EditHeight,
+            page: auditEditPageLoad,
           })
 
           res.render('pages/edit/heightImperial', {
-            pageTitle: 'Height - Prisoner personal details',
+            pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
@@ -259,16 +265,16 @@ export default class PersonalController {
                 user,
                 prisonerNumber,
                 correlationId: req.id,
-                action: PostAction.EditPhysicalCharacteristics,
-                details: { fieldName: heightFieldData.fieldName, previous: previousHeight, updated: height },
+                action: auditEditPostAction,
+                details: { fieldName, previous: previousHeight, updated: height },
               })
               .catch(error => logger.error(error))
 
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
           } catch (e) {
             req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/height/imperial`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}/imperial`)
           }
         },
       },
@@ -276,6 +282,8 @@ export default class PersonalController {
   }
 
   weight() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = weightFieldData
+
     return {
       metric: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -294,13 +302,12 @@ export default class PersonalController {
           })
 
           res.render('pages/edit/weightMetric', {
-            pageTitle: 'Weight - Prisoner personal details',
+            pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors,
-            fieldName: 'weight',
             fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes?.weight?.value,
             miniBannerData: miniBannerData(prisonerData),
           })
@@ -327,16 +334,16 @@ export default class PersonalController {
                 user,
                 prisonerNumber,
                 correlationId: req.id,
-                action: PostAction.EditPhysicalCharacteristics,
-                details: { fieldName: weightFieldData.fieldName, previous: previousWeight, updated: weight },
+                action: auditEditPostAction,
+                details: { fieldName, previous: previousWeight, updated: weight },
               })
               .catch(error => logger.error(error))
 
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
           } catch (e) {
             req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}`)
           }
         },
       },
@@ -361,11 +368,11 @@ export default class PersonalController {
             prisonerNumber: prisonerData.prisonerNumber,
             prisonId: prisonerData.prisonId,
             correlationId: req.id,
-            page: Page.EditWeight,
+            page: auditEditPageLoad,
           })
 
           res.render('pages/edit/weightImperial', {
-            pageTitle: 'Weight - Prisoner personal details',
+            pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
             breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
               style: NameFormatStyle.lastCommaFirst,
@@ -401,16 +408,16 @@ export default class PersonalController {
                 user: res.locals.user,
                 prisonerNumber,
                 correlationId: req.id,
-                action: PostAction.EditPhysicalCharacteristics,
-                details: { fieldName: weightFieldData.fieldName, previous: previousWeight, updated: weight },
+                action: auditEditPostAction,
+                details: { fieldName, previous: previousWeight, updated: weight },
               })
               .catch(error => logger.error(error))
 
-            return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
           } catch (e) {
             req.flash('requestBody', JSON.stringify(req.body))
             req.flash('errors', [{ text: 'There was an error please try again' }])
-            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/weight/imperial`)
+            return res.redirect(`/prisoner/${prisonerNumber}/personal/edit/${url}/imperial`)
           }
         },
       },
@@ -465,7 +472,16 @@ export default class PersonalController {
   }
 
   private textInput(fieldData: TextFieldData, getter: TextFieldGetter, setter: TextFieldSetter) {
-    const { pageTitle, hintText, auditPage, fieldName, url, redirectAnchor, inputClasses } = fieldData
+    const {
+      pageTitle,
+      hintText,
+      auditEditPageLoad,
+      auditEditPostAction,
+      fieldName,
+      url,
+      redirectAnchor,
+      inputClasses,
+    } = fieldData
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
@@ -483,7 +499,7 @@ export default class PersonalController {
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
-          page: auditPage,
+          page: auditEditPageLoad,
         })
 
         res.render('pages/edit/textField', {
@@ -502,10 +518,11 @@ export default class PersonalController {
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
-        const fieldValue = req.body[fieldName] || null
+        const updatedValue = req.body[fieldName] || null
 
         try {
-          await setter(req, res, fieldData, fieldValue)
+          const previousValue = await getter(req, fieldData)
+          await setter(req, res, fieldData, updatedValue)
 
           req.flash('flashMessage', {
             text: `${pageTitle} updated`,
@@ -518,8 +535,8 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
-              details: { pageTitle },
+              action: auditEditPostAction,
+              details: { fieldName, previous: previousValue, updated: updatedValue },
             })
             .catch(error => logger.error(error))
 
@@ -535,7 +552,7 @@ export default class PersonalController {
 
   editRadioFields(formTitle: string, fieldData: RadioFieldData, options: RadioOption[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { pageTitle, hintText, redirectAnchor, auditPage } = fieldData
+      const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
       const { prisonerNumber } = req.params
       const { prisonerData } = req.middleware
       const { firstName, lastName, cellLocation } = prisonerData
@@ -548,7 +565,7 @@ export default class PersonalController {
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
-        page: auditPage,
+        page: auditEditPageLoad,
       })
 
       res.render('pages/edit/radioField', {
@@ -587,7 +604,7 @@ export default class PersonalController {
     autocompleteOptionLabel: string
   }) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const { pageTitle, hintText, redirectAnchor, auditPage } = fieldData
+      const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
       const { prisonerNumber } = req.params
       const { prisonerData } = req.middleware
       const { firstName, lastName, cellLocation } = prisonerData
@@ -600,7 +617,7 @@ export default class PersonalController {
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
-        page: auditPage,
+        page: auditEditPageLoad,
       })
 
       res.render('pages/edit/radioFieldWithAutocomplete', {
@@ -626,6 +643,8 @@ export default class PersonalController {
   }
 
   smokerOrVaper() {
+    const { pageTitle, fieldName, auditEditPostAction, url, redirectAnchor } = smokerOrVaperFieldData
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
@@ -648,7 +667,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, url } = smokerOrVaperFieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -665,12 +683,12 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditSmokerOrVaper,
+              action: auditEditPostAction,
               details: { fieldName, previous: previousValue, updated: radioField },
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
@@ -681,6 +699,8 @@ export default class PersonalController {
   }
 
   nationality() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = nationalityFieldData
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { prisonerNumber } = req.params
@@ -726,7 +746,7 @@ export default class PersonalController {
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
-          page: nationalityFieldData.auditPage,
+          page: auditEditPageLoad,
         })
 
         res.render('pages/edit/nationality', {
@@ -755,7 +775,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, url, redirectAnchor } = nationalityFieldData
         const { prisonerNumber } = req.params
         const { clientToken, inmateDetail } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -786,7 +805,7 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditNationality,
+              action: auditEditPostAction,
               details: [
                 { fieldName, previous: previousValue, updated: autocompleteField || radioField },
                 {
@@ -820,11 +839,11 @@ export default class PersonalController {
    *   Build
    */
   physicalCharacteristicRadioField(fieldData: RadioFieldData) {
+    const { pageTitle, code, fieldName, url, auditEditPostAction } = fieldData
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { clientToken } = req.middleware
         const { prisonerNumber } = req.params
-        const { pageTitle, code } = fieldData
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const [characteristics, prisonPerson] = await Promise.all([
           this.personalPageService.getReferenceDataCodes(clientToken, code),
@@ -843,7 +862,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, code, fieldName, url } = fieldData
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -865,7 +883,7 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
+              action: auditEditPostAction,
               details: { fieldName, previous: previousValue, updated: radioField },
             })
             .catch(error => logger.error(error))
@@ -884,11 +902,11 @@ export default class PersonalController {
    * Handler for editing eye colour.
    */
   eyeColour() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = eyeColourFieldData
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Eye colour'
         const code = PrisonPersonCharacteristicCode.eye
-        const auditPage = Page.EditEyeColour
 
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
@@ -917,7 +935,7 @@ export default class PersonalController {
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
-          page: auditPage,
+          page: auditEditPageLoad,
         })
 
         res.render('pages/edit/eyeColour', {
@@ -936,10 +954,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const fieldName = 'eyeColour'
-        const pageTitle = 'Eye colour'
-        const url = 'eye-colour'
-
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -960,7 +974,7 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
+              action: auditEditPostAction,
               details: {
                 fieldName,
                 previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
@@ -969,7 +983,7 @@ export default class PersonalController {
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
@@ -983,12 +997,12 @@ export default class PersonalController {
    * Handler for editing left and right eye colour individually.
    */
   eyeColourIndividual() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } =
+      eyeColourIndividualFieldData
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Left and right eye colours'
         const code = PrisonPersonCharacteristicCode.eye
-        const auditPage = Page.EditEyeColour
-
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
@@ -1011,7 +1025,7 @@ export default class PersonalController {
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
-          page: auditPage,
+          page: auditEditPageLoad,
         })
 
         res.render('pages/edit/eyeColourIndividual', {
@@ -1031,9 +1045,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const fieldName = 'eyeColour'
-        const url = 'eye-colour-individual'
-
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1059,7 +1070,7 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditPhysicalCharacteristics,
+              action: auditEditPostAction,
               details: {
                 fieldName,
                 previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
@@ -1068,7 +1079,7 @@ export default class PersonalController {
             })
             .catch(error => logger.error(error))
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
@@ -1079,7 +1090,7 @@ export default class PersonalController {
   }
 
   history(fieldData: TextFieldData) {
-    const { pageTitle, fieldName, formatter, auditPage } = fieldData
+    const { pageTitle, fieldName, formatter, auditEditPageLoad } = fieldData
 
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = req.params
@@ -1097,7 +1108,7 @@ export default class PersonalController {
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
-        page: auditPage,
+        page: auditEditPageLoad,
       })
 
       return res.render('pages/edit/fieldHistory', {
@@ -1139,7 +1150,7 @@ export default class PersonalController {
         prisonerNumber: prisonerData.prisonerNumber,
         prisonId: prisonerData.prisonId,
         correlationId: req.id,
-        page: fieldData.auditPage,
+        page: fieldData.auditEditPageLoad,
       })
 
       res.render('pages/edit/checkboxField', {
@@ -1164,6 +1175,9 @@ export default class PersonalController {
   }
 
   dietAndFoodAllergies() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } =
+      dietAndFoodAllergiesFieldData
+
     const mapDietAndAllergy = (
       dietAndAllergy: DietAndAllergy,
       field: keyof DietAndAllergy,
@@ -1251,11 +1265,11 @@ export default class PersonalController {
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
-          page: Page.EditDietAndFoodAllergies,
+          page: auditEditPageLoad,
         })
 
         res.render('pages/edit/dietAndFoodAllergies', {
-          pageTitle: 'Diet and food allergies - Prisoner personal details',
+          pageTitle: `${pageTitle} - Prisoner personal details`,
           prisonerNumber,
           prisonerName,
           breadcrumbPrisonerName: prisonerBannerName,
@@ -1309,22 +1323,22 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditDietAndFoodAllergies,
-              details: { fieldName: 'dietAndFoodAllergies', previous: previousValues, updated: update },
+              action: auditEditPostAction,
+              details: { fieldName, previous: previousValues, updated: update },
             })
             .catch(error => logger.error(error))
 
           req.flash('flashMessage', {
             text: `Diet and food allergies updated`,
             type: FlashMessageType.success,
-            fieldName: 'dietAndFoodAllergies',
+            fieldName,
           })
 
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+          return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
         } catch (e) {
           req.flash('errors', [{ text: 'There was an error please try again' }])
         }
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/diet-and-food-allergies`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
       },
     }
   }
@@ -1455,6 +1469,8 @@ export default class PersonalController {
   }
 
   countryOfBirth() {
+    const { pageTitle, fieldName, auditEditPostAction, url, redirectAnchor } = countryOfBirthFieldData
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
@@ -1490,7 +1506,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { pageTitle, fieldName, url, redirectAnchor } = countryOfBirthFieldData
         const { prisonerNumber } = req.params
         const { clientToken, inmateDetail } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1520,7 +1535,7 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditCountryOfBirth,
+              action: auditEditPostAction,
               details: { fieldName, previous: previousValue, updated: autocompleteField || radioField },
             })
             .catch(error => logger.error(error))
@@ -1536,9 +1551,10 @@ export default class PersonalController {
   }
 
   religion() {
+    const { pageTitle, fieldName, auditEditPageLoad, auditEditPostAction, url, redirectAnchor } = religionFieldData
+
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const pageTitle = 'Religion, faith or belief'
         const { prisonerNumber } = req.params
         const { clientToken, inmateDetail, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
@@ -1580,7 +1596,7 @@ export default class PersonalController {
           prisonerNumber: prisonerData.prisonerNumber,
           prisonId: prisonerData.prisonId,
           correlationId: req.id,
-          page: Page.EditReligion,
+          page: auditEditPageLoad,
         })
 
         res.render('pages/edit/religion', {
@@ -1607,11 +1623,6 @@ export default class PersonalController {
       },
 
       submit: async (req: Request, res: Response, next: NextFunction) => {
-        const fieldName = 'religion'
-        const pageTitle = 'Religion, faith or belief'
-        const url = 'religion'
-        const redirectAnchor = 'personal-details'
-
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
@@ -1640,7 +1651,7 @@ export default class PersonalController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditReligion,
+              action: auditEditPostAction,
               details: {
                 fieldName,
                 previous: currentReligionCode,
