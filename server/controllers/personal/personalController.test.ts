@@ -291,7 +291,7 @@ describe('PersonalController', () => {
             user: prisonUserMock,
             prisonerNumber: 'ABC123',
             correlationId: request.id,
-            action: PostAction.EditPhysicalCharacteristics,
+            action: PostAction.EditHeight,
             details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
           }
 
@@ -455,7 +455,7 @@ describe('PersonalController', () => {
             user: prisonUserMock,
             prisonerNumber: 'ABC123',
             correlationId: request.id,
-            action: PostAction.EditPhysicalCharacteristics,
+            action: PostAction.EditHeight,
             details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
           }
 
@@ -484,11 +484,10 @@ describe('PersonalController', () => {
 
           expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightMetric', {
-            pageTitle: expect.anything(),
+            pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            fieldName: expect.anything(),
             fieldValue: 60,
             miniBannerData: {
               prisonerNumber: 'ABC123',
@@ -599,7 +598,7 @@ describe('PersonalController', () => {
             user: prisonUserMock,
             prisonerNumber: 'ABC123',
             correlationId: request.id,
-            action: PostAction.EditPhysicalCharacteristics,
+            action: PostAction.EditWeight,
             details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
           }
 
@@ -763,7 +762,7 @@ describe('PersonalController', () => {
             user: prisonUserMock,
             prisonerNumber: 'ABC123',
             correlationId: request.id,
-            action: PostAction.EditPhysicalCharacteristics,
+            action: PostAction.EditWeight,
             details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
           }
 
@@ -783,7 +782,8 @@ describe('PersonalController', () => {
       pageTitle: 'Build',
       fieldName: 'build',
       code: PrisonPersonCharacteristicCode.build,
-      auditPage: 'PAGE' as Page,
+      auditEditPageLoad: 'PAGE' as Page,
+      auditEditPostAction: 'ACTION' as PostAction,
       url: 'build',
       redirectAnchor: 'appearance',
       hintText: 'Hint text',
@@ -884,7 +884,7 @@ describe('PersonalController', () => {
           prisonerNumber: 'ABC123',
           prisonId: 999,
           correlationId: req.id,
-          page: fieldData.auditPage,
+          page: fieldData.auditEditPageLoad,
         }
 
         await action(req, res)
@@ -946,7 +946,7 @@ describe('PersonalController', () => {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
           correlationId: validRequest.id,
-          action: PostAction.EditPhysicalCharacteristics,
+          action: 'ACTION',
           details: { fieldName: fieldData.fieldName, previous: '', updated: 'CODE3' },
         }
 
@@ -1894,7 +1894,7 @@ describe('PersonalController', () => {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
           correlationId: validRequest.id,
-          action: PostAction.EditPhysicalCharacteristics,
+          action: PostAction.EditEyeColour,
           details: {
             fieldName: 'eyeColour',
             previous: { leftEyeColour: '', rightEyeColour: '' },
@@ -2083,7 +2083,7 @@ describe('PersonalController', () => {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
           correlationId: request.id,
-          action: PostAction.EditPhysicalCharacteristics,
+          action: PostAction.EditEyeColour,
           details: {
             fieldName: 'eyeColour',
             previous: { leftEyeColour: '', rightEyeColour: '' },
