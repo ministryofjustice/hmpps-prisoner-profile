@@ -132,3 +132,44 @@ export const MilitaryRecordsMock: MilitaryRecord[] = [
     selectiveServicesFlag: false,
   },
 ]
+
+export const MilitaryBranchRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_ARM',
+    code: 'ARM',
+    description: 'Army',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'MLTY_NAV',
+    code: 'NAV',
+    description: 'Navy',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'MLTY_RMA',
+    code: 'RMA',
+    description: 'Royal Marines',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'MLTY_RAF',
+    code: 'RAF',
+    description: 'RAF',
+    listSequence: 4,
+    isActive: true,
+  },
+]
+
+export const MilitaryRankRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_RANK_CPL_ARM',
+    code: 'CPL_ARM',
+    description: 'Corporal',
+    listSequence: 1,
+    isActive: true,
+  },
+]

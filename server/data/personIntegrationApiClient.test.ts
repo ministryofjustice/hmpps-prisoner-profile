@@ -69,4 +69,18 @@ describe('personIntegrationApiClient', () => {
       expect(result).toEqual(MilitaryRecordsMock)
     })
   })
+
+  describe('updateMilitaryRecord', () => {
+    it('should update military record', async () => {
+      fakePersonIntegrationApi.put('/v1/core-person-record/military-records?prisonerNumber=A1234AA').reply(204)
+      await personIntegrationApiClient.updateMilitaryRecord('A1234AA', MilitaryRecordsMock[0])
+    })
+  })
+
+  describe('createMilitaryRecord', () => {
+    it('should create military record', async () => {
+      fakePersonIntegrationApi.post('/v1/core-person-record/military-records?prisonerNumber=A1234AA').reply(201)
+      await personIntegrationApiClient.createMilitaryRecord('A1234AA', MilitaryRecordsMock[0])
+    })
+  })
 })

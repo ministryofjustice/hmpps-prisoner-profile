@@ -72,6 +72,8 @@ describe('PersonalPageService', () => {
       updateReligion: jest.fn(),
       getReferenceDataCodes: jest.fn(),
       getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
+      updateMilitaryRecord: jest.fn(),
+      createMilitaryRecord: jest.fn(),
     }
 
     healthAndMedicationApiClient = {

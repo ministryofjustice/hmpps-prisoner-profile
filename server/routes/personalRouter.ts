@@ -27,6 +27,7 @@ import { religionValidator } from '../validators/personal/religionValidator'
 import { shoeSizeValidator } from '../validators/personal/shoeSizeValidator'
 import distinguishingMarksRouter from './distinguishingMarksRouter'
 import { dietAndFoodAllergiesValidator } from '../validators/personal/dietAndFoodAllergiesValidator'
+import militaryRecordsRouter from './militaryRecordsRouter'
 import { Role } from '../data/enums/role'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
 
@@ -75,6 +76,43 @@ export default function personalRouter(services: Services): Router {
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     editProfileChecks(),
     distinguishingMarksRouter(services),
+  )
+
+  // Military history
+  // const militaryRecordsController = new MilitaryRecordsController(
+  //   services.militaryRecordsService,
+  //   services.auditService,
+  // )
+  //
+  // // Create Military Service Information
+  // get(
+  //   '/military-service-information',
+  //   getPrisonerData(services),
+  //   permissionsGuard(services.permissionsService.getOverviewPermissions),
+  //   militaryRecordsController.displayUpdateMilitaryServiceInformation(),
+  // )
+  //
+  // // Update Military Service Information
+  // get(
+  //   '/military-service-information/:militarySeq',
+  //   getPrisonerData(services),
+  //   permissionsGuard(services.permissionsService.getOverviewPermissions),
+  //   militaryRecordsController.displayUpdateMilitaryServiceInformation(),
+  // )
+  // post(
+  //   '/military-service-information/:militarySeq',
+  //   getPrisonerData(services),
+  //   permissionsGuard(services.permissionsService.getOverviewPermissions),
+  //   // validationMiddleware([newMilitaryServiceInformationValidator], {
+  //   //   redirectBackOnError: true,
+  //   // }),
+  //   militaryRecordsController.postUpdateMilitaryServiceInformation(),
+  // )
+  router.use(
+    `${basePath}`,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    militaryRecordsRouter(services),
   )
 
   // Edit routes

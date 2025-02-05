@@ -4,6 +4,7 @@ export interface ReferenceDataCodeDto {
   description: string
   listSequence: number
   isActive: boolean
+  parentCode?: string
 }
 
 // eslint-disable-next-line no-shadow
@@ -11,11 +12,16 @@ export enum ProxyReferenceDataDomain {
   country = 'COUNTRY',
   nationality = 'NAT',
   religion = 'RELF',
+  militaryBranch = 'MLTY_BRANCH',
+  militaryRank = 'MLTY_RANK',
+  militaryDischarge = 'MLTY_DSCHRG',
+  disciplinaryAction = 'MLTY_DISCP',
+  warZone = 'MLTY_WZONE',
 }
 
 export interface MilitaryRecord {
-  prisonerNumber: string
-  militarySeq: number
+  prisonerNumber?: string
+  militarySeq?: number
   warZoneCode?: string
   warZoneDescription?: string
   startDate: string
@@ -23,17 +29,30 @@ export interface MilitaryRecord {
   militaryDischargeCode?: string
   militaryDischargeDescription?: string
   militaryBranchCode: string
-  militaryBranchDescription: string
+  militaryBranchDescription?: string
   description?: string
   unitNumber?: string
   enlistmentLocation?: string
   dischargeLocation?: string
-  selectiveServicesFlag: boolean
+  selectiveServicesFlag?: boolean
   militaryRankCode?: string
   militaryRankDescription?: string
   serviceNumber?: string
   disciplinaryActionCode?: string
   disciplinaryActionDescription?: string
+}
+
+export interface MilitaryServiceInformation {
+  militarySeq?: number
+  startDate?: string
+  'startDate-year'?: string
+  'startDate-month'?: string
+  militaryBranchCode: string
+  militaryRankCode?: string
+  description?: string
+  unitNumber?: string
+  enlistmentLocation?: string
+  serviceNumber?: string
 }
 
 export interface PersonIntegrationApiClient {
@@ -43,4 +62,6 @@ export interface PersonIntegrationApiClient {
   updateReligion(prisonerNumber: string, religion: string, reasonForChange?: string): Promise<void>
   getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]>
   getMilitaryRecords(prisonerNumber: string): Promise<MilitaryRecord[]>
+  updateMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
+  createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
 }
