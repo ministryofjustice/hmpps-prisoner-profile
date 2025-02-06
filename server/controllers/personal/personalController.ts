@@ -9,7 +9,7 @@ import {
   stoneAndPoundsToKilograms,
 } from '../../utils/unitConversions'
 import { mapHeaderData } from '../../mappers/headerMappers'
-import { AuditService, Page, PostAction } from '../../services/auditService'
+import { AuditService, Page } from '../../services/auditService'
 import {
   CheckboxOptions,
   convertToTitleCase,
@@ -34,10 +34,8 @@ import {
   eyeColourFieldData,
   eyeColourIndividualFieldData,
   FieldData,
-  foodAllergiesFieldData,
-  heightFieldData,
   heightImperialFieldData,
-  medicalDietFieldData,
+  heightFieldData,
   nationalityFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
@@ -59,11 +57,7 @@ import {
 } from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
-import {
-  checkboxInputToSelectedValues,
-  referenceDataDomainToCheckboxFieldDataOptions,
-  referenceDataDomainToCheckboxOptions,
-} from '../../utils/checkboxUtils'
+import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
 import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
 import {
@@ -1235,131 +1229,6 @@ export default class PersonalController {
           fieldData: dietAndFoodAllergiesFieldData,
           auditDetails: { fieldName, previous: previousValues, updated: update },
         })
-      },
-    }
-  }
-
-  medicalDiet() {
-    return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerNumber } = req.params
-        const { clientToken, prisonerData } = req.middleware
-        const { firstName, lastName } = prisonerData
-        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
-        const formTitle = `Does ${prisonerName} have any of these medical dietary requirements?`
-        const [medicalDietaryRequirementValues, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataDomain(clientToken, 'medicalDiet'),
-          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
-        ])
-
-        return this.editCheckboxes(
-          formTitle,
-          {
-            ...medicalDietFieldData,
-            options: referenceDataDomainToCheckboxFieldDataOptions(medicalDietaryRequirementValues),
-          },
-          referenceDataDomainToCheckboxOptions(medicalDietaryRequirementValues),
-          prisonPerson?.health?.medicalDietaryRequirements?.value.map(code => code.id),
-        )(req, res, next)
-      },
-
-      submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
-        const checkedItems = checkboxInputToSelectedValues(medicalDietFieldData.fieldName, req.body).sort()
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousValues = prisonPerson?.health?.foodAllergies?.value?.map(code => code.id)?.sort()
-
-        try {
-          await this.personalPageService.updateMedicalDietaryRequirements(
-            clientToken,
-            user,
-            prisonerNumber,
-            checkedItems,
-          )
-          req.flash('flashMessage', {
-            text: `Medical diet updated`,
-            type: FlashMessageType.success,
-            fieldName: medicalDietFieldData.fieldName,
-          })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: PostAction.EditMedicalDiet,
-              details: { fieldName: medicalDietFieldData.fieldName, previous: previousValues, updated: checkedItems },
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/${medicalDietFieldData.url}`)
-      },
-    }
-  }
-
-  foodAllergies() {
-    return {
-      edit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerNumber } = req.params
-        const { clientToken, prisonerData } = req.middleware
-        const { firstName, lastName } = prisonerData
-        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
-        const formTitle = `Does ${prisonerName} have any food allergies?`
-        const [foodAllergyValues, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataDomain(clientToken, 'foodAllergy'),
-          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
-        ])
-
-        return this.editCheckboxes(
-          formTitle,
-          { ...foodAllergiesFieldData, options: referenceDataDomainToCheckboxFieldDataOptions(foodAllergyValues) },
-          referenceDataDomainToCheckboxOptions(foodAllergyValues),
-          prisonPerson?.health?.foodAllergies?.value.map(code => code.id),
-        )(req, res, next)
-      },
-
-      submit: async (req: Request, res: Response, next: NextFunction) => {
-        const { prisonerNumber } = req.params
-        const { clientToken } = req.middleware
-        const user = res.locals.user as PrisonUser
-        const checkedItems = checkboxInputToSelectedValues(foodAllergiesFieldData.fieldName, req.body).sort()
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousValues = prisonPerson?.health?.foodAllergies?.value?.map(code => code.id)?.sort()
-
-        try {
-          await this.personalPageService.updateFoodAllergies(clientToken, user, prisonerNumber, checkedItems)
-
-          req.flash('flashMessage', {
-            text: `Food allergies updated`,
-            type: FlashMessageType.success,
-            fieldName: 'foodAllergies',
-          })
-
-          this.auditService
-            .sendPostSuccess({
-              user: res.locals.user,
-              prisonerNumber,
-              correlationId: req.id,
-              action: PostAction.EditFoodAllergies,
-              details: {
-                fieldName: foodAllergiesFieldData.fieldName,
-                previous: previousValues,
-                updated: checkedItems,
-              },
-            })
-            .catch(error => logger.error(error))
-
-          return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
-        } catch (e) {
-          req.flash('errors', [{ text: 'There was an error please try again' }])
-        }
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/${foodAllergiesFieldData.url}`)
       },
     }
   }

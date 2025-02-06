@@ -66,41 +66,6 @@ export const mockMedicalDietReferenceDataDomain: ReferenceDataDomain = {
   })),
 }
 
-export const mockFoodAllergiesReferenceDataDomain: ReferenceDataDomain = {
-  code: 'FOOD_ALLERGY',
-  createdAt: '',
-  createdBy: '',
-  description: '',
-  isActive: true,
-  listSequence: 0,
-  subDomains: [],
-  referenceDataCodes: [
-    { description: 'Celery', code: 'CELERY' },
-    { description: 'Cereals containing gluten', code: 'GLUTEN' },
-    { description: 'Crustaceans', code: 'CRUSTACEANS' },
-    { description: 'Egg', code: 'EGG' },
-    { description: 'Fish', code: 'FISH' },
-    { description: 'Lupin', code: 'LUPIN' },
-    { description: 'Milk', code: 'MILK' },
-    { description: 'Molluscs', code: 'MOLLUSCS' },
-    { description: 'Mustard', code: 'MUSTARD' },
-    { description: 'Peanuts', code: 'PEANUTS' },
-    { description: 'Seasame', code: 'SEASAME' },
-    { description: 'Soya', code: 'SOYA' },
-    { description: 'Sulpur Dioxide', code: 'SULPUR_DIOXIDE' },
-    { description: 'Tree nuts', code: 'TREE_NUTS' },
-    { description: 'No', code: 'NO' },
-  ].map(x => ({
-    ...x,
-    id: `FOOD_ALLERGY_${x.code}`,
-    domain: 'MEDICAL_DIET',
-    createdAt: '',
-    createdBy: '',
-    listSequence: 0,
-    isActive: true,
-  })),
-}
-
 export const referenceDataDomainsMock: ReferenceDataDomain[] = [
   {
     code: 'BUILD',

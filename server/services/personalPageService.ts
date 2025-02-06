@@ -549,36 +549,6 @@ export default class PersonalPageService {
     return response
   }
 
-  async updateMedicalDietaryRequirements(
-    clientToken: string,
-    user: PrisonUser,
-    prisonerNumber: string,
-    medicalDietaryRequirements: string[],
-  ) {
-    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = await prisonPersonApiClient.updateHealth(prisonerNumber, { medicalDietaryRequirements })
-    this.metricsService.trackPrisonPersonUpdate({
-      fieldsUpdated: ['medicalDietaryRequirements'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
-  async updateFoodAllergies(clientToken: string, user: PrisonUser, prisonerNumber: string, foodAllergies: string[]) {
-    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = await prisonPersonApiClient.updateHealth(prisonerNumber, { foodAllergies })
-
-    this.metricsService.trackPrisonPersonUpdate({
-      fieldsUpdated: ['foodAllergies'],
-      prisonerNumber,
-      user,
-    })
-
-    return response
-  }
-
   async updateCityOrTownOfBirth(
     clientToken: string,
     user: PrisonUser,
