@@ -170,26 +170,6 @@ export const nationalityFieldData: RadioFieldData = {
   redirectAnchor: 'personal-details',
 }
 
-export const foodAllergiesFieldData: CheckboxFieldData = {
-  url: 'edit/food-allergies',
-  fieldName: 'foodAllergies',
-  pageTitle: 'Food allergies',
-  auditEditPageLoad: Page.EditFoodAllergies,
-  auditEditPostAction: PostAction.EditFoodAllergies,
-  hintText: 'Select all that apply',
-  redirectAnchor: 'personal-details',
-}
-
-export const medicalDietFieldData: CheckboxFieldData = {
-  url: 'edit/medical-diet',
-  fieldName: 'medicalDiet',
-  pageTitle: 'Medical diet',
-  auditEditPageLoad: Page.EditMedicalDiet,
-  auditEditPostAction: PostAction.EditMedicalDiet,
-  hintText: 'Select all that apply',
-  redirectAnchor: 'personal-details',
-}
-
 export const dietAndFoodAllergiesFieldData: FieldData = {
   url: 'diet-and-food-allergies',
   fieldName: 'dietAndFoodAllergies',
