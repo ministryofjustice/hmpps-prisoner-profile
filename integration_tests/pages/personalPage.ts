@@ -37,7 +37,6 @@ export default class PersonalPage extends Page {
       cityOrTownOfBirth: () => cardData('city-or-town-of-birth'),
       countryOfBirth: () => cardData('country-of-birth'),
       nationality: () => cardData('nationality'),
-      otherNationalities: () => cardData('other-nationalities'),
       ethnicGroup: () => cardData('ethnic-group'),
       religionOrBelief: () => cardData('religion-or-belief'),
       sex: () => cardData('sex'),

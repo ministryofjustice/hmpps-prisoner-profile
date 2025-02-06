@@ -56,6 +56,14 @@
   {% endif %}
 {% endmacro %}
 
+{% macro nationalitiesHtml(personalDetails) %}
+    {{ personalDetails.nationality }}
+    {% if personalDetails.otherNationalities.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block govuk-!-margin-top-2">Other nationalities</span>
+        {{ personalDetails.otherNationalities }}
+    {% endif %}
+{% endmacro %}
+
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
@@ -89,8 +97,7 @@
                 { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
                 { key: "City or town of birth", value: personalDetails.cityOrTownOfBirth, options: { dataQa: "city-or-town-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
                 { key: "Country of birth", value: personalDetails.countryOfBirth, options: { dataQa: "country-of-birth", visible: inUsersCaseLoad, changeHref: "personal/edit/country-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'countryOfBirth' } },
-                { key: "Nationality", value: personalDetails.nationality, options: { dataQa: "nationality", visible: inUsersCaseLoad, changeHref: "personal/edit/nationality", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'nationality' } },
-                { key: "Other nationalities", value: personalDetails.otherNationalities, options: { dataQa: "other-nationalities", hideIfEmpty: true } },
+                { key: "Nationality", value: nationalitiesHtml(personalDetails), options: { dataQa: "nationality", visible: inUsersCaseLoad, changeHref: "personal/edit/nationality", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'nationality' } },
                 { key: "Ethnic group", value: personalDetails.ethnicGroup, options: { dataQa: "ethnic-group" } },
                 { key: "Religion or belief", value: religionHistoryHtml(personalDetails.religionOrBelief, hasCurrentBelief, identityNumbers.prisonNumber), options: { dataQa: "religion-or-belief", html: true, visible: inUsersCaseLoad, changeHref: "personal/edit/religion", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'religion' } },
                 { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },

@@ -48,6 +48,7 @@
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <div class="govuk-form-group">
 
+                        {% set autocompleteOptions = [{ value: '', text: 'Please select a nationality' }].concat(autocompleteOptions) %}
                         {% set autocompleteHtml %}
                             {{ govukSelect({
                                 id: "autocomplete",
