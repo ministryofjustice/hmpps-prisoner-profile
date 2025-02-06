@@ -84,6 +84,7 @@ export enum Page {
   WeightHistory = 'WEIGHT_HISTORY',
   AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
   EditMilitaryServiceInformation = 'EDIT_MILITARY_SERVICE_INFORMATION',
+  EditConflicts = 'EDIT_CONFLICTS',
 }
 
 // eslint-disable-next-line no-shadow
@@ -121,6 +122,7 @@ export enum PostAction {
   EditShoeSize = 'EDIT_SHOE_SIZE',
   EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
   EditWeight = 'EDIT_WEIGHT',
+  EditConflicts = 'EDIT_CONFLICTS',
 }
 
 // eslint-disable-next-line no-shadow
