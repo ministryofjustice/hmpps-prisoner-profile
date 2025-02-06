@@ -173,3 +173,13 @@ export const MilitaryRankRefDataMock: ReferenceDataCodeDto[] = [
     isActive: true,
   },
 ]
+
+export const MilitaryWarZoneRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_WZONE_AFG',
+    code: 'AFG',
+    description: 'Afganistan',
+    listSequence: 1,
+    isActive: true,
+  },
+]

@@ -2,8 +2,12 @@ import { NextFunction, Request, Response } from 'express'
 import MilitaryRecordsController from './militaryRecordsController'
 import MilitaryRecordsService from '../services/militaryRecordsService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
-import { MilitaryRecordsMock } from '../data/localMockData/personIntegrationReferenceDataMock'
+import {
+  MilitaryRecordsMock,
+  MilitaryWarZoneRefDataMock,
+} from '../data/localMockData/personIntegrationReferenceDataMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
+import { objectToRadioOptions } from '../utils/utils'
 
 describe('MilitaryRecordsController', () => {
   let req: Request
@@ -132,6 +136,64 @@ describe('MilitaryRecordsController', () => {
         'G6123VU',
         militaryServiceInformation,
       )
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
+    })
+  })
+
+  describe('displayConflicts', () => {
+    it('should render the conflicts page', async () => {
+      const getMilitaryRecords = jest
+        .spyOn(militaryRecordsService, 'getMilitaryRecords')
+        .mockResolvedValue(MilitaryRecordsMock)
+      const getReferenceData = jest.spyOn(militaryRecordsService, 'getReferenceData').mockResolvedValue({
+        warZone: MilitaryWarZoneRefDataMock,
+      })
+
+      await controller.displayConflicts()(req, res, next)
+
+      expect(getMilitaryRecords).toHaveBeenCalledWith('CLIENT_TOKEN', 'G6123VU')
+      expect(getReferenceData).toHaveBeenCalledWith('CLIENT_TOKEN', ['MLTY_WZONE'])
+      expect(res.render).toHaveBeenCalledWith('pages/militaryRecords/conflicts', {
+        pageTitle: 'Most recent conflict - Prisoner personal details',
+        title: 'What was the most recent conflict John Saunders served in?',
+        militarySeq: 1,
+        formValues: { militarySeq: 1, warZoneCode: 'AFG' },
+        errors: [],
+        warZoneOptions: [
+          ...objectToRadioOptions(
+            MilitaryWarZoneRefDataMock,
+            'code',
+            'description',
+            MilitaryRecordsMock[0].warZoneCode,
+          ),
+          { divider: 'or' },
+          { text: 'Unknown', value: null },
+        ],
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+        },
+      })
+    })
+  })
+
+  describe('postConflicts', () => {
+    it('should update conflict and redirect', async () => {
+      req.params.militarySeq = '1'
+      req.body = {
+        warZoneCode: 'AFG',
+      }
+      const conflicts = {
+        militarySeq: 1,
+        warZoneCode: 'AFG',
+      }
+
+      const updateMilitaryRecord = jest.spyOn(militaryRecordsService, 'updateMilitaryRecord').mockResolvedValue()
+
+      await controller.postConflicts()(req, res, next)
+
+      expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', conflicts)
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
     })
   })

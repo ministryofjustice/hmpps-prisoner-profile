@@ -79,35 +79,6 @@ export default function personalRouter(services: Services): Router {
   )
 
   // Military history
-  // const militaryRecordsController = new MilitaryRecordsController(
-  //   services.militaryRecordsService,
-  //   services.auditService,
-  // )
-  //
-  // // Create Military Service Information
-  // get(
-  //   '/military-service-information',
-  //   getPrisonerData(services),
-  //   permissionsGuard(services.permissionsService.getOverviewPermissions),
-  //   militaryRecordsController.displayUpdateMilitaryServiceInformation(),
-  // )
-  //
-  // // Update Military Service Information
-  // get(
-  //   '/military-service-information/:militarySeq',
-  //   getPrisonerData(services),
-  //   permissionsGuard(services.permissionsService.getOverviewPermissions),
-  //   militaryRecordsController.displayUpdateMilitaryServiceInformation(),
-  // )
-  // post(
-  //   '/military-service-information/:militarySeq',
-  //   getPrisonerData(services),
-  //   permissionsGuard(services.permissionsService.getOverviewPermissions),
-  //   // validationMiddleware([newMilitaryServiceInformationValidator], {
-  //   //   redirectBackOnError: true,
-  //   // }),
-  //   militaryRecordsController.postUpdateMilitaryServiceInformation(),
-  // )
   router.use(
     `${basePath}`,
     getPrisonerData(services),

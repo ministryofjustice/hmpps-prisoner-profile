@@ -43,7 +43,7 @@ describe('Military Service Information Validator', () => {
     }
     const errors = await militaryServiceInformationValidator(body)
     expect(errors.length).toEqual(1)
-    expect(errors[0].text).toEqual('Unit number must be 20 characters or less')
+    expect(errors[0].text).toEqual('Unit name must be 20 characters or less')
     expect(errors[0].href).toEqual('#unitNumber')
   })
 

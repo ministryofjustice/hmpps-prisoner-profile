@@ -53,15 +53,15 @@ context('Military Service Information Page', () => {
     })
 
     it('should save successfully when valid data is entered', () => {
-      militaryServiceInformationPage.serviceNumberField().type('123456')
+      militaryServiceInformationPage.serviceNumberField().type('123456', { delay: 0 })
       militaryServiceInformationPage.militaryBranchRadio().click()
-      militaryServiceInformationPage.unitNumberField().type('Unit 1')
-      militaryServiceInformationPage.enlistmentLocationField().type('Location 1')
-      militaryServiceInformationPage.descriptionField().type('This is a test')
-      militaryServiceInformationPage.startDateMonthField().type('10')
-      militaryServiceInformationPage.startDateYearField().type('2021')
+      militaryServiceInformationPage.unitNumberField().type('Unit 1', { delay: 0 })
+      militaryServiceInformationPage.enlistmentLocationField().type('Location 1', { delay: 0 })
+      militaryServiceInformationPage.descriptionField().type('This is a test', { delay: 0 })
+      militaryServiceInformationPage.startDateMonthField().type('10', { delay: 0 })
+      militaryServiceInformationPage.startDateYearField().type('2021', { delay: 0 })
       militaryServiceInformationPage.saveAndReturnButton().click()
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
+      cy.url().should('include', '/prisoner/G6123VU/personal#military-service-information')
     })
 
     it('should show validation messages when no data is entered', () => {
@@ -91,20 +91,34 @@ context('Military Service Information Page', () => {
       militaryServiceInformationPage.startDateYearField().should('have.value', '2020')
     })
 
-    it('should save successfully when valid data is entered', () => {
-      militaryServiceInformationPage.serviceNumberField().clear().type('654321')
-      militaryServiceInformationPage.unitNumberField().clear().type('Unit 2')
-      militaryServiceInformationPage.enlistmentLocationField().clear().type('Location 2')
-      militaryServiceInformationPage.descriptionField().type('More info')
+    it('should save successfully and redirect to personal page on "Save and return to profile"', () => {
+      militaryServiceInformationPage.serviceNumberField().clear().type('654321', { delay: 0 })
+      militaryServiceInformationPage.unitNumberField().clear().type('Unit 2', { delay: 0 })
+      militaryServiceInformationPage.enlistmentLocationField().clear().type('Location 2', { delay: 0 })
+      militaryServiceInformationPage.descriptionField().type('More info', { delay: 0 })
       militaryServiceInformationPage.saveAndReturnButton().click()
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
+      cy.url().should('include', '/prisoner/G6123VU/personal#military-service-information')
+    })
+
+    it('should save successfully and redirect to conflicts page on "Save and continue to conflicts"', () => {
+      militaryServiceInformationPage.serviceNumberField().clear().type('654321', { delay: 0 })
+      militaryServiceInformationPage.unitNumberField().clear().type('Unit 2', { delay: 0 })
+      militaryServiceInformationPage.enlistmentLocationField().clear().type('Location 2', { delay: 0 })
+      militaryServiceInformationPage.descriptionField().type('More info', { delay: 0 })
+      militaryServiceInformationPage.saveAndContinueButton().click()
+      cy.url().should('include', '/prisoner/G6123VU/personal/conflicts/1')
+    })
+
+    it('should navigate back to personal page on cancel', () => {
+      cy.get('a[data-qa="cancel-button"]').click()
+      cy.url().should('include', `/prisoner/G6123VU/personal#military-service-information`)
     })
 
     it('should show validation message when enlistment date is cleared', () => {
       militaryServiceInformationPage.startDateMonthField().clear()
       militaryServiceInformationPage.startDateYearField().clear()
       militaryServiceInformationPage.saveAndReturnButton().click()
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/military-service-information/1')
+      cy.url().should('include', '/prisoner/G6123VU/personal/military-service-information/1')
       militaryServiceInformationPage.errorSummary().should('exist')
       militaryServiceInformationPage
         .errorSummary()
