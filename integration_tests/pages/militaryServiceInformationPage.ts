@@ -21,5 +21,9 @@ export default class MilitaryServiceInformationPage extends Page {
 
   saveAndReturnButton = (): PageElement => cy.getDataQa('save-and-return-submit-button')
 
+  saveAndContinueButton = (): PageElement => cy.getDataQa('save-and-continue-submit-button')
+
+  cancelButton = (): PageElement => cy.getDataQa('cancel-button')
+
   errorSummary = (): PageElement => cy.get('.govuk-error-summary')
 }

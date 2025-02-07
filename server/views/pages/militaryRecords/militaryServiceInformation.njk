@@ -81,11 +81,10 @@
                 id: 'serviceNumber',
                 name: 'serviceNumber',
                 value: formValues.serviceNumber,
-                classes: 'govuk-input--width-30',
+                classes: 'govuk-input--width-10',
                 errorMessage: errors | findError('serviceNumber')
             })
           }}
-
             {{
             govukRadios({
                 idPrefix: "militaryBranchCode",
@@ -162,7 +161,7 @@
                     }
                 },
                 hint: {
-                    text: "For example, 10 2021"
+                    text: "For example, 10 2021."
                 },
                 items: [
                     {
@@ -229,7 +228,7 @@
                 })
               }}
             <a
-              href="/prisoner/{{ prisonerNumber }}/personal"
+              href="/prisoner/{{ prisonerNumber }}/personal#military-service-information"
               class="govuk-link govuk-link--no-visited-state"
               data-qa="cancel-button"
               >Cancel</a
@@ -239,4 +238,8 @@
       </div>
     </div>
   {% endblock %}
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/militaryRankRadios.js" nonce="{{ cspNonce }}"></script>
 {% endblock %}

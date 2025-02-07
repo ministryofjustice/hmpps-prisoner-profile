@@ -117,11 +117,11 @@
       }}
 
       {% if militaryHistoryEnabled and militaryRecords.length > 0 %}
-        <dl class="govuk-summary-list" data-qa="military-records">
+        <dl id="military-service-information" class="govuk-summary-list {{ 'row-updated' if flashMessage.fieldName === 'military-service-information' }}" data-qa="military-records">
           <div class="govuk-summary-list__row govuk-!-border-none">
             <dt class="govuk-summary-list__key">UK military service record</dt>
             <dd class="govuk-summary-list__value govuk-summary-list--sub-list--bottom-border">
-              <span id="military-service-information" class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
+              <span class="govuk-!-font-weight-bold govuk-!-display-block">Service information</span>
               <div class="govuk-!-margin-bottom-2">
                 <dl class="govuk-summary-list--sub-list govuk-summary-list--bottom-border">
                   {{ summaryListRow("Service number", militaryRecords[0].serviceNumber | d('Not entered'), "service-number") }}
@@ -161,7 +161,7 @@
             <dd
               class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list--bottom-border"
             >
-              <a class="govuk-link govuk-link--no-visited-state" href="#"
+              <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ prisonerNumber }}/personal/conflicts/{{ militaryRecords[0].militarySeq }}"
                 >Change<span
                                         class="govuk-visually-hidden"> conflict</span></a
               >

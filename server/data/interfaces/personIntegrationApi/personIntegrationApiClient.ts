@@ -55,6 +55,11 @@ export interface MilitaryServiceInformation {
   serviceNumber?: string
 }
 
+export interface Conflicts {
+  militarySeq?: number
+  warZoneCode?: string
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
   updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void>

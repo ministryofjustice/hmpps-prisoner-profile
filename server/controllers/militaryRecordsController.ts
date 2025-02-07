@@ -4,6 +4,7 @@ import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import MilitaryRecordsService from '../services/militaryRecordsService'
 import {
+  Conflicts,
   MilitaryServiceInformation,
   ProxyReferenceDataDomain,
   ReferenceDataCodeDto,
@@ -188,10 +189,11 @@ export default class MilitaryRecordsController {
       }
 
       req.flash('flashMessage', {
-        text: `Military service information ${militarySeq ? 'updated' : 'added'}`,
+        text: `UK military service information ${militarySeq ? 'updated' : 'added'}`,
         type: FlashMessageType.success,
-        fieldName: 'military-service-information',
+        ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
       })
+
       this.auditService
         .sendPostSuccess({
           user: res.locals.user,
@@ -203,8 +205,118 @@ export default class MilitaryRecordsController {
         .catch(error => logger.error(error))
 
       if (action === 'continue') {
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/conflicts/${militarySeq ? `${militarySeq}` : '1'}`)
+      }
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
+    }
+  }
+
+  public displayConflicts(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        this.getCommonRequestData(req)
+      const militarySeq = +req.params.militarySeq
+      const requestBodyFlash = requestBodyFromFlash<Conflicts>(req)
+      const errors = req.flash('errors')
+
+      const conflicts: Conflicts =
+        militarySeq && !errors.length
+          ? (await this.militaryRecordsService.getMilitaryRecords(clientToken, prisonerNumber))
+              .filter(record => record.militarySeq === militarySeq)
+              .map(record => ({ militarySeq: record.militarySeq, warZoneCode: record.warZoneCode }))[0]
+          : ({} as Conflicts)
+      if (requestBodyFlash) {
+        Object.assign(conflicts, requestBodyFlash)
+      }
+
+      const { warZone } = await this.militaryRecordsService.getReferenceData(clientToken, [
+        ProxyReferenceDataDomain.warZone,
+      ])
+
+      const warZoneOptions = [
+        ...objectToRadioOptions(warZone, 'code', 'description', conflicts?.warZoneCode),
+        { divider: 'or' },
+        { text: 'Unknown', value: null },
+      ]
+
+      const formValues = conflicts ?? {}
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditConflicts,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/militaryRecords/conflicts', {
+        pageTitle: `Most recent conflict - Prisoner personal details`,
+        title: `What was the most recent conflict ${titlePrisonerName} served in?`,
+        militarySeq,
+        formValues,
+        errors,
+        warZoneOptions,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  public postConflicts(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, militarySeq } = req.params
+      const { clientToken } = req.middleware
+      const formValues = {
+        militarySeq: +militarySeq,
+        warZoneCode: req.body.warZoneCode || null,
+      }
+      const { action } = req.body
+
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.militaryRecordsService.updateMilitaryRecord(
+            clientToken,
+            res.locals.user as PrisonUser,
+            prisonerNumber,
+            formValues,
+          )
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('requestBody', JSON.stringify(formValues))
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/conflicts/${militarySeq}`)
+      }
+
+      req.flash('flashMessage', {
+        text: `UK military service information updated`,
+        type: FlashMessageType.success,
+        fieldName: 'military-service-information',
+      })
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditConflicts,
+          details: { formValues },
+        })
+        .catch(error => logger.error(error))
+
+      if (action === 'continue') {
         return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
-        // TODO use this url when conflicts page is done return res.redirect(`/prisoner/${prisonerNumber}/personal/conflicts/${militarySeq ? `${militarySeq}` : '1'}`)
+        // TODO use this url when disciplinary action page is done return res.redirect(`/prisoner/${prisonerNumber}/personal/disciplinary-action/${militarySeq}`)
       }
       return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
     }

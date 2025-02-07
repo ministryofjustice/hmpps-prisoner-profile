@@ -24,7 +24,7 @@ export const militaryServiceInformationValidator: Validator = (body: Record<stri
   }
 
   if (unitNumber?.length > 20) {
-    errors.push({ text: 'Unit number must be 20 characters or less', href: '#unitNumber' })
+    errors.push({ text: 'Unit name must be 20 characters or less', href: '#unitNumber' })
   }
 
   if (!startDateYear && !startDateMonth) {

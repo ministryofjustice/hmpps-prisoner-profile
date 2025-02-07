@@ -40,7 +40,7 @@ export default class MilitaryRecordsService {
     clientToken: string,
     user: PrisonUser,
     prisonerNumber: string,
-    militaryRecord: MilitaryRecord,
+    militaryRecord: Partial<MilitaryRecord>,
   ) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
 
