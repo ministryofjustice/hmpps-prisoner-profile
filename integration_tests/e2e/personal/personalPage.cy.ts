@@ -139,8 +139,12 @@ context('When signed in', () => {
           .personalDetails()
           .dateOfBirth()
           .should('include.text', `${expectedAge.years} years, ${expectedAge.months} month`)
-        page.personalDetails().nationality().should('have.text', 'Stateless')
-        page.personalDetails().otherNationalities().should('have.text', 'multiple nationalities field')
+        page
+          .personalDetails()
+          .nationality()
+          .should('include.text', 'Stateless')
+          .and('include.text', 'Other nationalities')
+          .and('include.text', 'multiple nationalities')
         page.personalDetails().ethnicGroup().should('have.text', 'White: Eng./Welsh/Scot./N.Irish/British (W1)')
         page.personalDetails().religionOrBelief().should('contain', 'Celestial Church of God')
         page
