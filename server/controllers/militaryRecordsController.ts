@@ -153,7 +153,6 @@ export default class MilitaryRecordsController {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
-        ...(militarySeq ? { militarySeq: +militarySeq } : {}),
         serviceNumber: req.body.serviceNumber,
         militaryBranchCode: req.body.militaryBranchCode,
         militaryRankCode: req.body.militaryRankCode,
@@ -179,6 +178,7 @@ export default class MilitaryRecordsController {
               clientToken,
               res.locals.user as PrisonUser,
               prisonerNumber,
+              +militarySeq,
               formValues,
             )
           }
@@ -279,7 +279,6 @@ export default class MilitaryRecordsController {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
-        militarySeq: +militarySeq,
         warZoneCode: req.body.warZoneCode || null,
       }
       const { action } = req.body
@@ -291,6 +290,7 @@ export default class MilitaryRecordsController {
             clientToken,
             res.locals.user as PrisonUser,
             prisonerNumber,
+            +militarySeq,
             formValues,
           )
         } catch (error) {
@@ -397,7 +397,6 @@ export default class MilitaryRecordsController {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
-        militarySeq: +militarySeq,
         disciplinaryActionCode: req.body.disciplinaryActionCode || null,
       }
       const { action } = req.body
@@ -409,6 +408,7 @@ export default class MilitaryRecordsController {
             clientToken,
             res.locals.user as PrisonUser,
             prisonerNumber,
+            +militarySeq,
             formValues,
           )
         } catch (error) {
@@ -522,7 +522,6 @@ export default class MilitaryRecordsController {
       const { prisonerNumber, militarySeq } = req.params
       const { clientToken } = req.middleware
       const formValues = {
-        militarySeq: +militarySeq,
         dischargeLocation: req.body.dischargeLocation,
         endDate: dateToIsoDate(`01/${req.body['endDate-month']}/${req.body['endDate-year']}`),
         militaryDischargeCode: req.body.militaryDischargeCode || null,
@@ -536,6 +535,7 @@ export default class MilitaryRecordsController {
             clientToken,
             res.locals.user as PrisonUser,
             prisonerNumber,
+            +militarySeq,
             formValues,
           )
         } catch (error) {

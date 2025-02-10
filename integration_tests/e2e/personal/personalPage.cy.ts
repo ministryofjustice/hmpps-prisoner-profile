@@ -208,7 +208,7 @@ context('When signed in', () => {
         page.personalDetails().militaryRecords().unitNumber().should('include.text', 'Unit 1')
         page.personalDetails().militaryRecords().rank().should('include.text', 'Corporal')
         page.personalDetails().militaryRecords().comments().should('include.text', 'Description')
-        page.personalDetails().militaryRecords().enlistmentDate().should('include.text', '01/01/2020')
+        page.personalDetails().militaryRecords().enlistmentDate().should('include.text', 'January 2020')
         page.personalDetails().militaryRecords().enlistmentLocation().should('include.text', 'Location 1')
         page.personalDetails().militaryRecords().conflict().should('include.text', 'Afghanistan')
         page.personalDetails().militaryRecords().disciplinaryAction().should('include.text', 'Court Martial')

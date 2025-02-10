@@ -82,6 +82,6 @@ export interface PersonIntegrationApiClient {
   updateReligion(prisonerNumber: string, religion: string, reasonForChange?: string): Promise<void>
   getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]>
   getMilitaryRecords(prisonerNumber: string): Promise<MilitaryRecord[]>
-  updateMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
+  updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void>
   createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
 }

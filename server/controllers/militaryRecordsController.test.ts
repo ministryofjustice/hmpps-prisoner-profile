@@ -131,7 +131,6 @@ describe('MilitaryRecordsController', () => {
         description: 'Description',
       }
       const militaryServiceInformation = {
-        militarySeq: 1,
         serviceNumber: '123456',
         militaryBranchCode: 'ARM',
         militaryRankCode: 'PVT',
@@ -148,6 +147,7 @@ describe('MilitaryRecordsController', () => {
         'CLIENT_TOKEN',
         expect.any(Object),
         'G6123VU',
+        1,
         militaryServiceInformation,
       )
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
@@ -199,7 +199,6 @@ describe('MilitaryRecordsController', () => {
         warZoneCode: 'AFG',
       }
       const conflicts = {
-        militarySeq: 1,
         warZoneCode: 'AFG',
       }
 
@@ -207,7 +206,7 @@ describe('MilitaryRecordsController', () => {
 
       await controller.postConflicts()(req, res, next)
 
-      expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', conflicts)
+      expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', 1, conflicts)
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
     })
   })
@@ -257,7 +256,6 @@ describe('MilitaryRecordsController', () => {
         disciplinaryActionCode: 'CM',
       }
       const disciplinaryAction = {
-        militarySeq: 1,
         disciplinaryActionCode: 'CM',
       }
 
@@ -269,6 +267,7 @@ describe('MilitaryRecordsController', () => {
         'CLIENT_TOKEN',
         expect.any(Object),
         'G6123VU',
+        1,
         disciplinaryAction,
       )
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
@@ -325,7 +324,6 @@ describe('MilitaryRecordsController', () => {
         'endDate-year': '2020',
       }
       const dischargeDetails = {
-        militarySeq: 1,
         militaryDischargeCode: 'HON',
         dischargeLocation: 'Location',
         endDate: '2020-01-01',
@@ -335,7 +333,13 @@ describe('MilitaryRecordsController', () => {
 
       await controller.postDischargeDetails()(req, res, next)
 
-      expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', dischargeDetails)
+      expect(updateMilitaryRecord).toHaveBeenCalledWith(
+        'CLIENT_TOKEN',
+        expect.any(Object),
+        'G6123VU',
+        1,
+        dischargeDetails,
+      )
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
     })
   })

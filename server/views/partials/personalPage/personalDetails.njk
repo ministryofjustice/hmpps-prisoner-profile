@@ -134,7 +134,7 @@
               <span class="govuk-!-font-weight-bold govuk-!-display-block">Enlistment</span>
               <div class="govuk-!-margin-bottom-2">
                 <dl class="govuk-summary-list--sub-list">
-                  {{ summaryListRow("Date", militaryRecords[0].startDate | formatDate('short', 'Not entered'), "enlistment-date") }}
+                  {{ summaryListRow("Date", militaryRecords[0].startDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "enlistment-date") }}
                   {{ summaryListRow("Location", militaryRecords[0].enlistmentLocation | d('Not entered'), "enlistment-location") }}
                 </dl>
               </div>
@@ -191,7 +191,7 @@
                             <span class="govuk-!-font-weight-bold govuk-!-display-block">Discharge</span>
                             <div class="govuk-!-margin-bottom-2">
                                 <dl class="govuk-summary-list--sub-list">
-                                    {{ summaryListRow("Date", militaryRecords[0].endDate | formatDate('short', 'Not entered'), "discharge-date") }}
+                                    {{ summaryListRow("Date", militaryRecords[0].endDate | formatDateToPattern('MMMM yyyy', 'Not entered'), "discharge-date") }}
                                     {{ summaryListRow("Location", militaryRecords[0].dischargeLocation | d('Not entered'), "discharge-location") }}
                                     {{ summaryListRow("Type", militaryRecords[0].militaryDischargeDescription | d('Not entered'), "discharge-description") }}
                                     {% if militaryRecords[0].endDate %}

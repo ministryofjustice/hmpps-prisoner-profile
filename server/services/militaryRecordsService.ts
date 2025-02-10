@@ -40,21 +40,20 @@ export default class MilitaryRecordsService {
     clientToken: string,
     user: PrisonUser,
     prisonerNumber: string,
+    militarySeq: number,
     militaryRecord: Partial<MilitaryRecord>,
   ) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
 
     const existingRecord =
       (await personIntegrationApiClient.getMilitaryRecords(prisonerNumber)).find(
-        record => record.militarySeq === militaryRecord.militarySeq,
+        record => record.militarySeq === militarySeq,
       ) ??
       (() => {
-        throw new BadRequestError(
-          `Military record not found for ${prisonerNumber} with seq ${militaryRecord.militarySeq}`,
-        )
+        throw new BadRequestError(`Military record not found for ${prisonerNumber} with seq ${militarySeq}`)
       })()
 
-    const response = await personIntegrationApiClient.updateMilitaryRecord(prisonerNumber, {
+    const response = await personIntegrationApiClient.updateMilitaryRecord(prisonerNumber, militarySeq, {
       ...existingRecord,
       ...militaryRecord,
     })
@@ -78,7 +77,6 @@ export default class MilitaryRecordsService {
 
     const response = await personIntegrationApiClient.createMilitaryRecord(prisonerNumber, militaryRecord)
 
-    // TODO change to create?
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: ['military-record'],
       prisonerNumber,

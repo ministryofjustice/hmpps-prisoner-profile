@@ -7,6 +7,7 @@ import {
   formatDateISO,
   formatDateTime,
   formatDateTimeISO,
+  formatDateToPattern,
   formatDateWithTime,
   isRealDate,
   parseDate,
@@ -198,5 +199,15 @@ describe('ageAsString', () => {
 
   it('Show not entered message', () => {
     expect(ageAsString(undefined)).toEqual('date of birth not entered')
+  })
+})
+
+describe('formatDateToPattern', () => {
+  it.each([
+    ['2023-01-20', 'dd/MM/yyyy', '', '20/01/2023'],
+    ['2023-01-20', 'MMMM yyyy', '', 'January 2023'],
+    [null, 'dd/MM/yyyy', 'Not entered', 'Not entered'],
+  ])('should format %s with pattern %s and return %s', (isoDate, pattern, emptyReturnValue, expected) => {
+    expect(formatDateToPattern(isoDate, pattern, emptyReturnValue)).toEqual(expected)
   })
 })
