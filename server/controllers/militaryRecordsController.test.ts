@@ -5,7 +5,7 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import {
   MilitaryRecordsMock,
   MilitaryWarZoneRefDataMock,
-} from '../data/localMockData/personIntegrationReferenceDataMock'
+} from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { objectToRadioOptions } from '../utils/utils'
 

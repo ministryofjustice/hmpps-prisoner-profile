@@ -11,21 +11,6 @@ export interface ValueWithMetadata<T> {
   lastModifiedBy: string
 }
 
-export interface ReferenceDataDomain {
-  code: string
-  description: string
-  listSequence: number
-  createdAt: string
-  createdBy: string
-  isActive: boolean
-  lastModifiedAt?: string
-  lastModifiedBy?: string
-  deactivatedAt?: string
-  deactivatedBy?: string
-  referenceDataCodes?: ReferenceDataCode[]
-  subDomains: ReferenceDataDomain[]
-}
-
 export interface ReferenceDataCode {
   id: string
   domain: string
@@ -75,7 +60,10 @@ export interface DietAndAllergyUpdate {
 }
 
 export interface HealthAndMedicationApiClient {
-  getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>
+  getReferenceDataCodes(
+    domain: HealthAndMedicationReferenceDataDomain,
+    includeInactive?: boolean,
+  ): Promise<ReferenceDataCode[]>
 
   getHealthAndMedicationForPrisoner(prisonerNumber: string): Promise<HealthAndMedication>
 

@@ -1,14 +1,14 @@
 import { RestClientBuilder } from '../data'
 import MetricsService from './metrics/metricsService'
 import {
+  CorePersonRecordReferenceDataDomain,
   MilitaryRecord,
   PersonIntegrationApiClient,
-  ProxyReferenceDataDomain,
-  ReferenceDataCodeDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import ReferenceDataService from './referenceDataService'
+import ReferenceDataService from './referenceData/referenceDataService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import BadRequestError from '../utils/badRequestError'
+import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 
 export default class MilitaryRecordsService {
   constructor(
@@ -24,12 +24,12 @@ export default class MilitaryRecordsService {
 
   async getReferenceData(
     clientToken: string,
-    domains: ProxyReferenceDataDomain[],
+    domains: CorePersonRecordReferenceDataDomain[],
   ): Promise<Record<string, ReferenceDataCodeDto[]>> {
     return Object.fromEntries(
       await Promise.all(
         domains.map(async domain => [
-          Object.entries(ProxyReferenceDataDomain).find(([_, value]) => value === domain)?.[0] ?? domain, // Get enum key name
+          Object.entries(CorePersonRecordReferenceDataDomain).find(([_, value]) => value === domain)?.[0] ?? domain, // Get enum key name
           await this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken),
         ]),
       ),

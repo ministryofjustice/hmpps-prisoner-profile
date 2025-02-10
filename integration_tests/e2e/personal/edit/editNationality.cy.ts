@@ -1,7 +1,7 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { NationalityReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationReferenceDataMock'
+import { NationalityReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 
 context('Edit nationality', () => {
   const prisonerNumber = 'G6123VU'
