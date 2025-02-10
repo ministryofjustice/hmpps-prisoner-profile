@@ -1,9 +1,9 @@
 import RestClient from './restClient'
 import {
+  CorePersonRecordReferenceDataCodeDto,
+  CorePersonRecordReferenceDataDomain,
   MilitaryRecord,
   PersonIntegrationApiClient,
-  ProxyReferenceDataDomain,
-  ReferenceDataCodeDto,
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 
@@ -38,7 +38,7 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
-  getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]> {
+  getReferenceDataCodes(domain: CorePersonRecordReferenceDataDomain): Promise<CorePersonRecordReferenceDataCodeDto[]> {
     return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
   }
 

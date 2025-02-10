@@ -1,10 +1,10 @@
 import MilitaryRecordsService from './militaryRecordsService'
 import { RestClientBuilder } from '../data'
 import {
+  CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
-  ProxyReferenceDataDomain,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import ReferenceDataService from './referenceDataService'
+import ReferenceDataService from './referenceData/referenceDataService'
 import MetricsService from './metrics/metricsService'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import BadRequestError from '../utils/badRequestError'
@@ -12,10 +12,10 @@ import {
   MilitaryBranchRefDataMock,
   MilitaryRankRefDataMock,
   MilitaryRecordsMock,
-} from '../data/localMockData/personIntegrationReferenceDataMock'
+} from '../data/localMockData/personIntegrationApiReferenceDataMock'
 
 jest.mock('../data')
-jest.mock('./referenceDataService')
+jest.mock('./referenceData/referenceDataService')
 jest.mock('./metrics/metricsService')
 
 describe('MilitaryRecordsService', () => {
@@ -76,15 +76,18 @@ describe('MilitaryRecordsService', () => {
 
   describe('getReferenceData', () => {
     it('should return reference data codes', async () => {
-      const domains = [ProxyReferenceDataDomain.militaryBranch, ProxyReferenceDataDomain.militaryRank]
+      const domains = [
+        CorePersonRecordReferenceDataDomain.militaryBranch,
+        CorePersonRecordReferenceDataDomain.militaryRank,
+      ]
       const result = await militaryRecordsService.getReferenceData(clientToken, domains)
 
       expect(referenceDataService.getActiveReferenceDataCodes).toHaveBeenCalledWith(
-        ProxyReferenceDataDomain.militaryBranch,
+        CorePersonRecordReferenceDataDomain.militaryBranch,
         clientToken,
       )
       expect(referenceDataService.getActiveReferenceDataCodes).toHaveBeenCalledWith(
-        ProxyReferenceDataDomain.militaryRank,
+        CorePersonRecordReferenceDataDomain.militaryRank,
         clientToken,
       )
       expect(result).toEqual({ militaryBranch: MilitaryBranchRefDataMock, militaryRank: MilitaryRankRefDataMock })

@@ -1,6 +1,6 @@
 import ReferenceDataStore from './referenceDataStore'
 import { RedisClient } from '../redisClient'
-import { CountryReferenceDataCodesMock } from '../localMockData/personIntegrationReferenceDataMock'
+import { CountryReferenceDataCodesMock } from '../localMockData/personIntegrationApiReferenceDataMock'
 
 const redisClient = {
   on: jest.fn(),

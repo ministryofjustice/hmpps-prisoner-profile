@@ -1,7 +1,7 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
+  CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
-  ReferenceDataCodeDto,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 const baseUrl = '/personIntegration'
@@ -12,7 +12,7 @@ export default {
     referenceData,
   }: {
     domain: string
-    referenceData: ReferenceDataCodeDto
+    referenceData: CorePersonRecordReferenceDataCodeDto[]
   }) =>
     stubGetWithBody({
       path: `${baseUrl}/v1/core-person-record/reference-data/domain/${domain}/codes`,

@@ -2,7 +2,7 @@ import Page from '../../../pages/page'
 import {
   MilitaryRecordsMock,
   MilitaryWarZoneRefDataMock,
-} from '../../../../server/data/localMockData/personIntegrationReferenceDataMock'
+} from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import ConflictsPage from '../../../pages/conflictsPage'
 
 const visitConflictsPage = (): ConflictsPage => {

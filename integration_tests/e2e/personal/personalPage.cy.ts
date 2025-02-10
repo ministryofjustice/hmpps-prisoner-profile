@@ -8,7 +8,7 @@ import { formatDate } from '../../../server/utils/dateHelpers'
 import NotFoundPage from '../../pages/notFoundPage'
 import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
-import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationReferenceDataMock'
+import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })

@@ -7,7 +7,7 @@ import {
   MilitaryDischargeRefDataMock,
   MilitaryRecordsMock,
   MilitaryWarZoneRefDataMock,
-} from '../data/localMockData/personIntegrationReferenceDataMock'
+} from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { objectToRadioOptions } from '../utils/utils'
 

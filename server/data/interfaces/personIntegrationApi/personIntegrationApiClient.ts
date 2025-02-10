@@ -1,4 +1,4 @@
-export interface ReferenceDataCodeDto {
+export interface CorePersonRecordReferenceDataCodeDto {
   id: string
   code: string
   description: string
@@ -9,7 +9,7 @@ export interface ReferenceDataCodeDto {
 }
 
 // eslint-disable-next-line no-shadow
-export enum ProxyReferenceDataDomain {
+export enum CorePersonRecordReferenceDataDomain {
   country = 'COUNTRY',
   nationality = 'NAT',
   religion = 'RELF',
@@ -77,11 +77,18 @@ export interface DischargeDetails {
 
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
+
   updateCountryOfBirth(prisonerNumber: string, countryOfBirth: string): Promise<void>
+
   updateNationality(prisonerNumber: string, nationality: string, otherNationalities: string): Promise<void>
+
   updateReligion(prisonerNumber: string, religion: string, reasonForChange?: string): Promise<void>
-  getReferenceDataCodes(domain: ProxyReferenceDataDomain): Promise<ReferenceDataCodeDto[]>
+
+  getReferenceDataCodes(domain: CorePersonRecordReferenceDataDomain): Promise<CorePersonRecordReferenceDataCodeDto[]>
+
   getMilitaryRecords(prisonerNumber: string): Promise<MilitaryRecord[]>
+
   updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void>
+
   createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
 }

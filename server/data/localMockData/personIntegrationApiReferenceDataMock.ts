@@ -1,4 +1,8 @@
-import { MilitaryRecord, ReferenceDataCodeDto } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  CorePersonRecordReferenceDataCodeDto,
+  MilitaryRecord,
+} from '../interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -8,7 +12,7 @@ export const EnglandCountryReferenceDataCodeMock = {
   isActive: true,
 }
 
-export const ActiveCountryReferenceDataCodesMock: ReferenceDataCodeDto[] = [
+export const ActiveCountryReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
   EnglandCountryReferenceDataCodeMock,
   {
     id: '2',
@@ -19,7 +23,7 @@ export const ActiveCountryReferenceDataCodesMock: ReferenceDataCodeDto[] = [
   },
 ]
 
-export const CountryReferenceDataCodesMock: ReferenceDataCodeDto[] = [
+export const CountryReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
   ...ActiveCountryReferenceDataCodesMock,
   {
     id: '3',
@@ -30,7 +34,7 @@ export const CountryReferenceDataCodesMock: ReferenceDataCodeDto[] = [
   },
 ]
 
-export const NationalityReferenceDataCodesMock: ReferenceDataCodeDto[] = [
+export const NationalityReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
   {
     id: 'NAT_BRIT',
     code: 'BRIT',
@@ -54,7 +58,7 @@ export const NationalityReferenceDataCodesMock: ReferenceDataCodeDto[] = [
   },
 ]
 
-export const ReligionReferenceDataCodesMock: ReferenceDataCodeDto[] = [
+export const ReligionReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
   {
     id: 'RELF_DRU',
     code: 'DRU',
@@ -133,7 +137,7 @@ export const MilitaryRecordsMock: MilitaryRecord[] = [
   },
 ]
 
-export const MilitaryBranchRefDataMock: ReferenceDataCodeDto[] = [
+export const MilitaryBranchRefDataMock: CorePersonRecordReferenceDataCodeDto[] = [
   {
     id: 'MLTY_ARM',
     code: 'ARM',
@@ -164,7 +168,7 @@ export const MilitaryBranchRefDataMock: ReferenceDataCodeDto[] = [
   },
 ]
 
-export const MilitaryRankRefDataMock: ReferenceDataCodeDto[] = [
+export const MilitaryRankRefDataMock: CorePersonRecordReferenceDataCodeDto[] = [
   {
     id: 'MLTY_RANK_CPL_ARM',
     code: 'CPL_ARM',
@@ -174,7 +178,7 @@ export const MilitaryRankRefDataMock: ReferenceDataCodeDto[] = [
   },
 ]
 
-export const MilitaryWarZoneRefDataMock: ReferenceDataCodeDto[] = [
+export const MilitaryWarZoneRefDataMock: CorePersonRecordReferenceDataCodeDto[] = [
   {
     id: 'MLTY_WZONE_AFG',
     code: 'AFG',

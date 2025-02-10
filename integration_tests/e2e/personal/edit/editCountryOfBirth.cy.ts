@@ -1,7 +1,7 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { CountryReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationReferenceDataMock'
+import { CountryReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 
 context('Edit city or town of birth', () => {
   const prisonerNumber = 'G6123VU'

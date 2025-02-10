@@ -6,7 +6,7 @@ import { ReferenceCodeDomain } from '../../server/data/interfaces/prisonApi/Refe
 import {
   CountryReferenceDataCodesMock,
   MilitaryRecordsMock,
-} from '../../server/data/localMockData/personIntegrationReferenceDataMock'
+} from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options

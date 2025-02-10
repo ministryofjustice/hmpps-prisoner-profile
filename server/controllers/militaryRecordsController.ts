@@ -5,17 +5,17 @@ import logger from '../../logger'
 import MilitaryRecordsService from '../services/militaryRecordsService'
 import {
   Conflicts,
+  CorePersonRecordReferenceDataDomain,
   DischargeDetails,
   DisciplinaryAction,
   MilitaryServiceInformation,
-  ProxyReferenceDataDomain,
-  ReferenceDataCodeDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { dateToIsoDate } from '../utils/dateHelpers'
+import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 
 export default class MilitaryRecordsController {
   constructor(
@@ -54,8 +54,8 @@ export default class MilitaryRecordsController {
       }
 
       const { militaryRank, militaryBranch } = await this.militaryRecordsService.getReferenceData(clientToken, [
-        ProxyReferenceDataDomain.militaryBranch,
-        ProxyReferenceDataDomain.militaryRank,
+        CorePersonRecordReferenceDataDomain.militaryBranch,
+        CorePersonRecordReferenceDataDomain.militaryRank,
       ])
 
       const militaryBranchOptions = objectToRadioOptions(
@@ -237,7 +237,7 @@ export default class MilitaryRecordsController {
       }
 
       const { warZone } = await this.militaryRecordsService.getReferenceData(clientToken, [
-        ProxyReferenceDataDomain.warZone,
+        CorePersonRecordReferenceDataDomain.warZone,
       ])
 
       const warZoneOptions = [
@@ -350,7 +350,7 @@ export default class MilitaryRecordsController {
       }
 
       const { disciplinaryAction } = await this.militaryRecordsService.getReferenceData(clientToken, [
-        ProxyReferenceDataDomain.disciplinaryAction,
+        CorePersonRecordReferenceDataDomain.disciplinaryAction,
       ])
 
       const disciplinaryActionOptions = [
@@ -473,7 +473,7 @@ export default class MilitaryRecordsController {
       }
 
       const { militaryDischarge } = await this.militaryRecordsService.getReferenceData(clientToken, [
-        ProxyReferenceDataDomain.militaryDischarge,
+        CorePersonRecordReferenceDataDomain.militaryDischarge,
       ])
 
       const dischargeOptions = objectToRadioOptions(

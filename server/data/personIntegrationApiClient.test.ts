@@ -1,8 +1,11 @@
 import nock from 'nock'
 import config from '../config'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
-import { CountryReferenceDataCodesMock, MilitaryRecordsMock } from './localMockData/personIntegrationReferenceDataMock'
-import { ProxyReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  CountryReferenceDataCodesMock,
+  MilitaryRecordsMock,
+} from './localMockData/personIntegrationApiReferenceDataMock'
+import { CorePersonRecordReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -54,7 +57,7 @@ describe('personIntegrationApiClient', () => {
         .get('/v1/core-person-record/reference-data/domain/COUNTRY/codes')
         .reply(200, CountryReferenceDataCodesMock)
 
-      const output = await personIntegrationApiClient.getReferenceDataCodes(ProxyReferenceDataDomain.country)
+      const output = await personIntegrationApiClient.getReferenceDataCodes(CorePersonRecordReferenceDataDomain.country)
       expect(output).toEqual(CountryReferenceDataCodesMock)
     })
   })

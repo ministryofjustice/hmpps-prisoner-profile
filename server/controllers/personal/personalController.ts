@@ -34,8 +34,8 @@ import {
   eyeColourFieldData,
   eyeColourIndividualFieldData,
   FieldData,
-  heightImperialFieldData,
   heightFieldData,
+  heightImperialFieldData,
   nationalityFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
@@ -58,16 +58,16 @@ import {
 import PrisonPersonService from '../../services/prisonPersonService'
 import { formatDateTime } from '../../utils/dateHelpers'
 import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
-import { ProxyReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
 import {
   DietAndAllergy,
   DietAndAllergyUpdate,
   HealthAndMedicationReferenceDataDomain,
-  ReferenceDataCode,
   ReferenceDataIdSelection,
 } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { Role } from '../../data/enums/role'
+import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -619,7 +619,7 @@ export default class PersonalController {
           requestBodyFlash?.radioField ||
           getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
         const [smokerOrVaperValues] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, 'smoke'),
+          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, 'smoke'),
         ])
 
         const options = objectToRadioOptions(smokerOrVaperValues, 'id', 'description', fieldValue)
@@ -670,7 +670,7 @@ export default class PersonalController {
         const errors = req.flash('errors')
 
         const [nationalityReferenceData] = await Promise.all([
-          this.personalPageService.getReferenceDataCodesFromProxy(clientToken, ProxyReferenceDataDomain.nationality),
+          this.personalPageService.getReferenceDataCodes(clientToken, CorePersonRecordReferenceDataDomain.nationality),
         ])
 
         const fieldValue =
@@ -789,7 +789,7 @@ export default class PersonalController {
         const { prisonerNumber } = req.params
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
         const [characteristics, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, code),
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
         const fieldValue =
@@ -849,7 +849,7 @@ export default class PersonalController {
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
         const [characteristics, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, code),
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
 
@@ -932,7 +932,7 @@ export default class PersonalController {
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
         const [characteristics, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataCodes(clientToken, code),
+          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, code),
           this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
         ])
         const leftEyeColour =
@@ -1097,7 +1097,7 @@ export default class PersonalController {
 
     const checkboxOptions = (
       namePrefix: string,
-      referenceDataCodes: ReferenceDataCode[],
+      referenceDataCodes: ReferenceDataCodeDto[],
       selectedItems: ReferenceDataIdSelection[],
     ) => {
       return referenceDataCodes
@@ -1126,15 +1126,15 @@ export default class PersonalController {
 
         const [healthAndMedication, allergyCodes, medicalDietCodes, personalisedDietCodes] = await Promise.all([
           this.personalPageService.getHealthAndMedication(clientToken, prisonerNumber),
-          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+          this.personalPageService.getReferenceDataCodes(
             clientToken,
             HealthAndMedicationReferenceDataDomain.foodAllergy,
           ),
-          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+          this.personalPageService.getReferenceDataCodes(
             clientToken,
             HealthAndMedicationReferenceDataDomain.medicalDiet,
           ),
-          this.personalPageService.getHealthAndMedicationReferenceDataCodes(
+          this.personalPageService.getReferenceDataCodes(
             clientToken,
             HealthAndMedicationReferenceDataDomain.personalisedDiet,
           ),
@@ -1241,9 +1241,9 @@ export default class PersonalController {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
-        const countryReferenceData = await this.personalPageService.getReferenceDataCodesFromProxy(
+        const countryReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
-          ProxyReferenceDataDomain.country,
+          CorePersonRecordReferenceDataDomain.country,
         )
 
         const fieldValue =
@@ -1323,9 +1323,9 @@ export default class PersonalController {
         const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
         const otherReligionCodes = ['OTH', 'NIL', 'UNKN']
-        const religionReferenceData = await this.personalPageService.getReferenceDataCodesFromProxy(
+        const religionReferenceData = await this.personalPageService.getReferenceDataCodes(
           clientToken,
-          ProxyReferenceDataDomain.religion,
+          CorePersonRecordReferenceDataDomain.religion,
         )
         const religionOptions = religionReferenceData
           .filter(it => !otherReligionCodes.includes(it.code))

@@ -1,31 +1,23 @@
-import logger from '../../logger'
-import { RestClientBuilder } from '../data'
-import ReferenceDataStore from '../data/referenceDataStore/referenceDataStore'
-import {
-  PersonIntegrationApiClient,
-  ProxyReferenceDataDomain,
-  ReferenceDataCodeDto,
-} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import logger from '../../../logger'
+import ReferenceDataStore from '../../data/referenceDataStore/referenceDataStore'
+import { ReferenceDataCodeDto, ReferenceDataDomain } from '../../data/interfaces/referenceData'
+import { ReferenceDataSourceFactory } from './referenceDataSourceFactory'
 
 const REFERENCE_DATA_CACHE_TTL_HOURS = 1
 
-/**
- * Service class to retrieve and cache reference data from `hmpps-person-integration-api`.
- */
 export default class ReferenceDataService {
   constructor(
     private readonly referenceDataStore: ReferenceDataStore,
-    private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
+    private readonly referenceDataSourceFactory: ReferenceDataSourceFactory,
   ) {}
 
-  async getReferenceData(domain: ProxyReferenceDataDomain, code: string, token: string): Promise<ReferenceDataCodeDto> {
+  async getReferenceData(domain: ReferenceDataDomain, code: string, token: string): Promise<ReferenceDataCodeDto> {
     const cachedCode = (await this.referenceDataStore.getReferenceData(domain)).find(c => c.code === code)
     if (cachedCode) return cachedCode
-
     return (await this.retrieveAndCacheReferenceDataCodes(domain, token)).find(c => c.code === code)
   }
 
-  async getActiveReferenceDataCodes(domain: ProxyReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
+  async getActiveReferenceDataCodes(domain: ReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
     const cachedReferenceDataCodes = await this.referenceDataStore.getReferenceData(domain)
 
     const allReferenceDataCodes = cachedReferenceDataCodes.length
@@ -36,11 +28,12 @@ export default class ReferenceDataService {
   }
 
   private async retrieveAndCacheReferenceDataCodes(
-    domain: ProxyReferenceDataDomain,
+    domain: ReferenceDataDomain,
     token: string,
   ): Promise<ReferenceDataCodeDto[]> {
     logger.info(`Retrieving and caching reference data codes for domain: ${domain}`)
-    const referenceData = await this.personIntegrationApiClientBuilder(token).getReferenceDataCodes(domain)
+    const referenceDataSource = this.referenceDataSourceFactory.getReferenceDataSourceFor(domain)
+    const referenceData = await referenceDataSource.getActiveReferenceDataCodes(domain, token)
     try {
       await this.referenceDataStore.setReferenceData(domain, referenceData, REFERENCE_DATA_CACHE_TTL_HOURS)
     } catch (ex) {
