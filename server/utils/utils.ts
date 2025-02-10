@@ -797,15 +797,17 @@ export const lengthOfService = (startDate: string, endDate: string): string => {
   const start = new Date(startDate)
   const end = new Date(endDate)
 
-  const years = end.getFullYear() - start.getFullYear()
-  const months = end.getMonth() - start.getMonth()
+  const totalMonths = differenceInMonths(end, start)
+
+  const years = Math.floor(totalMonths / 12)
+  const months = totalMonths % 12
 
   if (months === 0) {
     return pluralise(years, 'year')
   }
 
   if (years) {
-    return `${pluralise(years, 'year')} ${pluralise(months, 'month')}`
+    return `${pluralise(years, 'year')}, ${pluralise(months, 'month')}`
   }
 
   return pluralise(months, 'month')

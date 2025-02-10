@@ -5,6 +5,7 @@ export interface ReferenceDataCodeDto {
   listSequence: number
   isActive: boolean
   parentCode?: string
+  parentDomain?: string
 }
 
 // eslint-disable-next-line no-shadow
@@ -58,6 +59,20 @@ export interface MilitaryServiceInformation {
 export interface Conflicts {
   militarySeq?: number
   warZoneCode?: string
+}
+
+export interface DisciplinaryAction {
+  militarySeq?: number
+  disciplinaryActionCode?: string
+}
+
+export interface DischargeDetails {
+  militarySeq?: number
+  endDate?: string
+  'endDate-year'?: string
+  'endDate-month'?: string
+  militaryDischargeCode?: string
+  dischargeLocation?: string
 }
 
 export interface PersonIntegrationApiClient {

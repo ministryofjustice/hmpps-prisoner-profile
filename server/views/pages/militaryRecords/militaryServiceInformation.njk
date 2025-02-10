@@ -61,8 +61,6 @@
         })
       }}
     {% endif %}
-    {% set monthErrorClass = ' govuk-input--error' if (errors | findError("startDate-month")) or (errors | findError("startDate")) else '' %}
-    {% set yearErrorClass = ' govuk-input--error' if (errors | findError("startDate-year")) or (errors | findError("startDate")) else '' %}
 
     <span class="govuk-caption-l">Record UK military service information</span>
     <h1 class="govuk-heading-l">{{ title }}</h1>
@@ -150,6 +148,9 @@
                 errorMessage: errors | findError('unitNumber')
             })
             }}
+
+            {% set monthErrorClass = ' govuk-input--error' if (errors | findError("startDate-month")) or (errors | findError("startDate")) else '' %}
+            {% set yearErrorClass = ' govuk-input--error' if (errors | findError("startDate-year")) or (errors | findError("startDate")) else '' %}
 
             {{ govukDateInput({
                 id: "startDate",

@@ -3,6 +3,8 @@ import MilitaryRecordsController from './militaryRecordsController'
 import MilitaryRecordsService from '../services/militaryRecordsService'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import {
+  DisciplinaryActionRefDataMock,
+  MilitaryDischargeRefDataMock,
   MilitaryRecordsMock,
   MilitaryWarZoneRefDataMock,
 } from '../data/localMockData/personIntegrationReferenceDataMock'
@@ -47,6 +49,18 @@ describe('MilitaryRecordsController', () => {
         militaryRank: [],
         militaryBranch: [],
       })
+      const formValues = {
+        militarySeq: MilitaryRecordsMock[0].militarySeq,
+        serviceNumber: MilitaryRecordsMock[0].serviceNumber,
+        militaryBranchCode: MilitaryRecordsMock[0].militaryBranchCode,
+        militaryRankCode: MilitaryRecordsMock[0].militaryRankCode,
+        startDate: MilitaryRecordsMock[0].startDate,
+        enlistmentLocation: MilitaryRecordsMock[0].enlistmentLocation,
+        description: MilitaryRecordsMock[0].description,
+        'startDate-year': '2020',
+        'startDate-month': '01',
+        unitNumber: MilitaryRecordsMock[0].unitNumber,
+      }
 
       await controller.displayMilitaryServiceInformation()(req, res, next)
 
@@ -56,7 +70,7 @@ describe('MilitaryRecordsController', () => {
         pageTitle: 'UK military service information - Prisoner personal details',
         title: `John Saunders’ UK military service information`,
         militarySeq: 1,
-        formValues: { ...MilitaryRecordsMock[0], 'startDate-year': '2020', 'startDate-month': '01' },
+        formValues,
         errors: [],
         militaryBranchOptions: [],
         rankOptionsArmy: [],
@@ -194,6 +208,134 @@ describe('MilitaryRecordsController', () => {
       await controller.postConflicts()(req, res, next)
 
       expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', conflicts)
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
+    })
+  })
+
+  describe('displayDisciplinaryAction', () => {
+    it('should render the disciplinary action page', async () => {
+      const getMilitaryRecords = jest
+        .spyOn(militaryRecordsService, 'getMilitaryRecords')
+        .mockResolvedValue(MilitaryRecordsMock)
+      const getReferenceData = jest.spyOn(militaryRecordsService, 'getReferenceData').mockResolvedValue({
+        disciplinaryAction: DisciplinaryActionRefDataMock,
+      })
+
+      await controller.displayDisciplinaryAction()(req, res, next)
+
+      expect(getMilitaryRecords).toHaveBeenCalledWith('CLIENT_TOKEN', 'G6123VU')
+      expect(getReferenceData).toHaveBeenCalledWith('CLIENT_TOKEN', ['MLTY_DISCP'])
+      expect(res.render).toHaveBeenCalledWith('pages/militaryRecords/disciplinaryAction', {
+        pageTitle: 'Disciplinary action - Prisoner personal details',
+        title: 'Was John Saunders subject to any of the following disciplinary action?',
+        militarySeq: 1,
+        formValues: { militarySeq: 1, disciplinaryActionCode: 'CM' },
+        errors: [],
+        disciplinaryActionOptions: [
+          ...objectToRadioOptions(
+            DisciplinaryActionRefDataMock,
+            'code',
+            'description',
+            MilitaryRecordsMock[0].disciplinaryActionCode,
+          ),
+          { divider: 'or' },
+          { text: 'Unknown', value: null },
+        ],
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+        },
+      })
+    })
+  })
+
+  describe('postDisciplinaryAction', () => {
+    it('should update disciplinary action and redirect', async () => {
+      req.params.militarySeq = '1'
+      req.body = {
+        disciplinaryActionCode: 'CM',
+      }
+      const disciplinaryAction = {
+        militarySeq: 1,
+        disciplinaryActionCode: 'CM',
+      }
+
+      const updateMilitaryRecord = jest.spyOn(militaryRecordsService, 'updateMilitaryRecord').mockResolvedValue()
+
+      await controller.postDisciplinaryAction()(req, res, next)
+
+      expect(updateMilitaryRecord).toHaveBeenCalledWith(
+        'CLIENT_TOKEN',
+        expect.any(Object),
+        'G6123VU',
+        disciplinaryAction,
+      )
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
+    })
+  })
+
+  describe('displayDischargeDetails', () => {
+    it('should render the discharge details page', async () => {
+      const getMilitaryRecords = jest
+        .spyOn(militaryRecordsService, 'getMilitaryRecords')
+        .mockResolvedValue(MilitaryRecordsMock)
+      const getReferenceData = jest.spyOn(militaryRecordsService, 'getReferenceData').mockResolvedValue({
+        militaryDischarge: MilitaryDischargeRefDataMock,
+      })
+
+      const formValues = {
+        militarySeq: MilitaryRecordsMock[0].militarySeq,
+        militaryDischargeCode: MilitaryRecordsMock[0].militaryDischargeCode,
+        dischargeLocation: MilitaryRecordsMock[0].dischargeLocation,
+      }
+
+      await controller.displayDischargeDetails()(req, res, next)
+
+      expect(getMilitaryRecords).toHaveBeenCalledWith('CLIENT_TOKEN', 'G6123VU')
+      expect(getReferenceData).toHaveBeenCalledWith('CLIENT_TOKEN', ['MLTY_DSCHRG'])
+      expect(res.render).toHaveBeenCalledWith('pages/militaryRecords/dischargeDetails', {
+        pageTitle: 'Discharge details - Prisoner personal details',
+        title: 'John Saunders’ discharge details',
+        militarySeq: 1,
+        formValues,
+        errors: [],
+        dischargeOptions: objectToRadioOptions(
+          MilitaryDischargeRefDataMock,
+          'code',
+          'description',
+          MilitaryRecordsMock[0].militaryDischargeCode,
+        ),
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+          cellLocation: '1-1-035',
+        },
+      })
+    })
+  })
+
+  describe('postDischargeDetails', () => {
+    it('should update discharge details and redirect', async () => {
+      req.params.militarySeq = '1'
+      req.body = {
+        militaryDischargeCode: 'HON',
+        dischargeLocation: 'Location',
+        'endDate-month': '01',
+        'endDate-year': '2020',
+      }
+      const dischargeDetails = {
+        militarySeq: 1,
+        militaryDischargeCode: 'HON',
+        dischargeLocation: 'Location',
+        endDate: '2020-01-01',
+      }
+
+      const updateMilitaryRecord = jest.spyOn(militaryRecordsService, 'updateMilitaryRecord').mockResolvedValue()
+
+      await controller.postDischargeDetails()(req, res, next)
+
+      expect(updateMilitaryRecord).toHaveBeenCalledWith('CLIENT_TOKEN', expect.any(Object), 'G6123VU', dischargeDetails)
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/G6123VU/personal#military-service-information')
     })
   })

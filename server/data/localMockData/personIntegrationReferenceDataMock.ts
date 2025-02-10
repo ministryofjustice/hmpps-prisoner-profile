@@ -183,3 +183,23 @@ export const MilitaryWarZoneRefDataMock: ReferenceDataCodeDto[] = [
     isActive: true,
   },
 ]
+
+export const DisciplinaryActionRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_DISCP_CM',
+    code: 'CM',
+    description: 'Court Martial',
+    listSequence: 1,
+    isActive: true,
+  },
+]
+
+export const MilitaryDischargeRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_DSCHRG_HON',
+    code: 'HON',
+    description: 'Honourable',
+    listSequence: 1,
+    isActive: true,
+  },
+]

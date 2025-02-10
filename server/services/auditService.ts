@@ -85,6 +85,8 @@ export enum Page {
   AddMilitaryServiceInformation = 'ADD_MILITARY_SERVICE_INFORMATION',
   EditMilitaryServiceInformation = 'EDIT_MILITARY_SERVICE_INFORMATION',
   EditConflicts = 'EDIT_CONFLICTS',
+  EditDisciplinaryAction = 'EDIT_DISCIPLINARY_ACTION',
+  EditDischargeDetails = 'EDIT_DISCHARGE_DETAILS',
 }
 
 // eslint-disable-next-line no-shadow
@@ -123,6 +125,8 @@ export enum PostAction {
   EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
   EditWeight = 'EDIT_WEIGHT',
   EditConflicts = 'EDIT_CONFLICTS',
+  EditDisciplinaryAction = 'EDIT_DISCIPLINARY_ACTION',
+  EditDischargeDetails = 'EDIT_DISCHARGE_DETAILS',
 }
 
 // eslint-disable-next-line no-shadow

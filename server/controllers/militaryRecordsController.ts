@@ -5,6 +5,8 @@ import logger from '../../logger'
 import MilitaryRecordsService from '../services/militaryRecordsService'
 import {
   Conflicts,
+  DischargeDetails,
+  DisciplinaryAction,
   MilitaryServiceInformation,
   ProxyReferenceDataDomain,
   ReferenceDataCodeDto,
@@ -31,9 +33,18 @@ export default class MilitaryRecordsController {
 
       const militaryServiceInformation: MilitaryServiceInformation =
         militarySeq && !errors.length
-          ? (await this.militaryRecordsService.getMilitaryRecords(clientToken, prisonerNumber)).filter(
-              record => record.militarySeq === militarySeq,
-            )[0]
+          ? (await this.militaryRecordsService.getMilitaryRecords(clientToken, prisonerNumber))
+              ?.filter(record => record.militarySeq === militarySeq)
+              ?.map(record => ({
+                militarySeq: record.militarySeq,
+                serviceNumber: record.serviceNumber,
+                militaryBranchCode: record.militaryBranchCode,
+                militaryRankCode: record.militaryRankCode,
+                unitNumber: record.unitNumber,
+                startDate: record.startDate,
+                enlistmentLocation: record.enlistmentLocation,
+                description: record.description,
+              }))[0]
           : ({} as MilitaryServiceInformation)
       if (requestBodyFlash) {
         Object.assign(militaryServiceInformation, {
@@ -56,18 +67,14 @@ export default class MilitaryRecordsController {
 
       const rankOptions = () => {
         const ranksByBranch = militaryRank.reduce((acc: Record<string, ReferenceDataCodeDto[]>, rank) => {
-          // TODO remove this after the API has been updated to return the parentCode in the ref data dto
-          const parentCode = ['ARM', 'NAV', 'RMA', 'RAF'][rank.listSequence - 1] || 'OTH'
-          const cleanedRank = {
-            ...rank,
-            parentCode, // TODO remove as above
-            description: rank.description.replace(/\(Army\)|\(Navy\)|\(RAF\)|\(Royal Marines\)/g, '').trim(),
-          }
-
+          const { parentCode } = rank
           if (!acc[parentCode]) {
             acc[parentCode] = []
           }
-          acc[parentCode].push(cleanedRank) // TODO inline the cleanedRank creation
+          acc[parentCode].push({
+            ...rank,
+            description: rank.description.replace(/\(Army\)|\(Navy\)|\(RAF\)|\(Royal Marines\)/g, '').trim(),
+          })
           return acc
         }, {})
 
@@ -222,8 +229,8 @@ export default class MilitaryRecordsController {
       const conflicts: Conflicts =
         militarySeq && !errors.length
           ? (await this.militaryRecordsService.getMilitaryRecords(clientToken, prisonerNumber))
-              .filter(record => record.militarySeq === militarySeq)
-              .map(record => ({ militarySeq: record.militarySeq, warZoneCode: record.warZoneCode }))[0]
+              ?.filter(record => record.militarySeq === militarySeq)
+              ?.map(record => ({ militarySeq: record.militarySeq, warZoneCode: record.warZoneCode }))[0]
           : ({} as Conflicts)
       if (requestBodyFlash) {
         Object.assign(conflicts, requestBodyFlash)
@@ -302,7 +309,7 @@ export default class MilitaryRecordsController {
       req.flash('flashMessage', {
         text: `UK military service information updated`,
         type: FlashMessageType.success,
-        fieldName: 'military-service-information',
+        ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
       })
       this.auditService
         .sendPostSuccess({
@@ -315,9 +322,250 @@ export default class MilitaryRecordsController {
         .catch(error => logger.error(error))
 
       if (action === 'continue') {
-        return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
-        // TODO use this url when disciplinary action page is done return res.redirect(`/prisoner/${prisonerNumber}/personal/disciplinary-action/${militarySeq}`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/disciplinary-action/${militarySeq}`)
       }
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
+    }
+  }
+
+  public displayDisciplinaryAction(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        this.getCommonRequestData(req)
+      const militarySeq = +req.params.militarySeq
+      const requestBodyFlash = requestBodyFromFlash<DisciplinaryAction>(req)
+      const errors = req.flash('errors')
+
+      const disciplinaryActionForm: DisciplinaryAction =
+        militarySeq && !errors.length
+          ? (await this.militaryRecordsService.getMilitaryRecords(clientToken, prisonerNumber))
+              ?.filter(record => record.militarySeq === militarySeq)
+              ?.map(record => ({
+                militarySeq: record.militarySeq,
+                disciplinaryActionCode: record.disciplinaryActionCode,
+              }))[0]
+          : ({} as DisciplinaryAction)
+      if (requestBodyFlash) {
+        Object.assign(disciplinaryActionForm, requestBodyFlash)
+      }
+
+      const { disciplinaryAction } = await this.militaryRecordsService.getReferenceData(clientToken, [
+        ProxyReferenceDataDomain.disciplinaryAction,
+      ])
+
+      const disciplinaryActionOptions = [
+        ...objectToRadioOptions(
+          disciplinaryAction,
+          'code',
+          'description',
+          disciplinaryActionForm?.disciplinaryActionCode,
+        ),
+        { divider: 'or' },
+        { text: 'Unknown', value: null },
+      ]
+
+      const formValues = disciplinaryActionForm ?? {}
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditDisciplinaryAction,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/militaryRecords/disciplinaryAction', {
+        pageTitle: `Disciplinary action - Prisoner personal details`,
+        title: `Was ${titlePrisonerName} subject to any of the following disciplinary action?`,
+        militarySeq,
+        formValues,
+        errors,
+        disciplinaryActionOptions,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  public postDisciplinaryAction(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, militarySeq } = req.params
+      const { clientToken } = req.middleware
+      const formValues = {
+        militarySeq: +militarySeq,
+        disciplinaryActionCode: req.body.disciplinaryActionCode || null,
+      }
+      const { action } = req.body
+
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.militaryRecordsService.updateMilitaryRecord(
+            clientToken,
+            res.locals.user as PrisonUser,
+            prisonerNumber,
+            formValues,
+          )
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('requestBody', JSON.stringify(formValues))
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/disciplinary-action/${militarySeq}`)
+      }
+
+      req.flash('flashMessage', {
+        text: `UK military service information updated`,
+        type: FlashMessageType.success,
+        ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
+      })
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditDisciplinaryAction,
+          details: { formValues },
+        })
+        .catch(error => logger.error(error))
+
+      if (action === 'continue') {
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/discharge-details/${militarySeq}`)
+      }
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
+    }
+  }
+
+  public displayDischargeDetails(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId, cellLocation, clientToken } =
+        this.getCommonRequestData(req)
+      const militarySeq = +req.params.militarySeq
+      const requestBodyFlash = requestBodyFromFlash<DischargeDetails>(req)
+      const errors = req.flash('errors')
+
+      const dischargeDetailsForm: DischargeDetails =
+        militarySeq && !errors.length
+          ? (await this.militaryRecordsService.getMilitaryRecords(clientToken, prisonerNumber))
+              ?.filter(record => record.militarySeq === militarySeq)
+              ?.map(record => ({
+                militarySeq: record.militarySeq,
+                dischargeLocation: record.dischargeLocation,
+                endDate: record.endDate,
+                militaryDischargeCode: record.militaryDischargeCode,
+              }))[0]
+          : ({} as DischargeDetails)
+      if (requestBodyFlash) {
+        Object.assign(dischargeDetailsForm, {
+          ...requestBodyFlash,
+          endDate: dateToIsoDate(`01/${requestBodyFlash['endDate-month']}/${requestBodyFlash['endDate-year']}`),
+        })
+      }
+
+      const { militaryDischarge } = await this.militaryRecordsService.getReferenceData(clientToken, [
+        ProxyReferenceDataDomain.militaryDischarge,
+      ])
+
+      const dischargeOptions = objectToRadioOptions(
+        militaryDischarge,
+        'code',
+        'description',
+        dischargeDetailsForm?.militaryDischargeCode,
+      )
+
+      const formValues = dischargeDetailsForm
+        ? {
+            ...dischargeDetailsForm,
+            'endDate-year': dischargeDetailsForm['endDate-year'] ?? dischargeDetailsForm.endDate?.split('-')[0],
+            'endDate-month': dischargeDetailsForm['endDate-month'] ?? dischargeDetailsForm.endDate?.split('-')[1],
+          }
+        : {}
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditDischargeDetails,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/militaryRecords/dischargeDetails', {
+        pageTitle: `Discharge details - Prisoner personal details`,
+        title: `${apostrophe(titlePrisonerName)} discharge details`,
+        militarySeq,
+        formValues,
+        errors,
+        dischargeOptions,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+          cellLocation: formatLocation(cellLocation),
+        },
+      })
+    }
+  }
+
+  public postDischargeDetails(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber, militarySeq } = req.params
+      const { clientToken } = req.middleware
+      const formValues = {
+        militarySeq: +militarySeq,
+        dischargeLocation: req.body.dischargeLocation,
+        endDate: dateToIsoDate(`01/${req.body['endDate-month']}/${req.body['endDate-year']}`),
+        militaryDischargeCode: req.body.militaryDischargeCode || null,
+      }
+      const { action } = req.body
+
+      const errors = req.errors || []
+      if (!errors.length) {
+        try {
+          await this.militaryRecordsService.updateMilitaryRecord(
+            clientToken,
+            res.locals.user as PrisonUser,
+            prisonerNumber,
+            formValues,
+          )
+        } catch (error) {
+          if (error.status === 400) {
+            errors.push({ text: error.message })
+          } else throw error
+        }
+      }
+
+      if (errors.length) {
+        req.flash('requestBody', JSON.stringify(formValues))
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/discharge-details/${militarySeq}`)
+      }
+
+      req.flash('flashMessage', {
+        text: `UK military service information updated`,
+        type: FlashMessageType.success,
+        ...(action === 'continue' ? {} : { fieldName: 'military-service-information' }),
+      })
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditDischargeDetails,
+          details: { formValues },
+        })
+        .catch(error => logger.error(error))
+
       return res.redirect(`/prisoner/${prisonerNumber}/personal#military-service-information`)
     }
   }

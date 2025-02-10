@@ -49,8 +49,8 @@
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-three-quarters">
-        <span class="govuk-caption-l">Record UK military service information</span>
-        <h1 class="govuk-heading-l">{{ title }}</h1>
+          <span class="govuk-caption-l">Record UK military service information</span>
+          <h1 class="govuk-heading-l">{{ title }}</h1>
       </div>
     </div>
 
@@ -61,10 +61,10 @@
 
             {{
             govukRadios({
-                idPrefix: "warZoneCode",
-                name: "warZoneCode",
-                items: warZoneOptions,
-                errorMessage: errors | findError('warZoneCode')
+                idPrefix: "disciplinaryActionCode",
+                name: "disciplinaryActionCode",
+                items: disciplinaryActionOptions,
+                errorMessage: errors | findError('disciplinaryActionCode')
             })
             }}
 
@@ -79,7 +79,7 @@
               }}
               {{
                 govukButton({
-                    text: "Save and continue to disciplinary action",
+                    text: "Save and continue to discharge details",
                     type: "submit",
                     classes: "govuk-button--secondary",
                     preventDoubleClick: true,
