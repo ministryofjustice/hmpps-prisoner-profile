@@ -5,6 +5,7 @@ import {
   DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
+  HealthAndMedicationReferenceDataDomain,
   ReferenceDataCode,
 } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { mapToQueryString } from '../utils/utils'
@@ -16,7 +17,10 @@ export default class HealthAndMedicationApiRestClient implements HealthAndMedica
     this.restClient = new RestClient('Health and medication API', config.apis.healthAndMedicationApi, token)
   }
 
-  async getReferenceDataCodes(domain: string, includeInactive = false): Promise<ReferenceDataCode[]> {
+  async getReferenceDataCodes(
+    domain: HealthAndMedicationReferenceDataDomain,
+    includeInactive = false,
+  ): Promise<ReferenceDataCode[]> {
     return this.restClient.get<ReferenceDataCode[]>({
       path: `/reference-data/domains/${domain}/codes`,
       query: mapToQueryString({ includeInactive }),

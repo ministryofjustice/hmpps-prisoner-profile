@@ -2,22 +2,18 @@ import {
   DietAndAllergy,
   HealthAndMedication,
 } from '../../interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import { foodAllergyCodesMock, medicalDietCodesMock, personalisedDietCodesMock } from './referenceDataMocks'
 
 export const dietAndAllergyMock: DietAndAllergy = {
   foodAllergies: {
-    value: [{ value: { id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten', listSequence: 0, isActive: true } }],
+    value: [{ value: foodAllergyCodesMock[0] }],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
   },
   medicalDietaryRequirements: {
     value: [
       {
-        value: {
-          id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY',
-          description: 'Nutrient deficiency',
-          listSequence: 0,
-          isActive: true,
-        },
+        value: medicalDietCodesMock[0],
       },
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
@@ -26,12 +22,7 @@ export const dietAndAllergyMock: DietAndAllergy = {
   personalisedDietaryRequirements: {
     value: [
       {
-        value: {
-          id: 'PERSONALISED_DIET_VEGAN',
-          description: 'Vegan',
-          listSequence: 0,
-          isActive: true,
-        },
+        value: personalisedDietCodesMock[0],
       },
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',

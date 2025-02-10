@@ -26,11 +26,11 @@ import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClientMock'
-import ReferenceDataService from './referenceDataService'
+import ReferenceDataService from './referenceData/referenceDataService'
 import {
   EnglandCountryReferenceDataCodeMock,
   MilitaryRecordsMock,
-} from '../data/localMockData/personIntegrationReferenceDataMock'
+} from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { HealthAndMedicationApiClient } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import {
   dietAndAllergyMock,
@@ -38,7 +38,7 @@ import {
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
 
 jest.mock('./metrics/metricsService')
-jest.mock('./referenceDataService')
+jest.mock('./referenceData/referenceDataService')
 
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
@@ -200,7 +200,7 @@ describe('PersonalPageService', () => {
 
       describe('Food allergies', () => {
         it.each([
-          [true, [{ id: 'FOOD_ALLERGY_GLUTEN', description: 'Gluten' }]],
+          [true, [{ id: 'FOOD_ALLERGY_EGG', description: 'Egg' }]],
           [false, []],
         ])(
           'Maps the food allergies field (Diet and allergies enabled: %s)',
@@ -213,7 +213,7 @@ describe('PersonalPageService', () => {
 
       describe('Medical diet', () => {
         it.each([
-          [true, [{ id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY', description: 'Nutrient deficiency' }]],
+          [true, [{ id: 'MEDICAL_DIET_COELIAC', description: 'Coeliac' }]],
           [false, []],
         ])(
           'Maps the medical diet field (Prison person enabled: %s)',
@@ -641,9 +641,9 @@ describe('PersonalPageService', () => {
         PrisonerMockDataA.prisonerNumber,
       )
 
-      expect(personalDetails.foodAllergies).toEqual([{ description: 'Gluten', id: 'FOOD_ALLERGY_GLUTEN' }])
+      expect(personalDetails.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
       expect(personalDetails.medicalDietaryRequirements).toEqual([
-        { description: 'Nutrient deficiency', id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY' },
+        { description: 'Coeliac', id: 'MEDICAL_DIET_COELIAC' },
       ])
       expect(personalDetails.personalisedDietaryRequirements).toEqual([
         { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },

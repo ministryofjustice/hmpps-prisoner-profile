@@ -45,19 +45,19 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
 import {
+  CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
-  ProxyReferenceDataDomain,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
-import ReferenceDataService from './referenceDataService'
+import ReferenceDataService from './referenceData/referenceDataService'
 import {
   DietAndAllergy,
   DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
-  HealthAndMedicationReferenceDataDomain,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { militaryHistoryEnabled } from '../utils/featureToggles'
+import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 
 export default class PersonalPageService {
   constructor(
@@ -167,7 +167,7 @@ export default class PersonalPageService {
     const addresses: Addresses = this.addresses(addressList)
     const countryOfBirth =
       inmateDetail.birthCountryCode &&
-      (await this.getReferenceDataFromProxy(token, ProxyReferenceDataDomain.country, inmateDetail.birthCountryCode))
+      (await this.getReferenceData(token, CorePersonRecordReferenceDataDomain.country, inmateDetail.birthCountryCode))
         .description
 
     return {
@@ -513,26 +513,17 @@ export default class PersonalPageService {
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
 
-  async getReferenceDataCodes(clientToken: string, domain: string) {
+  // TODO - remove this temporary method to get the reference data codes from the prison person api
+  async getReferenceDataCodesFromPrisonPersonApi(clientToken: string, domain: string) {
     const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
     return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
-  async getReferenceDataDomain(clientToken: string, domain: string) {
-    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    return prisonPersonApiClient.getReferenceDataDomain(camelToSnakeCase(domain))
-  }
-
-  async getReferenceDataCodesFromProxy(clientToken: string, domain: ProxyReferenceDataDomain) {
+  async getReferenceDataCodes(clientToken: string, domain: ReferenceDataDomain) {
     return this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken)
   }
 
-  async getHealthAndMedicationReferenceDataCodes(clientToken: string, domain: HealthAndMedicationReferenceDataDomain) {
-    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
-    return healthAndMedicationApiClient.getReferenceDataCodes(domain)
-  }
-
-  async getReferenceDataFromProxy(clientToken: string, domain: ProxyReferenceDataDomain, code: string) {
+  async getReferenceData(clientToken: string, domain: CorePersonRecordReferenceDataDomain, code: string) {
     return this.referenceDataService.getReferenceData(domain, code.toUpperCase(), clientToken)
   }
 

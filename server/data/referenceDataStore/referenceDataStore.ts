@@ -1,6 +1,6 @@
 import { RedisClient } from '../redisClient'
 import logger from '../../../logger'
-import { ReferenceDataCodeDto } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 
 const REFERENCE_DATA_PREFIX = 'reference_data_'
 

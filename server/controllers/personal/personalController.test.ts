@@ -32,9 +32,17 @@ import {
   ActiveCountryReferenceDataCodesMock,
   NationalityReferenceDataCodesMock,
   ReligionReferenceDataCodesMock,
-} from '../../data/localMockData/personIntegrationReferenceDataMock'
+} from '../../data/localMockData/personIntegrationApiReferenceDataMock'
 import { healthAndMedicationMock } from '../../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
-import { HealthAndMedication } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import {
+  HealthAndMedication,
+  ReferenceDataIdSelection,
+} from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import {
+  foodAllergyCodesMock,
+  medicalDietCodesMock,
+  personalisedDietCodesMock,
+} from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -124,7 +132,7 @@ describe('PersonalController', () => {
     personalPageService = personalPageServiceMock() as PersonalPageService
     personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
     personalPageService.getHealthAndMedication = jest.fn(async () => ({ ...healthAndMedicationMock }))
-    personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
+    personalPageService.getReferenceDataCodesFromPrisonPersonApi = jest.fn(async (_, domain) => {
       if (domain === 'smoke')
         return [
           { id: 'SMOKE_SMOKER', description: 'Yes, they smoke' },
@@ -132,10 +140,13 @@ describe('PersonalController', () => {
         ] as ReferenceDataCode[]
       return physicalCharacteristicsMock.field as ReferenceDataCode[]
     })
-    personalPageService.getReferenceDataCodesFromProxy = jest.fn(async (_, domain) => {
+    personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
       if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
       if (domain === 'NAT') return NationalityReferenceDataCodesMock
       if (domain === 'RELF') return ReligionReferenceDataCodesMock
+      if (domain === 'MEDICAL_DIET') return medicalDietCodesMock
+      if (domain === 'FOOD_ALLERGY') return foodAllergyCodesMock
+      if (domain === 'PERSONALISED_DIET') return personalisedDietCodesMock
       return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
@@ -794,7 +805,7 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'build')
+        expect(personalPageService.getReferenceDataCodesFromPrisonPersonApi).toHaveBeenCalledWith('token', 'build')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Build - Prisoner personal details',
@@ -1744,7 +1755,7 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'eye')
+        expect(personalPageService.getReferenceDataCodesFromPrisonPersonApi).toHaveBeenCalledWith('token', 'eye')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColour', {
           pageTitle: 'Eye colour - Prisoner personal details',
@@ -1917,7 +1928,7 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith('token', 'eye')
+        expect(personalPageService.getReferenceDataCodesFromPrisonPersonApi).toHaveBeenCalledWith('token', 'eye')
         expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColourIndividual', {
           pageTitle: 'Left and right eye colours - Prisoner personal details',
@@ -2090,8 +2101,66 @@ describe('PersonalController', () => {
   describe('Diet and food allergies', () => {
     describe('Edit', () => {
       const action = async (req: any, response: any) => controller.dietAndFoodAllergies().edit(req, response, () => {})
+      const editOptions = ({ selections }: { selections: ReferenceDataIdSelection[] }) => ({
+        allergyOptions: [
+          {
+            checked: selections.map(s => s.value).includes('FOOD_ALLERGY_EGG'),
+            id: 'FOOD_ALLERGY_EGG',
+            listSequence: 0,
+            name: 'allergy[0][value]',
+            text: 'Egg',
+            value: 'FOOD_ALLERGY_EGG',
+          },
+          {
+            checked: selections.map(s => s.value).includes('FOOD_ALLERGY_OTHER'),
+            id: 'FOOD_ALLERGY_OTHER',
+            listSequence: 1,
+            name: 'allergy[1][value]',
+            text: 'Other',
+            value: 'FOOD_ALLERGY_OTHER',
+            comment: selections.find(s => s.value === 'FOOD_ALLERGY_OTHER')?.comment || undefined,
+          },
+        ],
+        medicalDietOptions: [
+          {
+            checked: selections.map(s => s.value).includes('MEDICAL_DIET_COELIAC'),
+            id: 'MEDICAL_DIET_COELIAC',
+            listSequence: 0,
+            name: 'medical[0][value]',
+            text: 'Coeliac',
+            value: 'MEDICAL_DIET_COELIAC',
+          },
+          {
+            checked: selections.map(s => s.value).includes('MEDICAL_DIET_OTHER'),
+            id: 'MEDICAL_DIET_OTHER',
+            listSequence: 1,
+            name: 'medical[1][value]',
+            text: 'Other',
+            value: 'MEDICAL_DIET_OTHER',
+            comment: selections.find(s => s.value === 'MEDICAL_DIET_OTHER')?.comment || undefined,
+          },
+        ],
+        personalisedDietOptions: [
+          {
+            checked: selections.map(s => s.value).includes('PERSONALISED_DIET_VEGAN'),
+            id: 'PERSONALISED_DIET_VEGAN',
+            listSequence: 0,
+            name: 'personalised[0][value]',
+            text: 'Vegan',
+            value: 'PERSONALISED_DIET_VEGAN',
+          },
+          {
+            checked: selections.map(s => s.value).includes('PERSONALISED_DIET_OTHER'),
+            id: 'PERSONALISED_DIET_OTHER',
+            listSequence: 1,
+            name: 'personalised[1][value]',
+            text: 'Other',
+            value: 'PERSONALISED_DIET_OTHER',
+            comment: selections.find(s => s.value === 'PERSONALISED_DIET_OTHER')?.comment || undefined,
+          },
+        ],
+      })
 
-      // TODO: Requires mock to return reference codes
       it('Renders the edit page with the correct data from the health and medications api when no existing data is present', async () => {
         personalPageService.getHealthAndMedication = jest.fn(async () => null as HealthAndMedication)
 
@@ -2115,18 +2184,15 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
           },
           errors: [],
-          allergyOptions: [],
-          medicalDietOptions: [],
-          personalisedDietOptions: [],
           errorsForForms: {
             allergy: null,
             medical: null,
             personalised: null,
           },
+          ...editOptions({ selections: [] }),
         })
       })
 
-      // TODO: Requires mock to return reference codes
       it('Renders the edit page with the correct data from the health and medications api when data is present', async () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
@@ -2149,14 +2215,18 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
           },
           errors: [],
-          allergyOptions: [],
-          medicalDietOptions: [],
-          personalisedDietOptions: [],
           errorsForForms: {
             allergy: null,
             medical: null,
             personalised: null,
           },
+          ...editOptions({
+            selections: [
+              { value: medicalDietCodesMock[0].id },
+              { value: foodAllergyCodesMock[0].id },
+              { value: personalisedDietCodesMock[0].id },
+            ],
+          }),
         })
       })
 
@@ -2173,7 +2243,6 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
       })
 
-      // TODO: Requires mock to return reference codes
       it('Populates the field value from the flash', async () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
@@ -2181,12 +2250,15 @@ describe('PersonalController', () => {
             return key === 'requestBody'
               ? [
                   JSON.stringify({
-                    medical: ['MEDICAL_DIET_FREE_FROM', 'MEDICAL_DIET_OTHER'],
-                    allergies: ['FOOD_ALLERGY_EGG', 'FOOD_ALLERGY_OTHER'],
-                    personal: 'PERSONAL_DIET_OTHER',
-                    medicalOther: 'other1',
-                    allergiesOther: 'other2',
-                    personalOther: 'other3',
+                    medical: [{ value: medicalDietCodesMock[0].id }, { value: 'MEDICAL_DIET_OTHER', comment: 'abc' }],
+                    allergy: [{ value: foodAllergyCodesMock[0].id }, { value: 'FOOD_ALLERGY_OTHER', comment: 'def' }],
+                    personalised: [
+                      { value: personalisedDietCodesMock[0].id },
+                      {
+                        value: 'PERSONALISED_DIET_OTHER',
+                        comment: 'ghi',
+                      },
+                    ],
                   }),
                 ]
               : []
@@ -2197,9 +2269,16 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            allergyOptions: [],
-            medicalDietOptions: [],
-            personalisedDietOptions: [],
+            ...editOptions({
+              selections: [
+                { value: medicalDietCodesMock[0].id },
+                { value: 'MEDICAL_DIET_OTHER', comment: 'abc' },
+                { value: foodAllergyCodesMock[0].id },
+                { value: 'FOOD_ALLERGY_OTHER', comment: 'def' },
+                { value: personalisedDietCodesMock[0].id },
+                { value: 'PERSONALISED_DIET_OTHER', comment: 'ghi' },
+              ],
+            }),
           }),
         )
       })
@@ -2237,7 +2316,17 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { medical: ['MEDICAL_DIET_DIABETES_TYPE_1'], allergies: ['FOOD_ALLERGIES_EGG'] },
+          body: {
+            medical: [{ value: medicalDietCodesMock[0].id }, { value: 'MEDICAL_DIET_OTHER', comment: 'abc' }],
+            allergy: [{ value: foodAllergyCodesMock[0].id }, { value: 'FOOD_ALLERGY_OTHER', comment: 'def' }],
+            personalised: [
+              { value: personalisedDietCodesMock[0].id },
+              {
+                value: 'PERSONALISED_DIET_OTHER',
+                comment: 'ghi',
+              },
+            ],
+          },
           flash: jest.fn(),
         } as any
       })
@@ -2257,14 +2346,26 @@ describe('PersonalController', () => {
         })
       })
 
-      // TODO: Requires mock to return reference codes
       it('Updates the prisoner health on success', async () => {
         await action(validRequest, res)
         expect(personalPageService.updateDietAndFoodAllergies).toHaveBeenCalledWith(
           expect.anything(),
           expect.anything(),
           'A1234BC',
-          { foodAllergies: [], medicalDietaryRequirements: [], personalisedDietaryRequirements: [] },
+          {
+            medicalDietaryRequirements: [
+              { value: medicalDietCodesMock[0].id },
+              { value: 'MEDICAL_DIET_OTHER', comment: 'abc' },
+            ],
+            foodAllergies: [{ value: foodAllergyCodesMock[0].id }, { value: 'FOOD_ALLERGY_OTHER', comment: 'def' }],
+            personalisedDietaryRequirements: [
+              { value: personalisedDietCodesMock[0].id },
+              {
+                value: 'PERSONALISED_DIET_OTHER',
+                comment: 'ghi',
+              },
+            ],
+          },
         )
       })
 
@@ -2288,14 +2389,23 @@ describe('PersonalController', () => {
           details: {
             fieldName: 'dietAndFoodAllergies',
             previous: {
-              medicalDietaryRequirements: [{ value: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY' }],
-              foodAllergies: [{ value: 'FOOD_ALLERGY_GLUTEN' }],
-              personalisedDietaryRequirements: [{ value: 'PERSONALISED_DIET_VEGAN' }],
+              medicalDietaryRequirements: [{ value: medicalDietCodesMock[0].id }],
+              foodAllergies: [{ value: foodAllergyCodesMock[0].id }],
+              personalisedDietaryRequirements: [{ value: personalisedDietCodesMock[0].id }],
             },
             updated: {
-              medicalDietaryRequirements: [] as string[],
-              foodAllergies: [] as string[],
-              personalisedDietaryRequirements: [] as string[],
+              medicalDietaryRequirements: [
+                { value: medicalDietCodesMock[0].id },
+                { value: 'MEDICAL_DIET_OTHER', comment: 'abc' },
+              ],
+              foodAllergies: [{ value: foodAllergyCodesMock[0].id }, { value: 'FOOD_ALLERGY_OTHER', comment: 'def' }],
+              personalisedDietaryRequirements: [
+                { value: personalisedDietCodesMock[0].id },
+                {
+                  value: 'PERSONALISED_DIET_OTHER',
+                  comment: 'ghi',
+                },
+              ],
             },
           },
         }

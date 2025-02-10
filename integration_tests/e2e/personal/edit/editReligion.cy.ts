@@ -1,7 +1,7 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { ReligionReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationReferenceDataMock'
+import { ReligionReferenceDataCodesMock } from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { inmateDetailMock } from '../../../../server/data/localMockData/inmateDetailMock'
 
 context('Edit religion, faith or belief', () => {
