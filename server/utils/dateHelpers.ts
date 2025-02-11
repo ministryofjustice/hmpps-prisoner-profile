@@ -220,8 +220,8 @@ export const formatAddressDate = (isoDate: string): string => {
   return format(isoDate, 'MMMM yyyy')
 }
 
-export const formatDateToPattern = (isoDate: string, pattern: string): string => {
-  if (!isoDate) return ''
+export const formatDateToPattern = (isoDate: string, pattern: string, emptyReturnValue: string = ''): string => {
+  if (!isoDate) return emptyReturnValue
 
   return format(isoDate, pattern)
 }

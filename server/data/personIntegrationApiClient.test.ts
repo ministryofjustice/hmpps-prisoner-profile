@@ -75,8 +75,10 @@ describe('personIntegrationApiClient', () => {
 
   describe('updateMilitaryRecord', () => {
     it('should update military record', async () => {
-      fakePersonIntegrationApi.put('/v1/core-person-record/military-records?prisonerNumber=A1234AA').reply(204)
-      await personIntegrationApiClient.updateMilitaryRecord('A1234AA', MilitaryRecordsMock[0])
+      fakePersonIntegrationApi
+        .put('/v1/core-person-record/military-records?prisonerNumber=A1234AA&militarySeq=1')
+        .reply(204)
+      await personIntegrationApiClient.updateMilitaryRecord('A1234AA', 1, MilitaryRecordsMock[0])
     })
   })
 

@@ -2,6 +2,7 @@ import {
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCodeDto } from '../interfaces/referenceData'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -182,6 +183,26 @@ export const MilitaryWarZoneRefDataMock: CorePersonRecordReferenceDataCodeDto[] 
     id: 'MLTY_WZONE_AFG',
     code: 'AFG',
     description: 'Afganistan',
+    listSequence: 1,
+    isActive: true,
+  },
+]
+
+export const DisciplinaryActionRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_DISCP_CM',
+    code: 'CM',
+    description: 'Court Martial',
+    listSequence: 1,
+    isActive: true,
+  },
+]
+
+export const MilitaryDischargeRefDataMock: ReferenceDataCodeDto[] = [
+  {
+    id: 'MLTY_DSCHRG_HON',
+    code: 'HON',
+    description: 'Honourable',
     listSequence: 1,
     isActive: true,
   },

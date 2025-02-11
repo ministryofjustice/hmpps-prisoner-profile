@@ -28,7 +28,7 @@ import {
 } from './utils'
 import { checkboxFieldDataToInputs } from './checkboxUtils'
 import { pluralise } from './pluralise'
-import { formatAddressDate, formatDate, formatDateTime, timeFormat } from './dateHelpers'
+import { formatAddressDate, formatDate, formatDateTime, formatDateToPattern, timeFormat } from './dateHelpers'
 import config from '../config'
 import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
 import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
@@ -188,4 +188,5 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
   njkEnv.addFilter('sortByLatestAndUuid', sortByLatestAndUuid)
   njkEnv.addFilter('lengthOfService', lengthOfService)
+  njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
 }

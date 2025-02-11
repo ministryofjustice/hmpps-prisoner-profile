@@ -58,13 +58,65 @@
       <div class="govuk-grid-column-three-quarters">
         <form method="post" novalidate="novalidate" autocomplete="off">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+            {% set monthErrorClass = ' govuk-input--error' if (errors | findError("endDate-month")) or (errors | findError("endDate")) else '' %}
+            {% set yearErrorClass = ' govuk-input--error' if (errors | findError("endDate-year")) or (errors | findError("endDate")) else '' %}
+
+            {{ govukDateInput({
+                id: "endDate",
+                namePrefix: "endDate",
+                fieldset: {
+                    legend: {
+                        text: "When did they leave the armed forces?",
+                        classes: "govuk-fieldset__legend--s"
+                    }
+                },
+                hint: {
+                    text: "For example, 10 2021."
+                },
+                items: [
+                    {
+                        name: "month",
+                        attributes: { maxlength: 2 },
+                        classes: "govuk-input--width-2" + monthErrorClass,
+                        value: formValues['endDate-month']
+                    },
+                    {
+                        name: "year",
+                        attributes: { maxlength: 4 },
+                        classes: "govuk-input--width-4" + yearErrorClass,
+                        value: formValues['endDate-year']
+                    }
+                ],
+                value: formValues.endDate,
+                errorMessage: (errors | findError('endDate')) or (errors | findError('endDate-month')) or (errors | findError('endDate-year'))
+            }) }}
+
+            {{
+            govukInput({
+                label: {
+                    text: 'Discharge location',
+                    classes: 'govuk-label--s'
+                },
+                id: 'dischargeLocation',
+                name: 'dischargeLocation',
+                value: formValues.dischargeLocation,
+                classes: 'govuk-input--width-30',
+                errorMessage: errors | findError('dischargeLocation')
+            })
+            }}
 
             {{
             govukRadios({
-                idPrefix: "warZoneCode",
-                name: "warZoneCode",
-                items: warZoneOptions,
-                errorMessage: errors | findError('warZoneCode')
+                fieldset: {
+                    legend: {
+                        text: "Discharge reason",
+                        classes: "govuk-fieldset__legend--s"
+                    }
+                },
+                idPrefix: "militaryDischargeCode",
+                name: "militaryDischargeCode",
+                items: dischargeOptions,
+                errorMessage: errors | findError('militaryDischargeCode')
             })
             }}
 
@@ -75,15 +127,6 @@
                     type: "submit",
                     preventDoubleClick: true,
                     attributes: { "data-qa": "save-and-return-submit-button" }
-                })
-              }}
-              {{
-                govukButton({
-                    text: "Save and continue to disciplinary action",
-                    type: "submit",
-                    classes: "govuk-button--secondary",
-                    preventDoubleClick: true,
-                    attributes: { name: "action", value: "continue", "data-qa": "save-and-continue-submit-button" }
                 })
               }}
             <a

@@ -25,6 +25,7 @@ describe('MilitaryRecordsService', () => {
   let metricsService: MetricsService
   let clientToken: string
   let prisonerNumber: string
+  let militarySeq: number
   let user: PrisonUser
 
   beforeEach(() => {
@@ -56,6 +57,7 @@ describe('MilitaryRecordsService', () => {
 
     clientToken = 'test-token'
     prisonerNumber = 'A1234AA'
+    militarySeq = 1
     user = { username: 'testuser' } as PrisonUser
   })
 
@@ -94,11 +96,18 @@ describe('MilitaryRecordsService', () => {
 
   describe('updateMilitaryRecord', () => {
     it('should update military record', async () => {
-      await militaryRecordsService.updateMilitaryRecord(clientToken, user, prisonerNumber, MilitaryRecordsMock[0])
+      await militaryRecordsService.updateMilitaryRecord(
+        clientToken,
+        user,
+        prisonerNumber,
+        militarySeq,
+        MilitaryRecordsMock[0],
+      )
 
       expect(personIntegrationApiClient.getMilitaryRecords).toHaveBeenCalledWith(prisonerNumber)
       expect(personIntegrationApiClient.updateMilitaryRecord).toHaveBeenCalledWith(
         prisonerNumber,
+        militarySeq,
         MilitaryRecordsMock[0],
       )
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
@@ -112,7 +121,13 @@ describe('MilitaryRecordsService', () => {
       jest.spyOn(personIntegrationApiClient, 'getMilitaryRecords').mockResolvedValue([])
 
       await expect(
-        militaryRecordsService.updateMilitaryRecord(clientToken, user, prisonerNumber, MilitaryRecordsMock[0]),
+        militaryRecordsService.updateMilitaryRecord(
+          clientToken,
+          user,
+          prisonerNumber,
+          militarySeq,
+          MilitaryRecordsMock[0],
+        ),
       ).rejects.toThrow(BadRequestError)
     })
   })

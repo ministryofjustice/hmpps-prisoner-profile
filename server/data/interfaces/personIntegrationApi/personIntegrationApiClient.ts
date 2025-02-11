@@ -5,6 +5,7 @@ export interface CorePersonRecordReferenceDataCodeDto {
   listSequence: number
   isActive: boolean
   parentCode?: string
+  parentDomain?: string
 }
 
 // eslint-disable-next-line no-shadow
@@ -60,6 +61,20 @@ export interface Conflicts {
   warZoneCode?: string
 }
 
+export interface DisciplinaryAction {
+  militarySeq?: number
+  disciplinaryActionCode?: string
+}
+
+export interface DischargeDetails {
+  militarySeq?: number
+  endDate?: string
+  'endDate-year'?: string
+  'endDate-month'?: string
+  militaryDischargeCode?: string
+  dischargeLocation?: string
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -73,7 +88,7 @@ export interface PersonIntegrationApiClient {
 
   getMilitaryRecords(prisonerNumber: string): Promise<MilitaryRecord[]>
 
-  updateMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
+  updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void>
 
   createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
 }

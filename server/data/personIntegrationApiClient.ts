@@ -46,10 +46,10 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.restClient.get({ path: `/v1/core-person-record/military-records`, query: { prisonerNumber } })
   }
 
-  updateMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void> {
+  updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void> {
     return this.restClient.put({
       path: '/v1/core-person-record/military-records',
-      query: { prisonerNumber },
+      query: { prisonerNumber, militarySeq },
       data: militaryRecord,
     })
   }

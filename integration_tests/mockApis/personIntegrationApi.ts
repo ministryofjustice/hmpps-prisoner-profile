@@ -45,7 +45,7 @@ export default {
 
   stubPersonIntegrationUpdateMilitaryRecord: () =>
     stubPutWithResponse<void>({
-      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*&militarySeq=.*`,
       responseBody: null,
     }),
 
