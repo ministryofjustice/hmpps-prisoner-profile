@@ -9,7 +9,11 @@ context('Photo Page', () => {
 
   context('Permissions', () => {
     const visitPage = prisonerDataOverrides => {
-      cy.setupBannerStubs({ prisonerNumber, bookingId, prisonerDataOverrides })
+      cy.setupBannerStubs({
+        prisonerNumber,
+        bookingId,
+        prisonerDataOverrides: { ...prisonerDataOverrides, category: 'B' },
+      })
       cy.task('stubImageDetails')
       cy.task('stubImagesForOffender', prisonerNumber)
       cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image/all' })
@@ -17,12 +21,20 @@ context('Photo Page', () => {
     permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoListPage })
   })
 
+  context('Cat A Prisoner', () => {
+    it('Does not display the page', () => {
+      cy.setupBannerStubs({ prisonerNumber, bookingId })
+      cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image/all' })
+      Page.verifyOnPage(NotFoundPage)
+    })
+  })
+
   beforeEach(() => {
     cy.task('reset')
     cy.setupUserAuth()
     cy.setupComponentsData()
     cy.setupBannerStubs({ prisonerNumber, bookingId })
-    cy.setupOverviewPageStubs({ prisonerNumber, bookingId })
+    cy.setupOverviewPageStubs({ prisonerNumber, bookingId, prisonerDataOverrides: { category: 'B' } })
     cy.task('stubImageDetails')
     cy.task('stubImagesForOffender', prisonerNumber)
   })

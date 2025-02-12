@@ -116,6 +116,7 @@ export function mapHeaderData(
     hideBanner: hideBanner || false,
     newArrival24: prisonerData.newArrival24,
     newArrival72: prisonerData.newArrival72,
+    category: prisonerData.category,
   }
 }
 

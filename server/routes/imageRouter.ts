@@ -9,6 +9,7 @@ import { mapHeaderData } from '../mappers/headerMappers'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import { formatDateTime } from '../utils/dateHelpers'
+import NotFoundError from '../utils/notFoundError'
 
 export default function goalsRouter(services: Services): Router {
   const router = Router()
@@ -25,6 +26,11 @@ export default function goalsRouter(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
       const clientToken = req.middleware?.clientToken
+
+      if (prisonerData.category === 'A') {
+        return next(new NotFoundError())
+      }
+
       const imageDetail = await services.photoService.getImageDetail(inmateDetail.facialImageId, clientToken)
 
       await services.auditService.sendPageView({
@@ -35,7 +41,7 @@ export default function goalsRouter(services: Services): Router {
         page: Page.Photo,
       })
 
-      res.render('pages/photoPage', {
+      return res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
         miniBannerData: {
@@ -59,6 +65,11 @@ export default function goalsRouter(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
       const clientToken = req.middleware?.clientToken
+
+      if (prisonerData.category === 'A') {
+        return next(new NotFoundError())
+      }
+
       const facialImages = await services.photoService.getAllFacialPhotos(
         prisonerData.prisonerNumber,
         inmateDetail.facialImageId,
@@ -73,7 +84,7 @@ export default function goalsRouter(services: Services): Router {
         page: Page.PhotoList,
       })
 
-      res.render('pages/photoPageAll', {
+      return res.render('pages/photoPageAll', {
         pageTitle: `All facial images`,
         ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
         miniBannerData: {

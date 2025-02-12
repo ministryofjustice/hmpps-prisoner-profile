@@ -13,12 +13,12 @@
 ] %}
 {% extends "../partials/layout.njk" %}
 {% block content %}
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row govuk-!-display-none-print">
     <div class="govuk-grid-column-full">
       {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false}) }}
     </div>
   </div>
-  <div class="govuk-grid-row" data-qa="prisoner-photo-page">
+  <div class="govuk-grid-row govuk-!-display-none-print" data-qa="prisoner-photo-page">
     <div class="govuk-grid-column-full">
       {{ mojSubNavigation({
       label: 'Sub navigation',
@@ -35,7 +35,12 @@
     }) }}
     </div>
   </div>
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row hmpps-!-display-print-only">
+    <div class="govuk-grid-column-full center-content profile-photo">
+      <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+    </div>
+  </div>
+  <div class="govuk-grid-row govuk-!-display-none-print">
     <div class="govuk-grid-column-one-third">
       <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
     </div>

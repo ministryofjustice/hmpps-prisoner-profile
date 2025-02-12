@@ -87,3 +87,11 @@
 .hmpps-profile-photo__large {
   width: 100%
 }
+
+.hmpps-\!-display-print-only {
+  display: none;
+
+  @media print {
+    display: block;
+  }
+}
