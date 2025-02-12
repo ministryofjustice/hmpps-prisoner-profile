@@ -50,6 +50,7 @@ import VisitWithVisitors from './VisitWithVisitors'
 import PrisonDetails from './PrisonDetails'
 import CourtEvent from './CourtEvent'
 import { QueryParams } from '../../../interfaces/QueryParams'
+import ImageDetails from './ImageDetails'
 
 export interface CaseNoteSummaryByTypesParams extends QueryParams {
   type: string
@@ -233,4 +234,8 @@ export interface PrisonApiClient {
   getActiveCourtCasesCount(bookingId: number): Promise<number>
 
   getLatestArrivalDate(prisonerNumber: string): Promise<string>
+
+  getImagesForPrisoner(prisonerNumber: string): Promise<ImageDetails[]>
+
+  getImageDetail(imageId: number): Promise<ImageDetails>
 }

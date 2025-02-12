@@ -91,6 +91,7 @@ import { visitPrisonsMock } from '../../server/data/localMockData/visitPrisons'
 import VisitWithVisitors from '../../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { VisitsListQueryParams } from '../../server/data/interfaces/prisonApi/PagedList'
 import { CaseNoteSummaryByTypesParams } from '../../server/data/interfaces/prisonApi/prisonApiClient'
+import { stubGetWithBody } from './utils'
 
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
@@ -1301,6 +1302,37 @@ export default {
         },
         jsonBody: resp ?? '2000-01-01',
       },
+    })
+  },
+
+  stubImageDetails: () => {
+    return stubGetWithBody({
+      path: '/prison/api/images/\\d*',
+      body: {
+        imageId: 1234,
+        active: true,
+        captureDateTime: '2015-02-11T08:32:50',
+      },
+    })
+  },
+
+  stubImagesForOffender: (prisonerNumber: string) => {
+    return stubGetWithBody({
+      path: `/prison/api/images/offenders/${prisonerNumber}`,
+      body: [
+        {
+          imageId: 1234,
+          active: true,
+          captureDateTime: '2025-01-11T08:32:50',
+          imageView: 'FACE',
+        },
+        {
+          imageId: 4321,
+          active: false,
+          captureDateTime: '2024-01-11T08:32:50',
+          imageView: 'FACE',
+        },
+      ],
     })
   },
 }

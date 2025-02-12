@@ -1,0 +1,67 @@
+{%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set breadCrumbs = [
+  {
+    text: 'Digital Prison Services',
+    href: '/'
+  },
+  {
+    text: prisonerName,
+    href: "/prisoner/" + prisonerNumber
+  }
+] %}
+{% extends "../partials/layout.njk" %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false}) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row" data-qa="prisoner-photo-page">
+    <div class="govuk-grid-column-full">
+      {{ mojSubNavigation({
+      label: 'Sub navigation',
+      items: [{
+          text: 'Main facial image',
+          href: '/prisoner/' + prisonerNumber + '/image'
+        }, 
+        {
+          text: 'All facial images',
+          href: '/prisoner/' + prisonerNumber + '/image/all',
+          active: true
+        }
+      ]
+    }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">All facial images</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row hmpps-photo-list" data-qa="image-list">
+    <div class="govuk-grid-column-two-thirds">
+      {% for image in facialImages %}
+        <div
+          class="govuk-grid-row hmpps-photo-list__item {{ "
+          hmpps-photo-list__active" if image.active }}"
+          data-qa="image-list-item">
+          <div class="govuk-grid-column-one-quarter" data-qa="image-item-photo">
+            <img class="hmpps-profile-photo__large" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
+          </div>
+          <div class="govuk-grid-column-three-quarters" data-qa="image-item-details">
+            {% if image.active %}
+              {{ govukTag({
+                text: "Main facial image",
+                classes: "govuk-!-margin-bottom-2 govuk-!-margin-top-0"
+              }) }}
+            {% endif %}
+            <p class="govuk-body">{{ image.uploadedDateTime }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>{% endblock %}

@@ -1,19 +1,21 @@
-{% macro miniBanner(data) %}
-<div class="hmpps-mini-banner">
-    <img
-        class="hmpps-mini-banner__photo"
-        src="/api/prisoner/{{ data.prisonerNumber or data.photoType }}/image?fullSizeImage=false"
-        alt="{{ data.prisonerName }}"
-        width="80"
-        height="100"
-    />
-    <div class="hmpps-mini-banner__name">
-        <div class="govuk-!-font-weight-bold"><a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ data.prisonerNumber }}">{{ data.prisonerName }}</a></div>
-        <div id="prisonerNumber">{{ data.prisonerNumber }}</div>
+{% macro miniBanner(data, options = {displayImage: true, nameLink: true}) %}
+    <div class="hmpps-mini-banner govuk-body">
+        {% if options.displayImage %}
+            <img class="hmpps-mini-banner__photo" src="/api/prisoner/{{ data.prisonerNumber or data.photoType }}/image?fullSizeImage=false" alt="{{ data.prisonerName }}" width="80" height="100"/>
+        {% endif %}
+        <div class="hmpps-mini-banner__name">
+            <div class="govuk-!-font-weight-bold">
+                {% if options.nameLink %}
+                    <a class="govuk-link govuk-link--no-visited-state" href="/prisoner/{{ data.prisonerNumber }}">{{ data.prisonerName }}</a>
+                {% else %}
+                    {{ data.prisonerName }}
+                {% endif %}
+            </div>
+            <div id="prisonerNumber">{{ data.prisonerNumber }}</div>
+        </div>
+        {#    <dl class="hmpps-mini-banner__location">#}
+    {#        <dt>Location</dt>#}
+        {#        <dd>{{ data.cellLocation }}</dd>#}
+        {#    </dl>#}
     </div>
-{#    <dl class="hmpps-mini-banner__location">#}
-{#        <dt>Location</dt>#}
-{#        <dd>{{ data.cellLocation }}</dd>#}
-{#    </dl>#}
-</div>
 {% endmacro %}
