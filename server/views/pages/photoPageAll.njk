@@ -46,13 +46,13 @@
       {% for image in facialImages %}
         <div
           class="govuk-grid-row hmpps-photo-list__item {{ "
-          hmpps-photo-list__active" if image.active }}"
+          hmpps-photo-list__main" if image.main }}"
           data-qa="image-list-item">
           <div class="govuk-grid-column-one-quarter" data-qa="image-item-photo">
             <img class="hmpps-profile-photo__large" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
           </div>
           <div class="govuk-grid-column-three-quarters" data-qa="image-item-details">
-            {% if image.active %}
+            {% if image.main %}
               {{ govukTag({
                 text: "Main facial image",
                 classes: "govuk-!-margin-bottom-2 govuk-!-margin-top-0"

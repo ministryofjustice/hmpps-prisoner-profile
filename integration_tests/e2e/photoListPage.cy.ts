@@ -31,7 +31,7 @@ context('Photo Page', () => {
     cy.signIn({ redirectPath: 'prisoner/G6123VU/image/all' })
     const photoPage = new PrisonerPhotoListPage()
     photoPage.breadcrumbToOverview().should('exist')
-    photoPage.photoList().row(0).photo().should('have.attr', 'src', '/api/image/1234')
+    photoPage.photoList().row(0).photo().should('have.attr', 'src', '/api/image/1413311')
     photoPage.photoList().row(0).details().should('include.text', 'Main facial image')
     photoPage.photoList().row(0).details().should('include.text', '11 January 2025')
 

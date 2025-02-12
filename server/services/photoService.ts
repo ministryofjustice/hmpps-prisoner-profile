@@ -11,14 +11,14 @@ export default class PhotoService {
     return prisonApiClient.getImageDetail(prisonerPhotoId)
   }
 
-  async getAllFacialPhotos(prisonerNumber: string, clientToken: string) {
+  async getAllFacialPhotos(prisonerNumber: string, prisonerPhotoId: number, clientToken: string) {
     const prisonApiClient = this.prisonApiClientBuilder(clientToken)
     const images = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
     return images
       .filter(i => i.imageView === 'FACE')
       .sort((a, b) => compareDesc(new Date(a.captureDateTime), new Date(b.captureDateTime)))
-      .map(({ active, captureDateTime, imageId }) => ({
-        active,
+      .map(({ captureDateTime, imageId }) => ({
+        main: imageId === prisonerPhotoId,
         imageId,
         uploadedDateTime: formatDateTime(captureDateTime, 'long'),
       }))
