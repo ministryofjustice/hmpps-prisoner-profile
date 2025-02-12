@@ -39,7 +39,6 @@ import {
   PrisonPersonApiClient,
   PrisonPersonDistinguishingMark,
   PrisonPersonPhysicalAttributesUpdate,
-  ReferenceDataCodeSimple,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
@@ -80,7 +79,7 @@ export default class PersonalPageService {
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    return apiClient.getHealthAndMedicationForPrisoner(prisonerNumber)
+    return apiClient.getHealthAndMedication(prisonerNumber)
   }
 
   async updateDietAndFoodAllergies(
@@ -90,7 +89,7 @@ export default class PersonalPageService {
     dietAndFoodAllergies: Partial<DietAndAllergyUpdate>,
   ): Promise<DietAndAllergy> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
-    const response = apiClient.updateDietAndAllergyDataForPrisoner(prisonerNumber, dietAndFoodAllergies)
+    const response = apiClient.updateDietAndAllergyData(prisonerNumber, dietAndFoodAllergies)
 
     this.metricsService.trackHealthAndMedicationUpdate({
       fieldsUpdated: Object.keys(dietAndFoodAllergies),
@@ -176,7 +175,6 @@ export default class PersonalPageService {
         inmateDetail,
         prisonerDetail,
         secondaryLanguages,
-        prisonPerson,
         countryOfBirth,
         healthAndMedication,
       ),
@@ -237,7 +235,6 @@ export default class PersonalPageService {
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
-    prisonPerson: PrisonPerson,
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
   ): PersonalDetails {
@@ -330,13 +327,6 @@ export default class PersonalPageService {
       []
     )
   }
-
-  private mapSmokerDescription = (refData: ReferenceDataCodeSimple) =>
-    ({
-      SMOKE_SMOKER: 'Smoker',
-      SMOKE_VAPER: 'Vaper or uses nicotine replacement therapy (NRT)',
-      SMOKE_NO: 'Does not smoke or vape',
-    })[refData?.id] ?? null
 
   private identityNumbers(prisonerData: Prisoner, identifiers: OffenderIdentifier[]): IdentityNumbers {
     return {
@@ -528,8 +518,10 @@ export default class PersonalPageService {
   }
 
   async updateSmokerOrVaper(clientToken: string, user: PrisonUser, prisonerNumber: string, smokerOrVaper: string) {
-    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    const response = await prisonPersonApiClient.updateHealth(prisonerNumber, { smokerOrVaper })
+    const healthAndMedicationApiClient = this.healthAndMedicationApiClientBuilder(clientToken)
+    const response = await healthAndMedicationApiClient.updateSmokerStatus(prisonerNumber, {
+      smokerStatus: smokerOrVaper,
+    })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: ['smokerOrVaper'],

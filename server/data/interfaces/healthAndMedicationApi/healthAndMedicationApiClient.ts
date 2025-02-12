@@ -3,6 +3,7 @@ export enum HealthAndMedicationReferenceDataDomain {
   foodAllergy = 'FOOD_ALLERGY',
   medicalDiet = 'MEDICAL_DIET',
   personalisedDiet = 'PERSONALISED_DIET',
+  smoker = 'SMOKER',
 }
 
 export interface ValueWithMetadata<T> {
@@ -59,16 +60,22 @@ export interface DietAndAllergyUpdate {
   personalisedDietaryRequirements?: ReferenceDataIdSelection[]
 }
 
+export interface SmokerStatusUpdate {
+  smokerStatus?: string
+}
+
 export interface HealthAndMedicationApiClient {
   getReferenceDataCodes(
     domain: HealthAndMedicationReferenceDataDomain,
     includeInactive?: boolean,
   ): Promise<ReferenceDataCode[]>
 
-  getHealthAndMedicationForPrisoner(prisonerNumber: string): Promise<HealthAndMedication>
+  getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication>
 
-  updateDietAndAllergyDataForPrisoner(
+  updateDietAndAllergyData(
     prisonerNumber: string,
     dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
   ): Promise<DietAndAllergy>
+
+  updateSmokerStatus(prisonerNumber: string, smokerStatusUpdate: Partial<SmokerStatusUpdate>): Promise<void>
 }

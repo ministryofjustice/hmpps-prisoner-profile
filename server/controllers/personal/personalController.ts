@@ -68,6 +68,7 @@ import {
 import { Role } from '../../data/enums/role'
 import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
+import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 
 type TextFieldGetter = (req: Request, fieldData: TextFieldData) => Promise<string>
 type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, value: string) => Promise<void>
@@ -79,50 +80,6 @@ export default class PersonalController {
     private readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
   ) {}
-
-  private async submit({
-    req,
-    res,
-    prisonerNumber,
-    submit,
-    fieldData,
-    auditDetails,
-  }: {
-    req: Request
-    res: Response
-    prisonerNumber: string
-    submit: () => Promise<void>
-    fieldData: FieldData
-    auditDetails: object
-  }) {
-    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor } = fieldData
-
-    try {
-      await submit()
-
-      req.flash('flashMessage', {
-        text: `${pageTitle} updated`,
-        type: FlashMessageType.success,
-        fieldName,
-      })
-
-      this.auditService
-        .sendPostSuccess({
-          user: res.locals.user,
-          prisonerNumber,
-          correlationId: req.id,
-          action: auditEditPostAction,
-          details: auditDetails,
-        })
-        .catch(error => logger.error(error))
-
-      return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
-    } catch (e) {
-      req.flash('errors', [{ text: 'There was an error please try again' }])
-      req.flash('requestBody', JSON.stringify(req.body))
-      return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
-    }
-  }
 
   displayPersonalPage() {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -615,12 +572,11 @@ export default class PersonalController {
         const { inmateDetail, prisonerData, clientToken } = req.middleware
         const { firstName, lastName } = prisonerData
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const fieldValue =
-          requestBodyFlash?.radioField ||
-          getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)
-        const [smokerOrVaperValues] = await Promise.all([
-          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, 'smoke'),
-        ])
+        const fieldValue = requestBodyFlash?.radioField || this.getSmokerStatus(inmateDetail)
+        const smokerOrVaperValues = await this.personalPageService.getReferenceDataCodes(
+          clientToken,
+          HealthAndMedicationReferenceDataDomain.smoker,
+        )
 
         const options = objectToRadioOptions(smokerOrVaperValues, 'id', 'description', fieldValue)
 
@@ -636,8 +592,7 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousValue = prisonPerson?.health?.smokerOrVaper?.value?.id
+        const previousValue: string = this.getSmokerStatus(req.middleware.inmateDetail)
         return this.submit({
           req,
           res,
@@ -1411,6 +1366,60 @@ export default class PersonalController {
           },
         })
       },
+    }
+  }
+
+  // This will be replaced by a request to the Health and Medication API once it masters this data:
+  getSmokerStatus(inmateDetail: InmateDetail): string {
+    const statusMap: Record<string, string> = {
+      Yes: 'SMOKER_YES',
+      No: 'SMOKER_NO',
+      'Vaper/NRT Only': 'SMOKER_VAPER',
+    }
+    return statusMap[getProfileInformationValue(ProfileInformationType.SmokerOrVaper, inmateDetail.profileInformation)]
+  }
+
+  private async submit({
+    req,
+    res,
+    prisonerNumber,
+    submit,
+    fieldData,
+    auditDetails,
+  }: {
+    req: Request
+    res: Response
+    prisonerNumber: string
+    submit: () => Promise<void>
+    fieldData: FieldData
+    auditDetails: object
+  }) {
+    const { pageTitle, auditEditPostAction, fieldName, url, redirectAnchor } = fieldData
+
+    try {
+      await submit()
+
+      req.flash('flashMessage', {
+        text: `${pageTitle} updated`,
+        type: FlashMessageType.success,
+        fieldName,
+      })
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: auditEditPostAction,
+          details: auditDetails,
+        })
+        .catch(error => logger.error(error))
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal#${redirectAnchor}`)
+    } catch (e) {
+      req.flash('errors', [{ text: 'There was an error please try again' }])
+      req.flash('requestBody', JSON.stringify(req.body))
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/${url}`)
     }
   }
 }
