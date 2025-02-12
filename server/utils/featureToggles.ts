@@ -1,5 +1,8 @@
 import config from '../config'
 
+export const editProfileEnabled = (activeCaseLoadId: string) =>
+  config.featureToggles.editProfileEnabled && config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId)
+
 export const enablePrisonPerson = (activeCaseLoadId: string) =>
   config.featureToggles.prisonPersonApiEnabled &&
   config.featureToggles.prisonPersonApiEnabledPrisons.includes(activeCaseLoadId)

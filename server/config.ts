@@ -345,6 +345,8 @@ export default {
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
     prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),
+    editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
+    editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
     dietAndAllergyEnabled: toBoolean(get('DIET_AND_ALLERGY_ENABLED', 'false')),
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     militaryHistoryEnabled: toBoolean(get('MILITARY_HISTORY_ENABLED', 'false')),
