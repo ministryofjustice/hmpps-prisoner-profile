@@ -1321,7 +1321,7 @@ export default {
       path: `/prison/api/images/offenders/${prisonerNumber}`,
       body: [
         {
-          imageId: 1234,
+          imageId: inmateDetailMock.facialImageId,
           active: true,
           captureDateTime: '2025-01-11T08:32:50',
           imageView: 'FACE',
