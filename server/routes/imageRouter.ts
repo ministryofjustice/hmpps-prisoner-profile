@@ -59,7 +59,11 @@ export default function goalsRouter(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
       const clientToken = req.middleware?.clientToken
-      const facialImages = await services.photoService.getAllFacialPhotos(prisonerData.prisonerNumber, clientToken)
+      const facialImages = await services.photoService.getAllFacialPhotos(
+        prisonerData.prisonerNumber,
+        inmateDetail.facialImageId,
+        clientToken,
+      )
 
       await services.auditService.sendPageView({
         user: res.locals.user,
