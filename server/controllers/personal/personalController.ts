@@ -25,7 +25,7 @@ import {
 } from '../../utils/utils'
 import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
-import { dietAndAllergyEnabled, enablePrisonPerson } from '../../utils/featureToggles'
+import { dietAndAllergyEnabled, editProfileEnabled, enablePrisonPerson } from '../../utils/featureToggles'
 import {
   CheckboxFieldData,
   cityOrTownOfBirthFieldData,
@@ -87,6 +87,7 @@ export default class PersonalController {
       const { bookingId } = prisonerData
       const user = res.locals.user as PrisonUser
       const { activeCaseLoadId, userRoles } = user
+      const profileEditEnabled = editProfileEnabled(activeCaseLoadId)
       const prisonPersonEnabled = enablePrisonPerson(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
@@ -121,7 +122,8 @@ export default class PersonalController {
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),
-        editEnabled: enablePrisonPerson(activeCaseLoadId) && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        editEnabled: profileEditEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
+        prisonPersonEnabled: prisonPersonEnabled && userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
         dietAndAllergiesEnabled:
           dietAndAllergyEnabled(activeCaseLoadId) && dietAndAllergyEnabled(prisonerData.prisonId),
         editDietAndAllergiesEnabled:
