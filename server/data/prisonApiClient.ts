@@ -58,6 +58,7 @@ import PagedList, { VisitsListQueryParams } from './interfaces/prisonApi/PagedLi
 import PrisonDetails from './interfaces/prisonApi/PrisonDetails'
 import VisitWithVisitors from './interfaces/prisonApi/VisitWithVisitors'
 import CourtEvent from './interfaces/prisonApi/CourtEvent'
+import ImageDetails from './interfaces/prisonApi/ImageDetails'
 
 export default class PrisonApiRestClient implements PrisonApiClient {
   private readonly restClient: RestClient
@@ -518,6 +519,18 @@ export default class PrisonApiRestClient implements PrisonApiClient {
   async getLatestArrivalDate(prisonerNumber: string): Promise<string> {
     return this.restClient.get<string>({
       path: `/api/movements/offenders/${prisonerNumber}/latest-arrival-date`,
+    })
+  }
+
+  async getImagesForPrisoner(prisonerNumber: string): Promise<ImageDetails[]> {
+    return this.restClient.get<ImageDetails[]>({
+      path: `/api/images/offenders/${prisonerNumber}`,
+    })
+  }
+
+  async getImageDetail(imageId: number): Promise<ImageDetails> {
+    return this.restClient.get<ImageDetails>({
+      path: `/api/images/${imageId}`,
     })
   }
 }

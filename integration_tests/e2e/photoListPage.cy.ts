@@ -1,7 +1,7 @@
-import PrisonerPhotoPage from '../pages/photoPage'
 import { permissionsTests } from './permissionsTests'
 import Page from '../pages/page'
 import NotFoundPage from '../pages/notFoundPage'
+import PrisonerPhotoListPage from '../pages/photoListPage'
 
 context('Photo Page', () => {
   const prisonerNumber = 'G6123VU'
@@ -12,9 +12,9 @@ context('Photo Page', () => {
       cy.setupBannerStubs({ prisonerNumber, bookingId, prisonerDataOverrides })
       cy.task('stubImageDetails')
       cy.task('stubImagesForOffender', prisonerNumber)
-      cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image' })
+      cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image/all' })
     }
-    permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoPage })
+    permissionsTests({ prisonerNumber, visitPage, pageToDisplay: PrisonerPhotoListPage })
   })
 
   beforeEach(() => {
@@ -27,35 +27,29 @@ context('Photo Page', () => {
     cy.task('stubImagesForOffender', prisonerNumber)
   })
 
-  it('Display the photopage', () => {
-    cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
-    const photoPage = new PrisonerPhotoPage()
+  it('Displays the photo list page', () => {
+    cy.signIn({ redirectPath: 'prisoner/G6123VU/image/all' })
+    const photoPage = new PrisonerPhotoListPage()
     photoPage.breadcrumbToOverview().should('exist')
+    photoPage.photoList().row(0).photo().should('have.attr', 'src', '/api/image/1234')
+    photoPage.photoList().row(0).details().should('include.text', 'Main facial image')
+    photoPage.photoList().row(0).details().should('include.text', '11 January 2025')
+
+    photoPage.photoList().row(1).photo().should('have.attr', 'src', '/api/image/4321')
+    photoPage.photoList().row(1).details().should('include.text', '11 January 2024')
   })
 
   it('Click the breadcrumb and go to the overview page', () => {
-    cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
-    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')
-    const photoPage = new PrisonerPhotoPage()
+    cy.signIn({ redirectPath: 'prisoner/G6123VU/image/all' })
+    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image/all')
+    const photoPage = new PrisonerPhotoListPage()
     photoPage.breadcrumbToOverview().should('exist')
     photoPage.breadcrumbToOverview().click()
     cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU')
   })
 
-  it('Clicking the print link should open a print dialog', () => {
-    cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
-    cy.url().should('eq', 'http://localhost:3007/prisoner/G6123VU/image')
-    cy.window().then(win => {
-      cy.stub(win, 'print').as('Print')
-    })
-    const photoPage = new PrisonerPhotoPage()
-    photoPage.printLink().should('be.visible')
-    photoPage.printLink().click()
-    cy.get('@Print').should('have.been.called')
-  })
-
   it('Photo page should go to 404 not found page', () => {
-    cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/asudhsdudhid/image' })
+    cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/asudhsdudhid/image/all' })
     Page.verifyOnPage(NotFoundPage)
   })
 })
