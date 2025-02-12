@@ -35,5 +35,5 @@ export default interface ImageDetails {
   imageView: ImageView
   imageOrientation: ImageOrientation
   imageType: ImageType
-  objectId: number
+  objectId?: number
 }

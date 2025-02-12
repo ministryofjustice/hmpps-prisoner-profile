@@ -47,6 +47,7 @@ import { beliefHistoryMock } from './localMockData/beliefHistoryMock'
 import { mockInmateAtLocation } from './localMockData/locationsInmates'
 import { pagedVisitsMock } from './localMockData/pagedVisitsWithVisitors'
 import { visitPrisonsMock } from './localMockData/visitPrisons'
+import { imageDetailListMock, imageDetailMock } from './localMockData/imageMock'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -604,6 +605,24 @@ describe('prisonApiClient', () => {
       mockSuccessfulPrisonApiCall(`/api/bookings/${bookingId}/visits/prisons`, visitPrisonsMock)
       const output = await prisonApiClient.getVisitsPrisons(bookingId)
       expect(output).toEqual(visitPrisonsMock)
+    })
+  })
+
+  describe('getImagesForPrisoner', () => {
+    it('Should return data from the API', async () => {
+      const prisonerNumber = 'abc123'
+      mockSuccessfulPrisonApiCall(`/api/images/offenders/${prisonerNumber}`, imageDetailListMock)
+      const output = await prisonApiClient.getImagesForPrisoner(prisonerNumber)
+      expect(output).toEqual(imageDetailListMock)
+    })
+  })
+
+  describe('getImageDetail', () => {
+    it('Should return data from the API', async () => {
+      const imageId = 1234
+      mockSuccessfulPrisonApiCall(`/api/images/${imageId}`, imageDetailMock)
+      const output = await prisonApiClient.getImageDetail(imageId)
+      expect(output).toEqual(imageDetailMock)
     })
   })
 })

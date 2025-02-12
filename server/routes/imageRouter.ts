@@ -1,4 +1,3 @@
-import { compareDesc } from 'date-fns'
 import { Router } from 'express'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
@@ -26,9 +25,7 @@ export default function goalsRouter(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
       const clientToken = req.middleware?.clientToken
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(clientToken)
-      const photoId = inmateDetail.facialImageId
-      const imageDetail = await prisonApiClient.getImageDetail(photoId)
+      const imageDetail = await services.photoService.getImageDetail(inmateDetail.facialImageId, clientToken)
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -62,16 +59,7 @@ export default function goalsRouter(services: Services): Router {
       const inmateDetail = req.middleware?.inmateDetail
       const alertSummaryData = req.middleware?.alertSummaryData
       const clientToken = req.middleware?.clientToken
-      const prisonApiClient = services.dataAccess.prisonApiClientBuilder(clientToken)
-      const images = await prisonApiClient.getImagesForPrisoner(prisonerData.prisonerNumber)
-      const facialImages = images
-        .filter(i => i.imageView === 'FACE')
-        .sort((a, b) => compareDesc(new Date(a.captureDateTime), new Date(b.captureDateTime)))
-        .map(({ active, captureDateTime, imageId }) => ({
-          active,
-          imageId,
-          uploadedDateTime: formatDateTime(captureDateTime, 'long'),
-        }))
+      const facialImages = await services.photoService.getAllFacialPhotos(prisonerData.prisonerNumber, clientToken)
 
       await services.auditService.sendPageView({
         user: res.locals.user,
