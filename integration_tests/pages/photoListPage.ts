@@ -1,8 +1,8 @@
 import Page, { PageElement } from './page'
 
-export default class PrisonerPhotoPage extends Page {
+export default class PrisonerPhotoListPage extends Page {
   constructor() {
-    super('Main facial image')
+    super('All facial images')
   }
 
   prisonerPhotoPartial = (): PageElement => cy.get('[prisoner-photo-page]')
@@ -14,4 +14,14 @@ export default class PrisonerPhotoPage extends Page {
   breadcrumbToOverview = (): PageElement => cy.get('.govuk-breadcrumbs__link').last()
 
   printLink = (): PageElement => cy.get('#profile-photo-print-link')
+
+  photoList = () => ({
+    row: (row: number) => {
+      const rowItem = () => cy.getDataQa('image-list').findDataQa('image-list-item').eq(row)
+      return {
+        photo: () => rowItem().findDataQa('prisoner-photo'),
+        details: () => rowItem().findDataQa('image-item-details'),
+      }
+    },
+  })
 }

@@ -45,6 +45,7 @@ export enum Page {
   Overview = 'OVERVIEW',
   Personal = 'PERSONAL',
   Photo = 'PHOTO',
+  PhotoList = 'PHOTO_LIST',
   PostAddAlert = 'POST_ADD_ALERT',
   PostAddAppointment = 'POST_ADD_APPOINTMENT',
   PostEditAppointment = 'POST_EDIT_APPOINTMENT',

@@ -40,6 +40,7 @@ import CsipService from './csipService'
 import ReferenceDataService from './referenceData/referenceDataService'
 import MilitaryRecordsService from './militaryRecordsService'
 import { ReferenceDataSourceFactory } from './referenceData/referenceDataSourceFactory'
+import PhotoService from './photoService'
 
 export const services = () => {
   const {
@@ -155,6 +156,7 @@ export const services = () => {
     referenceDataService,
     metricsService,
   )
+  const photoService = new PhotoService(prisonApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -208,6 +210,7 @@ export const services = () => {
     distinguishingMarksService,
     csipService,
     militaryRecordsService,
+    photoService,
   }
 }
 

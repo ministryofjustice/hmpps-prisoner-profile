@@ -28,6 +28,7 @@ import retrieveCuriousInPrisonCourses from '../middleware/retrieveCuriousInPriso
 import CareNeedsController from '../controllers/careNeedsController'
 import permissionsGuard from '../middleware/permissionsGuard'
 import personalRouter from './personalRouter'
+import imageRouter from './imageRouter'
 
 export const standardGetPaths = /^(?!\/api|\/save-backlink|^\/$).*/
 
@@ -94,31 +95,6 @@ export default function routes(services: Services): Router {
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
       return overviewController.displayOverview(req, res)
-    },
-  )
-
-  get(
-    `${basePath}/image`,
-    auditPageAccessAttempt({ services, page: Page.Photo }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertSummaryData = req.middleware?.alertSummaryData
-
-      await services.auditService.sendPageView({
-        user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: Page.Photo,
-      })
-
-      res.render('pages/photoPage', {
-        pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
-      })
     },
   )
 
@@ -223,6 +199,7 @@ export default function routes(services: Services): Router {
   router.use(visitsRouter(services))
   router.use(addressRouter(services))
   router.use(personalRouter(services))
+  router.use(imageRouter(services))
 
   get(
     `${basePath}/schedule`,

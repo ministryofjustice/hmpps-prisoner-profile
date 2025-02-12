@@ -42,6 +42,7 @@ import {
   foodAllergyCodesMock,
   medicalDietCodesMock,
   personalisedDietCodesMock,
+  smokerStatusCodesMock,
 } from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
 
 describe('PersonalController', () => {
@@ -147,6 +148,7 @@ describe('PersonalController', () => {
       if (domain === 'MEDICAL_DIET') return medicalDietCodesMock
       if (domain === 'FOOD_ALLERGY') return foodAllergyCodesMock
       if (domain === 'PERSONALISED_DIET') return personalisedDietCodesMock
+      if (domain === 'SMOKER') return smokerStatusCodesMock
       return null
     })
     personalPageService.updateSmokerOrVaper = jest.fn()
@@ -979,8 +981,9 @@ describe('PersonalController', () => {
           hintText: undefined,
           errors: [],
           options: expect.arrayContaining([
-            expect.objectContaining({ value: 'SMOKE_SMOKER' }),
-            expect.objectContaining({ value: 'SMOKE_NO' }),
+            expect.objectContaining({ value: 'SMOKER_YES' }),
+            expect.objectContaining({ value: 'SMOKER_VAPER' }),
+            expect.objectContaining({ value: 'SMOKER_NO' }),
           ]),
           redirectAnchor: 'personal-details',
           miniBannerData: {
@@ -1008,7 +1011,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKE_NO' })] : []
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'SMOKER_NO' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -1016,7 +1019,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([expect.objectContaining({ value: 'SMOKE_NO', checked: true })]),
+            options: expect.arrayContaining([expect.objectContaining({ value: 'SMOKER_NO', checked: true })]),
           }),
         )
       })
@@ -1095,13 +1098,13 @@ describe('PersonalController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { radioField: 'SMOKE_NO' } }
+        const request = { ...validRequest, id: 1, body: { radioField: 'SMOKER_NO' } }
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
           correlationId: request.id,
           action: PostAction.EditSmokerOrVaper,
-          details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKE_SMOKER', updated: 'SMOKE_NO' },
+          details: { fieldName: smokerOrVaperFieldData.fieldName, previous: 'SMOKER_YES', updated: 'SMOKER_NO' },
         }
 
         await action(request, res)

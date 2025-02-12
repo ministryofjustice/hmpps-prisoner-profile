@@ -7,6 +7,7 @@ import {
   HealthAndMedicationApiClient,
   HealthAndMedicationReferenceDataDomain,
   ReferenceDataCode,
+  SmokerStatusUpdate,
 } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { mapToQueryString } from '../utils/utils'
 
@@ -27,17 +28,24 @@ export default class HealthAndMedicationApiRestClient implements HealthAndMedica
     })
   }
 
-  getHealthAndMedicationForPrisoner(prisonerNumber: string): Promise<HealthAndMedication> {
+  getHealthAndMedication(prisonerNumber: string): Promise<HealthAndMedication> {
     return this.restClient.get<HealthAndMedication>({ path: `/prisoners/${prisonerNumber}`, ignore404: true })
   }
 
-  updateDietAndAllergyDataForPrisoner(
+  updateDietAndAllergyData(
     prisonerNumber: string,
     dietAndAllergyUpdate: Partial<DietAndAllergyUpdate>,
   ): Promise<DietAndAllergy> {
     return this.restClient.put<DietAndAllergy>({
       path: `/prisoners/${prisonerNumber}/diet-and-allergy`,
       data: dietAndAllergyUpdate,
+    })
+  }
+
+  updateSmokerStatus(prisonerNumber: string, smokerStatusUpdate: Partial<SmokerStatusUpdate>): Promise<void> {
+    return this.restClient.put<void>({
+      path: `/prisoners/${prisonerNumber}/smoker`,
+      data: smokerStatusUpdate,
     })
   }
 }

@@ -85,4 +85,10 @@ export default {
         ...overrides,
       },
     }),
+
+  stubSmokerStatusUpdate: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/prisoners/${prisonerNumber}/smoker`,
+      responseBody: null,
+    }),
 }
