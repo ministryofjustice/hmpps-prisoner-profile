@@ -26,7 +26,7 @@ describe('healthAndMedicationApiRestClient', () => {
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, healthAndMedicationMock)
 
-      const output = await healthAndMedicationApiClient.getHealthAndMedicationForPrisoner('A8469DY')
+      const output = await healthAndMedicationApiClient.getHealthAndMedication('A8469DY')
       expect(output).toEqual(healthAndMedicationMock)
     })
   })
