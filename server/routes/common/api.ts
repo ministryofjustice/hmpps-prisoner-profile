@@ -33,10 +33,11 @@ export default class CommonApiRoutes {
 
     const { withheld, placeholder } = this.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
-    if (placeholder) {
-      res.redirect(placeHolderImage)
-    } else if (withheld) {
+    // Withheld images take precedence over placeholder images
+    if (withheld) {
       res.redirect(categoryAImage)
+    } else if (placeholder) {
+      res.redirect(placeHolderImage)
     } else {
       this.offenderService
         .getPrisonerImage(req.middleware.clientToken, prisonerNumber, fullSizeImage)
