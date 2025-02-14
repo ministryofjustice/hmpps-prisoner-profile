@@ -18,38 +18,47 @@
       {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false}) }}
     </div>
   </div>
-  <div class="govuk-grid-row govuk-!-display-none-print" data-qa="prisoner-photo-page">
-    <div class="govuk-grid-column-full">
-      {{ mojSubNavigation({
-      label: 'Sub navigation',
-      items: [{
-          text: 'Main facial image',
-          href: '#',
-          active: true
-        }, 
-        {
-          text: 'All facial images',
-          href: '/prisoner/' + prisonerNumber + '/image/all'
-        }
-      ]
-    }) }}
+  {% if not (photoStatus.withheld or photoStatus.placeholder ) %}
+    <div class="govuk-grid-row govuk-!-display-none-print" data-qa="prisoner-photo-page">
+      <div class="govuk-grid-column-full">
+        {{ mojSubNavigation({
+          label: 'Sub navigation',
+          items: [{
+              text: 'Main facial image',
+              href: '#',
+              active: true
+            }, 
+            {
+              text: 'All facial images',
+              href: '/prisoner/' + prisonerNumber + '/image/all'
+            }
+          ]
+        }) }}
+      </div>
     </div>
-  </div>
+  {% endif %}
   <div class="govuk-grid-row hmpps-!-display-print-only">
     <div class="govuk-grid-column-full center-content profile-photo">
-      <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+      <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
     </div>
   </div>
-  <div class="govuk-grid-row govuk-!-display-none-print">
-    <div class="govuk-grid-column-one-third">
-      <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber or photoType }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+  {% if (photoStatus.withheld or photoStatus.placeholder ) %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full center-content profile-photo">
+        <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+      </div>
     </div>
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-          <h1 class="govuk-heading-l">Main facial image</h1>
-          {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-          {{ govukSummaryList({
+  {% else %}
+    <div class="govuk-grid-row govuk-!-display-none-print">
+      <div class="govuk-grid-column-one-third">
+        <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">Main facial image</h1>
+            {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+            {{ govukSummaryList({
         rows: [
           {
             key: {
@@ -61,12 +70,13 @@
           }
         ]
       }) }}
-          <span class="govuk-!-padding-top-4">
-            <a href="#" id="profile-photo-print-link" class="govuk-link govuk-link--no-visited-state hmpps-print-link">Print this
-              image</a>
-          </span>
+            <span class="govuk-!-padding-top-4">
+              <a href="#" id="profile-photo-print-link" class="govuk-link govuk-link--no-visited-state hmpps-print-link">Print this
+                image</a>
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 {% endblock %}

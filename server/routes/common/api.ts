@@ -3,6 +3,7 @@ import OffenderService from '../../services/offenderService'
 import { ApiAction, AuditService, SubjectType } from '../../services/auditService'
 import logger from '../../../logger'
 import PrisonPersonService from '../../services/prisonPersonService'
+import PhotoService from '../../services/photoService'
 
 const placeHolderImage = '/assets/images/prisoner-profile-image.png'
 const categoryAImage = '/assets/images/category-a-prisoner-image.png'
@@ -12,11 +13,13 @@ export default class CommonApiRoutes {
     private readonly offenderService: OffenderService,
     private readonly auditService: AuditService,
     private readonly prisonPersonService: PrisonPersonService,
+    private readonly photoService: PhotoService,
   ) {}
 
   public prisonerImage: RequestHandler = (req: Request, res: Response) => {
     const { prisonerNumber } = req.params
     const fullSizeImage = req.query.fullSizeImage ? req.query.fullSizeImage === 'true' : true
+    const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
 
     this.auditService
       .sendEvent({
@@ -28,9 +31,11 @@ export default class CommonApiRoutes {
       })
       .catch(error => logger.error(error))
 
-    if (prisonerNumber === 'placeholder') {
+    const { withheld, placeholder } = this.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
+
+    if (placeholder) {
       res.redirect(placeHolderImage)
-    } else if (prisonerNumber === 'photoWithheld') {
+    } else if (withheld) {
       res.redirect(categoryAImage)
     } else {
       this.offenderService

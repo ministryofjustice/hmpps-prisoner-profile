@@ -22,16 +22,14 @@ export default function goalsRouter(services: Services): Router {
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertSummaryData = req.middleware?.alertSummaryData
-      const clientToken = req.middleware?.clientToken
+      const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
+      const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
+      let imageUploadedDate = ''
 
-      if (prisonerData.category === 'A') {
-        return next(new NotFoundError())
+      if (!(photoStatus.withheld || photoStatus.placeholder)) {
+        const imageDetail = await services.photoService.getImageDetail(inmateDetail.facialImageId, clientToken)
+        imageUploadedDate = formatDateTime(imageDetail.captureDateTime, 'long')
       }
-
-      const imageDetail = await services.photoService.getImageDetail(inmateDetail.facialImageId, clientToken)
 
       await services.auditService.sendPageView({
         user: res.locals.user,
@@ -50,7 +48,8 @@ export default function goalsRouter(services: Services): Router {
           }),
           prisonerNumber: prisonerData.prisonerNumber,
         },
-        imageUploadedDate: formatDateTime(imageDetail.captureDateTime, 'long'),
+        imageUploadedDate,
+        photoStatus,
       })
     },
   )
@@ -61,12 +60,11 @@ export default function goalsRouter(services: Services): Router {
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     async (req, res, next) => {
-      const prisonerData = req.middleware?.prisonerData
-      const inmateDetail = req.middleware?.inmateDetail
-      const alertSummaryData = req.middleware?.alertSummaryData
-      const clientToken = req.middleware?.clientToken
+      const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
+      const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
-      if (prisonerData.category === 'A') {
+      // Do not display this page for prisoners with their photos withheld
+      if (photoStatus.withheld) {
         return next(new NotFoundError())
       }
 

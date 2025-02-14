@@ -76,5 +76,6 @@ export const toAlertSummaryData = (alerts: Result<PagedList<Alert>>): AlertSumma
     ...toAlertTypesFilters(alertsContent),
     alertFlags: dpsShared.alertFlags.getAlertFlagLabelsForAlerts(alertsContent),
     apiUnavailable: false,
+    highPublicInterestPrisoner: alertsContent.filter(a => a.alertCode.code === 'HPI' && a.isActive).length > 0,
   }
 }
