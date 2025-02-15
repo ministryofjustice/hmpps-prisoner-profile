@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const appointmentLocationSelect = document.getElementById('location')
   const appointmentTypeSelect = document.getElementById('appointmentType')
   const recurringRadios = document.querySelector('.js-recurring-radios')
+  const optionalVideoLabel = document.getElementById('optional-video-label')
   const appointmentRepeatsSelect = document.getElementById('repeats')
   const appointmentRepeatsTimesInput = document.getElementById('times')
   const lastAppointmentDate = document.getElementById('last-appointment-date')
@@ -66,13 +67,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function showHideVideoLabel() {
+    const appointmentType = appointmentTypeSelect.value
+
+    if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
+      optionalVideoLabel.style.display = 'block'
+    } else {
+      optionalVideoLabel.style.display = 'none'
+    }
+  }
+
   appointmentTypeSelect.addEventListener('change', () => {
     showHideRecurring()
+  })
+
+  appointmentTypeSelect.addEventListener('change', () => {
+    showHideVideoLabel()
   })
 
   appointmentLocationSelect.addEventListener('change', () => {
     getEventsForLocation()
   })
+
   appointmentDateInput.addEventListener('change', () => {
     getEventsForLocation()
   })
@@ -84,9 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
   appointmentRepeatsSelect.addEventListener('change', () => {
     getAppointmentEndDate()
   })
+
   appointmentDateInput.addEventListener('change', () => {
     getAppointmentEndDate()
   })
+
   appointmentRepeatsTimesInput.addEventListener('keyup', () => {
     getAppointmentEndDate()
   })
@@ -96,4 +114,5 @@ document.addEventListener('DOMContentLoaded', () => {
   getEventsForLocation()
   getAppointmentEndDate()
   showHideRecurring()
+  showHideVideoLabel()
 })

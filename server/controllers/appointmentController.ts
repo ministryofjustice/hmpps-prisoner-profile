@@ -307,6 +307,7 @@ export default class AppointmentController {
         heading,
         prisonerName,
         prisonerNumber,
+        appointmentTypeCode: appointmentDetails.appointmentType,
         appointmentType,
         location,
         date: formatDate(dateToIsoDate(appointmentDetails.date), 'long'),
@@ -676,6 +677,8 @@ export default class AppointmentController {
 
       const appointmentData = {
         bookingType: formValues.bookingType,
+        appointmentTypeCode: 'VLB',
+        appointmentType: 'Video Link - Court Hearing',
         prisonerName,
         prisonerNumber,
         prisonName: prison.description,
@@ -713,7 +716,6 @@ export default class AppointmentController {
       // Save appointment details to session for movement slips to pick up if needed
       req.session.movementSlipData = {
         ...appointmentData,
-        appointmentType: 'Video Link Booking',
         comment: appointmentData.comments,
         prisonerNumber,
         cellLocation: formatLocation(cellLocation),
