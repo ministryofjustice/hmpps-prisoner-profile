@@ -79,9 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   appointmentTypeSelect.addEventListener('change', () => {
     showHideRecurring()
-  })
-
-  appointmentTypeSelect.addEventListener('change', () => {
     showHideVideoLabel()
   })
 
