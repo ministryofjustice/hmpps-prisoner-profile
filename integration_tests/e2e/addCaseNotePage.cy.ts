@@ -117,7 +117,7 @@ context('Add Case Note Page', () => {
   context('As a user without prisoner in their caseload', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
       cy.setupComponentsData({
         caseLoads: [
           {

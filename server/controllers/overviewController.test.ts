@@ -411,7 +411,7 @@ describe('overviewController', () => {
     it('should call adjudicationsService.getAdjudicationsOverview if user is Global search user', async () => {
       const resRole = {
         ...res,
-        locals: getResLocals({ caseLoads: CaseLoadsDummyDataB, userRoles: [Role.GlobalSearch] }),
+        locals: getResLocals({ caseLoads: CaseLoadsDummyDataB, userRoles: [Role.PrisonUser, Role.GlobalSearch] }),
       }
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,

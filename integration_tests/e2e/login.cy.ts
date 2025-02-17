@@ -30,14 +30,13 @@ context('SignIn', () => {
     Page.verifyOnPage(IndexPage)
   })
 
-  it('User with Global Search role has access', () => {
+  it('User with only global search role denied access', () => {
     cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
-    cy.signIn()
-    cy.visit('/prisoner/G6123VU')
-    Page.verifyOnPage(IndexPage)
+    cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
+    Page.verifyOnPage(AuthErrorPage)
   })
 
-  it('User with neither prison or global search role denied access', () => {
+  it('User without prison role denied access', () => {
     cy.setupUserAuth({ roles: ['ROLE_SOMETHING_ELSE'] })
     cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU' })
     Page.verifyOnPage(AuthErrorPage)

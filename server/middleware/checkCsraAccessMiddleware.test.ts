@@ -23,7 +23,7 @@ describe('CheckCsraAccessMiddleware', () => {
       locals: {
         user: {
           activeCaseLoadId: 'ZZZ',
-          userRoles: [Role.GlobalSearch],
+          userRoles: [Role.PrisonUser, Role.GlobalSearch],
           caseLoads: CaseLoadsDummyDataB,
         },
       },

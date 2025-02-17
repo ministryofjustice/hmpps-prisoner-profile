@@ -296,7 +296,7 @@ context('Incentive slips', () => {
 context('Case Notes Page Not Found', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+    cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
     cy.setupComponentsData({
       caseLoads: [
         {

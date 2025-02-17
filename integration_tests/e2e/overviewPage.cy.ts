@@ -38,7 +38,7 @@ context('Overview Page', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
@@ -542,7 +542,7 @@ context('Overview Page', () => {
   context('Given the prisoner is not on remand', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
     })
 
     context('Main offence overview', () => {
@@ -592,7 +592,7 @@ context('Overview Page', () => {
   context('Given the prisoner is on remand', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
       cy.setupOverviewPageStubs({ prisonerNumber: 'X9999XX', bookingId: 1234568 })
     })
 
@@ -785,7 +785,7 @@ context('Overview Page - Prisoner not found', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,

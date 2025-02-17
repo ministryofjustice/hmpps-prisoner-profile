@@ -15,7 +15,7 @@ context('Profile banner', () => {
     context('Given the user has the GLOBAL_SEARCH role', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
@@ -46,7 +46,7 @@ context('Profile banner', () => {
     context('Given the prisoner arrived today', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
@@ -64,7 +64,7 @@ context('Profile banner', () => {
     context('Given the prisoner arrived 2 days ago', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+        cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
         cy.setupOverviewPageStubs({
           prisonerNumber: 'G6123VU',
           bookingId: 1102484,
@@ -174,7 +174,7 @@ context('Profile banner', () => {
   context('Given the prisoner is released from prison', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.InactiveBookings] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, Role.InactiveBookings] })
       cy.setupComponentsData()
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
@@ -205,7 +205,7 @@ context('Profile banner', () => {
   context('Given the prisoner is being transferred', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.InactiveBookings] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, Role.InactiveBookings] })
       cy.setupOverviewPageStubs({
         prisonerNumber: 'G6123VU',
         bookingId: 1102484,
