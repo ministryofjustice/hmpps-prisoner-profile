@@ -99,6 +99,7 @@ export interface AlertSummaryData {
   inactiveAlertTypesFilter?: { [key: string]: AlertTypeFilter }
   alertFlags?: AlertFlagLabel[]
   apiUnavailable: boolean
+  highPublicInterestPrisoner?: boolean
 }
 
 export interface AlertForm {

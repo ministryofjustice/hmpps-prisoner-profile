@@ -1,5 +1,5 @@
 import { PrisonerMockDataA, PrisonerMockDataB } from '../data/localMockData/prisoner'
-import { mapHeaderData, mapHeaderNoBannerData, mapProfileBannerTopLinks } from './headerMappers'
+import { mapHeaderNoBannerData, mapProfileBannerTopLinks } from './headerMappers'
 import { prisonUserMock } from '../data/localMockData/user'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
 
@@ -22,32 +22,6 @@ describe('HeaderMapping', () => {
       })
     })
   })
-  describe('Category A prisoner', () => {
-    it('Photo type should be photoWithheld for security purposes', async () => {
-      const headerData = mapHeaderData(
-        PrisonerMockDataA,
-        inmateDetailMock,
-        {
-          alertFlags: [],
-          apiUnavailable: false,
-        },
-        prisonUserMock,
-      )
-      expect(headerData.photoType).toBe('photoWithheld')
-    })
-    it('Photo type should return as placeholder if the category is not A', async () => {
-      const headerData = mapHeaderData(
-        PrisonerMockDataB,
-        inmateDetailMock,
-        {
-          alertFlags: [],
-          apiUnavailable: false,
-        },
-        prisonUserMock,
-      )
-      expect(headerData.photoType).toBe('placeholder')
-    })
-  })
 
   describe('No banner', () => {
     it('should return prisonerName, prisonerNumber and prisonId', async () => {
@@ -59,7 +33,6 @@ describe('HeaderMapping', () => {
       expect(headerData['profileBannerTopLinks' as keyof typeof headerData]).not.toBeDefined()
       expect(headerData['alerts' as keyof typeof headerData]).not.toBeDefined()
       expect(headerData['tabLinks' as keyof typeof headerData]).not.toBeDefined()
-      expect(headerData['photoType' as keyof typeof headerData]).not.toBeDefined()
       expect(headerData['restrictedPatient' as keyof typeof headerData]).not.toBeDefined()
       expect(headerData['hideBanner' as keyof typeof headerData]).not.toBeDefined()
     })

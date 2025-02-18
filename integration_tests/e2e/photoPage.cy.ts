@@ -31,14 +31,6 @@ context('Photo Page', () => {
     cy.task('stubImagesForOffender', prisonerNumber)
   })
 
-  context('Cat A Prisoner', () => {
-    it('Does not display the page', () => {
-      cy.setupBannerStubs({ prisonerNumber, bookingId })
-      cy.signIn({ failOnStatusCode: false, redirectPath: 'prisoner/G6123VU/image/all' })
-      Page.verifyOnPage(NotFoundPage)
-    })
-  })
-
   it('Display the photopage', () => {
     cy.signIn({ redirectPath: 'prisoner/G6123VU/image' })
     const photoPage = new PrisonerPhotoPage()
