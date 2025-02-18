@@ -66,17 +66,22 @@ export default class MilitaryRecordsController {
       )
 
       const rankOptions = () => {
-        const ranksByBranch = militaryRank.reduce((acc: Record<string, ReferenceDataCodeDto[]>, rank) => {
-          const { parentCode } = rank
-          if (!acc[parentCode]) {
-            acc[parentCode] = []
-          }
-          acc[parentCode].push({
-            ...rank,
-            description: rank.description.replace(/\(Army\)|\(Navy\)|\(RAF\)|\(Royal Marines\)/g, '').trim(),
-          })
-          return acc
-        }, {})
+        const ranksByBranch = militaryRank
+          .filter(rank => rank.code !== 'LT/2') // Temp filter out duplicate rank - TODO can be removed once ref data is fixed
+          .reduce((acc: Record<string, ReferenceDataCodeDto[]>, rank) => {
+            const { parentCode } = rank
+            if (!acc[parentCode]) {
+              acc[parentCode] = []
+            }
+            acc[parentCode].push({
+              ...rank,
+              description: rank.description
+                .replace(/\(Army\)|\(Navy\)|\(RAF\)|\(Royal Marines\)/g, '')
+                .replace(/Staff Sergeant/g, 'Staff Sergeant (may also be known as Colour Sergeant)')
+                .trim(),
+            })
+            return acc
+          }, {})
 
         return {
           rankOptionsArmy: objectToRadioOptions(
