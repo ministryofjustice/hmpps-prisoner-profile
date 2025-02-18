@@ -54,7 +54,7 @@ describe('PhotoService', () => {
       ).toEqual({ withheld: true, placeholder: false })
     })
 
-    it('Correctly marks the photo as withheld for non-high public interest prisoners', () => {
+    it('Correctly marks the photo as withheld for high public interest prisoners', () => {
       service = new PhotoService(() => prisonApiClient)
       const alertSummaryData: AlertSummaryData = {
         apiUnavailable: false,
