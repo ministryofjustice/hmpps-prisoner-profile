@@ -52,8 +52,15 @@
     }
   }
 
+  .govuk-summary-list .govuk-summary-list__value.govuk-summary-list--sub-list--bottom-border {
+    padding-top: 15px;
+    padding-right: 20px;
+    padding-bottom: 15px;
+  }
+
   .govuk-summary-list--sub-list {
-    margin-top: 5px;
+    margin-top: 0;
+    margin-bottom: 0;
 
     &.govuk-summary-list--bottom-border .govuk-summary-list__row:last-of-type {
       border-bottom: 1px solid $govuk-border-colour !important;
@@ -66,7 +73,7 @@
   }
 
   .govuk-summary-list--sub-list--bottom-border {
-    border-bottom: 2px solid $govuk-border-colour;
+    border-bottom: 1px solid $govuk-border-colour;
   }
 }
 
