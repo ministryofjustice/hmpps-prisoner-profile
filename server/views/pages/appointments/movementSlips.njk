@@ -30,7 +30,13 @@
             {{ labelAndValue('Date and time', date +' ' + startTime + ' to ' + endTime) }}
             {{ labelAndValue('Moving to', location) }}
             {{ labelAndValue('Reason', appointmentType) }}
-            {{ labelAndValue('Comments', comment, true) }}
+
+            {# Suppress comments for VLB and VLPM appointments - can contain personal contact data #}
+            {% if (appointmentTypeCode == 'VLB') or (appointmentTypeCode == 'VLPM') %}
+                {{ labelAndValue('Comments', ' ', true) }}
+            {% else %}
+                {{ labelAndValue('Comments', comment, true) }}
+            {% endif %}
         </div>
 
         <div class="movement-slip__section">

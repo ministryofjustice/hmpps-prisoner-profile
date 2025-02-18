@@ -393,6 +393,7 @@ describe('Appointments Controller', () => {
       prisonerName: 'John Saunders',
       prisonerNumber,
       appointmentType: 'Activities',
+      appointmentTypeCode: 'ACTI',
       location: 'Local name one',
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
@@ -669,6 +670,8 @@ describe('Appointments Controller', () => {
       prisonerName: 'John Saunders',
       prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
+      appointmentType: 'Video Link - Court Hearing',
+      appointmentTypeCode: 'VLB',
       location: locationsApiMock[0].localName,
       date: formatDate(dateToIsoDate(formBody.date), 'long'),
       startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
@@ -733,6 +736,8 @@ describe('Appointments Controller', () => {
       return []
     }
     const appointmentData = {
+      appointmentType: 'Video Link - Court Hearing',
+      appointmentTypeCode: 'VLB',
       prisonerName: 'John Saunders',
       prisonerNumber,
       prisonName: 'Moorland (HMP & YOI)',
