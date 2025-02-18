@@ -1,7 +1,7 @@
 {% macro miniBanner(data, options = {displayImage: true, nameLink: true}) %}
     <div class="hmpps-mini-banner govuk-body">
         {% if options.displayImage %}
-            <img class="hmpps-mini-banner__photo" src="/api/prisoner/{{ data.prisonerNumber or data.photoType }}/image?fullSizeImage=false" alt="{{ data.prisonerName }}" width="80" height="100"/>
+            <img class="hmpps-mini-banner__photo" src="/api/prisoner/{{ data.prisonerNumber }}/image?fullSizeImage=false" alt="{{ data.prisonerName }}" width="80" height="100"/>
         {% endif %}
         <div class="hmpps-mini-banner__name">
             <div class="govuk-!-font-weight-bold">

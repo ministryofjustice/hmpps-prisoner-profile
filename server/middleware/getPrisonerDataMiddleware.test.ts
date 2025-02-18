@@ -137,6 +137,7 @@ describe('GetPrisonerDataMiddleware', () => {
       alertFlags: expect.anything(),
       activeAlertTypesFilter: expect.anything(),
       inactiveAlertTypesFilter: {},
+      highPublicInterestPrisoner: false,
     })
     expect(next).toHaveBeenCalledWith()
   })

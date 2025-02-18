@@ -32,6 +32,8 @@ const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
 export const isEmpty = (array: Array<unknown>): boolean => !array || (Array.isArray(array) && !array.length)
 
+export const withheldPhotoCategoryCodes = ['A', 'H', 'P']
+
 /**
  * Converts a name (first name, last name, middle name, etc.) to proper case equivalent, handling double-barreled names
  * correctly (i.e. each part in a double-barreled is converted to proper case).

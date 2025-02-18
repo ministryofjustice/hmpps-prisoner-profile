@@ -93,7 +93,6 @@ export function mapHeaderData(
   pageId?: string,
   hideBanner?: boolean,
 ) {
-  const photoType = prisonerData.category === 'A' ? 'photoWithheld' : 'placeholder'
   const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 
   if (pageId && tabs.find(tab => tab.id === pageId)) {
@@ -110,13 +109,11 @@ export function mapHeaderData(
     alertSummaryData,
     categoryLabel: formatCategoryALabel(prisonerData.category),
     tabLinks: tabs,
-    photoType,
     prisonId: prisonerData.prisonId,
     restrictedPatient: prisonerData.restrictedPatient,
     hideBanner: hideBanner || false,
     newArrival24: prisonerData.newArrival24,
     newArrival72: prisonerData.newArrival72,
-    category: prisonerData.category,
   }
 }
 
