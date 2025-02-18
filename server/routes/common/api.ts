@@ -6,6 +6,9 @@ import PrisonPersonService from '../../services/prisonPersonService'
 import PhotoService from '../../services/photoService'
 
 const placeHolderImage = '/assets/images/prisoner-profile-image.png'
+
+// This is unused but kept for the path for now
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const categoryAImage = '/assets/images/category-a-prisoner-image.png'
 
 export default class CommonApiRoutes {
@@ -31,12 +34,10 @@ export default class CommonApiRoutes {
       })
       .catch(error => logger.error(error))
 
-    const { withheld, placeholder } = this.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
+    const { placeholder } = this.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
-    // Withheld images take precedence over placeholder images
-    if (withheld) {
-      res.redirect(categoryAImage)
-    } else if (placeholder) {
+    // If there's no photo ID then we dont need to call the API and can prevent the extra call
+    if (placeholder) {
       res.redirect(placeHolderImage)
     } else {
       this.offenderService

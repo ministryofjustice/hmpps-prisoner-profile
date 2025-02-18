@@ -1,5 +1,6 @@
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set breadCrumbs = [
   {
@@ -36,16 +37,38 @@
         }) }}
       </div>
     </div>
+  {% elif photoStatus.withheld and not photoStatus.placeholder %}
+    <div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-display-none-print">
+      <div class="govuk-grid-column-full">
+        <div class="hmpps-warning__blue">
+          <div class="govuk-warning-text govuk-!-margin-bottom-0">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <p class="govuk-warning-text__text govuk-!-font-weight-regular govuk-!-margin-bottom-0">
+              <span class="govuk-visually-hidden">Warning</span>
+              You cannot view historic photos for category A or high profile prisoners.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   {% endif %}
   <div class="govuk-grid-row hmpps-!-display-print-only">
     <div class="govuk-grid-column-full center-content profile-photo">
       <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
     </div>
   </div>
-  {% if (photoStatus.withheld or photoStatus.placeholder ) %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full center-content profile-photo">
+  {% if photoStatus.placeholder %}
+    <div class="govuk-grid-row govuk-!-display-none-print">
+      <div class="govuk-grid-column-one-third">
         <img class="hmpps-profile-photo__large" src="/api/prisoner/{{ prisonerNumber }}/image" alt="{{ prisonerName }}" data-qa="prisoner-photo"/>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l">Main facial image</h1>
+            <p class="govuk-body">This prisoner does not have any facial images.</p>
+          </div>
+        </div>
       </div>
     </div>
   {% else %}

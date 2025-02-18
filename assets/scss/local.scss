@@ -8,8 +8,9 @@
   }
 }
 
-.govuk-link, a.govuk-tabs__tab {
-  text-underline-offset: .1em;
+.govuk-link,
+a.govuk-tabs__tab {
+  text-underline-offset: 0.1em;
 }
 
 .hmpps-profile-banner + .govuk-error-summary {
@@ -26,7 +27,7 @@
   display: inline-block;
   position: relative;
   padding: 5px 5px 5px 38px;
-  background: url("/assets/images/printer_icon.svg") no-repeat 10px 50%;
+  background: url('/assets/images/printer_icon.svg') no-repeat 10px 50%;
   background-size: 16px 18px;
 }
 
@@ -50,7 +51,7 @@
 }
 
 .govuk-frontend-supported .govuk-accordion__section-toggle {
-  margin-bottom: 5px
+  margin-bottom: 5px;
 }
 
 .dps-banner {
@@ -74,7 +75,8 @@
     padding: 0;
     margin: 0;
 
-    a:link, a:visited {
+    a:link,
+    a:visited {
       color: $govuk-text-colour;
     }
   }
@@ -85,7 +87,7 @@
 }
 
 .hmpps-profile-photo__large {
-  width: 100%
+  width: 100%;
 }
 
 .hmpps-\!-display-print-only {
@@ -93,5 +95,15 @@
 
   @media print {
     display: block;
+  }
+}
+
+.hmpps-warning__blue {
+  border: 5px solid govuk-colour('blue');
+  padding: 20px;
+
+  .govuk-warning-text__icon {
+    border-color: govuk-colour('blue');
+    background-color: govuk-colour('blue');
   }
 }

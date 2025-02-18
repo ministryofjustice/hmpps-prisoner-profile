@@ -26,7 +26,8 @@ export default function goalsRouter(services: Services): Router {
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
       let imageUploadedDate = ''
 
-      if (!(photoStatus.withheld || photoStatus.placeholder)) {
+      // As long as there's a photo ID we can get information about it
+      if (!photoStatus.placeholder) {
         const imageDetail = await services.photoService.getImageDetail(inmateDetail.facialImageId, clientToken)
         imageUploadedDate = formatDateTime(imageDetail.captureDateTime, 'long')
       }
@@ -63,8 +64,8 @@ export default function goalsRouter(services: Services): Router {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const photoStatus = services.photoService.getPhotoStatus(prisonerData, inmateDetail, alertSummaryData)
 
-      // Do not display this page for prisoners with their photos withheld
-      if (photoStatus.withheld) {
+      // Do not display this page for prisoners with their photos withheld or with no image
+      if (photoStatus.withheld || photoStatus.placeholder) {
         return next(new NotFoundError())
       }
 
