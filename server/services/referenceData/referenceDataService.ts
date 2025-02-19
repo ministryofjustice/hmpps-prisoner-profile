@@ -33,7 +33,7 @@ export default class ReferenceDataService {
   ): Promise<ReferenceDataCodeDto[]> {
     logger.info(`Retrieving and caching reference data codes for domain: ${domain}`)
     const referenceDataSource = this.referenceDataSourceFactory.getReferenceDataSourceFor(domain)
-    const referenceData = await referenceDataSource.getActiveReferenceDataCodes(domain, token)
+    const referenceData = await referenceDataSource.getReferenceDataCodes(domain, token)
     try {
       await this.referenceDataStore.setReferenceData(domain, referenceData, REFERENCE_DATA_CACHE_TTL_HOURS)
     } catch (ex) {
