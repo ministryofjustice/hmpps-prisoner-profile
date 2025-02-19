@@ -43,7 +43,7 @@ describe('referenceDataService', () => {
 
     it('should call API when reference data codes have not been previously cached', async () => {
       referenceDataStore.getReferenceData.mockResolvedValue([])
-      referenceDataSource.getActiveReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
+      referenceDataSource.getReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
 
       const actual = await referenceDataService.getReferenceData(domain, code, systemToken)
       expect(actual.code).toEqual(code)
@@ -58,7 +58,7 @@ describe('referenceDataService', () => {
 
     it('returns undefined when code is not found', async () => {
       referenceDataStore.getReferenceData.mockResolvedValue([])
-      referenceDataSource.getActiveReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
+      referenceDataSource.getReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
 
       const actual = await referenceDataService.getReferenceData(domain, '???', systemToken)
       expect(actual).toBeUndefined()
@@ -67,7 +67,7 @@ describe('referenceDataService', () => {
     it('refreshes the cache if code cannot be found in the cache', async () => {
       const [newReferenceData, ...outdatedReferenceData] = CountryReferenceDataCodesMock
       referenceDataStore.getReferenceData.mockResolvedValue(outdatedReferenceData)
-      referenceDataSource.getActiveReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
+      referenceDataSource.getReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
 
       const actual = await referenceDataService.getReferenceData(domain, newReferenceData.code, systemToken)
       expect(actual.code).toEqual(newReferenceData.code)
@@ -81,7 +81,7 @@ describe('referenceDataService', () => {
 
     it('propagate error when retrieving from source throws', async () => {
       referenceDataStore.getReferenceData.mockResolvedValue([])
-      referenceDataSource.getActiveReferenceDataCodes.mockRejectedValue('some-api-error')
+      referenceDataSource.getReferenceDataCodes.mockRejectedValue('some-api-error')
 
       expect(referenceDataService.getReferenceData(domain, code, systemToken)).rejects.toEqual('some-api-error')
     })
@@ -97,7 +97,7 @@ describe('referenceDataService', () => {
 
     it('should call API when reference data codes have not been previously cached', async () => {
       referenceDataStore.getReferenceData.mockResolvedValue([])
-      referenceDataSource.getActiveReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
+      referenceDataSource.getReferenceDataCodes.mockResolvedValue(CountryReferenceDataCodesMock)
 
       const actual = await referenceDataService.getActiveReferenceDataCodes(domain, systemToken)
       expect(actual).toEqual(ActiveCountryReferenceDataCodesMock)
@@ -111,7 +111,7 @@ describe('referenceDataService', () => {
 
     it('propagate error when retrieving from api throws', async () => {
       referenceDataStore.getReferenceData.mockResolvedValue([])
-      referenceDataSource.getActiveReferenceDataCodes.mockRejectedValue('some-api-error')
+      referenceDataSource.getReferenceDataCodes.mockRejectedValue('some-api-error')
 
       expect(referenceDataService.getActiveReferenceDataCodes(domain, systemToken)).rejects.toEqual('some-api-error')
     })

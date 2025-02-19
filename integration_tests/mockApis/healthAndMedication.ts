@@ -51,7 +51,7 @@ export default {
   // GET routes
   stubHealthAndMedicationReferenceDataCodes: ({ domain, resp }: { domain: string; resp: ReferenceDataCode[] }) =>
     stubGetWithBody({
-      path: `${baseUrl}/reference-data/domains/${domain}/codes\\?includeInactive=false`,
+      path: `${baseUrl}/reference-data/domains/${domain}/codes\\?includeInactive=true`,
       body: resp,
     }),
 

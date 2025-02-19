@@ -12,7 +12,7 @@ import { ReferenceDataCodeDto, ReferenceDataDomain } from '../../data/interfaces
 export default class PersonIntegrationApiReferenceDataSource implements ReferenceDataSource {
   constructor(private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>) {}
 
-  async getActiveReferenceDataCodes(domain: ReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
+  async getReferenceDataCodes(domain: ReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
     const personIntegrationReferenceDataCodes = await this.personIntegrationApiClientBuilder(
       token,
     ).getReferenceDataCodes(domain as CorePersonRecordReferenceDataDomain)
