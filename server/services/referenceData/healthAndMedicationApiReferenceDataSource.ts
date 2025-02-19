@@ -12,10 +12,10 @@ import {
 export default class HealthAndMedicationApiReferenceDataSource implements ReferenceDataSource {
   constructor(private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>) {}
 
-  async getActiveReferenceDataCodes(domain: ReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
+  async getReferenceDataCodes(domain: ReferenceDataDomain, token: string): Promise<ReferenceDataCodeDto[]> {
     const healthAndMedicationReferenceDataCodes = await this.healthAndMedicationApiClientBuilder(
       token,
-    ).getReferenceDataCodes(domain as HealthAndMedicationReferenceDataDomain)
+    ).getReferenceDataCodes(domain as HealthAndMedicationReferenceDataDomain, true)
 
     return healthAndMedicationReferenceDataCodes.map(code => ({
       id: code.id,
