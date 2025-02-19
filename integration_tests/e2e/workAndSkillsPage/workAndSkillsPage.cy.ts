@@ -24,7 +24,7 @@ context('Work and skills page', () => {
     beforeEach(() => {
       const prisonerNumber = 'G6123VU'
       cy.task('reset')
-      cy.setupUserAuth({ roles: ['ROLE_GLOBAL_SEARCH'] })
+      cy.setupUserAuth({ roles: ['ROLE_PRISON', 'ROLE_GLOBAL_SEARCH'] })
       cy.setupComponentsData({
         caseLoads: [
           {

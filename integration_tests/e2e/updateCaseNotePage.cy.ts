@@ -55,7 +55,7 @@ context('Update Case Note Page', () => {
 
     context('Updating an OMiC Open Case Note', () => {
       beforeEach(() => {
-        cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.PomUser] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, Role.PomUser] })
         cy.setupComponentsData()
         cy.task('stubGetSensitiveCaseNotesPage', 'G6123VU')
         cy.task('stubGetCaseNotes', { prisonerNumber: 'G6123VU', includeSensitive: true })
@@ -104,7 +104,7 @@ context('Update Case Note Page', () => {
   context('As a user without prisoner in their caseload', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
       cy.setupComponentsData({
         caseLoads: [
           {

@@ -32,7 +32,7 @@ context('When signed in', () => {
   context('As a global search user who does not have the prisoner in their case loads', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
       cy.setupComponentsData({
         caseLoads: [
           {
@@ -552,7 +552,7 @@ context('When signed in', () => {
   context('Neurodiversity', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+      cy.setupUserAuth()
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')

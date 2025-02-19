@@ -14,7 +14,7 @@ context('Add Alert Page', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.setupBannerStubs({ prisonerNumber: 'G6123VU' })
-    cy.setupUserAuth({ roles: [Role.GlobalSearch, Role.UpdateAlert] })
+    cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, Role.UpdateAlert] })
     cy.setupComponentsData()
   })
 
@@ -93,7 +93,7 @@ context('Add Alert Page', () => {
     context('As a user without prisoner in their caseload', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.setupUserAuth({ roles: [Role.GlobalSearch] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch] })
         cy.setupComponentsData({
           caseLoads: [
             {

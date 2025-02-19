@@ -62,7 +62,7 @@ export function permissionsTests<TPage extends Page>({
     context('The user has the GLOBAL_SEARCH role', () => {
       const overrides: Partial<Prisoner> = { prisonId: 'ABC' }
       beforeEach(() => {
-        cy.setupUserAuth({ roles: [Role.GlobalSearch, ...options.additionalRoles] })
+        cy.setupUserAuth({ roles: [Role.PrisonUser, Role.GlobalSearch, ...options.additionalRoles] })
         cy.setupComponentsData({
           caseLoads: [
             {
