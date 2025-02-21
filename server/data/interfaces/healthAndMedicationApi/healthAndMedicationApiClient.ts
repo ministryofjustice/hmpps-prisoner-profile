@@ -27,15 +27,14 @@ export interface ReferenceDataCode {
   deactivatedBy?: string
 }
 
-export interface ReferenceDataCodeSimple {
+export interface ReferenceDataValue {
   id: string
+  code: string
   description: string
-  listSequence: number
-  isActive: boolean
 }
 
 export interface ReferenceDataSelection {
-  value: ReferenceDataCodeSimple
+  value: ReferenceDataValue
   comment?: string
 }
 
