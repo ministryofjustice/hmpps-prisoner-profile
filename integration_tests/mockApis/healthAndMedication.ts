@@ -7,7 +7,7 @@ import { stubGetWithBody, stubPutWithResponse } from './utils'
 
 const mockDietAndAllergy = (): DietAndAllergy => ({
   foodAllergies: {
-    value: [{ value: { id: 'FOOD_ALLERGY_EGG', description: 'Egg', isActive: true, listSequence: 0 } }],
+    value: [{ value: { id: 'FOOD_ALLERGY_EGG', code: 'EGG', description: 'Egg' } }],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
   },
@@ -16,9 +16,8 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
       {
         value: {
           id: 'MEDICAL_DIET_NUTRIENT_DEFICIENCY',
+          code: 'NUTRIENT_DEFICIENCY',
           description: 'Nutrient deficiency',
-          isActive: true,
-          listSequence: 0,
         },
       },
     ],
@@ -30,9 +29,8 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
       {
         value: {
           id: 'PERSONALISED_DIET_VEGAN',
+          code: 'VEGAN',
           description: 'Vegan',
-          isActive: true,
-          listSequence: 0,
         },
       },
     ],
