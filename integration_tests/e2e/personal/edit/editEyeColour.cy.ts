@@ -1,10 +1,6 @@
 import { Role } from '../../../../server/data/enums/role'
 import { editPageTests } from './editPageTests'
-import {
-  eyeColourCodesMock,
-  referenceDataDomainMock,
-  referenceDataDomainsMock,
-} from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
+import { eyeColourCodesMock } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 import EditEyeColour from '../../../pages/editPages/eyeColour'
 import Page from '../../../pages/page'
 
@@ -21,30 +17,23 @@ context('Edit eye colour - both eyes the same colour', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
-      cy.task('stubPrisonPerson', {
-        prisonerNumber,
-        overrides: {
-          physicalAttributes: {
-            leftEyeColour: { id: 'EYE_GREEN', description: 'Green' },
-            rightEyeColour: { id: 'EYE_GREEN', description: 'Green' },
-          },
-        },
-      })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.setupPersonRefDataStubs({
-        domainsResp: referenceDataDomainsMock,
-        domainResp: referenceDataDomainMock,
-        codesResp: eyeColourCodesMock,
-        codeResp: eyeColourCodesMock[0],
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'L_EYE_C',
+        referenceData: eyeColourCodesMock,
       })
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'R_EYE_C',
+        referenceData: eyeColourCodesMock,
+      })
+      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/eye-colour`,
     editPageWithTitle: EditEyeColour,
     editPageTitle: 'Eye colour',
     successfulFlashMessage: 'Eye colour updated',
-    validInputs: [{ radioInputs: { eyeColour: 'EYE_BLUE' } }],
+    validInputs: [{ radioInputs: { eyeColour: 'BLUE' } }],
     redirectAnchor: 'appearance',
   })
 })
@@ -62,30 +51,23 @@ context('Edit eye colour - left and right eyes different colours', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
-      cy.task('stubPrisonPerson', {
-        prisonerNumber,
-        overrides: {
-          physicalAttributes: {
-            leftEyeColour: { id: 'EYE_BLUE', description: 'Blue' },
-            rightEyeColour: { id: 'EYE_GREEN', description: 'Green' },
-          },
-        },
-      })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.setupPersonRefDataStubs({
-        domainsResp: referenceDataDomainsMock,
-        domainResp: referenceDataDomainMock,
-        codesResp: eyeColourCodesMock,
-        codeResp: eyeColourCodesMock[0],
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'L_EYE_C',
+        referenceData: eyeColourCodesMock,
       })
+      cy.task('stubPersonIntegrationGetReferenceData', {
+        domain: 'R_EYE_C',
+        referenceData: eyeColourCodesMock,
+      })
+      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/eye-colour-individual`,
     editPageWithTitle: EditEyeColour,
     editPageTitle: 'Left and right eye colours',
     successfulFlashMessage: 'Left and right eye colours updated',
-    validInputs: [{ radioInputs: { leftEyeColour: 'EYE_BROWN', rightEyeColour: 'EYE_HAZEL' } }],
+    validInputs: [{ radioInputs: { leftEyeColour: 'BROWN', rightEyeColour: 'HAZEL' } }],
     redirectAnchor: 'appearance',
   })
 })
@@ -99,24 +81,17 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
     cy.task('reset')
     cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
     cy.setupComponentsData()
-    cy.task('stubPrisonPerson', {
-      prisonerNumber,
-      overrides: {
-        physicalAttributes: {
-          leftEyeColour: { id: 'EYE_GREEN', description: 'Green' },
-          rightEyeColour: { id: 'EYE_GREEN', description: 'Green' },
-        },
-      },
-    })
-    cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
     cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
     cy.task('stubPersonalCareNeeds')
-    cy.setupPersonRefDataStubs({
-      domainsResp: referenceDataDomainsMock,
-      domainResp: referenceDataDomainMock,
-      codesResp: eyeColourCodesMock,
-      codeResp: eyeColourCodesMock[0],
+    cy.task('stubPersonIntegrationGetReferenceData', {
+      domain: 'L_EYE_C',
+      referenceData: eyeColourCodesMock,
     })
+    cy.task('stubPersonIntegrationGetReferenceData', {
+      domain: 'R_EYE_C',
+      referenceData: eyeColourCodesMock,
+    })
+    cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/personal/edit/eye-colour` })
   })
 

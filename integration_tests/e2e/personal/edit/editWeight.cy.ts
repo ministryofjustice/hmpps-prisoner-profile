@@ -16,10 +16,9 @@ context('Edit height (metric)', () => {
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
-      cy.task('stubPrisonPerson', { prisonerNumber })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/weight`,
     validInputs: [{ textInputs: { kilograms: '65' } }],
@@ -61,10 +60,9 @@ context('Edit weight (Imperial)', () => {
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
-      cy.task('stubPrisonPerson', { prisonerNumber })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/weight/imperial`,
     validInputs: [{ textInputs: { stone: '5', pounds: '3' } }],

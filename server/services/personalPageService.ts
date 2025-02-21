@@ -11,7 +11,6 @@ import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import {
   addressToLines,
   calculateAge,
-  camelToSnakeCase,
   convertToTitleCase,
   formatHeight,
   formatName,
@@ -35,15 +34,15 @@ import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import {
-  PrisonPerson,
   PrisonPersonApiClient,
   PrisonPersonDistinguishingMark,
-  PrisonPersonPhysicalAttributesUpdate,
 } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
 import {
+  CorePersonPhysicalAttributes,
+  CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -57,6 +56,7 @@ import {
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { militaryHistoryEnabled } from '../utils/featureToggles'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
+import BadRequestError from '../utils/badRequestError'
 
 export default class PersonalPageService {
   constructor(
@@ -68,14 +68,6 @@ export default class PersonalPageService {
     private readonly referenceDataService: ReferenceDataService,
     private readonly metricsService: MetricsService,
   ) {}
-
-  async getPrisonPerson(token: string, prisonerNumber: string, enablePrisonPerson: boolean): Promise<PrisonPerson> {
-    if (enablePrisonPerson) {
-      const apiClient = this.prisonPersonApiClientBuilder(token)
-      return apiClient.getPrisonPerson(prisonerNumber)
-    }
-    return null
-  }
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
     const apiClient = this.healthAndMedicationApiClientBuilder(token)
@@ -105,22 +97,35 @@ export default class PersonalPageService {
     return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
+  async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
+    const apiClient = this.personIntegrationApiClientBuilder(token)
+    return apiClient.getPhysicalAttributes(prisonerNumber)
+  }
+
   async updatePhysicalAttributes(
     token: string,
     user: PrisonUser,
     prisonerNumber: string,
-    physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
+    physicalAttributes: CorePersonPhysicalAttributesRequest,
   ) {
-    const apiClient = this.prisonPersonApiClientBuilder(token)
-    const response = await apiClient.updatePhysicalAttributes(prisonerNumber, physicalAttributes)
+    const apiClient = this.personIntegrationApiClientBuilder(token)
+
+    const existingPhysicalAttributes =
+      (await apiClient.getPhysicalAttributes(prisonerNumber)) ??
+      (() => {
+        throw new BadRequestError(`Physical attributes not found for ${prisonerNumber}`)
+      })()
+
+    await apiClient.updatePhysicalAttributes(prisonerNumber, {
+      ...existingPhysicalAttributes,
+      ...physicalAttributes,
+    })
 
     this.metricsService.trackPrisonPersonUpdate({
       fieldsUpdated: Object.keys(physicalAttributes),
       prisonerNumber,
       user,
     })
-
-    return response
   }
 
   public async get(
@@ -142,11 +147,11 @@ export default class PersonalPageService {
       contacts,
       identifiers,
       beliefs,
-      prisonPerson,
       distinguishingMarks,
       learnerNeurodivergence,
       healthAndMedication,
       militaryRecords,
+      physicalAttributes,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
@@ -156,11 +161,11 @@ export default class PersonalPageService {
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
-      this.getPrisonPerson(token, prisonerNumber, enablePrisonPerson),
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
+      this.getPhysicalAttributes(token, prisonerNumber),
     ])
 
     const addresses: Addresses = this.addresses(addressList)
@@ -183,7 +188,7 @@ export default class PersonalPageService {
       addresses,
       addressSummary: this.addressSummary(addresses),
       nextOfKin: await this.nextOfKin(contacts, prisonApiClient),
-      physicalCharacteristics: this.physicalCharacteristics(prisonerData, inmateDetail, prisonPerson),
+      physicalCharacteristics: this.physicalCharacteristics(inmateDetail, physicalAttributes),
       security: {
         interestToImmigration: getProfileInformationValue(
           ProfileInformationType.InterestToImmigration,
@@ -196,7 +201,6 @@ export default class PersonalPageService {
       },
       learnerNeurodivergence,
       hasCurrentBelief: beliefs?.some(belief => belief.bookingId === bookingId),
-      showFieldHistoryLink: !!prisonPerson,
       distinguishingMarks,
       militaryRecords: militaryRecords?.filter(record => record.militarySeq === 1), // Temporary fix to only show the first military record - designs for multiple not ready yet
     }
@@ -441,20 +445,13 @@ export default class PersonalPageService {
   }
 
   private physicalCharacteristics(
-    prisonerData: Prisoner,
     inmateDetail: InmateDetail,
-    prisonPerson: PrisonPerson,
+    physicalAttributes: CorePersonPhysicalAttributes,
   ): PhysicalCharacteristics {
     return {
-      height: formatHeight(
-        prisonPerson ? prisonPerson.physicalAttributes?.height?.value : prisonerData.heightCentimetres,
-      ),
-      weight: formatWeight(
-        prisonPerson ? prisonPerson.physicalAttributes?.weight?.value : prisonerData.weightKilograms,
-      ),
-      build: prisonPerson
-        ? prisonPerson.physicalAttributes?.build?.value?.description || 'Not entered'
-        : prisonerData.build || 'Not entered',
+      height: formatHeight(physicalAttributes.height),
+      weight: formatWeight(physicalAttributes.weight),
+      build: physicalAttributes.buildDescription || 'Not entered',
       distinguishingMarks:
         inmateDetail.physicalMarks?.map(({ bodyPart, comment, imageId, side, orentiation, type }) => ({
           bodyPart,
@@ -464,24 +461,12 @@ export default class PersonalPageService {
           orientation: orentiation,
           type,
         })) || [],
-      facialHair: prisonPerson
-        ? prisonPerson.physicalAttributes?.facialHair?.value?.description || 'Not entered'
-        : prisonerData.facialHair || 'Not entered',
-      hairColour: prisonPerson
-        ? prisonPerson.physicalAttributes?.hair?.value?.description || 'Not entered'
-        : prisonerData.hairColour || 'Not entered',
-      leftEyeColour: prisonPerson
-        ? prisonPerson.physicalAttributes?.leftEyeColour?.value?.description || 'Not entered'
-        : prisonerData.leftEyeColour || 'Not entered',
-      rightEyeColour: prisonPerson
-        ? prisonPerson.physicalAttributes?.rightEyeColour?.value?.description || 'Not entered'
-        : prisonerData.rightEyeColour || 'Not entered',
-      shapeOfFace: prisonPerson
-        ? prisonPerson.physicalAttributes?.face?.value?.description || 'Not entered'
-        : prisonerData.shapeOfFace || 'Not entered',
-      shoeSize: prisonPerson
-        ? prisonPerson.physicalAttributes?.shoeSize?.value || 'Not entered'
-        : prisonerData.shoeSize || 'Not entered',
+      facialHair: physicalAttributes.facialHairDescription || 'Not entered',
+      hairColour: physicalAttributes.hairDescription || 'Not entered',
+      leftEyeColour: physicalAttributes.leftEyeColourDescription || 'Not entered',
+      rightEyeColour: physicalAttributes.rightEyeColourDescription || 'Not entered',
+      shapeOfFace: physicalAttributes.faceDescription || 'Not entered',
+      shoeSize: physicalAttributes.shoeSize || 'Not entered',
       warnedAboutTattooing:
         getProfileInformationValue(ProfileInformationType.WarnedAboutTattooing, inmateDetail.profileInformation) ||
         'Needs to be warned',
@@ -501,12 +486,6 @@ export default class PersonalPageService {
     if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
     const curiousApiClient = this.curiousApiClientBuilder(clientToken)
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
-  }
-
-  // TODO - remove this temporary method to get the reference data codes from the prison person api
-  async getReferenceDataCodesFromPrisonPersonApi(clientToken: string, domain: string) {
-    const prisonPersonApiClient = this.prisonPersonApiClientBuilder(clientToken)
-    return prisonPersonApiClient.getReferenceDataCodes(camelToSnakeCase(domain))
   }
 
   async getReferenceDataCodes(clientToken: string, domain: ReferenceDataDomain) {

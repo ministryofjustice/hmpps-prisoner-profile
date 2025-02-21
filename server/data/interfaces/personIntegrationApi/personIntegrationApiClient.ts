@@ -18,6 +18,12 @@ export enum CorePersonRecordReferenceDataDomain {
   militaryDischarge = 'MLTY_DSCHRG',
   disciplinaryAction = 'MLTY_DISCP',
   warZone = 'MLTY_WZONE',
+  hair = 'HAIR',
+  facialHair = 'FACIAL_HAIR',
+  face = 'FACE',
+  build = 'BUILD',
+  leftEyeColour = 'L_EYE_C',
+  rightEyeColour = 'R_EYE_C',
 }
 
 export interface MilitaryRecord {
@@ -75,6 +81,36 @@ export interface DischargeDetails {
   dischargeLocation?: string
 }
 
+export interface CorePersonPhysicalAttributes {
+  height?: number
+  weight?: number
+  hairCode?: string
+  hairDescription?: string
+  facialHairCode?: string
+  facialHairDescription?: string
+  faceCode?: string
+  faceDescription?: string
+  buildCode?: string
+  buildDescription?: string
+  leftEyeColourCode?: string
+  leftEyeColourDescription?: string
+  rightEyeColourCode?: string
+  rightEyeColourDescription?: string
+  shoeSize?: string
+}
+
+export interface CorePersonPhysicalAttributesRequest {
+  height?: number
+  weight?: number
+  hairCode?: string
+  facialHairCode?: string
+  faceCode?: string
+  buildCode?: string
+  leftEyeColourCode?: string
+  rightEyeColourCode?: string
+  shoeSize?: string
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -91,4 +127,11 @@ export interface PersonIntegrationApiClient {
   updateMilitaryRecord(prisonerNumber: string, militarySeq: number, militaryRecord: MilitaryRecord): Promise<void>
 
   createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
+
+  getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributes>
+
+  updatePhysicalAttributes(
+    prisonerNumber: string,
+    physicalAttributes: CorePersonPhysicalAttributesRequest,
+  ): Promise<void>
 }
