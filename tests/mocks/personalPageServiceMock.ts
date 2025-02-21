@@ -4,9 +4,7 @@ import PersonalPageService from '../../server/services/personalPageService'
 export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   get: jest.fn(),
   getLearnerNeurodivergence: jest.fn(),
-  getPrisonPerson: jest.fn(),
   updatePhysicalAttributes: jest.fn(),
-  getReferenceDataCodesFromPrisonPersonApi: jest.fn(),
   updateSmokerOrVaper: jest.fn(),
   updateCityOrTownOfBirth: jest.fn(),
   updateNationality: jest.fn(),
@@ -18,4 +16,5 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   getHealthAndMedication: jest.fn(),
   updateDietAndFoodAllergies: jest.fn(),
   getMilitaryRecords: jest.fn(),
+  getPhysicalAttributes: jest.fn(),
 })

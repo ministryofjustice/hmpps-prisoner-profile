@@ -7,8 +7,6 @@ interface Options {
   visible?: boolean
   dataQa?: string
   html?: boolean
-  historyLinkEnabled?: boolean
-  historyHref?: string
   mergeKeyDown?: boolean
 }
 
@@ -55,16 +53,6 @@ const summaryListRowWithOptionalChangeLink = (
   }
 
   const items = [
-    ...(options.historyLinkEnabled
-      ? [
-          {
-            href: options.historyHref,
-            text: 'History',
-            visuallyHiddenText: options.hiddenText || key,
-            classes: 'govuk-link--no-visited-state',
-          },
-        ]
-      : []),
     ...(options.changeLinkEnabled
       ? [
           {

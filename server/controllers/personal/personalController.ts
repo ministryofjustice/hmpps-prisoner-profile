@@ -13,8 +13,6 @@ import { AuditService, Page } from '../../services/auditService'
 import {
   CheckboxOptions,
   convertToTitleCase,
-  fieldHistoryToFormattedValue,
-  fieldHistoryToRows,
   formatLocation,
   formatName,
   objectToRadioOptions,
@@ -49,14 +47,6 @@ import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import { getProfileInformationValue, ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
-import {
-  PrisonPersonCharacteristic,
-  PrisonPersonCharacteristicCode,
-  PrisonPersonPhysicalAttributes,
-  ValueWithMetadata,
-} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import PrisonPersonService from '../../services/prisonPersonService'
-import { formatDateTime } from '../../utils/dateHelpers'
 import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
 import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
 import {
@@ -66,7 +56,10 @@ import {
   ReferenceDataIdSelection,
 } from '../../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { Role } from '../../data/enums/role'
-import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  CorePersonPhysicalAttributesRequest,
+  CorePersonRecordReferenceDataDomain,
+} from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../../data/interfaces/referenceData'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 
@@ -76,7 +69,6 @@ type TextFieldSetter = (req: Request, res: Response, fieldData: TextFieldData, v
 export default class PersonalController {
   constructor(
     private readonly personalPageService: PersonalPageService,
-    private readonly prisonPersonService: PrisonPersonService,
     private readonly careNeedsService: CareNeedsService,
     private readonly auditService: AuditService,
   ) {}
@@ -130,10 +122,6 @@ export default class PersonalController {
           dietAndAllergyEnabled(activeCaseLoadId) &&
           userHasRoles([Role.DietAndAllergiesEdit], userRoles) &&
           prisonerData.prisonId === activeCaseLoadId,
-        historyEnabled:
-          personalPageData.showFieldHistoryLink &&
-          enablePrisonPerson(activeCaseLoadId) &&
-          userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles),
       })
     }
   }
@@ -149,7 +137,8 @@ export default class PersonalController {
           const { firstName, lastName } = prisonerData
           const requestBodyFlash = requestBodyFromFlash<{ editField: string }>(req)
           const errors = req.flash('errors')
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+          const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
           await this.auditService.sendPageView({
             user: res.locals.user,
@@ -164,7 +153,7 @@ export default class PersonalController {
             prisonerNumber,
             breadcrumbPrisonerName: formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst }),
             errors,
-            fieldValue: requestBodyFlash ? requestBodyFlash.editField : prisonPerson?.physicalAttributes?.height?.value,
+            fieldValue: requestBodyFlash ? requestBodyFlash.editField : height,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -176,8 +165,11 @@ export default class PersonalController {
           const user = res.locals.user as PrisonUser
 
           const height = editField ? parseInt(editField, 10) : 0
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const previousHeight = prisonPerson?.physicalAttributes?.height?.value
+
+          const { height: previousHeight } = await this.personalPageService.getPhysicalAttributes(
+            clientToken,
+            prisonerNumber,
+          )
 
           return this.submit({
             req,
@@ -198,13 +190,13 @@ export default class PersonalController {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const prisonPersonHeight = prisonPerson?.physicalAttributes?.height?.value
+
+          const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
           const { feet, inches } =
-            prisonPersonHeight === undefined || prisonPersonHeight === null
+            height === undefined || height === null
               ? { feet: undefined, inches: undefined }
-              : centimetresToFeetAndInches(prisonPerson?.physicalAttributes?.height?.value)
+              : centimetresToFeetAndInches(height)
 
           const requestBodyFlash = requestBodyFromFlash<{ feet: string; inches: string }>(req)
           const errors = req.flash('errors')
@@ -235,8 +227,12 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
           const { feet: feetString, inches: inchesString }: { feet: string; inches: string } = req.body
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const previousHeight = prisonPerson?.physicalAttributes?.height?.value
+
+          const { height: previousHeight } = await this.personalPageService.getPhysicalAttributes(
+            clientToken,
+            prisonerNumber,
+          )
+
           const feet = feetString ? parseInt(feetString, 10) : 0
           const inches = inchesString ? parseInt(inchesString, 10) : 0
           const height = feetAndInchesToCentimetres(feet, inches)
@@ -267,7 +263,8 @@ export default class PersonalController {
           const { clientToken, prisonerData } = req.middleware
           const requestBodyFlash = requestBodyFromFlash<{ kilograms: string }>(req)
           const errors = req.flash('errors')
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
+
+          const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
           await this.auditService.sendPageView({
             user: res.locals.user,
@@ -284,7 +281,7 @@ export default class PersonalController {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors,
-            fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : prisonPerson?.physicalAttributes?.weight?.value,
+            fieldValue: requestBodyFlash ? requestBodyFlash.kilograms : weight,
             miniBannerData: miniBannerData(prisonerData),
           })
         },
@@ -295,8 +292,12 @@ export default class PersonalController {
           const user = res.locals.user as PrisonUser
           const { kilograms } = req.body
           const weight = parseInt(kilograms, 10)
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
+
+          const { weight: previousWeight } = await this.personalPageService.getPhysicalAttributes(
+            clientToken,
+            prisonerNumber,
+          )
+
           return this.submit({
             req,
             res,
@@ -316,13 +317,13 @@ export default class PersonalController {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
           const { clientToken, prisonerData } = req.middleware
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const prisonPersonWeight = prisonPerson?.physicalAttributes?.weight?.value
+
+          const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
           const { stone, pounds } =
-            prisonPersonWeight === undefined || prisonPersonWeight === null
+            weight === undefined || weight === null
               ? { stone: undefined, pounds: undefined }
-              : kilogramsToStoneAndPounds(prisonPersonWeight)
+              : kilogramsToStoneAndPounds(weight)
 
           const requestBodyFlash = requestBodyFromFlash<{ stone: string; pounds: string }>(req)
           const errors = req.flash('errors')
@@ -353,8 +354,12 @@ export default class PersonalController {
           const { clientToken } = req.middleware
           const user = res.locals.user as PrisonUser
           const { stone: stoneString, pounds: poundsString }: { stone: string; pounds: string } = req.body
-          const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-          const previousWeight = prisonPerson?.physicalAttributes?.weight?.value
+
+          const { weight: previousWeight } = await this.personalPageService.getPhysicalAttributes(
+            clientToken,
+            prisonerNumber,
+          )
+
           const stone = stoneString ? parseInt(stoneString, 10) : 0
           const pounds = poundsString ? parseInt(poundsString, 10) : 0
           const weight = stoneAndPoundsToKilograms(stone, pounds)
@@ -401,22 +406,28 @@ export default class PersonalController {
   physicalAttributesTextInput = (fieldData: PhysicalAttributesTextFieldData) =>
     this.textInput(fieldData, this.getPhysicalAttributesText.bind(this), this.setPhysicalAttributesText.bind(this))
 
-  private async getPhysicalAttributesText(req: Request, fieldData: PhysicalAttributesTextFieldData): Promise<string> {
+  private async getPhysicalAttributesText(
+    req: Request,
+    fieldData: PhysicalAttributesTextFieldData,
+  ): Promise<string | number> {
     const { prisonerNumber } = req.params
     const { clientToken } = req.middleware
-    const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-    return (prisonPerson?.physicalAttributes[fieldData.fieldName] as ValueWithMetadata<string>)?.value
+
+    const physicalAttributes = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
+
+    return physicalAttributes[fieldData.fieldName]
   }
 
   private async setPhysicalAttributesText(
     req: Request,
     res: Response,
     fieldData: PhysicalAttributesTextFieldData,
-    value: string,
+    value: string | number,
   ): Promise<void> {
     const { prisonerNumber } = req.params
     const { clientToken } = req.middleware
     const user = res.locals.user as PrisonUser
+
     await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
       [fieldData.fieldName]: value,
     })
@@ -739,24 +750,19 @@ export default class PersonalController {
    *   Build
    */
   physicalCharacteristicRadioField(fieldData: RadioFieldData) {
-    const { pageTitle, code, fieldName } = fieldData
+    const { pageTitle, code, domain, fieldName } = fieldData
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
         const { clientToken } = req.middleware
         const { prisonerNumber } = req.params
         const requestBodyFlash = requestBodyFromFlash<{ radioField: string }>(req)
-        const [characteristics, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, code),
-          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+
+        const [characteristics, physicalAttributes] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, domain),
+          this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber),
         ])
-        const fieldValue =
-          requestBodyFlash?.radioField ||
-          (
-            prisonPerson?.physicalAttributes[
-              code as keyof PrisonPersonPhysicalAttributes
-            ] as ValueWithMetadata<PrisonPersonCharacteristic>
-          )?.value?.id
-        const options = objectToRadioOptions(characteristics, 'id', 'description', fieldValue)
+        const fieldValue = requestBodyFlash?.radioField || physicalAttributes[code]
+        const options = objectToRadioOptions(characteristics, 'code', 'description', fieldValue)
 
         return this.editRadioFields(pageTitle, fieldData, options)(req, res, next)
       },
@@ -766,11 +772,8 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const radioField = req.body.radioField || null
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousValue = (
-          prisonPerson?.physicalAttributes?.[code as keyof PrisonPersonPhysicalAttributes]
-            ?.value as PrisonPersonCharacteristic
-        )?.id
+        const physicalAttributes = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
+        const previousValue = physicalAttributes?.[code as keyof CorePersonPhysicalAttributesRequest]
         return this.submit({
           req,
           res,
@@ -795,7 +798,7 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const code = PrisonPersonCharacteristicCode.eye
+        const domain = CorePersonRecordReferenceDataDomain.leftEyeColour
 
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
@@ -805,16 +808,15 @@ export default class PersonalController {
 
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
-        const [characteristics, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, code),
-          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        const [characteristics, physicalAttributes] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, domain),
+          this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber),
         ])
 
         /* Set radio to correct eye colour if both left and right values are the same, otherwise leave unselected. */
         const eyeColour =
-          prisonPerson?.physicalAttributes.leftEyeColour?.value?.id ===
-          prisonPerson?.physicalAttributes.rightEyeColour?.value?.id
-            ? prisonPerson?.physicalAttributes.leftEyeColour?.value?.id
+          physicalAttributes.leftEyeColourCode === physicalAttributes.rightEyeColourCode
+            ? physicalAttributes.leftEyeColourCode
             : undefined
 
         const fieldValue = requestBodyFlash?.eyeColour || eyeColour
@@ -833,7 +835,7 @@ export default class PersonalController {
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
-          options: objectToRadioOptions(characteristics, 'id', 'description', fieldValue),
+          options: objectToRadioOptions(characteristics, 'code', 'description', fieldValue),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,
@@ -847,24 +849,24 @@ export default class PersonalController {
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
         const eyeColour = req.body.eyeColour || null
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
-        const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
+        const physicalAttributes = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
+        const previousLeftEyeColour = physicalAttributes?.leftEyeColourCode
+        const previousRightEyeColour = physicalAttributes?.rightEyeColourCode
         return this.submit({
           req,
           res,
           prisonerNumber,
           submit: async () => {
             await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              leftEyeColour: eyeColour,
-              rightEyeColour: eyeColour,
+              leftEyeColourCode: eyeColour,
+              rightEyeColourCode: eyeColour,
             })
           },
           fieldData: eyeColourFieldData,
           auditDetails: {
             fieldName,
-            previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
-            updated: { leftEyeColour: eyeColour, rightEyeColour: eyeColour },
+            previous: { leftEyeColourCode: previousLeftEyeColour, rightEyeColourCode: previousRightEyeColour },
+            updated: { leftEyeColourCode: eyeColour, rightEyeColourCode: eyeColour },
           },
         })
       },
@@ -879,7 +881,9 @@ export default class PersonalController {
 
     return {
       edit: async (req: Request, res: Response, next: NextFunction) => {
-        const code = PrisonPersonCharacteristicCode.eye
+        const domainLeftEyeColour = CorePersonRecordReferenceDataDomain.leftEyeColour
+        const domainRightEyeColour = CorePersonRecordReferenceDataDomain.rightEyeColour
+
         const { prisonerNumber } = req.params
         const { clientToken, prisonerData } = req.middleware
         const { firstName, lastName, cellLocation } = prisonerData
@@ -888,14 +892,13 @@ export default class PersonalController {
 
         const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
 
-        const [characteristics, prisonPerson] = await Promise.all([
-          this.personalPageService.getReferenceDataCodesFromPrisonPersonApi(clientToken, code),
-          this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true),
+        const [leftEyeColours, rightEyeColours, physicalAttributes] = await Promise.all([
+          this.personalPageService.getReferenceDataCodes(clientToken, domainLeftEyeColour),
+          this.personalPageService.getReferenceDataCodes(clientToken, domainRightEyeColour),
+          this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber),
         ])
-        const leftEyeColour =
-          requestBodyFlash?.leftEyeColour || prisonPerson?.physicalAttributes.leftEyeColour?.value?.id
-        const rightEyeColour =
-          requestBodyFlash?.rightEyeColour || prisonPerson?.physicalAttributes.rightEyeColour?.value?.id
+        const leftEyeColour = requestBodyFlash?.leftEyeColour || physicalAttributes.leftEyeColourCode
+        const rightEyeColour = requestBodyFlash?.rightEyeColour || physicalAttributes.rightEyeColourCode
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -911,8 +914,8 @@ export default class PersonalController {
           prisonerNumber,
           breadcrumbPrisonerName: prisonerBannerName,
           errors,
-          leftOptions: objectToRadioOptions(characteristics, 'id', 'description', leftEyeColour),
-          rightOptions: objectToRadioOptions(characteristics, 'id', 'description', rightEyeColour),
+          leftOptions: objectToRadioOptions(leftEyeColours, 'code', 'description', leftEyeColour),
+          rightOptions: objectToRadioOptions(rightEyeColours, 'code', 'description', rightEyeColour),
           miniBannerData: {
             prisonerName: prisonerBannerName,
             prisonerNumber,
@@ -925,65 +928,29 @@ export default class PersonalController {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
-        const leftEyeColour = req.body.leftEyeColour || null
-        const rightEyeColour = req.body.rightEyeColour || null
-        const prisonPerson = await this.personalPageService.getPrisonPerson(clientToken, prisonerNumber, true)
-        const previousLeftEyeColour = prisonPerson?.physicalAttributes?.leftEyeColour?.value?.id
-        const previousRightEyeColour = prisonPerson?.physicalAttributes?.rightEyeColour?.value?.id
+        const leftEyeColourCode = req.body.leftEyeColour || null
+        const rightEyeColourCode = req.body.rightEyeColour || null
+        const physicalAttributes = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
+        const previousLeftEyeColour = physicalAttributes?.leftEyeColourCode
+        const previousRightEyeColour = physicalAttributes?.rightEyeColourCode
         return this.submit({
           req,
           res,
           prisonerNumber,
           submit: async () => {
             await this.personalPageService.updatePhysicalAttributes(clientToken, user, prisonerNumber, {
-              leftEyeColour,
-              rightEyeColour,
+              leftEyeColourCode,
+              rightEyeColourCode,
             })
           },
           fieldData: eyeColourIndividualFieldData,
           auditDetails: {
             fieldName: 'eyeColour',
-            previous: { leftEyeColour: previousLeftEyeColour, rightEyeColour: previousRightEyeColour },
-            updated: { leftEyeColour, rightEyeColour },
+            previous: { leftEyeColourCode: previousLeftEyeColour, rightEyeColourCode: previousRightEyeColour },
+            updated: { leftEyeColourCode, rightEyeColourCode },
           },
         })
       },
-    }
-  }
-
-  history(fieldData: TextFieldData) {
-    const { pageTitle, fieldName, formatter, auditEditPageLoad } = fieldData
-
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber } = req.params
-      const { clientToken, prisonerData } = req.middleware
-      const { firstName, lastName } = prisonerData
-      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-      const fieldHistory = await this.prisonPersonService.getFieldHistory(clientToken, prisonerNumber, fieldName)
-      const latestFieldHistory = fieldHistory.pop()
-      const currentValue = fieldHistoryToFormattedValue(latestFieldHistory, formatter)
-      const currentCreatedBy = latestFieldHistory?.createdBy
-      const currentAppliesFrom = formatDateTime(latestFieldHistory?.appliesFrom)
-
-      await this.auditService.sendPageView({
-        user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: auditEditPageLoad,
-      })
-
-      return res.render('pages/edit/fieldHistory', {
-        pageTitle: `${pageTitle} history - Prisoner personal details`,
-        formTitle: `${pageTitle}`,
-        prisonerNumber,
-        breadcrumbPrisonerName: prisonerBannerName,
-        fieldHistory: fieldHistoryToRows(fieldHistory.reverse(), formatter),
-        currentValue,
-        currentCreatedBy,
-        currentAppliesFrom,
-        miniBannerData: miniBannerData(prisonerData),
-      })
     }
   }
 

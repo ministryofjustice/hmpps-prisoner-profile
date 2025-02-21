@@ -17,17 +17,8 @@ import {
   weightFieldData,
 } from './fieldData'
 import { prisonUserMock } from '../../data/localMockData/user'
-import { physicalCharacteristicsMock } from '../../data/localMockData/prisonPersonApi/physicalCharacteristicsMock'
 import InmateDetail from '../../data/interfaces/prisonApi/InmateDetail'
 import { ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
-import {
-  PrisonPerson,
-  PrisonPersonCharacteristicCode,
-  ReferenceDataCode,
-  ReferenceDataCodeSimple,
-} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import PrisonPersonService from '../../services/prisonPersonService'
-import { prisonPersonServiceMock } from '../../../tests/mocks/prisonPersonServiceMock'
 import {
   ActiveCountryReferenceDataCodesMock,
   NationalityReferenceDataCodesMock,
@@ -44,10 +35,22 @@ import {
   personalisedDietCodesMock,
   smokerStatusCodesMock,
 } from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
+import {
+  CorePersonPhysicalAttributes,
+  CorePersonRecordReferenceDataDomain,
+} from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  buildCodesMock,
+  eyeColourCodesMock,
+  faceCodesMock,
+  facialHairCodesMock,
+  hairCodesMock,
+} from '../../data/localMockData/prisonPersonApi/referenceDataMocks'
+import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
+import { objectToRadioOptions } from '../../utils/utils'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
-  let prisonPersonService: PrisonPersonService
   let auditService: AuditService
   let careNeedsService: CareNeedsService
   let controller: PersonalController
@@ -81,66 +84,57 @@ describe('PersonalController', () => {
     user: prisonUserMock,
   }
 
-  const defaultPrisonPerson = {
-    prisonerNumber: 'ABC123',
-    physicalAttributes: {
-      height: { value: 102, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-      weight: { value: 60, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-      hair: { value: { id: '', description: '' }, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-      facialHair: {
-        value: { id: '', description: '' },
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-      face: { value: { id: '', description: '' }, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-      build: {
-        value: { id: '', description: '' },
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-      leftEyeColour: {
-        value: { id: '', description: '' },
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-      rightEyeColour: {
-        value: { id: '', description: '' },
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-      shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
-    },
-    health: {
-      smokerOrVaper: {
-        value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-      medicalDietaryRequirements: {
-        value: [] as ReferenceDataCodeSimple[],
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-      foodAllergies: {
-        value: [] as ReferenceDataCodeSimple[],
-        lastModifiedAt: '2024-07-01T01:02:03+0100',
-        lastModifiedBy: 'USER1',
-      },
-    },
-  }
+  // const defaultPrisonPerson = {
+  //   prisonerNumber: 'ABC123',
+  //   physicalAttributes: {
+  //     height: { value: 102, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+  //     weight: { value: 60, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+  //     hair: { value: { id: '', description: '' }, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+  //     facialHair: {
+  //       value: { id: '', description: '' },
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //     face: { value: { id: '', description: '' }, lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+  //     build: {
+  //       value: { id: '', description: '' },
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //     leftEyeColour: {
+  //       value: { id: '', description: '' },
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //     rightEyeColour: {
+  //       value: { id: '', description: '' },
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //     shoeSize: { value: '11', lastModifiedAt: '2024-07-01T01:02:03+0100', lastModifiedBy: 'USER1' },
+  //   },
+  //   health: {
+  //     smokerOrVaper: {
+  //       value: { id: 'SMOKE_SMOKER', description: '', listSequence: 0, isActive: true },
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //     medicalDietaryRequirements: {
+  //       value: [] as ReferenceDataCodeSimple[],
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //     foodAllergies: {
+  //       value: [] as ReferenceDataCodeSimple[],
+  //       lastModifiedAt: '2024-07-01T01:02:03+0100',
+  //       lastModifiedBy: 'USER1',
+  //     },
+  //   },
+  // }
 
   beforeEach(() => {
     personalPageService = personalPageServiceMock() as PersonalPageService
-    personalPageService.getPrisonPerson = jest.fn(async () => ({ ...defaultPrisonPerson }))
     personalPageService.getHealthAndMedication = jest.fn(async () => ({ ...healthAndMedicationMock }))
-    personalPageService.getReferenceDataCodesFromPrisonPersonApi = jest.fn(async (_, domain) => {
-      if (domain === 'smoke')
-        return [
-          { id: 'SMOKE_SMOKER', description: 'Yes, they smoke' },
-          { id: 'SMOKE_NO', description: 'No, they do not smoke or vape' },
-        ] as ReferenceDataCode[]
-      return physicalCharacteristicsMock.field as ReferenceDataCode[]
-    })
     personalPageService.getReferenceDataCodes = jest.fn(async (_, domain) => {
       if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
       if (domain === 'NAT') return NationalityReferenceDataCodesMock
@@ -149,14 +143,20 @@ describe('PersonalController', () => {
       if (domain === 'FOOD_ALLERGY') return foodAllergyCodesMock
       if (domain === 'PERSONALISED_DIET') return personalisedDietCodesMock
       if (domain === 'SMOKER') return smokerStatusCodesMock
+      if (domain === 'HAIR') return hairCodesMock
+      if (domain === 'FACIAL_HAIR') return facialHairCodesMock
+      if (domain === 'FACE') return faceCodesMock
+      if (domain === 'BUILD') return buildCodesMock
+      if (domain === 'L_EYE_C') return eyeColourCodesMock
+      if (domain === 'R_EYE_C') return eyeColourCodesMock
       return null
     })
+    personalPageService.getPhysicalAttributes = jest.fn(async () => corePersonPhysicalAttributesMock)
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
-    prisonPersonService = prisonPersonServiceMock() as PrisonPersonService
 
-    controller = new PersonalController(personalPageService, prisonPersonService, careNeedsService, auditService)
+    controller = new PersonalController(personalPageService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
   })
 
@@ -180,13 +180,13 @@ describe('PersonalController', () => {
           } as any
           await action(req, res)
 
-          expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
+          expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123')
           expect(res.render).toHaveBeenCalledWith('pages/edit/heightMetric', {
             pageTitle: expect.anything(),
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            fieldValue: 102,
+            fieldValue: 100,
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
@@ -294,7 +294,7 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             correlationId: request.id,
             action: PostAction.EditHeight,
-            details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
+            details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
           }
 
           await action(request, res)
@@ -324,7 +324,7 @@ describe('PersonalController', () => {
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
             feetValue: 3,
-            inchesValue: 4,
+            inchesValue: 3,
             miniBannerData: {
               cellLocation: '2-3-001',
               prisonerName: 'Last, First',
@@ -362,10 +362,11 @@ describe('PersonalController', () => {
         })
 
         it('Keeps the inputs empty when no height exists', async () => {
-          personalPageService.getPrisonPerson = jest.fn(
-            async (): Promise<PrisonPerson> => ({
-              ...defaultPrisonPerson,
-              physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
+          personalPageService.getPhysicalAttributes = jest.fn(
+            async (): Promise<CorePersonPhysicalAttributes> => ({
+              ...corePersonPhysicalAttributesMock,
+              height: undefined,
+              weight: undefined,
             }),
           )
           const req = {
@@ -458,7 +459,7 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             correlationId: request.id,
             action: PostAction.EditHeight,
-            details: { fieldName: heightFieldData.fieldName, previous: 102, updated: 157 },
+            details: { fieldName: heightFieldData.fieldName, previous: 100, updated: 157 },
           }
 
           await action(request, res)
@@ -484,13 +485,13 @@ describe('PersonalController', () => {
           } as any
           await action(req, res)
 
-          expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
+          expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123')
           expect(res.render).toHaveBeenCalledWith('pages/edit/weightMetric', {
             pageTitle: 'Weight - Prisoner personal details',
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            fieldValue: 60,
+            fieldValue: 100,
             miniBannerData: {
               prisonerNumber: 'ABC123',
               prisonerName: 'Last, First',
@@ -601,7 +602,7 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             correlationId: request.id,
             action: PostAction.EditWeight,
-            details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
+            details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
           }
 
           await action(request, res)
@@ -630,8 +631,8 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             breadcrumbPrisonerName: 'Last, First',
             errors: [],
-            stoneValue: 9,
-            poundsValue: 6,
+            stoneValue: 15,
+            poundsValue: 10,
             miniBannerData: {
               prisonerNumber: 'ABC123',
               prisonerName: 'Last, First',
@@ -669,10 +670,11 @@ describe('PersonalController', () => {
         })
 
         it('Keeps the inputs empty when no weight exists', async () => {
-          personalPageService.getPrisonPerson = jest.fn(
-            async (): Promise<PrisonPerson> => ({
-              ...defaultPrisonPerson,
-              physicalAttributes: { ...defaultPrisonPerson.physicalAttributes, height: undefined, weight: undefined },
+          personalPageService.getPhysicalAttributes = jest.fn(
+            async (): Promise<CorePersonPhysicalAttributes> => ({
+              ...corePersonPhysicalAttributesMock,
+              height: undefined,
+              weight: undefined,
             }),
           )
           const req = {
@@ -765,7 +767,7 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
             correlationId: request.id,
             action: PostAction.EditWeight,
-            details: { fieldName: weightFieldData.fieldName, previous: 60, updated: 96 },
+            details: { fieldName: weightFieldData.fieldName, previous: 100, updated: 96 },
           }
 
           await action(request, res)
@@ -783,7 +785,8 @@ describe('PersonalController', () => {
     const fieldData: RadioFieldData = {
       pageTitle: 'Build',
       fieldName: 'build',
-      code: PrisonPersonCharacteristicCode.build,
+      code: 'buildCode',
+      domain: CorePersonRecordReferenceDataDomain.build,
       auditEditPageLoad: 'PAGE' as Page,
       auditEditPostAction: 'ACTION' as PostAction,
       url: 'edit/build',
@@ -807,8 +810,11 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodesFromPrisonPersonApi).toHaveBeenCalledWith('token', 'build')
-        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
+          'token',
+          CorePersonRecordReferenceDataDomain.build,
+        )
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
         expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
           pageTitle: 'Build - Prisoner personal details',
           formTitle: 'Build',
@@ -816,20 +822,7 @@ describe('PersonalController', () => {
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
           hintText: 'Hint text',
-          options: [
-            {
-              text: 'Characteristic One',
-              value: 'CODE1',
-            },
-            {
-              text: 'Characteristic Two',
-              value: 'CODE2',
-            },
-            {
-              text: 'Characteristic Three',
-              value: 'CODE3',
-            },
-          ],
+          options: objectToRadioOptions(buildCodesMock, 'code', 'description'),
           redirectAnchor: 'appearance',
           miniBannerData: {
             prisonerName: 'Last, First',
@@ -858,7 +851,7 @@ describe('PersonalController', () => {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ radioField: 'CODE2' })]
+            if (key === 'requestBody') return [JSON.stringify({ radioField: 'MEDIUM' })]
             return []
           },
           middleware: defaultMiddleware,
@@ -867,7 +860,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
+            options: expect.arrayContaining([{ checked: true, text: 'Medium', value: 'MEDIUM' }]),
           }),
         )
       })
@@ -905,7 +898,7 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { radioField: 'CODE3' },
+          body: { radioField: 'MEDIUM' },
           flash: jest.fn(),
         } as any
       })
@@ -913,7 +906,7 @@ describe('PersonalController', () => {
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
-          build: 'CODE3',
+          buildCode: 'MEDIUM',
         })
       })
 
@@ -949,7 +942,11 @@ describe('PersonalController', () => {
           prisonerNumber: 'A1234BC',
           correlationId: validRequest.id,
           action: 'ACTION',
-          details: { fieldName: fieldData.fieldName, previous: '', updated: 'CODE3' },
+          details: {
+            fieldName: fieldData.fieldName,
+            previous: corePersonPhysicalAttributesMock.buildCode,
+            updated: 'MEDIUM',
+          },
         }
 
         await action(validRequest, res)
@@ -1381,7 +1378,7 @@ describe('PersonalController', () => {
         } as any
         await action(req, res)
 
-        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'ABC123', true)
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'ABC123')
         expect(res.render).toHaveBeenCalledWith('pages/edit/textField', {
           pageTitle: 'Shoe size - Prisoner personal details',
           formTitle: 'Shoe size',
@@ -1758,28 +1755,23 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodesFromPrisonPersonApi).toHaveBeenCalledWith('token', 'eye')
-        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
+          'token',
+          CorePersonRecordReferenceDataDomain.leftEyeColour,
+        )
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColour', {
           pageTitle: 'Eye colour - Prisoner personal details',
           formTitle: 'Eye colour',
           prisonerNumber: 'A1234BC',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
-          options: [
-            {
-              text: 'Characteristic One',
-              value: 'CODE1',
-            },
-            {
-              text: 'Characteristic Two',
-              value: 'CODE2',
-            },
-            {
-              text: 'Characteristic Three',
-              value: 'CODE3',
-            },
-          ],
+          options: objectToRadioOptions(
+            eyeColourCodesMock,
+            'code',
+            'description',
+            corePersonPhysicalAttributesMock.leftEyeColourCode,
+          ),
           miniBannerData: {
             prisonerName: 'Last, First',
             prisonerNumber: 'A1234BC',
@@ -1807,7 +1799,7 @@ describe('PersonalController', () => {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ eyeColour: 'CODE2' })]
+            if (key === 'requestBody') return [JSON.stringify({ eyeColour: 'GREEN' })]
             return []
           },
           middleware: defaultMiddleware,
@@ -1816,7 +1808,7 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            options: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
+            options: expect.arrayContaining([{ checked: true, text: 'Green', value: 'GREEN' }]),
           }),
         )
       })
@@ -1853,7 +1845,7 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { eyeColour: 'CODE3' },
+          body: { eyeColour: 'GREEN' },
           flash: jest.fn(),
         } as any
       })
@@ -1861,8 +1853,8 @@ describe('PersonalController', () => {
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
-          leftEyeColour: 'CODE3',
-          rightEyeColour: 'CODE3',
+          leftEyeColourCode: 'GREEN',
+          rightEyeColourCode: 'GREEN',
         })
       })
 
@@ -1900,8 +1892,8 @@ describe('PersonalController', () => {
           action: PostAction.EditEyeColour,
           details: {
             fieldName: 'eyeColour',
-            previous: { leftEyeColour: '', rightEyeColour: '' },
-            updated: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE3' },
+            previous: { leftEyeColourCode: 'BLUE', rightEyeColourCode: 'BLUE' },
+            updated: { leftEyeColourCode: 'GREEN', rightEyeColourCode: 'GREEN' },
           },
         }
 
@@ -1931,42 +1923,33 @@ describe('PersonalController', () => {
 
         await action(req, res)
 
-        expect(personalPageService.getReferenceDataCodesFromPrisonPersonApi).toHaveBeenCalledWith('token', 'eye')
-        expect(personalPageService.getPrisonPerson).toHaveBeenCalledWith('token', 'A1234BC', true)
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
+          'token',
+          CorePersonRecordReferenceDataDomain.leftEyeColour,
+        )
+        expect(personalPageService.getReferenceDataCodes).toHaveBeenCalledWith(
+          'token',
+          CorePersonRecordReferenceDataDomain.rightEyeColour,
+        )
+        expect(personalPageService.getPhysicalAttributes).toHaveBeenCalledWith('token', 'A1234BC')
         expect(res.render).toHaveBeenCalledWith('pages/edit/eyeColourIndividual', {
           pageTitle: 'Left and right eye colours - Prisoner personal details',
           formTitle: 'Left and right eye colours',
           prisonerNumber: 'A1234BC',
           breadcrumbPrisonerName: 'Last, First',
           errors: [],
-          leftOptions: [
-            {
-              text: 'Characteristic One',
-              value: 'CODE1',
-            },
-            {
-              text: 'Characteristic Two',
-              value: 'CODE2',
-            },
-            {
-              text: 'Characteristic Three',
-              value: 'CODE3',
-            },
-          ],
-          rightOptions: [
-            {
-              text: 'Characteristic One',
-              value: 'CODE1',
-            },
-            {
-              text: 'Characteristic Two',
-              value: 'CODE2',
-            },
-            {
-              text: 'Characteristic Three',
-              value: 'CODE3',
-            },
-          ],
+          leftOptions: objectToRadioOptions(
+            eyeColourCodesMock,
+            'code',
+            'description',
+            corePersonPhysicalAttributesMock.leftEyeColourCode,
+          ),
+          rightOptions: objectToRadioOptions(
+            eyeColourCodesMock,
+            'code',
+            'description',
+            corePersonPhysicalAttributesMock.rightEyeColourCode,
+          ),
           miniBannerData: {
             prisonerName: 'Last, First',
             prisonerNumber: 'A1234BC',
@@ -1994,7 +1977,7 @@ describe('PersonalController', () => {
           id: '1',
           params: { prisonerNumber: 'A1234BC' },
           flash: (key: string): any => {
-            if (key === 'requestBody') return [JSON.stringify({ leftEyeColour: 'CODE2', rightEyeColour: 'CODE3' })]
+            if (key === 'requestBody') return [JSON.stringify({ leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' })]
             return []
           },
           middleware: defaultMiddleware,
@@ -2003,8 +1986,8 @@ describe('PersonalController', () => {
         expect(res.render).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            leftOptions: expect.arrayContaining([{ checked: true, text: 'Characteristic Two', value: 'CODE2' }]),
-            rightOptions: expect.arrayContaining([{ checked: true, text: 'Characteristic Three', value: 'CODE3' }]),
+            leftOptions: expect.arrayContaining([{ checked: true, text: 'Brown', value: 'BROWN' }]),
+            rightOptions: expect.arrayContaining([{ checked: true, text: 'Green', value: 'GREEN' }]),
           }),
         )
       })
@@ -2041,7 +2024,7 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' },
+          body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' },
           flash: jest.fn(),
         } as any
       })
@@ -2049,8 +2032,8 @@ describe('PersonalController', () => {
       it('Updates the physical characteristic', async () => {
         await action(validRequest, res)
         expect(personalPageService.updatePhysicalAttributes).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', {
-          leftEyeColour: 'CODE3',
-          rightEyeColour: 'CODE1',
+          leftEyeColourCode: 'BROWN',
+          rightEyeColourCode: 'GREEN',
         })
       })
 
@@ -2081,7 +2064,7 @@ describe('PersonalController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' } }
+        const request = { ...validRequest, id: 1, body: { leftEyeColour: 'BROWN', rightEyeColour: 'GREEN' } }
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
@@ -2089,8 +2072,11 @@ describe('PersonalController', () => {
           action: PostAction.EditEyeColour,
           details: {
             fieldName: 'eyeColour',
-            previous: { leftEyeColour: '', rightEyeColour: '' },
-            updated: { leftEyeColour: 'CODE3', rightEyeColour: 'CODE1' },
+            previous: {
+              leftEyeColourCode: corePersonPhysicalAttributesMock.leftEyeColourCode,
+              rightEyeColourCode: corePersonPhysicalAttributesMock.rightEyeColourCode,
+            },
+            updated: { leftEyeColourCode: 'BROWN', rightEyeColourCode: 'GREEN' },
           },
         }
 

@@ -631,7 +631,7 @@ export const objectToRadioOptions = <T>(
   array: T[],
   id: keyof (typeof array)[number],
   description: keyof (typeof array)[number],
-  checked?: string,
+  checked?: string | number,
 ): RadioOption[] => {
   return array.map(obj => ({
     text: obj[description] as string,

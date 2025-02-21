@@ -31,15 +31,6 @@ export interface PrisonPersonPhysicalAttributesUpdate {
   rightEyeColour: PrisonPersonCharacteristic
 }
 
-// eslint-disable-next-line no-shadow
-export enum PrisonPersonCharacteristicCode {
-  hair = 'hair',
-  facialHair = 'facialHair',
-  face = 'face',
-  build = 'build',
-  eye = 'eye',
-}
-
 export interface PrisonPersonCharacteristic {
   id: string
   description: string
@@ -163,24 +154,7 @@ export interface PrisonPersonDistinguishingMarkRequest {
 }
 
 export interface PrisonPersonApiClient {
-  getPrisonPerson(prisonerNumber: string): Promise<PrisonPerson>
-
-  updatePhysicalAttributes(
-    prisonerNumber: string,
-    physicalAttributes: Partial<PrisonPersonPhysicalAttributesUpdate>,
-  ): Promise<PrisonPersonPhysicalAttributes>
-
   updateHealth(prisonerNumber: string, healthData: Partial<PrisonPersonHealthUpdate>): Promise<PrisonPerson>
-
-  getReferenceDataDomains(includeInactive?: boolean, includeSubDomains?: boolean): Promise<ReferenceDataDomain[]>
-
-  getReferenceDataDomain(domain: string): Promise<ReferenceDataDomain>
-
-  getReferenceDataCodes(domain: string, includeInactive?: boolean): Promise<ReferenceDataCode[]>
-
-  getReferenceDataCode(domain: string, code: string): Promise<ReferenceDataCode>
-
-  getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]>
 
   getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]>
 
