@@ -16,7 +16,6 @@ export default interface PersonalPage {
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
-  showFieldHistoryLink: boolean
   distinguishingMarks: PrisonPersonDistinguishingMark[] | null
   militaryRecords: MilitaryRecord[] | null
 }

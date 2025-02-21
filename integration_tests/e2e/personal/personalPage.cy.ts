@@ -9,6 +9,7 @@ import NotFoundPage from '../../pages/notFoundPage'
 import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
 import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import { corePersonPhysicalAttributesMock } from '../../../server/data/localMockData/physicalAttributesMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -61,6 +62,7 @@ context('When signed in', () => {
       cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
+      cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesMock)
       visitPersonalDetailsPage()
     })
 
@@ -320,15 +322,15 @@ context('When signed in', () => {
     context('Appearance', () => {
       it('Displays the appearance information', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        page.appearance().height().should('include.text', '1.88m')
-        page.appearance().weight().should('include.text', '86kg')
+        page.appearance().height().should('include.text', '1m')
+        page.appearance().weight().should('include.text', '100kg')
         page.appearance().hairColour().should('include.text', 'Brown')
         page.appearance().leftEyeColour().should('include.text', 'Blue')
         page.appearance().rightEyeColour().should('include.text', 'Blue')
-        page.appearance().facialHair().should('include.text', 'Clean Shaven')
-        page.appearance().shapeOfFace().should('include.text', 'Angular')
-        page.appearance().build().should('include.text', 'Proportional')
-        page.appearance().shoeSize().should('include.text', '10')
+        page.appearance().facialHair().should('include.text', 'Bearded')
+        page.appearance().shapeOfFace().should('include.text', 'Round')
+        page.appearance().build().should('include.text', 'Average')
+        page.appearance().shoeSize().should('include.text', '11')
         page.appearance().warnedAboutTattooing().should('include.text', 'Yes')
         page.appearance().warnedNotTochangeAppearance().should('include.text', 'Yes')
       })

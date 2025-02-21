@@ -16,10 +16,9 @@ context('Edit height (metric)', () => {
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
-      cy.task('stubPrisonPerson', { prisonerNumber })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height`,
     validInputs: [{ textInputs: { editField: '125' } }],
@@ -71,10 +70,9 @@ context('Edit height (Imperial)', () => {
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
       cy.setupBannerStubs({ prisonerNumber, bookingId })
-      cy.task('stubPrisonPerson', { prisonerNumber })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
+      cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
     editUrl: `prisoner/${prisonerNumber}/personal/edit/height/imperial`,
     validInputs: [{ textInputs: { feet: '5', inches: '3' } }],

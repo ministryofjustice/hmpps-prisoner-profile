@@ -36,6 +36,7 @@ import {
   dietAndAllergyMock,
   healthAndMedicationMock,
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
+import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -74,6 +75,8 @@ describe('PersonalPageService', () => {
       getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
       updateMilitaryRecord: jest.fn(),
       createMilitaryRecord: jest.fn(),
+      getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesMock),
+      updatePhysicalAttributes: jest.fn(),
     }
 
     healthAndMedicationApiClient = {
@@ -503,14 +506,14 @@ describe('PersonalPageService', () => {
   describe('Appearance', () => {
     it('Maps the data from the API', async () => {
       const { physicalCharacteristics } = await constructService().get('token', PrisonerMockDataA)
-      expect(physicalCharacteristics.height).toEqual('1.88m')
-      expect(physicalCharacteristics.weight).toEqual('86kg')
+      expect(physicalCharacteristics.height).toEqual('1m')
+      expect(physicalCharacteristics.weight).toEqual('100kg')
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
       expect(physicalCharacteristics.leftEyeColour).toEqual('Blue')
       expect(physicalCharacteristics.rightEyeColour).toEqual('Blue')
-      expect(physicalCharacteristics.shapeOfFace).toEqual('Angular')
-      expect(physicalCharacteristics.build).toEqual('Proportional')
-      expect(physicalCharacteristics.shoeSize).toEqual('10')
+      expect(physicalCharacteristics.shapeOfFace).toEqual('Round')
+      expect(physicalCharacteristics.build).toEqual('Average')
+      expect(physicalCharacteristics.shoeSize).toEqual('11')
       expect(physicalCharacteristics.warnedAboutTattooing).toEqual('Yes')
       expect(physicalCharacteristics.warnedNotToChangeAppearance).toEqual('Yes')
 
@@ -613,7 +616,11 @@ describe('PersonalPageService', () => {
   describe('Update physical attributes', () => {
     it('Makes a call to the prison person api to update physical attributes', async () => {
       await constructService().updatePhysicalAttributes('token', prisonUserMock, 'A1234AA', { height: 123 })
-      expect(prisonPersonApiClient.updatePhysicalAttributes).toHaveBeenCalledWith('A1234AA', { height: 123 })
+      expect(personIntegrationApiClient.getPhysicalAttributes).toHaveBeenCalledWith('A1234AA')
+      expect(personIntegrationApiClient.updatePhysicalAttributes).toHaveBeenCalledWith('A1234AA', {
+        ...corePersonPhysicalAttributesMock,
+        height: 123,
+      })
       expect(metricsService.trackPrisonPersonUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['height'],

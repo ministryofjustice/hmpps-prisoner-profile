@@ -1,5 +1,6 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
+  CorePersonPhysicalAttributes,
   CorePersonRecordReferenceDataCodeDto,
   MilitaryRecord,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
@@ -52,6 +53,18 @@ export default {
   stubPersonIntegrationCreateMilitaryRecord: () =>
     stubPostWithResponse<void>({
       path: `${baseUrl}/v1/core-person-record/military-records\\?prisonerNumber=.*`,
+      responseBody: null,
+    }),
+
+  stubPersonIntegrationGetPhysicalAttributes: (physicalAttributes: CorePersonPhysicalAttributes) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/core-person-record/physical-attributes\\?prisonerNumber=.*`,
+      body: physicalAttributes,
+    }),
+
+  stubPersonIntegrationUpdatePhysicalAttributes: () =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/core-person-record/physical-attributes\\?prisonerNumber=.*`,
       responseBody: null,
     }),
 }

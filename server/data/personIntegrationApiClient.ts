@@ -1,5 +1,7 @@
 import RestClient from './restClient'
 import {
+  CorePersonPhysicalAttributes,
+  CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
   CorePersonRecordReferenceDataDomain,
   MilitaryRecord,
@@ -67,6 +69,21 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: '/v1/core-person-record',
       query: { prisonerNumber },
       data: { fieldName, value },
+    })
+  }
+
+  getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
+    return this.restClient.get({ path: `/v1/core-person-record/physical-attributes`, query: { prisonerNumber } })
+  }
+
+  updatePhysicalAttributes(
+    prisonerNumber: string,
+    physicalAttributes: CorePersonPhysicalAttributesRequest,
+  ): Promise<void> {
+    return this.restClient.put({
+      path: '/v1/core-person-record/physical-attributes',
+      query: { prisonerNumber },
+      data: physicalAttributes,
     })
   }
 }

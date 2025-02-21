@@ -1,9 +1,9 @@
-import {
-  PrisonPersonCharacteristicCode,
-  PrisonPersonPhysicalAttributes,
-} from '../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Page, PostAction } from '../../services/auditService'
 import { formatHeight, formatWeight } from '../../utils/utils'
+import {
+  CorePersonPhysicalAttributesRequest,
+  CorePersonRecordReferenceDataDomain,
+} from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export interface FieldData {
   url: string
@@ -21,11 +21,12 @@ export interface TextFieldData extends FieldData {
 }
 
 export interface PhysicalAttributesTextFieldData extends TextFieldData {
-  fieldName: keyof PrisonPersonPhysicalAttributes
+  fieldName: keyof CorePersonPhysicalAttributesRequest
 }
 
 export interface RadioFieldData extends FieldData {
-  code?: PrisonPersonCharacteristicCode
+  code?: keyof CorePersonPhysicalAttributesRequest
+  domain?: CorePersonRecordReferenceDataDomain
 }
 
 export interface CheckboxFieldData extends FieldData {
@@ -52,7 +53,8 @@ export const hairFieldData: RadioFieldData = {
   pageTitle: 'Hair type or colour',
   auditEditPageLoad: Page.EditHairTypeOrColour,
   auditEditPostAction: PostAction.EditHairTypeOrColour,
-  code: PrisonPersonCharacteristicCode.hair,
+  code: 'hairCode',
+  domain: CorePersonRecordReferenceDataDomain.hair,
   hintText: 'Select the most prominent hair type or colour.',
   redirectAnchor: 'appearance',
 }
@@ -63,7 +65,8 @@ export const facialHairFieldData: RadioFieldData = {
   pageTitle: 'Facial hair',
   auditEditPageLoad: Page.EditFacialHair,
   auditEditPostAction: PostAction.EditFacialHair,
-  code: PrisonPersonCharacteristicCode.facialHair,
+  code: 'facialHairCode',
+  domain: CorePersonRecordReferenceDataDomain.facialHair,
   hintText: 'Select the most prominent type of facial hair.',
   redirectAnchor: 'appearance',
 }
@@ -74,7 +77,8 @@ export const faceShapeFieldData: RadioFieldData = {
   pageTitle: 'Face shape',
   auditEditPageLoad: Page.EditFaceShape,
   auditEditPostAction: PostAction.EditFaceShape,
-  code: PrisonPersonCharacteristicCode.face,
+  code: 'faceCode',
+  domain: CorePersonRecordReferenceDataDomain.face,
   redirectAnchor: 'appearance',
 }
 
@@ -84,7 +88,8 @@ export const buildFieldData: RadioFieldData = {
   pageTitle: 'Build',
   auditEditPageLoad: Page.EditBuild,
   auditEditPostAction: PostAction.EditBuild,
-  code: PrisonPersonCharacteristicCode.build,
+  code: 'buildCode',
+  domain: CorePersonRecordReferenceDataDomain.build,
   redirectAnchor: 'appearance',
 }
 
