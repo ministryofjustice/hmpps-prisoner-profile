@@ -16,13 +16,14 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false}) }}
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3"}) }}
     </div>
   </div>
   <div class="govuk-grid-row" data-qa="prisoner-photo-page">
     <div class="govuk-grid-column-full">
       {{ mojSubNavigation({
       label: 'Sub navigation',
+      classes: 'govuk-!-margin-bottom-6',
       items: [{
           text: 'Main facial image',
           href: '/prisoner/' + prisonerNumber + '/image'
@@ -36,22 +37,23 @@
     }) }}
     </div>
   </div>
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row govuk-!-margin-bottom-4">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">All facial images</h1>
     </div>
   </div>
   <div class="govuk-grid-row hmpps-photo-list" data-qa="image-list">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-three-quarters">
       {% for image in facialImages %}
         <div
-          class="govuk-grid-row hmpps-photo-list__item {{ "
+          class="govuk-grid-row govuk-!-margin-left-0 govuk-!-margin-right-0
+                                    hmpps-photo-list__item {{ "
           hmpps-photo-list__main" if image.main }}"
           data-qa="image-list-item">
-          <div class="govuk-grid-column-one-quarter" data-qa="image-item-photo">
-            <img class="hmpps-profile-photo__large" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
+          <div class="hmpps-photo-list__photo" data-qa="image-item-photo">
+            <img class="" src="/api/image/{{ image.imageId }}" alt="{{ prisonerName + "-image-id-" + image.imageId }}" data-qa="prisoner-photo"/>
           </div>
-          <div class="govuk-grid-column-three-quarters" data-qa="image-item-details">
+          <div class="hmpps-photo-list__details" data-qa="image-item-details">
             {% if image.main %}
               {{ govukTag({
                 text: "Main facial image",
