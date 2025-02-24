@@ -1,17 +1,10 @@
 import {
   PrisonPerson,
-  PrisonPersonDistinguishingMark,
-  PrisonPersonDistinguishingMarkPhotographUuid,
-  PrisonPersonHealth,
   PrisonPersonPhysicalAttributes,
   ReferenceDataCode,
   ReferenceDataDomain,
 } from '../../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { stubGetWithBody, stubPatchWithResponse } from './utils'
-import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
-import { stubFor } from './wiremock'
-
-const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 const mockPrisonPerson = (prisonerNumber: string): PrisonPerson => ({
   prisonerNumber,
@@ -96,99 +89,6 @@ export default {
         ...mockPrisonPerson(prisonerNumber).physicalAttributes,
         ...overrides,
       },
-    }),
-
-  stubPrisonPersonUpdateHealth: ({
-    prisonerNumber,
-    overrides = {},
-  }: {
-    prisonerNumber: string
-    overrides: Partial<PrisonPersonHealth>
-  }) =>
-    stubPatchWithResponse<PrisonPersonHealth>({
-      path: `${baseUrl}/prisoners/${prisonerNumber}/health`,
-      responseBody: {
-        ...mockPrisonPerson(prisonerNumber).health,
-        ...overrides,
-      },
-    }),
-
-  stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
-    stubGetWithBody({
-      path: `${baseUrl}/distinguishing-marks/prisoner/${prisonerNumber}`,
-      body: [distinguishingMarkMock],
-    }),
-
-  stubPrisonPersonGetImage: (
-    photo: PrisonPersonDistinguishingMarkPhotographUuid = distinguishingMarkMock.photographUuids[0],
-  ) => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPattern: `${baseUrl}/distinguishing-marks/photo/${photo.id}`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'image/jpeg',
-        },
-        bodyFileName: placeHolderImagePath,
-      },
-    })
-  },
-
-  stubPostNewDistinguishingMark: () => {
-    return stubFor({
-      request: {
-        method: 'POST',
-        urlPattern: `${baseUrl}/distinguishing-marks/mark`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: distinguishingMarkMock,
-      },
-    })
-  },
-
-  stubPatchDistinguishingMark: () => {
-    return stubFor({
-      request: {
-        method: 'PATCH',
-        urlPattern: `${baseUrl}/distinguishing-marks/mark/.*`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: distinguishingMarkMock,
-      },
-    })
-  },
-
-  stubPostDistinguishingMarkPhoto: () => {
-    return stubFor({
-      request: {
-        method: 'POST',
-        urlPattern: `${baseUrl}/distinguishing-marks/mark/.*/photo`,
-      },
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: distinguishingMarkMock,
-      },
-    })
-  },
-
-  stubGetDistinguishingMark: (markResp: PrisonPersonDistinguishingMark) =>
-    stubGetWithBody({
-      path: `${baseUrl}/distinguishing-marks/mark/.*`,
-      body: markResp ?? distinguishingMarkMock,
     }),
 
   // Reference data

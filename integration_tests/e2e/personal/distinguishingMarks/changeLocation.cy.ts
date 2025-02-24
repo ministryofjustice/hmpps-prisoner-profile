@@ -7,7 +7,7 @@ import ChangeBodyPart from '../../../pages/editPages/distinguishingMarks/changeB
 
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
-const markId = '019205c0-0fd5-7c41-ae24-ede9eae05da5'
+const markId = '100'
 
 const visitChangeLocationTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/body-part` })
@@ -38,7 +38,7 @@ context('Change location of distinguishing mark on face', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPatchDistinguishingMark')
+      cy.task('stubPutDistinguishingMark', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })
@@ -46,7 +46,7 @@ context('Change location of distinguishing mark on face', () => {
     function testChangeDistinguishingMarkDetailWithRadios(bodyPartSelectorAlt) {
       return (bodyPart: string) => {
         it(`User can add distinguishing mark detail for body part: ${bodyPart}`, () => {
-          cy.task('stubGetDistinguishingMark', scarMock)
+          cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
           visitChangeLocationScarPage()
           const bodyPage = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the scar is')
 
@@ -65,7 +65,7 @@ context('Change location of distinguishing mark on face', () => {
           page.bodyPartRadios().filter(`[value="${bodyPart}"]`).check()
 
           page.saveBtn().click()
-          cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+          cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
         })
       }
     }

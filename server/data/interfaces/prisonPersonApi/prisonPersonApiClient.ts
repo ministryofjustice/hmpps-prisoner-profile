@@ -1,6 +1,3 @@
-import { Readable } from 'stream'
-import MulterFile from '../../../controllers/interfaces/MulterFile'
-
 export interface ValueWithMetadata<T> {
   value?: T
   lastModifiedAt: string
@@ -101,75 +98,7 @@ export interface PrisonPersonHealthUpdate {
   medicalDietaryRequirements?: string[]
 }
 
-export type BodyPartId =
-  | 'BODY_PART_ANKLE'
-  | 'BODY_PART_ARM'
-  | 'BODY_PART_EAR'
-  | 'BODY_PART_ELBOW'
-  | 'BODY_PART_FACE'
-  | 'BODY_PART_FINGER'
-  | 'BODY_PART_FOOT'
-  | 'BODY_PART_HAND'
-  | 'BODY_PART_HEAD'
-  | 'BODY_PART_KNEE'
-  | 'BODY_PART_LEG'
-  | 'BODY_PART_LIP'
-  | 'BODY_PART_NECK'
-  | 'BODY_PART_NOSE'
-  | 'BODY_PART_SHOULDER'
-  | 'BODY_PART_THIGH'
-  | 'BODY_PART_TOE'
-  | 'BODY_PART_TORSO'
-
-export type MarkTypeId = 'MARK_TYPE_MARK' | 'MARK_TYPE_SCAR' | 'MARK_TYPE_TAT' | 'MARK_TYPE_OTH'
-export type BodyPartSideId = 'SIDE_B' | 'SIDE_F' | 'SIDE_L' | 'SIDE_R' | 'SIDE_S'
-export type PartOrientationId = 'PART_ORIENT_CENTR' | 'PART_ORIENT_FACE' | 'PART_ORIENT_LOW' | 'PART_ORIENT_UPP'
-
-export interface PrisonPersonDistinguishingMarkPhotographUuid {
-  id: string
-  latest: boolean
-}
-
-export interface PrisonPersonDistinguishingMark {
-  id: string
-  prisonerNumber: string
-  bodyPart: ReferenceDataCodeSimple & { id: BodyPartId }
-  markType: ReferenceDataCodeSimple & { id: MarkTypeId }
-  side?: ReferenceDataCodeSimple & { id: BodyPartSideId }
-  partOrientation?: ReferenceDataCodeSimple & { id: PartOrientationId }
-  comment?: string
-  photographUuids?: PrisonPersonDistinguishingMarkPhotographUuid[]
-  createdBy: string
-  createdAt: string
-}
-
-export interface PrisonPersonDistinguishingMarkRequest {
-  markId?: string
-  prisonerNumber: string
-  bodyPart?: BodyPartId
-  markType: MarkTypeId
-  side?: BodyPartSideId
-  partOrientation?: PartOrientationId
-  comment?: string
-}
-
 export interface PrisonPersonApiClient {
   updateHealth(prisonerNumber: string, healthData: Partial<PrisonPersonHealthUpdate>): Promise<PrisonPerson>
-
-  getDistinguishingMarks(prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]>
-
-  postDistinguishingMark(
-    distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
-    photograph?: MulterFile,
-  ): Promise<PrisonPersonDistinguishingMark>
-
-  getDistinguishingMark(markId: string): Promise<PrisonPersonDistinguishingMark>
-
-  patchDistinguishingMark(
-    distinguishingMarkRequest: PrisonPersonDistinguishingMarkRequest,
-  ): Promise<PrisonPersonDistinguishingMark>
-
-  postDistinguishingMarkPhoto(markId: string, photograph: MulterFile): Promise<PrisonPersonDistinguishingMark>
-
-  getImage(imageId: string): Promise<{ stream: Readable; contentType: string }>
+  getFieldHistory(prisonerNumber: string, field: string): Promise<FieldHistory[]>
 }

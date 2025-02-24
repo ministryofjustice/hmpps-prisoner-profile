@@ -216,7 +216,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/image/data\\?fullSizeImage=true`,
+        urlPattern: `/prison/api/bookings/offenderNo/${prisonerNumber}/image/data\\?fullSizeImage=.*`,
       },
       response: {
         status: 200,
@@ -772,7 +772,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/staff/(.*)/(.*)/roles`,
+        urlPattern: `/prison/api/staff/\\w+/\\w+/roles`,
       },
       response: {
         status: 200,

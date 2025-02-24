@@ -1,11 +1,17 @@
-import { Readable } from 'stream'
 import { RestClientBuilder } from '../data'
-import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { FieldHistory, PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 
 export default class PrisonPersonService {
   constructor(private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>) {}
 
-  getImage(token: string, imageId: string): Promise<{ stream: Readable; contentType: string }> {
-    return this.prisonPersonApiClientBuilder(token).getImage(imageId)
+  /**
+   * Handle request for field history
+   *
+   * @param token
+   * @param prisonerNumber
+   * @param field
+   */
+  public async getFieldHistory(token: string, prisonerNumber: string, field: string): Promise<FieldHistory[]> {
+    return this.prisonPersonApiClientBuilder(token).getFieldHistory(prisonerNumber, field)
   }
 }

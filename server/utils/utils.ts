@@ -18,12 +18,10 @@ import { HmppsUser } from '../interfaces/HmppsUser'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
-import {
-  FieldHistory,
-  PrisonPersonDistinguishingMarkPhotographUuid,
-} from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { FieldHistory } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { formatDateTime } from './dateHelpers'
 import { pluralise } from './pluralise'
+import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -786,10 +784,10 @@ export const fieldHistoryToRows = (
   ])
 }
 
-export const sortByLatestAndUuid = (list: PrisonPersonDistinguishingMarkPhotographUuid[]) => {
+export const sortByLatestAndUuid = (list: PersonIntegrationDistinguishingMarkImageDetail[]) => {
   return list.sort((a, b) => {
     if (b.latest === a.latest) {
-      return b.id.localeCompare(a.id)
+      return b.id > a.id ? 1 : -1
     }
     return b.latest ? 1 : -1
   })

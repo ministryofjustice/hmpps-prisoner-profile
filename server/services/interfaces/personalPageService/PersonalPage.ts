@@ -1,9 +1,11 @@
 import Address from './Address'
 import GovSummaryItem from '../../../interfaces/GovSummaryItem'
 import LearnerNeurodivergence from '../../../data/interfaces/curiousApi/LearnerNeurodivergence'
-import { PrisonPersonDistinguishingMark } from '../../../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { Result } from '../../../utils/result/result'
-import { MilitaryRecord } from '../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  MilitaryRecord,
+  PersonIntegrationDistinguishingMark,
+} from '../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export default interface PersonalPage {
   personalDetails: PersonalDetails
@@ -16,7 +18,7 @@ export default interface PersonalPage {
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>
   hasCurrentBelief: boolean
-  distinguishingMarks: PrisonPersonDistinguishingMark[] | null
+  distinguishingMarks: PersonIntegrationDistinguishingMark[] | null
   militaryRecords: MilitaryRecord[] | null
 }
 

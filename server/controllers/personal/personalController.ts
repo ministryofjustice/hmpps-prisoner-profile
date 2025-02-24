@@ -86,8 +86,8 @@ export default class PersonalController {
         this.personalPageService.get(
           clientToken,
           prisonerData,
-          prisonPersonEnabled,
           dietAndAllergyEnabled(activeCaseLoadId),
+          profileEditEnabled,
           res.locals.apiErrorCallback,
         ),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),

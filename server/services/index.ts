@@ -148,7 +148,7 @@ export const services = () => {
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
   const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
-  const distinguishingMarksService = new DistinguishingMarksService(prisonPersonApiClientBuilder)
+  const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
     personIntegrationApiClientBuilder,
@@ -156,7 +156,7 @@ export const services = () => {
     metricsService,
   )
   const photoService = new PhotoService(prisonApiClientBuilder)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, prisonPersonService, photoService)
+  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),

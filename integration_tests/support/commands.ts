@@ -148,6 +148,7 @@ Cypress.Commands.add('setupComponentsData', (options = {}) => {
 
 Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, prisonerDataOverrides }) => {
   cy.setupBannerStubs({ prisonerNumber, prisonerDataOverrides })
+  cy.task('stubGetStaffRoles', [])
   cy.task('stubInmateDetail', { bookingId })
   cy.task('stubPrisonerDetail', prisonerNumber)
   cy.task('stubSecondaryLanguages', bookingId)
@@ -163,7 +164,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubGetLearnerNeurodivergence', { prisonerNumber })
   cy.task('stubBeliefHistory')
   cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber })
-  cy.task('stubPrisonPersonGetImage', { prisonerNumber })
+  cy.task('stubGetDistinguishingMarkImage')
   cy.task('stubPersonIntegrationGetReferenceData', {
     domain: 'COUNTRY',
     referenceData: CountryReferenceDataCodesMock,
