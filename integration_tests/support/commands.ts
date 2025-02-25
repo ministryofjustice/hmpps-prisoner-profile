@@ -255,13 +255,6 @@ Cypress.Commands.add('setupHealthPings', ({ httpStatus }) => {
   cy.task('stubBookAVideoLinkPing', httpStatus)
 })
 
-Cypress.Commands.add('setupPersonRefDataStubs', ({ domainsResp, domainResp, codesResp, codeResp }) => {
-  cy.task('stubGetReferenceDataDomains', domainsResp)
-  cy.task('stubGetReferenceDataDomain', domainResp)
-  cy.task('stubGetReferenceDataCodes', codesResp)
-  cy.task('stubGetReferenceDataCode', codeResp)
-})
-
 Cypress.Commands.add(
   'setupHealthAndMedicationRefDataStubs',
   ({ foodAllergies, medicalDiets, personalisedDiets, smokerCodes }) => {

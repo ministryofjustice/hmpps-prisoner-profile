@@ -17,14 +17,12 @@ import { curiousApiClientMock } from '../../tests/mocks/curiousApiClientMock'
 import { LearnerNeurodivergenceMock } from '../data/localMockData/learnerNeurodivergenceMock'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
-import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import MetricsService from './metrics/metricsService'
 import { prisonUserMock } from '../data/localMockData/user'
 import Address from '../data/interfaces/prisonApi/Address'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
-import { prisonPersonApiClientMock } from '../../tests/mocks/prisonPersonApiClientMock'
 import ReferenceDataService from './referenceData/referenceDataService'
 import {
   EnglandCountryReferenceDataCodeMock,
@@ -43,7 +41,6 @@ jest.mock('./referenceData/referenceDataService')
 describe('PersonalPageService', () => {
   let prisonApiClient: PrisonApiClient
   let curiousApiClient: CuriousApiClient
-  let prisonPersonApiClient: PrisonPersonApiClient
   let personIntegrationApiClient: PersonIntegrationApiClient
   let healthAndMedicationApiClient: HealthAndMedicationApiClient
   let referenceDataService: ReferenceDataService
@@ -62,8 +59,6 @@ describe('PersonalPageService', () => {
 
     curiousApiClient = curiousApiClientMock()
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
-
-    prisonPersonApiClient = prisonPersonApiClientMock()
 
     personIntegrationApiClient = {
       updateBirthPlace: jest.fn(),
@@ -101,7 +96,6 @@ describe('PersonalPageService', () => {
     new PersonalPageService(
       () => prisonApiClient,
       () => curiousApiClient,
-      () => prisonPersonApiClient,
       () => personIntegrationApiClient,
       () => healthAndMedicationApiClient,
       referenceDataService,

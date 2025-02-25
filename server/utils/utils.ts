@@ -18,8 +18,6 @@ import { HmppsUser } from '../interfaces/HmppsUser'
 import Pom from '../data/interfaces/allocationManagerApi/Pom'
 import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
-import { FieldHistory } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
-import { formatDateTime } from './dateHelpers'
 import { pluralise } from './pluralise'
 import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
@@ -762,26 +760,6 @@ export const formatHeight = (height: number): string => {
 
 export const formatWeight = (weight: number): string => {
   return weight || weight === 0 ? `${weight}kg` : 'Not entered'
-}
-
-export const fieldHistoryToFormattedValue = (
-  field: FieldHistory,
-  formatValue: (value: number | string) => string = value => value as string,
-): string => {
-  const value = field?.valueInt || field?.valueString || field?.valueRef?.description
-  return value ? formatValue(value) : 'Not entered'
-}
-
-export const fieldHistoryToRows = (
-  fieldHistory: FieldHistory[],
-  formatValue: (value: number | string) => string = value => value as string,
-) => {
-  return fieldHistory.map(field => [
-    { text: fieldHistoryToFormattedValue(field, formatValue) },
-    { text: formatDateTime(field.appliesFrom, 'short') || 'Initial value' },
-    { text: formatDateTime(field.appliesTo, 'short') },
-    { text: field.createdBy },
-  ])
 }
 
 export const sortByLatestAndUuid = (list: PersonIntegrationDistinguishingMarkImageDetail[]) => {

@@ -33,7 +33,6 @@ import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
-import PrisonPersonService from './prisonPersonService'
 import MetricsService from './metrics/metricsService'
 import DistinguishingMarksService from './distinguishingMarksService'
 import CsipService from './csipService'
@@ -62,7 +61,6 @@ export const services = () => {
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
-    prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     healthAndMedicationApiClientBuilder,
@@ -98,7 +96,6 @@ export const services = () => {
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
-    prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     referenceDataService,
@@ -147,7 +144,6 @@ export const services = () => {
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
-  const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
   const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
@@ -206,7 +202,6 @@ export const services = () => {
     featureToggleService,
     careNeedsService,
     permissionsService,
-    prisonPersonService,
     distinguishingMarksService,
     csipService,
     militaryRecordsService,

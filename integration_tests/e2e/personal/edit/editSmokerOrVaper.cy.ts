@@ -16,8 +16,6 @@ context('Edit smoker or vaper', () => {
       cy.task('reset')
       cy.setupUserAuth({ roles: [Role.PrisonUser, 'DPS_APPLICATION_DEVELOPER'] })
       cy.setupComponentsData()
-      cy.task('stubPrisonPerson', { prisonerNumber })
-      cy.task('stubPrisonPersonUpdatePhysicalAttributes', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
       cy.task('stubSmokerStatusUpdate', { prisonerNumber })
