@@ -6,7 +6,7 @@ import Prisoner from '../server/data/interfaces/prisonerSearchApi/Prisoner'
 import { ComplexityLevel } from '../server/data/interfaces/complexityApi/ComplexityOfNeed'
 import VisitWithVisitors from '../server/data/interfaces/prisonApi/VisitWithVisitors'
 import { UserToken } from './mockApis/auth'
-import { ReferenceDataCode } from '../server/data/interfaces/prisonPersonApi/prisonPersonApiClient'
+import { ReferenceDataCode } from '../server/data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 declare global {
   namespace Cypress {
