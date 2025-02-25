@@ -7,7 +7,7 @@ import ChangePhoto from '../../../pages/editPages/distinguishingMarks/changePhot
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 const prisonerName = 'Saunders, John'
-const markId = '019205c0-0fd5-7c41-ae24-ede9eae05da5'
+const markId = '100'
 
 const visitChangePhotoTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/photo` })
@@ -42,11 +42,11 @@ context('Change distinguishing mark photo', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPostDistinguishingMarkPhoto')
     })
 
     it('User can change tattoo photo', () => {
-      cy.task('stubGetDistinguishingMark', tattooMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: tattooMock })
+      cy.task('stubPostDistinguishingMarkPhoto', { prisonerNumber, response: tattooMock })
       visitChangePhotoTattooPage()
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the tattoo')
       page.miniBanner().card().should('be.visible')
@@ -59,11 +59,12 @@ context('Change distinguishing mark photo', () => {
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/100')
     })
 
     it('User can change scar photo', () => {
-      cy.task('stubGetDistinguishingMark', scarMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
+      cy.task('stubPostDistinguishingMarkPhoto', { prisonerNumber, response: scarMock })
       visitChangePhotoScarPage()
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the scar')
 
@@ -73,11 +74,12 @@ context('Change distinguishing mark photo', () => {
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
     })
 
     it('User can change mark photo', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
+      cy.task('stubPostDistinguishingMarkPhoto', { prisonerNumber, response: markMock })
       visitChangePhotoMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the mark')
 
@@ -87,7 +89,7 @@ context('Change distinguishing mark photo', () => {
       page.photoField().attachFile('tat.jpeg')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
     })
   })
 })

@@ -3,15 +3,30 @@ import config from '../config'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 import {
   CountryReferenceDataCodesMock,
+  DistinguishingMarksMock,
   MilitaryRecordsMock,
 } from './localMockData/personIntegrationApiReferenceDataMock'
 import { CorePersonRecordReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
+import MulterFile from '../controllers/interfaces/MulterFile'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('personIntegrationApiClient', () => {
   let fakePersonIntegrationApi: nock.Scope
   let personIntegrationApiClient: PersonIntegrationApiRestClient
+
+  const image: MulterFile = {
+    buffer: Buffer.from('image'),
+    originalname: 'image',
+    mimetype: 'image/png',
+    size: 123,
+    filename: 'image',
+    path: 'path',
+    fieldname: 'field',
+    stream: undefined,
+    destination: 'destination',
+    encoding: 'utf-8',
+  }
 
   beforeEach(() => {
     fakePersonIntegrationApi = nock(config.apis.personIntegrationApi.url)
@@ -86,6 +101,79 @@ describe('personIntegrationApiClient', () => {
     it('should create military record', async () => {
       fakePersonIntegrationApi.post('/v1/core-person-record/military-records?prisonerNumber=A1234AA').reply(201)
       await personIntegrationApiClient.createMilitaryRecord('A1234AA', MilitaryRecordsMock[0])
+    })
+  })
+
+  describe('getDistinguishingMark', () => {
+    it('should get the distinguishing mark', async () => {
+      fakePersonIntegrationApi
+        .get('/v1/distinguishing-mark/A1234AA-1?sourceSystem=NOMIS')
+        .reply(200, DistinguishingMarksMock[0])
+      const result = await personIntegrationApiClient.getDistinguishingMark('A1234AA', '1')
+      expect(result).toEqual(DistinguishingMarksMock[0])
+    })
+  })
+
+  describe('getDistinguishingMarks', () => {
+    it('should get all distinguishing marks', async () => {
+      fakePersonIntegrationApi
+        .get('/v1/distinguishing-marks?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(200, DistinguishingMarksMock)
+      const result = await personIntegrationApiClient.getDistinguishingMarks('A1234AA')
+      expect(result).toEqual(DistinguishingMarksMock)
+    })
+  })
+
+  describe('updateDistinguishingMark', () => {
+    it('should update an existing distinguishing mark', async () => {
+      fakePersonIntegrationApi
+        .put('/v1/distinguishing-mark/A1234AA-1?sourceSystem=NOMIS')
+        .reply(200, DistinguishingMarksMock[0])
+      const result = await personIntegrationApiClient.updateDistinguishingMark('A1234AA', '1', {
+        markType: 'TAT',
+        bodyPart: 'LEG',
+      })
+      expect(result).toEqual(DistinguishingMarksMock[0])
+    })
+  })
+
+  describe('createDistinguishingMark', () => {
+    it('should create a distinguishing mark without an image', async () => {
+      fakePersonIntegrationApi
+        .post('/v1/distinguishing-mark?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(200, DistinguishingMarksMock[0])
+      const result = await personIntegrationApiClient.createDistinguishingMark('A1234AA', {
+        markType: 'TAT',
+        bodyPart: 'LEG',
+      })
+      expect(result).toEqual(DistinguishingMarksMock[0])
+    })
+
+    it('should create a distinguishing mark with an image', async () => {
+      fakePersonIntegrationApi
+        .post('/v1/distinguishing-mark?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(200, DistinguishingMarksMock[0])
+      const result = await personIntegrationApiClient.createDistinguishingMark(
+        'A1234AA',
+        {
+          markType: 'TAT',
+          bodyPart: 'LEG',
+        },
+        image,
+      )
+      expect(result).toEqual(DistinguishingMarksMock[0])
+    })
+  })
+
+  describe('addDistinguishingMarkImage', () => {
+    const response = {
+      stream: image.stream,
+      contentType: 'image/jpeg',
+    }
+    it('should get the distinguishing mark image', async () => {
+      fakePersonIntegrationApi.post('/v1/distinguishing-mark/A1234AA-1/image?sourceSystem=NOMIS').reply(200, response)
+      const result = await personIntegrationApiClient.addDistinguishingMarkImage('A1234AA', '1', image)
+      expect(result).toEqual(response)
     })
   })
 })

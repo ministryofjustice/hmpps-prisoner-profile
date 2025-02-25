@@ -45,7 +45,7 @@ import {
   faceCodesMock,
   facialHairCodesMock,
   hairCodesMock,
-} from '../../data/localMockData/prisonPersonApi/referenceDataMocks'
+} from '../../data/localMockData/personIntegrationApi/referenceDataMocks'
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 

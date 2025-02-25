@@ -276,14 +276,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('ALERTS_API_TIMEOUT_DEADLINE', 10000))),
     },
-    prisonPersonApi: {
-      url: get('PRISON_PERSON_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('PRISON_PERSON_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000)),
-      },
-      agent: new AgentConfig(Number(get('PRISON_PERSON_TIMEOUT_DEADLINE', 10000))),
-    },
     personIntegrationApi: {
       url: get('PERSON_INTEGRATION_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
@@ -344,8 +336,6 @@ export default {
     useOfForceDisabledPrisons: get('USE_OF_FORCE_DISABLED_PRISONS', [], requiredInProduction) as string[],
     profileAddAppointmentEnabled: toBoolean(get('PROFILE_ADD_APPOINTMENT_ENABLED', 'false')),
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
-    prisonPersonApiEnabled: toBoolean(get('PRISON_PERSON_API_ENABLED', 'false')),
-    prisonPersonApiEnabledPrisons: get('PRISON_PERSON_API_ENABLED_PRISONS', []),
     editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
     dietAndAllergyEnabled: toBoolean(get('DIET_AND_ALLERGY_ENABLED', 'false')),

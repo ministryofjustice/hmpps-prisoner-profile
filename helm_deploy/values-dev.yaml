@@ -70,7 +70,6 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"
-    PRISON_PERSON_API_URL: "https://prison-person-api-dev.prison.service.justice.gov.uk"
     PERSON_INTEGRATION_API_URL: "https://person-integration-api-dev.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api-dev.hmpps.service.justice.gov.uk"
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-dev.hmpps.service.justice.gov.uk"
@@ -89,8 +88,6 @@ generic-service:
     DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
     EDIT_PROFILE_ENABLED: "true"
     EDIT_PROFILE_ENABLED_PRISONS: "KMI"
-    PRISON_PERSON_API_ENABLED: "false"
-    PRISON_PERSON_API_ENABLED_PRISONS: ""
     MILITARY_HISTORY_ENABLED: "true"
 
   scheduledDowntime:

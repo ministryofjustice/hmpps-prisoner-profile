@@ -1,7 +1,7 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { faceCodesMock } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
+import { faceCodesMock } from '../../../../server/data/localMockData/personIntegrationApi/referenceDataMocks'
 
 context('Edit face shape', () => {
   const prisonerNumber = 'G6123VU'
