@@ -25,6 +25,7 @@ generic-service:
     INGRESS_URL: "https://prisoner.digital.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api.prison.service.justice.gov.uk"
+    CONTENTFUL_ENVIRONMENT: "master"
 
     # UI Service urls
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates.hmpps.service.justice.gov.uk"
@@ -74,6 +75,7 @@ generic-service:
     PERSON_INTEGRATION_API_URL: "https://person-integration-api.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api.hmpps.service.justice.gov.uk"
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api.hmpps.service.justice.gov.uk"
+    CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
 
     # Feature flags
     AUDIT_ENABLED: "true"

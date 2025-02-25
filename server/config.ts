@@ -265,6 +265,7 @@ export default {
     contentful: {
       host: get('CONTENTFUL_HOST', '', requiredInProduction),
       spaceId: get('CONTENTFUL_SPACE_ID', 'spaceId', requiredInProduction),
+      environment: get('CONTENTFUL_ENVIRONMENT', 'environment', requiredInProduction),
       accessToken: get('CONTENTFUL_ACCESS_TOKEN', 'token', requiredInProduction),
     },
     alertsApi: {
