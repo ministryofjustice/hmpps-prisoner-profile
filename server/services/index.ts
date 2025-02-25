@@ -160,7 +160,7 @@ export const services = () => {
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
-    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/master`,
+    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/${config.apis.contentful.environment}`,
     headers: {
       Authorization: `Bearer ${config.apis.contentful.accessToken}`,
     },
