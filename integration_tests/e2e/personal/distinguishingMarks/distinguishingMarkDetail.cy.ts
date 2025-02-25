@@ -24,7 +24,7 @@ context('New distinguishing mark on face', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPostNewDistinguishingMark')
+      cy.task('stubPostNewDistinguishingMark', { prisonerNumber })
 
       visitNewTattooPage({ failOnStatusCode: false })
       Page.verifyOnPage(NotFoundPage)
@@ -38,7 +38,7 @@ context('New distinguishing mark on face', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPostNewDistinguishingMark')
+      cy.task('stubPostNewDistinguishingMark', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
     })

@@ -1,5 +1,6 @@
 import {
   CorePersonRecordReferenceDataCodeDto,
+  PersonIntegrationDistinguishingMark,
   MilitaryRecord,
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../interfaces/referenceData'
@@ -205,5 +206,66 @@ export const MilitaryDischargeRefDataMock: ReferenceDataCodeDto[] = [
     description: 'Honourable',
     listSequence: 1,
     isActive: true,
+  },
+]
+
+export const DistinguishingMarksMock: PersonIntegrationDistinguishingMark[] = [
+  {
+    id: 1,
+    bookingId: 1,
+    offenderNo: 'A1234AA',
+    bodyPart: {
+      id: 'BODY_PART_HEAD',
+      code: 'HEAD',
+      description: 'Head',
+    },
+    markType: {
+      id: 'MARK_TYPE_SCAR',
+      code: 'SCAR',
+      description: 'Scar',
+    },
+    side: {
+      id: 'SIDE_L',
+      code: 'L',
+      description: 'Left',
+    },
+    partOrientation: {
+      id: 'PART_ORIENT_UPP',
+      code: 'UPP',
+      description: 'Upper',
+    },
+    comment: 'Some comment',
+    createdAt: '2011-08-22T10:41:00',
+    createdBy: 'USER',
+    photographUuids: [],
+  },
+  {
+    id: 2,
+    bookingId: 1,
+    offenderNo: 'A1234AA',
+    bodyPart: {
+      id: 'BODY_PART_ARM',
+      code: 'ARM',
+      description: 'ARM',
+    },
+    markType: {
+      id: 'MARK_TYPE_TAT',
+      code: 'TAT',
+      description: 'Tattoo',
+    },
+    side: {
+      id: 'SIDE_R',
+      code: 'R',
+      description: 'Right',
+    },
+    partOrientation: {
+      id: 'PART_ORIENT_LOW',
+      code: 'LOW',
+      description: 'Low',
+    },
+    comment: 'Some comment',
+    createdAt: '2011-08-22T10:41:00',
+    createdBy: 'USER',
+    photographUuids: [],
   },
 ]

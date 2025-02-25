@@ -943,18 +943,18 @@ describe('utils', () => {
   describe('sortByLatestAndUuid', () => {
     test.each([
       ['empty list', [], []],
-      ['list with one item', [{ id: 'abc', latest: true }], [{ id: 'abc', latest: true }]],
+      ['list with one item', [{ id: 1, latest: true }], [{ id: 1, latest: true }]],
       [
         'list sorted by latest and then by id',
         [
-          { id: 'a', latest: false },
-          { id: 'b', latest: true },
-          { id: 'c', latest: false },
+          { id: 1, latest: false },
+          { id: 2, latest: true },
+          { id: 3, latest: false },
         ],
         [
-          { id: 'b', latest: true },
-          { id: 'c', latest: false },
-          { id: 'a', latest: false },
+          { id: 2, latest: true },
+          { id: 3, latest: false },
+          { id: 1, latest: false },
         ],
       ],
     ])('should sort %s', (_, input, expected) => {
@@ -963,8 +963,8 @@ describe('utils', () => {
 
     test('should not mutate the original array', () => {
       const input = [
-        { id: 'b', latest: true },
-        { id: 'a', latest: false },
+        { id: 2, latest: true },
+        { id: 1, latest: false },
       ]
       const copy = [...input]
       sortByLatestAndUuid(input)

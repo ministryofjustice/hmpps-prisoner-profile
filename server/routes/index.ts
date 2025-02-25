@@ -83,9 +83,9 @@ export default function routes(services: Services): Router {
   )
 
   get(
-    '/api/prison-person-image/:imageId',
+    '/api/distinguishing-mark-image/:imageId',
     auditPageAccessAttempt({ services, page: ApiAction.Image }),
-    services.commonApiRoutes.prisonPersonImage,
+    services.commonApiRoutes.distinguishingMarkImage,
   )
 
   get(

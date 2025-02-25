@@ -1,7 +1,7 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { hairCodesMock } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
+import { hairCodesMock } from '../../../../server/data/localMockData/personIntegrationApi/referenceDataMocks'
 
 context('Edit hair', () => {
   const prisonerNumber = 'G6123VU'

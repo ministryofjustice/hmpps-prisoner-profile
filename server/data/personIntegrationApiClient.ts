@@ -1,13 +1,17 @@
+import { Readable } from 'stream'
 import RestClient from './restClient'
 import {
   CorePersonPhysicalAttributes,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
   CorePersonRecordReferenceDataDomain,
+  PersonIntegrationDistinguishingMark,
+  DistinguishingMarkRequest,
   MilitaryRecord,
   PersonIntegrationApiClient,
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
+import MulterFile from '../controllers/interfaces/MulterFile'
 
 export default class PersonIntegrationApiRestClient implements PersonIntegrationApiClient {
   private readonly restClient: RestClient
@@ -61,6 +65,67 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: '/v1/core-person-record/military-records',
       query: { prisonerNumber },
       data: militaryRecord,
+    })
+  }
+
+  async getDistinguishingMark(
+    prisonerNumber: string,
+    sequenceId: string,
+  ): Promise<PersonIntegrationDistinguishingMark> {
+    return this.restClient.get<PersonIntegrationDistinguishingMark>({
+      path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}`,
+      query: { sourceSystem: 'NOMIS' },
+    })
+  }
+
+  async getDistinguishingMarks(prisonerNumber: string): Promise<PersonIntegrationDistinguishingMark[]> {
+    return this.restClient.get<PersonIntegrationDistinguishingMark[]>({
+      path: `/v1/distinguishing-marks`,
+      query: { prisonerNumber, sourceSystem: 'NOMIS' },
+    })
+  }
+
+  updateDistinguishingMark(
+    prisonerNumber: string,
+    sequenceId: string,
+    distinguishingMarkRequest: DistinguishingMarkRequest,
+  ): Promise<PersonIntegrationDistinguishingMark> {
+    return this.restClient.put<PersonIntegrationDistinguishingMark>({
+      path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}`,
+      query: { sourceSystem: 'NOMIS' },
+      data: distinguishingMarkRequest,
+    })
+  }
+
+  createDistinguishingMark(
+    prisonerNumber: string,
+    distinguishingMarkRequest: DistinguishingMarkRequest,
+    image?: MulterFile,
+  ): Promise<PersonIntegrationDistinguishingMark> {
+    return this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
+      path: '/v1/distinguishing-mark',
+      query: { prisonerNumber, sourceSystem: 'NOMIS' },
+      data: distinguishingMarkRequest,
+      file: image,
+    })
+  }
+
+  addDistinguishingMarkImage(
+    prisonerNumber: string,
+    sequenceId: string,
+    image: MulterFile,
+  ): Promise<PersonIntegrationDistinguishingMark> {
+    return this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
+      path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}/image`,
+      query: { sourceSystem: 'NOMIS' },
+      file: image,
+    })
+  }
+
+  async getDistinguishingMarkImage(imageId: string): Promise<Readable> {
+    return this.restClient.stream({
+      path: `/v1/distinguishing-mark/image/${imageId}`,
+      query: { sourceSystem: 'NOMIS' },
     })
   }
 

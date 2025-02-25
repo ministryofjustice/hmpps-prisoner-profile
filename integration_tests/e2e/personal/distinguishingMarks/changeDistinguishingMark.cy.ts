@@ -7,7 +7,7 @@ import { markMock, scarMock, tattooMock } from '../../../../server/data/localMoc
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 const prisonerName = 'Saunders, John'
-const markId = '019205c0-0fd5-7c41-ae24-ede9eae05da5'
+const markId = '100'
 
 const visitChangeTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}` })
@@ -29,7 +29,7 @@ context('Change distinguishing mark', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubGetDistinguishingMark', tattooMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: tattooMock })
 
       visitChangeTattooPage({ failOnStatusCode: false })
       Page.verifyOnPage(NotFoundPage)
@@ -46,7 +46,7 @@ context('Change distinguishing mark', () => {
     })
 
     it('User can access the change tattoo page', () => {
-      cy.task('stubGetDistinguishingMark', tattooMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: tattooMock })
       visitChangeTattooPage()
       const page = Page.verifyOnPageWithTitle(ChangeDistinguishingMark, 'Change tattoo details')
       page.miniBanner().card().should('be.visible')
@@ -62,12 +62,12 @@ context('Change distinguishing mark', () => {
         .photo()
         .should(
           'contain.html',
-          '<img src="/api/prison-person-image/019205c0-0f5f-7bef-9a24-d64db76ca24a" alt="Image of Tattoo on Front and sides" width="350px">',
+          '<img src="/api/distinguishing-mark-image/100" alt="Image of Tattoo on Front and sides" width="350px">',
         )
     })
 
     it('User can access the change scar page', () => {
-      cy.task('stubGetDistinguishingMark', scarMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
       visitChangeScarPage()
       const page = Page.verifyOnPageWithTitle(ChangeDistinguishingMark, 'Change scar details')
 
@@ -80,12 +80,12 @@ context('Change distinguishing mark', () => {
         .photo()
         .should(
           'contain.html',
-          '<img src="/api/prison-person-image/019205c0-0f5f-7bef-9a24-d64db76ca24a" alt="Image of Scar on Left arm" width="350px">',
+          '<img src="/api/distinguishing-mark-image/100" alt="Image of Scar on Left arm" width="350px">',
         )
     })
 
     it('User can access the change mark page', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeDistinguishingMark, 'Change mark details')
 
@@ -98,7 +98,7 @@ context('Change distinguishing mark', () => {
         .photo()
         .should(
           'contain.html',
-          '<img src="/api/prison-person-image/019205c0-0f5f-7bef-9a24-d64db76ca24a" alt="Image of Mark on Left leg" width="350px">',
+          '<img src="/api/distinguishing-mark-image/100" alt="Image of Mark on Left leg" width="350px">',
         )
     })
   })

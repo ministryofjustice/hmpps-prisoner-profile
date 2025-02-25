@@ -7,7 +7,7 @@ import ChangeDescription from '../../../pages/editPages/distinguishingMarks/chan
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 const prisonerName = 'Saunders, John'
-const markId = '019205c0-0fd5-7c41-ae24-ede9eae05da5'
+const markId = '100'
 
 const visitChangeDescriptionTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/description` })
@@ -42,11 +42,11 @@ context('Change distinguishing mark description', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPatchDistinguishingMark')
+      cy.task('stubPutDistinguishingMark', { prisonerNumber })
     })
 
     it('User can change tattoo description', () => {
-      cy.task('stubGetDistinguishingMark', tattooMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: tattooMock })
       visitChangeDescriptionTattooPage()
       const page = Page.verifyOnPageWithTitle(ChangeDescription, 'Change the description of the tattoo')
       page.miniBanner().card().should('be.visible')
@@ -58,11 +58,11 @@ context('Change distinguishing mark description', () => {
       page.descriptionField().type('UPDATED')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/tattoo/100')
     })
 
     it('User can change scar description', () => {
-      cy.task('stubGetDistinguishingMark', scarMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
       visitChangeDescriptionScarPage()
       const page = Page.verifyOnPageWithTitle(ChangeDescription, 'Change the description of the scar')
 
@@ -71,11 +71,11 @@ context('Change distinguishing mark description', () => {
       page.descriptionField().type('UPDATED')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/scar/100')
     })
 
     it('User can change mark description', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeDescriptionMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeDescription, 'Change the description of the mark')
 
@@ -84,7 +84,7 @@ context('Change distinguishing mark description', () => {
       page.descriptionField().type('UPDATED')
       page.saveBtn().click()
 
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
     })
   })
 })

@@ -27,7 +27,7 @@ context('New distinguishing feature', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPostNewDistinguishingMark')
+      cy.task('stubPostNewDistinguishingMark', { prisonerNumber })
 
       visitNewTattooPage({ failOnStatusCode: false })
       Page.verifyOnPage(NotFoundPage)
@@ -41,7 +41,7 @@ context('New distinguishing feature', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPrisonerData', { prisonerNumber })
-      cy.task('stubPostNewDistinguishingMark')
+      cy.task('stubPostNewDistinguishingMark', { prisonerNumber })
     })
     it('User can access the new tattoo page', () => {
       visitNewTattooPage()

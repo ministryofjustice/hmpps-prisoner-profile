@@ -2,10 +2,15 @@ import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWi
 import {
   CorePersonPhysicalAttributes,
   CorePersonRecordReferenceDataCodeDto,
+  PersonIntegrationDistinguishingMark,
+  PersonIntegrationDistinguishingMarkImageDetail,
   MilitaryRecord,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
+import { stubFor } from './wiremock'
 
 const baseUrl = '/personIntegration'
+const placeHolderImagePath = './../../assets/images/average-face.jpg'
 
 export default {
   stubPersonIntegrationGetReferenceData: ({
@@ -66,5 +71,107 @@ export default {
     stubPutWithResponse<void>({
       path: `${baseUrl}/v1/core-person-record/physical-attributes\\?prisonerNumber=.*`,
       responseBody: null,
+    }),
+
+  stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/distinguishing-marks\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      body: [distinguishingMarkMock],
+    }),
+
+  stubGetDistinguishingMarkImage: (
+    photo: PersonIntegrationDistinguishingMarkImageDetail = distinguishingMarkMock.photographUuids[0],
+  ) => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `${baseUrl}/v1/distinguishing-mark/image/${photo.id}\\?sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+        bodyFileName: placeHolderImagePath,
+      },
+    })
+  },
+
+  stubPostNewDistinguishingMark: ({ prisonerNumber }: { prisonerNumber: string }) => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}/v1/distinguishing-mark\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: distinguishingMarkMock,
+      },
+    })
+  },
+
+  stubPutDistinguishingMark: ({
+    prisonerNumber,
+    markId = '100',
+    response = distinguishingMarkMock,
+  }: {
+    prisonerNumber: string
+    markId: string
+    response: PersonIntegrationDistinguishingMark
+  }) => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}\\?sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    })
+  },
+
+  stubPostDistinguishingMarkPhoto: ({
+    prisonerNumber,
+    markId = '100',
+    response = distinguishingMarkMock,
+  }: {
+    prisonerNumber: string
+    markId: string
+    response: PersonIntegrationDistinguishingMark
+  }) => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}/image\\?sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    })
+  },
+
+  stubGetDistinguishingMark: ({
+    prisonerNumber,
+    markId = '100',
+    response = distinguishingMarkMock,
+  }: {
+    prisonerNumber: string
+    markId: string
+    response: PersonIntegrationDistinguishingMark
+  }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}\\?sourceSystem=NOMIS`,
+      body: response,
     }),
 }

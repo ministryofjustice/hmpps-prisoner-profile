@@ -33,10 +33,6 @@ import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
-import {
-  PrisonPersonApiClient,
-  PrisonPersonDistinguishingMark,
-} from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
@@ -44,6 +40,7 @@ import {
   CorePersonPhysicalAttributes,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
+  PersonIntegrationDistinguishingMark,
   PersonIntegrationApiClient,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
@@ -62,7 +59,6 @@ export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
-    private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
@@ -92,8 +88,8 @@ export default class PersonalPageService {
     return response
   }
 
-  async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PrisonPersonDistinguishingMark[]> {
-    const apiClient = this.prisonPersonApiClientBuilder(token)
+  async getDistinguishingMarks(token: string, prisonerNumber: string): Promise<PersonIntegrationDistinguishingMark[]> {
+    const apiClient = this.personIntegrationApiClientBuilder(token)
     return apiClient.getDistinguishingMarks(prisonerNumber)
   }
 
@@ -131,8 +127,8 @@ export default class PersonalPageService {
   public async get(
     token: string,
     prisonerData: Prisoner,
-    enablePrisonPerson: boolean = false,
     dietAndAllergyIsEnabled: boolean = false,
+    editProfileEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
@@ -161,7 +157,7 @@ export default class PersonalPageService {
       prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
-      enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
+      editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
       Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,

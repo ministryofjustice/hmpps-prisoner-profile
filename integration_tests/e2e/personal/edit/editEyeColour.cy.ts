@@ -1,6 +1,6 @@
 import { Role } from '../../../../server/data/enums/role'
 import { editPageTests } from './editPageTests'
-import { eyeColourCodesMock } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
+import { eyeColourCodesMock } from '../../../../server/data/localMockData/personIntegrationApi/referenceDataMocks'
 import EditEyeColour from '../../../pages/editPages/eyeColour'
 import Page from '../../../pages/page'
 

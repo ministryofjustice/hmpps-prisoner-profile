@@ -1,7 +1,7 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { buildCodesMock } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
+import { buildCodesMock } from '../../../../server/data/localMockData/personIntegrationApi/referenceDataMocks'
 
 context('Edit build', () => {
   const prisonerNumber = 'G6123VU'

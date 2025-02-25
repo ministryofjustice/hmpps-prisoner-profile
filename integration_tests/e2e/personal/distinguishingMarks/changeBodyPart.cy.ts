@@ -7,7 +7,7 @@ import ChangeBodyPart from '../../../pages/editPages/distinguishingMarks/changeB
 const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 const prisonerName = 'Saunders, John'
-const markId = '019205c0-0fd5-7c41-ae24-ede9eae05da5'
+const markId = '100'
 
 const visitChangeTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/body-part` })
@@ -45,7 +45,7 @@ context('Change body part', () => {
     })
 
     it('User can access the change tattoo page', () => {
-      cy.task('stubGetDistinguishingMark', tattooMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: tattooMock })
       visitChangeTattooPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the tattoo is')
       page.miniBanner().card().should('be.visible')
@@ -64,7 +64,7 @@ context('Change body part', () => {
     })
 
     it('User can access the change scar page', () => {
-      cy.task('stubGetDistinguishingMark', scarMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
       visitChangeScarPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the scar is')
 
@@ -80,7 +80,7 @@ context('Change body part', () => {
     })
 
     it('User can access the change mark page', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
@@ -113,7 +113,7 @@ context('Change body part', () => {
 
       areas.forEach(area => {
         it(`User can select the ${area.alt}`, () => {
-          cy.task('stubGetDistinguishingMark', markMock)
+          cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
           visitChangeMarkPage()
           const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
@@ -132,7 +132,7 @@ context('Change body part', () => {
     })
 
     it('User can deselect body parts', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
@@ -152,7 +152,7 @@ context('Change body part', () => {
     })
 
     it('User can change body parts', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
@@ -169,8 +169,8 @@ context('Change body part', () => {
     })
 
     it('User can submit selection for neck to save and return to summary', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
-      cy.task('stubPatchDistinguishingMark')
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
+      cy.task('stubPutDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
@@ -181,12 +181,12 @@ context('Change body part', () => {
       page.formValue('bodyPart').should('have.value', 'neck')
 
       page.continueBtn().click()
-      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/019205c0-0fd5-7c41-ae24-ede9eae05da5')
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100')
     })
 
     it('User can submit selection and move to change location', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
-      cy.task('stubPatchDistinguishingMark')
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
+      cy.task('stubPutDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
@@ -197,15 +197,12 @@ context('Change body part', () => {
       page.formValue('bodyPart').should('have.value', 'face')
 
       page.continueBtn().click()
-      cy.location('pathname').should(
-        'eq',
-        '/prisoner/G6123VU/personal/mark/019205c0-0fd5-7c41-ae24-ede9eae05da5/location',
-      )
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/mark/100/location')
     })
 
     it('No selection causes a validation error', () => {
-      cy.task('stubGetDistinguishingMark', markMock)
-      cy.task('stubPatchDistinguishingMark')
+      cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
+      cy.task('stubPutDistinguishingMark', { prisonerNumber, response: markMock })
       visitChangeMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangeBodyPart, 'Change where the mark is')
 
