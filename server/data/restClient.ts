@@ -232,11 +232,12 @@ export default class RestClient {
     }
   }
 
-  async stream({ path = null, headers = {} }: StreamRequest = {}): Promise<Readable> {
+  async stream({ path = null, query = '', headers = {} }: StreamRequest = {}): Promise<Readable> {
     const endpoint = `${this.apiUrl()}${path}`
     return new Promise((resolve, reject) => {
       superagent
         .get(endpoint)
+        .query(query)
         .agent(this.agent)
         .auth(this.token, { type: 'bearer' })
         .retry(2, (err, res) => {
