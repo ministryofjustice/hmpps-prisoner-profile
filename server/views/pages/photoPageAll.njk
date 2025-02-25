@@ -16,7 +16,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3"}) }}
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
     </div>
   </div>
   <div class="govuk-grid-row" data-qa="prisoner-photo-page">
@@ -39,7 +39,7 @@
   </div>
   <div class="govuk-grid-row govuk-!-margin-bottom-4">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">All facial images</h1>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-0">All facial images</h1>
     </div>
   </div>
   <div class="govuk-grid-row hmpps-photo-list" data-qa="image-list">
