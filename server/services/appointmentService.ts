@@ -16,15 +16,20 @@ import CreateVideoBookingRequest, {
 import Court, { ProbationTeam } from '../data/interfaces/bookAVideoLinkApi/Court'
 import LocationDetailsService from './locationDetailsService'
 import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
+import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 export interface AddAppointmentRefData {
   appointmentTypes: ReferenceCode[]
   locations: LocationsApiLocation[]
+  probationTeams: ProbationTeam[]
+  meetingTypes: CourtHearingOrMeetingType[]
 }
 
 export interface PrePostAppointmentRefData {
   courts: Court[]
   probationTeams: ProbationTeam[]
+  hearingTypes: CourtHearingOrMeetingType[]
+  meetingTypes: CourtHearingOrMeetingType[]
   locations: LocationsApiLocation[]
 }
 
@@ -83,14 +88,20 @@ export default class AppointmentService {
    * @param prisonId
    */
   public async getAddAppointmentRefData(token: string, prisonId: string): Promise<AddAppointmentRefData> {
-    const [appointmentTypes, locations] = await Promise.all([
+    const [appointmentTypes, locations, probationTeams, meetingTypes] = await Promise.all([
       this.prisonApiClientBuilder(token).getAppointmentTypes(),
       this.locationDetailsService.getLocationsForAppointments(token, prisonId),
+      bvlsMasteredVlpmFeatureToggleEnabled() ? this.bookAVideoLinkApiClientBuilder(token).getProbationTeams() : [],
+      bvlsMasteredVlpmFeatureToggleEnabled()
+        ? this.bookAVideoLinkApiClientBuilder(token).getProbationMeetingTypes()
+        : [],
     ])
 
     return {
       appointmentTypes,
       locations,
+      probationTeams,
+      meetingTypes,
     }
   }
 
@@ -101,15 +112,21 @@ export default class AppointmentService {
    * @param prisonId
    */
   public async getPrePostAppointmentRefData(token: string, prisonId: string): Promise<PrePostAppointmentRefData> {
-    const [courts, probationTeams, locations] = await Promise.all([
+    const [courts, probationTeams, hearingTypes, meetingTypes, locations] = await Promise.all([
       this.bookAVideoLinkApiClientBuilder(token).getCourts(),
-      this.bookAVideoLinkApiClientBuilder(token).getProbationTeams(),
+      !bvlsMasteredVlpmFeatureToggleEnabled() ? this.bookAVideoLinkApiClientBuilder(token).getProbationTeams() : [],
+      this.bookAVideoLinkApiClientBuilder(token).getCourtHearingTypes(),
+      !bvlsMasteredVlpmFeatureToggleEnabled()
+        ? this.bookAVideoLinkApiClientBuilder(token).getProbationMeetingTypes()
+        : [],
       this.locationDetailsService.getLocationsForAppointments(token, prisonId),
     ])
 
     return {
       courts,
       probationTeams,
+      hearingTypes,
+      meetingTypes,
       locations,
     }
   }
@@ -136,14 +153,6 @@ export default class AppointmentService {
 
   public async getVideoLinkBooking(token: string, searchRequest: VideoBookingSearchRequest): Promise<VideoLinkBooking> {
     return this.bookAVideoLinkApiClientBuilder(token).getVideoLinkBooking(searchRequest)
-  }
-
-  public async getCourtHearingTypes(token: string): Promise<CourtHearingOrMeetingType[]> {
-    return this.bookAVideoLinkApiClientBuilder(token).getCourtHearingTypes()
-  }
-
-  public async getProbationMeetingTypes(token: string): Promise<CourtHearingOrMeetingType[]> {
-    return this.bookAVideoLinkApiClientBuilder(token).getProbationMeetingTypes()
   }
 
   public async getExistingEventsForOffender(

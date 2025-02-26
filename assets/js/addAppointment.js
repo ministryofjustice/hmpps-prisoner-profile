@@ -2,14 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const appointmentDateInput = document.getElementById('date')
   const appointmentLocationSelect = document.getElementById('location')
   const appointmentTypeSelect = document.getElementById('appointmentType')
+  const probationTeamSelect = document.querySelector('.js-probation-team')
+  const probationMeetingRadios = document.querySelector('.js-meeting-type')
+  const probationOfficerDetails = document.querySelector('.js-probation-officer')
   const recurringRadios = document.querySelector('.js-recurring-radios')
-  const optionalVideoLabel = document.getElementById('optional-video-label')
+  const commentsHint = document.getElementById('comments-hint')
   const appointmentRepeatsSelect = document.getElementById('repeats')
   const appointmentRepeatsTimesInput = document.getElementById('times')
   const lastAppointmentDate = document.getElementById('last-appointment-date')
   const locationEventsContainer = document.getElementById('location-events')
   const offenderEventsContainer = document.getElementById('offender-events')
-  const appointmentId = document.getElementById('appointment-id')?.innerText || ''
+  const appointmentId = document.getElementById('appointment-id')?.value || ''
 
   async function getEventsForLocation() {
     const date = appointmentDateInput.value
@@ -60,26 +63,46 @@ document.addEventListener('DOMContentLoaded', () => {
   function showHideRecurring() {
     const appointmentType = appointmentTypeSelect.value
 
-    if (appointmentType === 'VLB') {
+    if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
       recurringRadios.style.display = 'none'
     } else {
       recurringRadios.style.display = 'block'
     }
   }
 
-  function showHideVideoLabel() {
+  function showHideProbationFields() {
+    const appointmentType = appointmentTypeSelect.value
+
+    // TODO remove this when the feature toggle BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED is removed
+    if (!probationTeamSelect || !probationMeetingRadios || !probationOfficerDetails) {
+      return
+    }
+
+    if (appointmentType === 'VLPM') {
+      if (probationTeamSelect) probationTeamSelect.style.display = 'block'
+      probationMeetingRadios.style.display = 'block'
+      probationOfficerDetails.style.display = 'block'
+    } else {
+      if (probationTeamSelect) probationTeamSelect.style.display = 'none'
+      probationMeetingRadios.style.display = 'none'
+      probationOfficerDetails.style.display = 'none'
+    }
+  }
+
+  function showHideCommentsHint() {
     const appointmentType = appointmentTypeSelect.value
 
     if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
-      optionalVideoLabel.style.display = 'block'
+      commentsHint.style.display = 'block'
     } else {
-      optionalVideoLabel.style.display = 'none'
+      commentsHint.style.display = 'none'
     }
   }
 
   appointmentTypeSelect.addEventListener('change', () => {
     showHideRecurring()
-    showHideVideoLabel()
+    showHideProbationFields()
+    showHideCommentsHint()
   })
 
   appointmentLocationSelect.addEventListener('change', () => {
@@ -111,5 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
   getEventsForLocation()
   getAppointmentEndDate()
   showHideRecurring()
-  showHideVideoLabel()
+  showHideProbationFields()
+  showHideCommentsHint()
 })

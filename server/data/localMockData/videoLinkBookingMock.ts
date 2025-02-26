@@ -1,6 +1,6 @@
 import { VideoLinkBooking } from '../interfaces/bookAVideoLinkApi/VideoLinkBooking'
 
-export const videoLinkBookingMock: VideoLinkBooking = {
+export const courtBookingMock: VideoLinkBooking = {
   videoLinkBookingId: 1,
   statusCode: 'ACTIVE',
   bookingType: 'COURT',
@@ -39,4 +39,32 @@ export const videoLinkBookingMock: VideoLinkBooking = {
       appointmentType: 'VLB_COURT_POST',
     },
   ],
+}
+
+export const probationBookingMock: VideoLinkBooking = {
+  videoLinkBookingId: 1,
+  statusCode: 'ACTIVE',
+  bookingType: 'PROBATION',
+  probationTeamCode: 'BLACKPP',
+  probationTeamDescription: 'Blackpool',
+  probationMeetingType: 'PSR',
+  probationMeetingTypeDescription: 'Post-sentence report',
+  comments: 'Comment',
+  videoLinkUrl: 'http://bvls.test.url',
+  prisonAppointments: [
+    {
+      prisonCode: 'MDI',
+      prisonLocKey: 'ABC',
+      prisonerNumber: 'ABC123',
+      appointmentDate: '2023-01-01',
+      startTime: '12:34',
+      endTime: '13:34',
+      appointmentType: 'VLB_PROBATION',
+    },
+  ],
+  additionalBookingDetails: {
+    contactName: 'Test name',
+    contactEmail: 'Test email',
+    contactNumber: 'Test number',
+  },
 }
