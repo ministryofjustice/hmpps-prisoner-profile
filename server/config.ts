@@ -341,5 +341,6 @@ export default {
     dietAndAllergyEnabled: toBoolean(get('DIET_AND_ALLERGY_ENABLED', 'false')),
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     militaryHistoryEnabled: toBoolean(get('MILITARY_HISTORY_ENABLED', 'false')),
+    bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
   },
 }

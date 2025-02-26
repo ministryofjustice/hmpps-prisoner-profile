@@ -23,6 +23,7 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
     CONTENTFUL_ENVIRONMENT: "master"
+    BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED: "false"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-preprod.hmpps.service.justice.gov.uk"
