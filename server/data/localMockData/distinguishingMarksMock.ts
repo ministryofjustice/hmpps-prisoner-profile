@@ -22,6 +22,32 @@ export const distinguishingMarkMock: PersonIntegrationDistinguishingMark = {
   createdBy: 'hmpps-prisoner-profile-system-1',
 }
 
+export const distinguishingMarkMultiplePhotosMock: PersonIntegrationDistinguishingMark = {
+  id: 1,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
+  bodyPart: {
+    id: 'BODY_PART_ARM',
+    code: 'ARM',
+    description: 'Arm',
+  },
+  markType: {
+    id: 'MARK_TYPE_SCAR',
+    code: 'SCAR',
+    description: 'Scar',
+  },
+  side: null,
+  partOrientation: null,
+  comment: 'Horrible arm scar',
+  photographUuids: [
+    { id: 100, latest: false },
+    { id: 101, latest: false },
+    { id: 102, latest: true },
+  ],
+  createdAt: '2024-09-18T16:28:45+0100',
+  createdBy: 'hmpps-prisoner-profile-system-1',
+}
+
 export const distinguishingMarkNoPhotosMock: PersonIntegrationDistinguishingMark = {
   id: 2,
   bookingId: 1,

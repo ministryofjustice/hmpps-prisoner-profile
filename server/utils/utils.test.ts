@@ -28,6 +28,7 @@ import {
   isActiveCaseLoad,
   isInUsersCaseLoad,
   isTemporaryLocation,
+  latestImageId,
   lengthOfService,
   mapToQueryString,
   neurodiversityEnabled,
@@ -969,6 +970,24 @@ describe('utils', () => {
       const copy = [...input]
       sortByLatestAndUuid(input)
       expect(input).toEqual(copy)
+    })
+  })
+
+  describe('latestImageId', () => {
+    test.each([
+      ['empty list', [], undefined],
+      ['list with one item', [{ id: 1, latest: true }], 1],
+      [
+        'list with multiple items',
+        [
+          { id: 1, latest: false },
+          { id: 2, latest: true },
+          { id: 3, latest: false },
+        ],
+        2,
+      ],
+    ])('should sort %s', (_, input, expected) => {
+      expect(latestImageId(input)).toEqual(expected)
     })
   })
 

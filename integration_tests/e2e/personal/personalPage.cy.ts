@@ -10,6 +10,7 @@ import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
 import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesMock } from '../../../server/data/localMockData/physicalAttributesMock'
+import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -337,16 +338,16 @@ context('When signed in', () => {
 
       it('Displays the distinguishing marks', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        page.appearance().prisonPersonDistinguishingMarks().tattoos().should('include.text', 'Not entered')
-        page.appearance().prisonPersonDistinguishingMarks().others().should('include.text', 'Not entered')
+        page.appearance().personIntegrationDistinguishingMarks().tattoos().should('include.text', 'Not entered')
+        page.appearance().personIntegrationDistinguishingMarks().others().should('include.text', 'Not entered')
 
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().find('summary').click()
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().find('summary').click()
 
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
         const scarsDetailHeaders = page
           .appearance()
-          .prisonPersonDistinguishingMarks()
+          .personIntegrationDistinguishingMarks()
           .scarsDetail()
           .content()
           .find('dt')
@@ -358,16 +359,62 @@ context('When signed in', () => {
           cy.wrap(element).should('include.text', expectedHeaders[index])
           cy.wrap(element).siblings('dd').should('include.text', expectedTexts[index])
         })
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().content().find('img').should('have.length', 1)
+        page
+          .appearance()
+          .personIntegrationDistinguishingMarks()
+          .scarsDetail()
+          .content()
+          .find('img')
+          .should('have.length', 1)
+        page
+          .appearance()
+          .personIntegrationDistinguishingMarks()
+          .scarsDetail()
+          .detail()
+          .get('[data-qa=mark-images-link]')
+          .should('not.exist')
+      })
+
+      it(`Renders only the latest photo when there are multiple photos for a distinguishing mark`, () => {
+        cy.task('stubGetDistinguishingMarksForPrisoner', {
+          prisonerNumber: 'G6123VU',
+          response: [distinguishingMarkMultiplePhotosMock],
+        })
+        cy.visit(`prisoner/G6123VU/personal`, { failOnStatusCode: false })
+
+        const page = Page.verifyOnPage(PersonalPage)
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().find('summary').click()
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+
+        page
+          .appearance()
+          .personIntegrationDistinguishingMarks()
+          .scarsDetail()
+          .content()
+          .find('img')
+          .should('have.length', 1)
+        page
+          .appearance()
+          .personIntegrationDistinguishingMarks()
+          .scarsDetail()
+          .content()
+          .should('include.text', '1 of 3 photos.')
+        page
+          .appearance()
+          .personIntegrationDistinguishingMarks()
+          .scarsDetail()
+          .detail()
+          .get('[data-qa=mark-images-link]')
+          .should('exist')
       })
 
       it('Includes hide/show all functionality for a distinguishing mark type', () => {
         const page = Page.verifyOnPage(PersonalPage)
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
 
         const button = page
           .appearance()
-          .prisonPersonDistinguishingMarks()
+          .personIntegrationDistinguishingMarks()
           .scars()
           .find('button.hmpps-open-close-all__button')
           .should('include.text', 'Show all scar details')
@@ -375,20 +422,20 @@ context('When signed in', () => {
         button.click()
         button.should('include.text', 'Hide all scar details')
 
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
 
         button.click()
         button.should('include.text', 'Show all scar details')
 
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('not.have.attr', 'open')
 
         // clicking the individual details should also update the button state
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().find('summary').click()
-        page.appearance().prisonPersonDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().find('summary').click()
+        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
 
         page
           .appearance()
-          .prisonPersonDistinguishingMarks()
+          .personIntegrationDistinguishingMarks()
           .scars()
           .find('button.hmpps-open-close-all__button')
           .should('include.text', 'Hide all scar details')
