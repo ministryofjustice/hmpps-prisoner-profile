@@ -7,7 +7,7 @@ import OffenderActivitiesHistory from '../data/interfaces/prisonApi/OffenderActi
 import Prisoner from '../data/interfaces/prisonerSearchApi/Prisoner'
 import { properCaseName } from '../utils/utils'
 import { formatDate } from '../utils/dateHelpers'
-import { RestClientBuilder } from '../data'
+import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import PersonalLearningPlanService from './personalLearningPlanService'
 import { PersonalLearningPlanActionPlan } from './interfaces/educationAndWorkPlanApiPersonalLearningPlanService/PersonalLearningPlanGoals'
 import CuriousGoals from './interfaces/workAndSkillsPageService/CuriousGoals'
@@ -16,6 +16,7 @@ import LearnerEmployabilitySkills from '../data/interfaces/curiousApi/LearnerEmp
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import LearnerLatestAssessment from '../data/interfaces/curiousApi/LearnerLatestAssessment'
 import { Result } from '../utils/result/result'
+import { CuriousApiToken } from '../data/hmppsAuthClient'
 
 export interface WorkAndSkillsData {
   learnerEmployabilitySkills: Result<LearnerEmployabilitySkills>
@@ -38,9 +39,10 @@ interface UnacceptableAttendanceData {
 
 export default class WorkAndSkillsPageService {
   constructor(
-    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
     private readonly personalLearningPlanService: PersonalLearningPlanService,
+    private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
   ) {}
 
   public async get(
@@ -48,7 +50,8 @@ export default class WorkAndSkillsPageService {
     prisonerData: Prisoner,
     apiErrorCallback: (error: Error) => void = () => null,
   ): Promise<WorkAndSkillsData> {
-    const curiousApiClient = this.curiousApiClientBuilder(token)
+    const curiousApiToken = await this.curiousApiTokenBuilder()
+    const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const { prisonerNumber, firstName, lastName } = prisonerData
     const workAndSkillsPrisonerName = `${properCaseName(firstName)} ${properCaseName(lastName)}`

@@ -7,7 +7,7 @@ import { buildAppInsightsClient, initialiseAppInsights } from '../utils/azureApp
 import AllocationManagerApiClient from './allocationManagerApiClient'
 import CaseNotesApiRestClient from './caseNotesApiClient'
 import CuriousRestApiClient from './curiousApiClient'
-import { systemTokenBuilder } from './hmppsAuthClient'
+import { CuriousApiToken, curiousApiTokenBuilder, systemTokenBuilder } from './hmppsAuthClient'
 import IncentivesApiRestClient from './incentivesApiClient'
 import KeyWorkerRestClient from './keyWorkersApiClient'
 import ManageSocCasesApiRestClient from './manageSocCasesApiClient'
@@ -22,7 +22,6 @@ import AdjudicationsApiRestClient from './adjudicationsApiClient'
 import NonAssociationsApiRestClient from './nonAssociationsApiClient'
 import WhereaboutsRestApiClient from './whereaboutsClient'
 import PrisonerProfileDeliusApiRestClient from './prisonerProfileDeliusApiClient'
-import ManageUsersApiRestClient from './manageUsersApiClient'
 import ComplexityApiRestClient from './complexityApiClient'
 import applicationInfo from '../applicationInfo'
 import EducationAndWorkPlanApiRestClient from './educationAndWorkPlanApiClient'
@@ -47,12 +46,15 @@ initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
 
 type RestClientBuilder<T> = (token: string) => T
+type CuriousRestClientBuilder<T> = (token: CuriousApiToken) => T
+
+const tokenStore = config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore()
 
 export const dataAccess = {
   applicationInfo: applicationInfo(),
   allocationManagerApiClientBuilder: (token: string) => new AllocationManagerApiClient(token),
   caseNotesApiClientBuilder: (token: string) => new CaseNotesApiRestClient(token),
-  curiousApiClientBuilder: (token: string) => new CuriousRestApiClient(token),
+  curiousApiClientBuilder: (token: CuriousApiToken) => new CuriousRestApiClient(token),
   incentivesApiClientBuilder: (token: string) => new IncentivesApiRestClient(token),
   keyworkerApiClientBuilder: (token: string) => new KeyWorkerRestClient(token),
   manageSocCasesApiClientBuilder: (token: string) => new ManageSocCasesApiRestClient(token),
@@ -62,14 +64,12 @@ export const dataAccess = {
   locationsInsidePrisonApiClientBuilder: (token: string) => new LocationsInsidePrisonApiRestClient(token),
   nomisSyncPrisonMappingClientBuilder: (token: string) => new NomisSyncPrisonMappingRestClient(token),
   prisonerSearchApiClientBuilder: (token: string) => new PrisonerSearchClient(token),
-  systemToken: systemTokenBuilder(
-    config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
-  ),
+  systemToken: systemTokenBuilder(tokenStore),
+  curiousApiToken: curiousApiTokenBuilder(tokenStore),
   nonAssociationsApiClientBuilder: (token: string) => new NonAssociationsApiRestClient(token),
   whereaboutsApiClientBuilder: (token: string) => new WhereaboutsRestApiClient(token),
   bookAVideoLinkApiClientBuilder: (token: string) => new BookAVideoLinkRestApiClient(token),
   prisonerProfileDeliusApiClientBuilder: (token: string) => new PrisonerProfileDeliusApiRestClient(token),
-  manageUsersApiClientBuilder: (token: string) => new ManageUsersApiRestClient(token),
   complexityApiClientBuilder: (token: string) => new ComplexityApiRestClient(token),
   educationAndWorkPlanApiClientBuilder: (token: string) => new EducationAndWorkPlanApiRestClient(token),
   restrictedPatientApiClientBuilder: (token: string) => new RestrictedPatientApiRestClient(token),
@@ -90,4 +90,4 @@ export const dataAccess = {
 
 export type DataAccess = typeof dataAccess
 
-export { RestClientBuilder }
+export { RestClientBuilder, CuriousRestClientBuilder }

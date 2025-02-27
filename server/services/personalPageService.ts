@@ -30,7 +30,7 @@ import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
-import { RestClientBuilder } from '../data'
+import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import {
@@ -57,16 +57,18 @@ import {
 import { militaryHistoryEnabled } from '../utils/featureToggles'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
+import { CuriousApiToken } from '../data/hmppsAuthClient'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
     private readonly prisonPersonApiClientBuilder: RestClientBuilder<PrisonPersonApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
     private readonly metricsService: MetricsService,
+    private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
@@ -162,7 +164,7 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       enablePrisonPerson ? this.getDistinguishingMarks(token, prisonerNumber) : null,
-      Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
+      Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
@@ -478,13 +480,10 @@ export default class PersonalPageService {
     }
   }
 
-  getLearnerNeurodivergence(
-    clientToken: string,
-    prisonId: string,
-    prisonerNumber: string,
-  ): Promise<LearnerNeurodivergence[]> {
+  async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[]> {
     if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
-    const curiousApiClient = this.curiousApiClientBuilder(clientToken)
+    const curiousApiToken = await this.curiousApiTokenBuilder()
+    const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
 

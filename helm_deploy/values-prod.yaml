@@ -57,7 +57,6 @@ generic-service:
     KEYWORKER_API_URL: "https://keyworker-api.prison.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api.hmpps.service.justice.gov.uk"
     MANAGE_SOC_CASES_API_URL: "https://manage-soc-cases-api.hmpps.service.justice.gov.uk"
-    MANAGE_USERS_API_URL: "https://manage-users-api.hmpps.service.justice.gov.uk"
     PATHFINDER_API_URL: "https://api.pathfinder.service.justice.gov.uk"
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search.prison.service.justice.gov.uk"

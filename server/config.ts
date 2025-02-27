@@ -76,6 +76,12 @@ export default {
       apiClientSecret: get('API_CLIENT_SECRET', 'clientsecret', requiredInProduction),
       systemClientId: get('SYSTEM_CLIENT_ID', 'hmpps-prisoner-profile-system', requiredInProduction),
       systemClientSecret: get('SYSTEM_CLIENT_SECRET', 'clientsecret', requiredInProduction),
+      systemClientIdCurious: get(
+        'SYSTEM_CLIENT_ID_CURIOUS',
+        'hmpps-prisoner-profile-system-curious',
+        requiredInProduction,
+      ),
+      systemClientSecretCurious: get('SYSTEM_CLIENT_SECRET_CURIOUS', 'clientsecret', requiredInProduction),
     },
     tokenVerification: {
       url: get('TOKEN_VERIFICATION_API_URL', 'http://localhost:8100', requiredInProduction),
@@ -213,14 +219,6 @@ export default {
         deadline: Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000)),
       },
       agent: new AgentConfig(Number(get('PRISONER_PROFILE_DELIUS_API_TIMEOUT_DEADLINE', 2000))),
-    },
-    manageUsersApi: {
-      url: get('MANAGE_USERS_API_URL', 'http://localhost:8082', requiredInProduction),
-      timeout: {
-        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 2000)),
-        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 2000)),
-      },
-      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 2000))),
     },
     complexityApi: {
       url: get('COMPLEXITY_OF_NEED_API_URL', 'http://localhost:8082', requiredInProduction),
