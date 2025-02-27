@@ -771,6 +771,10 @@ export const sortByLatestAndUuid = (list: PersonIntegrationDistinguishingMarkIma
   })
 }
 
+export const latestImageId = (list: PersonIntegrationDistinguishingMarkImageDetail[]) => {
+  return list.find(img => img.latest === true)?.id
+}
+
 export const lengthOfService = (startDate: string, endDate: string): string => {
   const start = new Date(startDate)
   const end = new Date(endDate)

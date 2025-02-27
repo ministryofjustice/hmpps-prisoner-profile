@@ -31,11 +31,15 @@
                                     </div>
                                     {% if mark.photographUuids.length %}
                                         <div class="personal-distinguishing-marks__row__populated__row__image-list">
-                                            {% for photo in mark.photographUuids | sortByLatestAndUuid %}
-                                                <img src="/api/distinguishing-mark-image/{{ photo.id }}"
-                                                     alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
-                                            {% endfor %}
+                                            <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}"
+                                                 alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
                                         </div>
+                                        {% if mark.photographUuids.length > 1 %}
+                                            <div class="personal-distinguishing-marks__row__populated__row">
+                                                <p class="govuk-!-margin-top-3 govuk-!-margin-bottom-0">1 of {{ mark.photographUuids.length }} photos.
+                                                    <a data-qa="mark-images-link" href="#" class='govuk-link govuk-link--no-visited-state'>All images</a></p>
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 </dl>
                                 {% if mark.markType.code != 'OTH' %}

@@ -73,10 +73,16 @@ export default {
       responseBody: null,
     }),
 
-  stubGetDistinguishingMarksForPrisoner: ({ prisonerNumber }: { prisonerNumber: string }) =>
+  stubGetDistinguishingMarksForPrisoner: ({
+    prisonerNumber,
+    response = [distinguishingMarkMock],
+  }: {
+    prisonerNumber: string
+    response: PersonIntegrationDistinguishingMark[]
+  }) =>
     stubGetWithBody({
       path: `${baseUrl}/v1/distinguishing-marks\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
-      body: [distinguishingMarkMock],
+      body: response,
     }),
 
   stubGetDistinguishingMarkImage: (
