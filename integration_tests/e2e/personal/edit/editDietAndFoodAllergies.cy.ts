@@ -1,7 +1,6 @@
 import { Role } from '../../../../server/data/enums/role'
 import EditPage from '../../../pages/editPages/editPage'
 import { editPageTests } from './editPageTests'
-import { mockMedicalDietReferenceDataDomain } from '../../../../server/data/localMockData/prisonPersonApi/referenceDataMocks'
 import {
   foodAllergyCodesMock,
   medicalDietCodesMock,
@@ -30,7 +29,6 @@ context('Edit medical diet', () => {
       cy.task('stubDietAndAllergyUpdate', { prisonerNumber })
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubPersonalCareNeeds')
-      cy.task('stubGetReferenceDataDomain', mockMedicalDietReferenceDataDomain)
     },
     editUrl: `prisoner/${prisonerNumber}/personal/diet-and-food-allergies`,
     editPageWithTitle: EditPage,

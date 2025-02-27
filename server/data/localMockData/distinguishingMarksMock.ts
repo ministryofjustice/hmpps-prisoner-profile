@@ -1,42 +1,66 @@
-import { PrisonPersonDistinguishingMark } from '../interfaces/prisonPersonApi/prisonPersonApiClient'
+import { PersonIntegrationDistinguishingMark } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 
-export const distinguishingMarkMock: PrisonPersonDistinguishingMark = {
-  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-  prisonerNumber: 'G4244UD',
+export const distinguishingMarkMock: PersonIntegrationDistinguishingMark = {
+  id: 1,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
   bodyPart: {
     id: 'BODY_PART_ARM',
+    code: 'ARM',
     description: 'Arm',
-    listSequence: 0,
-    isActive: true,
   },
   markType: {
     id: 'MARK_TYPE_SCAR',
+    code: 'SCAR',
     description: 'Scar',
-    listSequence: 0,
-    isActive: true,
   },
   side: null,
   partOrientation: null,
   comment: 'Horrible arm scar',
-  photographUuids: [{ id: '019205c0-0f5f-7bef-9a24-d64db76ca24a', latest: true }],
+  photographUuids: [{ id: 100, latest: true }],
   createdAt: '2024-09-18T16:28:45+0100',
   createdBy: 'hmpps-prisoner-profile-system-1',
 }
 
-export const distinguishingMarkNoPhotosMock: PrisonPersonDistinguishingMark = {
-  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-  prisonerNumber: 'G4244UD',
+export const distinguishingMarkMultiplePhotosMock: PersonIntegrationDistinguishingMark = {
+  id: 1,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
   bodyPart: {
     id: 'BODY_PART_ARM',
+    code: 'ARM',
     description: 'Arm',
-    listSequence: 0,
-    isActive: true,
   },
   markType: {
     id: 'MARK_TYPE_SCAR',
+    code: 'SCAR',
     description: 'Scar',
-    listSequence: 0,
-    isActive: true,
+  },
+  side: null,
+  partOrientation: null,
+  comment: 'Horrible arm scar',
+  photographUuids: [
+    { id: 100, latest: false },
+    { id: 101, latest: false },
+    { id: 102, latest: true },
+  ],
+  createdAt: '2024-09-18T16:28:45+0100',
+  createdBy: 'hmpps-prisoner-profile-system-1',
+}
+
+export const distinguishingMarkNoPhotosMock: PersonIntegrationDistinguishingMark = {
+  id: 2,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
+  bodyPart: {
+    id: 'BODY_PART_ARM',
+    code: 'ARM',
+    description: 'Arm',
+  },
+  markType: {
+    id: 'MARK_TYPE_SCAR',
+    code: 'SCAR',
+    description: 'Scar',
   },
   side: null,
   partOrientation: null,
@@ -46,109 +70,102 @@ export const distinguishingMarkNoPhotosMock: PrisonPersonDistinguishingMark = {
   createdBy: 'hmpps-prisoner-profile-system-1',
 }
 
-export const scarMock: PrisonPersonDistinguishingMark = {
-  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-  prisonerNumber: 'G4244UD',
+export const scarMock: PersonIntegrationDistinguishingMark = {
+  id: 3,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
   bodyPart: {
     id: 'BODY_PART_ARM',
+    code: 'ARM',
     description: 'Arm',
-    listSequence: 0,
-    isActive: true,
   },
   markType: {
     id: 'MARK_TYPE_SCAR',
+    code: 'SCAR',
     description: 'Scar',
-    listSequence: 0,
-    isActive: true,
   },
   side: {
     id: 'SIDE_L',
+    code: 'L',
     description: 'Left',
-    listSequence: 0,
-    isActive: true,
   },
   partOrientation: null,
   comment: 'Horrible arm scar',
-  photographUuids: [{ id: '019205c0-0f5f-7bef-9a24-d64db76ca24a', latest: true }],
+  photographUuids: [{ id: 100, latest: true }],
   createdAt: '2024-09-18T16:28:45+0100',
   createdBy: 'hmpps-prisoner-profile-system-1',
 }
 
-export const markMock: PrisonPersonDistinguishingMark = {
-  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-  prisonerNumber: 'G4244UD',
+export const markMock: PersonIntegrationDistinguishingMark = {
+  id: 4,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
   bodyPart: {
     id: 'BODY_PART_LEG',
+    code: 'LEG',
     description: 'Leg',
-    listSequence: 0,
-    isActive: true,
   },
   markType: {
     id: 'MARK_TYPE_MARK',
+    code: 'MARK',
     description: 'Mark',
-    listSequence: 0,
-    isActive: true,
   },
   side: {
     id: 'SIDE_L',
+    code: 'L',
     description: 'Left',
-    listSequence: 0,
-    isActive: true,
   },
   partOrientation: null,
   comment: 'Bump',
-  photographUuids: [{ id: '019205c0-0f5f-7bef-9a24-d64db76ca24a', latest: true }],
+  photographUuids: [{ id: 100, latest: true }],
   createdAt: '2024-09-18T16:28:45+0100',
   createdBy: 'hmpps-prisoner-profile-system-1',
 }
 
-export const tattooMock: PrisonPersonDistinguishingMark = {
-  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-  prisonerNumber: 'G4244UD',
+export const tattooMock: PersonIntegrationDistinguishingMark = {
+  id: 5,
+  bookingId: 1,
+  offenderNo: 'G4244UD',
   bodyPart: {
     id: 'BODY_PART_TORSO',
+    code: 'TORSO',
     description: 'Front and sides',
-    listSequence: 0,
-    isActive: true,
   },
   markType: {
     id: 'MARK_TYPE_TAT',
+    code: 'TAT',
     description: 'Tattoo',
-    listSequence: 0,
-    isActive: true,
   },
   side: null,
   partOrientation: null,
   comment: 'Hand sewn mickey mouse stormtrooper',
-  photographUuids: [{ id: '019205c0-0f5f-7bef-9a24-d64db76ca24a', latest: true }],
+  photographUuids: [{ id: 100, latest: true }],
   createdAt: '2024-09-18T16:28:45+0100',
   createdBy: 'hmpps-prisoner-profile-system-1',
 }
 
-export const leftLegMarkMock: PrisonPersonDistinguishingMark = {
-  id: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-  prisonerNumber: 'G4244UD',
+export const leftLegMarkMock: PersonIntegrationDistinguishingMark = {
+  id: 6,
+  bookingId: 6,
+  offenderNo: 'G4244UD',
   bodyPart: {
     id: 'BODY_PART_LEG',
+    code: 'LEG',
     description: 'Leg',
-    listSequence: 0,
-    isActive: true,
   },
   markType: {
     id: 'MARK_TYPE_TAT',
+    code: 'TAT',
     description: 'Tattoo',
-    listSequence: 0,
-    isActive: true,
   },
   side: {
     id: 'SIDE_L',
+    code: 'L',
     description: 'Left',
-    listSequence: 0,
-    isActive: true,
   },
   partOrientation: null,
   comment: 'Comment',
-  photographUuids: [{ id: '019205c0-0f5f-7bef-9a24-d64db76ca24a', latest: true }],
+  photographUuids: [{ id: 100, latest: true }],
   createdAt: '2024-09-18T16:28:45+0100',
   createdBy: 'hmpps-prisoner-profile-system-1',
 }

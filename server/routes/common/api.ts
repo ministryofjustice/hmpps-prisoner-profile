@@ -2,8 +2,8 @@ import { Request, RequestHandler, Response } from 'express'
 import OffenderService from '../../services/offenderService'
 import { ApiAction, AuditService, SubjectType } from '../../services/auditService'
 import logger from '../../../logger'
-import PrisonPersonService from '../../services/prisonPersonService'
 import PhotoService from '../../services/photoService'
+import DistinguishingMarksService from '../../services/distinguishingMarksService'
 
 const placeHolderImage = '/assets/images/prisoner-profile-image.png'
 
@@ -15,7 +15,7 @@ export default class CommonApiRoutes {
   public constructor(
     private readonly offenderService: OffenderService,
     private readonly auditService: AuditService,
-    private readonly prisonPersonService: PrisonPersonService,
+    private readonly distinguishingMarksService: DistinguishingMarksService,
     private readonly photoService: PhotoService,
   ) {}
 
@@ -83,16 +83,16 @@ export default class CommonApiRoutes {
     }
   }
 
-  public prisonPersonImage: RequestHandler = (req: Request, res: Response) => {
+  public distinguishingMarkImage: RequestHandler = (req: Request, res: Response) => {
     const { imageId } = req.params
 
-    this.prisonPersonService
+    this.distinguishingMarksService
       .getImage(req.middleware.clientToken, imageId)
-      .then(({ stream, contentType }) => {
+      .then(data => {
         res.set('Cache-control', 'private, max-age=86400')
         res.removeHeader('pragma')
-        res.type(contentType || 'image/jpeg')
-        stream.pipe(res)
+        res.type('image/jpeg')
+        data.pipe(res)
       })
       .catch(_error => {
         res.redirect(placeHolderImage)

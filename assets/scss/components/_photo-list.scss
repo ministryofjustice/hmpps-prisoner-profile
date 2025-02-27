@@ -12,16 +12,13 @@
   }
 
   .hmpps-photo-list__photo {
-    width: 120px;
-    height: 150px;
-
     img {
-      max-width: 120px;
-      max-height: 150px;
+      width: 120px;
     }
   }
 
   .hmpps-photo-list__details {
-    margin-left: 15px;
+    margin-left: 10px;
+    padding-top: 10px;
   }
 }

@@ -1,3 +1,7 @@
+import { Readable } from 'stream'
+import { ReferenceDataValue } from '../prisonApi/ReferenceDataValue'
+import MulterFile from '../../../controllers/interfaces/MulterFile'
+
 export interface CorePersonRecordReferenceDataCodeDto {
   id: string
   code: string
@@ -111,6 +115,57 @@ export interface CorePersonPhysicalAttributesRequest {
   shoeSize?: string
 }
 
+export type BodyPartId =
+  | 'ANKLE'
+  | 'ARM'
+  | 'EAR'
+  | 'ELBOW'
+  | 'FACE'
+  | 'FINGER'
+  | 'FOOT'
+  | 'HAND'
+  | 'HEAD'
+  | 'KNEE'
+  | 'LEG'
+  | 'LIP'
+  | 'NECK'
+  | 'NOSE'
+  | 'SHOULDER'
+  | 'THIGH'
+  | 'TOE'
+  | 'TORSO'
+
+export type MarkTypeId = 'MARK' | 'SCAR' | 'TAT' | 'OTH'
+export type BodyPartSideId = 'B' | 'F' | 'L' | 'R' | 'S'
+export type PartOrientationId = 'CENTR' | 'FACE' | 'LOW' | 'UPP'
+
+export interface PersonIntegrationDistinguishingMark {
+  id: number
+  bookingId: number
+  offenderNo: string
+  bodyPart: ReferenceDataValue & { code: BodyPartId }
+  markType: ReferenceDataValue & { code: MarkTypeId }
+  side?: ReferenceDataValue & { code: BodyPartSideId }
+  partOrientation?: ReferenceDataValue & { code: PartOrientationId }
+  comment?: string
+  createdAt: string
+  createdBy: string
+  photographUuids?: PersonIntegrationDistinguishingMarkImageDetail[]
+}
+
+export interface PersonIntegrationDistinguishingMarkImageDetail {
+  id: number
+  latest: boolean
+}
+
+export interface DistinguishingMarkRequest {
+  bodyPart?: string
+  markType?: string
+  side?: string
+  partOrientation?: string
+  comment?: string
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -134,4 +189,28 @@ export interface PersonIntegrationApiClient {
     prisonerNumber: string,
     physicalAttributes: CorePersonPhysicalAttributesRequest,
   ): Promise<void>
+
+  getDistinguishingMark(prisonerNumber: string, sequenceId: string): Promise<PersonIntegrationDistinguishingMark>
+
+  getDistinguishingMarks(prisonerNumber: string): Promise<PersonIntegrationDistinguishingMark[]>
+
+  createDistinguishingMark(
+    prisonerNumber: string,
+    distinguishingMarkRequest: DistinguishingMarkRequest,
+    image?: MulterFile,
+  ): Promise<PersonIntegrationDistinguishingMark>
+
+  updateDistinguishingMark(
+    prisonerNumber: string,
+    sequenceId: string,
+    distinguishingMarkRequest: DistinguishingMarkRequest,
+  ): Promise<PersonIntegrationDistinguishingMark>
+
+  addDistinguishingMarkImage(
+    prisonerNumber: string,
+    sequenceId: string,
+    image: MulterFile,
+  ): Promise<PersonIntegrationDistinguishingMark>
+
+  getDistinguishingMarkImage(imageId: string): Promise<Readable>
 }

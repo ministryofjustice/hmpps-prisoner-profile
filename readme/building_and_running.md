@@ -93,7 +93,8 @@ WELCOME_PEOPLE_INTO_PRISON_UI_URL=https://welcome-dev.prison.service.justice.gov
 WHEREABOUTS_API_URL=https://whereabouts-api-dev.service.justice.gov.uk
 LEARNING_AND_WORK_PROGRESS_UI_URL=https://learning-and-work-progress-dev.hmpps.service.justice.gov.uk
 EDUCATION_AND_WORK_PLAN_API_URL=https://learningandworkprogress-api-dev.hmpps.service.justice.gov.uk
-CONTENTFUL_HOST=https://graphql.contentful.com
+CONTENTFUL_HOST=https://graphql.eu.contentful.com
+CONTENTFUL_ENVIRONMENT=master
 CONTENTFUL_SPACE_ID=
 CONTENTFUL_ACCESS_TOKEN=
 ```

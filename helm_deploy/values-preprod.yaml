@@ -22,6 +22,7 @@ generic-service:
     INGRESS_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
+    CONTENTFUL_ENVIRONMENT: "master"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-preprod.hmpps.service.justice.gov.uk"
@@ -67,10 +68,10 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-preprod.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-preprod.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-preprod.hmpps.service.justice.gov.uk"
-    PRISON_PERSON_API_URL: "https://prison-person-api-preprod.prison.service.justice.gov.uk"
     PERSON_INTEGRATION_API_URL: "https://person-integration-api-preprod.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api-preprod.hmpps.service.justice.gov.uk"
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-preprod.hmpps.service.justice.gov.uk"
+    CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -83,8 +84,6 @@ generic-service:
     COURT_CASES_SUMMARY_ENABLED: "true"
     EDIT_PROFILE_ENABLED: "true"
     EDIT_PROFILE_ENABLED_PRISONS: "KMI"
-    PRISON_PERSON_API_ENABLED: "false"
-    PRISON_PERSON_API_ENABLED_PRISONS: ""
     DIET_AND_ALLERGY_ENABLED: "true"
     DIET_AND_ALLERGY_ENABLED_PRISONS: "STI"
     MILITARY_HISTORY_ENABLED: "true"

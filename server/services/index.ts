@@ -33,7 +33,6 @@ import CuriousService from './curiousService'
 import FeatureToggleService from './featureToggleService'
 import CareNeedsService from './careNeedsService'
 import PermissionsService from './permissionsService'
-import PrisonPersonService from './prisonPersonService'
 import MetricsService from './metrics/metricsService'
 import DistinguishingMarksService from './distinguishingMarksService'
 import CsipService from './csipService'
@@ -62,7 +61,6 @@ export const services = () => {
     calculateReleaseDatesApiClientBuilder,
     prisonRegisterApiClientBuilder,
     alertsApiClientBuilder,
-    prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     healthAndMedicationApiClientBuilder,
@@ -99,7 +97,6 @@ export const services = () => {
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
-    prisonPersonApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     referenceDataService,
@@ -150,8 +147,7 @@ export const services = () => {
   const incentivesService = new IncentivesService(incentivesApiClientBuilder, prisonApiClientBuilder)
   const careNeedsService = new CareNeedsService(prisonApiClientBuilder)
   const permissionsService = new PermissionsService(userService)
-  const prisonPersonService = new PrisonPersonService(prisonPersonApiClientBuilder)
-  const distinguishingMarksService = new DistinguishingMarksService(prisonPersonApiClientBuilder)
+  const distinguishingMarksService = new DistinguishingMarksService(personIntegrationApiClientBuilder)
   const csipService = new CsipService(csipApiClientBuilder)
   const militaryRecordsService = new MilitaryRecordsService(
     personIntegrationApiClientBuilder,
@@ -159,11 +155,11 @@ export const services = () => {
     metricsService,
   )
   const photoService = new PhotoService(prisonApiClientBuilder)
-  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, prisonPersonService, photoService)
+  const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
-    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/master`,
+    uri: `${config.apis.contentful.host}/content/v1/spaces/${config.apis.contentful.spaceId}/environments/${config.apis.contentful.environment}`,
     headers: {
       Authorization: `Bearer ${config.apis.contentful.accessToken}`,
     },
@@ -209,7 +205,6 @@ export const services = () => {
     featureToggleService,
     careNeedsService,
     permissionsService,
-    prisonPersonService,
     distinguishingMarksService,
     csipService,
     militaryRecordsService,

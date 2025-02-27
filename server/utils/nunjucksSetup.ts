@@ -8,13 +8,13 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
-  fieldHistoryToRows,
   findError,
   formatMoney,
   formatName,
   formatScheduleItem,
   initialiseName,
   isInUsersCaseLoad,
+  latestImageId,
   lengthOfService,
   neurodiversityEnabled,
   prependBaseUrl,
@@ -178,7 +178,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
-  njkEnv.addFilter('fieldHistoryToRows', fieldHistoryToRows)
   njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)
   njkEnv.addFilter('toBodyPartDisplayText', distinguishingMarkBodyPartsToDisplay)
@@ -187,6 +186,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toBodyPartDescription', getBodyPartDescription)
   njkEnv.addFilter('toBodyPartToken', getBodyPartToken)
   njkEnv.addFilter('sortByLatestAndUuid', sortByLatestAndUuid)
+  njkEnv.addFilter('latestImageId', latestImageId)
   njkEnv.addFilter('lengthOfService', lengthOfService)
   njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
 }

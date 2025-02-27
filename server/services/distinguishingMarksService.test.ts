@@ -1,18 +1,21 @@
-import { PrisonPersonApiClient } from '../data/interfaces/prisonPersonApi/prisonPersonApiClient'
 import DistinguishingMarksService from './distinguishingMarksService'
 import MulterFile from '../controllers/interfaces/MulterFile'
+import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { DistinguishingMarksMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 
-const prisonPersonApiClient = {
-  postDistinguishingMark: jest.fn(),
+const personIntegrationApiClient = {
   getDistinguishingMark: jest.fn(),
-  patchDistinguishingMark: jest.fn(),
-  postDistinguishingMarkPhoto: jest.fn(),
-} as undefined as PrisonPersonApiClient
+  getDistinguishingMarks: jest.fn(),
+  createDistinguishingMark: jest.fn(),
+  updateDistinguishingMark: jest.fn(),
+  addDistinguishingMarkImage: jest.fn(),
+  getDistinguishingMarkImage: jest.fn(),
+} as undefined as PersonIntegrationApiClient
 
 describe('distinguishingMarksService', () => {
   let service: DistinguishingMarksService
   beforeEach(() => {
-    service = new DistinguishingMarksService(() => prisonPersonApiClient)
+    service = new DistinguishingMarksService(() => personIntegrationApiClient)
   })
 
   afterEach(() => {
@@ -22,55 +25,55 @@ describe('distinguishingMarksService', () => {
   describe('postNewDistinguishingMark', () => {
     test.each`
       bodyPart           | distinguishingMarkRequest
-      ${'back'}          | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_B' }}
-      ${'face'}          | ${{ bodyPart: 'BODY_PART_FACE' }}
-      ${'head'}          | ${{ bodyPart: 'BODY_PART_HEAD' }}
-      ${'leftArm'}       | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_L' }}
-      ${'rightArm'}      | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_R' }}
-      ${'leftFoot'}      | ${{ bodyPart: 'BODY_PART_FOOT', side: 'SIDE_L' }}
-      ${'rightFoot'}     | ${{ bodyPart: 'BODY_PART_FOOT', side: 'SIDE_R' }}
-      ${'leftLeg'}       | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_L' }}
-      ${'rightLeg'}      | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_R' }}
-      ${'leftHand'}      | ${{ bodyPart: 'BODY_PART_HAND', side: 'SIDE_L' }}
-      ${'rightHand'}     | ${{ bodyPart: 'BODY_PART_HAND', side: 'SIDE_R' }}
-      ${'neck'}          | ${{ bodyPart: 'BODY_PART_NECK' }}
-      ${'torso'}         | ${{ bodyPart: 'BODY_PART_TORSO' }}
-      ${'rightTorso'}    | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_R' }}
-      ${'leftTorso'}     | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_L' }}
-      ${'leftAnkle'}     | ${{ bodyPart: 'BODY_PART_ANKLE', side: 'SIDE_L' }}
-      ${'rightAnkle'}    | ${{ bodyPart: 'BODY_PART_ANKLE', side: 'SIDE_R' }}
-      ${'ear'}           | ${{ bodyPart: 'BODY_PART_EAR' }}
-      ${'leftFinger'}    | ${{ bodyPart: 'BODY_PART_FINGER', side: 'SIDE_L' }}
-      ${'rightFinger'}   | ${{ bodyPart: 'BODY_PART_FINGER', side: 'SIDE_R' }}
-      ${'leftKnee'}      | ${{ bodyPart: 'BODY_PART_KNEE', side: 'SIDE_L' }}
-      ${'rightKnee'}     | ${{ bodyPart: 'BODY_PART_KNEE', side: 'SIDE_R' }}
-      ${'lip'}           | ${{ bodyPart: 'BODY_PART_LIP' }}
-      ${'nose'}          | ${{ bodyPart: 'BODY_PART_NOSE' }}
-      ${'rightShoulder'} | ${{ bodyPart: 'BODY_PART_SHOULDER', side: 'SIDE_R' }}
-      ${'leftShoulder'}  | ${{ bodyPart: 'BODY_PART_SHOULDER', side: 'SIDE_L' }}
-      ${'rightThigh'}    | ${{ bodyPart: 'BODY_PART_THIGH', side: 'SIDE_R' }}
-      ${'leftThigh'}     | ${{ bodyPart: 'BODY_PART_THIGH', side: 'SIDE_L' }}
-      ${'rightToe'}      | ${{ bodyPart: 'BODY_PART_TOE', side: 'SIDE_R' }}
-      ${'leftToe'}       | ${{ bodyPart: 'BODY_PART_TOE', side: 'SIDE_L' }}
-      ${'upperRightArm'} | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_R', partOrientation: 'PART_ORIENT_UPP' }}
-      ${'lowerRightArm'} | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_R', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'upperLeftArm'}  | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_L', partOrientation: 'PART_ORIENT_UPP' }}
-      ${'lowerLeftArm'}  | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_L', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'lowerLeftLeg'}  | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_L', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'lowerRightLeg'} | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_R', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'upperBack'}     | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_B', partOrientation: 'PART_ORIENT_UPP' }}
-      ${'lowerBack'}     | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_B', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'leftElbow'}     | ${{ bodyPart: 'BODY_PART_ELBOW', side: 'SIDE_L' }}
-      ${'rightElbow'}    | ${{ bodyPart: 'BODY_PART_ELBOW', side: 'SIDE_R' }}
+      ${'back'}          | ${{ bodyPart: 'TORSO', side: 'B' }}
+      ${'face'}          | ${{ bodyPart: 'FACE' }}
+      ${'head'}          | ${{ bodyPart: 'HEAD' }}
+      ${'leftArm'}       | ${{ bodyPart: 'ARM', side: 'L' }}
+      ${'rightArm'}      | ${{ bodyPart: 'ARM', side: 'R' }}
+      ${'leftFoot'}      | ${{ bodyPart: 'FOOT', side: 'L' }}
+      ${'rightFoot'}     | ${{ bodyPart: 'FOOT', side: 'R' }}
+      ${'leftLeg'}       | ${{ bodyPart: 'LEG', side: 'L' }}
+      ${'rightLeg'}      | ${{ bodyPart: 'LEG', side: 'R' }}
+      ${'leftHand'}      | ${{ bodyPart: 'HAND', side: 'L' }}
+      ${'rightHand'}     | ${{ bodyPart: 'HAND', side: 'R' }}
+      ${'neck'}          | ${{ bodyPart: 'NECK' }}
+      ${'torso'}         | ${{ bodyPart: 'TORSO' }}
+      ${'rightTorso'}    | ${{ bodyPart: 'TORSO', side: 'R' }}
+      ${'leftTorso'}     | ${{ bodyPart: 'TORSO', side: 'L' }}
+      ${'leftAnkle'}     | ${{ bodyPart: 'ANKLE', side: 'L' }}
+      ${'rightAnkle'}    | ${{ bodyPart: 'ANKLE', side: 'R' }}
+      ${'ear'}           | ${{ bodyPart: 'EAR' }}
+      ${'leftFinger'}    | ${{ bodyPart: 'FINGER', side: 'L' }}
+      ${'rightFinger'}   | ${{ bodyPart: 'FINGER', side: 'R' }}
+      ${'leftKnee'}      | ${{ bodyPart: 'KNEE', side: 'L' }}
+      ${'rightKnee'}     | ${{ bodyPart: 'KNEE', side: 'R' }}
+      ${'lip'}           | ${{ bodyPart: 'LIP' }}
+      ${'nose'}          | ${{ bodyPart: 'NOSE' }}
+      ${'rightShoulder'} | ${{ bodyPart: 'SHOULDER', side: 'R' }}
+      ${'leftShoulder'}  | ${{ bodyPart: 'SHOULDER', side: 'L' }}
+      ${'rightThigh'}    | ${{ bodyPart: 'THIGH', side: 'R' }}
+      ${'leftThigh'}     | ${{ bodyPart: 'THIGH', side: 'L' }}
+      ${'rightToe'}      | ${{ bodyPart: 'TOE', side: 'R' }}
+      ${'leftToe'}       | ${{ bodyPart: 'TOE', side: 'L' }}
+      ${'upperRightArm'} | ${{ bodyPart: 'ARM', side: 'R', partOrientation: 'UPP' }}
+      ${'lowerRightArm'} | ${{ bodyPart: 'ARM', side: 'R', partOrientation: 'LOW' }}
+      ${'upperLeftArm'}  | ${{ bodyPart: 'ARM', side: 'L', partOrientation: 'UPP' }}
+      ${'lowerLeftArm'}  | ${{ bodyPart: 'ARM', side: 'L', partOrientation: 'LOW' }}
+      ${'lowerLeftLeg'}  | ${{ bodyPart: 'LEG', side: 'L', partOrientation: 'LOW' }}
+      ${'lowerRightLeg'} | ${{ bodyPart: 'LEG', side: 'R', partOrientation: 'LOW' }}
+      ${'upperBack'}     | ${{ bodyPart: 'TORSO', side: 'B', partOrientation: 'UPP' }}
+      ${'lowerBack'}     | ${{ bodyPart: 'TORSO', side: 'B', partOrientation: 'LOW' }}
+      ${'leftElbow'}     | ${{ bodyPart: 'ELBOW', side: 'L' }}
+      ${'rightElbow'}    | ${{ bodyPart: 'ELBOW', side: 'R' }}
     `(
       'should call post with $distinguishingMarkRequest when bodyPart is $bodyPart',
       ({ bodyPart, distinguishingMarkRequest }) => {
         service.postNewDistinguishingMark('token', 'A12345', 'tattoo', bodyPart)
 
-        expect(prisonPersonApiClient.postDistinguishingMark).toHaveBeenCalledWith(
+        expect(personIntegrationApiClient.createDistinguishingMark).toHaveBeenCalledWith(
+          'A12345',
           {
-            prisonerNumber: 'A12345',
-            markType: 'MARK_TYPE_TAT',
+            markType: 'TAT',
             ...distinguishingMarkRequest,
           },
           undefined,
@@ -81,11 +84,11 @@ describe('distinguishingMarksService', () => {
     it('should include comment if provided', () => {
       service.postNewDistinguishingMark('token', 'A12345', 'tattoo', 'neck', 'comment')
 
-      expect(prisonPersonApiClient.postDistinguishingMark).toHaveBeenCalledWith(
+      expect(personIntegrationApiClient.createDistinguishingMark).toHaveBeenCalledWith(
+        'A12345',
         {
-          prisonerNumber: 'A12345',
-          markType: 'MARK_TYPE_TAT',
-          bodyPart: 'BODY_PART_NECK',
+          markType: 'TAT',
+          bodyPart: 'NECK',
           comment: 'comment',
         },
         undefined,
@@ -107,11 +110,11 @@ describe('distinguishingMarksService', () => {
       }
       service.postNewDistinguishingMark('token', 'A12345', 'tattoo', 'neck', 'comment', image)
 
-      expect(prisonPersonApiClient.postDistinguishingMark).toHaveBeenCalledWith(
+      expect(personIntegrationApiClient.createDistinguishingMark).toHaveBeenCalledWith(
+        'A12345',
         {
-          prisonerNumber: 'A12345',
-          markType: 'MARK_TYPE_TAT',
-          bodyPart: 'BODY_PART_NECK',
+          markType: 'TAT',
+          bodyPart: 'NECK',
           comment: 'comment',
         },
         image,
@@ -121,74 +124,74 @@ describe('distinguishingMarksService', () => {
 
   describe('getDistinguishingMark', () => {
     it('should call getDistinguishingMark', () => {
-      service.getDistinguishingMark('token', 'markId')
+      service.getDistinguishingMark('token', 'A12345', '1')
 
-      expect(prisonPersonApiClient.getDistinguishingMark).toHaveBeenCalledWith('markId')
+      expect(personIntegrationApiClient.getDistinguishingMark).toHaveBeenCalledWith('A12345', '1')
     })
   })
 
   describe('updateDistinguishingMarkLocation', () => {
     test.each`
       bodyPartName       | distinguishingMarkRequest
-      ${'back'}          | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_B' }}
-      ${'face'}          | ${{ bodyPart: 'BODY_PART_FACE' }}
-      ${'head'}          | ${{ bodyPart: 'BODY_PART_HEAD' }}
-      ${'leftArm'}       | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_L' }}
-      ${'rightArm'}      | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_R' }}
-      ${'leftFoot'}      | ${{ bodyPart: 'BODY_PART_FOOT', side: 'SIDE_L' }}
-      ${'rightFoot'}     | ${{ bodyPart: 'BODY_PART_FOOT', side: 'SIDE_R' }}
-      ${'leftLeg'}       | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_L' }}
-      ${'rightLeg'}      | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_R' }}
-      ${'leftHand'}      | ${{ bodyPart: 'BODY_PART_HAND', side: 'SIDE_L' }}
-      ${'rightHand'}     | ${{ bodyPart: 'BODY_PART_HAND', side: 'SIDE_R' }}
-      ${'neck'}          | ${{ bodyPart: 'BODY_PART_NECK' }}
-      ${'torso'}         | ${{ bodyPart: 'BODY_PART_TORSO' }}
-      ${'rightTorso'}    | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_R' }}
-      ${'leftTorso'}     | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_L' }}
-      ${'leftAnkle'}     | ${{ bodyPart: 'BODY_PART_ANKLE', side: 'SIDE_L' }}
-      ${'rightAnkle'}    | ${{ bodyPart: 'BODY_PART_ANKLE', side: 'SIDE_R' }}
-      ${'ear'}           | ${{ bodyPart: 'BODY_PART_EAR' }}
-      ${'leftFinger'}    | ${{ bodyPart: 'BODY_PART_FINGER', side: 'SIDE_L' }}
-      ${'rightFinger'}   | ${{ bodyPart: 'BODY_PART_FINGER', side: 'SIDE_R' }}
-      ${'leftKnee'}      | ${{ bodyPart: 'BODY_PART_KNEE', side: 'SIDE_L' }}
-      ${'rightKnee'}     | ${{ bodyPart: 'BODY_PART_KNEE', side: 'SIDE_R' }}
-      ${'lip'}           | ${{ bodyPart: 'BODY_PART_LIP' }}
-      ${'nose'}          | ${{ bodyPart: 'BODY_PART_NOSE' }}
-      ${'rightShoulder'} | ${{ bodyPart: 'BODY_PART_SHOULDER', side: 'SIDE_R' }}
-      ${'leftShoulder'}  | ${{ bodyPart: 'BODY_PART_SHOULDER', side: 'SIDE_L' }}
-      ${'rightThigh'}    | ${{ bodyPart: 'BODY_PART_THIGH', side: 'SIDE_R' }}
-      ${'leftThigh'}     | ${{ bodyPart: 'BODY_PART_THIGH', side: 'SIDE_L' }}
-      ${'rightToe'}      | ${{ bodyPart: 'BODY_PART_TOE', side: 'SIDE_R' }}
-      ${'leftToe'}       | ${{ bodyPart: 'BODY_PART_TOE', side: 'SIDE_L' }}
-      ${'upperRightArm'} | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_R', partOrientation: 'PART_ORIENT_UPP' }}
-      ${'lowerRightArm'} | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_R', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'upperLeftArm'}  | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_L', partOrientation: 'PART_ORIENT_UPP' }}
-      ${'lowerLeftArm'}  | ${{ bodyPart: 'BODY_PART_ARM', side: 'SIDE_L', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'lowerLeftLeg'}  | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_L', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'lowerRightLeg'} | ${{ bodyPart: 'BODY_PART_LEG', side: 'SIDE_R', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'upperBack'}     | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_B', partOrientation: 'PART_ORIENT_UPP' }}
-      ${'lowerBack'}     | ${{ bodyPart: 'BODY_PART_TORSO', side: 'SIDE_B', partOrientation: 'PART_ORIENT_LOW' }}
-      ${'leftElbow'}     | ${{ bodyPart: 'BODY_PART_ELBOW', side: 'SIDE_L' }}
-      ${'rightElbow'}    | ${{ bodyPart: 'BODY_PART_ELBOW', side: 'SIDE_R' }}
+      ${'back'}          | ${{ bodyPart: 'TORSO', side: 'B' }}
+      ${'face'}          | ${{ bodyPart: 'FACE' }}
+      ${'head'}          | ${{ bodyPart: 'HEAD' }}
+      ${'leftArm'}       | ${{ bodyPart: 'ARM', side: 'L' }}
+      ${'rightArm'}      | ${{ bodyPart: 'ARM', side: 'R' }}
+      ${'leftFoot'}      | ${{ bodyPart: 'FOOT', side: 'L' }}
+      ${'rightFoot'}     | ${{ bodyPart: 'FOOT', side: 'R' }}
+      ${'leftLeg'}       | ${{ bodyPart: 'LEG', side: 'L' }}
+      ${'rightLeg'}      | ${{ bodyPart: 'LEG', side: 'R' }}
+      ${'leftHand'}      | ${{ bodyPart: 'HAND', side: 'L' }}
+      ${'rightHand'}     | ${{ bodyPart: 'HAND', side: 'R' }}
+      ${'neck'}          | ${{ bodyPart: 'NECK' }}
+      ${'torso'}         | ${{ bodyPart: 'TORSO' }}
+      ${'rightTorso'}    | ${{ bodyPart: 'TORSO', side: 'R' }}
+      ${'leftTorso'}     | ${{ bodyPart: 'TORSO', side: 'L' }}
+      ${'leftAnkle'}     | ${{ bodyPart: 'ANKLE', side: 'L' }}
+      ${'rightAnkle'}    | ${{ bodyPart: 'ANKLE', side: 'R' }}
+      ${'ear'}           | ${{ bodyPart: 'EAR' }}
+      ${'leftFinger'}    | ${{ bodyPart: 'FINGER', side: 'L' }}
+      ${'rightFinger'}   | ${{ bodyPart: 'FINGER', side: 'R' }}
+      ${'leftKnee'}      | ${{ bodyPart: 'KNEE', side: 'L' }}
+      ${'rightKnee'}     | ${{ bodyPart: 'KNEE', side: 'R' }}
+      ${'lip'}           | ${{ bodyPart: 'LIP' }}
+      ${'nose'}          | ${{ bodyPart: 'NOSE' }}
+      ${'rightShoulder'} | ${{ bodyPart: 'SHOULDER', side: 'R' }}
+      ${'leftShoulder'}  | ${{ bodyPart: 'SHOULDER', side: 'L' }}
+      ${'rightThigh'}    | ${{ bodyPart: 'THIGH', side: 'R' }}
+      ${'leftThigh'}     | ${{ bodyPart: 'THIGH', side: 'L' }}
+      ${'rightToe'}      | ${{ bodyPart: 'TOE', side: 'R' }}
+      ${'leftToe'}       | ${{ bodyPart: 'TOE', side: 'L' }}
+      ${'upperRightArm'} | ${{ bodyPart: 'ARM', side: 'R', partOrientation: 'UPP' }}
+      ${'lowerRightArm'} | ${{ bodyPart: 'ARM', side: 'R', partOrientation: 'LOW' }}
+      ${'upperLeftArm'}  | ${{ bodyPart: 'ARM', side: 'L', partOrientation: 'UPP' }}
+      ${'lowerLeftArm'}  | ${{ bodyPart: 'ARM', side: 'L', partOrientation: 'LOW' }}
+      ${'lowerLeftLeg'}  | ${{ bodyPart: 'LEG', side: 'L', partOrientation: 'LOW' }}
+      ${'lowerRightLeg'} | ${{ bodyPart: 'LEG', side: 'R', partOrientation: 'LOW' }}
+      ${'upperBack'}     | ${{ bodyPart: 'TORSO', side: 'B', partOrientation: 'UPP' }}
+      ${'lowerBack'}     | ${{ bodyPart: 'TORSO', side: 'B', partOrientation: 'LOW' }}
+      ${'leftElbow'}     | ${{ bodyPart: 'ELBOW', side: 'L' }}
+      ${'rightElbow'}    | ${{ bodyPart: 'ELBOW', side: 'R' }}
     `(
       'should call post with $distinguishingMarkRequest when bodyPart is $bodyPart',
       ({ bodyPartName, distinguishingMarkRequest }) => {
         service.updateDistinguishingMarkLocation(
           'token',
           'A12345',
-          '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+          '1',
+          DistinguishingMarksMock[0],
           'tattoo',
           bodyPartName,
         )
 
         const { bodyPart, side, partOrientation } = distinguishingMarkRequest
-        expect(prisonPersonApiClient.patchDistinguishingMark).toHaveBeenCalledWith({
-          prisonerNumber: 'A12345',
-          markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-          markType: 'MARK_TYPE_TAT',
+        expect(personIntegrationApiClient.updateDistinguishingMark).toHaveBeenCalledWith('A12345', '1', {
+          markType: 'TAT',
           bodyPart,
-          side: side ?? null,
-          partOrientation: partOrientation ?? null,
+          side,
+          partOrientation,
+          comment: 'Some comment',
         })
       },
     )
@@ -199,15 +202,17 @@ describe('distinguishingMarksService', () => {
       service.updateDistinguishingMarkDescription(
         'token',
         'A12345',
-        '019205c0-0fd5-7c41-ae24-ede9eae05da5',
+        '1',
+        DistinguishingMarksMock[0],
         'tattoo',
         'comment',
       )
 
-      expect(prisonPersonApiClient.patchDistinguishingMark).toHaveBeenCalledWith({
-        prisonerNumber: 'A12345',
-        markId: '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-        markType: 'MARK_TYPE_TAT',
+      expect(personIntegrationApiClient.updateDistinguishingMark).toHaveBeenCalledWith('A12345', '1', {
+        markType: 'TAT',
+        bodyPart: 'HEAD',
+        side: 'L',
+        partOrientation: 'UPP',
         comment: 'comment',
       })
     })
@@ -215,14 +220,13 @@ describe('distinguishingMarksService', () => {
 
   describe('addDistinguishingMarkPhoto', () => {
     it('should add correct photo', () => {
-      service.addDistinguishingMarkPhoto('token', '019205c0-0fd5-7c41-ae24-ede9eae05da5', {
+      service.addDistinguishingMarkPhoto('token', 'A12345', '1', {
         originalname: 'photo',
       } as MulterFile)
 
-      expect(prisonPersonApiClient.postDistinguishingMarkPhoto).toHaveBeenCalledWith(
-        '019205c0-0fd5-7c41-ae24-ede9eae05da5',
-        { originalname: 'photo' },
-      )
+      expect(personIntegrationApiClient.addDistinguishingMarkImage).toHaveBeenCalledWith('A12345', '1', {
+        originalname: 'photo',
+      })
     })
   })
 })

@@ -26,7 +26,6 @@ import calcluateReleaseDatesApi from './integration_tests/mockApis/calculateRele
 import contentful from './integration_tests/mockApis/contentful'
 import alertsApi from './integration_tests/mockApis/alertsApi'
 import componentApi from './integration_tests/mockApis/componentApi'
-import prisonPersonApi from './integration_tests/mockApis/prisonPerson'
 import personIntegrationApi from './integration_tests/mockApis/personIntegrationApi'
 import csipApi from './integration_tests/mockApis/csipApi'
 import bookAVideoLinkApi from './integration_tests/mockApis/bookAVideoLinkApi'
@@ -75,7 +74,6 @@ export default defineConfig({
         ...contentful,
         ...alertsApi,
         ...componentApi,
-        ...prisonPersonApi,
         ...personIntegrationApi,
         ...csipApi,
         ...bookAVideoLinkApi,
