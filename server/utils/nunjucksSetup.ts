@@ -51,7 +51,7 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { militaryHistoryEnabled } from './featureToggles'
+import { bvlsMasteredVlpmFeatureToggleEnabled, militaryHistoryEnabled } from './featureToggles'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -103,6 +103,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('standardApiErrorText', () => apiErrorMessage)
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
+  njkEnv.addGlobal('bvlsMasteredVlpmFeatureToggleEnabled', bvlsMasteredVlpmFeatureToggleEnabled)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)
@@ -111,6 +112,8 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatScheduleItem', formatScheduleItem)
   njkEnv.addFilter('summaryListOneHalfWidth', summaryListOneHalfWidth)
   njkEnv.addFilter('pluralise', pluralise)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  njkEnv.addFilter('filterNot', (l: any[], iteratee: string, eq: unknown) => l.filter(o => o[iteratee] !== eq))
   njkEnv.addFilter('addressToLines', addressToLines)
   njkEnv.addFilter('find', (l: never[], iteratee: string, eq: unknown) => l.find(o => o[iteratee] === eq))
   njkEnv.addFilter('findError', findError)

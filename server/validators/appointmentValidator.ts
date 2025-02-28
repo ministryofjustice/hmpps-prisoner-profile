@@ -1,8 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import { addYears, isAfter, isBefore, isPast, isWeekend, subDays } from 'date-fns'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 import { Validator } from '../middleware/validationMiddleware'
 import HmppsError from '../interfaces/HmppsError'
 import { calculateEndDate, formatDate, formatDateISO, isRealDate, parseDate } from '../utils/dateHelpers'
+import { bvlsMasteredVlpmFeatureToggleEnabled } from '../utils/featureToggles'
 
 export const AppointmentValidator: Validator = (body: Record<string, string>) => {
   const errors: HmppsError[] = []
@@ -11,6 +13,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
   let invalidEndTime = false
   let pastDate = false
   const date = parseDate(body.date)
+  const emailRegex = /^[a-zA-Z0-9+._%-]{1,256}@[a-zA-Z0-9][a-zA-Z0-9-]{0,64}(\.[a-zA-Z0-9][a-zA-Z0-9-]{0,25})+$/
 
   if (!body.appointmentType) {
     errors.push({
@@ -19,11 +22,68 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
+  if (bvlsMasteredVlpmFeatureToggleEnabled() && body.appointmentType === 'VLPM' && !body.probationTeam) {
+    errors.push({
+      text: 'Select the probation team',
+      href: '#probationTeam',
+    })
+  }
+
   if (!body.location) {
     errors.push({
       text: 'Select the location',
       href: '#location',
     })
+  }
+
+  if (bvlsMasteredVlpmFeatureToggleEnabled() && body.appointmentType === 'VLPM') {
+    const hasOfficerDetails = !!(body.officerFullName || body.officerEmail || body.officerTelephone)
+    const isUnknownSelected = !!body.officerDetailsNotKnown
+
+    if (!isUnknownSelected && !hasOfficerDetails) {
+      errors.push({
+        text: "Enter the probation officer's details",
+        href: '#officerDetailsOrUnknown',
+      })
+    } else if (isUnknownSelected === hasOfficerDetails) {
+      errors.push({
+        text: "Enter either the probation officer's details, or select 'Not yet known'",
+        href: '#officerDetailsOrUnknown',
+      })
+    } else if (!isUnknownSelected) {
+      if (!body.officerFullName) {
+        errors.push({
+          text: "Enter the probation officer's full name",
+          href: '#officerFullName',
+        })
+      }
+
+      if (!body.officerEmail) {
+        errors.push({
+          text: "Enter the probation officer's email address",
+          href: '#officerEmail',
+        })
+      } else if (!emailRegex.test(body.officerEmail)) {
+        errors.push({
+          text: "'Enter a valid email address'",
+          href: '#officerEmail',
+        })
+      }
+
+      if (body.officerTelephone && !isValidPhoneNumber(body.officerTelephone, 'GB')) {
+        errors.push({
+          text: 'Enter a valid UK phone number',
+          href: '#officerTelephone',
+        })
+      }
+    }
+
+    if (!body.meetingType) {
+      errors.push({
+        text: 'Select the meeting type',
+        href: '#meetingType',
+      })
+    }
   }
 
   if (!body.date) {
@@ -173,7 +233,7 @@ export const AppointmentValidator: Validator = (body: Record<string, string>) =>
     })
   }
 
-  if (!body.recurring && body.appointmentType !== 'VLB') {
+  if (!body.recurring && body.appointmentType !== 'VLB' && body.appointmentType !== 'VLPM') {
     errors.push({
       text: 'Select if this is a recurring appointment or not',
       href: '#recurring',
