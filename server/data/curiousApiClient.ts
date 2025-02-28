@@ -7,12 +7,13 @@ import { LearnerEductionPagedResponse } from './interfaces/curiousApi/LearnerEdu
 import LearnerLatestAssessment from './interfaces/curiousApi/LearnerLatestAssessment'
 import LearnerGoals from './interfaces/curiousApi/LearnerGoals'
 import LearnerNeurodivergence from './interfaces/curiousApi/LearnerNeurodivergence'
+import { CuriousApiToken } from './hmppsAuthClient'
 
 export default class CuriousRestApiClient implements CuriousApiClient {
   private readonly restClient: RestClient
 
-  constructor(token: string) {
-    this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token)
+  constructor(token: CuriousApiToken) {
+    this.restClient = new RestClient('Curious API', config.apis.curiousApiUrl, token.curiousApiToken)
   }
 
   async getLearnerEmployabilitySkills(offenderNumber: string): Promise<LearnerEmployabilitySkills> {

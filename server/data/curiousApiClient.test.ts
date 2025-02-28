@@ -17,7 +17,7 @@ describe('curiousApiClient', () => {
 
   beforeEach(() => {
     fakeCuriousApi = nock(config.apis.curiousApiUrl.url)
-    curiousApiClient = new CuriousApiClient(token.access_token)
+    curiousApiClient = new CuriousApiClient({ curiousApiToken: token.access_token })
   })
 
   afterEach(() => {

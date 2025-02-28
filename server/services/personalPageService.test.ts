@@ -100,6 +100,7 @@ describe('PersonalPageService', () => {
       () => healthAndMedicationApiClient,
       referenceDataService,
       metricsService,
+      () => Promise.resolve({ curiousApiToken: 'token' }),
     )
 
   describe('Getting information from the Prison API', () => {
