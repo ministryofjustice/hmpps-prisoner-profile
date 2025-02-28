@@ -24,7 +24,7 @@ describe('retrieveCuriousInPrisonCourses', () => {
     } as unknown as Response
   })
 
-  const curiousService = new CuriousService(null, null) as jest.Mocked<CuriousService>
+  const curiousService = new CuriousService(null, null, null) as jest.Mocked<CuriousService>
   const requestHandler = retrieveCuriousInPrisonCourses(curiousService)
 
   it('should retrieve prisoner In Prison Courses given In Prison Courses not already on res.locals', async () => {

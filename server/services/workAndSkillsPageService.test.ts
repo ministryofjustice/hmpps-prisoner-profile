@@ -73,6 +73,7 @@ describe('WorkAndSkillsService', () => {
       () => curiousApiClient,
       () => prisonApiClient,
       personalLearningPlanService,
+      () => Promise.resolve({ curiousApiToken: 'token' }),
     )
   })
 
