@@ -1,14 +1,14 @@
 import { Readable } from 'stream'
 import RestClient from './restClient'
 import {
-  CorePersonPhysicalAttributes,
+  CorePersonPhysicalAttributesDto,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataCodeDto,
   CorePersonRecordReferenceDataDomain,
-  PersonIntegrationDistinguishingMark,
   DistinguishingMarkRequest,
   MilitaryRecord,
   PersonIntegrationApiClient,
+  PersonIntegrationDistinguishingMark,
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -137,7 +137,7 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
-  getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
+  getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributesDto> {
     return this.restClient.get({ path: `/v1/core-person-record/physical-attributes`, query: { prisonerNumber } })
   }
 

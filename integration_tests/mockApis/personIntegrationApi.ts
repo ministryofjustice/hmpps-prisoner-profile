@@ -1,10 +1,10 @@
 import { stubGetWithBody, stubPatchWithResponse, stubPostWithResponse, stubPutWithResponse } from './utils'
 import {
-  CorePersonPhysicalAttributes,
+  CorePersonPhysicalAttributesDto,
   CorePersonRecordReferenceDataCodeDto,
+  MilitaryRecord,
   PersonIntegrationDistinguishingMark,
   PersonIntegrationDistinguishingMarkImageDetail,
-  MilitaryRecord,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
@@ -61,7 +61,7 @@ export default {
       responseBody: null,
     }),
 
-  stubPersonIntegrationGetPhysicalAttributes: (physicalAttributes: CorePersonPhysicalAttributes) =>
+  stubPersonIntegrationGetPhysicalAttributes: (physicalAttributes: CorePersonPhysicalAttributesDto) =>
     stubGetWithBody({
       path: `${baseUrl}/v1/core-person-record/physical-attributes\\?prisonerNumber=.*`,
       body: physicalAttributes,

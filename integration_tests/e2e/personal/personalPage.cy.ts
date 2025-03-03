@@ -9,7 +9,7 @@ import NotFoundPage from '../../pages/notFoundPage'
 import { calculateAge } from '../../../server/utils/utils'
 import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/localMockData/personalCareNeedsMock'
 import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
-import { corePersonPhysicalAttributesMock } from '../../../server/data/localMockData/physicalAttributesMock'
+import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localMockData/physicalAttributesMock'
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
@@ -63,7 +63,7 @@ context('When signed in', () => {
       cy.task('stubBeliefHistory')
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
-      cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesMock)
+      cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
       visitPersonalDetailsPage()
     })
 
@@ -328,8 +328,8 @@ context('When signed in', () => {
         page.appearance().hairColour().should('include.text', 'Brown')
         page.appearance().leftEyeColour().should('include.text', 'Blue')
         page.appearance().rightEyeColour().should('include.text', 'Blue')
-        page.appearance().facialHair().should('include.text', 'Bearded')
-        page.appearance().shapeOfFace().should('include.text', 'Round')
+        page.appearance().facialHair().should('include.text', 'Full beard')
+        page.appearance().shapeOfFace().should('include.text', 'Oval')
         page.appearance().build().should('include.text', 'Average')
         page.appearance().shoeSize().should('include.text', '11')
         page.appearance().warnedAboutTattooing().should('include.text', 'Yes')

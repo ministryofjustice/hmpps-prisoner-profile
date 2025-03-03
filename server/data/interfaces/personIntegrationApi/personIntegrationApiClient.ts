@@ -85,21 +85,15 @@ export interface DischargeDetails {
   dischargeLocation?: string
 }
 
-export interface CorePersonPhysicalAttributes {
+export interface CorePersonPhysicalAttributesDto {
   height?: number
   weight?: number
-  hairCode?: string
-  hairDescription?: string
-  facialHairCode?: string
-  facialHairDescription?: string
-  faceCode?: string
-  faceDescription?: string
-  buildCode?: string
-  buildDescription?: string
-  leftEyeColourCode?: string
-  leftEyeColourDescription?: string
-  rightEyeColourCode?: string
-  rightEyeColourDescription?: string
+  hair?: ReferenceDataValue
+  facialHair?: ReferenceDataValue
+  face?: ReferenceDataValue
+  build?: ReferenceDataValue
+  leftEyeColour?: ReferenceDataValue
+  rightEyeColour?: ReferenceDataValue
   shoeSize?: string
 }
 
@@ -183,7 +177,7 @@ export interface PersonIntegrationApiClient {
 
   createMilitaryRecord(prisonerNumber: string, militaryRecord: MilitaryRecord): Promise<void>
 
-  getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributes>
+  getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributesDto>
 
   updatePhysicalAttributes(
     prisonerNumber: string,

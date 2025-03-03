@@ -7,7 +7,7 @@ import {
   CountryReferenceDataCodesMock,
   MilitaryRecordsMock,
 } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
-import { corePersonPhysicalAttributesMock } from '../../server/data/localMockData/physicalAttributesMock'
+import { corePersonPhysicalAttributesDtoMock } from '../../server/data/localMockData/physicalAttributesMock'
 
 Cypress.Commands.add('signIn', (options = { failOnStatusCode: true, redirectPath: '/' }) => {
   const { failOnStatusCode, redirectPath } = options
@@ -171,7 +171,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   })
   cy.task('stubHealthAndMedication', { prisonerNumber })
   cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
-  cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesMock)
+  cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {

@@ -33,7 +33,10 @@ import {
   dietAndAllergyMock,
   healthAndMedicationMock,
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
-import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
+import {
+  corePersonPhysicalAttributesDtoMock,
+  corePersonPhysicalAttributesMock,
+} from '../data/localMockData/physicalAttributesMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -69,7 +72,7 @@ describe('PersonalPageService', () => {
       getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
       updateMilitaryRecord: jest.fn(),
       createMilitaryRecord: jest.fn(),
-      getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesMock),
+      getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
       updatePhysicalAttributes: jest.fn(),
       getDistinguishingMark: jest.fn(),
       getDistinguishingMarks: jest.fn(),
@@ -511,7 +514,7 @@ describe('PersonalPageService', () => {
       expect(physicalCharacteristics.hairColour).toEqual('Brown')
       expect(physicalCharacteristics.leftEyeColour).toEqual('Blue')
       expect(physicalCharacteristics.rightEyeColour).toEqual('Blue')
-      expect(physicalCharacteristics.shapeOfFace).toEqual('Round')
+      expect(physicalCharacteristics.shapeOfFace).toEqual('Oval')
       expect(physicalCharacteristics.build).toEqual('Average')
       expect(physicalCharacteristics.shoeSize).toEqual('11')
       expect(physicalCharacteristics.warnedAboutTattooing).toEqual('Yes')

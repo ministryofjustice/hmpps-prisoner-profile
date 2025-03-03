@@ -37,7 +37,6 @@ import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
 import {
-  CorePersonPhysicalAttributes,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
   PersonIntegrationApiClient,
@@ -55,6 +54,7 @@ import { militaryHistoryEnabled } from '../utils/featureToggles'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
+import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePersonPhysicalAttributes'
 
 export default class PersonalPageService {
   constructor(
@@ -97,7 +97,24 @@ export default class PersonalPageService {
 
   async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
-    return apiClient.getPhysicalAttributes(prisonerNumber)
+    const physicalAttributesDto = await apiClient.getPhysicalAttributes(prisonerNumber)
+    return {
+      height: physicalAttributesDto.height,
+      weight: physicalAttributesDto.weight,
+      hairCode: physicalAttributesDto.hair?.code,
+      hairDescription: physicalAttributesDto.hair?.description,
+      facialHairCode: physicalAttributesDto.facialHair?.code,
+      facialHairDescription: physicalAttributesDto.facialHair?.description,
+      faceCode: physicalAttributesDto.face?.code,
+      faceDescription: physicalAttributesDto.face?.description,
+      buildCode: physicalAttributesDto.build?.code,
+      buildDescription: physicalAttributesDto.build?.description,
+      leftEyeColourCode: physicalAttributesDto.leftEyeColour?.code,
+      leftEyeColourDescription: physicalAttributesDto.leftEyeColour?.description,
+      rightEyeColourCode: physicalAttributesDto.rightEyeColour?.code,
+      rightEyeColourDescription: physicalAttributesDto.rightEyeColour?.description,
+      shoeSize: physicalAttributesDto.shoeSize,
+    }
   }
 
   async updatePhysicalAttributes(
@@ -109,7 +126,7 @@ export default class PersonalPageService {
     const apiClient = this.personIntegrationApiClientBuilder(token)
 
     const existingPhysicalAttributes =
-      (await apiClient.getPhysicalAttributes(prisonerNumber)) ??
+      (await this.getPhysicalAttributes(token, prisonerNumber)) ??
       (() => {
         throw new BadRequestError(`Physical attributes not found for ${prisonerNumber}`)
       })()
