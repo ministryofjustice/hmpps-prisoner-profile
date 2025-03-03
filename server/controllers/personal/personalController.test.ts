@@ -35,10 +35,7 @@ import {
   personalisedDietCodesMock,
   smokerStatusCodesMock,
 } from '../../data/localMockData/healthAndMedicationApi/referenceDataMocks'
-import {
-  CorePersonPhysicalAttributes,
-  CorePersonRecordReferenceDataDomain,
-} from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { CorePersonRecordReferenceDataDomain } from '../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import {
   buildCodesMock,
   eyeColourCodesMock,
@@ -48,6 +45,7 @@ import {
 } from '../../data/localMockData/personIntegrationApi/referenceDataMocks'
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
+import { CorePersonPhysicalAttributes } from '../../services/interfaces/corePerson/corePersonPhysicalAttributes'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
