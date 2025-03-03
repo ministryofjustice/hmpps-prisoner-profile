@@ -24,6 +24,11 @@ export const registeredBackLinkServices: RegisteredService[] = [
     hostname: sanitizeUrl(config.serviceUrls.createAndVaryALicence),
     defaultBackLinkText: 'Back to Create and vary a licence',
   },
+  {
+    name: 'assess-for-early-release',
+    hostname: sanitizeUrl(config.serviceUrls.assessForEarlyRelease),
+    defaultBackLinkText: 'Back to Assess for early release',
+  },
 ]
 
 export const saveBackLink =
