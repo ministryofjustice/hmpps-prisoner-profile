@@ -383,29 +383,44 @@ context('When signed in', () => {
         cy.visit(`prisoner/G6123VU/personal`, { failOnStatusCode: false })
 
         const page = Page.verifyOnPage(PersonalPage)
-        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().find('summary').click()
-        page.appearance().personIntegrationDistinguishingMarks().scarsDetail().detail().should('have.attr', 'open')
+        page.appearance().personIntegrationDistinguishingMarks().tattoosDetail().detail().find('summary').click()
+        page.appearance().personIntegrationDistinguishingMarks().tattoosDetail().detail().should('have.attr', 'open')
 
         page
           .appearance()
           .personIntegrationDistinguishingMarks()
-          .scarsDetail()
+          .tattoosDetail()
           .content()
           .find('img')
           .should('have.length', 1)
         page
           .appearance()
           .personIntegrationDistinguishingMarks()
-          .scarsDetail()
+          .tattoosDetail()
           .content()
-          .should('include.text', '1 of 3 photos.')
+          .should('include.text', '1 of 6 photos.')
+      })
+
+      it(`Displays a link allowing the user to view all images for the distinguishing mark`, () => {
+        cy.task('stubGetDistinguishingMarksForPrisoner', {
+          prisonerNumber: 'G6123VU',
+          response: [distinguishingMarkMultiplePhotosMock],
+        })
+        cy.visit(`prisoner/G6123VU/personal`, { failOnStatusCode: false })
+
+        const page = Page.verifyOnPage(PersonalPage)
+        page.appearance().personIntegrationDistinguishingMarks().tattoosDetail().detail().find('summary').click()
+        page.appearance().personIntegrationDistinguishingMarks().tattoosDetail().detail().should('have.attr', 'open')
+
         page
           .appearance()
           .personIntegrationDistinguishingMarks()
-          .scarsDetail()
+          .tattoosDetail()
           .detail()
           .get('[data-qa=mark-images-link]')
           .should('exist')
+          .and('have.attr', 'href')
+          .and('include', '/all-images')
       })
 
       it('Includes hide/show all functionality for a distinguishing mark type', () => {

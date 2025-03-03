@@ -110,5 +110,8 @@ export default function distinguishingMarksRouter(services: Services): Router {
     distinguishingMarksController.updatePhoto,
   )
 
+  // View all images for a mark
+  get('/:markId/all-images', distinguishingMarksController.viewAllImages)
+
   return router
 }

@@ -10,8 +10,9 @@ import {
 import MulterFile from './interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
 import { FlashMessageType } from '../data/enums/flashMessageType'
-import { convertToTitleCase } from '../utils/utils'
+import { convertToTitleCase, formatName } from '../utils/utils'
 import { BodyPartId, BodyPartSideId } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 
 interface MulterFiles {
   [fieldname: string]: MulterFile[]
@@ -31,6 +32,7 @@ export default class DistinguishingMarksController {
     this.updateDescription = this.updateDescription.bind(this)
     this.changePhoto = this.changePhoto.bind(this)
     this.updatePhoto = this.updatePhoto.bind(this)
+    this.viewAllImages = this.viewAllImages.bind(this)
   }
 
   public newDistinguishingMark(req: Request, res: Response) {
@@ -323,5 +325,23 @@ export default class DistinguishingMarksController {
     await this.distinguishingMarksService.addDistinguishingMarkPhoto(clientToken, prisonerNumber, markId, file)
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+  }
+
+  public async viewAllImages(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const { clientToken, prisonerData } = req.middleware
+    const { firstName, lastName } = prisonerData
+    const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
+
+    const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+    return res.render('pages/distinguishingMarks/viewAllImages', {
+      prisonerName,
+      prisonerNumber,
+      mark,
+      markType,
+    })
   }
 }

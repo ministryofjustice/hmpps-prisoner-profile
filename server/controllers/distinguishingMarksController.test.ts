@@ -699,4 +699,26 @@ describe('Distinguishing Marks Controller', () => {
       })
     })
   })
+
+  describe('viewAllImages', () => {
+    it('should display all images for a distinguishing mark', async () => {
+      const req = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        body: {},
+        middleware: { clientToken: 'token', prisonerData: { firstName: 'John', lastName: 'Smith' } },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.viewAllImages(req, res as Response)
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/viewAllImages', {
+        prisonerName: 'John Smith',
+        prisonerNumber: 'A12345',
+        mark: distinguishingMarkMock,
+        markType: 'tattoo',
+      })
+    })
+  })
 })
