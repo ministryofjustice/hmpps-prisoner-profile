@@ -6,6 +6,18 @@
 {% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#marks" %}
 {% set heading =  "Change "+ markType + " details" %}
 {% set pageTitle =  heading + " - Prisoner personal details" %}
+{% set basePath = '/prisoner/' + prisonerNumber + '/personal/' + markType + '/' + mark.id %}
+
+{% set photoHtml %}
+    <!-- Will be replaced by a grid of photos in CDPS-1232 - hard coded to latest photo temporarily -->
+    <div class="mark-changeable-image">
+        <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}"
+             alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}" />
+        <div class="mark-changeable-image__overlay">
+            <a href="{{ basePath }}/photo/{{ mark.photographUuids | latestImageId }}" class="govuk-link govuk-link--no-visited-state">Change</a>
+        </div>
+    </div>
+{% endset -%}
 
 {% block body %}
 
@@ -20,7 +32,6 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            {% set basePath = '/prisoner/' + prisonerNumber + '/personal/' + markType + '/' + mark.id %}
             {{ govukSummaryList({
                 classes: 'govuk-!-margin-bottom-6',
                 rows: [
@@ -65,7 +76,7 @@
                         actions: {
                         items: [
                             {
-                                href: basePath + "/photo",
+                                href: basePath + "/photo/" + mark.photographUuids | latestImageId,
                                 text: "Change",
                                 visuallyHiddenText: "photograph",
                                 classes: "govuk-link--no-visited-state"

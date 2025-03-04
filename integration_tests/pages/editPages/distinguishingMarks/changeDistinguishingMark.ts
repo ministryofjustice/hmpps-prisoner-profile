@@ -22,19 +22,11 @@ export default class ChangeDistinguishingMark extends Page {
     }
   }
 
-  explanationText = (): PageElement => cy.get('[data-qa=explanation-text]')
-
-  image = (): PageElement => cy.get('img[usemap=#body-part-map]')
-
-  bodyParts = (): PageElement => cy.get('map[name=body-part-map] area')
-
-  selectionDescription = (): PageElement => cy.get('#distinguishing-mark-selection-text')
-
-  formValue = (name: string): PageElement => cy.get(`input[name=${name}]`)
-
-  continueBtn = (): PageElement => cy.get('button[type=submit][value=continue]')
-
-  saveAndReturnBtn = (): PageElement => cy.get('button[type=submit][value=returnToProfile]')
-
-  validationErrorBox = (): PageElement => cy.get('.govuk-error-summary')
+  changeableImage = () => {
+    const imageContainer = () => cy.get('.mark-changeable-image')
+    return {
+      image: () => imageContainer().children('img'),
+      link: () => imageContainer().get('.mark-changeable-image__overlay').children('a'),
+    }
+  }
 }
