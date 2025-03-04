@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import multer from 'multer'
-import noCache from 'nocache'
 import { getRequest, postRequest } from './routerUtils'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -108,7 +107,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
       redirectBackOnError: true,
       useReq: true,
     }),
-    noCache(),
     distinguishingMarksController.updatePhoto,
   )
 

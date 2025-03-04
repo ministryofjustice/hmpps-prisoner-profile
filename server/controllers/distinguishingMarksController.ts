@@ -296,7 +296,7 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
     const photoHtml = mark.photographUuids?.length
-      ? `<img src="/api/distinguishing-mark-image/${photoId}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
+      ? `<img src="/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
       : null
 
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`

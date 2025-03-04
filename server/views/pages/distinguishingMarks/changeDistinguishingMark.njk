@@ -11,7 +11,7 @@
 {% set photoHtml %}
     <!-- Will be replaced by a grid of photos in CDPS-1232 - hard coded to latest photo temporarily -->
     <div class="mark-changeable-image">
-        <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}"
+        <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
              alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}" />
         <div class="mark-changeable-image__overlay">
             <a href="{{ basePath }}/photo/{{ mark.photographUuids | latestImageId }}" class="govuk-link govuk-link--no-visited-state">Change</a>

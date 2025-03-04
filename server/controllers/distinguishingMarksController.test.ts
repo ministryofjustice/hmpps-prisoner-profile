@@ -598,11 +598,12 @@ describe('Distinguishing Marks Controller', () => {
         query: {},
       } as undefined as Request
 
+      global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
       await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
 
-      const photoHtml = `<img src="/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
+      const photoHtml = `<img src="/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',
@@ -625,11 +626,12 @@ describe('Distinguishing Marks Controller', () => {
         query: {},
       } as undefined as Request
 
+      global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
       await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
 
-      const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
+      const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
         markId: '100',

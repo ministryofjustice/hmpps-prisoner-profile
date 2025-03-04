@@ -31,7 +31,7 @@
                                     </div>
                                     {% if mark.photographUuids.length %}
                                         <div class="personal-distinguishing-marks__row__populated__row__image-list">
-                                            <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}"
+                                            <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
                                                  alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
                                         </div>
                                         {% if mark.photographUuids.length > 1 %}
