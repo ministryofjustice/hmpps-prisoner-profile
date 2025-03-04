@@ -33,6 +33,7 @@ interface PutRequest {
   data?: object | string[]
   raw?: boolean
   query?: object | string
+  file?: { buffer: Buffer; originalname: string }
 }
 
 interface StreamRequest {
@@ -135,9 +136,51 @@ export default class RestClient {
     data = {},
     raw = false,
   }: PostRequest = {}): Promise<T> {
+    return this.requestMultipart('POST', {
+      path,
+      query,
+      headers,
+      responseType,
+      file,
+      data,
+      raw,
+    })
+  }
+
+  async putMultipart<T>({
+    path = null,
+    query = '',
+    headers = {},
+    responseType = '',
+    file = null,
+    data = {},
+    raw = false,
+  }: PutRequest | PostRequest = {}): Promise<T> {
+    return this.requestMultipart('PUT', {
+      path,
+      query,
+      headers,
+      responseType,
+      file,
+      data,
+      raw,
+    })
+  }
+
+  async requestMultipart<T>(
+    method: 'POST' | 'PUT',
+    {
+      path = null,
+      query = '',
+      headers = {},
+      responseType = '',
+      file = null,
+      data = {},
+      raw = false,
+    }: PutRequest | PostRequest = {},
+  ): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
-    const request = superagent
-      .post(endpoint)
+    const request = superagent(method, endpoint)
       .type('form')
       .agent(this.agent)
       .query(query)
@@ -163,7 +206,7 @@ export default class RestClient {
       return raw ? result : result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error, endpoint)
-      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: ${method}`)
       throw sanitisedError
     }
   }

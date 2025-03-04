@@ -104,6 +104,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
   njkEnv.addGlobal('bvlsMasteredVlpmFeatureToggleEnabled', bvlsMasteredVlpmFeatureToggleEnabled)
+  njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatMoney', formatMoney)

@@ -8,17 +8,22 @@ const prisonerNumber = 'G6123VU'
 const bookingId = 1102484
 const prisonerName = 'Saunders, John'
 const markId = '100'
+const imageId = '100'
 
-const visitChangePhotoTattooPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/photo` })
+const visitChangePhotoTattooPage = ({
+  failOnStatusCode = true,
+  prisonerNo = prisonerNumber,
+  photoId = imageId,
+} = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/tattoo/${markId}/photo/${photoId}` })
 }
 
-const visitChangePhotoScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/photo` })
+const visitChangePhotoScarPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber, photoId = imageId } = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/scar/${markId}/photo/${photoId}` })
 }
 
-const visitChangePhotoMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber } = {}) => {
-  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}/photo` })
+const visitChangePhotoMarkPage = ({ failOnStatusCode = true, prisonerNo = prisonerNumber, photoId = imageId } = {}) => {
+  cy.signIn({ failOnStatusCode, redirectPath: `/prisoner/${prisonerNo}/personal/mark/${markId}/photo/${photoId}` })
 }
 
 context('Change distinguishing mark photo', () => {
@@ -46,7 +51,7 @@ context('Change distinguishing mark photo', () => {
 
     it('User can change tattoo photo', () => {
       cy.task('stubGetDistinguishingMark', { prisonerNumber, response: tattooMock })
-      cy.task('stubPostDistinguishingMarkPhoto', { prisonerNumber, response: tattooMock })
+      cy.task('stubPutDistinguishingMarkPhoto', { imageId, response: tattooMock })
       visitChangePhotoTattooPage()
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the tattoo')
       page.miniBanner().card().should('be.visible')
@@ -64,7 +69,7 @@ context('Change distinguishing mark photo', () => {
 
     it('User can change scar photo', () => {
       cy.task('stubGetDistinguishingMark', { prisonerNumber, response: scarMock })
-      cy.task('stubPostDistinguishingMarkPhoto', { prisonerNumber, response: scarMock })
+      cy.task('stubPutDistinguishingMarkPhoto', { imageId, response: scarMock })
       visitChangePhotoScarPage()
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the scar')
 
@@ -79,7 +84,7 @@ context('Change distinguishing mark photo', () => {
 
     it('User can change mark photo', () => {
       cy.task('stubGetDistinguishingMark', { prisonerNumber, response: markMock })
-      cy.task('stubPostDistinguishingMarkPhoto', { prisonerNumber, response: markMock })
+      cy.task('stubPutDistinguishingMarkPhoto', { imageId, response: markMock })
       visitChangePhotoMarkPage()
       const page = Page.verifyOnPageWithTitle(ChangePhoto, 'Change the photo of the mark')
 

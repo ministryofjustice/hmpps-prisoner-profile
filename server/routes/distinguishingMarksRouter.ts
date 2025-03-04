@@ -99,9 +99,9 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // Change photo
-  get('/:markId/photo', distinguishingMarksController.changePhoto)
+  get('/:markId/photo/:photoId', distinguishingMarksController.changePhoto)
   post(
-    '/:markId/photo',
+    '/:markId/photo/:photoId',
     multer().single('file'),
     validationMiddleware([updatePhotoValidator], {
       redirectBackOnError: true,
@@ -111,7 +111,7 @@ export default function distinguishingMarksRouter(services: Services): Router {
   )
 
   // View all images for a mark
-  get('/:markId/all-images', distinguishingMarksController.viewAllImages)
+  get('/:markId/all-photos', distinguishingMarksController.viewAllImages)
 
   return router
 }

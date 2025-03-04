@@ -143,6 +143,29 @@ export default {
     })
   },
 
+  stubPutDistinguishingMarkPhoto: ({
+    imageId = '100',
+    response = distinguishingMarkMock,
+  }: {
+    prisonerNumber: string
+    imageId: string
+    response: PersonIntegrationDistinguishingMark
+  }) => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `${baseUrl}/v1/distinguishing-mark/image/${imageId}\\?sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    })
+  },
+
   stubPostDistinguishingMarkPhoto: ({
     prisonerNumber,
     markId = '100',

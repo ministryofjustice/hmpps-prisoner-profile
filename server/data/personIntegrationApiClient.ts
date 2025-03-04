@@ -110,6 +110,14 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
+  updateDistinguishingMarkImage(photoId: string, image: MulterFile): Promise<PersonIntegrationDistinguishingMark> {
+    return this.restClient.putMultipart<PersonIntegrationDistinguishingMark>({
+      path: `/v1/distinguishing-mark/image/${photoId}`,
+      query: { sourceSystem: 'NOMIS' },
+      file: image,
+    })
+  }
+
   addDistinguishingMarkImage(
     prisonerNumber: string,
     sequenceId: string,

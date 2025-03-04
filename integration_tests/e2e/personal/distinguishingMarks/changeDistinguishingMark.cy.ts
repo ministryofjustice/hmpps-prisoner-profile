@@ -57,13 +57,10 @@ context('Change distinguishing mark', () => {
       page.markDetails().bodyPart().should('contain.text', 'Front and sides')
       page.markDetails().location().should('contain.text', 'Not entered')
       page.markDetails().description().should('contain.text', 'Hand sewn mickey mouse stormtrooper')
-      page
-        .markDetails()
-        .photo()
-        .should(
-          'contain.html',
-          '<img src="/api/distinguishing-mark-image/100" alt="Image of Tattoo on Front and sides" width="350px">',
-        )
+      page.markDetails().photo().should('be.visible')
+
+      page.changeableImage().image().should('be.visible')
+      page.changeableImage().link().should('contain.text', 'Change').and('not.be.visible')
     })
 
     it('User can access the change scar page', () => {
@@ -75,13 +72,10 @@ context('Change distinguishing mark', () => {
       page.markDetails().bodyPart().should('contain.text', 'Left arm')
       page.markDetails().location().should('contain.text', 'Arm (general)')
       page.markDetails().description().should('contain.text', 'Horrible arm scar')
-      page
-        .markDetails()
-        .photo()
-        .should(
-          'contain.html',
-          '<img src="/api/distinguishing-mark-image/100" alt="Image of Scar on Left arm" width="350px">',
-        )
+      page.markDetails().photo().should('be.visible')
+
+      page.changeableImage().image().should('be.visible')
+      page.changeableImage().link().should('contain.text', 'Change').and('not.be.visible')
     })
 
     it('User can access the change mark page', () => {
@@ -93,13 +87,10 @@ context('Change distinguishing mark', () => {
       page.markDetails().bodyPart().should('contain.text', 'Left leg')
       page.markDetails().location().should('contain.text', 'Leg (general)')
       page.markDetails().description().should('contain.text', 'Bump')
-      page
-        .markDetails()
-        .photo()
-        .should(
-          'contain.html',
-          '<img src="/api/distinguishing-mark-image/100" alt="Image of Mark on Left leg" width="350px">',
-        )
+      page.markDetails().photo().should('be.visible')
+
+      page.changeableImage().image().should('be.visible')
+      page.changeableImage().link().should('contain.text', 'Change').and('not.be.visible')
     })
   })
 })
