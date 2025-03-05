@@ -110,6 +110,18 @@ export default function distinguishingMarksRouter(services: Services): Router {
     distinguishingMarksController.updatePhoto,
   )
 
+  // Add photo
+  get('/:markId/photo', distinguishingMarksController.addNewPhoto)
+  post(
+    '/:markId/photo',
+    multer().single('file'),
+    validationMiddleware([updatePhotoValidator], {
+      redirectBackOnError: true,
+      useReq: true,
+    }),
+    distinguishingMarksController.addPhoto,
+  )
+
   // View all images for a mark
   get('/:markId/all-photos', distinguishingMarksController.viewAllImages)
 

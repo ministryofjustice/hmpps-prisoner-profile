@@ -13,12 +13,12 @@ export default class ChangeDistinguishingMark extends Page {
   })
 
   markDetails = () => {
-    const summaryListValues = () => cy.get('.govuk-summary-list__value')
+    const infoTable = () => cy.get('.mark-edit-details-table')
     return {
-      bodyPart: () => summaryListValues().eq(0),
-      location: () => summaryListValues().eq(1),
-      description: () => summaryListValues().eq(2),
-      photo: () => summaryListValues().eq(3),
+      bodyPart: () => infoTable().find('[data-qa=body-part]').find('td').eq(0),
+      location: () => infoTable().find('[data-qa=location]').find('td').eq(0),
+      description: () => infoTable().find('[data-qa=description]').find('td').eq(0),
+      photo: () => infoTable().find('[data-qa=photos]').find('td').eq(0),
     }
   }
 
@@ -27,6 +27,13 @@ export default class ChangeDistinguishingMark extends Page {
     return {
       image: () => imageContainer().children('img'),
       link: () => imageContainer().get('.mark-changeable-image__overlay').children('a'),
+    }
+  }
+
+  newImagePlaceholder = () => {
+    const imageContainer = () => cy.get('.mark-new-image-placeholder')
+    return {
+      link: () => imageContainer().find('a'),
     }
   }
 }

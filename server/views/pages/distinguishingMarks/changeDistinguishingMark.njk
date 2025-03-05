@@ -4,20 +4,9 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set refererUrl = "/prisoner/" + prisonerNumber + "/personal#marks" %}
-{% set heading =  "Change "+ markType + " details" %}
+{% set heading =  "Change " + markType + " details" %}
 {% set pageTitle =  heading + " - Prisoner personal details" %}
 {% set basePath = '/prisoner/' + prisonerNumber + '/personal/' + markType + '/' + mark.id %}
-
-{% set photoHtml %}
-    <!-- Will be replaced by a grid of photos in CDPS-1232 - hard coded to latest photo temporarily -->
-    <div class="mark-changeable-image">
-        <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
-             alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}" />
-        <div class="mark-changeable-image__overlay">
-            <a href="{{ basePath }}/photo/{{ mark.photographUuids | latestImageId }}" class="govuk-link govuk-link--no-visited-state">Change</a>
-        </div>
-    </div>
-{% endset -%}
 
 {% block body %}
 
@@ -32,65 +21,49 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            {{ govukSummaryList({
-                classes: 'govuk-!-margin-bottom-6',
-                rows: [
-                    { key: { text: "Body part", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark | toBodyPartDescription, classes: "hmpps-vertical-align-top" },
-                        actions: {
-                        items: [
-                            {
-                                href: basePath + "/body-part",
-                                text: "Change",
-                                visuallyHiddenText: "body part",
-                                classes: "govuk-link--no-visited-state"
-                            }
-                        ], classes: "hmpps-vertical-align-top"
-                        }
-                    },
-                    { key: { text: "Location", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark | toMarkLocationDescription, classes: "hmpps-vertical-align-top" },
-                        actions: {
-                        items: [
-                            {
-                                href: basePath + "/location?bodyPart=" + mark | toBodyPartToken,
-                                text: "Change",
-                                visuallyHiddenText: "location",
-                                classes: "govuk-link--no-visited-state"
-                            }
-                        ], classes: "hmpps-vertical-align-top"
-                        },
-                        classes:  "govuk-summary-list__row--hidden" if (mark | toBodyPartDescription === 'Neck' or mark | toBodyPartDescription === 'Back')
-                    },
-                    { key: { text: "Description", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { text: mark.comment | default("Not entered", true), classes: "hmpps-vertical-align-top" },
-                        actions: {
-                        items: [
-                            {
-                                href: basePath + "/description",
-                                text: "Change",
-                                visuallyHiddenText: "description",
-                                classes: "govuk-link--no-visited-state"
-                            }
-                        ], classes: "hmpps-vertical-align-top"
-                        }
-                    },
-                    { key: { text: "Photo", classes: "hmpps-width-10 hmpps-vertical-align-top" }, value: { html: photoHtml },
-                        actions: {
-                        items: [
-                            {
-                                href: basePath + "/photo/" + mark.photographUuids | latestImageId,
-                                text: "Change",
-                                visuallyHiddenText: "photograph",
-                                classes: "govuk-link--no-visited-state"
-                            }
-                        ], classes: "hmpps-vertical-align-top"
-                        }
-                    }
-                ]
-            }) }}
+            <table class="mark-edit-details-table govuk-!-margin-bottom-6">
+                <tr data-qa="body-part">
+                    <th>Body part</th>
+                    <td>{{ mark | toBodyPartDescription }}</td>
+                    <td><a href="{{ basePath }}/body-part" class="govuk-link govuk-link--no-visited-state">Change</a></td>
+                </tr>
+                {% if mark | toBodyPartDescription !== 'Neck' and mark | toBodyPartDescription !== 'Back' %}
+                    <tr data-qa="location">
+                        <th>Location</th>
+                        <td>{{ mark | toMarkLocationDescription }}</td>
+                        <td><a href="{{ basePath }}/location?bodyPart={{ mark | toBodyPartToken }}" class="govuk-link govuk-link--no-visited-state">Change</a></td>
+                    </tr>
+                {% endif %}
+                <tr data-qa="description">
+                    <th>Description</th>
+                    <td>{{ mark.comment | default("Not entered", true) }}</td>
+                    <td><a href="{{ basePath }}/description}" class="govuk-link govuk-link--no-visited-state">Change</a></td>
+                </tr>
+                <tr data-qa="photos">
+                    <th>Photos</th>
+                    <td colspan="2">
+                        <div class="mark-changeable-image__container">
+                            {% for photoDetails in mark.photographUuids | sortByLatestAndUuid %}
+                                <div class="mark-changeable-image">
+                                    <img src="/api/distinguishing-mark-image/{{ photoDetails.id }}?nocache={{ currentTimeMillis() }}"
+                                         alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}" />
+                                    <div class="mark-changeable-image__overlay">
+                                        <a href="{{ basePath }}/photo/{{ photoDetails.id }}" class="govuk-link govuk-link--no-visited-state">Change</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="mark-new-image-placeholder">
+                                <a href="{{ basePath }}/photo" class="govuk-link govuk-link--no-visited-state">Add photo</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 
     <div class="govuk-button-group">
-        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Return to the profile</a>
+        <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Return to the prisoner's profile</a>
     </div>
 
 {% endblock %}

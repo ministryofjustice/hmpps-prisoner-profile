@@ -33,6 +33,7 @@ export default class DistinguishingMarksController {
     this.changePhoto = this.changePhoto.bind(this)
     this.updatePhoto = this.updatePhoto.bind(this)
     this.addPhoto = this.addPhoto.bind(this)
+    this.addNewPhoto = this.addNewPhoto.bind(this)
     this.viewAllImages = this.viewAllImages.bind(this)
   }
 
@@ -302,9 +303,31 @@ export default class DistinguishingMarksController {
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     return res.render('pages/distinguishingMarks/changePhoto', {
+      pageTitle: `Change ${markType} photo - Prisoner personal details`,
+      heading: `Change the photo of the ${markType}`,
       markId,
       markType,
       photoHtml,
+      refererUrl,
+      upload,
+    })
+  }
+
+  public async addNewPhoto(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const upload = req.query.upload !== undefined
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+
+    return res.render('pages/distinguishingMarks/changePhoto', {
+      pageTitle: `Add ${markType} photo - Prisoner personal details`,
+      heading: `Add the photo of the ${markType}`,
+      markId,
+      markType,
+      photoHtml: null,
       refererUrl,
       upload,
     })
