@@ -44,6 +44,8 @@ $govuk-page-width: $moj-page-width;
 @import './components/personal-distinguishing-marks';
 @import './components/new-distinguishing-mark';
 @import './components/photo-list';
+@import './components/photo-upload-with-preview';
+@import './components/photo-upload-edit';
 @import 'server/views/components/catAPrisonerTag/catAPrisonerTag';
 @import 'server/views/components/miniBanner/miniBanner';
 @import 'server/views/components/modal/modal';
