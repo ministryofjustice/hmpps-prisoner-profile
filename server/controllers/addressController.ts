@@ -5,6 +5,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import logger from '../../logger'
 import AddressService from '../services/addressService'
 
+export const addressLookupErrorMessage: object = { message: 'Unable to perform address search.' }
 export default class AddressController {
   constructor(
     private readonly addressService: AddressService,
@@ -45,5 +46,23 @@ export default class AddressController {
       prisonerName: formatName(firstName, '', lastName),
       breadcrumbPrisonerName: formatName(firstName, '', lastName, { style: NameFormatStyle.lastCommaFirst }),
     })
+  }
+
+  public async findAddressesByFreeTextQuery(req: Request, res: Response): Promise<void> {
+    const { query } = req.params
+    try {
+      res.json(await this.addressService.getAddressesMatchingQuery(query))
+    } catch (error) {
+      res.status(424).json(addressLookupErrorMessage)
+    }
+  }
+
+  public async findAddressesByPostcode(req: Request, res: Response): Promise<void> {
+    const { postcode } = req.params
+    try {
+      res.json(await this.addressService.getAddressesMatchingPostCode(postcode))
+    } catch (error) {
+      res.status(424).json(addressLookupErrorMessage)
+    }
   }
 }
