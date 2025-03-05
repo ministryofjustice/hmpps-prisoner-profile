@@ -2,7 +2,7 @@ import { Router } from 'express'
 import AddressController from '../controllers/addressController'
 import { Services } from '../services'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
-import { Page } from '../services/auditService'
+import { ApiAction, Page } from '../services/auditService'
 import { getRequest } from './routerUtils'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import permissionsGuard from '../middleware/permissionsGuard'
@@ -20,6 +20,18 @@ export default function addressRouter(services: Services): Router {
     getPrisonerData(services, { minimal: true }),
     permissionsGuard(services.permissionsService.getStandardAccessPermission),
     (req, res, next) => addressController.displayAddresses(req, res),
+  )
+
+  get(
+    '/api/addresses/find/:query',
+    auditPageAccessAttempt({ services, page: ApiAction.AddressLookup }),
+    (req, res, next) => addressController.findAddressesByFreeTextQuery(req, res),
+  )
+
+  get(
+    '/api/addresses/postcode/:postcode',
+    auditPageAccessAttempt({ services, page: ApiAction.AddressLookup }),
+    services.commonApiRoutes.image,
   )
 
   return router
