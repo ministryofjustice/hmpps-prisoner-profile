@@ -35,6 +35,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
     AUDIT_SQS_REGION: "eu-west-2"
     AUDIT_SERVICE_NAME: "hmpps-prisoner-profile"
+    OS_PLACES_API_URL: "https://api.os.uk/search/places/v1"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -58,6 +59,9 @@ generic-service:
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
       AUDIT_SQS_QUEUE_NAME: "sqs_queue_name"
+    os-places-api-secret:
+      OS_PLACES_API_KEY: "API_KEY"
+
 
 generic-prometheus-alerts:
   targetApplication: hmpps-prisoner-profile
