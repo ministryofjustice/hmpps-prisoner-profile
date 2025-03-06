@@ -53,7 +53,7 @@ export default class AddressController {
     try {
       res.json(await this.addressService.getAddressesMatchingQuery(query))
     } catch (error) {
-      res.status(424).json(addressLookupErrorMessage)
+      res.status(error.status).json({ error: error.message })
     }
   }
 
@@ -62,7 +62,7 @@ export default class AddressController {
     try {
       res.json(await this.addressService.getAddressesMatchingPostCode(postcode))
     } catch (error) {
-      res.status(424).json(addressLookupErrorMessage)
+      res.status(error.status).json({ error: error.message })
     }
   }
 }

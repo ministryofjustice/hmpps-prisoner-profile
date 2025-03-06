@@ -3,7 +3,7 @@ import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { inmateDetailMock } from '../data/localMockData/inmateDetailMock'
-import AddressController, { addressLookupErrorMessage } from './addressController'
+import AddressController from './addressController'
 import AddressService from '../services/addressService'
 import { addressesNoStartDateMock, addressesPrimaryAndMailMock } from '../data/localMockData/addresses'
 import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
@@ -11,6 +11,10 @@ import { mockOsAddresses } from '../data/localMockData/osAddressesMock'
 let req: any
 let res: any
 let controller: AddressController
+
+const testError = () => {
+  return { message: 'Test Error Message', status: 500 }
+}
 
 describe('Address controller', () => {
   beforeEach(() => {
@@ -93,13 +97,13 @@ describe('Address controller', () => {
       const getAddressesMatchingQuery = jest
         .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingQuery')
         .mockImplementation(() => {
-          throw new Error('Test Error from service layer')
+          throw testError()
         })
 
       await controller.findAddressesByFreeTextQuery(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.query)
-      expect(res.status).toHaveBeenCalledWith(424)
-      expect(res.json).toHaveBeenCalledWith(addressLookupErrorMessage)
+      expect(res.status).toHaveBeenCalledWith(testError().status)
+      expect(res.json).toHaveBeenCalledWith({ error: testError().message })
     })
   })
 
@@ -131,13 +135,13 @@ describe('Address controller', () => {
       const getAddressesMatchingQuery = jest
         .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingPostCode')
         .mockImplementation(() => {
-          throw new Error('Test Error from service layer')
+          throw testError()
         })
 
       await controller.findAddressesByPostcode(req, res)
       expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.postcode)
-      expect(res.status).toHaveBeenCalledWith(424)
-      expect(res.json).toHaveBeenCalledWith(addressLookupErrorMessage)
+      expect(res.status).toHaveBeenCalledWith(testError().status)
+      expect(res.json).toHaveBeenCalledWith({ error: testError().message })
     })
   })
 })

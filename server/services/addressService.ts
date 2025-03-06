@@ -24,13 +24,11 @@ export default class AddressService {
 
   public async getAddressesMatchingQuery(searchQuery: string): Promise<OsAddress[]> {
     const response = await this.osPlacesApiClient.getAddressesByFreeTextQuery(searchQuery)
-
     return this.handleResponse(response)
   }
 
   public async getAddressesMatchingPostCode(postCode: string): Promise<OsAddress[]> {
     const response = await this.osPlacesApiClient.getAddressesByPostcode(postCode)
-
     return this.handleResponse(response)
   }
 

@@ -31,7 +31,7 @@ export default function addressRouter(services: Services): Router {
   get(
     '/api/addresses/postcode/:postcode',
     auditPageAccessAttempt({ services, page: ApiAction.AddressLookup }),
-    services.commonApiRoutes.image,
+    (req, res, next) => addressController.findAddressesByPostcode(req, res),
   )
 
   return router
