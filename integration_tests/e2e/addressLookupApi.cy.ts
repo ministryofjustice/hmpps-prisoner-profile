@@ -35,7 +35,7 @@ context('Address Lookup API', () => {
       cy.task('stubFindAddressesByFreeTextSearchError')
       cy.request({ method: 'GET', url: '/api/addresses/find/error', failOnStatusCode: false }).then(response => {
         expect(response.status).to.eq(500)
-        expect(response.body.error).to.eq('Internal Server Error')
+        expect(response.body.error).to.eq('Error calling OS Places API: Internal Server Error')
       })
     })
 
@@ -78,9 +78,7 @@ context('Address Lookup API', () => {
       cy.task('stubFindAddressesByPostcodeBadRequest')
       cy.request({ method: 'GET', url: '/api/addresses/postcode/invalid', failOnStatusCode: false }).then(response => {
         expect(response.status).to.eq(400)
-        expect(response.body.error).to.eq(
-          'Requested postcode must contain a minimum of the sector plus 1 digit of the district e.g. SO1. Requested postcode was invalid',
-        )
+        expect(response.body.error).to.eq('Error calling OS Places API: Bad Request')
       })
     })
 
@@ -89,7 +87,7 @@ context('Address Lookup API', () => {
       cy.task('stubFindAddressesByPostcodeError')
       cy.request({ method: 'GET', url: '/api/addresses/postcode/error', failOnStatusCode: false }).then(response => {
         expect(response.status).to.eq(500)
-        expect(response.body.error).to.eq('Internal Server Error')
+        expect(response.body.error).to.eq('Error calling OS Places API: Internal Server Error')
       })
     })
 

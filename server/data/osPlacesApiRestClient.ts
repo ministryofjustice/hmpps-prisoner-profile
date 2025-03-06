@@ -1,19 +1,15 @@
 import superagent from 'superagent'
-import { HttpsAgent } from 'agentkeepalive'
 import config from '../config'
 import { OsPlacesApiClient } from './interfaces/osPlacesApi/osPlacesApiClient'
 import OsPlacesQueryResponse from './interfaces/osPlacesApi/osPlacesQueryResponse'
 import logger from '../../logger'
-import sanitiseError from '../sanitisedError'
+import AddressLookupError from '../utils/addressLookupError'
 
 export default class OsPlacesApiRestClient implements OsPlacesApiClient {
   private baseUrl: string
 
-  private agent: HttpsAgent
-
   constructor() {
     this.baseUrl = config.apis.osPlacesApi.url
-    this.agent = new HttpsAgent(config.apis.osPlacesApi.agent)
   }
 
   async getAddressesByPostcode(postcode: string): Promise<OsPlacesQueryResponse> {
@@ -38,7 +34,6 @@ export default class OsPlacesApiRestClient implements OsPlacesApiClient {
     try {
       const result = await superagent
         .get(endpoint)
-        .agent(this.agent)
         .retry(2, (err, res) => {
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
@@ -48,9 +43,10 @@ export default class OsPlacesApiRestClient implements OsPlacesApiClient {
 
       return result.body
     } catch (error) {
-      const sanitisedError = sanitiseError(error, endpoint)
-      logger.warn(sanitisedError, `Error calling OS Places API, path: '${path}', verb: 'GET'`)
-      throw sanitisedError
+      const errorMessage = `Error calling OS Places API: ${error.message}`
+      const lookupError = new AddressLookupError(errorMessage, error.status, error.response ? error.response.body : {})
+      logger.warn(lookupError, errorMessage)
+      throw lookupError
     }
   }
 }

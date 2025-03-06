@@ -49,7 +49,7 @@ const stubFindAddressesByPostcode = (): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/search/places/v1/postcode?postcode=A123BC&key=',
+      urlPattern: '/search/places/v1/postcode\\?postcode=A123BC&key=',
     },
     response: {
       status: 200,

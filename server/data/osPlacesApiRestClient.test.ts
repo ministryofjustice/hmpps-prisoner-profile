@@ -39,8 +39,8 @@ describe('osPlacesApiRestClient', () => {
         .reply(401, mockOsPlacesInvalidApiKey)
 
       await expect(osPlacesApiRestClient.getAddressesByFreeTextQuery(testQuery)).rejects.toMatchObject({
+        message: 'Error calling OS Places API: Unauthorized',
         status: 401,
-        message: 'Unauthorized',
       })
     })
   })
@@ -61,8 +61,9 @@ describe('osPlacesApiRestClient', () => {
         .reply(400, mockOsPlacesInvalidPostcodeResponse)
 
       await expect(osPlacesApiRestClient.getAddressesByPostcode(testPostcode)).rejects.toMatchObject({
+        message: 'Error calling OS Places API: Bad Request',
         status: 400,
-        message: 'Bad Request',
+        data: mockOsPlacesInvalidPostcodeResponse,
       })
     })
   })
