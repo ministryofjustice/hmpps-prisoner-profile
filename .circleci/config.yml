@@ -113,6 +113,7 @@ jobs:
 
 workflows:
   version: 2
+
   build-test-and-deploy:
     jobs:
       - build:
@@ -136,6 +137,25 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
+          jira_update: true
+          pipeline_id: <<pipeline.id>>
+          pipeline_number: <<pipeline.number>>
+          context: hmpps-common-vars
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - helm_lint
+            - unit_test
+            - integration_test
+            - build_docker
+          helm_timeout: 5m
+      - request-test-approval:
+          type: approval
+      - hmpps/deploy_env:
+          name: deploy_test
+          env: "test"
           jira_update: true
           pipeline_id: <<pipeline.id>>
           pipeline_number: <<pipeline.number>>
