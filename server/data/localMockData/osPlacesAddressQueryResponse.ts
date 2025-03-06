@@ -244,3 +244,32 @@ export const mockOsPlacesAddressQueryEmptyResponse: OsPlacesQueryResponse = {
   },
   results: [],
 }
+
+export const mockOsPlacesInvalidPostcodeResponse = {
+  error: {
+    statuscode: 400,
+    message:
+      'Requested postcode must contain a minimum of the sector plus 1 digit of the district e.g. SO1. Requested postcode was invalid',
+  },
+}
+
+export const mockOsPlacesInvalidApiKey = {
+  fault: {
+    faultstring: 'Invalid ApiKey',
+    detail: {
+      errorcode: 'oauth.v2.InvalidApiKey',
+    },
+  },
+}
+
+export const mockOsPlacesApiUnavailable = {
+  status: 500,
+  response: {
+    status: 500,
+    body: {
+      error: 'Something went wrong',
+    },
+    headers: {},
+  },
+  message: 'Internal Server Error',
+}

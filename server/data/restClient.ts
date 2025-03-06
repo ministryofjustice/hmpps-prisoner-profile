@@ -71,7 +71,7 @@ export default class RestClient {
   }: GetRequest): Promise<T> {
     const endpoint = `${this.apiUrl()}${path}`
     try {
-      const request = superagent
+      const result = await superagent
         .get(endpoint)
         .agent(this.agent)
         .retry(2, (err, res) => {
@@ -79,15 +79,10 @@ export default class RestClient {
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
         .query(query)
+        .auth(this.token, { type: 'bearer' })
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
-
-      if (this.token) {
-        request.auth(this.token, { type: 'bearer' })
-      }
-
-      const result = await request
 
       return raw ? result : result.body
     } catch (error) {

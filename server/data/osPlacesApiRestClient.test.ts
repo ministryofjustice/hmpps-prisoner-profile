@@ -1,6 +1,10 @@
 import nock from 'nock'
 import config from '../config'
-import { mockOsPlacesAddressQueryResponse } from './localMockData/osPlacesAddressQueryResponse'
+import {
+  mockOsPlacesAddressQueryResponse,
+  mockOsPlacesInvalidApiKey,
+  mockOsPlacesInvalidPostcodeResponse,
+} from './localMockData/osPlacesAddressQueryResponse'
 import OsPlacesApiRestClient from './osPlacesApiRestClient'
 
 describe('osPlacesApiRestClient', () => {
@@ -28,6 +32,17 @@ describe('osPlacesApiRestClient', () => {
       const output = await osPlacesApiRestClient.getAddressesByFreeTextQuery(testQuery)
       expect(output).toEqual(mockOsPlacesAddressQueryResponse)
     })
+
+    it('should handle error responses', async () => {
+      fakeOsPlaceApi
+        .get(`/find?query=${testQuery}&key=${config.apis.osPlacesApi.apiKey}`)
+        .reply(401, mockOsPlacesInvalidApiKey)
+
+      await expect(osPlacesApiRestClient.getAddressesByFreeTextQuery(testQuery)).rejects.toMatchObject({
+        status: 401,
+        message: 'Unauthorized',
+      })
+    })
   })
 
   describe('getAddressesByPostcode', () => {
@@ -38,6 +53,17 @@ describe('osPlacesApiRestClient', () => {
 
       const output = await osPlacesApiRestClient.getAddressesByPostcode(testPostcode)
       expect(output).toEqual(mockOsPlacesAddressQueryResponse)
+    })
+
+    it('should handle error responses', async () => {
+      fakeOsPlaceApi
+        .get(`/postcode?postcode=${testPostcode}&key=${config.apis.osPlacesApi.apiKey}`)
+        .reply(400, mockOsPlacesInvalidPostcodeResponse)
+
+      await expect(osPlacesApiRestClient.getAddressesByPostcode(testPostcode)).rejects.toMatchObject({
+        status: 400,
+        message: 'Bad Request',
+      })
     })
   })
 })
