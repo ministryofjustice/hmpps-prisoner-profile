@@ -14,6 +14,8 @@ export default class ChangePhoto extends Page {
 
   changeLink = (): PageElement => cy.get('[data-qa="change-photo-link"]')
 
+  fileUploadButton = (): PageElement => cy.get('.mark-upload-control input')
+
   photoField = (): PageElement => cy.get('input[type=file]')
 
   saveBtn = (): PageElement => cy.get('button[type=submit]')

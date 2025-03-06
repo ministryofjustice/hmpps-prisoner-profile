@@ -32,6 +32,8 @@ export default class DistinguishingMarksController {
     this.updateDescription = this.updateDescription.bind(this)
     this.changePhoto = this.changePhoto.bind(this)
     this.updatePhoto = this.updatePhoto.bind(this)
+    this.addPhoto = this.addPhoto.bind(this)
+    this.addNewPhoto = this.addNewPhoto.bind(this)
     this.viewAllImages = this.viewAllImages.bind(this)
   }
 
@@ -127,14 +129,10 @@ export default class DistinguishingMarksController {
     const { prisonerNumber, markId, markType } = req.params
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
-    const latestPhotoId = mark.photographUuids?.find(photo => photo.latest)?.id || mark.photographUuids[0]?.id
-    const photoHtml = mark.photographUuids?.length
-      ? `<img src="/api/distinguishing-mark-image/${latestPhotoId}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="350px" />`
-      : 'Not entered'
     return res.render('pages/distinguishingMarks/changeDistinguishingMark', {
-      markType,
+      prisonerNumber,
       mark,
-      photoHtml,
+      markType,
     })
   }
 
@@ -288,7 +286,7 @@ export default class DistinguishingMarksController {
   }
 
   public async changePhoto(req: Request, res: Response) {
-    const { markId, markType, prisonerNumber } = req.params
+    const { photoId, markId, markType, prisonerNumber } = req.params
     const { clientToken } = req.middleware
     const upload = req.query.upload !== undefined
 
@@ -298,14 +296,15 @@ export default class DistinguishingMarksController {
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
-    const latestPhotoId = mark.photographUuids?.find(photo => photo.latest)?.id || mark.photographUuids[0]?.id
     const photoHtml = mark.photographUuids?.length
-      ? `<img src="/api/distinguishing-mark-image/${latestPhotoId}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
+      ? `<img src="/api/distinguishing-mark-image/${photoId}?nocache=${Date.now().toString()}" alt="Image of ${mark.markType.description} on ${getBodyPartDescription(mark)}" width="150px" />`
       : null
 
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     return res.render('pages/distinguishingMarks/changePhoto', {
+      pageTitle: `Change ${markType} photo - Prisoner personal details`,
+      heading: `Change the photo of the ${markType}`,
       markId,
       markType,
       photoHtml,
@@ -314,7 +313,40 @@ export default class DistinguishingMarksController {
     })
   }
 
+  public async addNewPhoto(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber } = req.params
+    const upload = req.query.upload !== undefined
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+
+    return res.render('pages/distinguishingMarks/changePhoto', {
+      pageTitle: `Add ${markType} photo - Prisoner personal details`,
+      heading: `Add the photo of the ${markType}`,
+      markId,
+      markType,
+      photoHtml: null,
+      refererUrl,
+      upload,
+    })
+  }
+
   public async updatePhoto(req: Request, res: Response) {
+    const { markId, markType, prisonerNumber, photoId } = req.params
+    const { clientToken } = req.middleware
+    const file = req.file as MulterFile
+
+    const verifiedMarkType = markTypeSelections.find(type => type === markType)
+    if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
+
+    await this.distinguishingMarksService.updateDistinguishingMarkPhoto(clientToken, photoId, file)
+
+    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+  }
+
+  public async addPhoto(req: Request, res: Response) {
     const { markId, markType, prisonerNumber } = req.params
     const { clientToken } = req.middleware
     const file = req.file as MulterFile

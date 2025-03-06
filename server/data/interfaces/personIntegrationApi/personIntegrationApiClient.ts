@@ -206,5 +206,7 @@ export interface PersonIntegrationApiClient {
     image: MulterFile,
   ): Promise<PersonIntegrationDistinguishingMark>
 
+  updateDistinguishingMarkImage(imageId: string, image: MulterFile): Promise<PersonIntegrationDistinguishingMark>
+
   getDistinguishingMarkImage(imageId: string): Promise<Readable>
 }

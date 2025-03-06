@@ -420,7 +420,7 @@ context('When signed in', () => {
           .get('[data-qa=mark-images-link]')
           .should('exist')
           .and('have.attr', 'href')
-          .and('include', '/all-images')
+          .and('include', '/all-photos')
       })
 
       it('Includes hide/show all functionality for a distinguishing mark type', () => {

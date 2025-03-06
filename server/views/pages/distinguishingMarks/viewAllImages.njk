@@ -54,8 +54,8 @@
     </div>
     <div class="mark-images__image-display-container">
         {% for photoDetails in mark.photographUuids | sortByLatestAndUuid %}
-            <img src="/api/distinguishing-mark-image/{{photoDetails.id}}"
-                 alt="photo of {{ prisonerName | apostrophe }} {{ mark | toBodyPartDescription | lower }} {{ markType }}"
+            <img src="/api/distinguishing-mark-image/{{photoDetails.id}}?nocache={{ currentTimeMillis() }}"
+                 alt="Image of {{ markType }} on {{ mark | toBodyPartDescription | lower }}"
                  class="mark-images__image-display-item" />
         {% endfor %}
     </div>

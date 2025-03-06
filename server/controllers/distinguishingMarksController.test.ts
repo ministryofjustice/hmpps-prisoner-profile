@@ -1,11 +1,7 @@
 import { Request, Response } from 'express'
 import DistinguishingMarksController from './distinguishingMarksController'
 import DistinguishingMarksService from '../services/distinguishingMarksService'
-import {
-  distinguishingMarkMock,
-  distinguishingMarkNoPhotosMock,
-  leftLegMarkMock,
-} from '../data/localMockData/distinguishingMarksMock'
+import { distinguishingMarkMock, leftLegMarkMock } from '../data/localMockData/distinguishingMarksMock'
 import { bodyPartMap, markTypeSelections } from './interfaces/distinguishingMarks/selectionTypes'
 import { getBodyPartDescription } from '../views/dataUtils/groupDistinguishingMarksForView'
 
@@ -242,48 +238,22 @@ describe('Distinguishing Marks Controller', () => {
   })
 
   describe('changeDistinguishingMark', () => {
-    it.each(['tattoo', 'scar', 'mark'])(
-      'should return the mark details including photoHtml if it is valid (%s)',
-      async markType => {
-        jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
-        const typeReq = {
-          params: { prisonerNumber: 'A12345', markType, markId: distinguishingMarkMock.id },
-          middleware: { clientToken: 'token' },
-          query: {},
-        } as undefined as Request
-        const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="350px" />`
+    it.each(['tattoo', 'scar', 'mark'])('should return the mark details', async markType => {
+      jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType, markId: distinguishingMarkMock.id },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
 
-        await controller.changeDistinguishingMark(typeReq, res as Response)
+      await controller.changeDistinguishingMark(typeReq, res as Response)
 
-        expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDistinguishingMark', {
-          markType,
-          mark: distinguishingMarkMock,
-          photoHtml,
-        })
-      },
-    )
-
-    it.each(['tattoo', 'scar', 'mark'])(
-      'should return the mark details with Not entered for photo if it is valid (%s)',
-      async markType => {
-        jest
-          .spyOn(distinguishingMarksService, 'getDistinguishingMark')
-          .mockResolvedValue(distinguishingMarkNoPhotosMock)
-        const typeReq = {
-          params: { prisonerNumber: 'A12345', markType, markId: distinguishingMarkNoPhotosMock.id },
-          middleware: { clientToken: 'token' },
-          query: {},
-        } as undefined as Request
-
-        await controller.changeDistinguishingMark(typeReq, res as Response)
-
-        expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDistinguishingMark', {
-          markType,
-          mark: distinguishingMarkNoPhotosMock,
-          photoHtml: 'Not entered',
-        })
-      },
-    )
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changeDistinguishingMark', {
+        prisonerNumber: 'A12345',
+        markType,
+        mark: distinguishingMarkMock,
+      })
+    })
   })
 
   describe('changeBodyPart', () => {
@@ -622,18 +592,22 @@ describe('Distinguishing Marks Controller', () => {
           prisonerNumber: 'A12345',
           markType,
           markId: '100',
+          photoId: leftLegMarkMock.photographUuids[0].id,
         },
         middleware: { clientToken: 'token' },
         query: {},
       } as undefined as Request
 
+      global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(leftLegMarkMock)
 
       await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
 
-      const photoHtml = `<img src="/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
+      const photoHtml = `<img src="/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
+        pageTitle: `Change ${markType} photo - Prisoner personal details`,
+        heading: `Change the photo of the ${markType}`,
         markId: '100',
         markType,
         photoHtml,
@@ -644,18 +618,26 @@ describe('Distinguishing Marks Controller', () => {
 
     it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async () => {
       const typeReq = {
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+        params: {
+          prisonerNumber: 'A12345',
+          markType: 'tattoo',
+          markId: '100',
+          photoId: distinguishingMarkMock.photographUuids[0].id,
+        },
         middleware: { clientToken: 'token' },
         query: {},
       } as undefined as Request
 
+      global.Date.now = jest.fn(() => 12345)
       jest.spyOn(distinguishingMarksService, 'getDistinguishingMark').mockResolvedValue(distinguishingMarkMock)
 
       await controller.changePhoto(typeReq, { ...res, locals: {} } as Response)
 
-      const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
+      const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
+        pageTitle: `Change tattoo photo - Prisoner personal details`,
+        heading: `Change the photo of the tattoo`,
         markId: '100',
         markType: 'tattoo',
         photoHtml,
@@ -681,7 +663,92 @@ describe('Distinguishing Marks Controller', () => {
   })
 
   describe('updatePhoto', () => {
-    it('should update distinguishing mark photo', async () => {
+    it('should update an existing distinguishing mark photo', async () => {
+      const req = {
+        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100', photoId: '123' },
+        body: {},
+        file: { originalname: 'file.jpg' },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      jest.spyOn(distinguishingMarksService, 'updateDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
+
+      await controller.updatePhoto(req, res as Response)
+
+      expect(distinguishingMarksService.updateDistinguishingMarkPhoto).toHaveBeenCalledWith('token', '123', {
+        originalname: 'file.jpg',
+      })
+    })
+  })
+
+  describe('addNewPhoto', () => {
+    it.each(['tattoo', 'scar', 'mark'])('should return the mark type if it is valid (%s)', async markType => {
+      const typeReq = {
+        params: {
+          prisonerNumber: 'A12345',
+          markType,
+          markId: '100',
+          photoId: leftLegMarkMock.photographUuids[0].id,
+        },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
+        pageTitle: `Add ${markType} photo - Prisoner personal details`,
+        heading: `Add the photo of the ${markType}`,
+        markId: '100',
+        markType,
+        photoHtml: null,
+        refererUrl: `/prisoner/A12345/personal/${markType}/100`,
+        upload: false,
+      })
+    })
+
+    it.each(Object.keys(bodyPartMap))('should render the view when bodyPart is %s', async () => {
+      const typeReq = {
+        params: {
+          prisonerNumber: 'A12345',
+          markType: 'tattoo',
+          markId: '100',
+          photoId: distinguishingMarkMock.photographUuids[0].id,
+        },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
+
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
+        pageTitle: `Add tattoo photo - Prisoner personal details`,
+        heading: `Add the photo of the tattoo`,
+        markId: '100',
+        markType: 'tattoo',
+        photoHtml: null,
+        refererUrl: `/prisoner/A12345/personal/tattoo/100`,
+        upload: false,
+      })
+    })
+
+    it('redirects back if the mark type is invalid', async () => {
+      const typeReq = {
+        params: { prisonerNumber: 'A12345', markType: 'invalidType', bodyPart: 'leftLeg' },
+        middleware: { clientToken: 'token' },
+        query: {},
+      } as undefined as Request
+
+      await controller.addNewPhoto(typeReq, res as Response)
+
+      expect(res.render).not.toHaveBeenCalled()
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/personal#appearance')
+    })
+  })
+
+  describe('addPhoto', () => {
+    it('should add a new distinguishing mark photo', async () => {
       const req = {
         params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
         body: {},
@@ -692,7 +759,7 @@ describe('Distinguishing Marks Controller', () => {
 
       jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.updatePhoto(req, res as Response)
+      await controller.addPhoto(req, res as Response)
 
       expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith('token', 'A12345', '100', {
         originalname: 'file.jpg',

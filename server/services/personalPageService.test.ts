@@ -79,6 +79,7 @@ describe('PersonalPageService', () => {
       createDistinguishingMark: jest.fn(),
       updateDistinguishingMark: jest.fn(),
       getDistinguishingMarkImage: jest.fn(),
+      updateDistinguishingMarkImage: jest.fn(),
       addDistinguishingMarkImage: jest.fn(),
     }
 
