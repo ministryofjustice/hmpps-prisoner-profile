@@ -3,8 +3,8 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import Address from '../data/interfaces/prisonApi/Address'
 import OsAddress from '../data/interfaces/osPlacesApi/osAddress'
 import { OsPlacesApiClient } from '../data/interfaces/osPlacesApi/osPlacesApiClient'
-import OsPlacesDeliveryPointAddress from '../data/interfaces/osPlacesApi/osPlacesDeliveryPointAddress'
 import OsPlacesQueryResponse from '../data/interfaces/osPlacesApi/osPlacesQueryResponse'
+import OsPlacesDeliveryPointAddress from '../data/interfaces/osPlacesApi/osPlacesDeliveryPointAddress'
 
 export default class AddressService {
   constructor(
