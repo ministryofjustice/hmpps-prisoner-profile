@@ -81,7 +81,10 @@ label.govuk-link {
   }
 
   &__image-display-item {
+    object-fit: contain;
+    aspect-ratio: 3 / 4;
     width: 100%;
+    background-color: govuk-colour('light-grey');
   }
 }
 
