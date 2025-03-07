@@ -41,36 +41,78 @@
                         },
                         {
                             key: {
-                            text: "Location",
-                            classes: 'govuk-!-padding-bottom-6'
-                        },
+                                text: "Probation team"
+                            },
                             value: {
-                            text: location
-                        }
+                                text: probationTeam
+                            }
+                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        {
+                            key: {
+                                text: "Location",
+                                classes: 'govuk-!-padding-bottom-6'
+                            },
+                            value: {
+                                text: location
+                            }
                         },
                         {
                             key: {
-                            text: "Date"
-                        },
+                                text: "Probation officer's full name"
+                            },
                             value: {
-                            text: date
-                        }
+                                text: "Not yet known" if officerDetailsNotKnown else officerFullName
+                            }
+                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        {
+                            key: {
+                                text: "Email address"
+                            },
+                            value: {
+                                text: "Not yet known" if officerDetailsNotKnown else officerEmail
+                            }
+                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        {
+                            key: {
+                                text: "UK phone number",
+                                classes: 'govuk-!-padding-bottom-6'
+                            },
+                            value: {
+                                text: "Not yet known" if officerDetailsNotKnown else (officerTelephone or "None entered")
+                            }
+                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        {
+                            key: {
+                                text: "Meeting type",
+                                classes: 'govuk-!-padding-bottom-6'
+                            },
+                            value: {
+                                text: meetingType
+                            }
+                        } if bvlsMasteredVlpmFeatureToggleEnabled() and appointmentTypeCode == 'VLPM',
+                        {
+                            key: {
+                                text: "Date"
+                            },
+                            value: {
+                                text: date
+                            }
                         },
                         {
                             key: {
-                            text: "Start time"
-                        },
+                                text: "Start time"
+                            },
                             value: {
-                            text: startTime
-                        }
+                                text: startTime
+                            }
                         },
                         {
                             key: {
-                            text: "End time"
-                        },
+                                text: "End time"
+                            },
                             value: {
-                            text: endTime
-                        }
+                                text: endTime
+                            }
                         }
                     ]
                 }) }}

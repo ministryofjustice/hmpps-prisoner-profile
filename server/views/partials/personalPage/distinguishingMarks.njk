@@ -31,13 +31,16 @@
                                     </div>
                                     {% if mark.photographUuids.length %}
                                         <div class="personal-distinguishing-marks__row__populated__row__image-list">
-                                            <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}"
+                                            <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
                                                  alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
                                         </div>
                                         {% if mark.photographUuids.length > 1 %}
                                             <div class="personal-distinguishing-marks__row__populated__row">
                                                 <p class="govuk-!-margin-top-3 govuk-!-margin-bottom-0">1 of {{ mark.photographUuids.length }} photos.
-                                                    <a data-qa="mark-images-link" href="#" class='govuk-link govuk-link--no-visited-state'>All images</a></p>
+                                                    <a data-qa="mark-images-link"
+                                                       href="/prisoner/{{ prisonerNumber }}/personal/{{ mark.markType.description | lower }}/{{ mark.id }}/all-photos"
+                                                       class='govuk-link govuk-link--no-visited-state'
+                                                    >All images</a></p>
                                             </div>
                                         {% endif %}
                                     {% endif %}

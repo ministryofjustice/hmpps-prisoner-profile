@@ -69,6 +69,7 @@ export const services = () => {
     featureToggleStore,
     telemetryClient,
     osPlacesApiClient,
+    curiousApiToken,
   } = dataAccess
 
   const auditService = AuditService({
@@ -101,13 +102,15 @@ export const services = () => {
     healthAndMedicationApiClientBuilder,
     referenceDataService,
     metricsService,
+    curiousApiToken,
   )
   const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
-  const curiousService = new CuriousService(curiousApiClientBuilder, prisonService)
+  const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
     prisonApiClientBuilder,
     personalLearningPlansService,
+    curiousApiToken,
   )
   const locationDetailsService = new LocationDetailsService(
     prisonApiClientBuilder,

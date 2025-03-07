@@ -25,3 +25,16 @@ export const vlbAppointmentMock: AppointmentDetails = {
     comment: 'Comment',
   },
 }
+
+export const vlpmAppointmentMock: AppointmentDetails = {
+  appointment: {
+    id: 1,
+    agencyId: 'MDI',
+    locationId: 1,
+    appointmentTypeCode: 'VLPM',
+    offenderNo: 'ABC123',
+    startTime: '2023-01-01T12:34:56',
+    endTime: '2023-01-01T13:34:56',
+    comment: 'Comment',
+  },
+}

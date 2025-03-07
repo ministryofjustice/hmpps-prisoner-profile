@@ -156,6 +156,7 @@ export default class PersonalPage extends Page {
       personIntegrationDistinguishingMarks: () => {
         const marks = () => cy.get('.personal-distinguishing-marks__info')
         const scarsDetail = () => marks().findDataQa('distinguishing-marks-scars').find('details')
+        const tattoosDetail = () => marks().findDataQa('distinguishing-marks-tattoos').find('details')
         return {
           tattoos: () => marks().findDataQa('distinguishing-marks-tattoos'),
           scars: () => marks().findDataQa('distinguishing-marks-scars'),
@@ -163,6 +164,10 @@ export default class PersonalPage extends Page {
           scarsDetail: () => ({
             detail: () => scarsDetail(),
             content: () => scarsDetail().find('div.govuk-details__text'),
+          }),
+          tattoosDetail: () => ({
+            detail: () => tattoosDetail(),
+            content: () => tattoosDetail().find('div.govuk-details__text'),
           }),
         }
       },

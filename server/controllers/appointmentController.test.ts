@@ -2,7 +2,7 @@ import { addDays, addMinutes, set, subMinutes } from 'date-fns'
 import { Role } from '../data/enums/role'
 import { CaseLoadsDummyDataA } from '../data/localMockData/caseLoad'
 import PrisonerSearchService from '../services/prisonerSearch'
-import AppointmentService from '../services/appointmentService'
+import AppointmentService, { AddAppointmentRefData, PrePostAppointmentRefData } from '../services/appointmentService'
 import LocationDetailsService from '../services/locationDetailsService'
 import AppointmentController from './appointmentController'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
@@ -15,7 +15,7 @@ import {
   parseDate,
   timeFormat,
 } from '../utils/dateHelpers'
-import { vlbAppointmentMock } from '../data/localMockData/appointmentMock'
+import { vlbAppointmentMock, vlpmAppointmentMock } from '../data/localMockData/appointmentMock'
 import { appointmentTypesMock, appointmentTypesSelectOptionsMock } from '../data/localMockData/appointmentTypesMock'
 import { locationsApiMock, locationsApiSelectOptionsMock, locationsMock } from '../data/localMockData/locationsMock'
 
@@ -38,7 +38,8 @@ import {
   probationMeetingTypesSelectOptions,
 } from '../data/localMockData/courtHearingsMock'
 import LocationsApiLocation from '../data/interfaces/locationsInsidePrisonApi/LocationsApiLocation'
-import { videoLinkBookingMock } from '../data/localMockData/videoLinkBookingMock'
+import { courtBookingMock, probationBookingMock } from '../data/localMockData/videoLinkBookingMock'
+import config from '../config'
 
 jest.mock('../services/locationDetailsService.ts')
 
@@ -70,6 +71,7 @@ const formBody = {
   times: 2,
   comments: 'Comment',
   bookingId: PrisonerMockDataA.bookingId,
+  prisonId: 'MDI',
 }
 
 const appointmentsToCreate = {
@@ -90,8 +92,6 @@ const appointmentsToCreate = {
 }
 
 const formBodyVLB = {
-  bookingType: 'COURT',
-  prisonId: 'MDI',
   preAppointment: 'yes',
   preAppointmentLocation: locationsMock[0].locationId,
   postAppointment: 'yes',
@@ -102,48 +102,11 @@ const formBodyVLB = {
   videoLinkUrl: 'http://test.url',
 }
 
-const videoLinkBookingForm = {
-  bookingType: 'COURT',
-  prisoners: [
-    {
-      prisonerNumber: PrisonerMockDataA.prisonerNumber,
-      prisonCode: formBodyVLB.prisonId,
-      appointments: [
-        {
-          type: 'VLB_COURT_PRE',
-          locationKey: locationsApiMock[0].key,
-          date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-          startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
-          endTime: timeFormat(appointmentsToCreate.startTime),
-        },
-        {
-          type: 'VLB_COURT_MAIN',
-          locationKey: locationsApiMock[0].key,
-          date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-          startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
-          endTime: timeFormat(appointmentsToCreate.endTime),
-        },
-        {
-          type: 'VLB_COURT_POST',
-          locationKey: locationsApiMock[1].key,
-          date: formatDateISO(new Date(appointmentsToCreate.startTime)),
-          startTime: timeFormat(appointmentsToCreate.endTime),
-          endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
-        },
-      ],
-    },
-  ],
-  courtCode: 'ABC',
-  courtHearingType: 'APPEAL',
-  comments: 'Comment',
-  videoLinkUrl: 'http://test.url',
-}
-
 jest.mock('../services/prisonerSearch.ts')
 jest.mock('../services/appointmentService.ts')
 jest.mock('../services/locationDetailsService.ts')
 
-describe('Appointments Controller', () => {
+describe('Appointment Controller', () => {
   const locationDetailsService: LocationDetailsService = new LocationDetailsService(
     null,
     null,
@@ -188,22 +151,26 @@ describe('Appointments Controller', () => {
       locationDetailsService,
     )
 
-    appointmentService.getAddAppointmentRefData = jest.fn(async () => ({
-      appointmentTypes: appointmentTypesMock,
-      locations: locationsApiMock,
-    }))
-    appointmentService.getPrePostAppointmentRefData = jest.fn(async () => {
+    appointmentService.getAddAppointmentRefData = jest.fn(
+      async (): Promise<AddAppointmentRefData> => ({
+        appointmentTypes: appointmentTypesMock,
+        locations: locationsApiMock,
+        probationTeams: probationTeamsMock,
+        meetingTypes: probationMeetingTypes,
+      }),
+    )
+    appointmentService.getPrePostAppointmentRefData = jest.fn(async (): Promise<PrePostAppointmentRefData> => {
       return {
         courts: courtLocationsMock,
         probationTeams: probationTeamsMock,
+        hearingTypes: courtHearingTypes,
+        meetingTypes: probationMeetingTypes,
         locations: locationsApiMock,
       }
     })
     appointmentService.getAgencyDetails = jest.fn(async () => AgenciesMock)
     appointmentService.getExistingEventsForOffender = jest.fn(async () => offenderEventsMock)
     appointmentService.getExistingEventsForLocation = jest.fn(async () => offenderEventsMock)
-    appointmentService.getCourtHearingTypes = jest.fn(async () => courtHearingTypes)
-    appointmentService.getProbationMeetingTypes = jest.fn(async () => probationMeetingTypes)
     prisonerSearchService.getPrisonerDetails = jest.fn(async () => PrisonerMockDataA)
     locationDetailsService.getLocationByNomisLocationId = jest.fn(
       async (_, locationId) =>
@@ -230,6 +197,8 @@ describe('Appointments Controller', () => {
           key: 'ABC',
         }) as LocationsApiLocation,
     )
+
+    config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = true
   })
 
   it('should display add appointment', async () => {
@@ -248,22 +217,25 @@ describe('Appointments Controller', () => {
         cellLocation: PrisonerMockDataA.cellLocation,
       },
       appointmentTypes: appointmentTypesSelectOptionsMock,
+      probationTeams: probationTeamsSelectOptionsMock,
       locations: locationsApiSelectOptionsMock,
+      meetingTypes: probationMeetingTypesSelectOptions,
       repeatOptions,
       today: formBody.date,
       formValues: {
         bookingId: 1102484,
         date: formBody.date,
+        prisonId: 'MDI',
       },
       refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
       errors: undefined,
     })
   })
 
-  it('should display add appointment with data prepopulated when editing', async () => {
+  it('should display add appointment with data prepopulated when editing a VLB', async () => {
     req.params.appointmentId = 1 // editing appointment with ID 1
     appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
-    appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(videoLinkBookingMock)
+    appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
 
     await controller.displayAddAppointment()(req, res)
 
@@ -281,10 +253,14 @@ describe('Appointments Controller', () => {
         cellLocation: PrisonerMockDataA.cellLocation,
       },
       appointmentTypes: appointmentTypesSelectOptionsMock,
+      probationTeams: probationTeamsSelectOptionsMock,
       locations: locationsApiSelectOptionsMock,
+      meetingTypes: probationMeetingTypesSelectOptions,
       repeatOptions,
       today: formBody.date,
       formValues: {
+        appointmentId: 1,
+        prisonId: 'MDI',
         appointmentType: 'VLB',
         bookingId: 1102484,
         date: '01/01/2023',
@@ -300,6 +276,61 @@ describe('Appointments Controller', () => {
       errors: undefined,
     })
   })
+
+  it.each([[true], [false]])(
+    'should display add appointment with data prepopulated when editing a VLPM - bvlsMasteredVlpmFeatureToggleEnabled %s',
+    async toggle => {
+      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = toggle
+
+      req.params.appointmentId = 1 // editing appointment with ID 1
+      appointmentService.getAppointment = jest.fn().mockResolvedValue(vlpmAppointmentMock)
+      appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(probationBookingMock)
+
+      await controller.displayAddAppointment()(req, res)
+
+      expect(controller['appointmentService'].getAddAppointmentRefData).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        res.locals.user.activeCaseLoadId,
+      )
+
+      expect(res.render).toHaveBeenCalledWith('pages/appointments/addAppointment', {
+        appointmentId: 1,
+        pageTitle: 'Change appointment details',
+        miniBannerData: {
+          prisonerName: 'Saunders, John',
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          cellLocation: PrisonerMockDataA.cellLocation,
+        },
+        appointmentTypes: appointmentTypesSelectOptionsMock,
+        probationTeams: probationTeamsSelectOptionsMock,
+        locations: locationsApiSelectOptionsMock,
+        meetingTypes: probationMeetingTypesSelectOptions,
+        repeatOptions,
+        today: formBody.date,
+        formValues: {
+          appointmentId: 1,
+          bookingId: 1102484,
+          prisonId: 'MDI',
+          appointmentType: 'VLPM',
+          probationTeam: toggle ? 'BLACKPP' : undefined,
+          officerEmail: toggle ? 'Test email' : undefined,
+          officerFullName: toggle ? 'Test name' : undefined,
+          officerTelephone: toggle ? 'Test number' : undefined,
+          meetingType: toggle ? 'PSR' : undefined,
+          date: '01/01/2023',
+          comments: 'Comment',
+          endTimeHours: '13',
+          endTimeMinutes: '34',
+          location: 'abc-123',
+          recurring: 'no',
+          startTimeHours: '12',
+          startTimeMinutes: '34',
+        },
+        refererUrl: `/prisoner/${PrisonerMockDataA.prisonerNumber}`,
+        errors: undefined,
+      })
+    },
+  )
 
   describe('POST', () => {
     beforeEach(() => {
@@ -327,6 +358,166 @@ describe('Appointments Controller', () => {
       })
 
       expect(req.flash).toHaveBeenCalledWith('appointmentForm', formBody)
+
+      expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        formBody.location,
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/appointment-confirmation`,
+      )
+    })
+
+    it('should create new VLPM appointment when the bvlsMasteredVlpmFeatureToggleEnabled toggle is off', async () => {
+      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = false
+
+      req.body = {
+        ...formBody,
+        appointmentType: 'VLPM',
+      }
+
+      locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
+        nomisLocationId: 1234,
+        dpsLocationId: 'location-1',
+        key: 'ABC',
+      }))
+
+      await controller.post()(req, res)
+
+      expect(controller['appointmentService'].createAppointments).toHaveBeenCalledWith(req.middleware.clientToken, {
+        ...appointmentsToCreate,
+        appointmentType: 'VLPM',
+        locationId: 1234,
+      })
+
+      expect(req.flash).toHaveBeenCalledWith('appointmentForm', { ...formBody, appointmentType: 'VLPM' })
+
+      expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        formBody.location,
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/appointment-confirmation`,
+      )
+    })
+
+    it('should create new probation video link booking for VLPM appointment', async () => {
+      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = true
+
+      req.body = {
+        ...formBody,
+        appointmentType: 'VLPM',
+        probationTeam: 'BLACKPP',
+        officerDetailsNotKnown: 'true',
+        meetingType: 'PSR',
+      }
+
+      locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
+        nomisLocationId: 1234,
+        dpsLocationId: 'location-1',
+        key: 'ABC',
+      }))
+
+      locationDetailsService.getLocation = jest.fn(async () => ({
+        id: 'location-1',
+        key: 'ABC',
+        localName: 'Local name one',
+      }))
+
+      await controller.post()(req, res)
+
+      expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, {
+        bookingType: 'PROBATION',
+        prisoners: [
+          {
+            prisonerNumber: PrisonerMockDataA.prisonerNumber,
+            prisonCode: formBody.prisonId,
+            appointments: [
+              {
+                type: 'VLB_PROBATION',
+                locationKey: locationsApiMock[0].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+                endTime: timeFormat(appointmentsToCreate.endTime),
+              },
+            ],
+          },
+        ],
+        probationTeamCode: 'BLACKPP',
+        probationMeetingType: 'PSR',
+        comments: 'Comment',
+      })
+
+      expect(req.flash).toHaveBeenCalledWith('appointmentForm', req.body)
+
+      expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        formBody.location,
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/appointment-confirmation`,
+      )
+    })
+
+    it('should amend the existing probation video link booking for VLPM appointment', async () => {
+      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = true
+
+      req.body = {
+        ...formBody,
+        appointmentId: 1,
+        appointmentType: 'VLPM',
+        probationTeam: 'BLACKPP',
+        officerDetailsNotKnown: 'true',
+        meetingType: 'PSR',
+      }
+
+      appointmentService.getAppointment = jest.fn().mockResolvedValue(vlpmAppointmentMock)
+      appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(probationBookingMock)
+
+      locationDetailsService.getLocationMappingUsingDpsLocationId = jest.fn(async () => ({
+        nomisLocationId: 1234,
+        dpsLocationId: 'location-1',
+        key: 'ABC',
+      }))
+
+      locationDetailsService.getLocation = jest.fn(async () => ({
+        id: 'location-1',
+        key: 'ABC',
+        localName: 'Local name one',
+      }))
+
+      await controller.post()(req, res)
+
+      expect(controller['appointmentService'].amendVideoLinkBooking).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        1,
+        {
+          bookingType: 'PROBATION',
+          prisoners: [
+            {
+              prisonerNumber: PrisonerMockDataA.prisonerNumber,
+              prisonCode: formBody.prisonId,
+              appointments: [
+                {
+                  type: 'VLB_PROBATION',
+                  locationKey: locationsApiMock[0].key,
+                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                  startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+                  endTime: timeFormat(appointmentsToCreate.endTime),
+                },
+              ],
+            },
+          ],
+          probationTeamCode: 'BLACKPP',
+          probationMeetingType: 'PSR',
+          comments: 'Comment',
+        },
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('appointmentForm', req.body)
 
       expect(locationDetailsService.getLocationMappingUsingDpsLocationId).toHaveBeenCalledWith(
         req.middleware.clientToken,
@@ -478,85 +669,88 @@ describe('Appointments Controller', () => {
       errors: [],
       hearingTypes: courtHearingTypesSelectOptions,
       meetingTypes: probationMeetingTypesSelectOptions,
-      prisonId: 'MDI',
     })
   })
 
-  it('should display prepost appointment with data prepopulated when editing', async () => {
-    req.params.appointmentId = 1
-    appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
-    appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(videoLinkBookingMock)
+  it.each([[true], [false]])(
+    'should display prepost appointment with data prepopulated when editing with bvlsMasteredVlpmFeatureToggleEnabled %s',
+    async toggle => {
+      config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled = toggle
 
-    const { prisonerNumber, cellLocation } = PrisonerMockDataA
-    formBody.location = locationsMock[0].locationId
+      req.params.appointmentId = 1
+      appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
+      appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
 
-    const flash = {
-      appointmentDefaults: {
-        locationId: formBody.location,
-        startTime: formatDateTimeISO(
-          set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
-        ),
-      },
-      appointmentForm: formBody,
-    }
-    req.flash = (key: string) => {
-      if (key === 'prePostAppointmentDetails') {
-        return [flash]
+      const { prisonerNumber, cellLocation } = PrisonerMockDataA
+      formBody.location = locationsMock[0].locationId
+
+      const flash = {
+        appointmentDefaults: {
+          locationId: formBody.location,
+          startTime: formatDateTimeISO(
+            set(new Date(today), { hours: formBody.startTimeHours, minutes: formBody.startTimeMinutes }),
+          ),
+        },
+        appointmentForm: formBody,
       }
-      return []
-    }
+      req.flash = (key: string) => {
+        if (key === 'prePostAppointmentDetails') {
+          return [flash]
+        }
+        return []
+      }
 
-    const appointmentData = {
-      appointmentId: 1,
-      miniBannerData: {
-        prisonerName: 'Saunders, John',
-        prisonerNumber,
-        cellLocation: formatLocation(cellLocation),
-      },
-      location: locationsApiMock[0].localName,
-      date: formBody.date,
-      startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
-      endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
-      comments: formBody.comments,
-      appointmentDate: formatDate(today, 'long'),
-      formValues: {
-        bookingType: 'COURT',
-        court: 'ABERCV',
-        cvpRequired: 'yes',
-        hearingType: 'APPEAL',
-        postAppointment: 'yes',
-        postAppointmentLocation: 'abc-123',
-        preAppointment: 'yes',
-        preAppointmentLocation: 'abc-123',
-        videoLinkUrl: 'http://bvls.test.url',
-      },
-    }
+      const appointmentData = {
+        appointmentId: 1,
+        miniBannerData: {
+          prisonerName: 'Saunders, John',
+          prisonerNumber,
+          cellLocation: formatLocation(cellLocation),
+        },
+        location: locationsApiMock[0].localName,
+        date: formBody.date,
+        startTime: `${formBody.startTimeHours}:${formBody.startTimeMinutes}`,
+        endTime: `${formBody.endTimeHours}:${formBody.endTimeMinutes}`,
+        comments: formBody.comments,
+        appointmentDate: formatDate(today, 'long'),
+        formValues: {
+          bookingType: toggle ? undefined : 'COURT',
+          court: 'ABERCV',
+          cvpRequired: 'yes',
+          hearingType: 'APPEAL',
+          postAppointment: 'yes',
+          postAppointmentLocation: 'abc-123',
+          preAppointment: 'yes',
+          preAppointmentLocation: 'abc-123',
+          videoLinkUrl: 'http://bvls.test.url',
+        },
+      }
 
-    locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
-      nomisLocationId: 1234,
-      dpsLocationId: 'location-1',
-      key: 'ABC',
-    }))
+      locationDetailsService.getLocationMappingUsingNomisLocationId = jest.fn(async () => ({
+        nomisLocationId: 1234,
+        dpsLocationId: 'location-1',
+        key: 'ABC',
+      }))
 
-    await controller.displayPrePostAppointments()(req, res)
+      await controller.displayPrePostAppointments()(req, res)
 
-    expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
-      req.middleware.clientToken,
-      res.locals.user.activeCaseLoadId,
-    )
-    expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
-      pageTitle: 'Change appointment details',
-      ...appointmentData,
-      courts: courtLocationsSelectOptionsMock,
-      probationTeams: probationTeamsSelectOptionsMock,
-      locations: locationsApiSelectOptionsMock,
-      refererUrl: `/prisoner/${prisonerNumber}`,
-      errors: [],
-      hearingTypes: courtHearingTypesSelectOptions,
-      meetingTypes: probationMeetingTypesSelectOptions,
-      prisonId: 'MDI',
-    })
-  })
+      expect(controller['appointmentService'].getPrePostAppointmentRefData).toHaveBeenCalledWith(
+        req.middleware.clientToken,
+        res.locals.user.activeCaseLoadId,
+      )
+      expect(res.render).toHaveBeenCalledWith('pages/appointments/prePostAppointments', {
+        pageTitle: 'Change appointment details',
+        ...appointmentData,
+        courts: courtLocationsSelectOptionsMock,
+        probationTeams: probationTeamsSelectOptionsMock,
+        locations: locationsApiSelectOptionsMock,
+        refererUrl: `/prisoner/${prisonerNumber}`,
+        errors: [],
+        hearingTypes: courtHearingTypesSelectOptions,
+        meetingTypes: probationMeetingTypesSelectOptions,
+      })
+    },
+  )
 
   describe('POST Video Link Booking', () => {
     beforeEach(() => {
@@ -577,7 +771,7 @@ describe('Appointments Controller', () => {
           locationId: appointmentsToCreate.locationId,
           comment: appointmentsToCreate.comment,
         },
-        appointmentForm: formBody,
+        appointmentForm: { ...formBody, appointmentType: 'VLB' },
       }
       req.flash = (key: string) => {
         if (key === 'postVLBDetails') {
@@ -594,9 +788,115 @@ describe('Appointments Controller', () => {
 
       await controller.postVideoLinkBooking()(req, res)
 
-      expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(
+      expect(controller['appointmentService'].addVideoLinkBooking).toHaveBeenCalledWith(req.middleware.clientToken, {
+        bookingType: 'COURT',
+        prisoners: [
+          {
+            prisonerNumber: PrisonerMockDataA.prisonerNumber,
+            prisonCode: formBody.prisonId,
+            appointments: [
+              {
+                type: 'VLB_COURT_PRE',
+                locationKey: locationsApiMock[0].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
+                endTime: timeFormat(appointmentsToCreate.startTime),
+              },
+              {
+                type: 'VLB_COURT_MAIN',
+                locationKey: locationsApiMock[0].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+                endTime: timeFormat(appointmentsToCreate.endTime),
+              },
+              {
+                type: 'VLB_COURT_POST',
+                locationKey: locationsApiMock[1].key,
+                date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                startTime: timeFormat(appointmentsToCreate.endTime),
+                endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
+              },
+            ],
+          },
+        ],
+        courtCode: 'ABC',
+        courtHearingType: 'APPEAL',
+        comments: 'Comment',
+        videoLinkUrl: 'http://test.url',
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/prepost-appointment-confirmation`,
+      )
+    })
+
+    it('should amend the existing video link booking appointment', async () => {
+      const flash = {
+        appointmentDefaults: {
+          startTime: appointmentsToCreate.startTime,
+          endTime: appointmentsToCreate.endTime,
+          locationId: appointmentsToCreate.locationId,
+          comment: appointmentsToCreate.comment,
+        },
+        appointmentForm: { ...formBody, appointmentId: 1, appointmentType: 'VLB' },
+      }
+      req.flash = (key: string) => {
+        if (key === 'postVLBDetails') {
+          return [flash]
+        }
+        return []
+      }
+
+      appointmentService.getAppointment = jest.fn().mockResolvedValue(vlbAppointmentMock)
+      appointmentService.getVideoLinkBooking = jest.fn().mockResolvedValue(courtBookingMock)
+
+      locationDetailsService.getLocation = jest.fn(async () => ({
+        id: 'location-1',
+        key: 'ABC',
+        localName: 'Local name one',
+      }))
+
+      await controller.postVideoLinkBooking()(req, res)
+
+      expect(controller['appointmentService'].amendVideoLinkBooking).toHaveBeenCalledWith(
         req.middleware.clientToken,
-        videoLinkBookingForm,
+        1,
+        {
+          bookingType: 'COURT',
+          prisoners: [
+            {
+              prisonerNumber: PrisonerMockDataA.prisonerNumber,
+              prisonCode: formBody.prisonId,
+              appointments: [
+                {
+                  type: 'VLB_COURT_PRE',
+                  locationKey: locationsApiMock[0].key,
+                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                  startTime: timeFormat(formatDateTimeISO(subMinutes(new Date(appointmentsToCreate.startTime), 15))),
+                  endTime: timeFormat(appointmentsToCreate.startTime),
+                },
+                {
+                  type: 'VLB_COURT_MAIN',
+                  locationKey: locationsApiMock[0].key,
+                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                  startTime: timeFormat(formatDateTimeISO(new Date(appointmentsToCreate.startTime))),
+                  endTime: timeFormat(appointmentsToCreate.endTime),
+                },
+                {
+                  type: 'VLB_COURT_POST',
+                  locationKey: locationsApiMock[1].key,
+                  date: formatDateISO(new Date(appointmentsToCreate.startTime)),
+                  startTime: timeFormat(appointmentsToCreate.endTime),
+                  endTime: timeFormat(formatDateTimeISO(addMinutes(new Date(appointmentsToCreate.endTime), 15))),
+                },
+              ],
+            },
+          ],
+          courtCode: 'ABC',
+          courtHearingType: 'APPEAL',
+          comments: 'Comment',
+          videoLinkUrl: 'http://test.url',
+        },
       )
 
       expect(res.redirect).toHaveBeenCalledWith(

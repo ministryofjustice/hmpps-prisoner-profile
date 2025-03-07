@@ -30,18 +30,17 @@ import PropertyContainer from '../data/interfaces/prisonApi/PropertyContainer'
 import { formatDate } from '../utils/dateHelpers'
 import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
-import { RestClientBuilder } from '../data'
+import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
 import {
-  CorePersonPhysicalAttributes,
   CorePersonPhysicalAttributesRequest,
   CorePersonRecordReferenceDataDomain,
-  PersonIntegrationDistinguishingMark,
   PersonIntegrationApiClient,
+  PersonIntegrationDistinguishingMark,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
 import ReferenceDataService from './referenceData/referenceDataService'
@@ -54,15 +53,18 @@ import {
 import { militaryHistoryEnabled } from '../utils/featureToggles'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
+import { CuriousApiToken } from '../data/hmppsAuthClient'
+import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePersonPhysicalAttributes'
 
 export default class PersonalPageService {
   constructor(
     private readonly prisonApiClientBuilder: RestClientBuilder<PrisonApiClient>,
-    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
     private readonly metricsService: MetricsService,
+    private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
@@ -95,7 +97,24 @@ export default class PersonalPageService {
 
   async getPhysicalAttributes(token: string, prisonerNumber: string): Promise<CorePersonPhysicalAttributes> {
     const apiClient = this.personIntegrationApiClientBuilder(token)
-    return apiClient.getPhysicalAttributes(prisonerNumber)
+    const physicalAttributesDto = await apiClient.getPhysicalAttributes(prisonerNumber)
+    return {
+      height: physicalAttributesDto.height,
+      weight: physicalAttributesDto.weight,
+      hairCode: physicalAttributesDto.hair?.code,
+      hairDescription: physicalAttributesDto.hair?.description,
+      facialHairCode: physicalAttributesDto.facialHair?.code,
+      facialHairDescription: physicalAttributesDto.facialHair?.description,
+      faceCode: physicalAttributesDto.face?.code,
+      faceDescription: physicalAttributesDto.face?.description,
+      buildCode: physicalAttributesDto.build?.code,
+      buildDescription: physicalAttributesDto.build?.description,
+      leftEyeColourCode: physicalAttributesDto.leftEyeColour?.code,
+      leftEyeColourDescription: physicalAttributesDto.leftEyeColour?.description,
+      rightEyeColourCode: physicalAttributesDto.rightEyeColour?.code,
+      rightEyeColourDescription: physicalAttributesDto.rightEyeColour?.description,
+      shoeSize: physicalAttributesDto.shoeSize,
+    }
   }
 
   async updatePhysicalAttributes(
@@ -107,7 +126,7 @@ export default class PersonalPageService {
     const apiClient = this.personIntegrationApiClientBuilder(token)
 
     const existingPhysicalAttributes =
-      (await apiClient.getPhysicalAttributes(prisonerNumber)) ??
+      (await this.getPhysicalAttributes(token, prisonerNumber)) ??
       (() => {
         throw new BadRequestError(`Physical attributes not found for ${prisonerNumber}`)
       })()
@@ -158,7 +177,7 @@ export default class PersonalPageService {
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
-      Result.wrap(this.getLearnerNeurodivergence(token, prisonId, prisonerNumber), apiErrorCallback),
+      Result.wrap(this.getLearnerNeurodivergence(prisonId, prisonerNumber), apiErrorCallback),
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
@@ -474,13 +493,10 @@ export default class PersonalPageService {
     }
   }
 
-  getLearnerNeurodivergence(
-    clientToken: string,
-    prisonId: string,
-    prisonerNumber: string,
-  ): Promise<LearnerNeurodivergence[]> {
+  async getLearnerNeurodivergence(prisonId: string, prisonerNumber: string): Promise<LearnerNeurodivergence[]> {
     if (!neurodiversityEnabled(prisonId)) return Promise.resolve([])
-    const curiousApiClient = this.curiousApiClientBuilder(clientToken)
+    const curiousApiToken = await this.curiousApiTokenBuilder()
+    const curiousApiClient = this.curiousApiClientBuilder(curiousApiToken)
     return curiousApiClient.getLearnerNeurodivergence(prisonerNumber)
   }
 

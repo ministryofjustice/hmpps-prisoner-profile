@@ -8,3 +8,5 @@ export const dietAndAllergyEnabled = (activeCaseLoadId: string) =>
   config.featureToggles.dietAndAllergyEnabledPrisons.includes(activeCaseLoadId)
 
 export const militaryHistoryEnabled = () => config.featureToggles.militaryHistoryEnabled
+
+export const bvlsMasteredVlpmFeatureToggleEnabled = () => config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled

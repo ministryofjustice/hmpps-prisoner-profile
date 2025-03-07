@@ -60,6 +60,7 @@ ACTIVITIES_URL=https://activities-dev.prison.service.justice.gov.uk/activities
 ADJUDICATIONS_UI_URL=https://manage-adjudications-dev.hmpps.service.justice.gov.uk
 ALLOCATION_MANAGER_ENDPOINT_URL=https://dev.moic.service.justice.gov.uk
 APPOINTMENTS_URL=https://activities-dev.prison.service.justice.gov.uk/appointments
+ASSESS_FOR_EARLY_RELEASE_UI_URL=https:https://assess-for-early-release-dev.hmpps.service.justice.gov.uk
 BOOK_A_VIDEO_LINK_API_URL=https://book-a-video-link-api-dev.prison.service.justice.gov.uk
 CALCULATE_RELEASE_DATES_UI_URL=https://calculate-release-dates-dev.hmpps.service.justice.gov.uk
 CASE_NOTES_API_URL=https://dev.offender-case-notes.service.justice.gov.uk
@@ -79,7 +80,6 @@ MANAGE_ADJUDICATIONS_API_URL=https://manage-adjudications-api-dev.hmpps.service.
 MANAGE_A_WARRANT_FOLDER_UI_URL=https://manage-a-warrant-folder-dev.hmpps.service.justice.gov.uk
 MANAGE_SOC_CASES_API_URL=https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk
 MANAGE_SOC_CASES_UI_URL=https://manage-soc-cases-dev.hmpps.service.justice.gov.uk
-MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
 NON_ASSOCIATIONS_UI_URL=https://non-associations-dev.hmpps.service.justice.gov.uk
 OFFENDER_CATEGORISATION_UI_URL=https://dev.offender-categorisation.service.justice.gov.uk
 PATHFINDER_API_URL=https://dev-api.pathfinder.service.justice.gov.uk
@@ -102,7 +102,8 @@ CONTENTFUL_ACCESS_TOKEN=
 
 </details>
 
-Secrets can be extracted from the relevant kubernetes namespace on Cloud Platform using the follow example command below. The values are base64 encoded and this command uses the `jq` CLI tool to decode the values.
+Secrets can be extracted from the relevant kubernetes namespace on Cloud Platform using the follow example command
+below. The values are base64 encoded and this command uses the `jq` CLI tool to decode the values.
 
 ```
 kubectl get secret <INSERT_SECRET_NAME> -n hmpps-prisoner-profile-dev -o json | jq '.data|map_values(@base64d)'
@@ -165,6 +166,6 @@ npm run lint
 
 Features can be toggled by setting the relevant environment variable.
 
-| Name                                         | Default Value | Type    | Description                                                                                        |
-|----------------------------------------------|---------------|---------|----------------------------------------------------------------------------------------------------|
-| SOME_TOGGLE_ENABLED                          | false         | Boolean | Example feature toggle, for demonstration purposes.                                                |
+| Name                | Default Value | Type    | Description                                         |
+|---------------------|---------------|---------|-----------------------------------------------------|
+| SOME_TOGGLE_ENABLED | false         | Boolean | Example feature toggle, for demonstration purposes. |

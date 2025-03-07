@@ -40,7 +40,8 @@ export default function appointmentRouter(services: Services): Router {
     const { clientToken } = req.middleware
     const appointment = await services.appointmentService.getAppointment(clientToken, +appointmentId)
     if (
-      appointment.appointment.appointmentTypeCode === 'VLB' &&
+      (appointment.appointment.appointmentTypeCode === 'VLB' ||
+        appointment.appointment.appointmentTypeCode === 'VLPM') &&
       appointment.appointment.offenderNo === prisonerNumber
     ) {
       return next()

@@ -158,6 +158,14 @@ export default class DistinguishingMarksService {
     )
   }
 
+  updateDistinguishingMarkPhoto(
+    token: string,
+    photoId: string,
+    file?: MulterFile,
+  ): Promise<PersonIntegrationDistinguishingMark> {
+    return this.personIntegrationApiClientBuilder(token).updateDistinguishingMarkImage(photoId, file)
+  }
+
   addDistinguishingMarkPhoto(
     token: string,
     prisonerNumber: string,

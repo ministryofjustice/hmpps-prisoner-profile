@@ -25,4 +25,5 @@ const retrieveCuriousInPrisonCourses = (curiousService: CuriousService): Request
     next()
   })
 }
+
 export default retrieveCuriousInPrisonCourses

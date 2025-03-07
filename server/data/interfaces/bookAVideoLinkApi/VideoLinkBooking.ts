@@ -7,6 +7,11 @@ export default interface CreateVideoBookingRequest {
   probationMeetingType?: string
   comments?: string
   videoLinkUrl?: string
+  additionalBookingDetails?: {
+    contactName: string
+    contactEmail: string
+    contactNumber?: string
+  }
 }
 
 export interface AmendVideoBookingRequest extends CreateVideoBookingRequest {}
@@ -57,4 +62,9 @@ export interface VideoLinkBooking {
   probationMeetingTypeDescription?: string
   comments?: string
   videoLinkUrl?: string
+  additionalBookingDetails?: {
+    contactName?: string
+    contactEmail?: string
+    contactNumber?: string
+  }
 }

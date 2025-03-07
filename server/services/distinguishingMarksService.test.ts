@@ -9,6 +9,7 @@ const personIntegrationApiClient = {
   createDistinguishingMark: jest.fn(),
   updateDistinguishingMark: jest.fn(),
   addDistinguishingMarkImage: jest.fn(),
+  updateDistinguishingMarkImage: jest.fn(),
   getDistinguishingMarkImage: jest.fn(),
 } as undefined as PersonIntegrationApiClient
 
@@ -214,6 +215,18 @@ describe('distinguishingMarksService', () => {
         side: 'L',
         partOrientation: 'UPP',
         comment: 'comment',
+      })
+    })
+  })
+
+  describe('updateDistinguishingMarkPhoto', () => {
+    it('should update correct photo', () => {
+      service.updateDistinguishingMarkPhoto('token', '123', {
+        originalname: 'photo',
+      } as MulterFile)
+
+      expect(personIntegrationApiClient.updateDistinguishingMarkImage).toHaveBeenCalledWith('123', {
+        originalname: 'photo',
       })
     })
   })

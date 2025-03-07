@@ -16,10 +16,14 @@ jest.mock('../data/curiousApiClient')
 jest.mock('./prisonService')
 
 describe('curiousService', () => {
+  const prisonNumber = 'A1234BC'
+  const systemToken = 'a-system-token'
+  const curiousApiToken = { curiousApiToken: 'curious-api-token' }
+
   const curiousApiClient = new CuriousRestApiClient(null) as jest.Mocked<CuriousRestApiClient>
   const curiousClientBuilder = jest.fn()
   const prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
-  const curiousService = new CuriousService(curiousClientBuilder, prisonService)
+  const curiousService = new CuriousService(curiousClientBuilder, prisonService, () => Promise.resolve(curiousApiToken))
 
   const mockPrisonLookup = (prisonId: string): Promise<Prison> => {
     let prisonName: string
@@ -32,9 +36,6 @@ describe('curiousService', () => {
     }
     return Promise.resolve({ prisonId, prisonName })
   }
-
-  const prisonNumber = 'A1234BC'
-  const systemToken = 'a-system-token'
 
   beforeEach(() => {
     jest.resetAllMocks()

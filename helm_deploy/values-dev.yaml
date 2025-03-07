@@ -24,9 +24,11 @@ generic-service:
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
     CONTENTFUL_ENVIRONMENT: "master"
+    BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED: "true"
 
     # UI Service urls
     ADJUDICATIONS_UI_URL: "https://manage-adjudications-dev.hmpps.service.justice.gov.uk"
+    ASSESS_FOR_EARLY_RELEASE_UI_URL: "https://assess-for-early-release-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_UI_URL: "https://calculate-release-dates-dev.hmpps.service.justice.gov.uk"
     CREATE_AND_VARY_A_LICENCE_UI_URL: "https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk"
     DPS_HOME_PAGE_URL: "https://digital-dev.prison.service.justice.gov.uk"
@@ -57,7 +59,6 @@ generic-service:
     KEYWORKER_API_URL: "https://keyworker-api-dev.prison.service.justice.gov.uk"
     MANAGE_ADJUDICATIONS_API_URL: "https://manage-adjudications-api-dev.hmpps.service.justice.gov.uk"
     MANAGE_SOC_CASES_API_URL: "https://manage-soc-cases-api-dev.hmpps.service.justice.gov.uk"
-    MANAGE_USERS_API_URL: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
     PATHFINDER_API_URL: "https://dev-api.pathfinder.service.justice.gov.uk"
     PRISONER_PROFILE_DELIUS_API_URL: "https://prisoner-profile-and-delius-dev.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-dev.prison.service.justice.gov.uk"

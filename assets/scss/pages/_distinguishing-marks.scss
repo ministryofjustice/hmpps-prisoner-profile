@@ -26,3 +26,174 @@ label.govuk-link {
   color: $govuk-link-colour;
   cursor: pointer;
 }
+
+.mark-images {
+  &__header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+
+    > h1 {
+      flex: 4;
+
+      @media print {
+        margin-top: 0;
+      }
+    }
+
+    > .print-link {
+      flex: 1;
+      text-align: right;
+
+      @media print {
+        display: none;
+      }
+    }
+  }
+
+  &__container {
+    display: flex;
+
+    @media print {
+      display: block;
+    }
+  }
+
+  &__summary {
+    @media screen {
+      padding-right: 20px;
+      border-right: 1px solid $govuk-border-colour;
+      flex-basis: 33%;
+    }
+  }
+
+  &__image-display-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 20px;
+    flex-basis: 67%;
+    padding-left: 20px;
+
+    @media print {
+      padding-left: 0;
+    }
+  }
+
+  &__image-display-item {
+    object-fit: contain;
+    aspect-ratio: 3 / 4;
+    width: 100%;
+    background-color: govuk-colour('light-grey');
+  }
+}
+
+.mark-changeable-image {
+  position: relative;
+  width: 100%;
+  background-color: govuk-colour('light-grey');
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    margin: -3px;
+    border: 3px solid rgba(0, 0, 0, 0);
+    transition: 0.5s ease;
+
+    > a {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 16pt;
+    }
+
+
+    &:hover {
+      opacity: 1;
+      border: 3px solid #adbdcb;
+    }
+  }
+
+  > img {
+    display: block;
+    object-fit: contain;
+    aspect-ratio: 3 / 4;
+    width: 100%;
+    opacity: 1;
+    transition: opacity 0.5s;
+  }
+
+  &:hover img {
+    opacity: 0.1;
+  }
+
+  &__container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 20px;
+  }
+}
+
+.mark-new-image-placeholder {
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  background-color: govuk-colour('light-grey');
+  width: 100%;
+  aspect-ratio: 3 / 4;
+
+  a {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 16pt;
+
+    @media (min-width: 961px) {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+}
+
+.mark-edit-details-table {
+  border-collapse: collapse;
+  width: 100%;
+
+  tr {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+
+  th {
+    text-align: left;
+    vertical-align: top;
+    width: 10em;
+    padding-top: 10px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+  }
+
+  td {
+    vertical-align: top;
+    padding-top: 10px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+  }
+
+  td:last-child {
+    padding-right: 0;
+    @media (min-width: 40.0625em) {
+      width: 20%;
+      text-align: right;
+    }
+  }
+}

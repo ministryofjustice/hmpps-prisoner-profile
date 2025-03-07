@@ -4,6 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
@@ -80,18 +81,20 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <form method="post" novalidate="novalidate" autocomplete="off" class="add-appointment-form">
-                    {# When editing a video link booking include the appointmentId in the hidden form attributes #}
-                    {% if appointmentId %}
-                        <span class="govuk-visually-hidden" id="appointment-id">{{ appointmentId }}</span>
-                    {% endif %}
-
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <input type="hidden" name="refererUrl" value="{{ refererUrl }}" />
                     <input type="hidden" name="bookingId" value="{{ formValues.bookingId }}" />
+                    <input type="hidden" id="prisonId" name="prisonId" value="{{ formValues.prisonId }}"/>
+                    {% if appointmentId %}
+                        <input type="hidden" id="appointment-id" name="appointmentId" value="{{ appointmentId }}"/>
+                    {% endif %}
 
-                    {# When editing a video link booking you cannot change the type of appointment - display only #}
+                    {# When editing a video link booking you cannot change the type of appointment, or the probation team - display only #}
                     {% if appointmentId %}
                         <input type="hidden" id="appointmentType" name="appointmentType" value="{{ formValues.appointmentType }}" />
+                        {% if bvlsMasteredVlpmFeatureToggleEnabled() %}
+                            <input type="hidden" id="probationTeam" name="probationTeam" value="{{ formValues.probationTeam }}" />
+                        {% endif %}
                         {{ govukSummaryList({
                             classes: "govuk-summary-list--no-border",
                             rows: [
@@ -102,7 +105,15 @@
                                     value: {
                                         text: (appointmentTypes | find('value', formValues.appointmentType)).text
                                     }
-                                }
+                                },
+                                {
+                                    key: {
+                                        text: "Probation team"
+                                    },
+                                    value: {
+                                        text: (probationTeams | find('value', formValues.probationTeam)).text
+                                    }
+                                } if bvlsMasteredVlpmFeatureToggleEnabled()
                             ]
                         }) }}
                     {% else %}
@@ -112,10 +123,28 @@
                             label: {
                                 text: "Type of appointment"
                             },
+                            classes: 'govuk-!-width-one-half',
                             errorMessage: errors | findError('appointmentType'),
-                            items: appointmentTypes | addDefaultSelectedValue('Choose appointment type') | setSelected(formValues.appointmentType)
+                            items: appointmentTypes | addDefaultSelectedValue('Select appointment type') | setSelected(formValues.appointmentType)
                         }) }}
+
+                        {% if bvlsMasteredVlpmFeatureToggleEnabled() %}
+                            {{ govukSelect({
+                                id: "probationTeam",
+                                name: "probationTeam",
+                                label: {
+                                    text: "Select the probation team the booking is for"
+                                },
+                                formGroup : {
+                                    classes: "js-probation-team"
+                                },
+                                classes: 'govuk-!-width-one-half',
+                                errorMessage: errors | findError('probationTeam'),
+                                items: probationTeams | addDefaultSelectedValue('Select probation team') | setSelected(formValues.probationTeam)
+                            }) }}
+                        {% endif %}
                     {% endif %}
+
                     {{ govukSelect({
                         id: "location",
                         name: "location",
@@ -124,8 +153,100 @@
                         },
                         classes: 'govuk-!-width-one-half',
                         errorMessage: errors | findError('location'),
-                        items: locations | addDefaultSelectedValue('Choose location') | setSelected(formValues.location)
+                        items: locations | addDefaultSelectedValue('Select location') | setSelected(formValues.location)
                     }) }}
+
+                    {% if bvlsMasteredVlpmFeatureToggleEnabled() %}
+                        <div class="govuk-form-group js-probation-officer {{ 'govuk-form-group--error' if errors | findError("officerDetailsOrUnknown") }}">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Enter the probation officer's details</legend>
+                                <p id="officerDetailsOrUnknown" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span>{{ (errors | findError("officerDetailsOrUnknown")).text }}</p>
+                                <p class="govuk-body">You can enter the details later if not yet known</p>
+                                {{ govukCheckboxes({
+                                    idPrefix: "officerDetailsNotKnown",
+                                    name: "officerDetailsNotKnown",
+                                    items: [
+                                        {
+                                            value: "true",
+                                            text: "Not yet known",
+                                            checked: formValues.officerDetailsNotKnown
+                                        },
+                                        {
+                                            divider: "or"
+                                        }
+                                    ],
+                                    errorMessage: errors | findError("officerDetailsNotKnown"),
+                                    formGroup: {
+                                        classes: 'govuk-!-margin-bottom-3'
+                                    },
+                                    classes: "govuk-!-width-one-third"
+                                }) }}
+
+                                {{ govukInput({
+                                    id: "officerFullName",
+                                    name: "officerFullName",
+                                    label: {
+                                        text: "Full name"
+                                    },
+                                    errorMessage: errors | findError('officerFullName'),
+                                    formGroup: {
+                                        classes: 'govuk-!-margin-bottom-3'
+                                    },
+                                    classes: "govuk-!-width-one-half",
+                                    value: formValues.officerFullName
+                                }) }}
+
+                                {{ govukInput({
+                                    id: "officerEmail",
+                                    name: "officerEmail",
+                                    label: {
+                                        text: "Email address"
+                                    },
+                                    errorMessage: errors | findError('officerEmail'),
+                                    formGroup: {
+                                        classes: 'govuk-!-margin-bottom-3'
+                                    },
+                                    classes: "govuk-!-width-one-half",
+                                    value: formValues.officerEmail
+                                }) }}
+
+                                {{ govukInput({
+                                    id: "officerTelephone",
+                                    name: "officerTelephone",
+                                    label: {
+                                        text: "UK phone number (optional)"
+                                    },
+                                    errorMessage: errors | findError('officerTelephone'),
+                                    classes: "govuk-input--width-10",
+                                    value: formValues.officerTelephone
+                                }) }}
+                            </fieldset>
+                        </div>
+
+                        {# Replace OTHER to the end of the list #}
+                        {% set meetingTypes = meetingTypes | filterNot('value', 'OTHER') %}
+                        {% set meetingTypes = (meetingTypes.push({
+                            value: 'OTHER',
+                            text: 'Other'
+                        }), meetingTypes) %}
+
+                        {{ govukRadios({
+                            idPrefix: "meetingType",
+                            name: "meetingType",
+                            fieldset: {
+                                legend: {
+                                    text: "Select meeting type",
+                                    classes: "govuk-fieldset__legend--s"
+                                }
+                            },
+                            formGroup : {
+                                classes: "js-meeting-type"
+                            },
+                            items: meetingTypes | setChecked([formValues.meetingType]),
+                            errorMessage: errors | findError("meetingType")
+                        }) }}
+                    {% endif %}
+
                     {{ hmppsDatepicker({
                         id: "date",
                         name: "date",
@@ -193,10 +314,6 @@
                         ]
                     }) }}
 
-                    <div id="optional-video-label" class="govuk-label">
-                      <p>For confidentiality reasons, comments for Video Link - Court Hearing and Video Link - Probation Meeting appointments will not appear on movement slips.</p>
-                    </div>
-
                     {{ govukTextarea({
                         name: "comments",
                         id: "comments",
@@ -205,6 +322,9 @@
                         classes: 'govuk-!-width-one-half',
                         label: {
                             text: "Comments (optional)"
+                        },
+                        hint: {
+                            text: "For confidentiality reasons, comments for Video Link - Court Hearing and Video Link - Probation Meeting appointments will not appear on movement slips."
                         }
                     }) }}
 

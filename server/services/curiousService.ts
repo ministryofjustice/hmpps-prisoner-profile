@@ -2,16 +2,18 @@ import { startOfDay, startOfToday, subMonths } from 'date-fns'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
 import logger from '../../logger'
 import PrisonService from './prisonService'
-import { InPrisonCourseRecords, InPrisonCourse } from './interfaces/curiousService/CuriousInPrisonCourses'
+import { InPrisonCourse, InPrisonCourseRecords } from './interfaces/curiousService/CuriousInPrisonCourses'
 import { LearnerEducation, LearnerEductionPagedResponse } from '../data/interfaces/curiousApi/LearnerEducation'
 import { toInPrisonCourse } from './mappers/inPrisonCourseMapper'
 import dateComparator from '../utils/dateComparator'
-import { RestClientBuilder } from '../data'
+import { CuriousRestClientBuilder } from '../data'
+import { CuriousApiToken } from '../data/hmppsAuthClient'
 
 export default class CuriousService {
   constructor(
-    private readonly curiousApiClientBuilder: RestClientBuilder<CuriousApiClient>,
+    private readonly curiousApiClientBuilder: CuriousRestClientBuilder<CuriousApiClient>,
     private readonly prisonService: PrisonService,
+    private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
   ) {}
 
   /**
@@ -26,11 +28,15 @@ export default class CuriousService {
       let page = 0
       let apiPagedResponse = { last: false } as LearnerEductionPagedResponse
       const apiLearnerEducation: Array<LearnerEducation> = []
+      const curiousApiToken = await this.curiousApiTokenBuilder()
 
       // loop until the API response's `last` field is `true`
       while (apiPagedResponse.last === false) {
         // eslint-disable-next-line no-await-in-loop
-        apiPagedResponse = await this.curiousApiClientBuilder(token).getLearnerEducationPage(prisonNumber, page)
+        apiPagedResponse = await this.curiousApiClientBuilder(curiousApiToken).getLearnerEducationPage(
+          prisonNumber,
+          page,
+        )
         if (!apiPagedResponse) {
           return this.noLearnerEducationForPrisoner(prisonNumber)
         }
