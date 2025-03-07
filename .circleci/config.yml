@@ -141,10 +141,6 @@ workflows:
           pipeline_id: <<pipeline.id>>
           pipeline_number: <<pipeline.number>>
           context: hmpps-common-vars
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - helm_lint
             - unit_test
@@ -153,6 +149,10 @@ workflows:
           helm_timeout: 5m
       - request-test-approval:
           type: approval
+          filters:
+            branches:
+              only:
+                - main
       - hmpps/deploy_env:
           name: deploy_test
           env: "test"
