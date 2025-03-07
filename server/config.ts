@@ -298,6 +298,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('HEALTH_AND_MEDICATION_TIMEOUT_DEADLINE', 10000))),
     },
+    osPlacesApi: {
+      url: get('OS_PLACES_API_URL', 'https://api.os.uk/search/places/v1', requiredInProduction),
+      apiKey: get('OS_PLACES_API_KEY', '', requiredInProduction),
+      timeout: {
+        response: Number(get('OS_PLACES_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('OS_PLACES_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('OS_PLACES_API_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),
