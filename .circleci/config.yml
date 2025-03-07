@@ -147,6 +147,10 @@ workflows:
             - integration_test
             - build_docker
           helm_timeout: 5m
+          filters:
+            branches:
+              only:
+                - main
       - request-test-approval:
           type: approval
           filters:
