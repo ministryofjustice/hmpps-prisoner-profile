@@ -147,7 +147,9 @@ workflows:
           jira_update: true
           pipeline_id: <<pipeline.id>>
           pipeline_number: <<pipeline.number>>
-          context: hmpps-common-vars
+          context:
+            - hmpps-common-vars
+            - hmpps-prisoner-profile-test
           filters:
             branches:
               only:
