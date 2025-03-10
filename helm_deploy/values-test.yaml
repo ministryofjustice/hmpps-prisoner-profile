@@ -71,9 +71,9 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     CALCULATE_RELEASE_DATES_API_URL: "https://calculate-release-dates-api-dev.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"
-    PERSON_INTEGRATION_API_URL: "https://person-integration-api-dev.hmpps.service.justice.gov.uk"
+    PERSON_INTEGRATION_API_URL: "https://person-integration-api-test.hmpps.service.justice.gov.uk"
     CSIP_API_URL: "https://csip-api-dev.hmpps.service.justice.gov.uk"
-    HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-dev.hmpps.service.justice.gov.uk"
+    HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-test.hmpps.service.justice.gov.uk"
     CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
 
     # Feature flags
