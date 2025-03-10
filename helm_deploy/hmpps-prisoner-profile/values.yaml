@@ -55,14 +55,14 @@ generic-service:
       TAG_MANAGER_CONTAINER_ID: "TAG_MANAGER_CONTAINER_ID"
       CONTENTFUL_SPACE_ID: "CONTENTFUL_SPACE_ID"
       CONTENTFUL_ACCESS_TOKEN: "CONTENTFUL_ACCESS_TOKEN"
+      OS_PLACES_API_KEY: "OS_PLACES_API_KEY"
+
     elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
       AUDIT_SQS_QUEUE_NAME: "sqs_queue_name"
-    os-places-api-secret:
-      OS_PLACES_API_KEY: "API_KEY"
 
 
 generic-prometheus-alerts:
