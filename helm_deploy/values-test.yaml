@@ -93,6 +93,11 @@ generic-service:
 
   allowlist:
       internal-pen-test: 80.195.27.199/32
+      groups:
+        - internal
+        - prisons
+        - private_prisons
+        - home_office
 
   scheduledDowntime:
     enabled: true
