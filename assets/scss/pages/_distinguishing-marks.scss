@@ -27,6 +27,18 @@ label.govuk-link {
   cursor: pointer;
 }
 
+.distinguishing-mark-summary-image {
+  &__container {
+    aspect-ratio: 3 / 4;
+    width: 150px;
+    background-color: govuk-colour('light-grey');
+  }
+  &__image {
+    aspect-ratio: 3 / 4;
+    object-fit: contain;
+  }
+}
+
 .mark-images {
   &__header-container {
     display: flex;
@@ -102,8 +114,9 @@ label.govuk-link {
     height: 100%;
     width: 100%;
     opacity: 0;
+    background-color: white;
+    border: 3px solid #adbdcb;
     margin: -3px;
-    border: 3px solid rgba(0, 0, 0, 0);
     transition: 0.5s ease;
 
     > a {
@@ -117,8 +130,7 @@ label.govuk-link {
 
 
     &:hover {
-      opacity: 1;
-      border: 3px solid #adbdcb;
+      opacity: 0.95;
     }
   }
 
@@ -127,12 +139,6 @@ label.govuk-link {
     object-fit: contain;
     aspect-ratio: 3 / 4;
     width: 100%;
-    opacity: 1;
-    transition: opacity 0.5s;
-  }
-
-  &:hover img {
-    opacity: 0.05;
   }
 
   &__container {

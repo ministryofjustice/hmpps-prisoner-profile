@@ -30,9 +30,10 @@
                                         <dd class='govuk-!-margin-left-0'>{{ mark.comment or "Not entered" }}</dd>
                                     </div>
                                     {% if mark.photographUuids.length %}
-                                        <div class="personal-distinguishing-marks__row__populated__row__image-list">
+                                        <div class="personal-distinguishing-marks__row__populated__row__image-list distinguishing-mark-summary-image__container">
                                             <img src="/api/distinguishing-mark-image/{{ mark.photographUuids | latestImageId }}?nocache={{ currentTimeMillis() }}"
-                                                 alt="Image of {{ type }} on {{ mark.location }}" width="150px" />
+                                                 alt="Image of {{ type }} on {{ mark.location }}"
+                                                 class="distinguishing-mark-summary-image__image" />
                                         </div>
                                         {% if mark.photographUuids.length > 1 %}
                                             <div class="personal-distinguishing-marks__row__populated__row">
