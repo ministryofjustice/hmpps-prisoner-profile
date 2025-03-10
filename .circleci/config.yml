@@ -134,7 +134,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - pen_test
       - request-test-approval:
           type: approval
           filters:
@@ -157,6 +157,7 @@ workflows:
             - unit_test
             - integration_test
             - build_docker
+            - request-test-approval
           helm_timeout: 5m
 
   build-test-and-deploy:
