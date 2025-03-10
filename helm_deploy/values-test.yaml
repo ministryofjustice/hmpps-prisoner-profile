@@ -93,6 +93,7 @@ generic-service:
 
   allowlist:
       internal-pen-test: 80.195.27.199/32
+      internal-pen-test-2: 90.246.18.183/32
       groups:
         - internal
         - prisons
