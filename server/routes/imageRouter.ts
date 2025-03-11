@@ -19,10 +19,9 @@ import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import miniBannerData from '../controllers/utils/miniBannerData'
 import config from '../config'
 import logger from '../../logger'
-import { updatePhotoValidator } from '../validators/updatePhotoValidator'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import { FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
+import { editPhotoValidator } from '../validators/editPhotoValidator'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
@@ -151,27 +150,10 @@ export default function imageRouter(services: Services): Router {
       includeSharedData: true,
       dpsUrl: config.serviceUrls.digitalPrison,
     }),
-    uploadToBuffer.single('photoUpload'),
-    validationMiddleware(
-      [
-        (req: FileUploadRequest) => {
-          const photoType = req.body?.photoType
-          const errors = []
-
-          if (!photoType) {
-            errors.push({ text: 'Select the type of facial image to use', href: '#photoType' })
-          } else if (photoType === 'upload') {
-            errors.push(...updatePhotoValidator(200, ['image/jpeg', 'image/gif'])(req))
-          }
-
-          return errors
-        },
-      ],
-      {
-        redirectBackOnError: true,
-        useReq: true,
-      },
-    ),
+    validationMiddleware([editPhotoValidator], {
+      redirectBackOnError: true,
+      useReq: true,
+    }),
     async (req, res, next) => {
       const { prisonerData } = req.middleware
       const file = req.file as MulterFile

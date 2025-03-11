@@ -5,7 +5,7 @@ export interface FileUploadRequest {
   files?: Record<string, MulterFile[]>
 }
 
-export function updatePhotoValidator(maxSizeMB: number, allowedMimeTypes: string[]) {
+export function fileUploadValidator(maxSizeMB: number, allowedMimeTypes: string[]) {
   const maxSize = maxSizeMB * 1024 * 1024
 
   return (req: FileUploadRequest) => {
