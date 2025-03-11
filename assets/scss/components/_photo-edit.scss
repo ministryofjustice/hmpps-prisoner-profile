@@ -25,3 +25,20 @@
     margin-left: auto;
   }
 }
+
+.hmpps-photo-container {
+  @include govuk-responsive-padding(2);
+  border: 1px solid $govuk-border-colour;
+  display: flex;
+  width: 100%;
+
+  &__photo {
+    img {
+      max-width: 250px;
+    }
+  }
+}
+
+.hmpps-withheld-photo {
+  width: 170px;
+}

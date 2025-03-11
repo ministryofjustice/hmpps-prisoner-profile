@@ -35,18 +35,12 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <form
-        method='post'
-        enctype='multipart/form-data'
-        action="/prisoner/{{ prisonerNumber }}/image/submit?_csrf={{ csrfToken }}">
-        <input type="file" id="js-cropped-image-input" name="editedFile" hidden/>
+      <form method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
-        <div class="hmpps-photo-container govuk-!-margin-bottom-4">
-          <div class="hmpps-photo-container__photo">
-            <img src='{{ imgSrc }}' class='' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id="uploaded-photo"/>
-            <p class="govuk-body">This page is a placeholder for now</p>
-          </div>
+        <div class="govuk-!-margin-bottom-4">
+          <img src="/assets/images/category-a-prisoner-image.png" class="hmpps-withheld-photo" />
         </div>
+        <p class="govuk-body">This button does nothing for now</p>
         <div class="govuk-button-group">
           {{ govukButton({
             text: "Save and continue",
@@ -60,7 +54,4 @@
       </form>
     </div>
   </div>
-{% endblock %}
-{% block pageScripts %}
-  <script src="/assets/js/profilePhotoCropper.js" nonce="{{ cspNonce }}"></script>
 {% endblock %}

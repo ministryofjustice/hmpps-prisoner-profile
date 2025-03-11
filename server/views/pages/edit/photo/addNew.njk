@@ -1,6 +1,7 @@
 {% extends "../../../partials/layout.njk" %}
 {% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
@@ -9,11 +10,12 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set hideBackLink = true %}
-{% set breadCrumbs = [
-    { text: 'Digital Prison Services', href:  "/" | prependBaseUrl },
-    { text: breadcrumbPrisonerName, href: "/prisoner/" + prisonerNumber },
-    { text: 'Personal', href: "/prisoner/" + prisonerNumber + "/personal" }
-  ] %}
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/prisoner/" + prisonerNumber +"/image"
+  }) }}
+{% endblock %}
 {% set fileHtml %}
 <div class="hmpps-photo-upload">
   <div id="file-upload" class="hmpps-photo-upload__upload">
@@ -43,7 +45,9 @@
 {% endset -%}
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
   </div>
   {% if errors.length > 0 %}
     <div class="govuk-grid-row">
@@ -62,7 +66,8 @@
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
         <div class="govuk-form-group {{ " govuk-form-group--error" if errors.length > 0 }}">
           {{ govukRadios({
-            name: "contact",
+            name: "photoType",
+            id: 'photoType',
             fieldset: {
               legend: {
                 text: "Add a new facial image",
@@ -76,14 +81,16 @@
                 text: "Upload a new photo of the person",
                 conditional: {
                   html: fileHtml
-                }
+                },
+                checked: formValues['photoType'] == 'upload'
               },
               {
                 value: "withheld",
                 text: "Use the 'Photo withheld for security reasons' image",
                 hint: {
                   text: 'This should be used for all Category A prisoners.'
-                }
+                },
+                checked: formValues['photoType'] == 'withheld'
               }
             ]
           }) }}
@@ -95,7 +102,7 @@
             preventDoubleClick: true,
             attributes: { "data-qa": "submit-button" }
             }) }}
-          <a href="/prisoner/{{ prisonerNumber }}/" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+          <a href="/prisoner/{{ prisonerNumber }}/image" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
             Cancel</a>
         </div>
       </form>

@@ -19,8 +19,12 @@ import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
 import miniBannerData from '../controllers/utils/miniBannerData'
 import config from '../config'
 import logger from '../../logger'
+import { updatePhotoValidator } from '../validators/updatePhotoValidator'
+import validationMiddleware from '../middleware/validationMiddleware'
+import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
+import { FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
 
-export default function goalsRouter(services: Services): Router {
+export default function imageRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
   const post = postRequest(router)
@@ -124,10 +128,12 @@ export default function goalsRouter(services: Services): Router {
     editProfileChecks(),
     async (req, res, next) => {
       const { prisonerData } = req.middleware
+      res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
 
       return res.render('pages/edit/photo/addNew', {
         pageTitle: 'Add a new facial image',
         miniBannerData: miniBannerData(prisonerData),
+        prisonerNumber: prisonerData.prisonerNumber,
       })
     },
   )
@@ -146,17 +152,71 @@ export default function goalsRouter(services: Services): Router {
       dpsUrl: config.serviceUrls.digitalPrison,
     }),
     uploadToBuffer.single('photoUpload'),
+    validationMiddleware(
+      [
+        (req: FileUploadRequest) => {
+          const photoType = req.body?.photoType
+          const errors = []
+
+          if (!photoType) {
+            errors.push({ text: 'Select the type of facial image to use', href: '#photoType' })
+          } else if (photoType === 'upload') {
+            errors.push(...updatePhotoValidator(200, ['image/jpeg', 'image/gif'])(req))
+          }
+
+          return errors
+        },
+      ],
+      {
+        redirectBackOnError: true,
+        useReq: true,
+      },
+    ),
     async (req, res, next) => {
       const { prisonerData } = req.middleware
       const file = req.file as MulterFile
 
-      res.render('pages/edit/photo/editPhoto', {
+      if (req.body.photoType === 'withheld') {
+        return res.redirect(`/prisoner/${prisonerData.prisonerNumber}/image/new-withheld`)
+      }
+
+      return res.render('pages/edit/photo/editPhoto', {
         miniBannerData: miniBannerData(prisonerData),
         imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-        prisonerNumber: req.middleware.prisonerData.prisonerNumber,
+        prisonerNumber: prisonerData.prisonerNumber,
         fileName: file.originalname,
         fileType: file.mimetype,
       })
+    },
+  )
+
+  get(
+    `${basePath}/image/new-withheld`,
+    auditPageAccessAttempt({ services, page: Page.Photo }),
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editProfileChecks(),
+    async (req, res, next) => {
+      const { prisonerData } = req.middleware
+      res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
+
+      return res.render('pages/edit/photo/addWithheld', {
+        pageTitle: 'Confirm facial image',
+        miniBannerData: miniBannerData(prisonerData),
+        prisonerNumber: prisonerData.prisonerNumber,
+      })
+    },
+  )
+
+  post(
+    `${basePath}/image/new-withheld`,
+    auditPageAccessAttempt({ services, page: Page.Photo }),
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editProfileChecks(),
+    async (req, res, next) => {
+      const { prisonerData } = req.middleware
+      return res.redirect(`/prisoner/${prisonerData.prisonerNumber}/image/new-withheld`)
     },
   )
 
