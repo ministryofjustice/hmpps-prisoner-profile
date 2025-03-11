@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import multer from 'multer'
 import { getRequest, postRequest } from './routerUtils'
 import { formatName } from '../utils/utils'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -14,7 +13,6 @@ import {
   updatePhotoValidator,
 } from '../validators/personal/distinguishingMarksValidator'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
-import { allBodyParts } from '../controllers/interfaces/distinguishingMarks/selectionTypes'
 
 export default function distinguishingMarksRouter(services: Services): Router {
   const router = Router({ mergeParams: true })
@@ -57,7 +55,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
   get(`/:bodyPart(${validBodyParts})`, distinguishingMarksController.newDistinguishingMarkWithDetail)
   post(
     `/:bodyPart(${validBodyParts})`,
-    multer().fields(allBodyParts.map(part => ({ name: `file-${part}`, maxCount: 1 }))),
     validationMiddleware([newDetailedDistinguishingMarkValidator], {
       redirectBackOnError: true,
       useReq: true,
@@ -102,7 +99,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
   get('/:markId/photo/:photoId', distinguishingMarksController.changePhoto)
   post(
     '/:markId/photo/:photoId',
-    multer().single('file'),
     validationMiddleware([updatePhotoValidator], {
       redirectBackOnError: true,
       useReq: true,
@@ -114,7 +110,6 @@ export default function distinguishingMarksRouter(services: Services): Router {
   get('/:markId/photo', distinguishingMarksController.addNewPhoto)
   post(
     '/:markId/photo',
-    multer().single('file'),
     validationMiddleware([updatePhotoValidator], {
       redirectBackOnError: true,
       useReq: true,
