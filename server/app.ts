@@ -55,7 +55,11 @@ export default function createApp(services: Services): express.Application {
     update the app.use(csrf stuff) to only run for routes which don't contain distinguishing-marks, then set
     up the Multer and CSRF middleware separately within the distinguishing marks router.
    */
-  app.use(multer().single('file'))
+  app.use(
+    multer({
+      storage: multer.memoryStorage(),
+    }).single('file'),
+  )
   app.use(setUpCsrf())
 
   app.use(setUpCurrentUser())
