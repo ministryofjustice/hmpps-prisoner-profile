@@ -110,7 +110,6 @@ export default function imageRouter(services: Services): Router {
     },
   )
 
-  // REFACTOR THIS
   const editProfileChecks = () => (req: Request, res: Response, next: NextFunction) => {
     const { userRoles, activeCaseLoadId } = res.locals.user as PrisonUser
     if (userHasRoles(['DPS_APPLICATION_DEVELOPER'], userRoles) && editProfileEnabled(activeCaseLoadId)) {
