@@ -25,9 +25,9 @@
         value: formValues["description-"+postfix]
     }) }}
     {{ govukFileUpload({
-        id: "file-"+postfix,
-        name: "file-"+postfix,
-        errorMessage: errors | findError('file-'+postfix),
+        id: "file",
+        name: "file",
+        errorMessage: errors | findError('file'),
         label: {
             text: "Add a photo (optional)",
             classes: "govuk-!-font-weight-bold"
@@ -62,8 +62,8 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form id="mark-detail-form" method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
-{#            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />#}
+        <form id="mark-detail-form" method="post" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <input type="hidden" name="bodyPart" value="{{ bodyPart }}">
             {% if formConfig.specificParts.length === 1 %}
 {#              Don't show the radio buttons if there is only one option #}
