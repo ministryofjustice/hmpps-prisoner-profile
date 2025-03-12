@@ -245,14 +245,6 @@ export const mockOsPlacesAddressQueryEmptyResponse: OsPlacesQueryResponse = {
   results: [],
 }
 
-export const mockOsPlacesInvalidPostcodeResponse = {
-  error: {
-    statuscode: 400,
-    message:
-      'Requested postcode must contain a minimum of the sector plus 1 digit of the district e.g. SO1. Requested postcode was invalid',
-  },
-}
-
 export const mockOsPlacesInvalidApiKey = {
   fault: {
     faultstring: 'Invalid ApiKey',

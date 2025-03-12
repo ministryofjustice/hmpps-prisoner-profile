@@ -106,42 +106,4 @@ describe('Address controller', () => {
       expect(res.json).toHaveBeenCalledWith({ error: testError().message })
     })
   })
-
-  describe('findAddressesByPostcode', () => {
-    beforeEach(() => {
-      req = {
-        params: { postcode: 'A123BC' },
-        middleware: {
-          clientToken: 'CLIENT_TOKEN',
-        },
-      }
-      res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      }
-    })
-
-    it('should render the correct json response', async () => {
-      const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingPostCode')
-        .mockResolvedValue(mockOsAddresses)
-
-      await controller.findAddressesByPostcode(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.postcode)
-      expect(res.json).toHaveBeenCalledWith(mockOsAddresses)
-    })
-
-    it('should handle errors correctly', async () => {
-      const getAddressesMatchingQuery = jest
-        .spyOn<any, string>(controller['addressService'], 'getAddressesMatchingPostCode')
-        .mockImplementation(() => {
-          throw testError()
-        })
-
-      await controller.findAddressesByPostcode(req, res)
-      expect(getAddressesMatchingQuery).toHaveBeenCalledWith(req.params.postcode)
-      expect(res.status).toHaveBeenCalledWith(testError().status)
-      expect(res.json).toHaveBeenCalledWith({ error: testError().message })
-    })
-  })
 })

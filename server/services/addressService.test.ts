@@ -45,22 +45,6 @@ describe('addressService', () => {
     })
   })
 
-  describe('getAddressesMatchingPostCode', () => {
-    const testPostcode = 'A123BC'
-
-    it('Handles empty address response', async () => {
-      osPlacesApiClient.getAddressesByPostcode = jest.fn(async () => mockOsPlacesAddressQueryEmptyResponse)
-      const addresses = await addressService.getAddressesMatchingPostCode(testPostcode)
-      expect(addresses.length).toEqual(0)
-    })
-
-    it('Maps the returned addresses correctly', async () => {
-      osPlacesApiClient.getAddressesByPostcode = jest.fn(async () => mockOsPlacesAddressQueryResponse)
-      const addresses = await addressService.getAddressesMatchingPostCode(testPostcode)
-      validateExpectedAddressResponse(addresses)
-    })
-  })
-
   function validateExpectedAddressResponse(addresses: OsAddress[]) {
     expect(addresses.length).toEqual(2)
     expect(addresses[0].addressString).toEqual('1, The Road, My Town, A123BC')

@@ -28,11 +28,5 @@ export default function addressRouter(services: Services): Router {
     (req, res, next) => addressController.findAddressesByFreeTextQuery(req, res),
   )
 
-  get(
-    '/api/addresses/postcode/:postcode',
-    auditPageAccessAttempt({ services, page: ApiAction.AddressLookup }),
-    (req, res, next) => addressController.findAddressesByPostcode(req, res),
-  )
-
   return router
 }

@@ -56,13 +56,4 @@ export default class AddressController {
       res.status(error.status).json({ error: error.message })
     }
   }
-
-  public async findAddressesByPostcode(req: Request, res: Response): Promise<void> {
-    const { postcode } = req.params
-    try {
-      res.json(await this.addressService.getAddressesMatchingPostCode(postcode))
-    } catch (error) {
-      res.status(error.status).json({ error: error.message })
-    }
-  }
 }

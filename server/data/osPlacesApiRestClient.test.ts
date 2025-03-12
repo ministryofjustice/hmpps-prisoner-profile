@@ -3,7 +3,6 @@ import config from '../config'
 import {
   mockOsPlacesAddressQueryResponse,
   mockOsPlacesInvalidApiKey,
-  mockOsPlacesInvalidPostcodeResponse,
 } from './localMockData/osPlacesAddressQueryResponse'
 import OsPlacesApiRestClient from './osPlacesApiRestClient'
 
@@ -11,7 +10,6 @@ describe('osPlacesApiRestClient', () => {
   let fakeOsPlaceApi: nock.Scope
   let osPlacesApiRestClient: OsPlacesApiRestClient
   const testQuery = '1,A123BC'
-  const testPostcode = 'A123BC'
 
   beforeEach(() => {
     fakeOsPlaceApi = nock(config.apis.osPlacesApi.url)
@@ -41,29 +39,6 @@ describe('osPlacesApiRestClient', () => {
       await expect(osPlacesApiRestClient.getAddressesByFreeTextQuery(testQuery)).rejects.toMatchObject({
         message: 'Error calling OS Places API: Unauthorized',
         status: 401,
-      })
-    })
-  })
-
-  describe('getAddressesByPostcode', () => {
-    it('should return data from api', async () => {
-      fakeOsPlaceApi
-        .get(`/postcode?postcode=${testPostcode}&key=${config.apis.osPlacesApi.apiKey}`)
-        .reply(200, mockOsPlacesAddressQueryResponse)
-
-      const output = await osPlacesApiRestClient.getAddressesByPostcode(testPostcode)
-      expect(output).toEqual(mockOsPlacesAddressQueryResponse)
-    })
-
-    it('should handle error responses', async () => {
-      fakeOsPlaceApi
-        .get(`/postcode?postcode=${testPostcode}&key=${config.apis.osPlacesApi.apiKey}`)
-        .reply(400, mockOsPlacesInvalidPostcodeResponse)
-
-      await expect(osPlacesApiRestClient.getAddressesByPostcode(testPostcode)).rejects.toMatchObject({
-        message: 'Error calling OS Places API: Bad Request',
-        status: 400,
-        data: mockOsPlacesInvalidPostcodeResponse,
       })
     })
   })

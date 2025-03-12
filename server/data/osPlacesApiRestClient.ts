@@ -12,14 +12,6 @@ export default class OsPlacesApiRestClient implements OsPlacesApiClient {
     this.baseUrl = config.apis.osPlacesApi.url
   }
 
-  async getAddressesByPostcode(postcode: string): Promise<OsPlacesQueryResponse> {
-    const queryParams: Record<string, string> = {
-      postcode,
-      key: config.apis.osPlacesApi.apiKey,
-    }
-    return this.get<Promise<OsPlacesQueryResponse>>('/postcode', queryParams)
-  }
-
   async getAddressesByFreeTextQuery(freeTextQuery: string): Promise<OsPlacesQueryResponse> {
     const queryParams: Record<string, string> = {
       query: freeTextQuery,
