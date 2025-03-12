@@ -10,7 +10,7 @@ const stubFindAddressesByFreeTextSearch = (): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/search/places/v1/find\\?query=1%2CA123BC&key=',
+      urlPattern: '/osPlaces/search/places/v1/find\\?query=1%2CA123BC&key=',
     },
     response: {
       status: 200,
@@ -23,7 +23,7 @@ const stubFindAddressesByFreeTextSearchNoMatch = (): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/search/places/v1/find\\?query=invalid&key=',
+      urlPattern: '/osPlaces/search/places/v1/find\\?query=invalid&key=',
     },
     response: {
       status: 200,
@@ -36,7 +36,7 @@ const stubFindAddressesByFreeTextSearchError = (): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/search/places/v1/find\\?query=error&key=',
+      urlPattern: '/osPlaces/search/places/v1/find\\?query=error&key=',
     },
     response: {
       status: 500,
