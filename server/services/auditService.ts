@@ -96,6 +96,7 @@ export enum ApiAction {
   LocationEvents = 'LOCATION_EVENTS',
   OffenderEvents = 'OFFENDER_EVENTS',
   PrisonerImage = 'PRISONER_IMAGE',
+  AddressLookup = 'ADDRESS_LOOKUP',
 }
 
 // eslint-disable-next-line no-shadow

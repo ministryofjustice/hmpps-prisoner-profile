@@ -40,6 +40,7 @@ import CsipApiRestClient from './csipApiClient'
 import PersonIntegrationApiRestClient from './personIntegrationApiClient'
 import ReferenceDataStore from './referenceDataStore/referenceDataStore'
 import HealthAndMedicationApiRestClient from './healthAndMedicationApiRestClient'
+import OsPlacesApiRestClient from './osPlacesApiRestClient'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -84,6 +85,7 @@ export const dataAccess = {
   csipApiClientBuilder: (token: string) => new CsipApiRestClient(token),
   healthAndMedicationApiClientBuilder: (token: string) => new HealthAndMedicationApiRestClient(token),
   telemetryClient,
+  osPlacesApiClient: new OsPlacesApiRestClient(),
 }
 
 export type DataAccess = typeof dataAccess
