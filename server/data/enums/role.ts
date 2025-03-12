@@ -10,6 +10,7 @@ export enum Role {
   CreateRecategorisation = 'ROLE_CREATE_RECATEGORISATION',
   DeleteSensitiveCaseNotes = 'ROLE_DELETE_SENSITIVE_CASE_NOTES',
   DietAndAllergiesEdit = 'ROLE_DIET_AND_FOOD_ALLERGIES_EDIT',
+  DpsApplicationDeveloper = 'ROLE_DPS_APPLICATION_DEVELOPER',
   EditEducationWorkPlan = 'ROLE_EDUCATION_WORK_PLAN_EDITOR',
   GlobalSearch = 'ROLE_GLOBAL_SEARCH',
   InactiveBookings = 'ROLE_INACTIVE_BOOKINGS',

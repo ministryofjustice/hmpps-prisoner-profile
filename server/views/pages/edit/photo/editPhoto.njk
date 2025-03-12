@@ -1,0 +1,66 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from '../../../components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/prisoner/" + prisonerNumber +"/image/new"
+  }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ miniBanner(miniBannerData, {nameLink: false, displayImage: false, classes: "govuk-!-margin-bottom-3", nameClasses: "govuk-!-font-size-24" }) }}
+    </div>
+  </div>
+  {% if errors.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{ govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: errors,
+              attributes: { 'data-qa-errors': true },
+              classes: 'govuk-!-margin-bottom-6'
+          }) }}
+      </div>
+    </div>
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form
+        method='post'
+        enctype='multipart/form-data'
+        action="/prisoner/{{ prisonerNumber }}/image/submit?_csrf={{ csrfToken }}">
+        <input type="file" id="js-cropped-image-input" name="file" hidden/>
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
+        <div class="hmpps-photo-container govuk-!-margin-bottom-4">
+          <div class="hmpps-photo-container__photo">
+            <img src='{{ imgSrc }}' class='' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id="uploaded-photo"/>
+            <p class="govuk-body">This page is a placeholder for now</p>
+          </div>
+        </div>
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Save and continue",
+            type: "submit",
+            preventDoubleClick: true,
+            attributes: { "data-qa": "submit-button" }
+            }) }}
+          <a href="/prisoner/{{ prisonerNumber }}/image" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+            Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+{% block pageScripts %}
+  <script src="/assets/js/profilePhotoCropper.js" nonce="{{ cspNonce }}"></script>
+{% endblock %}
