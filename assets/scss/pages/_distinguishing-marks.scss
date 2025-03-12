@@ -9,10 +9,32 @@
   margin-bottom: 30px;
 }
 
+#mark-preview-image-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  column-gap: 20px;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid $govuk-border-colour;
+  margin-bottom: 30px;
+
+  a {
+    color: $govuk-link-colour
+  }
+
+  > .image-preview {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    column-gap: 20px;
+    justify-content: start;
+  }
+}
+
 .mark-upload-control {
   display: none;
 }
-
 
 .upload-visible .mark-photo-container {
   display: none;

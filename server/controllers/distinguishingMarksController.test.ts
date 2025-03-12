@@ -605,8 +605,6 @@ describe('Distinguishing Marks Controller', () => {
       const photoHtml = `<img src="/api/distinguishing-mark-image/${leftLegMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${leftLegMarkMock.markType.description} on ${getBodyPartDescription(leftLegMarkMock)}" width="150px" />`
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
-        pageTitle: `Change ${markType} photo - Prisoner personal details`,
-        heading: `Change the photo of the ${markType}`,
         markId: '100',
         markType,
         photoHtml,
@@ -635,8 +633,6 @@ describe('Distinguishing Marks Controller', () => {
       const photoHtml = `<img src="/api/distinguishing-mark-image/${distinguishingMarkMock.photographUuids[0].id}?nocache=12345" alt="Image of ${distinguishingMarkMock.markType.description} on ${getBodyPartDescription(distinguishingMarkMock)}" width="150px" />`
 
       expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
-        pageTitle: `Change tattoo photo - Prisoner personal details`,
-        heading: `Change the photo of the tattoo`,
         markId: '100',
         markType: 'tattoo',
         photoHtml,
@@ -696,12 +692,9 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
 
-      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
-        pageTitle: `Add ${markType} photo - Prisoner personal details`,
-        heading: `Add the photo of the ${markType}`,
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType,
-        photoHtml: null,
         refererUrl: `/prisoner/A12345/personal/${markType}/100`,
         upload: false,
       })
@@ -721,12 +714,9 @@ describe('Distinguishing Marks Controller', () => {
 
       await controller.addNewPhoto(typeReq, { ...res, locals: {} } as Response)
 
-      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/changePhoto', {
-        pageTitle: `Add tattoo photo - Prisoner personal details`,
-        heading: `Add the photo of the tattoo`,
+      expect(res.render).toHaveBeenCalledWith('pages/distinguishingMarks/addPhoto', {
         markId: '100',
         markType: 'tattoo',
-        photoHtml: null,
         refererUrl: `/prisoner/A12345/personal/tattoo/100`,
         upload: false,
       })
@@ -747,23 +737,31 @@ describe('Distinguishing Marks Controller', () => {
   })
 
   describe('addPhoto', () => {
-    it('should add a new distinguishing mark photo', async () => {
-      const req = {
-        params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
-        body: {},
-        file: { originalname: 'file.jpg' },
-        middleware: { clientToken: 'token' },
-        query: {},
-      } as undefined as Request
+    it.each([
+      [undefined, '/prisoner/A12345/personal/tattoo/100'],
+      ['returnToMarkSummary', '/prisoner/A12345/personal/tattoo/100'],
+      ['addAnotherPhoto', '/prisoner/A12345/personal/tattoo/100/photo'],
+    ])(
+      'should add a new distinguishing mark photo and redirect correctly',
+      async (action: string | undefined, redirectUrl: string) => {
+        const req = {
+          params: { prisonerNumber: 'A12345', markType: 'tattoo', markId: '100' },
+          body: { action },
+          file: { originalname: 'file.jpg' },
+          middleware: { clientToken: 'token' },
+          query: {},
+        } as undefined as Request
 
-      jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
+        jest.spyOn(distinguishingMarksService, 'addDistinguishingMarkPhoto').mockResolvedValue(distinguishingMarkMock)
 
-      await controller.addPhoto(req, res as Response)
+        await controller.addPhoto(req, res as Response)
 
-      expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith('token', 'A12345', '100', {
-        originalname: 'file.jpg',
-      })
-    })
+        expect(distinguishingMarksService.addDistinguishingMarkPhoto).toHaveBeenCalledWith('token', 'A12345', '100', {
+          originalname: 'file.jpg',
+        })
+        expect(res.redirect).toHaveBeenCalledWith(redirectUrl)
+      },
+    )
   })
 
   describe('viewAllImages', () => {
