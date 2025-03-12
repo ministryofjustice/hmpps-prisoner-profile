@@ -29,7 +29,6 @@ describe('Distinguishing Marks Validators', () => {
       ({ specificBodyPart, description }) => {
         const req = {
           body: { [`description-${specificBodyPart}`]: description, specificBodyPart },
-          files: {},
         }
         const errors = newDetailedDistinguishingMarkValidator(req)
         expect(errors.length).toEqual(0)
@@ -39,7 +38,6 @@ describe('Distinguishing Marks Validators', () => {
     it('Invalid body part', () => {
       const req = {
         body: { 'description-invalid-part': 'Valid description', specificBodyPart: 'invalid-part' },
-        files: {},
       }
       const errors = newDetailedDistinguishingMarkValidator(req)
       expect(errors.length).toEqual(1)
@@ -50,7 +48,6 @@ describe('Distinguishing Marks Validators', () => {
     it('Description too long', () => {
       const req = {
         body: { 'description-face': 'a'.repeat(241), specificBodyPart: 'face' },
-        files: {},
       }
       const errors = newDetailedDistinguishingMarkValidator(req)
       expect(errors.length).toEqual(1)
@@ -61,23 +58,23 @@ describe('Distinguishing Marks Validators', () => {
     it('File size too large', () => {
       const req = {
         body: { specificBodyPart: 'face' },
-        files: { 'file-face': [{ size: 201 * 1024 * 1024 } as MulterFile] },
+        file: { size: 201 * 1024 * 1024 } as MulterFile,
       }
       const errors = newDetailedDistinguishingMarkValidator(req)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual('The photo file size must be less than 200MB')
-      expect(errors[0].href).toEqual('#file-face')
+      expect(errors[0].href).toEqual('#file')
     })
 
     it('Invalid MIME type', () => {
       const req = {
         body: { specificBodyPart: 'face' },
-        files: { 'file-face': [{ size: 100, mimetype: 'image/png' } as MulterFile] },
+        file: { size: 100, mimetype: 'image/png' } as MulterFile,
       }
       const errors = newDetailedDistinguishingMarkValidator(req)
       expect(errors.length).toEqual(1)
       expect(errors[0].text).toEqual('The photo must be a JPG or GIF')
-      expect(errors[0].href).toEqual('#file-face')
+      expect(errors[0].href).toEqual('#file')
     })
   })
 
