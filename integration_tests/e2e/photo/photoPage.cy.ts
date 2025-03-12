@@ -1,7 +1,7 @@
-import PrisonerPhotoPage from '../pages/photoPage'
-import { permissionsTests } from './permissionsTests'
-import Page from '../pages/page'
-import NotFoundPage from '../pages/notFoundPage'
+import PrisonerPhotoPage from '../../pages/photoPages/photoPage'
+import { permissionsTests } from '../permissionsTests'
+import Page from '../../pages/page'
+import NotFoundPage from '../../pages/notFoundPage'
 
 context('Photo Page', () => {
   const prisonerNumber = 'G6123VU'
