@@ -1,9 +1,9 @@
-import Page from '../../../pages/page'
+import Page from '../../../../pages/page'
 import {
   MilitaryRecordsMock,
   MilitaryWarZoneRefDataMock,
-} from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
-import ConflictsPage from '../../../pages/conflictsPage'
+} from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import ConflictsPage from '../../../../pages/conflictsPage'
 
 const visitConflictsPage = (): ConflictsPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/personal/conflicts/1' })
