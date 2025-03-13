@@ -6,8 +6,8 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 
-{% set pageTitle = "Change " + markType + " photo - Prisoner personal details" %}
-{% set heading = "Change the photo of the " + markType %}
+{% set pageTitle = "Add " + markType + " photo - Prisoner personal details" %}
+{% set heading = "Add the photo of the " + markType %}
 
 {% block body %}
 <div class="govuk-grid-row">
@@ -32,22 +32,25 @@
 {% endif %}
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds {{ "upload-visible" if upload or errors.length > 0 or not photoHtml }}">
-        <form id="mark-detail-form" method="post" enctype="multipart/form-data" autocomplete="off">
+    <div class="govuk-grid-column-two-thirds">
+        <form id="add-photo-form" method="post" enctype="multipart/form-data" autocomplete="off">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
             <span class="govuk-caption-l">Distinguishing marks</span>
             <h1 class="govuk-heading-l">
                 {{ heading }}
             </h1>
 
-            <div class="mark-photo-container">
-                {{ photoHtml | safe }}
+            <div id="mark-preview-image-container">
+                <div class="image-preview">
+                    <img id="mark-image-preview" width="150px"/>
+                    <p id="mark-image-filename"></p>
+                </div>
                 <div>
-                    <a href="?upload" class="govuk-link govuk-link--no-visited-state" data-qa="change-photo-link">Change</a>
+                    <a id="change-photo-link" class="govuk-link govuk-link--no-visited-state" data-qa="change-photo-link">Change</a>
                 </div>
             </div>
 
-            <div class="mark-upload-control">
+            <div id="mark-add-photo-upload-control">
                 {{ govukFileUpload({
                     id: "file",
                     name: "file",
@@ -59,11 +62,25 @@
             </div>
 
             <div class="govuk-button-group">
-                {{ govukButton({ text: "Save", type: "submit" }) }}
+                {{ govukButton({
+                    text: "Save and return",
+                    type: "submit",
+                    attributes: { name: "action", value: "returnToMarkSummary" }
+                }) }}
+                {{ govukButton({
+                    text: "Save and add another photo",
+                    type: "submit",
+                    classes: "govuk-button--secondary",
+                    attributes: { name: "action", value: "addAnotherPhoto" }
+                }) }}
                 <a href="{{ refererUrl }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
             </div>
         </form>
     </div>
 </div>
 
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/distinguishingMarkAddImage.js"></script>
 {% endblock %}

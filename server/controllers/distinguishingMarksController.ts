@@ -298,8 +298,6 @@ export default class DistinguishingMarksController {
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
     return res.render('pages/distinguishingMarks/changePhoto', {
-      pageTitle: `Change ${markType} photo - Prisoner personal details`,
-      heading: `Change the photo of the ${markType}`,
       markId,
       markType,
       photoHtml,
@@ -317,12 +315,9 @@ export default class DistinguishingMarksController {
 
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
-    return res.render('pages/distinguishingMarks/changePhoto', {
-      pageTitle: `Add ${markType} photo - Prisoner personal details`,
-      heading: `Add the photo of the ${markType}`,
+    return res.render('pages/distinguishingMarks/addPhoto', {
       markId,
       markType,
-      photoHtml: null,
       refererUrl,
       upload,
     })
@@ -343,6 +338,7 @@ export default class DistinguishingMarksController {
 
   public async addPhoto(req: Request, res: Response) {
     const { markId, markType, prisonerNumber } = req.params
+    const { action } = req.body
     const { clientToken } = req.middleware
     const file = req.file as MulterFile
 
@@ -350,8 +346,9 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
     await this.distinguishingMarksService.addDistinguishingMarkPhoto(clientToken, prisonerNumber, markId, file)
-
-    return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
+    return action === 'addAnotherPhoto'
+      ? res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}/photo`)
+      : res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
   }
 
   public async viewAllImages(req: Request, res: Response) {
