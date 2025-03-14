@@ -348,7 +348,7 @@ export default {
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
     dietAndAllergyEnabled: toBoolean(get('DIET_AND_ALLERGY_ENABLED', 'false')),
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
-    militaryHistoryEnabled: toBoolean(get('MILITARY_HISTORY_ENABLED', 'false')),
+    militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
   },
 }
