@@ -7,7 +7,7 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 export default class AliasController {
   constructor(private readonly auditService: AuditService) {}
 
-  public displayChangeNameDecision(): RequestHandler {
+  public displayChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
       const errors = req.flash('errors')
@@ -18,11 +18,11 @@ export default class AliasController {
           prisonerNumber,
           prisonId,
           correlationId: req.id,
-          page: Page.EditNameDecision,
+          page: Page.EditNamePurpose,
         })
         .catch(error => logger.error(error))
 
-      return res.render('pages/edit/alias/changeNameDecision', {
+      return res.render('pages/edit/alias/changeNamePurpose', {
         pageTitle: `Why are you changing this person's name? - Prisoner personal details`,
         formTitle: `Why are you changing ${apostrophe(titlePrisonerName)} name?`,
         errors,
@@ -34,12 +34,12 @@ export default class AliasController {
     }
   }
 
-  public submitChangeNameDecision(): RequestHandler {
+  public submitChangeNamePurpose(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { titlePrisonerName, prisonerNumber } = this.getCommonRequestData(req)
-      const { decision } = req.body
+      const { purpose } = req.body
 
-      if (!decision) {
+      if (!purpose) {
         req.flash('errors', [{ text: `Select why you're changing ${apostrophe(titlePrisonerName)} name` }])
         return res.redirect(`/prisoner/${prisonerNumber}/personal/change-name`)
       }
@@ -49,12 +49,12 @@ export default class AliasController {
           user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
-          action: PostAction.EditNameDecision,
-          details: { decision },
+          action: PostAction.EditNamePurpose,
+          details: { purpose },
         })
         .catch(error => logger.error(error))
 
-      const redirect = decision === 'name-wrong' ? 'enter-corrected-name' : 'enter-new-name'
+      const redirect = purpose === 'name-wrong' ? 'enter-corrected-name' : 'enter-new-name'
       return res.redirect(`/prisoner/${prisonerNumber}/personal/${redirect}`)
     }
   }
