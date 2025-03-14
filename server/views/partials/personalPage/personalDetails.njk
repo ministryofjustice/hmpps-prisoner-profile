@@ -24,7 +24,12 @@
       <div class="govuk-!-margin-bottom-2">
         {% for requirement in personalDetails.medicalDietaryRequirements %}
           <span class="govuk-!-display-block">
-            {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+            {{ requirement.description }}
+              {% if 'OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id %}
+                  {% if requirement.comment.length > 0 %}
+                    : {{ requirement.comment }}
+                  {% endif %}
+              {% endif %}
           </span>
         {% endfor %}
       </div>
@@ -50,6 +55,13 @@
           </span>
         {% endfor %}
       </div>
+    {% endif %}
+
+    {% if personalDetails.cateringInstructions.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+        <div class="govuk-!-margin-bottom-2">
+            <span class="govuk-!-display-block">{{ personalDetails.cateringInstructions }}</span>
+        </div>
     {% endif %}
   {% else %}
     <span class="govuk-!-margin-top-1">Not entered</span>

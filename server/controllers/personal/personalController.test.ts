@@ -2123,11 +2123,6 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
           },
           errors: [],
-          errorsForForms: {
-            allergy: null,
-            medical: null,
-            personalised: null,
-          },
           ...editOptions({ selections: [] }),
         })
       })
@@ -2154,11 +2149,6 @@ describe('PersonalController', () => {
             prisonerNumber: 'ABC123',
           },
           errors: [],
-          errorsForForms: {
-            allergy: null,
-            medical: null,
-            personalised: null,
-          },
           ...editOptions({
             selections: [
               { value: medicalDietCodesMock[0].id },
@@ -2166,6 +2156,7 @@ describe('PersonalController', () => {
               { value: personalisedDietCodesMock[0].id },
             ],
           }),
+          cateringInstructions: 'Some catering instructions.',
         })
       })
 
@@ -2198,6 +2189,7 @@ describe('PersonalController', () => {
                         comment: 'ghi',
                       },
                     ],
+                    cateringInstructions: 'jkl',
                   }),
                 ]
               : []
@@ -2218,6 +2210,7 @@ describe('PersonalController', () => {
                 { value: 'PERSONALISED_DIET_OTHER', comment: 'ghi' },
               ],
             }),
+            cateringInstructions: 'jkl',
           }),
         )
       })
@@ -2265,6 +2258,7 @@ describe('PersonalController', () => {
                 comment: 'ghi',
               },
             ],
+            cateringInstructions: 'jkl',
           },
           flash: jest.fn(),
         } as any
@@ -2304,6 +2298,7 @@ describe('PersonalController', () => {
                 comment: 'ghi',
               },
             ],
+            cateringInstructions: 'jkl',
           },
         )
       })
@@ -2331,6 +2326,7 @@ describe('PersonalController', () => {
               medicalDietaryRequirements: [{ value: medicalDietCodesMock[0].id }],
               foodAllergies: [{ value: foodAllergyCodesMock[0].id }],
               personalisedDietaryRequirements: [{ value: personalisedDietCodesMock[0].id }],
+              cateringInstructions: 'Some catering instructions.',
             },
             updated: {
               medicalDietaryRequirements: [
@@ -2345,6 +2341,7 @@ describe('PersonalController', () => {
                   comment: 'ghi',
                 },
               ],
+              cateringInstructions: 'jkl',
             },
           },
         }

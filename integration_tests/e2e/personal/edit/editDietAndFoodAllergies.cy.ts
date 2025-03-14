@@ -41,6 +41,9 @@ context('Edit medical diet', () => {
           '"allergy[0][value]"': ['FOOD_ALLERGY_EGG'],
           '"personalised[0][value]"': ['PERSONALISED_DIET_VEGAN'],
         },
+        textAreaInputs: {
+          cateringInstructions: 'Do not feed after midnight.',
+        },
       },
     ],
     redirectAnchor: 'personal-details',

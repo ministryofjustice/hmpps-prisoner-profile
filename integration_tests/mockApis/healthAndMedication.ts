@@ -37,6 +37,11 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
   },
+  cateringInstructions: {
+    value: 'Arrange the food like a smiley face.',
+    lastModifiedAt: '2024-07-01T01:02:03+0100',
+    lastModifiedBy: 'USER1',
+  },
 })
 
 const mockHealthAndMedication = (): HealthAndMedication => ({

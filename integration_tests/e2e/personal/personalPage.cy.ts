@@ -168,6 +168,7 @@ context('When signed in', () => {
           .should('include.text', 'Egg')
           .and('include.text', 'Nutrient deficiency')
           .and('include.text', 'Vegan')
+          .and('include.text', 'Arrange the food like a smiley face.')
         page.personalDetails().smokeOrVaper().should('have.text', 'No')
         page.personalDetails().domesticAbusePerpetrator().should('have.text', 'Not stated')
         page.personalDetails().domesticAbuseVictim().should('have.text', 'Not stated')

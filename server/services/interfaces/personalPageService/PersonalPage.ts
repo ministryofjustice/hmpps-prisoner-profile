@@ -62,6 +62,7 @@ export interface PersonalDetails {
   foodAllergies: { id: string; description: string }[]
   medicalDietaryRequirements: { id: string; description: string; comment?: string }[]
   personalisedDietaryRequirements: { id: string; description: string; comment?: string }[]
+  cateringInstructions: string
 }
 
 export interface IdentityNumber {

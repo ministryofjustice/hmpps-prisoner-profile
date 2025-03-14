@@ -329,11 +329,16 @@ export default class PersonalPageService {
       foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
       medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
       personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
+      cateringInstructions: healthAndMedication?.dietAndAllergy?.cateringInstructions?.value ?? '',
     }
   }
 
-  private mapDietAndAllergy = (healthAndMedication: HealthAndMedication, field: keyof DietAndAllergy) => {
+  private mapDietAndAllergy = (
+    healthAndMedication: HealthAndMedication,
+    field: keyof Omit<DietAndAllergy, 'cateringInstructions'>,
+  ) => {
     const dietAndAllergy = healthAndMedication?.dietAndAllergy
+
     return (
       (dietAndAllergy &&
         dietAndAllergy[field]?.value

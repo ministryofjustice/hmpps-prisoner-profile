@@ -47,6 +47,7 @@ export interface DietAndAllergy {
   foodAllergies: ValueWithMetadata<ReferenceDataSelection[]>
   medicalDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
   personalisedDietaryRequirements: ValueWithMetadata<ReferenceDataSelection[]>
+  cateringInstructions?: ValueWithMetadata<string>
 }
 
 export interface HealthAndMedication {
@@ -57,6 +58,7 @@ export interface DietAndAllergyUpdate {
   foodAllergies?: ReferenceDataIdSelection[]
   medicalDietaryRequirements?: ReferenceDataIdSelection[]
   personalisedDietaryRequirements?: ReferenceDataIdSelection[]
+  cateringInstructions?: string
 }
 
 export interface SmokerStatusUpdate {
