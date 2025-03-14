@@ -1,18 +1,18 @@
-import ChangeNameDecisionPage from '../../../../pages/editPages/alias/changeNameDecisionPage'
+import ChangeNamePurposePage from '../../../../pages/editPages/alias/changeNamePurposePage'
 import Page from '../../../../pages/page'
 import { Role } from '../../../../../server/data/enums/role'
 import NotFoundPage from '../../../../pages/notFoundPage'
 
-const visitChangeNameDecisionPage = (): ChangeNameDecisionPage => {
+const visitChangeNamePurposePage = (): ChangeNamePurposePage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/personal/change-name' })
-  return Page.verifyOnPageWithTitle(ChangeNameDecisionPage, `Why are you changing John Saunders’ name?`)
+  return Page.verifyOnPageWithTitle(ChangeNamePurposePage, `Why are you changing John Saunders’ name?`)
 }
 
-context('Change Name Decision Page', () => {
+context('Change Name Purpose Page', () => {
   const prisonerNumber = 'G6123VU'
   const bookingId = 1102484
 
-  let page: ChangeNameDecisionPage
+  let page: ChangeNamePurposePage
 
   beforeEach(() => {
     cy.task('reset')
@@ -33,7 +33,7 @@ context('Change Name Decision Page', () => {
 
   context("Can select a reason for changing the prisoner's name", () => {
     beforeEach(() => {
-      page = visitChangeNameDecisionPage()
+      page = visitChangeNamePurposePage()
     })
 
     it('should display the mini banner with prisoner details', () => {
@@ -42,7 +42,7 @@ context('Change Name Decision Page', () => {
     })
 
     it('should redirect to new name page', () => {
-      cy.get(`input[name=decision][value=name-changed]`).click()
+      cy.get(`input[name=purpose][value=name-changed]`).click()
       page.continueButton().click()
 
       // TODO: CDPS-1035
@@ -50,7 +50,7 @@ context('Change Name Decision Page', () => {
     })
 
     it('should redirect to correct name page', () => {
-      cy.get(`input[name=decision][value=name-wrong]`).click()
+      cy.get(`input[name=purpose][value=name-wrong]`).click()
       page.continueButton().click()
 
       // TODO: CDPS-1028
