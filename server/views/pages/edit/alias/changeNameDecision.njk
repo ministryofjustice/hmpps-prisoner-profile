@@ -1,0 +1,86 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% set hideBackLink = true %}
+{% set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: miniBannerData.prisonerName,
+        href: "/prisoner/" + miniBannerData.prisonerNumber
+    },
+    {
+        text: 'Personal',
+        href: "/prisoner/" + miniBannerData.prisonerNumber + "/personal"
+    }
+] %}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+    {% block body %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
+
+        {% if errors.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            }) }}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                <form method="post" novalidate="novalidate" autocomplete="off">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                    <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
+                        {{ govukRadios({
+                            name: "decision",
+                            errorMessage: errors | findError("decision"),
+                            fieldset: {
+                                id: "decisionFieldset",
+                                legend: {
+                                    text: formTitle,
+                                    isPageHeading: true,
+                                    classes: "govuk-fieldset__legend--l"
+                                }
+                            },
+                            items: [
+                                {
+                                    value: "name-wrong",
+                                    text: "Their current name is wrong",
+                                    hint: { text: "For example, if it contains a typo or is missing a middle name." }
+                                },
+                                {
+                                    value: "name-changed",
+                                    text: "Their name has legally changed",
+                                    hint: { text: "For example, if they have taken their spouse's or civil partner's last name." }
+                                }
+                            ],
+                            errorMessage: { text: errors[0].text } if errors.length > 0
+                        }) }}
+                    </div>
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Continue",
+                            type: "submit",
+                            preventDoubleClick: true,
+                            attributes: { "data-qa": "edit-submit-button" }
+                        }) }}
+                        <a href="/prisoner/{{ prisonerNumber }}/personal#personal-details"
+                           class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}

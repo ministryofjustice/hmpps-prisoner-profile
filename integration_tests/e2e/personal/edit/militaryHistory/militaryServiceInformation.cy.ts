@@ -2,9 +2,9 @@ import {
   MilitaryBranchRefDataMock,
   MilitaryRankRefDataMock,
   MilitaryRecordsMock,
-} from '../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
-import Page from '../../../pages/page'
-import MilitaryServiceInformationPage from '../../../pages/militaryServiceInformationPage'
+} from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import Page from '../../../../pages/page'
+import MilitaryServiceInformationPage from '../../../../pages/militaryServiceInformationPage'
 
 const visitCreateMilitaryServiceInformationPage = (): MilitaryServiceInformationPage => {
   cy.signIn({ redirectPath: '/prisoner/G6123VU/personal/military-service-information' })
