@@ -15,14 +15,15 @@
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro dietAndFoodAllergiesHtml(personalDetails) %}
   {%
-    if personalDetails.medicalDietaryRequirements.length > 0
-    or personalDetails.foodAllergies.length > 0
-    or personalDetails.personalisedDietaryRequirements.length > 0
+    if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0
+    or personalDetails.dietAndAllergy.foodAllergies.length > 0
+    or personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0
+    or personalDetails.dietAndAllergy.cateringInstructions.length > 0
   %}
-    {% if personalDetails.medicalDietaryRequirements.length > 0 %}
+    {% if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0 %}
       <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
       <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.medicalDietaryRequirements %}
+        {% for requirement in personalDetails.dietAndAllergy.medicalDietaryRequirements %}
           <span class="govuk-!-display-block">
               {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
                   {{ requirement.description }}: {{ requirement.comment }}
@@ -34,10 +35,10 @@
       </div>
     {% endif %}
 
-    {% if personalDetails.foodAllergies.length > 0 %}
+    {% if personalDetails.dietAndAllergy.foodAllergies.length > 0 %}
       <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
       <div class="govuk-!-margin-bottom-2">
-        {% for allergy in personalDetails.foodAllergies %}
+        {% for allergy in personalDetails.dietAndAllergy.foodAllergies %}
           <span class="govuk-!-display-block">
             {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
           </span>
@@ -45,10 +46,10 @@
       </div>
     {% endif %}
 
-    {% if personalDetails.personalisedDietaryRequirements.length > 0 %}
+    {% if personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0 %}
       <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
       <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.personalisedDietaryRequirements %}
+        {% for requirement in personalDetails.dietAndAllergy.personalisedDietaryRequirements %}
           <span class="govuk-!-display-block">
             {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
           </span>
@@ -56,12 +57,14 @@
       </div>
     {% endif %}
 
-    {% if personalDetails.cateringInstructions.length > 0 %}
+    {% if personalDetails.dietAndAllergy.cateringInstructions.length > 0 %}
         <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
         <div class="govuk-!-margin-bottom-2">
-            <span class="govuk-!-display-block">{{ personalDetails.cateringInstructions }}</span>
+            <span class="govuk-!-display-block">{{ personalDetails.dietAndAllergy.cateringInstructions }}</span>
         </div>
     {% endif %}
+
+    <span class="govuk-hint last-updated-summary">Updated on {{ personalDetails.dietAndAllergy.lastModifiedAt }} at {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0%}HMP {{ personalDetails.dietAndAllergy.lastModifiedPrison | title }}{% else %}Unknown{% endif %}</span>
   {% else %}
     <span class="govuk-!-margin-top-1">Not entered</span>
   {% endif %}

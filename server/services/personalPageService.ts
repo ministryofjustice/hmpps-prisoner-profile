@@ -16,6 +16,7 @@ import {
   formatName,
   formatWeight,
   neurodiversityEnabled,
+  sortByDateTime,
 } from '../utils/utils'
 import { getProfileInformationValue, ProfileInformationType } from '../data/interfaces/prisonApi/ProfileInformation'
 import OffenderIdentifier, {
@@ -49,6 +50,8 @@ import {
   DietAndAllergyUpdate,
   HealthAndMedication,
   HealthAndMedicationApiClient,
+  ReferenceDataCode,
+  ValueWithMetadata,
 } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import { militaryHistoryEnabled } from '../utils/featureToggles'
 import { ReferenceDataDomain } from '../data/interfaces/referenceData'
@@ -190,7 +193,8 @@ export default class PersonalPageService {
         .description
 
     return {
-      personalDetails: this.personalDetails(
+      personalDetails: await this.personalDetails(
+        prisonApiClient,
         prisonerData,
         inmateDetail,
         prisonerDetail,
@@ -249,14 +253,15 @@ export default class PersonalPageService {
     return addressSummary
   }
 
-  private personalDetails(
+  private async personalDetails(
+    prisonApiClient: PrisonApiClient,
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
-  ): PersonalDetails {
+  ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
 
     const aliases = prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
@@ -280,6 +285,12 @@ export default class PersonalPageService {
       if (count === '0') return 'None'
       return count
     }
+
+    const foodAllergyAndDietLatestUpdate = this.latestModificationDetails(healthAndMedication)
+    const lastUpdatedAgency = foodAllergyAndDietLatestUpdate.lastModifiedPrisonId
+      ? await prisonApiClient.getAgencyDetails(foodAllergyAndDietLatestUpdate.lastModifiedPrisonId)
+      : null
+    const lastModifiedPrison = lastUpdatedAgency?.description?.replace(/\s?\(.*\)/g, '')
 
     return {
       age: calculateAge(prisonerData.dateOfBirth),
@@ -326,10 +337,14 @@ export default class PersonalPageService {
       socialCareNeeded: getProfileInformationValue(ProfileInformationType.SocialCareNeeded, profileInformation),
       typeOfDiet: getProfileInformationValue(ProfileInformationType.TypesOfDiet, profileInformation) || 'Not entered',
       youthOffender: prisonerData.youthOffender ? 'Yes' : 'No',
-      foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
-      medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
-      personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
-      cateringInstructions: healthAndMedication?.dietAndAllergy?.cateringInstructions?.value ?? '',
+      dietAndAllergy: {
+        foodAllergies: this.mapDietAndAllergy(healthAndMedication, 'foodAllergies'),
+        medicalDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'medicalDietaryRequirements'),
+        personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
+        cateringInstructions: healthAndMedication?.dietAndAllergy?.cateringInstructions?.value ?? '',
+        lastModifiedAt: formatDate(foodAllergyAndDietLatestUpdate.lastModifiedAt),
+        lastModifiedPrison: lastModifiedPrison ?? '',
+      },
     }
   }
 
@@ -350,6 +365,20 @@ export default class PersonalPageService {
           })) ??
       []
     )
+  }
+
+  private latestModificationDetails = (healthAndMedication: HealthAndMedication) => {
+    const dietAndAllergy = healthAndMedication?.dietAndAllergy
+
+    const metadata = (dietAndAllergy ? Object.values(dietAndAllergy) : null) as ValueWithMetadata<
+      string | ReferenceDataCode[]
+    >[]
+    const mostRecentUpdate = metadata?.sort((a, b) => sortByDateTime(b.lastModifiedAt, a.lastModifiedAt))[0] ?? null
+
+    return {
+      lastModifiedAt: mostRecentUpdate?.lastModifiedAt,
+      lastModifiedPrisonId: mostRecentUpdate?.lastModifiedPrisonId,
+    }
   }
 
   private identityNumbers(prisonerData: Prisoner, identifiers: OffenderIdentifier[]): IdentityNumbers {

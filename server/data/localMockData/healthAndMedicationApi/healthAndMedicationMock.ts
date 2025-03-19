@@ -9,6 +9,7 @@ export const dietAndAllergyMock: DietAndAllergy = {
     value: [{ value: foodAllergyCodesMock[0] }],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
   medicalDietaryRequirements: {
     value: [
@@ -18,6 +19,7 @@ export const dietAndAllergyMock: DietAndAllergy = {
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
   personalisedDietaryRequirements: {
     value: [
@@ -27,11 +29,13 @@ export const dietAndAllergyMock: DietAndAllergy = {
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
   cateringInstructions: {
     value: 'Some catering instructions.',
-    lastModifiedAt: '2024-07-01T01:02:03+0100',
+    lastModifiedAt: '2024-07-02T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
 }
 

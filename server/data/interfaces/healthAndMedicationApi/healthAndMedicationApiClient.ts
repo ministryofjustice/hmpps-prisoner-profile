@@ -10,6 +10,7 @@ export interface ValueWithMetadata<T> {
   value?: T
   lastModifiedAt: string
   lastModifiedBy: string
+  lastModifiedPrisonId: string
 }
 
 export interface ReferenceDataCode {
