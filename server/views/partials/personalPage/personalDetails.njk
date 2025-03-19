@@ -64,7 +64,7 @@
         </div>
     {% endif %}
 
-    <span class="govuk-hint last-updated-summary">Updated on {{ personalDetails.dietAndAllergy.lastModifiedAt }} at {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0%}HMP {{ personalDetails.dietAndAllergy.lastModifiedPrison | title }}{% else %}Unknown{% endif %}</span>
+    <span class="govuk-hint last-updated-summary">Updated on {{ personalDetails.dietAndAllergy.lastModifiedAt }} at {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0%}{{ personalDetails.dietAndAllergy.lastModifiedPrison }}{% else %}Unknown{% endif %}</span>
   {% else %}
     <span class="govuk-!-margin-top-1">Not entered</span>
   {% endif %}

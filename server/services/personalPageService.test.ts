@@ -260,7 +260,7 @@ describe('PersonalPageService', () => {
         )
 
         it.each([
-          [true, 'Moorland'],
+          [true, 'Moorland (HMP & YOI)'],
           [false, ''],
         ])(
           'Maps the lastModifiedPrison field (Prison person enabled: %s)',

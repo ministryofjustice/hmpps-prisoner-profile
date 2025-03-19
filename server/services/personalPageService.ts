@@ -290,7 +290,6 @@ export default class PersonalPageService {
     const lastUpdatedAgency = foodAllergyAndDietLatestUpdate.lastModifiedPrisonId
       ? await prisonApiClient.getAgencyDetails(foodAllergyAndDietLatestUpdate.lastModifiedPrisonId)
       : null
-    const lastModifiedPrison = lastUpdatedAgency?.description?.replace(/\s?\(.*\)/g, '')
 
     return {
       age: calculateAge(prisonerData.dateOfBirth),
@@ -343,7 +342,7 @@ export default class PersonalPageService {
         personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
         cateringInstructions: healthAndMedication?.dietAndAllergy?.cateringInstructions?.value ?? '',
         lastModifiedAt: formatDate(foodAllergyAndDietLatestUpdate.lastModifiedAt),
-        lastModifiedPrison: lastModifiedPrison ?? '',
+        lastModifiedPrison: lastUpdatedAgency?.description ?? '',
       },
     }
   }
