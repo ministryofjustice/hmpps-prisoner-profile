@@ -64,6 +64,26 @@
     {% endif %}
 {% endmacro %}
 
+{% macro otherLanguagesText(language) %}
+    {% if language.canSpeak and language.canWrite and language.canRead %}
+        Speaks, reads and writes
+        {% elif language.canSpeak and language.canWrite %}
+        Speaks and writes
+        {% elif language.canSpeak and language.canRead %}
+        Speaks and reads
+        {% elif language.canWrite and language.canRead %}
+        Reads and writes
+        {% elif language.canWrite %}
+        Writes only
+        {% elif language.canRead %}
+        Reads only
+        {% elif language.canSpeak %}
+        Speaks only
+    {% else %}
+        Not entered
+    {% endif %}
+{% endmacro %}
+
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
@@ -103,8 +123,94 @@
                 { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
                 { key: "Sexual orientation", value: personalDetails.sexualOrientation, options: { dataQa: "sexual-orientation", visible: inUsersCaseLoad } },
                 { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
-                { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
-                { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
+                { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } }
+            ])
+        })
+      }}
+        {% if inUsersCaseLoad %}
+        <dl id="languages"
+            class="govuk-summary-list govuk-summary-list--bottom-border govuk-!-margin-bottom-0 {{ 'row-updated' if flashMessage.fieldName === 'languages' }}"
+            data-qa="languages">
+            <div class="govuk-summary-list__row govuk-!-border-none">
+                <dt class="govuk-summary-list__key govuk-!-padding-top-2">Languages</dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-0">
+                    <span class="govuk-!-font-weight-bold govuk-!-display-block">Main language</span>
+                    {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
+                        <div data-qa="no-language-entered">Not entered</div>
+                    {% else %}
+                        <div data-qa="spoken-language">
+                        {% if personalDetails.languages.spoken %}
+                            {{ personalDetails.languages.spoken }}
+                            {{ "(interpreter required)" if personalDetails.languages.interpreterRequired }}
+                        {% endif %}
+                      </div>
+                      <div data-qa="written-language">
+                        {% if personalDetails.languages.written and personalDetails.languages.written != personalDetails.languages.spoken %}
+                            {{ personalDetails.languages.written }}
+                            (written)
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list">
+                    {% if editEnabled %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/main-language">
+                        Change<span class="govuk-visually-hidden"> main language</span>
+                    </a>
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row {{ 'govuk-!-border-none' if personalDetails.otherLanguages.length > 0 }}">
+                <dt class="govuk-summary-list__key govuk-!-padding-top-2"></dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-0">
+                    <span class="govuk-!-font-weight-bold govuk-!-display-block">Other languages</span>
+                    {% if personalDetails.otherLanguages.length == 0 %}
+                        <span class="govuk-!-display-block govuk-!-margin-bottom-2" data-qa="no-other-languages-entered">Not entered</span>
+                    {% endif %}
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 govuk-!-padding-bottom-0 hmpps-width-4 govuk-summary-list--sub-list">
+                    {% if editEnabled %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/other-language">
+                        Add<span class="govuk-visually-hidden"> other language</span>
+                    </a>
+                    {% endif %}
+                </dd>
+            </div>
+            {% for language in personalDetails.otherLanguages %}
+            <div class="govuk-summary-list__row {{ 'govuk-!-border-none' if not loop.last }}">
+                <dt class="govuk-summary-list__key govuk-!-padding-top-0"></dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-0 govuk-!-padding-top-0 {{ 'hmpps-border-bottom' if not loop.last }}">
+                    <div>
+                        <dl class="govuk-summary-list--sub-list govuk-summary-list">
+                        {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-"+language.code) }}
+                        </dl>
+                    </div>
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list {{ 'hmpps-border-bottom' if not loop.last }}">
+                    {% if editEnabled %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/other-language/{{ language.code }}">
+                        Change<span class="govuk-visually-hidden"> {{ language.description }} as other language</span>
+                    </a>
+                    {% endif %}
+                </dd>
+            </div>
+            {% endfor %}
+        </dl>
+        {% else %}
+        <div class="govuk-summary-list__row  govuk-summary-list__row--hidden ">
+            <dt class="govuk-summary-list__key">
+                <span data-qa="hidden-languages-key">Languages</span>
+            </dt>
+            <dd class="govuk-summary-list__value"></dd>
+        </div>
+        {% endif %}
+      {{
+        govukSummaryList({
+            classes: listClasses,
+            rows: toSummaryListRows([
                 { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not dietAndAllergiesEnabled } },
                 { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: dietAndAllergiesEnabled, changeLinkEnabled: editDietAndAllergiesEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
                 { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },
