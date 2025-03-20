@@ -187,7 +187,7 @@ context('When signed in', () => {
           .languages()
           .otherLanguages('BSL')
           .proficiency()
-          .should('include.text', 'reads and speaks only')
+          .should('include.text', 'Speaks and reads')
         page
           .personalDetails()
           .languages()
@@ -199,10 +199,10 @@ context('When signed in', () => {
           .languages()
           .otherLanguages('GLA')
           .proficiency()
-          .should('include.text', 'writes and speaks only')
+          .should('include.text', 'Speaks and writes')
         page.personalDetails().languages().otherLanguages('MAN').language().should('include.text', 'Mandarin')
         page.personalDetails().languages().otherLanguages('URD').language().should('include.text', 'Urdu')
-        page.personalDetails().languages().otherLanguages('URD').proficiency().should('include.text', 'reads only')
+        page.personalDetails().languages().otherLanguages('URD').proficiency().should('include.text', 'Reads only')
       })
 
       it('Displays all the information from the API: Military Records', () => {

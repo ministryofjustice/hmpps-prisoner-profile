@@ -24,12 +24,8 @@ export default class PersonalPage extends Page {
         spoken: (): PageElement => cardData('languages').find('[data-qa=spoken-language]'),
         written: (): PageElement => cardData('languages').find('[data-qa=written-language]'),
         otherLanguages: (language: string) => ({
-          language: (): PageElement =>
-            cardData('languages')
-              .find('[data-qa=other-languages-list]')
-              .find(`[data-qa=other-language-${language}-key]`),
-          proficiency: (): PageElement =>
-            cardData('languages').find('[data-qa=other-languages-list]').find(`[data-qa=other-language-${language}]`),
+          language: (): PageElement => cardData('languages').find(`[data-qa=other-language-${language}-key]`),
+          proficiency: (): PageElement => cardData('languages').find(`[data-qa=other-language-${language}]`),
         }),
       }),
       preferredName: (): PageElement => cardData('preferred-name'),
