@@ -59,9 +59,16 @@ export interface PersonalDetails {
   socialCareNeeded: string
   typeOfDiet: string
   youthOffender: string
+  dietAndAllergy: DietAndAllergyDetails
+}
+
+export interface DietAndAllergyDetails {
   foodAllergies: { id: string; description: string }[]
   medicalDietaryRequirements: { id: string; description: string; comment?: string }[]
   personalisedDietaryRequirements: { id: string; description: string; comment?: string }[]
+  cateringInstructions: string
+  lastModifiedAt: string
+  lastModifiedPrison: string
 }
 
 export interface IdentityNumber {

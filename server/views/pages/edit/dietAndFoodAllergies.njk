@@ -20,10 +20,39 @@
     {{ govukCharacterCount({
         id: type + "-other",
         name: type + "[" + sequence + "][comment]",
+        classes: "diet-and-food-allergies-text-input",
         maxlength: 100,
         rows: 2,
         value: comment,
-        label: { text: "This information may be seen by prisoners working in the kitchen." }
+        label: { text: "Please specify" },
+        hint: { text: "This information may be seen by prisoners working in the kitchen." },
+        errorMessage: errors | findError(type + "-other")
+    }) }}
+{% endmacro %}
+
+{% macro eatingDisorderHtml(sequence, comment) %}
+    {{ govukCharacterCount({
+        id: "medical-eating-disorder",
+        name: "medical[" + sequence + "][comment]",
+        classes: "diet-and-food-allergies-text-input",
+        maxlength: 100,
+        rows: 2,
+        value: comment,
+        label: { text: "Type of eating disorder" },
+        errorMessage: errors | findError("medical-eating-disorder")
+    }) }}
+{% endmacro %}
+
+{% macro nutrientDeficiencyHtml(sequence, comment) %}
+    {{ govukCharacterCount({
+        id: "medical-nutrient-deficiency",
+        name: "medical[" + sequence + "][comment]",
+        classes: "diet-and-food-allergies-text-input",
+        maxlength: 100,
+        rows: 2,
+        value: comment,
+        label: { text: "Type of deficiency" },
+        errorMessage: errors | findError("medical-nutrient-deficiency")
     }) }}
 {% endmacro %}
 
@@ -56,7 +85,7 @@
         <div class="govuk-grid-column-three-quarters">
             <form method="post" novalidate="novalidate" autocomplete="off">
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-                <div class="govuk-form-group {{ "govuk-form-group--error" if errorsForForms.medical }}">
+                <div class="govuk-form-group">
                     {% call govukFieldset({
                         legend: {
                             text: 'Does ' + prisonerName + ' have any of these medical dietary requirements?',
@@ -74,7 +103,32 @@
                                         value: diet.value,
                                         id: diet.id,
                                         checked: diet.checked,
-                                        conditional: { html: otherHtml("medical", diet.listSequence, diet.comment) }
+                                        conditional: { html: otherHtml("medical", diet.listSequence, diet.comment) },
+                                        errorMessage: errors | findError("medical-other")
+                                    }
+                                ), medicalDiets) %}
+                            {% elseif diet.value == "MEDICAL_DIET_EATING_DISORDER" %}
+                                {% set medicalDiets = (medicalDiets.push(
+                                    {
+                                        name: diet.name,
+                                        text: diet.text,
+                                        value: diet.value,
+                                        id: diet.id,
+                                        checked: diet.checked,
+                                        conditional: { html: eatingDisorderHtml(diet.listSequence, diet.comment) },
+                                        errorMessage: errors | findError("medical-eating-disorder")
+                                    }
+                                ), medicalDiets) %}
+                            {% elseif diet.value == "MEDICAL_DIET_NUTRIENT_DEFICIENCY" %}
+                                {% set medicalDiets = (medicalDiets.push(
+                                    {
+                                        name: diet.name,
+                                        text: diet.text,
+                                        value: diet.value,
+                                        id: diet.id,
+                                        checked: diet.checked,
+                                        conditional: { html: nutrientDeficiencyHtml(diet.listSequence, diet.comment) },
+                                        errorMessage: errors | findError("medical-nutrient-deficiency")
                                     }
                                 ), medicalDiets) %}
                             {% else %}
@@ -84,13 +138,12 @@
 
                         {{ govukCheckboxes({
                             hint: { text: 'Select all that apply.' },
-                            errorMessage: { text: errorsForForms.medical } if errorsForForms.medical,
                             items: medicalDiets
                         }) }}
                     {% endcall %}
                 </div>
 
-                <div class="govuk-form-group {{ "govuk-form-group--error" if errorsForForms.allergy }}">
+                <div class="govuk-form-group">
                     {% call govukFieldset({
                         legend: {
                             text: 'Does ' + prisonerName + ' have any food allergies?',
@@ -118,13 +171,12 @@
 
                         {{ govukCheckboxes({
                             hint: { text: 'Select all that apply.' },
-                            errorMessage: { text: errorsForForms.allergy } if errorsForForms.allergy,
                             items: allergies
                         }) }}
                     {% endcall %}
                 </div>
 
-                <div class="govuk-form-group {{ "govuk-form-group--error" if errorsForForms.personalised }}">
+                <div class="govuk-form-group">
                     {% call govukFieldset({
                         legend: {
                             text: 'Does ' + prisonerName + ' have any personalised dietary requirements?',
@@ -152,11 +204,25 @@
 
                         {{ govukCheckboxes({
                             hint: { text: 'Select all that apply.' },
-                            errorMessage: { text: errorsForForms.personalised } if errorsForForms.personalised,
                             items: personalisedDiets
                         }) }}
                     {% endcall %}
                 </div>
+
+                {{ govukCharacterCount({
+                    name: "cateringInstructions",
+                    id: "catering-instructions",
+                    value: cateringInstructions,
+                    maxlength: 1000,
+                    label: {
+                        text: "Catering instructions",
+                        classes: "govuk-label--m"
+                    },
+                    hint: {
+                        text: "Record additional information for kitchen use only."
+                    },
+                    errorMessage: errors | findError("catering-instructions")
+                }) }}
 
                 <div class="govuk-button-group">
                     {{ govukButton({
