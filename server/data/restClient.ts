@@ -198,7 +198,7 @@ export default class RestClient {
     })
 
     if (file) {
-      request.attach('file', file.buffer, file.originalname)
+      request.attach('imageFile', file.buffer, file.originalname)
     }
 
     try {

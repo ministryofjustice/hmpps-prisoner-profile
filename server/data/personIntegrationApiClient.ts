@@ -159,4 +159,15 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       data: physicalAttributes,
     })
   }
+
+  updateProfileImage(
+    prisonerNumber: string,
+    image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
+  ): Promise<void> {
+    return this.restClient.putMultipart<void>({
+      path: `/v1/core-person-record/profile-image`,
+      query: { prisonerNumber },
+      file: image,
+    })
+  }
 }

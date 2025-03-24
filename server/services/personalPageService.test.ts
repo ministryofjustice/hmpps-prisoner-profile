@@ -33,11 +33,9 @@ import {
   dietAndAllergyMock,
   healthAndMedicationMock,
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
-import {
-  corePersonPhysicalAttributesDtoMock,
-  corePersonPhysicalAttributesMock,
-} from '../data/localMockData/physicalAttributesMock'
+import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
 import agenciesMock from '../data/localMockData/agenciesDetails'
+import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -64,25 +62,7 @@ describe('PersonalPageService', () => {
     curiousApiClient = curiousApiClientMock()
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
 
-    personIntegrationApiClient = {
-      updateBirthPlace: jest.fn(),
-      updateCountryOfBirth: jest.fn(),
-      updateNationality: jest.fn(),
-      updateReligion: jest.fn(),
-      getReferenceDataCodes: jest.fn(),
-      getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
-      updateMilitaryRecord: jest.fn(),
-      createMilitaryRecord: jest.fn(),
-      getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
-      updatePhysicalAttributes: jest.fn(),
-      getDistinguishingMark: jest.fn(),
-      getDistinguishingMarks: jest.fn(),
-      createDistinguishingMark: jest.fn(),
-      updateDistinguishingMark: jest.fn(),
-      getDistinguishingMarkImage: jest.fn(),
-      updateDistinguishingMarkImage: jest.fn(),
-      addDistinguishingMarkImage: jest.fn(),
-    }
+    personIntegrationApiClient = personIntegrationApiClientMock()
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),

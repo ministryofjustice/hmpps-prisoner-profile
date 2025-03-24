@@ -209,4 +209,9 @@ export interface PersonIntegrationApiClient {
   updateDistinguishingMarkImage(imageId: string, image: MulterFile): Promise<PersonIntegrationDistinguishingMark>
 
   getDistinguishingMarkImage(imageId: string): Promise<Readable>
+
+  updateProfileImage(
+    prisonerNumber: string,
+    image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
+  ): Promise<void>
 }

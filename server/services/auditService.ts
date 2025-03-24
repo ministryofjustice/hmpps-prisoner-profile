@@ -12,6 +12,7 @@ export enum Page {
   EditAppointment = 'EDIT_APPOINTMENT',
   AddCaseNote = 'ADD_CASE_NOTE',
   Addresses = 'ADDRESSES',
+  AddWithheld = 'ADD_WITHHELD_IMAGE',
   AlertAddMoreDetails = 'ALERT_ADD_MORE_DETAILS',
   AlertChangeEndDate = 'ALERT_CHANGE_END_DATE',
   AlertClose = 'ALERT_CLOSE',
@@ -33,6 +34,9 @@ export enum Page {
   EditSmokerOrVaper = 'EDIT_SMOKER_OR_VAPER',
   EditWeight = 'EDIT_WEIGHT',
   EditDietAndFoodAllergies = 'EDIT_DIET_AND_FOOD_ALLERGIES',
+  EditProfileImage = 'EDIT_PROFILE_IMAGE',
+  EditUploadedProfileImage = 'EDIT_UPLOADED_PROFILE_IMAGE',
+  EditProfileImageWithheld = 'EDIT_PROFILE_IMAGE_WITHHELD',
   CaseNotes = 'CASE_NOTES',
   CsraHistory = 'CSRA_HISTORY',
   CsraReview = 'CSRA_REVIEW',
@@ -65,6 +69,7 @@ export enum Page {
   PostEditSmokerOrVaper = 'POST_EDIT_SMOKER_OR_VAPER',
   PostEditWeight = 'POST_EDIT_WEIGHT',
   PostEditDietAndFoodAllergies = 'POST_EDIT_DIET_AND_FOOD_ALLERGIES',
+  PostEditProfileImageWithheld = 'POST_EDIT_PROFILE_IMAGE_WITHHELD',
   PostPrePostAppointments = 'POST_PRE_POST_APPOINTMENTS',
   PostEditPrePostAppointments = 'POST_EDIT_PRE_POST_APPOINTMENTS',
   PostUpdateCaseNote = 'POST_UPDATE_CASE_NOTE',
@@ -126,6 +131,7 @@ export enum PostAction {
   EditConflicts = 'EDIT_CONFLICTS',
   EditDisciplinaryAction = 'EDIT_DISCIPLINARY_ACTION',
   EditDischargeDetails = 'EDIT_DISCHARGE_DETAILS',
+  EditProfileImage = 'POST_EDIT_PROFILE_IMAGE',
 }
 
 // eslint-disable-next-line no-shadow
