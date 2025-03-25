@@ -1,50 +1,101 @@
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
 {% macro otherLanguagesText(language) %}
-  {% if language.canSpeak and language.canWrite and language.canRead %}
-  {# Intentionally blank #}
-  {% elif language.canSpeak and language.canWrite %}
-    writes and speaks only
-  {% elif language.canSpeak and language.canRead %}
-    reads and speaks only
-  {% elif language.canWrite and language.canRead %}
-    reads and writes only
-  {% elif language.canWrite %}
-    writes only
-  {% elif language.canRead %}
-    reads only
-  {% elif language.canSpeak %}
-    speaks only
-  {% endif %}
+    {% if language.canSpeak and language.canWrite and language.canRead %}
+        Speaks, reads and writes
+        {% elif language.canSpeak and language.canWrite %}
+        Speaks and writes
+        {% elif language.canSpeak and language.canRead %}
+        Speaks and reads
+        {% elif language.canWrite and language.canRead %}
+        Reads and writes
+        {% elif language.canWrite %}
+        Writes only
+        {% elif language.canRead %}
+        Reads only
+        {% elif language.canSpeak %}
+        Speaks only
+    {% else %}
+        Not entered
+    {% endif %}
 {% endmacro %}
-{% macro languagesHtml(personalDetails) %}
-  {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
-    <span data-qa="no-language-entered">Not entered</span>
-  {% else %}
-  <span data-qa="spoken-language">
-    {% if personalDetails.languages.spoken %}
-      {{ personalDetails.languages.spoken }}
-      {{ "(interpreter required)" if personalDetails.languages.interpreterRequired }}
-    {% endif %}
-  </span>
-  <span data-qa="written-language">
-    {% if personalDetails.languages.written and personalDetails.languages.written != personalDetails.languages.spoken %}
-      {{ personalDetails.languages.written }}
-      (written)
-    {% endif %}
-  </span>
-  {% endif %}
-  {% if personalDetails.otherLanguages.length %}
-  <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary govuk-!-display-none-print">
-      <span class="govuk-details__summary-text">View other languages</span>
-    </summary>
-    <div class="govuk-details__text" data-qa="other-languages-list">
-      <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
+
+{% if inUsersCaseLoad %}
+    <dl id="languages"
+        class="govuk-summary-list govuk-summary-list--bottom-border govuk-!-margin-bottom-0 {{ 'row-updated' if flashMessage.fieldName === 'languages' }}"
+        data-qa="languages">
+        <div class="govuk-summary-list__row govuk-!-border-none">
+            <dt class="govuk-summary-list__key govuk-!-padding-top-2">Languages</dt>
+            <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-2">
+                <span class="govuk-!-font-weight-bold govuk-!-display-block">Main language</span>
+                {% if not (personalDetails.languages.spoken or personalDetails.languages.written) %}
+                    <div data-qa="no-language-entered">Not entered</div>
+                {% else %}
+                    <div data-qa="spoken-language">
+                        {% if personalDetails.languages.spoken %}
+                            {{ personalDetails.languages.spoken }}
+                            {{ "(interpreter required)" if personalDetails.languages.interpreterRequired }}
+                        {% endif %}
+                    </div>
+                    <div data-qa="written-language">
+                        {% if personalDetails.languages.written and personalDetails.languages.written != personalDetails.languages.spoken %}
+                            {{ personalDetails.languages.written }}
+                            (written)
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list">
+                {% if editEnabled %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/main-language">
+                        Change<span class="govuk-visually-hidden"> main language</span>
+                    </a>
+                {% endif %}
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row {{ 'govuk-!-border-none' if personalDetails.otherLanguages.length > 0 }}">
+            <dt class="govuk-summary-list__key govuk-!-padding-top-2"></dt>
+            <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-bottom-0">
+                <span class="govuk-!-font-weight-bold govuk-!-display-block {{ 'other-languages-header--list' if personalDetails.otherLanguages.length > 0 }}">Other languages</span>
+                {% if personalDetails.otherLanguages.length == 0 %}
+                    <span class="govuk-!-display-block govuk-!-margin-bottom-2" data-qa="no-other-languages-entered">Not entered</span>
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions govuk-!-padding-right-0 govuk-!-padding-bottom-0 hmpps-width-4 govuk-summary-list--sub-list">
+                {% if editEnabled %}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="/prisoner/{{ prisonerNumber }}/personal/other-language">
+                        Add<span class="govuk-visually-hidden"> other language</span>
+                    </a>
+                {% endif %}
+            </dd>
+        </div>
         {% for language in personalDetails.otherLanguages %}
-          {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-" + language.code) }}
+            <div class="govuk-summary-list__row {{ 'govuk-!-border-none' if not loop.last }}">
+                <dt class="govuk-summary-list__key govuk-!-padding-top-0"></dt>
+                <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-top-0 {{ 'hmpps-border-bottom govuk-!-padding-bottom-0' if not loop.last }}">
+                    <div>
+                        <dl class="govuk-summary-list--sub-list govuk-summary-list">
+                            {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-"+language.code) }}
+                        </dl>
+                    </div>
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-!-padding-right-0 hmpps-width-4 govuk-summary-list--sub-list {{ 'hmpps-border-bottom govuk-!-padding-bottom-0' if not loop.last }}">
+                    {% if editEnabled %}
+                        <a class="govuk-link govuk-link--no-visited-state"
+                           href="/prisoner/{{ prisonerNumber }}/personal/other-language/{{ language.code }}">
+                            Change<span class="govuk-visually-hidden"> {{ language.description }} as other language</span>
+                        </a>
+                    {% endif %}
+                </dd>
+            </div>
         {% endfor %}
-      </dl>
+    </dl>
+{% else %}
+    <div class="govuk-summary-list__row  govuk-summary-list__row--hidden ">
+        <dt class="govuk-summary-list__key">
+            <span data-qa="hidden-languages-key">Languages</span>
+        </dt>
+        <dd class="govuk-summary-list__value"></dd>
     </div>
-  </details>
-  {% endif %}
-{% endmacro %}
+{% endif %}

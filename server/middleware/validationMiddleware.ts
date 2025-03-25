@@ -2,9 +2,10 @@ import { RequestHandler } from 'express'
 import HmppsError from '../interfaces/HmppsError'
 import { hasLength } from '../utils/utils'
 import { BodySubmission, FileUploadRequest } from '../validators/personal/distinguishingMarksValidator'
+import { DietAndFoodAllergiesSubmission } from '../validators/personal/dietAndFoodAllergiesValidator'
 
 export type Validator = (
-  body: FileUploadRequest | Record<string, string> | BodySubmission,
+  body: FileUploadRequest | Record<string, string> | BodySubmission | DietAndFoodAllergiesSubmission,
 ) => HmppsError[] | Promise<HmppsError[]>
 
 export default function validationMiddleware(

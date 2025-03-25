@@ -37,6 +37,7 @@ import {
   corePersonPhysicalAttributesDtoMock,
   corePersonPhysicalAttributesMock,
 } from '../data/localMockData/physicalAttributesMock'
+import agenciesMock from '../data/localMockData/agenciesDetails'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -214,7 +215,7 @@ describe('PersonalPageService', () => {
           'Maps the food allergies field (Diet and allergies enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
             const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
-            expect(response.personalDetails.foodAllergies).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.foodAllergies).toEqual(expectedValue)
           },
         )
       })
@@ -227,7 +228,7 @@ describe('PersonalPageService', () => {
           'Maps the medical diet field (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
             const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
-            expect(response.personalDetails.medicalDietaryRequirements).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual(expectedValue)
           },
         )
       })
@@ -240,7 +241,33 @@ describe('PersonalPageService', () => {
           'Maps the medical diet field (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
             const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
-            expect(response.personalDetails.personalisedDietaryRequirements).toEqual(expectedValue)
+            expect(response.personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual(expectedValue)
+          },
+        )
+      })
+
+      describe('Diet and allergy modification details', () => {
+        it.each([
+          [true, '2 July 2024'],
+          [false, ''],
+        ])(
+          'Maps the lastModifiedAt field to the latest timestamp (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            prisonApiClient.getAgencyDetails = jest.fn(async () => agenciesMock)
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.lastModifiedAt).toEqual(expectedValue)
+          },
+        )
+
+        it.each([
+          [true, 'Moorland (HMP & YOI)'],
+          [false, ''],
+        ])(
+          'Maps the lastModifiedPrison field (Prison person enabled: %s)',
+          async (dietAndAllergiesEnabled, expectedValue) => {
+            prisonApiClient.getAgencyDetails = jest.fn(async () => agenciesMock)
+            const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
+            expect(response.personalDetails.dietAndAllergy.lastModifiedPrison).toEqual(expectedValue)
           },
         )
       })
@@ -653,11 +680,11 @@ describe('PersonalPageService', () => {
 
       expect(healthAndMedicationApiClient.getHealthAndMedication).toHaveBeenCalledWith(PrisonerMockDataA.prisonerNumber)
 
-      expect(personalDetails.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
-      expect(personalDetails.medicalDietaryRequirements).toEqual([
+      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([{ description: 'Egg', id: 'FOOD_ALLERGY_EGG' }])
+      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([
         { description: 'Coeliac', id: 'MEDICAL_DIET_COELIAC' },
       ])
-      expect(personalDetails.personalisedDietaryRequirements).toEqual([
+      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([
         { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },
       ])
     })
@@ -669,9 +696,9 @@ describe('PersonalPageService', () => {
         PrisonerMockDataA.prisonerNumber,
       )
 
-      expect(personalDetails.foodAllergies).toEqual([])
-      expect(personalDetails.medicalDietaryRequirements).toEqual([])
-      expect(personalDetails.personalisedDietaryRequirements).toEqual([])
+      expect(personalDetails.dietAndAllergy.foodAllergies).toEqual([])
+      expect(personalDetails.dietAndAllergy.medicalDietaryRequirements).toEqual([])
+      expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([])
     })
   })
 

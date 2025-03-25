@@ -75,6 +75,14 @@
   .govuk-summary-list--sub-list--bottom-border {
     border-bottom: 1px solid $govuk-border-colour;
   }
+
+  .govuk-summary-list__actions {
+    width: 10%;
+    
+    @media (max-width: 800px) {
+      width: 20%;
+    }
+  }
 }
 
 @keyframes greenToTransparent {
@@ -111,4 +119,12 @@
     margin-bottom: auto;
     color: inherit;
   }
+}
+
+.last-updated-summary {
+  font-size: 10pt;
+}
+
+.govuk-summary-list dd .other-languages-header--list {
+  margin-bottom: 8px;
 }

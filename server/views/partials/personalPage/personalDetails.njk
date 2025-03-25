@@ -1,6 +1,5 @@
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
-{% from "./languages.njk" import languagesHtml %}
 {% from "./religionHistory.njk" import religionHistoryHtml %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
@@ -15,25 +14,30 @@
 {% set inUsersCaseLoad = isInUsersCaseLoad(prisonId, user) %}
 {% macro dietAndFoodAllergiesHtml(personalDetails) %}
   {%
-    if personalDetails.medicalDietaryRequirements.length > 0
-    or personalDetails.foodAllergies.length > 0
-    or personalDetails.personalisedDietaryRequirements.length > 0
+    if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0
+    or personalDetails.dietAndAllergy.foodAllergies.length > 0
+    or personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0
+    or personalDetails.dietAndAllergy.cateringInstructions.length > 0
   %}
-    {% if personalDetails.medicalDietaryRequirements.length > 0 %}
+    {% if personalDetails.dietAndAllergy.medicalDietaryRequirements.length > 0 %}
       <span class="govuk-!-font-weight-bold govuk-!-display-block">Medical diet</span>
       <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.medicalDietaryRequirements %}
+        {% for requirement in personalDetails.dietAndAllergy.medicalDietaryRequirements %}
           <span class="govuk-!-display-block">
-            {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
+              {% if ('OTHER' in requirement.id or 'EATING_DISORDER' in requirement.id or 'NUTRIENT_DEFICIENCY' in requirement.id) and requirement.comment.length > 0 %}
+                  {{ requirement.description }}: {{ requirement.comment }}
+              {% else %}
+                  {{ requirement.description }}
+              {% endif %}
           </span>
         {% endfor %}
       </div>
     {% endif %}
 
-    {% if personalDetails.foodAllergies.length > 0 %}
+    {% if personalDetails.dietAndAllergy.foodAllergies.length > 0 %}
       <span class="govuk-!-font-weight-bold govuk-!-display-block">Food allergies</span>
       <div class="govuk-!-margin-bottom-2">
-        {% for allergy in personalDetails.foodAllergies %}
+        {% for allergy in personalDetails.dietAndAllergy.foodAllergies %}
           <span class="govuk-!-display-block">
             {{ allergy.description }}{% if 'OTHER' in allergy.id %}: {{ allergy.comment }}{% endif %}
           </span>
@@ -41,16 +45,25 @@
       </div>
     {% endif %}
 
-    {% if personalDetails.personalisedDietaryRequirements.length > 0 %}
+    {% if personalDetails.dietAndAllergy.personalisedDietaryRequirements.length > 0 %}
       <span class="govuk-!-font-weight-bold govuk-!-display-block">Personalised diet</span>
       <div class="govuk-!-margin-bottom-2">
-        {% for requirement in personalDetails.personalisedDietaryRequirements %}
+        {% for requirement in personalDetails.dietAndAllergy.personalisedDietaryRequirements %}
           <span class="govuk-!-display-block">
             {{ requirement.description }}{% if 'OTHER' in requirement.id %}: {{ requirement.comment }}{% endif %}
           </span>
         {% endfor %}
       </div>
     {% endif %}
+
+    {% if personalDetails.dietAndAllergy.cateringInstructions.length > 0 %}
+        <span class="govuk-!-font-weight-bold govuk-!-display-block">Catering instructions</span>
+        <div class="govuk-!-margin-bottom-2">
+            <span class="govuk-!-display-block">{{ personalDetails.dietAndAllergy.cateringInstructions }}</span>
+        </div>
+    {% endif %}
+
+    <span class="govuk-hint last-updated-summary">Updated on {{ personalDetails.dietAndAllergy.lastModifiedAt }} at {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0%}{{ personalDetails.dietAndAllergy.lastModifiedPrison }}{% else %}Unknown{% endif %}</span>
   {% else %}
     <span class="govuk-!-margin-top-1">Not entered</span>
   {% endif %}
@@ -103,8 +116,15 @@
                 { key: "Sex", value: personalDetails.sex, options: { dataQa: "sex" } },
                 { key: "Sexual orientation", value: personalDetails.sexualOrientation, options: { dataQa: "sexual-orientation", visible: inUsersCaseLoad } },
                 { key: "Marriage or civil partnership status", value: personalDetails.marriageOrCivilPartnership, options: { dataQa: "marriage-or-civil-partnership", visible: inUsersCaseLoad } },
-                { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } },
-                { key: "Languages", value: languagesHtml(personalDetails), options: { dataQa: "languages", html: true, visible: inUsersCaseLoad } },
+                { key: "Number of children", value: personalDetails.numberOfChildren, options: { dataQa: "number-of-children", visible: inUsersCaseLoad } }
+            ])
+        })
+      }}
+      {% include "./languages.njk" %}
+      {{
+        govukSummaryList({
+            classes: listClasses,
+            rows: toSummaryListRows([
                 { key: "Type of diet", value: personalDetails.typeOfDiet, options: { dataQa: "type-of-diet", visible: inUsersCaseLoad and not dietAndAllergiesEnabled } },
                 { key: "Diet and food allergies", value: dietAndFoodAllergiesHtml(personalDetails), options: {dataQa: "diet-and-food-allergies", visible: dietAndAllergiesEnabled, changeLinkEnabled: editDietAndAllergiesEnabled, changeHref: 'personal/diet-and-food-allergies', rowUpdated: flashMessage.fieldName === 'dietAndFoodAllergies' } },
                 { key: "Smoking and vaping", value: personalDetails.smokerOrVaper, options: { dataQa: "smoker-or-vaper", visible: inUsersCaseLoad, changeLinkEnabled: editEnabled, changeHref: 'personal/edit/smoker-or-vaper', rowUpdated: flashMessage.fieldName === 'smokerOrVaper' } },

@@ -10,6 +10,7 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
     value: [{ value: { id: 'FOOD_ALLERGY_EGG', code: 'EGG', description: 'Egg' } }],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
   medicalDietaryRequirements: {
     value: [
@@ -23,6 +24,7 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
   personalisedDietaryRequirements: {
     value: [
@@ -36,6 +38,13 @@ const mockDietAndAllergy = (): DietAndAllergy => ({
     ],
     lastModifiedAt: '2024-07-01T01:02:03+0100',
     lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
+  },
+  cateringInstructions: {
+    value: 'Arrange the food like a smiley face.',
+    lastModifiedAt: '2024-07-01T01:02:03+0100',
+    lastModifiedBy: 'USER1',
+    lastModifiedPrisonId: 'STI',
   },
 })
 

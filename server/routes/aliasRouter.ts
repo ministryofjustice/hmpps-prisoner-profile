@@ -10,8 +10,8 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
 
   const aliasController = new AliasController(services.auditService)
 
-  get('/change-name', editProfileChecks(), aliasController.displayChangeNameDecision())
-  post('/change-name', editProfileChecks(), aliasController.submitChangeNameDecision())
+  get('/change-name', editProfileChecks(), aliasController.displayChangeNamePurpose())
+  post('/change-name', editProfileChecks(), aliasController.submitChangeNamePurpose())
 
   return router
 }

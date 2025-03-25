@@ -1,6 +1,6 @@
 import Page, { PageElement } from '../../page'
 
-export default class ChangeNameDecisionPage extends Page {
+export default class ChangeNamePurposePage extends Page {
   constructor(pageTitle: string) {
     super(pageTitle)
   }

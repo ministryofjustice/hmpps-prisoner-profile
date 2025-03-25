@@ -44,10 +44,10 @@
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
                     <div class="govuk-form-group {{ "govuk-form-group--error" if errors.length > 0 }}">
                         {{ govukRadios({
-                            name: "decision",
-                            errorMessage: errors | findError("decision"),
+                            name: "purpose",
+                            errorMessage: errors | findError("purpose"),
                             fieldset: {
-                                id: "decisionFieldset",
+                                id: "purposeFieldset",
                                 legend: {
                                     text: formTitle,
                                     isPageHeading: true,

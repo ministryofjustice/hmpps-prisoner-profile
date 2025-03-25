@@ -32,11 +32,11 @@ describe('Alias Controller', () => {
     controller = new AliasController(auditService)
   })
 
-  describe('Change name decision page', () => {
-    it('should render the change name decision page', async () => {
-      await controller.displayChangeNameDecision()(req, res, next)
+  describe('Change name purpose page', () => {
+    it('should render the change name purpose page', async () => {
+      await controller.displayChangeNamePurpose()(req, res, next)
 
-      expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeNameDecision', {
+      expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeNamePurpose', {
         pageTitle: `Why are you changing this person's name? - Prisoner personal details`,
         formTitle: `Why are you changing John Saunders’ name?`,
         errors: [],
@@ -51,7 +51,7 @@ describe('Alias Controller', () => {
         prisonerNumber: PrisonerMockDataA.prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
-        page: Page.EditNameDecision,
+        page: Page.EditNamePurpose,
       })
     })
 
@@ -59,22 +59,22 @@ describe('Alias Controller', () => {
       [undefined, 'change-name'],
       ['name-wrong', 'enter-corrected-name'],
       ['name-changed', 'enter-new-name'],
-    ])('for choice %s should redirect to %s page', async (decision: string, redirect: string) => {
-      req = { ...req, body: { decision } } as unknown as Request
+    ])('for choice %s should redirect to %s page', async (purpose: string, redirect: string) => {
+      req = { ...req, body: { purpose } } as unknown as Request
 
-      await controller.submitChangeNameDecision()(req, res, next)
+      await controller.submitChangeNamePurpose()(req, res, next)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/personal/${redirect}`)
 
-      if (!decision) {
+      if (!purpose) {
         expect(req.flash).toHaveBeenCalledWith('errors', [{ text: `Select why you're changing John Saunders’ name` }])
       } else {
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber: PrisonerMockDataA.prisonerNumber,
           correlationId: req.id,
-          action: PostAction.EditNameDecision,
-          details: { decision },
+          action: PostAction.EditNamePurpose,
+          details: { purpose },
         })
       }
     })

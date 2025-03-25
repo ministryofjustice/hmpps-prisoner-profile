@@ -11,7 +11,6 @@ import {
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import {
-  CheckboxOptions,
   convertToTitleCase,
   formatLocation,
   formatName,
@@ -25,7 +24,6 @@ import { NameFormatStyle } from '../../data/enums/nameFormatStyle'
 import { FlashMessageType } from '../../data/enums/flashMessageType'
 import { dietAndAllergyEnabled, editProfileEnabled } from '../../utils/featureToggles'
 import {
-  CheckboxFieldData,
   cityOrTownOfBirthFieldData,
   countryOfBirthFieldData,
   dietAndFoodAllergiesFieldData,
@@ -47,7 +45,6 @@ import logger from '../../../logger'
 import miniBannerData from '../utils/miniBannerData'
 import { requestBodyFromFlash } from '../../utils/requestBodyFromFlash'
 import { getProfileInformationValue, ProfileInformationType } from '../../data/interfaces/prisonApi/ProfileInformation'
-import { checkboxInputToSelectedValues } from '../../utils/checkboxUtils'
 import { validationErrorsFromFlash } from '../../utils/validationErrorsFromFlash'
 import {
   DietAndAllergy,
@@ -952,61 +949,12 @@ export default class PersonalController {
     }
   }
 
-  editCheckboxes(
-    formTitle: string,
-    fieldData: CheckboxFieldData,
-    options: CheckboxOptions[],
-    selectedValues: string[] = [],
-  ) {
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const { prisonerNumber } = req.params
-      const { prisonerData } = req.middleware
-      const { firstName, lastName, cellLocation } = prisonerData
-      const requestBodyFlash = requestBodyFromFlash<{ [key: string]: string[] }>(req)
-      const checkedItems = requestBodyFlash
-        ? checkboxInputToSelectedValues(fieldData.fieldName, requestBodyFlash)
-        : selectedValues
-
-      const errors = req.flash('errors')
-
-      const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
-      const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
-
-      await this.auditService.sendPageView({
-        user: res.locals.user,
-        prisonerNumber: prisonerData.prisonerNumber,
-        prisonId: prisonerData.prisonId,
-        correlationId: req.id,
-        page: fieldData.auditEditPageLoad,
-      })
-
-      res.render('pages/edit/checkboxField', {
-        pageTitle: `${fieldData.pageTitle} - Prisoner personal details`,
-        formTitle,
-        formHint: fieldData.hintText || '',
-        fieldName: fieldData.fieldName,
-        formOptions: fieldData.options,
-        prisonerNumber,
-        prisonerName,
-        breadcrumbPrisonerName: prisonerBannerName,
-        errors,
-        checkboxInputs: options,
-        checkedItems,
-        miniBannerData: {
-          prisonerName: prisonerBannerName,
-          prisonerNumber,
-          cellLocation: formatLocation(cellLocation),
-        },
-      })
-    }
-  }
-
   dietAndFoodAllergies() {
     const { pageTitle, fieldName, auditEditPageLoad } = dietAndFoodAllergiesFieldData
 
     const mapDietAndAllergy = (
       dietAndAllergy: DietAndAllergy,
-      field: keyof DietAndAllergy,
+      field: keyof Omit<DietAndAllergy, 'cateringInstructions'>,
     ): ReferenceDataIdSelection[] => {
       if (dietAndAllergy && dietAndAllergy[field]) {
         return dietAndAllergy[field].value.map(selection => ({
@@ -1067,6 +1015,7 @@ export default class PersonalController {
           allergy?: ReferenceDataIdSelection[]
           medical?: ReferenceDataIdSelection[]
           personalised?: ReferenceDataIdSelection[]
+          cateringInstructions?: string
         }>(req)
 
         const dietAndAllergy = healthAndMedication?.dietAndAllergy
@@ -1085,6 +1034,10 @@ export default class PersonalController {
           if (requestBodyFlash?.personalised) return requestBodyFlash.personalised.filter(item => !!item.value)
           return mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements')
         }
+
+        const cateringInstructions = requestBodyFlash?.cateringInstructions
+          ? requestBodyFlash.cateringInstructions
+          : dietAndAllergy?.cateringInstructions?.value
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -1107,12 +1060,8 @@ export default class PersonalController {
           allergyOptions: checkboxOptions('allergy', allergyCodes, allergiesSelected()),
           medicalDietOptions: checkboxOptions('medical', medicalDietCodes, medicalDietChecked()),
           personalisedDietOptions: checkboxOptions('personalised', personalisedDietCodes, personalisedDietChecked()),
+          cateringInstructions,
           errors: errors ?? [],
-          errorsForForms: {
-            medical: errors?.filter(e => e.href === '#medical-other')[0]?.text ?? null,
-            allergy: errors?.filter(e => e.href === '#allergy-other')[0]?.text ?? null,
-            personalised: errors?.filter(e => e.href === '#personalised-other')[0]?.text ?? null,
-          },
         })
       },
 
@@ -1133,12 +1082,14 @@ export default class PersonalController {
           personalisedDietaryRequirements: req.body.personalised
             ? req.body.personalised.filter((item: ReferenceDataIdSelection) => !!item.value)
             : [],
+          cateringInstructions: req.body.cateringInstructions,
         }
 
         const previousValues: Partial<DietAndAllergyUpdate> = {
           foodAllergies: mapDietAndAllergy(dietAndAllergy, 'foodAllergies'),
           medicalDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'medicalDietaryRequirements'),
           personalisedDietaryRequirements: mapDietAndAllergy(dietAndAllergy, 'personalisedDietaryRequirements'),
+          cateringInstructions: dietAndAllergy?.cateringInstructions?.value,
         }
 
         return this.submit({
