@@ -1,0 +1,20 @@
+.hmpps-name-change {
+  .govuk-label {
+    margin-bottom: 10px;
+  }
+
+  .govuk-input {
+    width: 311px;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 20px;
+  }
+
+  .govuk-warning-text {
+    &__text {
+      @include govuk-font($size: 16, $weight: 'bold');
+      margin-top: 5px;
+    }
+  }
+}

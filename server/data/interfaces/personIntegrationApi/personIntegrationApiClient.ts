@@ -160,6 +160,36 @@ export interface DistinguishingMarkRequest {
   comment?: string
 }
 
+export interface PseudonymRequestDto {
+  firstName: string
+  middleName1?: string
+  middleName2?: string
+  lastName: string
+  dateOfBirth: string
+  sex: string
+  nameType?: string
+  title?: string
+  ethnicity?: string
+  isWorkingName: boolean
+}
+
+export interface PseudonymResponseDto {
+  personId?: string
+  sourceSystemId: number
+  sourceSystem: string
+  prisonerNumber: string
+  firstName: string
+  middleName1?: string
+  middleName2?: string
+  lastName: string
+  dateOfBirth: string
+  sex?: ReferenceDataValue
+  nameType?: ReferenceDataValue
+  title?: ReferenceDataValue
+  ethnicity?: ReferenceDataValue
+  isWorkingName: boolean
+}
+
 export interface PersonIntegrationApiClient {
   updateBirthPlace(prisonerNumber: string, birthPlace: string): Promise<void>
 
@@ -209,4 +239,10 @@ export interface PersonIntegrationApiClient {
   updateDistinguishingMarkImage(imageId: string, image: MulterFile): Promise<PersonIntegrationDistinguishingMark>
 
   getDistinguishingMarkImage(imageId: string): Promise<Readable>
+
+  getPseudonyms(prisonerNumber: string): Promise<PseudonymResponseDto[]>
+
+  updatePseudonym(pseudonymId: number, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto>
+
+  createPseudonym(prisonerNumber: string, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto>
 }

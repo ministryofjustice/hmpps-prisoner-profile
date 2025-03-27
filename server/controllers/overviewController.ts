@@ -147,7 +147,7 @@ export default class OverviewController {
         prisonerData.prisonerNumber,
       ),
       statuses: getOverviewStatuses(prisonerData, inmateDetail, learnerNeurodivergence, scheduledTransfers),
-      prisonerDisplayName: formatName(prisonerData.firstName, null, prisonerData.lastName),
+      prisonerDisplayName: formatName(inmateDetail.firstName, null, inmateDetail.lastName),
       prisonerInCaseLoad,
       bookingId: prisonerData.bookingId,
       personalDetails: getPersonalDetails(prisonerData, inmateDetail, prisonerDetail),

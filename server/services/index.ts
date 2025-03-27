@@ -40,6 +40,7 @@ import ReferenceDataService from './referenceData/referenceDataService'
 import MilitaryRecordsService from './militaryRecordsService'
 import { ReferenceDataSourceFactory } from './referenceData/referenceDataSourceFactory'
 import PhotoService from './photoService'
+import AliasService from './aliasService'
 
 export const services = () => {
   const {
@@ -156,6 +157,7 @@ export const services = () => {
     metricsService,
   )
   const photoService = new PhotoService(prisonApiClientBuilder)
+  const aliasService = new AliasService(personIntegrationApiClientBuilder, metricsService)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
 
   const apolloClient = new ApolloClient({
@@ -210,6 +212,7 @@ export const services = () => {
     csipService,
     militaryRecordsService,
     photoService,
+    aliasService,
   }
 }
 

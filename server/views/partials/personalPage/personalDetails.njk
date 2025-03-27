@@ -5,7 +5,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% set aliases = [] %}
 {% for alias in personalDetails.aliases %}
-  {% set aliases = (aliases.push([{text: alias.alias | title}, {text: alias.dateOfBirth}]), aliases) %}
+  {% set aliases = (aliases.push([{text: alias.alias}, {text: alias.dateOfBirth}]), aliases) %}
 {% endfor %}
 {% set dateOfBirthText %}
   {{ personalDetails.dateOfBirth }}
@@ -81,7 +81,7 @@
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
       <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
-        {{ summaryListRow("Full name", personalDetails.fullName | title, "full-name") }}
+        {{ summaryListRow("Full name", personalDetails.fullName, "full-name") }}
       </dl>
 
       {% if aliases.length > 0 %}

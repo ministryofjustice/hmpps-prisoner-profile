@@ -45,16 +45,14 @@ context('Change Name Purpose Page', () => {
       cy.get(`input[name=purpose][value=name-changed]`).click()
       page.continueButton().click()
 
-      // TODO: CDPS-1035
-      Page.verifyOnPage(NotFoundPage)
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/enter-new-name')
     })
 
     it('should redirect to correct name page', () => {
       cy.get(`input[name=purpose][value=name-wrong]`).click()
       page.continueButton().click()
 
-      // TODO: CDPS-1028
-      Page.verifyOnPage(NotFoundPage)
+      cy.location('pathname').should('eq', '/prisoner/G6123VU/personal/enter-corrected-name')
     })
 
     it('should show an error if nothing is selected', () => {
