@@ -40,6 +40,7 @@ import ReferenceDataService from './referenceData/referenceDataService'
 import MilitaryRecordsService from './militaryRecordsService'
 import { ReferenceDataSourceFactory } from './referenceData/referenceDataSourceFactory'
 import PhotoService from './photoService'
+import LanguagesService from './languagesService'
 
 export const services = () => {
   const {
@@ -64,6 +65,7 @@ export const services = () => {
     personIntegrationApiClientBuilder,
     csipApiClientBuilder,
     healthAndMedicationApiClientBuilder,
+    personCommunicationNeedsApiClientBuilder,
     prisonRegisterStore,
     referenceDataStore,
     featureToggleStore,
@@ -157,6 +159,11 @@ export const services = () => {
   )
   const photoService = new PhotoService(prisonApiClientBuilder)
   const commonApiRoutes = new CommonApiRoutes(offenderService, auditService, distinguishingMarksService, photoService)
+  const languagesService = new LanguagesService(
+    personCommunicationNeedsApiClientBuilder,
+    referenceDataService,
+    metricsService,
+  )
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -210,6 +217,7 @@ export const services = () => {
     csipService,
     militaryRecordsService,
     photoService,
+    languagesService,
   }
 }
 

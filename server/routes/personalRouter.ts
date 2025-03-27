@@ -29,6 +29,7 @@ import militaryRecordsRouter from './militaryRecordsRouter'
 import { Role } from '../data/enums/role'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
 import aliasRouter from './aliasRouter'
+import languagesRouter from './languagesRouter'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -90,6 +91,15 @@ export default function personalRouter(services: Services): Router {
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     aliasRouter(services, editProfileChecks),
+  )
+
+  // Languages
+  router.use(
+    `${basePath}`,
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editProfileChecks(),
+    languagesRouter(services),
   )
 
   // Edit routes
