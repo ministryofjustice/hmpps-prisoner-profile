@@ -98,8 +98,7 @@ export default function personalRouter(services: Services): Router {
     `${basePath}`,
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editProfileChecks(),
-    languagesRouter(services),
+    languagesRouter(services, editProfileChecks),
   )
 
   // Edit routes

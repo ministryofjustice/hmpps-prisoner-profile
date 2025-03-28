@@ -28,7 +28,6 @@ export enum CorePersonRecordReferenceDataDomain {
   build = 'BUILD',
   leftEyeColour = 'L_EYE_C',
   rightEyeColour = 'R_EYE_C',
-  language = 'LANG',
 }
 
 export interface MilitaryRecord {

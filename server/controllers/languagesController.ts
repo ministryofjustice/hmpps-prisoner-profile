@@ -6,9 +6,9 @@ import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import LanguagesService from '../services/languagesService'
 import {
   LanguagePreferencesRequest,
+  PersonCommunicationNeedsReferenceDataDomain,
   SecondaryLanguageDto,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
-import { CorePersonRecordReferenceDataDomain } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import HmppsError from '../interfaces/HmppsError'
@@ -29,7 +29,7 @@ export default class LanguagesController {
 
       const [communicationNeeds, languageReferenceCodes] = await Promise.all([
         this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber),
-        this.languagesService.getReferenceData(clientToken, [CorePersonRecordReferenceDataDomain.language]),
+        this.languagesService.getReferenceData(clientToken, [PersonCommunicationNeedsReferenceDataDomain.language]),
       ])
 
       const formValues: LanguagePreferencesRequest = requestBodyFlash || {
@@ -41,7 +41,7 @@ export default class LanguagesController {
       const preferredSpokenLanguageOptions = [
         { value: undefined, text: '' },
         ...objectToSelectOptions(
-          languageReferenceCodes.language,
+          languageReferenceCodes.language ?? [],
           'code',
           'description',
           formValues.preferredSpokenLanguageCode,
@@ -50,7 +50,7 @@ export default class LanguagesController {
       const preferredWrittenLanguageOptions = [
         { value: undefined, text: '' },
         ...objectToSelectOptions(
-          languageReferenceCodes.language,
+          languageReferenceCodes.language ?? [],
           'code',
           'description',
           formValues.preferredWrittenLanguageCode,

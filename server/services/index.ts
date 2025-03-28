@@ -96,6 +96,7 @@ export const services = () => {
   const referenceDataSourceFactory = new ReferenceDataSourceFactory(
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
+    personCommunicationNeedsApiClientBuilder,
   )
   const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
   const personalPageService = new PersonalPageService(

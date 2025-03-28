@@ -1,11 +1,11 @@
 import { RestClientBuilder } from '../data'
 import MetricsService from './metrics/metricsService'
-import { CorePersonRecordReferenceDataDomain } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import ReferenceDataService from './referenceData/referenceDataService'
 import { ReferenceDataCodeDto } from '../data/interfaces/referenceData'
 import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsApiClient,
+  PersonCommunicationNeedsReferenceDataDomain,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 
@@ -23,12 +23,13 @@ export default class LanguagesService {
 
   async getReferenceData(
     clientToken: string,
-    domains: CorePersonRecordReferenceDataDomain[],
+    domains: PersonCommunicationNeedsReferenceDataDomain[],
   ): Promise<Record<string, ReferenceDataCodeDto[]>> {
     return Object.fromEntries(
       await Promise.all(
         domains.map(async domain => [
-          Object.entries(CorePersonRecordReferenceDataDomain).find(([_, value]) => value === domain)?.[0] ?? domain, // Get enum key name
+          Object.entries(PersonCommunicationNeedsReferenceDataDomain).find(([_, value]) => value === domain)?.[0] ??
+            domain, // Get enum key name
           await this.referenceDataService.getActiveReferenceDataCodes(domain, clientToken),
         ]),
       ),

@@ -1,4 +1,10 @@
 import { ReferenceDataValue } from '../prisonApi/ReferenceDataValue'
+import { CorePersonRecordReferenceDataCodeDto } from '../personIntegrationApi/personIntegrationApiClient'
+
+// eslint-disable-next-line no-shadow
+export enum PersonCommunicationNeedsReferenceDataDomain {
+  language = 'LANG',
+}
 
 export interface LanguagePreferencesDto {
   preferredSpokenLanguage?: ReferenceDataValue
@@ -43,4 +49,8 @@ export interface PersonCommunicationNeedsApiClient {
   updateSecondaryLanguage(prisonerNumber: string, secondaryLanguageRequest: SecondaryLanguageRequest): Promise<void>
 
   deleteSecondaryLanguage(prisonerNumber: string, languageCode: string): Promise<void>
+
+  getReferenceDataCodes(
+    domain: PersonCommunicationNeedsReferenceDataDomain,
+  ): Promise<CorePersonRecordReferenceDataCodeDto[]>
 }

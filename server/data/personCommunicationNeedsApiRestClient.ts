@@ -4,8 +4,10 @@ import {
   CommunicationNeedsDto,
   LanguagePreferencesRequest,
   PersonCommunicationNeedsApiClient,
+  PersonCommunicationNeedsReferenceDataDomain,
   SecondaryLanguageRequest,
 } from './interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
+import { CorePersonRecordReferenceDataCodeDto } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export default class PersonCommunicationNeedsApiRestClient implements PersonCommunicationNeedsApiClient {
   private readonly restClient: RestClient
@@ -14,9 +16,11 @@ export default class PersonCommunicationNeedsApiRestClient implements PersonComm
     this.restClient = new RestClient('Person Communication Needs API', config.apis.personCommunicationNeedsApi, token)
   }
 
-  // getReferenceDataCodes(domain: CorePersonRecordReferenceDataDomain): Promise<CorePersonRecordReferenceDataCodeDto[]> {
-  //   return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
-  // }
+  getReferenceDataCodes(
+    domain: PersonCommunicationNeedsReferenceDataDomain,
+  ): Promise<CorePersonRecordReferenceDataCodeDto[]> {
+    return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
+  }
 
   getCommunicationNeeds(prisonerNumber: string): Promise<CommunicationNeedsDto> {
     return this.restClient.get({ path: `/v1/prisoner/${prisonerNumber}/communication-needs` })
