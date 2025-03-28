@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatName, formatNamePart } from '../utils/utils'
+import { apostrophe, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -114,18 +114,9 @@ export default class AliasController {
   }): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const { firstName, middleName1, middleName2, lastName } = await this.aliasService.getWorkingNameAlias(
-        req.middleware.clientToken,
-        prisonerNumber,
-      )
       const errors = req.flash('errors')
 
-      const formValues = requestBodyFromFlash<Name>(req) || {
-        firstName: firstName && formatNamePart(firstName),
-        middleName1: middleName1 && formatNamePart(middleName1),
-        middleName2: middleName2 && formatNamePart(middleName2),
-        lastName: lastName && formatNamePart(lastName),
-      }
+      const formValues = requestBodyFromFlash<Name>(req) || {}
 
       this.auditService
         .sendPageView({

@@ -96,12 +96,7 @@ describe('Alias Controller', () => {
         formTitle: `Enter John Saunders’ correct name`,
         warningText: 'This will become their main name in DPS and NOMIS.',
         errors: [],
-        formValues: {
-          firstName: 'John',
-          middleName1: 'Middle',
-          middleName2: 'Names',
-          lastName: 'Saunders',
-        },
+        formValues: {},
         miniBannerData: {
           prisonerNumber: 'G6123VU',
           prisonerName: 'Saunders, John',
@@ -241,12 +236,7 @@ describe('Alias Controller', () => {
         warningText:
           'This will become their main name in DPS and NOMIS. The previous name will be recorded as an alias.',
         errors: [],
-        formValues: {
-          firstName: 'John',
-          middleName1: 'Middle',
-          middleName2: 'Names',
-          lastName: 'Saunders',
-        },
+        formValues: {},
         miniBannerData: {
           prisonerNumber: 'G6123VU',
           prisonerName: 'Saunders, John',
