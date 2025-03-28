@@ -74,8 +74,8 @@ export default class PersonalController {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerData, inmateDetail, alertSummaryData, clientToken } = req.middleware
       const { bookingId } = prisonerData
-      const user = res.locals.user as PrisonUser
-      const { activeCaseLoadId, userRoles } = user
+      const { user, flashMessage, apiErrorCallback } = res.locals
+      const { activeCaseLoadId, userRoles } = user as PrisonUser
       const profileEditEnabled = editProfileEnabled(activeCaseLoadId)
 
       const [personalPageData, careNeeds, xrays] = await Promise.all([
@@ -84,7 +84,8 @@ export default class PersonalController {
           prisonerData,
           dietAndAllergyEnabled(activeCaseLoadId),
           profileEditEnabled,
-          res.locals.apiErrorCallback,
+          apiErrorCallback,
+          flashMessage,
         ),
         this.careNeedsService.getCareNeedsAndAdjustments(clientToken, bookingId),
         this.careNeedsService.getXrayBodyScanSummary(clientToken, bookingId),
