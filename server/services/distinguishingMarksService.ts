@@ -70,9 +70,16 @@ const MarkTypeIds: Record<MarkTypeSelection, MarkTypeId> = {
   tattoo: 'TAT',
 }
 
-export const findBodyPartByCodeAndSide = (targetPart: BodyPartId, targetSide: BodyPartSideId): BodyPartSelection => {
+export const findBodyPartByCodeAndSideAndOrientation = (
+  targetPart: BodyPartId,
+  targetSide: BodyPartSideId,
+  targetOrientation: PartOrientationId,
+): BodyPartSelection => {
   return Object.entries(bodyPartConfig)
-    .filter(([_, config]) => config.bodyPartId === targetPart && config.side === targetSide)
+    .filter(
+      ([_, config]) =>
+        config.bodyPartId === targetPart && config.side === targetSide && config.orientation === targetOrientation,
+    )
     .map(([key]) => key as BodyPartSelection)[0]
 }
 

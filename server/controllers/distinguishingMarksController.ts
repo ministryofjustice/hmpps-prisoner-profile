@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
-import DistinguishingMarksService, { findBodyPartByCodeAndSide } from '../services/distinguishingMarksService'
+import DistinguishingMarksService, {
+  findBodyPartByCodeAndSideAndOrientation,
+} from '../services/distinguishingMarksService'
 import {
   AllBodyPartSelection,
   bodyPartMap,
@@ -11,11 +13,20 @@ import MulterFile from './interfaces/MulterFile'
 import { getBodyPartDescription, getBodyPartToken } from '../views/dataUtils/groupDistinguishingMarksForView'
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import { convertToTitleCase, formatName } from '../utils/utils'
-import { BodyPartId, BodyPartSideId } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  BodyPartId,
+  BodyPartSideId,
+  PartOrientationId,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
+import { AuditService, Page, PostAction } from '../services/auditService'
+import logger from '../../logger'
 
 export default class DistinguishingMarksController {
-  constructor(private readonly distinguishingMarksService: DistinguishingMarksService) {
+  constructor(
+    private readonly distinguishingMarksService: DistinguishingMarksService,
+    private readonly auditService: AuditService,
+  ) {
     this.newDistinguishingMark = this.newDistinguishingMark.bind(this)
     this.postNewDistinguishingMark = this.postNewDistinguishingMark.bind(this)
     this.postNewDistinguishingMarkWithDetail = this.postNewDistinguishingMarkWithDetail.bind(this)
@@ -33,14 +44,23 @@ export default class DistinguishingMarksController {
     this.viewAllImages = this.viewAllImages.bind(this)
   }
 
-  public newDistinguishingMark(req: Request, res: Response) {
+  public async newDistinguishingMark(req: Request, res: Response) {
     const { markType, prisonerNumber } = req.params
+    const { prisonerData } = req.middleware
     const selected = req.query.selected as string
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedSelection = bodyPartSelections.find(selection => selection === bodyPartMap[selected])
 
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
+
+    await this.auditService.sendPageView({
+      user: res.locals.user,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.AddDistinguishingMark,
+    })
 
     return res.render('pages/distinguishingMarks/addNewDistinguishingMark', {
       markType,
@@ -61,12 +81,24 @@ export default class DistinguishingMarksController {
       return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${bodyPart}`)
     }
 
-    await this.distinguishingMarksService.postNewDistinguishingMark(
+    const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
       clientToken,
       prisonerNumber,
       verifiedMarkType,
       bodyPartMap[bodyPart] as BodyPartSelection,
     )
+
+    this.auditService
+      .sendPostSuccess({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.AddDistinguishingMark,
+        details: {
+          markId: mark.id,
+        },
+      })
+      .catch(error => logger.error(error))
 
     req.flash('flashMessage', {
       text: `${convertToTitleCase(verifiedMarkType)} added`,
@@ -77,7 +109,7 @@ export default class DistinguishingMarksController {
     return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
   }
 
-  public newDistinguishingMarkWithDetail(req: Request, res: Response) {
+  public async newDistinguishingMarkWithDetail(req: Request, res: Response) {
     const { markType, prisonerNumber, bodyPart } = req.params
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
@@ -99,7 +131,7 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
-    await this.distinguishingMarksService.postNewDistinguishingMark(
+    const mark = await this.distinguishingMarksService.postNewDistinguishingMark(
       clientToken,
       prisonerNumber,
       verifiedMarkType,
@@ -107,6 +139,19 @@ export default class DistinguishingMarksController {
       req.body[`description-${specificBodyPart}`],
       req.file,
     )
+
+    this.auditService
+      .sendPostSuccess({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.AddDistinguishingMark,
+        details: {
+          markId: mark.id,
+          photoId: mark.photographUuids?.find(id => id.latest)?.id,
+        },
+      })
+      .catch(error => logger.error(error))
 
     req.flash('flashMessage', {
       text: `${convertToTitleCase(verifiedMarkType)} added`,
@@ -120,10 +165,19 @@ export default class DistinguishingMarksController {
   }
 
   public async changeDistinguishingMark(req: Request, res: Response) {
-    const { clientToken } = req.middleware
+    const { clientToken, prisonerData } = req.middleware
     const { prisonerNumber, markId, markType } = req.params
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+
+    await this.auditService.sendPageView({
+      user: res.locals.user,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.EditDistinguishingMark,
+    })
+
     return res.render('pages/distinguishingMarks/changeDistinguishingMark', {
       prisonerNumber,
       mark,
@@ -165,14 +219,35 @@ export default class DistinguishingMarksController {
 
     if (bodyPartChanged) {
       const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+      const currentSpecificBodyPart = findBodyPartByCodeAndSideAndOrientation(
+        mark.bodyPart?.code,
+        mark.side?.code,
+        mark?.partOrientation?.code,
+      )
+      const verifiedBodyPart = bodyPartMap[bodyPart] as BodyPartSelection
       await this.distinguishingMarksService.updateDistinguishingMarkLocation(
         clientToken,
         prisonerNumber,
         markId,
         mark,
         verifiedMarkType,
-        bodyPartMap[bodyPart] as BodyPartSelection,
+        verifiedBodyPart,
       )
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditDistinguishingMark,
+          details: {
+            markId,
+            fieldName: 'location',
+            previous: currentSpecificBodyPart,
+            updated: verifiedBodyPart,
+          },
+        })
+        .catch(error => logger.error(error))
     }
 
     // Neck and back have no specific locations to choose from, so return to the change summary screen
@@ -195,9 +270,10 @@ export default class DistinguishingMarksController {
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
     const bodyPartCode: BodyPartId = mark.bodyPart.code as BodyPartId
     const sideCode = mark.side?.code as BodyPartSideId
+    const orientationCode = mark.partOrientation?.code as PartOrientationId
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     const verifiedBodyPart = bodyPartSelections.find(selection => selection === bodyPartMap[bodyPart])
-    const specificBodyPart = findBodyPartByCodeAndSide(bodyPartCode, sideCode)
+    const specificBodyPart = findBodyPartByCodeAndSideAndOrientation(bodyPartCode, sideCode, orientationCode)
 
     if (!verifiedMarkType || !verifiedBodyPart) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
@@ -223,6 +299,11 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+    const currentSpecificBodyPart = findBodyPartByCodeAndSideAndOrientation(
+      mark.bodyPart?.code,
+      mark.side?.code,
+      mark.partOrientation?.code,
+    )
     await this.distinguishingMarksService.updateDistinguishingMarkLocation(
       clientToken,
       prisonerNumber,
@@ -231,6 +312,21 @@ export default class DistinguishingMarksController {
       verifiedMarkType,
       specificBodyPart as AllBodyPartSelection,
     )
+
+    this.auditService
+      .sendPostSuccess({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditDistinguishingMark,
+        details: {
+          markId,
+          fieldName: 'location',
+          previous: currentSpecificBodyPart,
+          updated: specificBodyPart,
+        },
+      })
+      .catch(error => logger.error(error))
 
     return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
   }
@@ -268,6 +364,7 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+    const currentDescription = mark.comment
     await this.distinguishingMarksService.updateDistinguishingMarkDescription(
       clientToken,
       prisonerNumber,
@@ -277,12 +374,27 @@ export default class DistinguishingMarksController {
       description,
     )
 
+    this.auditService
+      .sendPostSuccess({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditDistinguishingMark,
+        details: {
+          markId,
+          fieldName: 'description',
+          previous: currentDescription,
+          updated: description,
+        },
+      })
+      .catch(error => logger.error(error))
+
     return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
   }
 
   public async changePhoto(req: Request, res: Response) {
     const { photoId, markId, markType, prisonerNumber } = req.params
-    const { clientToken } = req.middleware
+    const { clientToken, prisonerData } = req.middleware
     const upload = req.query.upload !== undefined
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
@@ -297,6 +409,14 @@ export default class DistinguishingMarksController {
 
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
 
+    await this.auditService.sendPageView({
+      user: res.locals.user,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.EditDistinguishingMarkPhoto,
+    })
+
     return res.render('pages/distinguishingMarks/changePhoto', {
       markId,
       markType,
@@ -308,12 +428,21 @@ export default class DistinguishingMarksController {
 
   public async addNewPhoto(req: Request, res: Response) {
     const { markId, markType, prisonerNumber } = req.params
+    const { prisonerData } = req.middleware
     const upload = req.query.upload !== undefined
 
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
     const refererUrl = `/prisoner/${prisonerNumber}/personal/${markType}/${markId}`
+
+    await this.auditService.sendPageView({
+      user: res.locals.user,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.AddDistinguishingMarkPhoto,
+    })
 
     return res.render('pages/distinguishingMarks/addPhoto', {
       markId,
@@ -333,6 +462,19 @@ export default class DistinguishingMarksController {
 
     await this.distinguishingMarksService.updateDistinguishingMarkPhoto(clientToken, photoId, file)
 
+    this.auditService
+      .sendPostSuccess({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditDistinguishingMarkPhoto,
+        details: {
+          markId,
+          photoId,
+        },
+      })
+      .catch(error => logger.error(error))
+
     return res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
   }
 
@@ -345,7 +487,27 @@ export default class DistinguishingMarksController {
     const verifiedMarkType = markTypeSelections.find(type => type === markType)
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#appearance`)
 
-    await this.distinguishingMarksService.addDistinguishingMarkPhoto(clientToken, prisonerNumber, markId, file)
+    const updatedMark = await this.distinguishingMarksService.addDistinguishingMarkPhoto(
+      clientToken,
+      prisonerNumber,
+      markId,
+      file,
+    )
+    const newPhotoId = updatedMark.photographUuids?.find(photo => photo.latest)?.id
+
+    this.auditService
+      .sendPostSuccess({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.AddDistinguishingMarkPhoto,
+        details: {
+          markId,
+          photoId: newPhotoId,
+        },
+      })
+      .catch(error => logger.error(error))
+
     return action === 'addAnotherPhoto'
       ? res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}/photo`)
       : res.redirect(`/prisoner/${prisonerNumber}/personal/${markType}/${markId}`)
@@ -361,6 +523,15 @@ export default class DistinguishingMarksController {
     if (!verifiedMarkType) return res.redirect(`/prisoner/${prisonerNumber}/personal#marks`)
 
     const mark = await this.distinguishingMarksService.getDistinguishingMark(clientToken, prisonerNumber, markId)
+
+    await this.auditService.sendPageView({
+      user: res.locals.user,
+      prisonerNumber: prisonerData.prisonerNumber,
+      prisonId: prisonerData.prisonId,
+      correlationId: req.id,
+      page: Page.DistinguishingMarkAllPhotos,
+    })
+
     return res.render('pages/distinguishingMarks/viewAllImages', {
       prisonerName,
       prisonerNumber,
