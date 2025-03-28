@@ -3,7 +3,7 @@ import EditPage from '../../../../pages/editPages/editPage'
 import { editPageTests } from '../editPageTests'
 import { PseudonymResponseMock } from '../../../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 
-context('Change name - correction', () => {
+context('Change name - legal', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
@@ -18,14 +18,14 @@ context('Change name - correction', () => {
       cy.setupComponentsData()
       cy.setupPersonalPageStubs({ prisonerNumber, bookingId })
       cy.task('stubGetPseudonyms', { prisonerNumber, response: [PseudonymResponseMock] })
-      cy.task('stubUpdatePseudonym', {
-        pseudonymId: PseudonymResponseMock.sourceSystemId,
+      cy.task('stubCreatePseudonym', {
+        prisonerNumber,
         response: PseudonymResponseMock,
       })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/enter-corrected-name`,
+    editUrl: `prisoner/${prisonerNumber}/personal/enter-new-name`,
     editPageWithTitle: EditPage,
-    editPageTitle: 'Enter John Saunders’ correct name',
+    editPageTitle: 'Enter John Saunders’ new name',
     successfulFlashMessage: 'Name updated',
     validInputs: [
       {

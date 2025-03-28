@@ -49,6 +49,31 @@ export default class AliasService {
     return response
   }
 
+  async createNewWorkingName(clientToken: string, user: PrisonUser, prisonerNumber: string, name: Name) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const existingWorkingName = await this.getWorkingNameAlias(clientToken, prisonerNumber)
+
+    if (!existingWorkingName) throw new NotFoundError('Existing working name not found')
+
+    const response = personIntegrationApiClient.createPseudonym(prisonerNumber, {
+      isWorkingName: true,
+      dateOfBirth: existingWorkingName.dateOfBirth,
+      sex: existingWorkingName.sex?.code,
+      nameType: existingWorkingName.nameType?.code,
+      title: existingWorkingName.title?.code,
+      ethnicity: existingWorkingName.ethnicity?.code,
+      ...name,
+    })
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: this.getUpdatedFields(existingWorkingName, name),
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
   private getUpdatedFields(existingWorkingName: Name, name: Name): Array<keyof Name> {
     return (Object.keys(name) as Array<keyof Name>)
       .map(field => {
