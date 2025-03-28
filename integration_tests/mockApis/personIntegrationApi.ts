@@ -10,6 +10,7 @@ import {
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
 import { PseudonymResponseMock } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 
 const baseUrl = '/personIntegration'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -224,8 +225,8 @@ export default {
   }: {
     pseudonymId: number
     response: PseudonymResponseDto
-  }) => {
-    return stubFor({
+  }) =>
+    stubFor({
       request: {
         method: 'PUT',
         urlPattern: `${baseUrl}/v1/pseudonym/${pseudonymId}\\?sourceSystem=NOMIS`,
@@ -237,6 +238,26 @@ export default {
         },
         jsonBody: response,
       },
-    })
-  },
+    }),
+
+  stubCreatePseudonym: ({
+    prisonerNumber = PrisonerMockDataA.prisonerNumber,
+    response = PseudonymResponseMock,
+  }: {
+    prisonerNumber: string
+    response: PseudonymResponseDto
+  }) =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}/v1/pseudonym\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    }),
 }

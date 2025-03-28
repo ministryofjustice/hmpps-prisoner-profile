@@ -23,5 +23,13 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     aliasController.submitChangeNameCorrection(),
   )
 
+  get('/enter-new-name', editProfileChecks(), aliasController.displayChangeNameLegal())
+  post(
+    '/enter-new-name',
+    editProfileChecks(),
+    validationMiddleware([nameValidator], { redirectBackOnError: true }),
+    aliasController.submitChangeNameLegal(),
+  )
+
   return router
 }
