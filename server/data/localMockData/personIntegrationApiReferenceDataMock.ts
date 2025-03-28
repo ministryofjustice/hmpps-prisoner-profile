@@ -212,6 +212,44 @@ export const MilitaryDischargeRefDataMock: ReferenceDataCodeDto[] = [
   },
 ]
 
+export const LanguageReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
+  {
+    id: 'LANG_ENG',
+    code: 'ENG',
+    description: 'English',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'LANG_FRE',
+    code: 'FRE',
+    description: 'French',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'LANG_SPA',
+    code: 'SPA',
+    description: 'Spanish',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'LANG_ARA',
+    code: 'ARA',
+    description: 'Arabic',
+    listSequence: 4,
+    isActive: true,
+  },
+  {
+    id: 'LANG_CHI',
+    code: 'CHI',
+    description: 'Chinese',
+    listSequence: 5,
+    isActive: true,
+  },
+]
+
 export const DistinguishingMarksMock: PersonIntegrationDistinguishingMark[] = [
   {
     id: 1,

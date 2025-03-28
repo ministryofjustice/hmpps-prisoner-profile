@@ -307,6 +307,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('OS_PLACES_API_TIMEOUT_DEADLINE', 10000))),
     },
+    personCommunicationNeedsApi: {
+      url: get('PERSON_COMMUNICATION_NEEDS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PERSON_COMMUNICATION_NEEDS_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PRISON_COMMUNICATION_NEEDS_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('PERSON_COMMUNICATION_NEEDS_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   serviceUrls: {
     offenderCategorisation: get('OFFENDER_CATEGORISATION_UI_URL', 'http://localhost:3001', requiredInProduction),

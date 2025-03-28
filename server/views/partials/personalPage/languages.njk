@@ -1,23 +1,5 @@
 {% from "../../macros/summaryListRow.njk" import summaryListRow %}
-{% macro otherLanguagesText(language) %}
-    {% if language.canSpeak and language.canWrite and language.canRead %}
-        Speaks, reads and writes
-        {% elif language.canSpeak and language.canWrite %}
-        Speaks and writes
-        {% elif language.canSpeak and language.canRead %}
-        Speaks and reads
-        {% elif language.canWrite and language.canRead %}
-        Reads and writes
-        {% elif language.canWrite %}
-        Writes only
-        {% elif language.canRead %}
-        Reads only
-        {% elif language.canSpeak %}
-        Speaks only
-    {% else %}
-        Not entered
-    {% endif %}
-{% endmacro %}
+{% from "../../macros/otherLanguagesText.njk" import otherLanguagesText %}
 
 {% if inUsersCaseLoad %}
     <dl id="languages"
@@ -76,7 +58,7 @@
                 <dd class="govuk-summary-list__value govuk-summary-list--sub-list govuk-!-padding-top-0 {{ 'hmpps-border-bottom govuk-!-padding-bottom-0' if not loop.last }}">
                     <div>
                         <dl class="govuk-summary-list--sub-list govuk-summary-list">
-                            {{ summaryListRow(language.language, otherLanguagesText(language), "other-language-"+language.code) }}
+                            {{ summaryListRow(language.language, otherLanguagesText(language, true), "other-language-"+language.code) }}
                         </dl>
                     </div>
                 </dd>

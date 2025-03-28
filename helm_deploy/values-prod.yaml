@@ -77,6 +77,7 @@ generic-service:
     CSIP_API_URL: "https://csip-api.hmpps.service.justice.gov.uk"
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api.hmpps.service.justice.gov.uk"
     CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
+    PERSON_COMMUNICATION_NEEDS_API_URL: "https://communication-needs-api.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"

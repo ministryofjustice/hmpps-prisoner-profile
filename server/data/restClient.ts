@@ -304,4 +304,30 @@ export default class RestClient {
         })
     })
   }
+
+  async delete<T>({
+    path = null,
+    query = '',
+    headers = {},
+    responseType = '',
+    raw = false,
+  }: GetRequest = {}): Promise<T> {
+    const endpoint = `${this.apiUrl()}${path}`
+    try {
+      const result = await superagent
+        .delete(endpoint)
+        .agent(this.agent)
+        .query(query)
+        .auth(this.token, { type: 'bearer' })
+        .set(headers)
+        .responseType(responseType)
+        .timeout(this.timeoutConfig())
+
+      return raw ? result : result.body
+    } catch (error) {
+      const sanitisedError = sanitiseError(error, endpoint)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'DELETE'`)
+      throw sanitisedError
+    }
+  }
 }

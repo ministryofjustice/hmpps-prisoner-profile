@@ -48,6 +48,14 @@ export default class EditPage extends Page {
     }
   }
 
+  fillInNamedAutocompleteFields = (fields: { [key: string]: string }) => {
+    Object.entries(fields).forEach(([key, value]) => {
+      cy.get(`input[id=${key}]`).clear()
+      // The trailing {esc} is to explicitly close the autocomplete dropdown allowing testing invalid inputs
+      cy.get(`input[id=${key}]`).type(`${value}{esc}`)
+    })
+  }
+
   selectCheckboxes = (fields: { [key: string]: CheckboxValue[] }) => {
     Object.entries(fields).forEach(([name, values]) => {
       values.forEach(value => {
