@@ -101,7 +101,7 @@ export function mapHeaderData(
 
   return {
     backLinkLabel: 'Back to search results',
-    prisonerName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName, {
+    prisonerName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName, {
       style: NameFormatStyle.lastCommaFirst,
     }),
     prisonerNumber: prisonerData.prisonerNumber,
