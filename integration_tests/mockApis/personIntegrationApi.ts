@@ -5,9 +5,12 @@ import {
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
   PersonIntegrationDistinguishingMarkImageDetail,
+  PseudonymResponseDto,
 } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { distinguishingMarkMock } from '../../server/data/localMockData/distinguishingMarksMock'
 import { stubFor } from './wiremock'
+import { PseudonymResponseMock } from '../../server/data/localMockData/personIntegrationApiReferenceDataMock'
+import { PrisonerMockDataA } from '../../server/data/localMockData/prisoner'
 
 const baseUrl = '/personIntegration'
 const placeHolderImagePath = './../../assets/images/average-face.jpg'
@@ -202,5 +205,59 @@ export default {
     stubGetWithBody({
       path: `${baseUrl}/v1/distinguishing-mark/${prisonerNumber}-${markId}\\?sourceSystem=NOMIS`,
       body: response,
+    }),
+
+  stubGetPseudonyms: ({
+    prisonerNumber,
+    response = [PseudonymResponseMock],
+  }: {
+    prisonerNumber: string
+    response: PseudonymResponseDto[]
+  }) =>
+    stubGetWithBody({
+      path: `${baseUrl}/v1/pseudonyms\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      body: response,
+    }),
+
+  stubUpdatePseudonym: ({
+    pseudonymId = 12345,
+    response = PseudonymResponseMock,
+  }: {
+    pseudonymId: number
+    response: PseudonymResponseDto
+  }) =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPattern: `${baseUrl}/v1/pseudonym/${pseudonymId}\\?sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
+    }),
+
+  stubCreatePseudonym: ({
+    prisonerNumber = PrisonerMockDataA.prisonerNumber,
+    response = PseudonymResponseMock,
+  }: {
+    prisonerNumber: string
+    response: PseudonymResponseDto
+  }) =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPattern: `${baseUrl}/v1/pseudonym\\?prisonerNumber=${prisonerNumber}&sourceSystem=NOMIS`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: response,
+      },
     }),
 }

@@ -5,6 +5,8 @@ import {
   CountryReferenceDataCodesMock,
   DistinguishingMarksMock,
   MilitaryRecordsMock,
+  PseudonymRequestMock,
+  PseudonymResponseMock,
 } from './localMockData/personIntegrationApiReferenceDataMock'
 import { CorePersonRecordReferenceDataDomain } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -174,6 +176,34 @@ describe('personIntegrationApiClient', () => {
       fakePersonIntegrationApi.post('/v1/distinguishing-mark/A1234AA-1/image?sourceSystem=NOMIS').reply(200, response)
       const result = await personIntegrationApiClient.addDistinguishingMarkImage('A1234AA', '1', image)
       expect(result).toEqual(response)
+    })
+  })
+
+  describe('getPseudonyms', () => {
+    it('should get list of pseudonyms', async () => {
+      fakePersonIntegrationApi
+        .get('/v1/pseudonyms?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(200, [PseudonymResponseMock])
+      const result = await personIntegrationApiClient.getPseudonyms('A1234AA')
+      expect(result).toEqual([PseudonymResponseMock])
+    })
+  })
+
+  describe('createPseudonym', () => {
+    it('should create new pseudonym', async () => {
+      fakePersonIntegrationApi
+        .post('/v1/pseudonym?prisonerNumber=A1234AA&sourceSystem=NOMIS')
+        .reply(200, PseudonymResponseMock)
+      const result = await personIntegrationApiClient.createPseudonym('A1234AA', PseudonymRequestMock)
+      expect(result).toEqual(PseudonymResponseMock)
+    })
+  })
+
+  describe('updatePseudonym', () => {
+    it('should update existing pseudonym', async () => {
+      fakePersonIntegrationApi.put('/v1/pseudonym/12345?sourceSystem=NOMIS').reply(200, PseudonymResponseMock)
+      const result = await personIntegrationApiClient.updatePseudonym(12345, PseudonymRequestMock)
+      expect(result).toEqual(PseudonymResponseMock)
     })
   })
 })

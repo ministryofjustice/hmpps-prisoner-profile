@@ -1,9 +1,7 @@
 {% extends "../../../partials/layout.njk" %}
-{% from "../../../macros/summaryCardMacro.njk" import summaryCard %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
 {% set hideBackLink = true %}
 {% set breadCrumbs = [
@@ -76,7 +74,7 @@
                             preventDoubleClick: true,
                             attributes: { "data-qa": "edit-submit-button" }
                         }) }}
-                        <a href="/prisoner/{{ prisonerNumber }}/personal#personal-details"
+                        <a href="/prisoner/{{ miniBannerData.prisonerNumber }}/personal#personal-details"
                            class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">Cancel</a>
                     </div>
                 </form>

@@ -44,6 +44,7 @@ export const inmateDetailMock: InmateDetail = {
   offenderId: 1814850,
   rootOffenderId: 1814850,
   firstName: 'JOHN',
+  middleName: 'MIDDLE NAMES',
   lastName: 'SAUNDERS',
   dateOfBirth: '1990-10-12',
   age: 32,

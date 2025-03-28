@@ -9,6 +9,8 @@ import {
   MilitaryRecord,
   PersonIntegrationApiClient,
   PersonIntegrationDistinguishingMark,
+  PseudonymRequestDto,
+  PseudonymResponseDto,
 } from './interfaces/personIntegrationApi/personIntegrationApiClient'
 import config from '../config'
 import MulterFile from '../controllers/interfaces/MulterFile'
@@ -137,14 +139,6 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
-  private updateCorePersonRecord(prisonerNumber: string, fieldName: string, value: string): Promise<void> {
-    return this.restClient.patch({
-      path: '/v1/core-person-record',
-      query: { prisonerNumber },
-      data: { fieldName, value },
-    })
-  }
-
   getPhysicalAttributes(prisonerNumber: string): Promise<CorePersonPhysicalAttributesDto> {
     return this.restClient.get({ path: `/v1/core-person-record/physical-attributes`, query: { prisonerNumber } })
   }
@@ -157,6 +151,34 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: '/v1/core-person-record/physical-attributes',
       query: { prisonerNumber },
       data: physicalAttributes,
+    })
+  }
+
+  getPseudonyms(prisonerNumber: string): Promise<PseudonymResponseDto[]> {
+    return this.restClient.get({ path: `/v1/pseudonyms`, query: { prisonerNumber, sourceSystem: 'NOMIS' } })
+  }
+
+  updatePseudonym(pseudonymId: number, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto> {
+    return this.restClient.put({
+      path: `/v1/pseudonym/${pseudonymId}`,
+      query: { sourceSystem: 'NOMIS' },
+      data: pseudonym,
+    })
+  }
+
+  createPseudonym(prisonerNumber: string, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto> {
+    return this.restClient.post({
+      path: `/v1/pseudonym`,
+      query: { prisonerNumber, sourceSystem: 'NOMIS' },
+      data: pseudonym,
+    })
+  }
+
+  private updateCorePersonRecord(prisonerNumber: string, fieldName: string, value: string): Promise<void> {
+    return this.restClient.patch({
+      path: '/v1/core-person-record',
+      query: { prisonerNumber },
+      data: { fieldName, value },
     })
   }
 }
