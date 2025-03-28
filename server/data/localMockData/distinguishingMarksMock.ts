@@ -14,7 +14,11 @@ export const distinguishingMarkMock: PersonIntegrationDistinguishingMark = {
     code: 'SCAR',
     description: 'Scar',
   },
-  side: null,
+  side: {
+    id: 'SIDE_L',
+    code: 'L',
+    description: 'Left',
+  },
   partOrientation: null,
   comment: 'Horrible arm scar',
   photographUuids: [{ id: 100, latest: true }],

@@ -355,7 +355,7 @@ context('When signed in', () => {
 
         scarsDetailHeaders.each((element, index) => {
           const expectedHeaders = ['Location', 'Description']
-          const expectedTexts = ['Arm - no specific location', 'Horrible arm scar']
+          const expectedTexts = ['Arm (general)', 'Horrible arm scar']
 
           cy.wrap(element).should('include.text', expectedHeaders[index])
           cy.wrap(element).siblings('dd').should('include.text', expectedTexts[index])
