@@ -38,7 +38,7 @@ context('Edit main language', () => {
         cy.task('stubPersonCommunicationNeedsUpdateLanguagePreferences', { prisonerNumber })
         cy.task('stubPersonCommunicationNeedsGetReferenceData', {
           domain: 'LANG',
-          referenceData: LanguageRefDataMock,
+          referenceData: LanguageRefDataMock.language,
         })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/main-language`,
@@ -122,7 +122,7 @@ context('Edit main language', () => {
         cy.task('stubPersonCommunicationNeedsUpdateLanguagePreferences', { prisonerNumber })
         cy.task('stubPersonCommunicationNeedsGetReferenceData', {
           domain: 'LANG',
-          referenceData: LanguageRefDataMock,
+          referenceData: LanguageRefDataMock.language,
         })
       },
       editUrl: `prisoner/${prisonerNumber}/personal/main-language`,

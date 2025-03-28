@@ -1,6 +1,6 @@
 import { stubGetWithBody, stubPutWithResponse } from './utils'
 import { SecondaryLanguageDto } from '../../server/data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
-import { CorePersonRecordReferenceDataCodeDto } from '../../server/data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCodeDto } from '../../server/data/interfaces/referenceData'
 
 const baseUrl = '/communicationNeeds'
 
@@ -41,7 +41,7 @@ export default {
     referenceData,
   }: {
     domain: string
-    referenceData: CorePersonRecordReferenceDataCodeDto[]
+    referenceData: ReferenceDataCodeDto[]
   }) =>
     stubGetWithBody({
       path: `${baseUrl}/v1/core-person-record/reference-data/domain/${domain}/codes`,

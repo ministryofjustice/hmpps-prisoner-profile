@@ -25,8 +25,6 @@ export default class PersonCommunicationNeedsApiReferenceDataSource implements R
       description: code.description,
       listSequence: code.listSequence,
       isActive: code.isActive,
-      parentCode: code.parentCode,
-      parentDomain: code.parentDomain,
     }))
   }
 }

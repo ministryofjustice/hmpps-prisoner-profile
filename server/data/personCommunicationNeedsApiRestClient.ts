@@ -7,7 +7,7 @@ import {
   PersonCommunicationNeedsReferenceDataDomain,
   SecondaryLanguageRequest,
 } from './interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
-import { CorePersonRecordReferenceDataCodeDto } from './interfaces/personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCode } from './interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 
 export default class PersonCommunicationNeedsApiRestClient implements PersonCommunicationNeedsApiClient {
   private readonly restClient: RestClient
@@ -16,9 +16,7 @@ export default class PersonCommunicationNeedsApiRestClient implements PersonComm
     this.restClient = new RestClient('Person Communication Needs API', config.apis.personCommunicationNeedsApi, token)
   }
 
-  getReferenceDataCodes(
-    domain: PersonCommunicationNeedsReferenceDataDomain,
-  ): Promise<CorePersonRecordReferenceDataCodeDto[]> {
+  getReferenceDataCodes(domain: PersonCommunicationNeedsReferenceDataDomain): Promise<ReferenceDataCode[]> {
     return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
   }
 

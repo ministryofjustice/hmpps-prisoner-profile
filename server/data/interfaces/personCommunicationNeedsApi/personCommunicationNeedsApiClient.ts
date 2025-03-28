@@ -1,5 +1,5 @@
 import { ReferenceDataValue } from '../prisonApi/ReferenceDataValue'
-import { CorePersonRecordReferenceDataCodeDto } from '../personIntegrationApi/personIntegrationApiClient'
+import { ReferenceDataCode } from '../healthAndMedicationApi/healthAndMedicationApiClient'
 
 // eslint-disable-next-line no-shadow
 export enum PersonCommunicationNeedsReferenceDataDomain {
@@ -50,7 +50,5 @@ export interface PersonCommunicationNeedsApiClient {
 
   deleteSecondaryLanguage(prisonerNumber: string, languageCode: string): Promise<void>
 
-  getReferenceDataCodes(
-    domain: PersonCommunicationNeedsReferenceDataDomain,
-  ): Promise<CorePersonRecordReferenceDataCodeDto[]>
+  getReferenceDataCodes(domain: PersonCommunicationNeedsReferenceDataDomain): Promise<ReferenceDataCode[]>
 }
