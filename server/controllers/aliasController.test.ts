@@ -4,16 +4,22 @@ import { auditServiceMock } from '../../tests/mocks/auditServiceMock'
 import { PrisonerMockDataA } from '../data/localMockData/prisoner'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import { prisonUserMock } from '../data/localMockData/user'
+import AliasService, { Name } from '../services/aliasService'
+import { aliasServiceMock } from '../../tests/mocks/aliasServiceMock'
+import { PseudonymResponseMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
+import { FlashMessageType } from '../data/enums/flashMessageType'
 
 describe('Alias Controller', () => {
   let req: Request
   let res: Response
   let next: NextFunction
+  let aliasService: AliasService
   let auditService: AuditService
   let controller: AliasController
 
   beforeEach(() => {
     req = {
+      id: '123',
       params: { prisonerNumber: 'G6123VU' },
       middleware: { clientToken: 'CLIENT_TOKEN', prisonerData: PrisonerMockDataA },
       flash: jest.fn().mockReturnValue([]),
@@ -29,7 +35,8 @@ describe('Alias Controller', () => {
     next = jest.fn()
 
     auditService = auditServiceMock()
-    controller = new AliasController(auditService)
+    aliasService = aliasServiceMock() as AliasService
+    controller = new AliasController(aliasService, auditService)
   })
 
   describe('Change name purpose page', () => {
@@ -77,6 +84,149 @@ describe('Alias Controller', () => {
           details: { purpose },
         })
       }
+    })
+  })
+
+  describe('Change name (correction) page', () => {
+    it('should render the change name correction page', async () => {
+      await controller.displayChangeNameCorrection()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeNameCorrection', {
+        pageTitle: `Enter this person's correct name - Prisoner personal details`,
+        formTitle: `Enter John Saunders’ correct name`,
+        errors: [],
+        formValues: {
+          firstName: 'John',
+          middleName1: 'Middle',
+          middleName2: 'Names',
+          lastName: 'Saunders',
+        },
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+        },
+      })
+    })
+
+    it('Populates the errors from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          if (key === 'errors') return ['error']
+          return []
+        },
+      } as any
+
+      await controller.displayChangeNameCorrection()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+    })
+
+    it('Populates the field value from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          return key === 'requestBody' ? [JSON.stringify({ firstName: 'first' })] : []
+        },
+      } as any
+
+      await controller.displayChangeNameCorrection()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ formValues: { firstName: 'first' } }),
+      )
+    })
+
+    it('Sends a page view audit event', async () => {
+      await controller.displayChangeNameCorrection()(req, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonId: PrisonerMockDataA.prisonId,
+        correlationId: req.id,
+        page: Page.EditNameCorrection,
+      })
+    })
+
+    it('submits the name change', async () => {
+      const newName: Name = {
+        firstName: 'first',
+        middleName1: 'middleone',
+        middleName2: 'middletwo',
+        lastName: 'last',
+      }
+
+      req = { ...req, body: newName } as unknown as Request
+
+      aliasService.updateWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+
+      await controller.submitChangeNameCorrection()(req, res, next)
+
+      expect(aliasService.updateWorkingName).toHaveBeenCalledWith(
+        expect.anything(),
+        prisonUserMock,
+        PrisonerMockDataA.prisonerNumber,
+        newName,
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Name updated',
+        type: FlashMessageType.success,
+        fieldName: 'full-name',
+      })
+    })
+
+    it('Submission handles API errors', async () => {
+      aliasService.updateWorkingName = async () => {
+        throw new Error()
+      }
+
+      await controller.submitChangeNameCorrection()(req, res, next)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/enter-corrected-name`,
+      )
+    })
+
+    it('Sends a post success audit event', async () => {
+      const newName: Name = {
+        firstName: 'first',
+        middleName1: 'middleone',
+        middleName2: 'middletwo',
+        lastName: 'last',
+      }
+
+      req = { ...req, body: newName } as unknown as Request
+
+      aliasService.updateWorkingName = jest.fn().mockResolvedValue({ ...PseudonymResponseMock, ...newName })
+
+      await controller.submitChangeNameCorrection()(req, res, next)
+
+      const expectedAuditEvent = {
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditNameCorrection,
+        details: {
+          fieldName: 'name',
+          previous: {
+            firstName: 'JOHN',
+            middleName1: 'MIDDLE',
+            middleName2: 'NAMES',
+            lastName: 'SAUNDERS',
+          },
+          updated: newName,
+        },
+      }
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
   })
 })

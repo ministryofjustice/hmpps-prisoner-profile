@@ -1,9 +1,12 @@
 import {
   CorePersonRecordReferenceDataCodeDto,
-  PersonIntegrationDistinguishingMark,
   MilitaryRecord,
+  PersonIntegrationDistinguishingMark,
+  PseudonymRequestDto,
+  PseudonymResponseDto,
 } from '../interfaces/personIntegrationApi/personIntegrationApiClient'
 import { ReferenceDataCodeDto } from '../interfaces/referenceData'
+import { PrisonerMockDataA } from './prisoner'
 
 export const EnglandCountryReferenceDataCodeMock = {
   id: '1',
@@ -269,3 +272,48 @@ export const DistinguishingMarksMock: PersonIntegrationDistinguishingMark[] = [
     photographUuids: [],
   },
 ]
+
+export const PseudonymRequestMock: PseudonymRequestDto = {
+  firstName: PrisonerMockDataA.firstName,
+  middleName1: PrisonerMockDataA.middleNames.split(' ')[0],
+  middleName2: PrisonerMockDataA.middleNames.split(' ')[1],
+  lastName: PrisonerMockDataA.lastName,
+  dateOfBirth: PrisonerMockDataA.dateOfBirth,
+  nameType: 'CN',
+  title: 'MR',
+  sex: 'M',
+  ethnicity: 'W1',
+  isWorkingName: true,
+}
+
+export const PseudonymResponseMock: PseudonymResponseDto = {
+  prisonerNumber: PrisonerMockDataA.prisonerNumber,
+  sourceSystem: 'NOMIS',
+  sourceSystemId: 12345,
+  firstName: PrisonerMockDataA.firstName,
+  middleName1: PrisonerMockDataA.middleNames.split(' ')[0],
+  middleName2: PrisonerMockDataA.middleNames.split(' ')[1],
+  lastName: PrisonerMockDataA.lastName,
+  dateOfBirth: PrisonerMockDataA.dateOfBirth,
+  nameType: {
+    id: 'NAME_TYPE_CN',
+    code: 'CN',
+    description: 'Current name',
+  },
+  title: {
+    id: 'TITLE_MR',
+    code: 'MR',
+    description: 'Mr.',
+  },
+  sex: {
+    id: 'SEX_M',
+    code: 'M',
+    description: 'Male',
+  },
+  ethnicity: {
+    id: 'ETHNICITY_W1',
+    code: 'W1',
+    description: 'White',
+  },
+  isWorkingName: true,
+}

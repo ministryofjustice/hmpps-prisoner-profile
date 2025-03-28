@@ -303,7 +303,7 @@ export default class PersonalPageService {
       cityOrTownOfBirth: inmateDetail.birthPlace ? convertToTitleCase(inmateDetail.birthPlace) : 'Not entered',
       countryOfBirth: countryOfBirth ? convertToTitleCase(countryOfBirth) : 'Not entered',
       ethnicGroup,
-      fullName: formatName(prisonerData.firstName, prisonerData.middleNames, prisonerData.lastName),
+      fullName: formatName(inmateDetail.firstName, inmateDetail.middleName, inmateDetail.lastName),
       languages: {
         interpreterRequired: inmateDetail.interpreterRequired,
         spoken: inmateDetail.language,

@@ -184,7 +184,7 @@ export default class PersonalController {
       imperial: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
-          const { clientToken, prisonerData } = req.middleware
+          const { clientToken, prisonerData, inmateDetail } = req.middleware
 
           const { height } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
@@ -207,7 +207,7 @@ export default class PersonalController {
           res.render('pages/edit/heightImperial', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
-            breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
+            breadcrumbPrisonerName: formatName(inmateDetail.firstName, '', inmateDetail.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors,
@@ -255,7 +255,7 @@ export default class PersonalController {
       metric: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
-          const { clientToken, prisonerData } = req.middleware
+          const { clientToken, prisonerData, inmateDetail } = req.middleware
           const requestBodyFlash = requestBodyFromFlash<{ kilograms: string }>(req)
           const errors = req.flash('errors')
 
@@ -272,7 +272,7 @@ export default class PersonalController {
           res.render('pages/edit/weightMetric', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
-            breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
+            breadcrumbPrisonerName: formatName(inmateDetail.firstName, '', inmateDetail.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors,
@@ -311,7 +311,7 @@ export default class PersonalController {
       imperial: {
         edit: async (req: Request, res: Response, next: NextFunction) => {
           const { prisonerNumber } = req.params
-          const { clientToken, prisonerData } = req.middleware
+          const { clientToken, prisonerData, inmateDetail } = req.middleware
 
           const { weight } = await this.personalPageService.getPhysicalAttributes(clientToken, prisonerNumber)
 
@@ -334,7 +334,7 @@ export default class PersonalController {
           res.render('pages/edit/weightImperial', {
             pageTitle: `${pageTitle} - Prisoner personal details`,
             prisonerNumber,
-            breadcrumbPrisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
+            breadcrumbPrisonerName: formatName(inmateDetail.firstName, '', inmateDetail.lastName, {
               style: NameFormatStyle.lastCommaFirst,
             }),
             errors,

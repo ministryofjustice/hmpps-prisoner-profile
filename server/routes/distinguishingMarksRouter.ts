@@ -39,7 +39,10 @@ export default function distinguishingMarksRouter(services: Services): Router {
     next()
   })
 
-  const distinguishingMarksController = new DistinguishingMarksController(services.distinguishingMarksService)
+  const distinguishingMarksController = new DistinguishingMarksController(
+    services.distinguishingMarksService,
+    services.auditService,
+  )
 
   // Add distinguishing mark
   get('/', distinguishingMarksController.newDistinguishingMark)

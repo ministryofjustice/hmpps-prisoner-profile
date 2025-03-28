@@ -64,6 +64,8 @@ describe('PersonalController', () => {
       prisonId: 999,
     },
     inmateDetail: {
+      firstName: 'First',
+      lastName: 'Last',
       birthPlace: 'SHEFFIELD',
       profileInformation: [
         { question: 'Smoker or Vaper', resultValue: 'Yes', type: ProfileInformationType.SmokerOrVaper },

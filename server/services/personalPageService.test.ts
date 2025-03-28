@@ -71,18 +71,9 @@ describe('PersonalPageService', () => {
       updateReligion: jest.fn(),
       getReferenceDataCodes: jest.fn(),
       getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
-      updateMilitaryRecord: jest.fn(),
-      createMilitaryRecord: jest.fn(),
       getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
       updatePhysicalAttributes: jest.fn(),
-      getDistinguishingMark: jest.fn(),
-      getDistinguishingMarks: jest.fn(),
-      createDistinguishingMark: jest.fn(),
-      updateDistinguishingMark: jest.fn(),
-      getDistinguishingMarkImage: jest.fn(),
-      updateDistinguishingMarkImage: jest.fn(),
-      addDistinguishingMarkImage: jest.fn(),
-    }
+    } as unknown as PersonIntegrationApiClient
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),
@@ -727,6 +718,18 @@ describe('PersonalPageService', () => {
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['cityOrTownOfBirth'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update country of birth', () => {
+    it('Updates the country of birth using Person Integration API', async () => {
+      await constructService().updateCountryOfBirth('token', prisonUserMock, 'A1234AA', 'France')
+      expect(personIntegrationApiClient.updateCountryOfBirth).toHaveBeenCalledWith('A1234AA', 'France')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['countryOfBirth'],
         user: prisonUserMock,
       })
     })
