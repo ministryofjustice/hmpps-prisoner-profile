@@ -22,7 +22,10 @@ import { prisonUserMock } from '../data/localMockData/user'
 import Address from '../data/interfaces/prisonApi/Address'
 import SecondaryLanguage from '../data/interfaces/prisonApi/SecondaryLanguage'
 import LearnerNeurodivergence from '../data/interfaces/curiousApi/LearnerNeurodivergence'
-import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  PersonIntegrationApiClient,
+  PseudonymResponseDto,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import ReferenceDataService from './referenceData/referenceDataService'
 import {
   EnglandCountryReferenceDataCodeMock,
@@ -73,6 +76,7 @@ describe('PersonalPageService', () => {
       getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
       getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
       updatePhysicalAttributes: jest.fn(),
+      getPseudonyms: jest.fn(),
     } as unknown as PersonIntegrationApiClient
 
     healthAndMedicationApiClient = {
@@ -133,30 +137,106 @@ describe('PersonalPageService', () => {
     })
 
     describe('Aliases', () => {
-      const getResponseWithAliases = async (aliases: Alias[]) => {
-        const prisonerData = { ...PrisonerMockDataA }
-        prisonerData.aliases = aliases
-        const service = constructService()
-        return service.get('token', prisonerData)
-      }
+      describe('Aliases from Prisoner Search', () => {
+        const getResponseWithAliases = async (aliases: Alias[]) => {
+          const prisonerData = { ...PrisonerMockDataA }
+          prisonerData.aliases = aliases
+          const service = constructService()
+          return service.get('token', prisonerData)
+        }
 
-      it('Handles no aliases', async () => {
-        const response = await getResponseWithAliases([])
-        expect(response.personalDetails.aliases).toEqual([])
+        it('Handles no aliases', async () => {
+          const response = await getResponseWithAliases([])
+          expect(response.personalDetails.aliases).toEqual([])
+        })
+
+        it('Maps multiple aliases', async () => {
+          const response = await getResponseWithAliases([
+            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: '' },
+            { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
+          ])
+          expect(response.personalDetails.aliases[0]).toEqual({
+            alias: 'First Name Last Name',
+            dateOfBirth: '01/01/2022',
+          })
+          expect(response.personalDetails.aliases[1]).toEqual({
+            alias: 'First Middle Last',
+            dateOfBirth: '01/01/2023',
+          })
+        })
       })
 
-      it('Maps multiple aliases', async () => {
-        const response = await getResponseWithAliases([
-          { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: '' },
-          { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
-        ])
-        expect(response.personalDetails.aliases[0]).toEqual({
-          alias: 'First Name Last Name',
-          dateOfBirth: '01/01/2022',
+      describe('Aliases from Person Integration API after an update', () => {
+        const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
+          personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
+          const service = constructService()
+          return service.get('token', PrisonerMockDataA, false, false, null, { text: 'updated' })
+        }
+
+        it('Handles no pseudonyms', async () => {
+          const response = await getResponseWithPseudonyms([])
+          expect(response.personalDetails.aliases).toEqual([])
         })
-        expect(response.personalDetails.aliases[1]).toEqual({
-          alias: 'First Middle Last',
-          dateOfBirth: '01/01/2023',
+
+        it('Handles only working name pseudonym', async () => {
+          const response = await getResponseWithPseudonyms([
+            { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
+          ])
+          expect(response.personalDetails.aliases).toEqual([])
+        })
+
+        it('Maps multiple pseudonyms', async () => {
+          const response = await getResponseWithPseudonyms([
+            { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
+            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name' } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleName1: 'Middleone',
+              lastName: 'Last',
+            } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleName1: 'Middleone',
+              middleName2: 'Middletwo',
+              lastName: 'Last',
+            } as PseudonymResponseDto,
+          ])
+          expect(response.personalDetails.aliases[0]).toEqual({
+            alias: 'First Name Last Name',
+            dateOfBirth: '01/01/2022',
+          })
+          expect(response.personalDetails.aliases[1]).toEqual({
+            alias: 'First Middleone Last',
+            dateOfBirth: '01/01/2023',
+          })
+          expect(response.personalDetails.aliases[2]).toEqual({
+            alias: 'First Middleone Middletwo Last',
+            dateOfBirth: '01/01/2023',
+          })
+        })
+
+        it('Falls back to Prisoner Search results if Person Integration API call fails', async () => {
+          personIntegrationApiClient.getPseudonyms = async () => {
+            throw new Error()
+          }
+          const service = constructService()
+          const prisonerData = { ...PrisonerMockDataA }
+          prisonerData.aliases = [
+            {
+              dateOfBirth: '2022-01-01',
+              firstName: 'First name',
+              lastName: 'Last name',
+            } as Alias,
+          ]
+          const response = await service.get('token', prisonerData, false, false, null, { text: 'updated' })
+          expect(response.personalDetails.aliases).toEqual([
+            {
+              alias: 'First Name Last Name',
+              dateOfBirth: '01/01/2022',
+            },
+          ])
         })
       })
     })
