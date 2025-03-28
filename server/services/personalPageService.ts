@@ -58,6 +58,7 @@ import { ReferenceDataDomain } from '../data/interfaces/referenceData'
 import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
 import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePersonPhysicalAttributes'
+import logger from '../../logger'
 
 export default class PersonalPageService {
   constructor(
@@ -152,8 +153,10 @@ export default class PersonalPageService {
     dietAndAllergyIsEnabled: boolean = false,
     editProfileEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
+    flashMessage: unknown = null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
 
     const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
@@ -195,12 +198,14 @@ export default class PersonalPageService {
     return {
       personalDetails: await this.personalDetails(
         prisonApiClient,
+        personIntegrationApiClient,
         prisonerData,
         inmateDetail,
         prisonerDetail,
         secondaryLanguages,
         countryOfBirth,
         healthAndMedication,
+        flashMessage,
       ),
       identityNumbers: this.identityNumbers(prisonerData, identifiers),
       property: this.property(property),
@@ -255,19 +260,18 @@ export default class PersonalPageService {
 
   private async personalDetails(
     prisonApiClient: PrisonApiClient,
+    personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
     prisonerDetail: PrisonerDetail,
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
+    flashMessage: unknown,
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
 
-    const aliases = prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
-      alias: formatName(firstName, middleNames, lastName),
-      dateOfBirth: formatDate(dateOfBirth, 'short'),
-    }))
+    const aliases = await this.aliases(personIntegrationApiClient, prisonerData, flashMessage)
 
     let ethnicGroup = 'Not entered'
     if (prisonerDetail?.ethnicity) {
@@ -345,6 +349,33 @@ export default class PersonalPageService {
         lastModifiedPrison: lastUpdatedAgency?.description ?? '',
       },
     }
+  }
+
+  private aliases = async (
+    personIntegrationApiClient: PersonIntegrationApiClient,
+    prisonerData: Prisoner,
+    flashMessage: unknown,
+  ) => {
+    if (flashMessage) {
+      try {
+        logger.debug('Retrieving aliases from Person Integration API after update')
+
+        const pseudonyms = await personIntegrationApiClient.getPseudonyms(prisonerData.prisonerNumber)
+        return pseudonyms
+          .filter(pseudonym => !pseudonym.isWorkingName)
+          .map(({ firstName, middleName1, middleName2, lastName, dateOfBirth }) => ({
+            alias: formatName(firstName, [middleName1, middleName2].join(' ').trim(), lastName),
+            dateOfBirth: formatDate(dateOfBirth, 'short'),
+          }))
+      } catch (error) {
+        logger.error('Failed to retrieve aliases from Person Integration API', error)
+      }
+    }
+
+    return prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
+      alias: formatName(firstName, middleNames, lastName),
+      dateOfBirth: formatDate(dateOfBirth, 'short'),
+    }))
   }
 
   private mapDietAndAllergy = (

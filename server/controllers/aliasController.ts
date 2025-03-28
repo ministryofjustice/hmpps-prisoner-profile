@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatName, formatNamePart } from '../utils/utils'
+import { apostrophe, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -7,6 +7,7 @@ import { FlashMessageType } from '../data/enums/flashMessageType'
 import AliasService, { Name } from '../services/aliasService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { PrisonUser } from '../interfaces/HmppsUser'
+import { PseudonymResponseDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 
 export default class AliasController {
   constructor(
@@ -67,20 +68,55 @@ export default class AliasController {
   }
 
   public displayChangeNameCorrection(): RequestHandler {
+    return this.displayChangeNamePage({
+      pageTitle: `Enter this person's correct name - Prisoner personal details`,
+      formTitle: (titlePrisonerName: string) => `Enter ${apostrophe(titlePrisonerName)} correct name`,
+      warningText: 'This will become their main name in DPS and NOMIS.',
+      auditPage: Page.EditNameCorrection,
+    })
+  }
+
+  public submitChangeNameCorrection(): RequestHandler {
+    return this.submitChangeName({
+      redirectUrl: 'enter-corrected-name',
+      auditPostAction: PostAction.EditNameCorrection,
+      submitMethod: this.aliasService.updateWorkingName.bind(this.aliasService),
+    })
+  }
+
+  public displayChangeNameLegal(): RequestHandler {
+    return this.displayChangeNamePage({
+      pageTitle: `Enter this person's new name - Prisoner personal details`,
+      formTitle: (titlePrisonerName: string) => `Enter ${apostrophe(titlePrisonerName)} new name`,
+      warningText: 'This will become their main name in DPS and NOMIS. The previous name will be recorded as an alias.',
+      auditPage: Page.EditNameLegal,
+    })
+  }
+
+  public submitChangeNameLegal(): RequestHandler {
+    return this.submitChangeName({
+      redirectUrl: 'enter-new-name',
+      auditPostAction: PostAction.EditNameLegal,
+      submitMethod: this.aliasService.createNewWorkingName.bind(this.aliasService),
+    })
+  }
+
+  private displayChangeNamePage({
+    pageTitle,
+    formTitle,
+    warningText,
+    auditPage,
+  }: {
+    pageTitle: string
+    formTitle: (titlePrisonerName: string) => string
+    warningText: string
+    auditPage: Page
+  }): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const { firstName, middleName1, middleName2, lastName } = await this.aliasService.getWorkingNameAlias(
-        req.middleware.clientToken,
-        prisonerNumber,
-      )
       const errors = req.flash('errors')
 
-      const formValues = requestBodyFromFlash<Name>(req) || {
-        firstName: formatNamePart(firstName),
-        middleName1: formatNamePart(middleName1),
-        middleName2: formatNamePart(middleName2),
-        lastName: formatNamePart(lastName),
-      }
+      const formValues = requestBodyFromFlash<Name>(req) || {}
 
       this.auditService
         .sendPageView({
@@ -88,13 +124,14 @@ export default class AliasController {
           prisonerNumber,
           prisonId,
           correlationId: req.id,
-          page: Page.EditNameCorrection,
+          page: auditPage,
         })
         .catch(error => logger.error(error))
 
-      return res.render('pages/edit/alias/changeNameCorrection', {
-        pageTitle: `Enter this person's correct name - Prisoner personal details`,
-        formTitle: `Enter ${apostrophe(titlePrisonerName)} correct name`,
+      return res.render('pages/edit/alias/changeName', {
+        pageTitle,
+        formTitle: formTitle(titlePrisonerName),
+        warningText,
         errors,
         formValues,
         miniBannerData: {
@@ -105,7 +142,20 @@ export default class AliasController {
     }
   }
 
-  public submitChangeNameCorrection(): RequestHandler {
+  private submitChangeName({
+    redirectUrl,
+    auditPostAction,
+    submitMethod,
+  }: {
+    redirectUrl: string
+    auditPostAction: PostAction
+    submitMethod: (
+      clientToken: string,
+      user: PrisonUser,
+      prisonerNumber: string,
+      name: Name,
+    ) => Promise<PseudonymResponseDto>
+  }): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerNumber } = req.params
       const { clientToken } = req.middleware
@@ -121,17 +171,12 @@ export default class AliasController {
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(formValues))
         req.flash('errors', errors)
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/enter-corrected-name`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${redirectUrl}`)
       }
 
       try {
         const previousWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
-        const result = await this.aliasService.updateWorkingName(
-          clientToken,
-          res.locals.user as PrisonUser,
-          prisonerNumber,
-          formValues,
-        )
+        const result = await submitMethod(clientToken, res.locals.user as PrisonUser, prisonerNumber, formValues)
 
         req.flash('flashMessage', {
           text: 'Name updated',
@@ -144,7 +189,7 @@ export default class AliasController {
             user: res.locals.user,
             prisonerNumber,
             correlationId: req.id,
-            action: PostAction.EditNameCorrection,
+            action: auditPostAction,
             details: {
               fieldName: 'name',
               previous: {
@@ -167,7 +212,7 @@ export default class AliasController {
       } catch (e) {
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
-        return res.redirect(`/prisoner/${prisonerNumber}/personal/enter-corrected-name`)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${redirectUrl}`)
       }
     }
   }
