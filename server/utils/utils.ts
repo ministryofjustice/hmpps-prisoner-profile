@@ -794,3 +794,8 @@ export const lengthOfService = (startDate: string, endDate: string): string => {
 
   return pluralise(months, 'month')
 }
+
+export const requestStringToBoolean = (value: string): boolean => {
+  if (value === undefined) return undefined
+  return value === 'true'
+}

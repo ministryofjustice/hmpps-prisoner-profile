@@ -98,6 +98,10 @@ CONTENTFUL_HOST=https://graphql.eu.contentful.com
 CONTENTFUL_ENVIRONMENT=master
 CONTENTFUL_SPACE_ID=
 CONTENTFUL_ACCESS_TOKEN=
+PERSON_COMMUNICATION_NEEDS_API_URL=https://communication-needs-api-dev.hmpps.service.justice.gov.uk
+HEALTH_AND_MEDICATION_API_URL=https://health-and-medication-api-dev.hmpps.service.justice.gov.uk
+ALERTS_API_URL=https://alerts-api-dev.hmpps.service.justice.gov.uk
+PERSON_INTEGRATION_API_URL=https://person-integration-api-dev.hmpps.service.justice.gov.uk
 ```
 
 </details>

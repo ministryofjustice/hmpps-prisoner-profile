@@ -1,5 +1,6 @@
 import { CorePersonRecordReferenceDataDomain } from './personIntegrationApi/personIntegrationApiClient'
 import { HealthAndMedicationReferenceDataDomain } from './healthAndMedicationApi/healthAndMedicationApiClient'
+import { PersonCommunicationNeedsReferenceDataDomain } from './personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 
 export interface ReferenceDataCodeDto {
   id: string
@@ -10,4 +11,7 @@ export interface ReferenceDataCodeDto {
   parentCode?: string
 }
 
-export type ReferenceDataDomain = CorePersonRecordReferenceDataDomain | HealthAndMedicationReferenceDataDomain
+export type ReferenceDataDomain =
+  | CorePersonRecordReferenceDataDomain
+  | HealthAndMedicationReferenceDataDomain
+  | PersonCommunicationNeedsReferenceDataDomain

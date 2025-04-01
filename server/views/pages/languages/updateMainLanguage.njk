@@ -1,0 +1,140 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from 'components/miniBanner/miniBanner.njk' import miniBanner %}
+{% from "../../macros/otherLanguagesText.njk" import otherLanguagesText %}
+
+
+{% set hideBackLink = true %}
+{% set prisonerNumber = miniBannerData.prisonerNumber %}
+{%
+    set breadCrumbs = [
+    {
+        text: 'Digital Prison Services',
+        href:  "/" | prependBaseUrl
+    },
+    {
+        text: miniBannerData.prisonerName,
+        href: "/prisoner/" + prisonerNumber
+    },
+    {
+        text: 'Personal',
+        href: "/prisoner/" + prisonerNumber + "/personal"
+    }
+]
+%}
+{% set mainClasses = 'govuk-body' %}
+
+{% block content %}
+
+    {% block body %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
+        </div>
+
+        {% if errors.length > 0 %}
+            {{
+            govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errors,
+                attributes: { 'data-qa-errors': true },
+                classes: 'govuk-!-margin-bottom-6'
+            })
+            }}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">{{ title }}</h1>
+
+                <form id="mainLanguageForm" method="post" novalidate="novalidate" autocomplete="off">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+                    <input type="hidden" id="preferredSpokenLanguageCodeError" name="preferredSpokenLanguageCodeError" value="" />
+                    <input type="hidden" id="preferredWrittenLanguageCodeError" name="preferredWrittenLanguageCodeError" value="" />
+
+                    {{ govukSelect({
+                        id: "preferredSpokenLanguageCode",
+                        name: "preferredSpokenLanguageCode",
+                        label: {
+                            text: mainLanguageLabel
+                        },
+                        items: preferredSpokenLanguageOptions,
+                        errorMessage: errors | findError("preferredSpokenLanguageCode"),
+                        classes: "js-autocomplete-select",
+                        attributes: {
+                            "data-qa": "select-preferred-spoken-language-input"
+                        }
+                    }) }}
+
+                    {{ govukRadios({
+                        idPrefix: "interpreterRequired",
+                        name: "interpreterRequired",
+                        fieldset: {
+                            legend: {
+                                text: "Do they need an interpreter?",
+                                classes: "govuk-fieldset__legend--s"
+                            }
+                        },
+                        items: [
+                            {
+                                value: true,
+                                text: "Yes",
+                                checked: formValues.interpreterRequired == true
+                            },
+                            {
+                                value: false,
+                                text: "No",
+                                checked: formValues.interpreterRequired == false
+                            }
+                        ],
+                        errorMessage: errors | findError('interpreterRequired')
+                    }) }}
+
+                    {{ govukSelect({
+                        id: "preferredWrittenLanguageCode",
+                        name: "preferredWrittenLanguageCode",
+                        label: {
+                            text: 'What is their main written language?'
+                        },
+                        items: preferredWrittenLanguageOptions,
+                        errorMessage: errors | findError("preferredWrittenLanguageCode"),
+                        classes: "js-autocomplete-select",
+                        attributes: {
+                            "data-qa": "select-preferred-written-language-input"
+                        }
+                    }) }}
+
+                    <div class="govuk-button-group">
+                        {{ govukButton({
+                            text: "Save",
+                            type: "submit",
+                            preventDoubleClick: true,
+                            classes: "js-autocomplete-submit",
+                            attributes: { "data-qa": "save-button" }
+                        }) }}
+                        <a href="/prisoner/{{ prisonerNumber }}/personal#personal-details"
+                            class="govuk-link govuk-link--no-visited-state"
+                            data-qa="cancel-button">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                {% if otherLanguages.length > 0 %}
+                    <aside class="other-languages-sidebar">
+                        <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Other languages</h2>
+                        {% for lang in otherLanguages %}
+                        <div class="govuk-!-padding-bottom-2">{{ lang.language.description }} ({{ otherLanguagesText(lang, false) }})</div>
+                        {% endfor %}
+                    </aside>
+                {% endif %}
+            </div>
+    {% endblock %}
+{% endblock %}
+
+{% block pageScripts %}
+    <script src="/assets/js/accessible-autocomplete.min.js"></script>
+    <script src="/assets/js/languages.js"></script>
+{% endblock %}
