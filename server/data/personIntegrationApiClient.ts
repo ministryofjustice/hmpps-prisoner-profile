@@ -46,6 +46,10 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     })
   }
 
+  updateSexualOrientation(prisonerNumber: string, sexualOrientation: string): Promise<void> {
+    return this.updateCorePersonRecord(prisonerNumber, 'SEXUAL_ORIENTATION', sexualOrientation)
+  }
+
   getReferenceDataCodes(domain: CorePersonRecordReferenceDataDomain): Promise<CorePersonRecordReferenceDataCodeDto[]> {
     return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
   }

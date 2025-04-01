@@ -72,6 +72,7 @@ describe('PersonalPageService', () => {
       updateCountryOfBirth: jest.fn(),
       updateNationality: jest.fn(),
       updateReligion: jest.fn(),
+      updateSexualOrientation: jest.fn(),
       getReferenceDataCodes: jest.fn(),
       getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
       getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
@@ -838,6 +839,18 @@ describe('PersonalPageService', () => {
       expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
         prisonerNumber: 'A1234AA',
         fieldsUpdated: ['nationality', 'otherNationalities'],
+        user: prisonUserMock,
+      })
+    })
+  })
+
+  describe('Update sexual orientation', () => {
+    it('Updates the sexual orientation using Person Integration API', async () => {
+      await constructService().updateSexualOrientation('token', prisonUserMock, 'A1234AA', 'HET')
+      expect(personIntegrationApiClient.updateSexualOrientation).toHaveBeenCalledWith('A1234AA', 'HET')
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenLastCalledWith({
+        prisonerNumber: 'A1234AA',
+        fieldsUpdated: ['sexualOrientation'],
         user: prisonUserMock,
       })
     })

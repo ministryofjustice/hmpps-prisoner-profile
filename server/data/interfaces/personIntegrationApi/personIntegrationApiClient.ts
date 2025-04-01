@@ -28,6 +28,7 @@ export enum CorePersonRecordReferenceDataDomain {
   build = 'BUILD',
   leftEyeColour = 'L_EYE_C',
   rightEyeColour = 'R_EYE_C',
+  sexualOrientation = 'SEXO',
 }
 
 export interface MilitaryRecord {
@@ -198,6 +199,8 @@ export interface PersonIntegrationApiClient {
   updateNationality(prisonerNumber: string, nationality: string, otherNationalities: string): Promise<void>
 
   updateReligion(prisonerNumber: string, religion: string, reasonForChange?: string): Promise<void>
+
+  updateSexualOrientation(prisonerNumber: string, sexualOrientation: string): Promise<void>
 
   getReferenceDataCodes(domain: CorePersonRecordReferenceDataDomain): Promise<CorePersonRecordReferenceDataCodeDto[]>
 
