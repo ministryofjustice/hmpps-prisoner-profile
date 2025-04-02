@@ -144,6 +144,7 @@ export enum PostAction {
   EditNameLegal = 'EDIT_NAME_LEGAL',
   EditNamePurpose = 'EDIT_NAME_PURPOSE',
   EditNationality = 'EDIT_NATIONALITY',
+  EditProfileImage = 'EDIT_PROFILE_IMAGE',
   EditReligion = 'EDIT_RELIGION',
   EditSexualOrientation = 'EDIT_SEXUAL_ORIENTATION',
   EditShoeSize = 'EDIT_SHOE_SIZE',

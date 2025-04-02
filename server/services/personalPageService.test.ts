@@ -64,7 +64,7 @@ describe('PersonalPageService', () => {
 
     curiousApiClient = curiousApiClientMock()
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
-    personIntegrationApiClient = personIntegrationApiClientMock() as unknown as PersonIntegrationApiClient
+    personIntegrationApiClient = personIntegrationApiClientMock()
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),
