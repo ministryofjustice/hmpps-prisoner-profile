@@ -145,6 +145,7 @@ export enum PostAction {
   EditNamePurpose = 'EDIT_NAME_PURPOSE',
   EditNationality = 'EDIT_NATIONALITY',
   EditProfileImage = 'EDIT_PROFILE_IMAGE',
+  EditProfileImageWithheld = 'EDIT_PROFILE_IMAGE_WITHHELD',
   EditReligion = 'EDIT_RELIGION',
   EditSexualOrientation = 'EDIT_SEXUAL_ORIENTATION',
   EditShoeSize = 'EDIT_SHOE_SIZE',

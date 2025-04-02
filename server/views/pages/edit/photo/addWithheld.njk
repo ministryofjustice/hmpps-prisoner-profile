@@ -38,7 +38,7 @@
       <form method="post" enctype="multipart/form-data" autocomplete="off" action="?_csrf={{ csrfToken }}">
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
         <div class="govuk-!-margin-bottom-4">
-          <img src='{{ imgSrc }}' class='hmpps-withheld-photo' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' />
+          <img src="{{ imgSrc }}" class="hmpps-withheld-photo" data-file-name="{{ fileName }}" data-file-type="{{ fileType }}" />
         </div>
         <div class="govuk-button-group">
           {{ govukButton({

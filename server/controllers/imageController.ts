@@ -119,7 +119,7 @@ export default class ImageController {
               user: res.locals.user,
               prisonerNumber,
               correlationId: req.id,
-              action: PostAction.EditProfileImage,
+              action: PostAction.EditProfileImageWithheld,
               details: {},
             })
             .catch(error => logger.error(error))
