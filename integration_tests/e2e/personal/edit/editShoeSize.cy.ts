@@ -42,7 +42,7 @@ context('Edit shoe size', () => {
       },
       {
         input: { textInputs: { shoeSize: 'Example' } },
-        errorMessages: ["Enter this person's shoe size"],
+        errorMessages: ['Enter this person’s shoe size'],
         testDescription: 'Input with letters',
       },
     ],

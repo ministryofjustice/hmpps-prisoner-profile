@@ -11,7 +11,7 @@ export const heightMetricValidator: Validator = (body: Record<string, string>) =
   }
 
   if (Number.isNaN(height)) {
-    return [{ text: "Enter this person's height", href: '#height' }]
+    return [{ text: 'Enter this person’s height', href: '#height' }]
   }
 
   if (height < 50 || height > 280) {
@@ -33,7 +33,7 @@ export const heightImperialValidator: Validator = (body: Record<string, string>)
   }
 
   if (Number.isNaN(feet) || Number.isNaN(inches)) {
-    return [{ text: "Enter this person's height", href: '#feet' }]
+    return [{ text: 'Enter this person’s height', href: '#feet' }]
   }
 
   if (!feetString || (feet >= 1 && feet <= 9 && inches < 0)) {

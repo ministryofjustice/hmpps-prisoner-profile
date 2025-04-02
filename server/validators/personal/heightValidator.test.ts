@@ -12,7 +12,7 @@ describe('Height validators', () => {
       ['-1', 'Height must be between 50 centimetres and 280 centimetres'],
       ['49', 'Height must be between 50 centimetres and 280 centimetres'],
       ['281', 'Height must be between 50 centimetres and 280 centimetres'],
-      ['Example', "Enter this person's height"],
+      ['Example', 'Enter this person’s height'],
     ])('Validations: %s: %s', async (value: string, errorMessage: string) => {
       const body = { editField: value }
       const errors = await heightMetricValidator(body)
@@ -39,8 +39,8 @@ describe('Height validators', () => {
       [{ feet: '9', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
       [{ feet: '12', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
       [{ feet: '', inches: '1' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
-      [{ feet: 'example', inches: '1' }, "Enter this person's height"],
-      [{ feet: '5', inches: 'example' }, "Enter this person's height"],
+      [{ feet: 'example', inches: '1' }, 'Enter this person’s height'],
+      [{ feet: '5', inches: 'example' }, 'Enter this person’s height'],
       [{ feet: '-5', inches: '1' }, 'Height must be between 1 feet and 9 feet'],
       [{ feet: '1', inches: '-5' }, 'Feet must be between 1 and 9. Inches must be between 0 and 11'],
     ])('Validations: %s: %s', async ({ feet, inches }: { feet: string; inches: string }, errorMessage: string) => {

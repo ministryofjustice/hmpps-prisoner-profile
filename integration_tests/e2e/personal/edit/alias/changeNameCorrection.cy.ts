@@ -56,7 +56,7 @@ context('Change name - correction', () => {
             lastName: '',
           },
         },
-        errorMessages: [`Enter this person's first name`, `Enter this person's last name`],
+        errorMessages: [`Enter this person’s first name`, `Enter this person’s last name`],
       },
       {
         testDescription: 'Long values',

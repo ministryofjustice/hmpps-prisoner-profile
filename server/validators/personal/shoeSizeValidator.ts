@@ -8,7 +8,7 @@ export const shoeSizeValidator: Validator = (body: Record<string, string>) => {
   const shoeSize = Number(shoeSizeInput)
 
   if (Number.isNaN(shoeSize)) {
-    return [{ text: "Enter this person's shoe size", href: '#shoeSize' }]
+    return [{ text: 'Enter this person’s shoe size', href: '#shoeSize' }]
   }
 
   if (shoeSize < 1 || shoeSize > 25 || shoeSize % 0.5 !== 0) {

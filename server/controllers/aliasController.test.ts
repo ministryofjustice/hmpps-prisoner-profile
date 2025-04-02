@@ -92,7 +92,7 @@ describe('Alias Controller', () => {
       await controller.displayChangeNameCorrection()(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeName', {
-        pageTitle: `Enter this person's correct name - Prisoner personal details`,
+        pageTitle: `Enter this person’s correct name - Prisoner personal details`,
         formTitle: `Enter John Saunders’ correct name`,
         warningText: 'This will become their main name in DPS and NOMIS.',
         errors: [],
@@ -231,7 +231,7 @@ describe('Alias Controller', () => {
       await controller.displayChangeNameLegal()(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeName', {
-        pageTitle: `Enter this person's new name - Prisoner personal details`,
+        pageTitle: `Enter this person’s new name - Prisoner personal details`,
         formTitle: `Enter John Saunders’ new name`,
         warningText:
           'This will become their main name in DPS and NOMIS. The previous name will be recorded as an alias.',
@@ -358,6 +358,158 @@ describe('Alias Controller', () => {
           },
           updated: newName,
         },
+      }
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+    })
+  })
+
+  describe('Add new alias page', () => {
+    it('should render the add new alias page', async () => {
+      await controller.displayAddNewAlias()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/edit/alias/addNewAlias', {
+        pageTitle: `Enter alias details - Prisoner personal details`,
+        formTitle: `Enter alias details`,
+        errors: [],
+        formValues: {
+          'dateOfBirth-day': PseudonymResponseMock.dateOfBirth.split('-')[2],
+          'dateOfBirth-month': PseudonymResponseMock.dateOfBirth.split('-')[1],
+          'dateOfBirth-year': PseudonymResponseMock.dateOfBirth.split('-')[0],
+          sex: PseudonymResponseMock.sex.code,
+        },
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+        },
+      })
+    })
+
+    it('Populates the errors from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          if (key === 'errors') return ['error']
+          return []
+        },
+      } as any
+
+      await controller.displayAddNewAlias()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+    })
+
+    it('Populates the field value from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          return key === 'requestBody' ? [JSON.stringify({ firstName: 'first' })] : []
+        },
+      } as any
+
+      await controller.displayAddNewAlias()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ formValues: { firstName: 'first' } }),
+      )
+    })
+
+    it('Sends a page view audit event', async () => {
+      await controller.displayAddNewAlias()(req, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonId: PrisonerMockDataA.prisonId,
+        correlationId: req.id,
+        page: Page.AddNewAlias,
+      })
+    })
+
+    it('submits the new alias request', async () => {
+      req = {
+        ...req,
+        body: {
+          firstName: 'first',
+          middleName1: 'middleone',
+          middleName2: 'middletwo',
+          lastName: 'last',
+          'dateOfBirth-day': '01',
+          'dateOfBirth-month': '02',
+          'dateOfBirth-year': '1990',
+          sex: 'M',
+        },
+      } as unknown as Request
+
+      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+
+      await controller.submitAddNewAlias()(req, res, next)
+
+      expect(aliasService.addNewAlias).toHaveBeenCalledWith(
+        expect.anything(),
+        prisonUserMock,
+        PrisonerMockDataA.prisonerNumber,
+        {
+          firstName: 'first',
+          middleName1: 'middleone',
+          middleName2: 'middletwo',
+          lastName: 'last',
+          dateOfBirth: '1990-02-01',
+          sex: 'M',
+          isWorkingName: false,
+        },
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Alias added',
+        type: FlashMessageType.success,
+        fieldName: 'aliases',
+      })
+    })
+
+    it('Submission handles API errors', async () => {
+      aliasService.addNewAlias = async () => {
+        throw new Error()
+      }
+
+      await controller.submitAddNewAlias()(req, res, next)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/enter-alias-details`,
+      )
+    })
+
+    it('Sends a post success audit event', async () => {
+      req = {
+        ...req,
+        body: {
+          firstName: 'first',
+          middleName1: 'middleone',
+          middleName2: 'middletwo',
+          lastName: 'last',
+          'dateOfBirth-day': '01',
+          'dateOfBirth-month': '02',
+          'dateOfBirth-year': '1990',
+          sex: 'M',
+        },
+      } as unknown as Request
+
+      aliasService.addNewAlias = jest.fn().mockResolvedValue(PseudonymResponseMock)
+
+      await controller.submitAddNewAlias()(req, res, next)
+
+      const expectedAuditEvent = {
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.AddNewAlias,
+        details: PseudonymResponseMock,
       }
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
