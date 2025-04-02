@@ -198,8 +198,8 @@ export default class RestClient {
     })
 
     if (files) {
-      Object.keys(files).forEach(key => {
-        request.attach(key, files[key].buffer, files[key].originalname)
+      Object.entries(files).forEach(([key, file]) => {
+        request.attach(key, file.buffer, file.originalname)
       })
     }
 
