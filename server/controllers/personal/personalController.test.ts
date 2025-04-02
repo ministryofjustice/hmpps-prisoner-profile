@@ -12,6 +12,7 @@ import {
   heightFieldData,
   nationalityFieldData,
   RadioFieldData,
+  sexualOrientationFieldData,
   shoeSizeFieldData,
   smokerOrVaperFieldData,
   weightFieldData,
@@ -23,6 +24,7 @@ import {
   ActiveCountryReferenceDataCodesMock,
   NationalityReferenceDataCodesMock,
   ReligionReferenceDataCodesMock,
+  SexualOrientationReferenceDataCodesMock,
 } from '../../data/localMockData/personIntegrationApiReferenceDataMock'
 import { healthAndMedicationMock } from '../../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
 import {
@@ -76,6 +78,11 @@ describe('PersonalController', () => {
           type: ProfileInformationType.OtherNationalities,
         },
         { question: 'Religion', resultValue: 'Druid', type: ProfileInformationType.Religion },
+        {
+          question: 'Sexual orientation',
+          resultValue: 'Heterosexual / Straight',
+          type: ProfileInformationType.SexualOrientation,
+        },
       ],
     } as InmateDetail,
   }
@@ -91,6 +98,7 @@ describe('PersonalController', () => {
       if (domain === 'COUNTRY') return ActiveCountryReferenceDataCodesMock
       if (domain === 'NAT') return NationalityReferenceDataCodesMock
       if (domain === 'RELF') return ReligionReferenceDataCodesMock
+      if (domain === 'SEXO') return SexualOrientationReferenceDataCodesMock
       if (domain === 'MEDICAL_DIET') return medicalDietCodesMock
       if (domain === 'FOOD_ALLERGY') return foodAllergyCodesMock
       if (domain === 'PERSONALISED_DIET') return personalisedDietCodesMock
@@ -2637,6 +2645,165 @@ describe('PersonalController', () => {
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
         expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/religion')
+      })
+    })
+  })
+
+  describe('Sexual orientation', () => {
+    describe('Edit', () => {
+      const action = async (req: any, response: any) => controller.sexualOrientation().edit(req, response, () => {})
+      const expectedOptions = [
+        { text: 'Heterosexual or straight', value: 'HET', checked: true },
+        { text: 'Gay or lesbian', value: 'HOM' },
+        { text: 'Bisexual', value: 'BIS' },
+        { text: 'Other', value: 'OTH' },
+        { divider: 'Or' },
+        { text: 'Not answered', value: 'ND' },
+      ]
+
+      it('Renders the default edit page with the correct data from the prison person API', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+          pageTitle: 'Sexual orientation - Prisoner personal details',
+          formTitle: `Which of the following best describes First Last’s sexual orientation?`,
+          prisonerNumber: 'ABC123',
+          breadcrumbPrisonerName: 'Last, First',
+          hintText: undefined,
+          errors: [],
+          options: expectedOptions,
+          redirectAnchor: 'personal-details',
+          miniBannerData: {
+            cellLocation: '2-3-001',
+            prisonerName: 'Last, First',
+            prisonerNumber: 'ABC123',
+          },
+        })
+      })
+
+      it('Populates the errors from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            if (key === 'errors') return ['error']
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+      })
+
+      it('Populates the field value from the flash', async () => {
+        const req = {
+          params: { prisonerNumber: 'ABC123' },
+          flash: (key: string): any => {
+            return key === 'requestBody' ? [JSON.stringify({ radioField: 'HOM' })] : []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        await action(req, res)
+        expect(res.render).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            options: expect.arrayContaining([expect.objectContaining({ value: 'HOM', checked: true })]),
+          }),
+        )
+      })
+
+      it('Sends a page view audit event', async () => {
+        const req = {
+          id: 1,
+          params: { prisonerNumber: 'ABC123' },
+          flash: (): any => {
+            return []
+          },
+          middleware: defaultMiddleware,
+        } as any
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'ABC123',
+          prisonId: 999,
+          correlationId: req.id,
+          page: Page.EditSexualOrientation,
+        }
+
+        await action(req, res)
+
+        expect(auditService.sendPageView).toHaveBeenCalledWith(expectedAuditEvent)
+      })
+    })
+
+    describe('submit', () => {
+      let validRequest: any
+      const action = async (req: any, response: any) => controller.sexualOrientation().submit(req, response, () => {})
+
+      beforeEach(() => {
+        validRequest = {
+          id: '1',
+          middleware: defaultMiddleware,
+          params: { prisonerNumber: 'A1234BC' },
+          body: { radioField: 'HET' },
+          flash: jest.fn(),
+        } as any
+      })
+
+      it('Updates the sexual orientation', async () => {
+        await action(validRequest, res)
+        expect(personalPageService.updateSexualOrientation).toHaveBeenCalledWith(
+          'token',
+          prisonUserMock,
+          'A1234BC',
+          'HET',
+        )
+      })
+
+      it('Redirects to the personal page #personal-details on success', async () => {
+        await action(validRequest, res)
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal#personal-details')
+      })
+
+      it('Adds the success message to the flash', async () => {
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('flashMessage', {
+          text: 'Sexual orientation updated',
+          type: FlashMessageType.success,
+          fieldName: 'sexualOrientation',
+        })
+      })
+
+      it('Handles API errors', async () => {
+        personalPageService.updateSexualOrientation = async () => {
+          throw new Error()
+        }
+
+        await action(validRequest, res)
+
+        expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/sexual-orientation')
+      })
+
+      it('Sends a post success audit event', async () => {
+        const request = { ...validRequest, id: 1, body: { radioField: 'HOM' } }
+        const expectedAuditEvent = {
+          user: prisonUserMock,
+          prisonerNumber: 'A1234BC',
+          correlationId: request.id,
+          action: PostAction.EditSexualOrientation,
+          details: { fieldName: sexualOrientationFieldData.fieldName, previous: 'HET', updated: 'HOM' },
+        }
+
+        await action(request, res)
+
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
       })
     })
   })

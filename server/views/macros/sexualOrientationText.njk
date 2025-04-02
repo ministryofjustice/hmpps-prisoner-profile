@@ -1,0 +1,13 @@
+{%- macro sexualOrientationText(orientation) -%}
+    {%- set txt = "Not entered" -%}
+    {%- if orientation === 'Heterosexual / Straight' -%}
+        {%- set txt = "Heterosexual or straight" -%}
+    {%- elif orientation === 'Gay / Lesbian' -%}
+        {%- set txt = "Gay or lesbian" -%}
+    {%- elif orientation === 'Not Disclosed' -%}
+        {%- set txt = "Not answered" -%}
+    {%- elif orientation -%}
+        {%- set txt = orientation | capitalize -%}
+    {%- endif -%}
+    {{- txt -}}
+{%- endmacro -%}

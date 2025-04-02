@@ -405,5 +405,17 @@ export default function personalRouter(services: Services): Router {
     },
   })
 
+  editRoute({
+    path: 'edit/sexual-orientation',
+    edit: {
+      audit: Page.EditSexualOrientation,
+      method: personalController.sexualOrientation().edit,
+    },
+    submit: {
+      audit: Page.PostEditSexualOrientation,
+      method: personalController.sexualOrientation().submit,
+    },
+  })
+
   return router
 }

@@ -11,6 +11,7 @@ export const personalPageServiceMock = (): Interface<PersonalPageService> => ({
   getDistinguishingMarks: jest.fn(),
   updateCountryOfBirth: jest.fn(),
   updateReligion: jest.fn(),
+  updateSexualOrientation: jest.fn(),
   getReferenceDataCodes: jest.fn(),
   getReferenceData: jest.fn(),
   getHealthAndMedication: jest.fn(),
