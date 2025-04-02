@@ -81,9 +81,11 @@
 {%- call summaryCard({title: "Personal details", id: "personal-details"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-full">
-      <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-0">
-        {{ summaryListRow("Full name", personalDetails.fullName, "full-name") }}
-      </dl>
+      {{ govukSummaryList({
+        rows: toSummaryListRows([
+            { key: "Full name", value: personalDetails.fullName, options: { dataQa: "full-name", changeHref: "personal/change-name", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'fullName' } }
+        ])
+      }) }}
 
       {% if aliases.length > 0 %}
         <details class="govuk-details hmpps-alias-details" data-module="govuk-details">

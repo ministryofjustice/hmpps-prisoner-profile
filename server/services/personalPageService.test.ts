@@ -171,7 +171,7 @@ describe('PersonalPageService', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'full-name' })
+          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'fullName' })
         }
 
         it('Handles no pseudonyms', async () => {

@@ -356,7 +356,7 @@ export default class PersonalPageService {
     prisonerData: Prisoner,
     flashMessage: { fieldName: string },
   ) => {
-    if (flashMessage?.fieldName === 'full-name' || flashMessage?.fieldName === 'aliases') {
+    if (flashMessage?.fieldName === 'fullName' || flashMessage?.fieldName === 'aliases') {
       try {
         logger.debug('Retrieving aliases from Person Integration API after update')
 
