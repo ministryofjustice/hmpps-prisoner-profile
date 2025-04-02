@@ -23,7 +23,7 @@ interface PostRequest {
   data?: object | string[]
   raw?: boolean
   query?: object | string
-  file?: { buffer: Buffer; originalname: string }
+  files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
 
 interface PutRequest {
@@ -33,7 +33,7 @@ interface PutRequest {
   data?: object | string[]
   raw?: boolean
   query?: object | string
-  file?: { buffer: Buffer; originalname: string }
+  files?: { [key: string]: { buffer: Buffer; originalname: string } }
 }
 
 interface StreamRequest {
@@ -132,7 +132,7 @@ export default class RestClient {
     query = '',
     headers = {},
     responseType = '',
-    file = null,
+    files = null,
     data = {},
     raw = false,
   }: PostRequest = {}): Promise<T> {
@@ -141,7 +141,7 @@ export default class RestClient {
       query,
       headers,
       responseType,
-      file,
+      files,
       data,
       raw,
     })
@@ -152,7 +152,7 @@ export default class RestClient {
     query = '',
     headers = {},
     responseType = '',
-    file = null,
+    files = null,
     data = {},
     raw = false,
   }: PutRequest | PostRequest = {}): Promise<T> {
@@ -161,7 +161,7 @@ export default class RestClient {
       query,
       headers,
       responseType,
-      file,
+      files,
       data,
       raw,
     })
@@ -174,7 +174,7 @@ export default class RestClient {
       query = '',
       headers = {},
       responseType = '',
-      file = null,
+      files = null,
       data = {},
       raw = false,
     }: PutRequest | PostRequest = {},
@@ -197,8 +197,10 @@ export default class RestClient {
       request.field(key, value)
     })
 
-    if (file) {
-      request.attach('imageFile', file.buffer, file.originalname)
+    if (files) {
+      Object.keys(files).forEach(key => {
+        request.attach(key, files[key].buffer, files[key].originalname)
+      })
     }
 
     try {
