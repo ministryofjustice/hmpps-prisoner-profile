@@ -13,7 +13,7 @@ export const nameValidator: Validator = (body: Record<string, string>) => {
 
 export const validateMandatoryName = (href: string, label: string, name: string): HmppsError[] => {
   if (!name.trim()) {
-    return [{ href, text: `Enter this person's ${label.toLowerCase()}` }]
+    return [{ href, text: `Enter this person’s ${label.toLowerCase()}` }]
   }
 
   return validateName(href, label, name)

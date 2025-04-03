@@ -36,7 +36,7 @@ context('Edit height (metric)', () => {
       {
         testDescription: 'Non-number',
         input: { textInputs: { editField: 'Example' } },
-        errorMessages: ["Enter this person's height"],
+        errorMessages: ['Enter this person’s height'],
       },
       {
         testDescription: 'Lower bound',

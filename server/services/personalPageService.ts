@@ -153,7 +153,7 @@ export default class PersonalPageService {
     dietAndAllergyIsEnabled: boolean = false,
     editProfileEnabled: boolean = false,
     apiErrorCallback: (error: Error) => void = () => null,
-    flashMessage: unknown = null,
+    flashMessage: { fieldName: string } = null,
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
@@ -267,7 +267,7 @@ export default class PersonalPageService {
     secondaryLanguages: SecondaryLanguage[],
     countryOfBirth: string,
     healthAndMedication: HealthAndMedication,
-    flashMessage: unknown,
+    flashMessage: { fieldName: string },
   ): Promise<PersonalDetails> {
     const { profileInformation } = inmateDetail
 
@@ -354,9 +354,9 @@ export default class PersonalPageService {
   private aliases = async (
     personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
-    flashMessage: unknown,
+    flashMessage: { fieldName: string },
   ) => {
-    if (flashMessage) {
+    if (flashMessage?.fieldName === 'full-name' || flashMessage?.fieldName === 'aliases') {
       try {
         logger.debug('Retrieving aliases from Person Integration API after update')
 

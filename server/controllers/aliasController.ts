@@ -7,7 +7,11 @@ import { FlashMessageType } from '../data/enums/flashMessageType'
 import AliasService, { Name } from '../services/aliasService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { PrisonUser } from '../interfaces/HmppsUser'
-import { PseudonymResponseDto } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  PseudonymRequestDto,
+  PseudonymResponseDto,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { dateToIsoDate } from '../utils/dateHelpers'
 
 export default class AliasController {
   constructor(
@@ -69,7 +73,7 @@ export default class AliasController {
 
   public displayChangeNameCorrection(): RequestHandler {
     return this.displayChangeNamePage({
-      pageTitle: `Enter this person's correct name - Prisoner personal details`,
+      pageTitle: `Enter this person’s correct name - Prisoner personal details`,
       formTitle: (titlePrisonerName: string) => `Enter ${apostrophe(titlePrisonerName)} correct name`,
       warningText: 'This will become their main name in DPS and NOMIS.',
       auditPage: Page.EditNameCorrection,
@@ -86,7 +90,7 @@ export default class AliasController {
 
   public displayChangeNameLegal(): RequestHandler {
     return this.displayChangeNamePage({
-      pageTitle: `Enter this person's new name - Prisoner personal details`,
+      pageTitle: `Enter this person’s new name - Prisoner personal details`,
       formTitle: (titlePrisonerName: string) => `Enter ${apostrophe(titlePrisonerName)} new name`,
       warningText: 'This will become their main name in DPS and NOMIS. The previous name will be recorded as an alias.',
       auditPage: Page.EditNameLegal,
@@ -99,6 +103,99 @@ export default class AliasController {
       auditPostAction: PostAction.EditNameLegal,
       submitMethod: this.aliasService.createNewWorkingName.bind(this.aliasService),
     })
+  }
+
+  public displayAddNewAlias(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
+      const errors = req.flash('errors')
+
+      const formValues = requestBodyFromFlash<Name>(req) || {
+        'dateOfBirth-year': currentWorkingName.dateOfBirth?.split('-')[0],
+        'dateOfBirth-month': currentWorkingName.dateOfBirth?.split('-')[1],
+        'dateOfBirth-day': currentWorkingName.dateOfBirth?.split('-')[2],
+        sex: currentWorkingName.sex?.code,
+      }
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.AddNewAlias,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/alias/addNewAlias', {
+        pageTitle: 'Enter alias details - Prisoner personal details',
+        formTitle: 'Enter alias details',
+        errors,
+        formValues,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+        },
+      })
+    }
+  }
+
+  public submitAddNewAlias(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
+
+      const formValues: PseudonymRequestDto = {
+        firstName: req.body.firstName,
+        middleName1: req.body.middleName1 || undefined,
+        middleName2: req.body.middleName2 || undefined,
+        lastName: req.body.lastName,
+        dateOfBirth: dateToIsoDate(
+          `${req.body['dateOfBirth-day']}/${req.body['dateOfBirth-month']}/${req.body['dateOfBirth-year']}`,
+        ),
+        sex: req.body.sex,
+        isWorkingName: false,
+      }
+
+      const errors = req.errors || []
+      if (errors.length) {
+        req.flash('requestBody', JSON.stringify(req.body))
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/enter-alias-details`)
+      }
+
+      try {
+        const result = await this.aliasService.addNewAlias(
+          clientToken,
+          res.locals.user as PrisonUser,
+          prisonerNumber,
+          formValues,
+        )
+
+        req.flash('flashMessage', {
+          text: 'Alias added',
+          type: FlashMessageType.success,
+          fieldName: 'aliases',
+        })
+
+        this.auditService
+          .sendPostSuccess({
+            user: res.locals.user,
+            prisonerNumber,
+            correlationId: req.id,
+            action: PostAction.AddNewAlias,
+            details: result,
+          })
+          .catch(error => logger.error(error))
+
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      } catch (e) {
+        req.flash('errors', [{ text: 'There was an error please try again' }])
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/enter-alias-details`)
+      }
+    }
   }
 
   private displayChangeNamePage({

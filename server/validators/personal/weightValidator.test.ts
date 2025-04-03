@@ -15,7 +15,7 @@ describe('Weight validator', () => {
       [{ kilograms: '0' }, 'Weight must be between 12 kilograms and 640 kilograms'],
       [{ kilograms: '11' }, 'Weight must be between 12 kilograms and 640 kilograms'],
       [{ kilograms: '651' }, 'Weight must be between 12 kilograms and 640 kilograms'],
-      [{ kilograms: 'Example' }, "Enter this person's weight"],
+      [{ kilograms: 'Example' }, 'Enter this person’s weight'],
     ])('Validations: %s: %s', async ({ kilograms }: { kilograms: string }, errorMessage: string) => {
       const body = { kilograms }
       const errors = await weightMetricValidator(body)
@@ -39,8 +39,8 @@ describe('Weight validator', () => {
 
     it.each([
       // Invalid input
-      [{ stone: 'example', pounds: '1' }, "Enter this person's weight"],
-      [{ stone: '10', pounds: 'example' }, "Enter this person's weight"],
+      [{ stone: 'example', pounds: '1' }, 'Enter this person’s weight'],
+      [{ stone: '10', pounds: 'example' }, 'Enter this person’s weight'],
 
       // Stone limits
       [{ stone: '1', pounds: '5' }, 'Weight must be between 2 stone and 100 stone'],

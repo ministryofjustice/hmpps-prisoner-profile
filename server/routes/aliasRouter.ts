@@ -4,6 +4,7 @@ import { Services } from '../services'
 import AliasController from '../controllers/aliasController'
 import validationMiddleware from '../middleware/validationMiddleware'
 import { nameValidator } from '../validators/personal/nameValidator'
+import { dateValidator } from '../validators/personal/dateValidator'
 
 export default function aliasRouter(services: Services, editProfileChecks: () => RequestHandler): Router {
   const router = Router({ mergeParams: true })
@@ -29,6 +30,26 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     editProfileChecks(),
     validationMiddleware([nameValidator], { redirectBackOnError: true }),
     aliasController.submitChangeNameLegal(),
+  )
+
+  get('/enter-alias-details', editProfileChecks(), aliasController.displayAddNewAlias())
+  post(
+    '/enter-alias-details',
+    editProfileChecks(),
+    validationMiddleware(
+      [
+        nameValidator,
+        dateValidator({
+          namePrefix: 'dateOfBirth',
+          label: 'Date of birth',
+          missingText: 'Enter this person’s date of birth',
+        }),
+      ],
+      {
+        redirectBackOnError: true,
+      },
+    ),
+    aliasController.submitAddNewAlias(),
   )
 
   return router

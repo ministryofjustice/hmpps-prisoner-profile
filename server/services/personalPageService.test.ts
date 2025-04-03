@@ -157,7 +157,7 @@ describe('PersonalPageService', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, null, { text: 'updated' })
+          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'full-name' })
         }
 
         it('Handles no pseudonyms', async () => {
@@ -217,7 +217,7 @@ describe('PersonalPageService', () => {
               lastName: 'Last name',
             } as Alias,
           ]
-          const response = await service.get('token', prisonerData, false, false, null, { text: 'updated' })
+          const response = await service.get('token', prisonerData, false, false, null, { fieldName: 'full-name' })
           expect(response.personalDetails.aliases).toEqual([
             {
               alias: 'First Name Last Name',

@@ -10,7 +10,7 @@ export const weightMetricValidator: Validator = (body: Record<string, string>) =
   }
 
   if (Number.isNaN(weight)) {
-    return [{ text: "Enter this person's weight", href: '#kilograms' }]
+    return [{ text: 'Enter this person’s weight', href: '#kilograms' }]
   }
 
   if (weight < 12 || weight > 640) {
@@ -32,7 +32,7 @@ export const weightImperialValidator: Validator = (body: Record<string, string>)
   }
 
   if (Number.isNaN(stone) || Number.isNaN(pounds)) {
-    return [{ text: "Enter this person's weight", href: '#stone' }]
+    return [{ text: 'Enter this person’s weight', href: '#stone' }]
   }
 
   if (!stoneString || (stone >= 2 && stone <= 100 && (pounds < 0 || pounds > 13))) {

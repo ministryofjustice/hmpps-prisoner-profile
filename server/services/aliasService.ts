@@ -1,6 +1,9 @@
 import { RestClientBuilder } from '../data'
 import MetricsService from './metrics/metricsService'
-import { PersonIntegrationApiClient } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import {
+  PersonIntegrationApiClient,
+  PseudonymRequestDto,
+} from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import NotFoundError from '../utils/notFoundError'
 import { PrisonUser } from '../interfaces/HmppsUser'
 
@@ -67,6 +70,20 @@ export default class AliasService {
 
     this.metricsService.trackPersonIntegrationUpdate({
       fieldsUpdated: this.getUpdatedFields(existingWorkingName, name),
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
+  async addNewAlias(clientToken: string, user: PrisonUser, prisonerNumber: string, pseudonym: PseudonymRequestDto) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+
+    const response = personIntegrationApiClient.createPseudonym(prisonerNumber, pseudonym)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['alias'],
       prisonerNumber,
       user,
     })

@@ -19,9 +19,9 @@ describe('shoeSizeValidator', () => {
     [{ shoeSize: '0.5' }, 'Enter a whole or half number between 1 and 25'],
     [{ shoeSize: '10.4' }, 'Enter a whole or half number between 1 and 25'],
     [{ shoeSize: '25.5' }, 'Enter a whole or half number between 1 and 25'],
-    [{ shoeSize: 'Example' }, "Enter this person's shoe size"],
-    [{ shoeSize: '12.abc123' }, "Enter this person's shoe size"],
-    [{ shoeSize: '1aa2.abc123' }, "Enter this person's shoe size"],
+    [{ shoeSize: 'Example' }, 'Enter this person’s shoe size'],
+    [{ shoeSize: '12.abc123' }, 'Enter this person’s shoe size'],
+    [{ shoeSize: '1aa2.abc123' }, 'Enter this person’s shoe size'],
   ])('Validations: %s: %s', async ({ shoeSize }: { shoeSize: string }, errorMessage: string) => {
     const body = { shoeSize }
     const errors = await shoeSizeValidator(body)
