@@ -17,25 +17,25 @@ describe('educationAndWorkPlanApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getActiveGoals', () => {
-    it('should get active goals', async () => {
+  describe('getAllGoals', () => {
+    it('should get all goals', async () => {
       // Given
       const prisonerNumber = 'A1234BC'
 
       const expectedGetGoalsResponse = aValidGetGoalsResponseWithOneGoal()
-      educationAndWorkPlanApi
-        .get(`/action-plans/${prisonerNumber}/goals?status=ACTIVE`)
+      educationAndWorkPlanApi //
+        .get(`/action-plans/${prisonerNumber}/goals`)
         .reply(200, expectedGetGoalsResponse)
 
       // When
-      const actual = await educationAndWorkPlanClient.getActiveGoals(prisonerNumber)
+      const actual = await educationAndWorkPlanClient.getAllGoals(prisonerNumber)
 
       // Then
       expect(nock.isDone()).toBe(true)
       expect(actual).toEqual(expectedGetGoalsResponse)
     })
 
-    it('should not get active goals given API returns error response', async () => {
+    it('should not get all goals given API returns error response', async () => {
       // Given
       const prisonerNumber = 'A1234BC'
 
@@ -44,13 +44,13 @@ describe('educationAndWorkPlanApiClient', () => {
         userMessage: 'An unexpected error occurred',
         developerMessage: 'An unexpected error occurred',
       }
-      educationAndWorkPlanApi
-        .get(`/action-plans/${prisonerNumber}/goals?status=ACTIVE`)
+      educationAndWorkPlanApi //
+        .get(`/action-plans/${prisonerNumber}/goals`)
         .reply(501, expectedResponseBody)
 
       // When
       try {
-        await educationAndWorkPlanClient.getActiveGoals(prisonerNumber)
+        await educationAndWorkPlanClient.getAllGoals(prisonerNumber)
       } catch (e) {
         // Then
         expect(nock.isDone()).toBe(true)

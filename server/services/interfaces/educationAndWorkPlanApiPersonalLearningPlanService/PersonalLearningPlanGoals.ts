@@ -11,7 +11,9 @@
  */
 export interface PersonalLearningPlanActionPlan {
   prisonerNumber: string
-  goals: Array<PersonalLearningPlanGoal>
+  activeGoals: Array<PersonalLearningPlanGoal>
+  archivedGoals: Array<PersonalLearningPlanGoal>
+  completedGoals: Array<PersonalLearningPlanGoal>
   updatedBy?: string
   updatedByDisplayName?: string
   updatedAt?: Date
@@ -21,6 +23,7 @@ export interface PersonalLearningPlanActionPlan {
 export interface PersonalLearningPlanGoal {
   reference: string
   title: string
+  status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED'
   createdAt: Date
   createdBy: string
   createdByDisplayName: string

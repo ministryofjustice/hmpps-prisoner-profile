@@ -3,8 +3,10 @@ import { aValidGetGoalsResponse } from '../data/localMockData/getGoalsResponse'
 import personalLearningPlanActionPlanMapper from './mappers/personalLearningPlanActionPlanMapper'
 import { aValidPersonalLearningPlanActionPlan } from '../data/localMockData/personalLearningPlanActionPlan'
 import EducationAndWorkPlanApiPersonalLearningPlanService from './educationAndWorkPlanApiPersonalLearningPlanService'
+import EducationAndWorkPlanApiRestClient from '../data/educationAndWorkPlanApiClient'
 
 jest.mock('./mappers/personalLearningPlanActionPlanMapper')
+jest.mock('../data/educationAndWorkPlanApiClient')
 
 describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
   const prisonerNumber = 'A1234BC'
@@ -14,9 +16,9 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
     typeof personalLearningPlanActionPlanMapper
   >
 
-  const educationAndWorkPlanApiClientMock = {
-    getActiveGoals: jest.fn(),
-  }
+  const educationAndWorkPlanApiClientMock = new EducationAndWorkPlanApiRestClient(
+    null,
+  ) as jest.Mocked<EducationAndWorkPlanApiRestClient>
   const service = new EducationAndWorkPlanApiPersonalLearningPlanService(() => educationAndWorkPlanApiClientMock)
 
   beforeEach(() => {
@@ -26,7 +28,7 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
   it('should get prisoner action plan given prisoner has a PLP action plan', async () => {
     // Given
     const apiGetGoalsResponse = aValidGetGoalsResponse()
-    educationAndWorkPlanApiClientMock.getActiveGoals.mockResolvedValue(apiGetGoalsResponse)
+    educationAndWorkPlanApiClientMock.getAllGoals.mockResolvedValue(apiGetGoalsResponse)
 
     const expectedActionPlan = aValidPersonalLearningPlanActionPlan()
     personalLearningPlanActionPlanMapperMock.mockReturnValue(expectedActionPlan)
@@ -36,16 +38,20 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
 
     // Then
     expect(actual).toEqual(expectedActionPlan)
-    expect(educationAndWorkPlanApiClientMock.getActiveGoals).toHaveBeenCalledWith(prisonerNumber)
+    expect(educationAndWorkPlanApiClientMock.getAllGoals).toHaveBeenCalledWith(prisonerNumber)
     expect(personalLearningPlanActionPlanMapperMock).toHaveBeenCalledWith(prisonerNumber, apiGetGoalsResponse)
   })
 
   it('should get empty prisoner action plan given prisoner does not have any goals in their PLP action plan', async () => {
     // Given
     const apiGetGoalsResponse = aValidGetGoalsResponse({ goals: [] })
-    educationAndWorkPlanApiClientMock.getActiveGoals.mockResolvedValue(apiGetGoalsResponse)
+    educationAndWorkPlanApiClientMock.getAllGoals.mockResolvedValue(apiGetGoalsResponse)
 
-    const expectedActionPlan = aValidPersonalLearningPlanActionPlan({ goals: [] })
+    const expectedActionPlan = aValidPersonalLearningPlanActionPlan({
+      activeGoals: [],
+      archivedGoals: [],
+      completedGoals: [],
+    })
     personalLearningPlanActionPlanMapperMock.mockReturnValue(expectedActionPlan)
 
     // When
@@ -53,15 +59,19 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
 
     // Then
     expect(actual).toEqual(expectedActionPlan)
-    expect(educationAndWorkPlanApiClientMock.getActiveGoals).toHaveBeenCalledWith(prisonerNumber)
+    expect(educationAndWorkPlanApiClientMock.getAllGoals).toHaveBeenCalledWith(prisonerNumber)
     expect(personalLearningPlanActionPlanMapperMock).toHaveBeenCalledWith(prisonerNumber, apiGetGoalsResponse)
   })
 
   it('should get empty prisoner action plan given prisoner does not have a PLP action plan (service returns 404)', async () => {
     // Given
-    educationAndWorkPlanApiClientMock.getActiveGoals.mockRejectedValue(createError(404, 'Service unavailable'))
+    educationAndWorkPlanApiClientMock.getAllGoals.mockRejectedValue(createError(404, 'Service unavailable'))
 
-    const expectedActionPlan = aValidPersonalLearningPlanActionPlan({ goals: [] })
+    const expectedActionPlan = aValidPersonalLearningPlanActionPlan({
+      activeGoals: [],
+      archivedGoals: [],
+      completedGoals: [],
+    })
     personalLearningPlanActionPlanMapperMock.mockReturnValue(expectedActionPlan)
 
     // When
@@ -69,8 +79,8 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
 
     // Then
     expect(actual).toEqual(expectedActionPlan)
-    expect(educationAndWorkPlanApiClientMock.getActiveGoals).toHaveBeenCalledWith(prisonerNumber)
-    expect(personalLearningPlanActionPlanMapperMock).not.toHaveBeenCalledWith({ goals: [] })
+    expect(educationAndWorkPlanApiClientMock.getAllGoals).toHaveBeenCalledWith(prisonerNumber)
+    expect(personalLearningPlanActionPlanMapperMock).toHaveBeenCalledWith(prisonerNumber, { goals: [] })
   })
 
   it('should not get prisoner action plan given PLP API throws an error', async () => {
@@ -83,7 +93,7 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
         developerMessage: 'An unexpected error occurred',
       },
     }
-    educationAndWorkPlanApiClientMock.getActiveGoals.mockRejectedValue(actionPlanApiError)
+    educationAndWorkPlanApiClientMock.getAllGoals.mockRejectedValue(actionPlanApiError)
 
     const expectedActionPlan = { problemRetrievingData: true }
 
@@ -92,7 +102,7 @@ describe('EducationAndWorkPlanApiPersonalLearningPlanService', () => {
 
     // Then
     expect(actual).toEqual(expectedActionPlan)
-    expect(educationAndWorkPlanApiClientMock.getActiveGoals).toHaveBeenCalledWith(prisonerNumber)
+    expect(educationAndWorkPlanApiClientMock.getAllGoals).toHaveBeenCalledWith(prisonerNumber)
     expect(personalLearningPlanActionPlanMapperMock).not.toHaveBeenCalled()
   })
 })
