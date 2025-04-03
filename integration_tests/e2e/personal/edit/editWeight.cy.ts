@@ -2,7 +2,7 @@ import { Role } from '../../../../server/data/enums/role'
 import EditWeight from '../../../pages/editPages/weight'
 import { editPageTests } from './editPageTests'
 
-context('Edit height (metric)', () => {
+context('Edit Weight (metric)', () => {
   const prisonerNumber = 'G6123VU'
   const prisonerName = 'Saunders, John'
   const bookingId = 1102484
@@ -20,7 +20,7 @@ context('Edit height (metric)', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/weight`,
+    editUrl: `prisoner/${prisonerNumber}/personal/weight`,
     validInputs: [{ textInputs: { kilograms: '65' } }],
     invalidInputs: [
       {
@@ -64,7 +64,7 @@ context('Edit weight (Imperial)', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/weight/imperial`,
+    editUrl: `prisoner/${prisonerNumber}/personal/weight/imperial`,
     validInputs: [{ textInputs: { stone: '5', pounds: '3' } }],
     invalidInputs: [
       {

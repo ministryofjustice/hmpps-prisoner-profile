@@ -24,7 +24,7 @@ context('Edit build', () => {
       })
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/build`,
+    editUrl: `prisoner/${prisonerNumber}/personal/build`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Build',
     successfulFlashMessage: 'Build updated',

@@ -260,4 +260,10 @@ export default {
         jsonBody: response,
       },
     }),
+
+  stubUpdateProfileImage: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubPutWithResponse({
+      path: `${baseUrl}/v1/core-person-record/profile-image\\?prisonerNumber=${prisonerNumber}`,
+      responseBody: {},
+    }),
 }

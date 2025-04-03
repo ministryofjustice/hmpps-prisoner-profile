@@ -24,7 +24,7 @@ context('Edit nationality', () => {
         referenceData: NationalityReferenceDataCodesMock,
       })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/nationality`,
+    editUrl: `prisoner/${prisonerNumber}/personal/nationality`,
     editPageWithTitle: EditPage,
     editPageTitle: `Nationality`,
     successfulFlashMessage: 'Nationality updated',

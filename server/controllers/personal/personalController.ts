@@ -108,8 +108,8 @@ export default class PersonalController {
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===
           personalPageData.physicalCharacteristics.rightEyeColour
-            ? 'personal/edit/eye-colour'
-            : 'personal/edit/eye-colour-individual',
+            ? 'personal/eye-colour'
+            : 'personal/eye-colour-individual',
         careNeeds: careNeeds.filter(need => need.isOngoing).sort((a, b) => b.startDate?.localeCompare(a.startDate)),
         security: { ...personalPageData.security, xrays },
         hasPastCareNeeds: careNeeds.some(need => !need.isOngoing),

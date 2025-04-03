@@ -248,4 +248,9 @@ export interface PersonIntegrationApiClient {
   updatePseudonym(pseudonymId: number, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto>
 
   createPseudonym(prisonerNumber: string, pseudonym: PseudonymRequestDto): Promise<PseudonymResponseDto>
+
+  updateProfileImage(
+    prisonerNumber: string,
+    image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
+  ): Promise<void>
 }

@@ -22,7 +22,7 @@ context('Edit smoker or vaper', () => {
 
       cy.setupHealthAndMedicationRefDataStubs({ smokerCodes: smokerStatusCodesMock })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/smoker-or-vaper`,
+    editUrl: `prisoner/${prisonerNumber}/personal/smoker-or-vaper`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Does John Saunders smoke or vape?',
     successfulFlashMessage: 'Smoker or vaper updated',

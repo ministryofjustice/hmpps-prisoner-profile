@@ -19,7 +19,7 @@ context('Edit shoe size', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/shoe-size`,
+    editUrl: `prisoner/${prisonerNumber}/personal/shoe-size`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Shoe size',
     successfulFlashMessage: 'Shoe size updated',

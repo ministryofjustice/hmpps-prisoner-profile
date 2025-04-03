@@ -36,12 +36,10 @@ import {
   dietAndAllergyMock,
   healthAndMedicationMock,
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
-import {
-  corePersonPhysicalAttributesDtoMock,
-  corePersonPhysicalAttributesMock,
-} from '../data/localMockData/physicalAttributesMock'
+import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
 import agenciesMock from '../data/localMockData/agenciesDetails'
 import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
+import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -67,19 +65,7 @@ describe('PersonalPageService', () => {
 
     curiousApiClient = curiousApiClientMock()
     curiousApiClient.getLearnerNeurodivergence = jest.fn(async () => LearnerNeurodivergenceMock)
-
-    personIntegrationApiClient = {
-      updateBirthPlace: jest.fn(),
-      updateCountryOfBirth: jest.fn(),
-      updateNationality: jest.fn(),
-      updateReligion: jest.fn(),
-      updateSexualOrientation: jest.fn(),
-      getReferenceDataCodes: jest.fn(),
-      getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
-      getPhysicalAttributes: jest.fn(async () => corePersonPhysicalAttributesDtoMock),
-      updatePhysicalAttributes: jest.fn(),
-      getPseudonyms: jest.fn(),
-    } as unknown as PersonIntegrationApiClient
+    personIntegrationApiClient = personIntegrationApiClientMock()
 
     healthAndMedicationApiClient = {
       getReferenceDataCodes: jest.fn(),
