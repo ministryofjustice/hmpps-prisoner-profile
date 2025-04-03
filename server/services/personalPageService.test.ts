@@ -41,6 +41,7 @@ import {
   corePersonPhysicalAttributesMock,
 } from '../data/localMockData/physicalAttributesMock'
 import agenciesMock from '../data/localMockData/agenciesDetails'
+import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -153,16 +154,24 @@ describe('PersonalPageService', () => {
 
         it('Maps multiple aliases', async () => {
           const response = await getResponseWithAliases([
-            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: '' },
-            { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
+            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: 'Male' },
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleNames: 'Middle',
+              lastName: 'Last',
+              gender: 'Female',
+            },
           ])
           expect(response.personalDetails.aliases[0]).toEqual({
             alias: 'First Name Last Name',
             dateOfBirth: '01/01/2022',
+            sex: 'Male',
           })
           expect(response.personalDetails.aliases[1]).toEqual({
             alias: 'First Middle Last',
             dateOfBirth: '01/01/2023',
+            sex: 'Female',
           })
         })
       })
@@ -187,14 +196,23 @@ describe('PersonalPageService', () => {
         })
 
         it('Maps multiple pseudonyms', async () => {
+          const male = { description: 'Male' } as ReferenceDataValue
+          const female = { description: 'Female' } as ReferenceDataValue
+
           const response = await getResponseWithPseudonyms([
             { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
-            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name' } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2022-01-01',
+              firstName: 'First name',
+              lastName: 'Last name',
+              sex: male,
+            } as PseudonymResponseDto,
             {
               dateOfBirth: '2023-01-01',
               firstName: 'First',
               middleName1: 'Middleone',
               lastName: 'Last',
+              sex: female,
             } as PseudonymResponseDto,
             {
               dateOfBirth: '2023-01-01',
@@ -202,19 +220,24 @@ describe('PersonalPageService', () => {
               middleName1: 'Middleone',
               middleName2: 'Middletwo',
               lastName: 'Last',
+              sex: female,
             } as PseudonymResponseDto,
           ])
+
           expect(response.personalDetails.aliases[0]).toEqual({
             alias: 'First Name Last Name',
             dateOfBirth: '01/01/2022',
+            sex: 'Male',
           })
           expect(response.personalDetails.aliases[1]).toEqual({
             alias: 'First Middleone Last',
             dateOfBirth: '01/01/2023',
+            sex: 'Female',
           })
           expect(response.personalDetails.aliases[2]).toEqual({
             alias: 'First Middleone Middletwo Last',
             dateOfBirth: '01/01/2023',
+            sex: 'Female',
           })
         })
 

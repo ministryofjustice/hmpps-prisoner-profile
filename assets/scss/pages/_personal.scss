@@ -1,8 +1,16 @@
 .hmpps-profile--personal-content {
+  .hmpps-alias-details {
+    margin-bottom: govuk-spacing(0);
+    padding-bottom: govuk-spacing(3);
 
-  @media (min-width: 40.0625em) {
-    .hmpps-alias-details th:first-of-type {
-      width: 41.5%;
+    @media (min-width: 40.0625em) {
+      th:first-of-type {
+        width: 41.5%;
+      }
+
+      th:nth-of-type(2) {
+        width: 20%;
+      }
     }
   }
 
@@ -14,7 +22,7 @@
 
 
   .govuk-summary-list__row--no-border .govuk-summary-list__row {
-    border-bottom: none!important;
+    border-bottom: none !important;
   }
 
   .govuk-body-s-dd {
@@ -76,9 +84,9 @@
     border-bottom: 1px solid $govuk-border-colour;
   }
 
-  .govuk-summary-list__actions {
+  .govuk-summary-list__actions :not(.hmpps-alias-row) {
     width: 10%;
-    
+
     @media (max-width: 800px) {
       width: 20%;
     }
