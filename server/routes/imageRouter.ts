@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import multer from 'multer'
 import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
-import MulterFile from '../controllers/interfaces/MulterFile'
 import { Services } from '../services'
 import getPrisonerData from '../middleware/getPrisonerDataMiddleware'
 import auditPageAccessAttempt from '../middleware/auditPageAccessAttempt'
@@ -16,18 +14,22 @@ import NotFoundError from '../utils/notFoundError'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import { editProfileEnabled } from '../utils/featureToggles'
 import { HmppsStatusCode } from '../data/enums/hmppsStatusCode'
-import miniBannerData from '../controllers/utils/miniBannerData'
 import config from '../config'
 import logger from '../../logger'
 import validationMiddleware from '../middleware/validationMiddleware'
-import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { editPhotoValidator } from '../validators/editPhotoValidator'
+import ImageController from '../controllers/imageController'
 
 export default function imageRouter(services: Services): Router {
   const router = Router()
   const get = getRequest(router)
   const post = postRequest(router)
   const basePath = '/prisoner/:prisonerNumber([a-zA-Z][0-9]{4}[a-zA-Z]{2})'
+  const imageController = new ImageController(
+    services.dataAccess.personIntegrationApiClientBuilder,
+    services.dataAccess.prisonerProfileApiClientBuilder,
+    services.auditService,
+  )
 
   get(
     `${basePath}/image`,
@@ -120,27 +122,16 @@ export default function imageRouter(services: Services): Router {
 
   get(
     `${basePath}/image/new`,
-    auditPageAccessAttempt({ services, page: Page.Photo }),
+    auditPageAccessAttempt({ services, page: Page.EditProfileImage }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     editProfileChecks(),
-    async (req, res, next) => {
-      const { prisonerData } = req.middleware
-      res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
-
-      return res.render('pages/edit/photo/addNew', {
-        pageTitle: 'Add a new facial image',
-        miniBannerData: miniBannerData(prisonerData),
-        prisonerNumber: prisonerData.prisonerNumber,
-      })
-    },
+    imageController.updateProfileImage().newImage.get,
   )
-
-  const uploadToBuffer = multer({ storage: multer.memoryStorage() })
 
   post(
     `${basePath}/image/new`,
-    auditPageAccessAttempt({ services, page: Page.Photo }),
+    auditPageAccessAttempt({ services, page: Page.EditUploadedProfileImage }),
     getPrisonerData(services),
     permissionsGuard(services.permissionsService.getOverviewPermissions),
     editProfileChecks(),
@@ -153,52 +144,7 @@ export default function imageRouter(services: Services): Router {
       redirectBackOnError: true,
       useReq: true,
     }),
-    async (req, res, next) => {
-      const { prisonerData } = req.middleware
-      const file = req.file as MulterFile
-
-      if (req.body.photoType === 'withheld') {
-        return res.redirect(`/prisoner/${prisonerData.prisonerNumber}/image/new-withheld`)
-      }
-
-      return res.render('pages/edit/photo/editPhoto', {
-        miniBannerData: miniBannerData(prisonerData),
-        imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-        prisonerNumber: prisonerData.prisonerNumber,
-        fileName: file.originalname,
-        fileType: file.mimetype,
-      })
-    },
-  )
-
-  get(
-    `${basePath}/image/new-withheld`,
-    auditPageAccessAttempt({ services, page: Page.Photo }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editProfileChecks(),
-    async (req, res, next) => {
-      const { prisonerData } = req.middleware
-      res.locals = { ...res.locals, errors: req.flash('errors'), formValues: requestBodyFromFlash(req) }
-
-      return res.render('pages/edit/photo/addWithheld', {
-        pageTitle: 'Confirm facial image',
-        miniBannerData: miniBannerData(prisonerData),
-        prisonerNumber: prisonerData.prisonerNumber,
-      })
-    },
-  )
-
-  post(
-    `${basePath}/image/new-withheld`,
-    auditPageAccessAttempt({ services, page: Page.Photo }),
-    getPrisonerData(services),
-    permissionsGuard(services.permissionsService.getOverviewPermissions),
-    editProfileChecks(),
-    async (req, res, next) => {
-      const { prisonerData } = req.middleware
-      return res.redirect(`/prisoner/${prisonerData.prisonerNumber}/image/new-withheld`)
-    },
+    imageController.updateProfileImage().newImage.post,
   )
 
   post(
@@ -212,19 +158,26 @@ export default function imageRouter(services: Services): Router {
       includeSharedData: true,
       dpsUrl: config.serviceUrls.digitalPrison,
     }),
-    uploadToBuffer.single('editedFile'),
-    async (req, res, next) => {
-      const { prisonerData } = req.middleware
-      const file = req.file as MulterFile
-
-      res.render('pages/edit/photo/editPhoto', {
-        miniBannerData: miniBannerData(prisonerData),
-        imgSrc: `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
-        prisonerNumber: req.middleware.prisonerData.prisonerNumber,
-        fileName: file.originalname,
-        fileType: file.mimetype,
-      })
-    },
+    imageController.updateProfileImage().submitImage,
   )
+
+  get(
+    `${basePath}/image/new-withheld`,
+    auditPageAccessAttempt({ services, page: Page.EditProfileImageWithheld }),
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editProfileChecks(),
+    imageController.updateProfileImage().newWithheldImage.get,
+  )
+
+  post(
+    `${basePath}/image/new-withheld`,
+    auditPageAccessAttempt({ services, page: Page.PostEditProfileImageWithheld }),
+    getPrisonerData(services),
+    permissionsGuard(services.permissionsService.getOverviewPermissions),
+    editProfileChecks(),
+    imageController.updateProfileImage().newWithheldImage.post,
+  )
+
   return router
 }
