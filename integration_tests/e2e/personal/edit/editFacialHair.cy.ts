@@ -24,7 +24,7 @@ context('Edit facial hair', () => {
       })
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/facial-hair`,
+    editUrl: `prisoner/${prisonerNumber}/personal/facial-hair`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Facial hair',
     successfulFlashMessage: 'Facial hair updated',

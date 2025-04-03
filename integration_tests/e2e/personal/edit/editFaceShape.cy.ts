@@ -24,7 +24,7 @@ context('Edit face shape', () => {
       })
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/face-shape`,
+    editUrl: `prisoner/${prisonerNumber}/personal/face-shape`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Face shape',
     successfulFlashMessage: 'Face shape updated',

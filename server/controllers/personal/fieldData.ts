@@ -37,7 +37,7 @@ export interface CheckboxFieldData extends FieldData {
 }
 
 export const shoeSizeFieldData: PhysicalAttributesTextFieldData = {
-  url: 'edit/shoe-size',
+  url: 'shoe-size',
   fieldName: 'shoeSize',
   pageTitle: 'Shoe size',
   auditEditPageLoad: Page.EditShoeSize,
@@ -48,7 +48,7 @@ export const shoeSizeFieldData: PhysicalAttributesTextFieldData = {
 }
 
 export const hairFieldData: RadioFieldData = {
-  url: 'edit/hair',
+  url: 'hair',
   fieldName: 'hair',
   pageTitle: 'Hair type or colour',
   auditEditPageLoad: Page.EditHairTypeOrColour,
@@ -60,7 +60,7 @@ export const hairFieldData: RadioFieldData = {
 }
 
 export const facialHairFieldData: RadioFieldData = {
-  url: 'edit/facial-hair',
+  url: 'facial-hair',
   fieldName: 'facialHair',
   pageTitle: 'Facial hair',
   auditEditPageLoad: Page.EditFacialHair,
@@ -72,7 +72,7 @@ export const facialHairFieldData: RadioFieldData = {
 }
 
 export const faceShapeFieldData: RadioFieldData = {
-  url: 'edit/face-shape',
+  url: 'face-shape',
   fieldName: 'faceShape',
   pageTitle: 'Face shape',
   auditEditPageLoad: Page.EditFaceShape,
@@ -83,7 +83,7 @@ export const faceShapeFieldData: RadioFieldData = {
 }
 
 export const buildFieldData: RadioFieldData = {
-  url: 'edit/build',
+  url: 'build',
   fieldName: 'build',
   pageTitle: 'Build',
   auditEditPageLoad: Page.EditBuild,
@@ -94,7 +94,7 @@ export const buildFieldData: RadioFieldData = {
 }
 
 export const eyeColourFieldData: FieldData = {
-  url: 'edit/eye-colour',
+  url: 'eye-colour',
   fieldName: 'eyeColour',
   pageTitle: 'Eye colour',
   auditEditPageLoad: Page.EditEyeColour,
@@ -104,12 +104,12 @@ export const eyeColourFieldData: FieldData = {
 
 export const eyeColourIndividualFieldData: FieldData = {
   ...eyeColourFieldData,
-  url: 'edit/eye-colour-individual',
+  url: 'eye-colour-individual',
   pageTitle: 'Left and right eye colours',
 }
 
 export const smokerOrVaperFieldData: RadioFieldData = {
-  url: 'edit/smoker-or-vaper',
+  url: 'smoker-or-vaper',
   fieldName: 'smokerOrVaper',
   pageTitle: 'Smoker or vaper',
   auditEditPageLoad: Page.EditSmokerOrVaper,
@@ -118,7 +118,7 @@ export const smokerOrVaperFieldData: RadioFieldData = {
 }
 
 export const heightFieldData: PhysicalAttributesTextFieldData = {
-  url: 'edit/height',
+  url: 'height',
   fieldName: 'height',
   pageTitle: 'Height',
   auditEditPageLoad: Page.EditHeight,
@@ -129,11 +129,11 @@ export const heightFieldData: PhysicalAttributesTextFieldData = {
 
 export const heightImperialFieldData: PhysicalAttributesTextFieldData = {
   ...heightFieldData,
-  url: 'edit/height/imperial',
+  url: 'height/imperial',
 }
 
 export const weightFieldData: PhysicalAttributesTextFieldData = {
-  url: 'edit/weight',
+  url: 'weight',
   fieldName: 'weight',
   pageTitle: 'Weight',
   auditEditPageLoad: Page.EditWeight,
@@ -144,11 +144,11 @@ export const weightFieldData: PhysicalAttributesTextFieldData = {
 
 export const weightImperialFieldData: PhysicalAttributesTextFieldData = {
   ...weightFieldData,
-  url: 'edit/weight/imperial',
+  url: 'weight/imperial',
 }
 
 export const cityOrTownOfBirthFieldData: TextFieldData = {
-  url: 'edit/city-or-town-of-birth',
+  url: 'city-or-town-of-birth',
   fieldName: 'cityOrTownOfBirth',
   pageTitle: 'City or town of birth',
   auditEditPageLoad: Page.EditCityOrTownOfBirth,
@@ -158,7 +158,7 @@ export const cityOrTownOfBirthFieldData: TextFieldData = {
 }
 
 export const countryOfBirthFieldData: RadioFieldData = {
-  url: 'edit/country-of-birth',
+  url: 'country-of-birth',
   fieldName: 'countryOfBirth',
   pageTitle: 'Country of birth',
   auditEditPageLoad: Page.EditCountryOfBirth,
@@ -167,7 +167,7 @@ export const countryOfBirthFieldData: RadioFieldData = {
 }
 
 export const nationalityFieldData: RadioFieldData = {
-  url: 'edit/nationality',
+  url: 'nationality',
   fieldName: 'nationality',
   pageTitle: 'Nationality',
   auditEditPageLoad: Page.EditNationality,
@@ -185,7 +185,7 @@ export const dietAndFoodAllergiesFieldData: FieldData = {
 }
 
 export const religionFieldData: FieldData = {
-  url: 'edit/religion',
+  url: 'religion',
   fieldName: 'religion',
   pageTitle: 'Religion, faith or belief',
   auditEditPageLoad: Page.EditReligion,

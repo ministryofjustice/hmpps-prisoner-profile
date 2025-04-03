@@ -24,7 +24,7 @@ context('Edit city or town of birth', () => {
         referenceData: CountryReferenceDataCodesMock,
       })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/country-of-birth`,
+    editUrl: `prisoner/${prisonerNumber}/personal/country-of-birth`,
     editPageWithTitle: EditPage,
     editPageTitle: 'What country was John Saunders born in?',
     successfulFlashMessage: 'Country of birth updated',

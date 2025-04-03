@@ -26,7 +26,7 @@ context('Edit religion, faith or belief', () => {
           referenceData: ReligionReferenceDataCodesMock,
         })
       },
-      editUrl: `prisoner/${prisonerNumber}/personal/edit/religion`,
+      editUrl: `prisoner/${prisonerNumber}/personal/religion`,
       editPageWithTitle: EditPage,
       editPageTitle: 'Religion, faith or belief',
       successfulFlashMessage: 'Religion, faith or belief updated',
@@ -101,7 +101,7 @@ context('Edit religion, faith or belief', () => {
           referenceData: ReligionReferenceDataCodesMock,
         })
       },
-      editUrl: `prisoner/${prisonerNumber}/personal/edit/religion`,
+      editUrl: `prisoner/${prisonerNumber}/personal/religion`,
       editPageWithTitle: EditPage,
       editPageTitle: 'Religion, faith or belief',
       successfulFlashMessage: 'Religion, faith or belief updated',

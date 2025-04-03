@@ -244,7 +244,7 @@ describe('PersonalController', () => {
           await action(validRequest, res)
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/height')
         })
 
         it('Sends a post success audit event', async () => {
@@ -409,7 +409,7 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/height/imperial')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/height/imperial')
         })
 
         it('Sends a post success audit event', async () => {
@@ -552,7 +552,7 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/weight')
         })
 
         it('Sends a post success audit event', async () => {
@@ -717,7 +717,7 @@ describe('PersonalController', () => {
 
           expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
           expect(validRequest.flash).toHaveBeenCalledWith('requestBody', JSON.stringify(validRequest.body))
-          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/weight/imperial')
+          expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/weight/imperial')
         })
 
         it('Sends a post success audit event', async () => {
@@ -749,7 +749,7 @@ describe('PersonalController', () => {
       domain: CorePersonRecordReferenceDataDomain.build,
       auditEditPageLoad: 'PAGE' as Page,
       auditEditPostAction: 'ACTION' as PostAction,
-      url: 'edit/build',
+      url: 'build',
       redirectAnchor: 'appearance',
       hintText: 'Hint text',
     }
@@ -893,7 +893,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/build')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/build')
       })
 
       it('Sends a post success audit event', async () => {
@@ -1051,7 +1051,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/smoker-or-vaper')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/smoker-or-vaper')
       })
 
       it('Sends a post success audit event', async () => {
@@ -1296,7 +1296,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/nationality')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/nationality')
       })
 
       it('Sends a post success audit event', async () => {
@@ -1426,7 +1426,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/shoe-size')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/shoe-size')
       })
     })
   })
@@ -1532,7 +1532,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/city-or-town-of-birth')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/city-or-town-of-birth')
       })
     })
   })
@@ -1691,7 +1691,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/country-of-birth')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/country-of-birth')
       })
     })
   })
@@ -1841,7 +1841,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/eye-colour')
       })
 
       it('Sends a post success audit event', async () => {
@@ -2020,7 +2020,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/eye-colour-individual')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/eye-colour-individual')
       })
 
       it('Sends a post success audit event', async () => {
@@ -2644,7 +2644,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/edit/religion')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/personal/religion')
       })
     })
   })

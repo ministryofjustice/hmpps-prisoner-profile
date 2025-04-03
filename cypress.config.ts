@@ -45,6 +45,7 @@ export default defineConfig({
   },
   taskTimeout: 60000,
   e2e: {
+    experimentalRunAllSpecs: true,
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on) {

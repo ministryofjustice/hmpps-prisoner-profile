@@ -29,7 +29,7 @@ context('Edit eye colour - both eyes the same colour', () => {
       })
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/eye-colour`,
+    editUrl: `prisoner/${prisonerNumber}/personal/eye-colour`,
     editPageWithTitle: EditEyeColour,
     editPageTitle: 'Eye colour',
     successfulFlashMessage: 'Eye colour updated',
@@ -63,7 +63,7 @@ context('Edit eye colour - left and right eyes different colours', () => {
       })
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/eye-colour-individual`,
+    editUrl: `prisoner/${prisonerNumber}/personal/eye-colour-individual`,
     editPageWithTitle: EditEyeColour,
     editPageTitle: 'Left and right eye colours',
     successfulFlashMessage: 'Left and right eye colours updated',
@@ -92,7 +92,7 @@ context('Edit eye colour - switch between using one or two sets of radios', () =
       referenceData: eyeColourCodesMock,
     })
     cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
-    cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/personal/edit/eye-colour` })
+    cy.signIn({ redirectPath: `prisoner/${prisonerNumber}/personal/eye-colour` })
   })
 
   it('Can switch between the eye colour edit pages', () => {
