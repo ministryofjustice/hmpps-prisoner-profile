@@ -30,6 +30,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     errorMessages: string[]
   }[]
   redirectAnchor: string
+  personalPageHref?: string
 }) {
   const {
     editUrl,
@@ -67,6 +68,15 @@ export function editPageTests<TPage extends EditPage>(options: {
       across multiple tests easily, it might need its own option in the future
     */
     context('Permissions', () => {
+      if (options.personalPageHref) {
+        it('Doesnt show an edit link on the personal page if they dont have the permissions', () => {
+          cy.setupUserAuth({ roles: [Role.PrisonUser] })
+
+          cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
+          cy.get(`a[href="${options.personalPageHref}"]`).should('not.exist')
+        })
+      }
+
       it('Doesnt let the user access if they dont have the permissions', () => {
         cy.setupUserAuth({ roles: [Role.PrisonUser] })
 
@@ -86,6 +96,13 @@ export function editPageTests<TPage extends EditPage>(options: {
         }
 
         return null
+      }
+
+      if (options.personalPageHref) {
+        it('Shows an edit link on the personal page', () => {
+          cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
+          cy.get(`a[href="${options.personalPageHref}"]`).should('exist')
+        })
       }
 
       context('Submitting valid responses', () => {
