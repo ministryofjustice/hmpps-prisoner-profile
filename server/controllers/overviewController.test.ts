@@ -97,6 +97,7 @@ describe('overviewController', () => {
           visits: { view: true, edit: true },
           category: { view: true },
           incentives: { view: true },
+          caseNotes: { view: true },
         },
       },
       originalUrl: 'http://localhost',
@@ -161,7 +162,7 @@ describe('overviewController', () => {
     it('should not call moneyService.getMoneySummary if user doesnt have money.view permission', async () => {
       const reqNoMoney = {
         ...req,
-        middleware: { ...req.middleware, permissions: { money: { view: false } } },
+        middleware: { ...req.middleware, permissions: { money: { view: false }, caseNotes: { view: true } } },
       }
       moneyService.getAccountBalances = jest
         .fn()
@@ -199,7 +200,7 @@ describe('overviewController', () => {
       }
       const reqNoAdj = {
         ...req,
-        middleware: { ...req.middleware, permissions: { adjudications: { view: false } } },
+        middleware: { ...req.middleware, permissions: { adjudications: { view: false }, caseNotes: { view: true } } },
       }
       adjudicationsService.getAdjudicationsOverview = jest
         .fn()
@@ -256,7 +257,7 @@ describe('overviewController', () => {
       }
       const reqNoVisits = {
         ...req,
-        middleware: { ...req.middleware, permissions: { visits: { view: false } } },
+        middleware: { ...req.middleware, permissions: { visits: { view: false }, caseNotes: { view: true } } },
       }
       visitsService.getVisitsOverview = jest
         .fn()
@@ -319,7 +320,7 @@ describe('overviewController', () => {
         ...req,
         middleware: {
           ...req.middleware,
-          permissions: { category: { edit: true } },
+          permissions: { category: { edit: true }, caseNotes: { view: true } },
           prisonerData: { prisonerNumber, bookingId, prisonId: 'MDI', assessments: assessmentsMock },
         },
       }
@@ -390,7 +391,7 @@ describe('overviewController', () => {
     it('should not call incentiveService.getIncentiveOverview if user does not have incentives.view permission', async () => {
       const reqNoIncentives = {
         ...req,
-        middleware: { ...req.middleware, permissions: { incentives: { view: false } } },
+        middleware: { ...req.middleware, permissions: { incentives: { view: false }, caseNotes: { view: true } } },
       }
       incentiveService.getIncentiveOverview = jest.fn().mockResolvedValue({
         positiveBehaviourCount: 1,

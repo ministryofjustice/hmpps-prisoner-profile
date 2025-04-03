@@ -103,7 +103,14 @@ export default class PersonalController {
 
       res.render('pages/personalPage', {
         pageTitle: 'Personal',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'personal'),
+        ...mapHeaderData(
+          prisonerData,
+          inmateDetail,
+          alertSummaryData,
+          req.middleware.permissions,
+          res.locals.user,
+          'personal',
+        ),
         ...personalPageData,
         changeEyeColourUrl:
           personalPageData.physicalCharacteristics.leftEyeColour ===

@@ -4,7 +4,7 @@ import Prisoner from '../../../../data/interfaces/prisonerSearchApi/Prisoner'
 import { HmppsUser } from '../../../../interfaces/HmppsUser'
 import { Role } from '../../../../data/enums/role'
 
-export default function getCaseNotesAccessStatusCode(user: HmppsUser, prisoner: Prisoner): HmppsStatusCode {
+export default function getCaseNotesAccessStatusCode(user: HmppsUser, prisoner: Partial<Prisoner>): HmppsStatusCode {
   const { restrictedPatient } = prisoner
   const prisonerInCaseLoad = isInUsersCaseLoad(prisoner.prisonId, user)
   const hasInactiveBookingsRole = userHasAllRoles([Role.InactiveBookings], user.userRoles)
@@ -29,6 +29,6 @@ export default function getCaseNotesAccessStatusCode(user: HmppsUser, prisoner: 
     return hasInactiveBookingsRole ? HmppsStatusCode.OK : HmppsStatusCode.PRISONER_IS_TRANSFERRING
   }
 
-  // Active prisoner case notes can only by users assigned to the prisoners caseload.
+  // Active prisoner case notes can only be viewed by users assigned to the prisoners caseload.
   return prisonerInCaseLoad ? HmppsStatusCode.OK : HmppsStatusCode.NOT_IN_CASELOAD
 }

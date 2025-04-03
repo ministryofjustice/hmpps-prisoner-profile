@@ -2,7 +2,7 @@ import {
   prisonerMDI,
   prisonerOUT,
   prisonerTRN,
-  restrictedPrisonerMDI,
+  restrictedPatientMDI,
   userLEI,
   userMDI,
 } from '../../../../tests/mocks/userMocks'
@@ -16,19 +16,19 @@ const caseLoadListWithMdi = [
 
 describe('getCaseNotesPermissions', () => {
   test.each`
-    user                                              | prisoner                 | roles                                | editPermitted
-    ${userMDI}                                        | ${prisonerMDI}           | ${[]}                                | ${true}
-    ${userLEI}                                        | ${prisonerMDI}           | ${[]}                                | ${false}
-    ${{ ...userLEI, caseLoads: caseLoadListWithMdi }} | ${prisonerMDI}           | ${[]}                                | ${true}
-    ${userLEI}                                        | ${prisonerOUT}           | ${[]}                                | ${false}
-    ${userLEI}                                        | ${prisonerOUT}           | ${[Role.InactiveBookings]}           | ${true}
-    ${userLEI}                                        | ${prisonerTRN}           | ${[]}                                | ${false}
-    ${userLEI}                                        | ${prisonerTRN}           | ${[Role.InactiveBookings]}           | ${true}
-    ${userLEI}                                        | ${restrictedPrisonerMDI} | ${[Role.InactiveBookings]}           | ${false}
-    ${userLEI}                                        | ${restrictedPrisonerMDI} | ${[Role.PomUser]}                    | ${true}
-    ${userLEI}                                        | ${prisonerMDI}           | ${[Role.GlobalSearch, Role.PomUser]} | ${true}
-    ${userLEI}                                        | ${prisonerMDI}           | ${[Role.GlobalSearch]}               | ${false}
-    ${userLEI}                                        | ${prisonerMDI}           | ${[Role.PomUser]}                    | ${false}
+    user                                              | prisoner                | roles                                | editPermitted
+    ${userMDI}                                        | ${prisonerMDI}          | ${[]}                                | ${true}
+    ${userLEI}                                        | ${prisonerMDI}          | ${[]}                                | ${false}
+    ${{ ...userLEI, caseLoads: caseLoadListWithMdi }} | ${prisonerMDI}          | ${[]}                                | ${true}
+    ${userLEI}                                        | ${prisonerOUT}          | ${[]}                                | ${false}
+    ${userLEI}                                        | ${prisonerOUT}          | ${[Role.InactiveBookings]}           | ${true}
+    ${userLEI}                                        | ${prisonerTRN}          | ${[]}                                | ${false}
+    ${userLEI}                                        | ${prisonerTRN}          | ${[Role.InactiveBookings]}           | ${true}
+    ${userLEI}                                        | ${restrictedPatientMDI} | ${[Role.InactiveBookings]}           | ${true}
+    ${userMDI}                                        | ${restrictedPatientMDI} | ${[Role.PomUser]}                    | ${true}
+    ${userLEI}                                        | ${prisonerMDI}          | ${[Role.GlobalSearch, Role.PomUser]} | ${false}
+    ${userLEI}                                        | ${prisonerMDI}          | ${[Role.GlobalSearch]}               | ${false}
+    ${userLEI}                                        | ${prisonerMDI}          | ${[Role.PomUser]}                    | ${false}
   `('roles: $roles; view: $editPermitted', async ({ user, prisoner, roles, editPermitted }) => {
     const permissions = getCaseNotesPermissions({ ...user, userRoles: [...roles] }, prisoner)
 
