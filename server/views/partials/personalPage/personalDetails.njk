@@ -79,7 +79,7 @@
             {% endif %}
         {% endset %}
 
-        Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation}}
+        Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation | safe }}
     </span>
   {% else %}
     <span class="govuk-!-margin-top-1">Not entered</span>

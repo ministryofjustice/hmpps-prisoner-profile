@@ -99,16 +99,17 @@ export const services = () => {
     personCommunicationNeedsApiClientBuilder,
   )
   const referenceDataService = new ReferenceDataService(referenceDataStore, referenceDataSourceFactory)
+  const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
   const personalPageService = new PersonalPageService(
     prisonApiClientBuilder,
     curiousApiClientBuilder,
     personIntegrationApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     referenceDataService,
+    prisonService,
     metricsService,
     curiousApiToken,
   )
-  const prisonService = new PrisonService(prisonRegisterStore, prisonRegisterApiClientBuilder)
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(
     curiousApiClientBuilder,
