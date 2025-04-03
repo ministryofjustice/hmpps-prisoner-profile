@@ -213,4 +213,11 @@ describe('personIntegrationApiClient', () => {
       expect(result).toEqual(PseudonymResponseMock)
     })
   })
+
+  describe('updateProfileImage', () => {
+    it('Should upload the image and return the response', async () => {
+      fakePersonIntegrationApi.put('/v1/core-person-record/profile-image?prisonerNumber=A1234AA').reply(200)
+      expect(async () => personIntegrationApiClient.updateProfileImage('A1234AA', image)).not.toThrow()
+    })
+  })
 })

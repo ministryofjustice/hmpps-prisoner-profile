@@ -13,6 +13,7 @@ import {
   MilitaryRankRefDataMock,
   MilitaryRecordsMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
+import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 
 jest.mock('../data')
 jest.mock('./referenceData/referenceDataService')
@@ -29,11 +30,9 @@ describe('MilitaryRecordsService', () => {
   let user: PrisonUser
 
   beforeEach(() => {
-    personIntegrationApiClient = {
-      getMilitaryRecords: jest.fn(async () => MilitaryRecordsMock),
-      createMilitaryRecord: jest.fn(),
-      updateMilitaryRecord: jest.fn(),
-    } as unknown as PersonIntegrationApiClient
+    personIntegrationApiClient = personIntegrationApiClientMock()
+    personIntegrationApiClient.getMilitaryRecords = jest.fn(async () => MilitaryRecordsMock)
+
     referenceDataService = {
       getActiveReferenceDataCodes: jest.fn(async (domain: string) => {
         if (domain === 'MLTY_BRANCH') return MilitaryBranchRefDataMock

@@ -7,6 +7,7 @@ import {
   PseudonymResponseMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import AliasService, { Name } from './aliasService'
+import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
 
 jest.mock('../data')
 jest.mock('./referenceData/referenceDataService')
@@ -22,10 +23,9 @@ describe('AliasService', () => {
   let metricsService: MetricsService
 
   beforeEach(() => {
-    personIntegrationApiClient = {
-      getPseudonyms: jest.fn(async () => [PseudonymResponseMock]),
-      updatePseudonym: jest.fn(async () => PseudonymResponseMock),
-    } as unknown as PersonIntegrationApiClient
+    personIntegrationApiClient = personIntegrationApiClientMock()
+    personIntegrationApiClient.getPseudonyms = jest.fn(async () => [PseudonymResponseMock])
+    personIntegrationApiClient.updatePseudonym = jest.fn(async () => PseudonymResponseMock)
 
     metricsService = {
       trackPersonIntegrationUpdate: jest.fn(),

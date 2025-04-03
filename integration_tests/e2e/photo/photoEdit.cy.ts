@@ -2,6 +2,7 @@ import { Role } from '../../../server/data/enums/role'
 import Page from '../../pages/page'
 import ConfirmFacialImagePage from '../../pages/photoPages/confirmFacialImagePage'
 import EditPhotoPage from '../../pages/photoPages/editPhotoPage'
+import PrisonerPhotoPage from '../../pages/photoPages/photoPage'
 import { permissionsTests } from '../permissionsTests'
 
 context('Editing the photo', () => {
@@ -15,6 +16,7 @@ context('Editing the photo', () => {
         prisonerNumber,
         bookingId,
       })
+      cy.task('stubUpdateProfileImage', { prisonerNumber })
     })
 
     context('Permissions', () => {
@@ -61,6 +63,16 @@ context('Editing the photo', () => {
         page.saveAndContinue().click()
         Page.verifyOnPage(ConfirmFacialImagePage)
       })
+
+      it('Allows you to submit the new photo', () => {
+        page.uploadNew().click()
+        page.fileUpload().attachFile('tat.jpeg')
+        page.saveAndContinue().click()
+        const confirmationPage = Page.verifyOnPage(ConfirmFacialImagePage)
+        confirmationPage.saveAndContinue().click()
+        const photoPage = Page.verifyOnPage(PrisonerPhotoPage)
+        photoPage.flashMessage().should('include.text', 'Profile image updated')
+      })
     })
 
     context('Uploading withheld photo', () => {
@@ -73,6 +85,16 @@ context('Editing the photo', () => {
         page.uploadWithheld().click()
         page.saveAndContinue().click()
         Page.verifyOnPage(ConfirmFacialImagePage)
+      })
+
+      it('Allows you to submit the new photo', () => {
+        page.uploadNew().click()
+        page.fileUpload().attachFile('tat.jpeg')
+        page.saveAndContinue().click()
+        const confirmationPage = Page.verifyOnPage(ConfirmFacialImagePage)
+        confirmationPage.saveAndContinue().click()
+        const photoPage = Page.verifyOnPage(PrisonerPhotoPage)
+        photoPage.flashMessage().should('include.text', 'Profile image updated')
       })
     })
   })
