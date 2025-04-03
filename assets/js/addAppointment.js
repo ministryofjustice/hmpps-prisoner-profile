@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (response?.ok) {
       locationEventsContainer.innerHTML = await response.text()
-      locationEventsContainer.style.display = 'block'
+      locationEventsContainer.removeAttribute("style");
     } else {
       locationEventsContainer.style.display = 'none'
     }
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       prisonerNumber && date && (await fetch(`/api/get-offender-events?date=${date}&prisonerNumber=${prisonerNumber}&appointmentId=${appointmentId}`))
 
     if (response?.ok) {
-      offenderEventsContainer.style.display = 'block'
+      offenderEventsContainer.removeAttribute("style");
       offenderEventsContainer.innerHTML = await response.text()
     } else {
       offenderEventsContainer.style.display = 'none'
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       times && date && (await fetch(`/api/get-recurring-end-date?date=${date}&repeats=${repeats}&times=${times}`))
 
     if (response?.ok) {
-      lastAppointmentDate.style.display = 'block'
+      lastAppointmentDate.removeAttribute("style");
       lastAppointmentDate.innerText = await response.text()
     } else {
       lastAppointmentDate.style.display = 'none'
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
       recurringRadios.style.display = 'none'
     } else {
-      recurringRadios.style.display = 'block'
+      recurringRadios.removeAttribute("style");
     }
   }
 
@@ -79,11 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (appointmentType === 'VLPM') {
-      if (probationTeamSelect) probationTeamSelect.style.display = 'block'
-      probationMeetingRadios.style.display = 'block'
-      probationOfficerDetails.style.display = 'block'
+      probationTeamSelect.removeAttribute("style");
+      probationMeetingRadios.removeAttribute("style");
+      probationOfficerDetails.removeAttribute("style");
     } else {
-      if (probationTeamSelect) probationTeamSelect.style.display = 'none'
+      probationTeamSelect.style.display = 'none'
       probationMeetingRadios.style.display = 'none'
       probationOfficerDetails.style.display = 'none'
     }
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appointmentType = appointmentTypeSelect.value
 
     if (appointmentType === 'VLB' || appointmentType === 'VLPM') {
-      commentsHint.style.display = 'block'
+      commentsHint.removeAttribute("style");
     } else {
       commentsHint.style.display = 'none'
     }
