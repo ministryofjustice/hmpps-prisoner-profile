@@ -198,6 +198,95 @@ export default class AliasController {
     }
   }
 
+  public displayChangeDateOfBirth(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
+      const errors = req.flash('errors')
+
+      const formValues = requestBodyFromFlash<Name>(req) || {
+        'dateOfBirth-year': currentWorkingName.dateOfBirth?.split('-')[0],
+        'dateOfBirth-month': currentWorkingName.dateOfBirth?.split('-')[1],
+        'dateOfBirth-day': currentWorkingName.dateOfBirth?.split('-')[2],
+      }
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditDateOfBirth,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/alias/changeDateOfBirth', {
+        pageTitle: `Date of birth - Prisoner personal details`,
+        warningText: 'This will become their date of birth in DPS and NOMIS.',
+        errors,
+        formValues,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+        },
+      })
+    }
+  }
+
+  public submitChangeDateOfBirth(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { prisonerNumber } = req.params
+      const { clientToken } = req.middleware
+
+      const dateOfBirth = dateToIsoDate(
+        `${req.body['dateOfBirth-day']}/${req.body['dateOfBirth-month']}/${req.body['dateOfBirth-year']}`,
+      )
+
+      const errors = req.errors || []
+      if (errors.length) {
+        req.flash('requestBody', JSON.stringify(req.body))
+        req.flash('errors', errors)
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/date-of-birth`)
+      }
+
+      try {
+        const previousWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
+        const result = await this.aliasService.updateDateOfBirth(
+          clientToken,
+          res.locals.user as PrisonUser,
+          prisonerNumber,
+          dateOfBirth,
+        )
+
+        req.flash('flashMessage', {
+          text: 'Date of birth updated',
+          type: FlashMessageType.success,
+          fieldName: 'dateOfBirth',
+        })
+
+        this.auditService
+          .sendPostSuccess({
+            user: res.locals.user,
+            prisonerNumber,
+            correlationId: req.id,
+            action: PostAction.EditDateOfBirth,
+            details: {
+              fieldName: 'dateOfBirth',
+              previous: previousWorkingName.dateOfBirth,
+              updated: result.dateOfBirth,
+            },
+          })
+          .catch(error => logger.error(error))
+
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      } catch (e) {
+        req.flash('errors', [{ text: 'There was an error please try again' }])
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/date-of-birth`)
+      }
+    }
+  }
+
   private displayChangeNamePage({
     pageTitle,
     formTitle,

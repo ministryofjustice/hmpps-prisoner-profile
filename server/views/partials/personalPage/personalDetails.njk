@@ -124,7 +124,7 @@
             classes: listClasses,
             rows: toSummaryListRows([
                 { key: "Preferred name", value: personalDetails.preferredName, options: { dataQa: "preferred-name", hideIfEmpty: true } },
-                { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth" } },
+                { key: "Date of birth", value: dateOfBirthText, options: { dataQa: "date-of-birth", changeHref: "personal/date-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'dateOfBirth' } },
                 { key: "City or town of birth", value: personalDetails.cityOrTownOfBirth, options: { dataQa: "city-or-town-of-birth", visible: inUsersCaseLoad, changeHref: "personal/city-or-town-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'cityOrTownOfBirth' } },
                 { key: "Country of birth", value: personalDetails.countryOfBirth, options: { dataQa: "country-of-birth", visible: inUsersCaseLoad, changeHref: "personal/country-of-birth", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'countryOfBirth' } },
                 { key: "Nationality", value: nationalitiesHtml(personalDetails), options: { dataQa: "nationality", visible: inUsersCaseLoad, changeHref: "personal/nationality", changeLinkEnabled: editEnabled, rowUpdated: flashMessage.fieldName === 'nationality' } },

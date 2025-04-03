@@ -16,6 +16,25 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
   get('/change-name', editProfileChecks(), aliasController.displayChangeNamePurpose())
   post('/change-name', editProfileChecks(), aliasController.submitChangeNamePurpose())
 
+  get('/date-of-birth', editProfileChecks(), aliasController.displayChangeDateOfBirth())
+  post(
+    '/date-of-birth',
+    editProfileChecks(),
+    validationMiddleware(
+      [
+        dateValidator({
+          namePrefix: 'dateOfBirth',
+          label: 'Date of birth',
+          missingText: 'Enter this person’s date of birth',
+        }),
+      ],
+      {
+        redirectBackOnError: true,
+      },
+    ),
+    aliasController.submitChangeDateOfBirth(),
+  )
+
   get('/enter-corrected-name', editProfileChecks(), aliasController.displayChangeNameCorrection())
   post(
     '/enter-corrected-name',
