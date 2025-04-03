@@ -1,5 +1,5 @@
 import { Readable } from 'stream'
-import { ReferenceDataValue } from '../prisonApi/ReferenceDataValue'
+import { ReferenceDataValue } from '../ReferenceDataValue'
 import MulterFile from '../../../controllers/interfaces/MulterFile'
 
 export interface CorePersonRecordReferenceDataCodeDto {

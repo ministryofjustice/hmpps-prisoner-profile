@@ -278,7 +278,7 @@ export default class AliasController {
         req.flash('flashMessage', {
           text: 'Name updated',
           type: FlashMessageType.success,
-          fieldName: 'full-name',
+          fieldName: 'fullName',
         })
 
         this.auditService

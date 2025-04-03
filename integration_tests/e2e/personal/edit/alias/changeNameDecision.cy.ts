@@ -23,6 +23,18 @@ context('Change Name Purpose Page', () => {
   })
 
   context('Permissions', () => {
+    it('Shows change name link on the personal page if they have permissions', () => {
+      cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
+      cy.get(`a[href="personal/change-name"]`).should('exist')
+    })
+
+    it('Doesnt show an edit link on the personal page if they dont have the permissions', () => {
+      cy.setupUserAuth({ roles: [Role.PrisonUser] })
+
+      cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
+      cy.get(`a[href="personal/change-name"]`).should('not.exist')
+    })
+
     it('Doesnt let the user access if they dont have the permissions', () => {
       cy.setupUserAuth({ roles: [Role.PrisonUser] })
 

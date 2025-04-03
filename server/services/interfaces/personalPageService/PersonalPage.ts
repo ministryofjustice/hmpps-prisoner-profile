@@ -27,6 +27,7 @@ export interface PersonalDetails {
   aliases: {
     alias: string
     dateOfBirth: string
+    sex: string
   }[]
   dateOfBirth: string
   domesticAbusePerpetrator: string

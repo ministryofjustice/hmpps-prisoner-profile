@@ -172,6 +172,7 @@ Cypress.Commands.add('setupPersonalPageStubs', ({ bookingId, prisonerNumber, pri
   cy.task('stubHealthAndMedication', { prisonerNumber })
   cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
   cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
+  cy.task('stubPersonalCareNeeds')
 })
 
 Cypress.Commands.add('setupMoneyStubs', ({ bookingId, prisonerNumber, prisonId = {} }) => {
