@@ -107,6 +107,44 @@ export const ReligionReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDt
   },
 ]
 
+export const SexualOrientationReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
+  {
+    id: 'SEXO_HET',
+    code: 'HET',
+    description: 'Heterosexual / Straight',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'SEXO_HOM',
+    code: 'HOM',
+    description: 'Homosexual / Lesbian',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'SEXO_BIS',
+    code: 'BIS',
+    description: 'Bisexual',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'SEXO_OTH',
+    code: 'OTH',
+    description: 'Other',
+    listSequence: 4,
+    isActive: true,
+  },
+  {
+    id: 'SEXO_ND',
+    code: 'ND',
+    description: 'Not Disclosed',
+    listSequence: 5,
+    isActive: true,
+  },
+]
+
 export const MilitaryRecordsMock: MilitaryRecord[] = [
   {
     prisonerNumber: 'A1234BC',
@@ -208,6 +246,44 @@ export const MilitaryDischargeRefDataMock: ReferenceDataCodeDto[] = [
     code: 'HON',
     description: 'Honourable',
     listSequence: 1,
+    isActive: true,
+  },
+]
+
+export const LanguageReferenceDataCodesMock: CorePersonRecordReferenceDataCodeDto[] = [
+  {
+    id: 'LANG_ENG',
+    code: 'ENG',
+    description: 'English',
+    listSequence: 1,
+    isActive: true,
+  },
+  {
+    id: 'LANG_FRE',
+    code: 'FRE',
+    description: 'French',
+    listSequence: 2,
+    isActive: true,
+  },
+  {
+    id: 'LANG_SPA',
+    code: 'SPA',
+    description: 'Spanish',
+    listSequence: 3,
+    isActive: true,
+  },
+  {
+    id: 'LANG_ARA',
+    code: 'ARA',
+    description: 'Arabic',
+    listSequence: 4,
+    isActive: true,
+  },
+  {
+    id: 'LANG_CHI',
+    code: 'CHI',
+    description: 'Chinese',
+    listSequence: 5,
     isActive: true,
   },
 ]

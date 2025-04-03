@@ -68,6 +68,13 @@ describe('personIntegrationApiClient', () => {
     })
   })
 
+  describe('updateSexualOrientation', () => {
+    it('should update sexual orientation', async () => {
+      fakePersonIntegrationApi.patch('/v1/core-person-record?prisonerNumber=A1234AA').reply(204)
+      await personIntegrationApiClient.updateSexualOrientation('A1234AA', 'HET')
+    })
+  })
+
   describe('getReferenceDataCodes', () => {
     it('should return reference data codes', async () => {
       fakePersonIntegrationApi

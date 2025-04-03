@@ -31,6 +31,7 @@ import csipApi from './integration_tests/mockApis/csipApi'
 import bookAVideoLinkApi from './integration_tests/mockApis/bookAVideoLinkApi'
 import healthAndMedicationApi from './integration_tests/mockApis/healthAndMedication'
 import osPlacesApi from './integration_tests/mockApis/osPlacesApi'
+import personCommunicationNeedsApi from './integration_tests/mockApis/personCommunicationNeedsApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -80,6 +81,7 @@ export default defineConfig({
         ...bookAVideoLinkApi,
         ...healthAndMedicationApi,
         ...osPlacesApi,
+        ...personCommunicationNeedsApi,
       })
     },
     baseUrl: 'http://localhost:3007',

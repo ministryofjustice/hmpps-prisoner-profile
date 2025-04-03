@@ -11,6 +11,7 @@ import {
 import { mapHeaderData } from '../../mappers/headerMappers'
 import { AuditService, Page } from '../../services/auditService'
 import {
+  apostrophe,
   convertToTitleCase,
   formatLocation,
   formatName,
@@ -36,6 +37,7 @@ import {
   PhysicalAttributesTextFieldData,
   RadioFieldData,
   religionFieldData,
+  sexualOrientationFieldData,
   smokerOrVaperFieldData,
   TextFieldData,
   weightFieldData,
@@ -483,7 +485,7 @@ export default class PersonalController {
     }
   }
 
-  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: RadioOption[]) {
+  editRadioFields(formTitle: string, fieldData: RadioFieldData, options: (RadioOption | { divider: string })[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { pageTitle, hintText, redirectAnchor, auditEditPageLoad } = fieldData
       const { prisonerNumber } = req.params
@@ -1283,6 +1285,91 @@ export default class PersonalController {
             previous: currentReligionCode,
             updated: religionCode,
           },
+        })
+      },
+    }
+  }
+
+  sexualOrientation() {
+    const { fieldName } = sexualOrientationFieldData
+
+    const descriptionLookup: Record<string, string> = {
+      HET: 'Heterosexual or straight',
+      HOM: 'Gay or lesbian',
+      ND: 'Not answered',
+    }
+
+    const currentOrientationCode = async (req: Request, referenceData?: ReferenceDataCodeDto[]) => {
+      const { inmateDetail, clientToken } = req.middleware
+      const sexualOrientationReferenceData =
+        referenceData ||
+        (await this.personalPageService.getReferenceDataCodes(
+          clientToken,
+          CorePersonRecordReferenceDataDomain.sexualOrientation,
+        ))
+      const profileInformationValue = getProfileInformationValue(
+        ProfileInformationType.SexualOrientation,
+        inmateDetail.profileInformation,
+      )
+      return profileInformationValue
+        ? sexualOrientationReferenceData.filter(
+            orientation =>
+              orientation.description === profileInformationValue || orientation.code === profileInformationValue,
+          )[0]?.code
+        : profileInformationValue
+    }
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerData, clientToken } = req.middleware
+        const { firstName, lastName } = prisonerData
+        const requestBodyFlash = requestBodyFromFlash<{ autocompleteField: string; radioField: string }>(req)
+        const sexualOrientationReferenceData = await this.personalPageService.getReferenceDataCodes(
+          clientToken,
+          CorePersonRecordReferenceDataDomain.sexualOrientation,
+        )
+        const mappedReferenceData = sexualOrientationReferenceData.map(item => {
+          return {
+            ...item,
+            description: descriptionLookup[item.code] ?? item.description,
+          }
+        })
+
+        const options = mappedReferenceData.filter(it => it.code !== 'ND')
+        const notAnsweredOption = mappedReferenceData.find(it => it.code === 'ND')
+
+        const fieldValue =
+          requestBodyFlash?.radioField || (await currentOrientationCode(req, sexualOrientationReferenceData))
+
+        const radioOptions = [
+          ...objectToRadioOptions(options, 'code', 'description', fieldValue),
+          { divider: 'Or' },
+          ...objectToRadioOptions([notAnsweredOption], 'code', 'description', fieldValue),
+        ]
+
+        return this.editRadioFields(
+          `Which of the following best describes ${apostrophe(formatName(firstName, '', lastName, { style: NameFormatStyle.firstLast }))} sexual orientation?`,
+          sexualOrientationFieldData,
+          radioOptions,
+        )(req, res, next)
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const radioField = req.body.radioField || null
+        const previousValue = await currentOrientationCode(req)
+
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateSexualOrientation(clientToken, user, prisonerNumber, radioField)
+          },
+          fieldData: sexualOrientationFieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: radioField },
         })
       },
     }

@@ -1,0 +1,19 @@
+{%- macro otherLanguagesText(language, useCaps) -%}
+    {%- set txt = "not entered" -%}
+    {%- if language.canSpeak and language.canWrite and language.canRead -%}
+        {%- set txt = "speaks, reads and writes" -%}
+    {%- elif language.canSpeak and language.canWrite -%}
+        {%- set txt = "speaks and writes" -%}
+    {%- elif language.canSpeak and language.canRead -%}
+        {%- set txt = "speaks and reads" -%}
+    {%- elif language.canWrite and language.canRead -%}
+        {%- set txt = "reads and writes" -%}
+    {%- elif language.canWrite -%}
+        {%- set txt = "writes only" -%}
+    {%- elif language.canRead -%}
+        {%- set txt = "reads only" -%}
+    {%- elif language.canSpeak -%}
+        {%- set txt = "speaks only" -%}
+    {%- endif -%}
+    {{- txt | capitalize if useCaps == true else txt | trim -}}
+{%- endmacro -%}

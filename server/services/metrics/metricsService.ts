@@ -63,4 +63,24 @@ export default class MetricsService {
       },
     })
   }
+
+  trackPersonCommunicationNeedsUpdate({
+    prisonerNumber,
+    fieldsUpdated,
+    user,
+  }: {
+    prisonerNumber: string
+    fieldsUpdated: string[]
+    user: PrisonUser
+  }) {
+    this.telemetryClient?.trackEvent({
+      name: 'prisoner-profile-person-communication-needs-updated',
+      properties: {
+        prisonerNumber,
+        fieldsUpdated,
+        username: user.username,
+        activeCaseLoad: user.activeCaseLoadId,
+      },
+    })
+  }
 }

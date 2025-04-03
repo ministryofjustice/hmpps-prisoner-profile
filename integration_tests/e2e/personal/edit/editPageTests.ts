@@ -10,6 +10,7 @@ export interface EditPageInput {
   radioInputs?: { [key: string]: string }
   checkboxInputs?: { [key: string]: CheckboxValue[] }
   autocompleteInput?: { value: string }
+  namedAutocompleteInputs?: { [key: string]: string }
 }
 
 export function editPageTests<TPage extends EditPage>(options: {
@@ -51,6 +52,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     if (input.radioInputs) page.selectRadios(input.radioInputs)
     if (input.checkboxInputs) page.selectCheckboxes(input.checkboxInputs)
     if (input.autocompleteInput) page.fillInAutocompleteField(input.autocompleteInput)
+    if (input.namedAutocompleteInputs) page.fillInNamedAutocompleteFields(input.namedAutocompleteInputs)
     if (input.textAreaInputs) page.fillInTextAreaFields(input.textAreaInputs)
   }
 

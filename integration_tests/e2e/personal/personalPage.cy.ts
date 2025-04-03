@@ -158,7 +158,7 @@ context('When signed in', () => {
             '<a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/G6123VU/religion-belief-history">Religion or belief history</a>',
           )
         page.personalDetails().sex().should('have.text', 'Male')
-        page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual / Straight')
+        page.personalDetails().sexualOrientation().should('have.text', 'Heterosexual or straight')
         page.personalDetails().marriageOrCivilPartnership().should('have.text', 'No')
         page.personalDetails().numberOfChildren().should('have.text', '2')
         page.personalDetails().typeOfDiet().should('not.exist')

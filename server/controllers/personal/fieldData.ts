@@ -192,3 +192,12 @@ export const religionFieldData: FieldData = {
   auditEditPostAction: PostAction.EditReligion,
   redirectAnchor: 'personal-details',
 }
+
+export const sexualOrientationFieldData: RadioFieldData = {
+  url: 'edit/sexual-orientation',
+  fieldName: 'sexualOrientation',
+  pageTitle: 'Sexual orientation',
+  auditEditPageLoad: Page.EditSexualOrientation,
+  auditEditPostAction: PostAction.EditSexualOrientation,
+  redirectAnchor: 'personal-details',
+}

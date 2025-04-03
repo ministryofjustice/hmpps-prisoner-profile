@@ -656,6 +656,24 @@ export default class PersonalPageService {
     return response
   }
 
+  async updateSexualOrientation(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    sexualOrientation: string,
+  ) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const response = await personIntegrationApiClient.updateSexualOrientation(prisonerNumber, sexualOrientation)
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['sexualOrientation'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
   async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
     return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
