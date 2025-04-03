@@ -162,7 +162,7 @@ export default function personalRouter(services: Services): Router {
 
   // Height
   editRoute({
-    path: `edit/height`,
+    path: `height`,
     edit: {
       method: personalController.height().metric.edit,
       audit: Page.EditHeight,
@@ -178,7 +178,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/height/imperial',
+    path: 'height/imperial',
     edit: {
       audit: Page.EditHeight,
       method: personalController.height().imperial.edit,
@@ -195,7 +195,7 @@ export default function personalRouter(services: Services): Router {
 
   // Weight
   editRoute({
-    path: 'edit/weight',
+    path: 'weight',
     edit: {
       audit: Page.EditWeight,
       method: personalController.weight().metric.edit,
@@ -211,7 +211,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/weight/imperial',
+    path: 'weight/imperial',
     edit: {
       audit: Page.EditWeight,
       method: personalController.weight().imperial.edit,
@@ -227,7 +227,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/shoe-size',
+    path: 'shoe-size',
     edit: {
       audit: Page.EditShoeSize,
       method: personalController.physicalAttributesTextInput(shoeSizeFieldData).edit,
@@ -244,7 +244,7 @@ export default function personalRouter(services: Services): Router {
 
   // Hair type or colour
   editRoute({
-    path: 'edit/hair',
+    path: 'hair',
     edit: {
       audit: Page.EditHairTypeOrColour,
       method: personalController.physicalCharacteristicRadioField(hairFieldData).edit,
@@ -257,7 +257,7 @@ export default function personalRouter(services: Services): Router {
 
   // Facial hair
   editRoute({
-    path: 'edit/facial-hair',
+    path: 'facial-hair',
     edit: {
       audit: Page.EditFacialHair,
       method: personalController.physicalCharacteristicRadioField(facialHairFieldData).edit,
@@ -270,7 +270,7 @@ export default function personalRouter(services: Services): Router {
 
   // Face shape
   editRoute({
-    path: 'edit/face-shape',
+    path: 'face-shape',
     edit: {
       audit: Page.EditFaceShape,
       method: personalController.physicalCharacteristicRadioField(faceShapeFieldData).edit,
@@ -283,7 +283,7 @@ export default function personalRouter(services: Services): Router {
 
   // Build
   editRoute({
-    path: 'edit/build',
+    path: 'build',
     edit: {
       audit: Page.EditBuild,
       method: personalController.physicalCharacteristicRadioField(buildFieldData).edit,
@@ -296,7 +296,7 @@ export default function personalRouter(services: Services): Router {
 
   // Smoker/Vaper
   editRoute({
-    path: 'edit/smoker-or-vaper',
+    path: 'smoker-or-vaper',
     edit: {
       audit: Page.EditSmokerOrVaper,
       method: personalController.smokerOrVaper().edit,
@@ -309,7 +309,7 @@ export default function personalRouter(services: Services): Router {
 
   // Eye colour
   editRoute({
-    path: 'edit/eye-colour',
+    path: 'eye-colour',
     edit: {
       audit: Page.EditEyeColour,
       method: personalController.eyeColour().edit,
@@ -321,7 +321,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/eye-colour-individual',
+    path: 'eye-colour-individual',
     edit: {
       audit: Page.EditEyeColour,
       method: personalController.eyeColourIndividual().edit,
@@ -350,7 +350,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/city-or-town-of-birth',
+    path: 'city-or-town-of-birth',
     edit: {
       audit: Page.EditCityOrTownOfBirth,
       method: personalController.cityOrTownOfBirthTextInput().edit,
@@ -362,7 +362,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/country-of-birth',
+    path: 'country-of-birth',
     edit: {
       audit: Page.EditCountryOfBirth,
       method: personalController.countryOfBirth().edit,
@@ -374,7 +374,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/nationality',
+    path: 'nationality',
     edit: {
       audit: Page.EditNationality,
       method: personalController.nationality().edit,
@@ -390,7 +390,7 @@ export default function personalRouter(services: Services): Router {
   })
 
   editRoute({
-    path: 'edit/religion',
+    path: 'religion',
     edit: {
       audit: Page.EditReligion,
       method: personalController.religion().edit,
