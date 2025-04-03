@@ -64,7 +64,23 @@
         </div>
     {% endif %}
 
-    <span class="govuk-hint last-updated-summary">Updated on {{ personalDetails.dietAndAllergy.lastModifiedAt }} at {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0%}{{ personalDetails.dietAndAllergy.lastModifiedPrison }}{% else %}Unknown{% endif %}</span>
+    <span class="govuk-hint last-updated-summary">
+        {% set dietAndAllergyUpdateDate %}
+            {% if personalDetails.dietAndAllergy.lastModifiedAt.length > 0 %}
+                on {{ personalDetails.dietAndAllergy.lastModifiedAt }}
+            {% endif %}
+        {% endset %}
+
+        {% set dietAndAllergyUpdateLocation %}
+            {% if personalDetails.dietAndAllergy.lastModifiedPrison.length > 0 %}
+                {{ personalDetails.dietAndAllergy.lastModifiedPrison }}
+            {% else %}
+                Unknown
+            {% endif %}
+        {% endset %}
+
+        Updated {{ dietAndAllergyUpdateDate }} at {{ dietAndAllergyUpdateLocation}}
+    </span>
   {% else %}
     <span class="govuk-!-margin-top-1">Not entered</span>
   {% endif %}
