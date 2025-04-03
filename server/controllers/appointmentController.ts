@@ -1000,10 +1000,9 @@ export default class AppointmentController {
       probationMeetingType: !bvlsMasteredVlpmFeatureToggleEnabled()
         ? prePostAppointmentForm.formValues.meetingType
         : appointmentForm.meetingType,
-      comments: appointments.comment.trim() || undefined,
+      comments: appointments.comment || undefined,
       videoLinkUrl:
-        (prePostAppointmentForm?.formValues?.cvpRequired === 'yes' &&
-          prePostAppointmentForm.formValues.videoLinkUrl?.trim()) ||
+        (prePostAppointmentForm?.formValues?.cvpRequired === 'yes' && prePostAppointmentForm.formValues.videoLinkUrl) ||
         undefined,
       additionalBookingDetails:
         bvlsMasteredVlpmFeatureToggleEnabled() &&
