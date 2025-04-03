@@ -59,6 +59,8 @@ import BadRequestError from '../utils/badRequestError'
 import { CuriousApiToken } from '../data/hmppsAuthClient'
 import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePersonPhysicalAttributes'
 import logger from '../../logger'
+import PrisonService from './prisonService'
+import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 
 export default class PersonalPageService {
   constructor(
@@ -67,6 +69,7 @@ export default class PersonalPageService {
     private readonly personIntegrationApiClientBuilder: RestClientBuilder<PersonIntegrationApiClient>,
     private readonly healthAndMedicationApiClientBuilder: RestClientBuilder<HealthAndMedicationApiClient>,
     private readonly referenceDataService: ReferenceDataService,
+    private readonly prisonService: PrisonService,
     private readonly metricsService: MetricsService,
     private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
   ) {}
@@ -197,7 +200,7 @@ export default class PersonalPageService {
 
     return {
       personalDetails: await this.personalDetails(
-        prisonApiClient,
+        id => this.prisonService.getPrisonByPrisonId(id, token),
         personIntegrationApiClient,
         prisonerData,
         inmateDetail,
@@ -259,7 +262,7 @@ export default class PersonalPageService {
   }
 
   private async personalDetails(
-    prisonApiClient: PrisonApiClient,
+    prison: (prisonId: string) => Promise<Prison>,
     personIntegrationApiClient: PersonIntegrationApiClient,
     prisonerData: Prisoner,
     inmateDetail: InmateDetail,
@@ -292,7 +295,7 @@ export default class PersonalPageService {
 
     const foodAllergyAndDietLatestUpdate = this.latestModificationDetails(healthAndMedication)
     const lastUpdatedAgency = foodAllergyAndDietLatestUpdate.lastModifiedPrisonId
-      ? await prisonApiClient.getAgencyDetails(foodAllergyAndDietLatestUpdate.lastModifiedPrisonId)
+      ? await prison(foodAllergyAndDietLatestUpdate.lastModifiedPrisonId)
       : null
 
     return {
@@ -346,7 +349,7 @@ export default class PersonalPageService {
         personalisedDietaryRequirements: this.mapDietAndAllergy(healthAndMedication, 'personalisedDietaryRequirements'),
         cateringInstructions: healthAndMedication?.dietAndAllergy?.cateringInstructions?.value ?? '',
         lastModifiedAt: formatDate(foodAllergyAndDietLatestUpdate.lastModifiedAt),
-        lastModifiedPrison: lastUpdatedAgency?.description ?? '',
+        lastModifiedPrison: lastUpdatedAgency?.prisonName ?? '',
       },
     }
   }
