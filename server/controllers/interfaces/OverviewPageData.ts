@@ -76,7 +76,6 @@ export interface OverviewStatus {
 
 interface PersonalDetails {
   personalDetailsMain: {
-    preferredName: string
     dateOfBirth: string
     age: { years: number; months: number } | null
     nationality: string

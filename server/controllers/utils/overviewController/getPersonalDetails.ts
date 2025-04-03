@@ -12,7 +12,6 @@ export default function getPersonalDetails(
 ): OverviewPageData['personalDetails'] {
   return {
     personalDetailsMain: {
-      preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : null,
       dateOfBirth: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : null,
       age: prisonerData.dateOfBirth ? calculateAge(prisonerData.dateOfBirth) : null,
       nationality: prisonerData.nationality,
