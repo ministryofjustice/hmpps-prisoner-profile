@@ -4,6 +4,7 @@ import StepResponse from '../interfaces/educationAndWorkPlanApi/StepResponse'
 const aValidGoalResponse = (options?: {
   reference?: string
   title?: string
+  status?: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED'
   createdAt?: string
   createdBy?: string
   createdByDisplayName?: string
@@ -15,7 +16,7 @@ const aValidGoalResponse = (options?: {
   return {
     goalReference: options?.reference || 'd38a6c41-13d1-1d05-13c2-24619966119b',
     title: options?.title || 'Learn Spanish',
-    status: 'ACTIVE',
+    status: options?.status || 'ACTIVE',
     steps: [aValidFirstStepResponse(), aValidSecondStepResponse()],
     createdBy: options?.createdBy || 'asmith_gen',
     createdByDisplayName: options?.createdByDisplayName || 'Alex Smith',

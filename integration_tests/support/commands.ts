@@ -106,7 +106,7 @@ Cypress.Commands.add('setupWorkAndSkillsPageStubs', ({ prisonerNumber, emptyStat
   cy.task('stubGetOffenderAttendanceHistory', prisonerNumber)
   cy.task('stubGetOffenderActivities', { prisonerNumber, emptyStates })
   cy.task('stubAttendanceHistory', prisonerNumber)
-  cy.task('stubGetPlpActiveGoals', prisonerNumber)
+  cy.task('stubGetPlpAllGoals', prisonerNumber)
   cy.task('stubGetAllPrisons')
   cy.task('stubGetAlerts')
 })

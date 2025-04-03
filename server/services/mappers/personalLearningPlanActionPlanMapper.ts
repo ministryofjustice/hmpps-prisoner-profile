@@ -8,7 +8,7 @@ import dateComparator from '../../utils/dateComparator'
 import GetGoalsResponse from '../../data/interfaces/educationAndWorkPlanApi/GetGoalsResponse'
 
 /**
- * Simple mapper function to map from the Education And Work Plan (PLP) API type [ActionPlanResponse]
+ * Simple mapper function to map from the Education And Work Plan (PLP) API type [GetGoalsResponse]
  * into the view model type [PersonalLearningPlanActionPlan]
  */
 const toPersonalLearningPlanActionPlan = (
@@ -17,9 +17,15 @@ const toPersonalLearningPlanActionPlan = (
 ): PersonalLearningPlanActionPlan => {
   return {
     prisonerNumber,
-    goals: apiGetGoalsResponse.goals.map((goal: GoalResponse) => {
-      return toPersonalLearningPlanGoal(goal)
-    }),
+    activeGoals: apiGetGoalsResponse.goals
+      .filter(goal => goal.status === 'ACTIVE')
+      .map((goal: GoalResponse) => toPersonalLearningPlanGoal(goal)),
+    archivedGoals: apiGetGoalsResponse.goals
+      .filter(goal => goal.status === 'ARCHIVED')
+      .map((goal: GoalResponse) => toPersonalLearningPlanGoal(goal)),
+    completedGoals: apiGetGoalsResponse.goals
+      .filter(goal => goal.status === 'COMPLETED')
+      .map((goal: GoalResponse) => toPersonalLearningPlanGoal(goal)),
     ...getLastUpdatedAuditFields(apiGetGoalsResponse.goals),
     problemRetrievingData: false,
   }
@@ -51,6 +57,7 @@ const toPersonalLearningPlanGoal = (apiGoalResponse: GoalResponse): PersonalLear
   return {
     reference: apiGoalResponse.goalReference,
     title: apiGoalResponse.title,
+    status: apiGoalResponse.status,
     createdAt: parseISO(apiGoalResponse.createdAt),
     createdBy: apiGoalResponse.createdBy,
     createdByDisplayName: apiGoalResponse.createdByDisplayName,

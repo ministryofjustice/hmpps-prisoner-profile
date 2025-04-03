@@ -20,7 +20,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with populated goals given prisoner has VC2 goals only', () => {
     // Given
     cy.task('stubGetCuriousGoals', prisonerNumber)
-    cy.task('stubGetPlpActiveGoalsForPrisonerWithNoGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoalsForPrisonerWithNoGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -34,7 +34,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with no populated goals given prisoner has no goals (empty goals from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals', prisonerNumber)
-    cy.task('stubGetPlpActiveGoalsForPrisonerWithNoGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoalsForPrisonerWithNoGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -48,7 +48,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with no populated goals given prisoner has no goals (404 from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoals404Error', prisonerNumber)
-    cy.task('stubGetPlpActiveGoalsForPrisonerWithNoGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoalsForPrisonerWithNoGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -62,7 +62,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with no populated goals given prisoner has no plan yet (404 from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoals404Error', prisonerNumber)
-    cy.task('stubGetPlpActiveGoalsPrisonerHasNoPlanYet', prisonerNumber)
+    cy.task('stubGetPlpAllGoalsPrisonerHasNoPlanYet', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -76,7 +76,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with populated goals given prisoner has PLP goals only (empty goals from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoalsForPrisonerWithNoGoals', prisonerNumber)
-    cy.task('stubGetPlpActiveGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -90,7 +90,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with populated goals given prisoner has PLP goals only (404 from Curious)', () => {
     // Given
     cy.task('stubGetCuriousGoals404Error', prisonerNumber)
-    cy.task('stubGetPlpActiveGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -104,7 +104,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card with populated goals given prisoner has both PLP and VC2 goals', () => {
     // Given
     cy.task('stubGetCuriousGoals', prisonerNumber)
-    cy.task('stubGetPlpActiveGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -118,7 +118,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card informing the user the Goals could not be retrieved given there was a problem getting the VC2 goals', () => {
     // Given
     cy.task('stubGetCuriousGoals500Error', prisonerNumber)
-    cy.task('stubGetPlpActiveGoals', prisonerNumber)
+    cy.task('stubGetPlpAllGoals', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
@@ -132,7 +132,7 @@ context('Work and skills page - Goals card', () => {
   it('should display the Goals card informing the user the Goals could not be retrieved given there was a problem getting the PLP goals', () => {
     // Given
     cy.task('stubGetCuriousGoals', prisonerNumber)
-    cy.task('stubGetPlpActiveGoals500Error', prisonerNumber)
+    cy.task('stubGetPlpAllGoals500Error', prisonerNumber)
 
     // When
     visitWorkAndSkillsPage()
