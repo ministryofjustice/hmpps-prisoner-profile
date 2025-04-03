@@ -15,7 +15,25 @@ export default function validationMiddleware(
     useReq: false,
   },
 ): RequestHandler {
+  // Recursively iterate into an object and trim any strings inside
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deepTrim = (object: any): object => {
+    const o = object
+    if (o) {
+      Object.keys(o).forEach(key => {
+        if (typeof o[key] === 'string') {
+          o[key] = o[key].trim()
+        } else if (typeof o[key] === 'object') {
+          o[key] = deepTrim(o[key])
+        }
+      })
+    }
+    return o as object
+  }
+
   return async (req, res, next) => {
+    req.body = deepTrim(req.body)
+
     const validationResults = await Promise.all(validators.map(validator => validator(options.useReq ? req : req.body)))
     const errors = validationResults.flat()
     if (hasLength(errors) && options.redirectBackOnError) {
