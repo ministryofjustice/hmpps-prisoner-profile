@@ -2,7 +2,7 @@ import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import PrisonerDetail from '../../../data/interfaces/prisonApi/PrisonerDetail'
 import OverviewPageData from '../../interfaces/OverviewPageData'
-import { calculateAge, convertToTitleCase } from '../../../utils/utils'
+import { calculateAge } from '../../../utils/utils'
 import { formatDate } from '../../../utils/dateHelpers'
 
 export default function getPersonalDetails(
