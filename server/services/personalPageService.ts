@@ -403,7 +403,13 @@ export default class PersonalPageService {
     const metadata = (dietAndAllergy ? Object.values(dietAndAllergy) : null) as ValueWithMetadata<
       string | ReferenceDataCode[]
     >[]
-    const mostRecentUpdate = metadata?.sort((a, b) => sortByDateTime(b.lastModifiedAt, a.lastModifiedAt))[0] ?? null
+
+    const mostRecentUpdate =
+      metadata?.sort((a, b) => {
+        if (!a) return 1
+        if (!b) return -1
+        return sortByDateTime(b.lastModifiedAt, a.lastModifiedAt)
+      })[0] ?? null
 
     return {
       lastModifiedAt: mostRecentUpdate?.lastModifiedAt,

@@ -20,7 +20,7 @@ context('Edit height (metric)', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/height`,
+    editUrl: `prisoner/${prisonerNumber}/personal/height`,
     validInputs: [{ textInputs: { editField: '125' } }],
     invalidInputs: [
       {
@@ -74,7 +74,7 @@ context('Edit height (Imperial)', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdatePhysicalAttributes')
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/height/imperial`,
+    editUrl: `prisoner/${prisonerNumber}/personal/height/imperial`,
     validInputs: [{ textInputs: { feet: '5', inches: '3' } }],
     invalidInputs: [
       {

@@ -19,7 +19,7 @@ context('Edit city or town of birth', () => {
       cy.task('stubPersonalCareNeeds')
       cy.task('stubPersonIntegrationUpdate', { prisonerNumber })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/city-or-town-of-birth`,
+    editUrl: `prisoner/${prisonerNumber}/personal/city-or-town-of-birth`,
     editPageWithTitle: EditPage,
     editPageTitle: 'City or town of birth',
     successfulFlashMessage: 'City or town of birth updated',

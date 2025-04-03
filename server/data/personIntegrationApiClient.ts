@@ -112,7 +112,7 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: '/v1/distinguishing-mark',
       query: { prisonerNumber, sourceSystem: 'NOMIS' },
       data: distinguishingMarkRequest,
-      file: image,
+      files: image ? { file: image } : null,
     })
   }
 
@@ -120,7 +120,7 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.restClient.putMultipart<PersonIntegrationDistinguishingMark>({
       path: `/v1/distinguishing-mark/image/${photoId}`,
       query: { sourceSystem: 'NOMIS' },
-      file: image,
+      files: { file: image },
     })
   }
 
@@ -132,7 +132,7 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
     return this.restClient.postMultipart<PersonIntegrationDistinguishingMark>({
       path: `/v1/distinguishing-mark/${prisonerNumber}-${sequenceId}/image`,
       query: { sourceSystem: 'NOMIS' },
-      file: image,
+      files: { file: image },
     })
   }
 
@@ -183,6 +183,17 @@ export default class PersonIntegrationApiRestClient implements PersonIntegration
       path: '/v1/core-person-record',
       query: { prisonerNumber },
       data: { fieldName, value },
+    })
+  }
+
+  updateProfileImage(
+    prisonerNumber: string,
+    image: { buffer: Buffer<ArrayBufferLike>; originalname: string },
+  ): Promise<void> {
+    return this.restClient.putMultipart<void>({
+      path: `/v1/core-person-record/profile-image`,
+      query: { prisonerNumber },
+      files: { imageFile: image },
     })
   }
 }
