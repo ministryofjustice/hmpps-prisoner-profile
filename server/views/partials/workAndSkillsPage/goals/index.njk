@@ -7,15 +7,37 @@
     {% if problemRetrievingPrisonerGoalData %}
         {% include './problemRetrievingGoals.njk' %}
     {% else %}
-        {% if hasVc2Goals and not hasPlpGoals %}
-            {% include './vc2GoalsOnly.njk' %}
-        {% elif hasPlpGoals and not hasVc2Goals %}
-            {% include './plpGoalsOnly.njk' %}
-        {% elif hasPlpGoals and hasVc2Goals %}
-            {% include './plpAndVc2Goals.njk' %}
+
+        {% if hasVc2Goals %}
+            {% if not hasAnyLwpGoals %}
+                {# prisoner has VC2 goals only. No LWP goals at all #}
+                {% include './hasVc2GoalsAnd/noLwpGoals.njk' %}
+            {% else %}
+                {% if hasActiveLwpGoals %}
+                    {# prisoner has VC2 goals and at least 1 in progress (active) LWP goal #}
+                    {% include './hasVc2GoalsAnd/someInProgressLwpGoals.njk' %}
+                {% else %}
+                    {# prisoner has VC2 goals and some LWP goals (none of which are in progress / active) #}
+                    {% include './hasVc2GoalsAnd/noInProgressLwpGoals.njk' %}
+                {% endif %}
+            {% endif %}
+
         {% else %}
-            {% include './noGoals.njk' %}
-        {% endif %} 
+            {% if not hasAnyLwpGoals %}
+                {# prisoner no VC2 goals and no LWP goals #}
+                {% include './hasNoVc2GoalsAnd/noLwpGoals.njk' %}
+            {% else %}
+                {% if hasActiveLwpGoals %}
+                    {# prisoner has no VC2 goals and at least 1 in progress (active) LWP goal #}
+                    {% include './hasNoVc2GoalsAnd/someInProgressLwpGoals.njk' %}
+                {% else %}
+                    {# prisoner has no VC2 goals and some LWP goals (none of which are in progress / active) #}
+                    {% include './hasNoVc2GoalsAnd/noInProgressLwpGoals.njk' %}
+                {% endif %}
+            {% endif %}
+
+        {% endif %}
+
     {%- endif -%}
 
 {%- endcall -%}
