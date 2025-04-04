@@ -63,3 +63,19 @@ export function stubPatchWithResponse<TResponse>({ path, responseBody }: { path:
     },
   })
 }
+
+export function stubDeleteWithResponse<TResponse>({ path, responseBody }: { path: string; responseBody: TResponse }) {
+  return stubFor({
+    request: {
+      method: 'DELETE',
+      urlPattern: path,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: responseBody,
+    },
+  })
+}

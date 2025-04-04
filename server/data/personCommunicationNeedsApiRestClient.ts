@@ -17,7 +17,7 @@ export default class PersonCommunicationNeedsApiRestClient implements PersonComm
   }
 
   getReferenceDataCodes(domain: PersonCommunicationNeedsReferenceDataDomain): Promise<ReferenceDataCode[]> {
-    return this.restClient.get({ path: `/v1/core-person-record/reference-data/domain/${domain}/codes` })
+    return this.restClient.get({ path: `/v1/reference-data/domains/${domain}/codes` })
   }
 
   getCommunicationNeeds(prisonerNumber: string): Promise<CommunicationNeedsDto> {

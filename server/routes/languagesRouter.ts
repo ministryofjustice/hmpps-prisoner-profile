@@ -13,8 +13,11 @@ export default function languagesRouter(services: Services, editProfileChecks: (
   get('/main-language', editProfileChecks(), languagesController.displayUpdateMainLanguage())
   post('/main-language', editProfileChecks(), languagesController.submitUpdateMainLanguage())
 
-  // get('/other-languages', editProfileChecks(), languagesController.displayUpdateMainLanguage())
-  // post('/other-languages', editProfileChecks(), languagesController.submitUpdateMainLanguage())
+  get('/other-languages', editProfileChecks(), languagesController.displayUpdateOtherLanguages())
+  post('/other-languages', editProfileChecks(), languagesController.submitUpdateOtherLanguages())
+
+  get('/other-languages/:languageCode', editProfileChecks(), languagesController.displayUpdateOtherLanguages())
+  post('/other-languages/:languageCode', editProfileChecks(), languagesController.submitUpdateOtherLanguages())
 
   return router
 }

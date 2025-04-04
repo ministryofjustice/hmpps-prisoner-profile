@@ -301,7 +301,7 @@ export default class PersonalPageService {
     return {
       age: calculateAge(prisonerData.dateOfBirth),
       aliases,
-      dateOfBirth: formatDate(prisonerData.dateOfBirth, 'short'),
+      dateOfBirth: formatDate(inmateDetail.dateOfBirth, 'short'),
       domesticAbusePerpetrator: getProfileInformationValue(
         ProfileInformationType.DomesticAbusePerpetrator,
         profileInformation,
