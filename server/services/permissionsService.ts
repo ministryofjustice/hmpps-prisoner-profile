@@ -96,6 +96,7 @@ export default class PermissionsService {
 
     return {
       accessCode,
+      caseNotes: getCaseNotesPermissions(user, prisoner),
       sensitiveCaseNotes: getSensitiveCaseNotesPermissions(user),
     }
   }
