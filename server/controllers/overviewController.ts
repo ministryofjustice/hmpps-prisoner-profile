@@ -29,6 +29,7 @@ import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
+import ContactsService from '../services/contactsService'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -48,6 +49,7 @@ export default class OverviewController {
     private readonly offenderService: OffenderService,
     private readonly professionalContactsService: ProfessionalContactsService,
     private readonly csipService: CsipService,
+    private readonly contactsService: ContactsService,
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
