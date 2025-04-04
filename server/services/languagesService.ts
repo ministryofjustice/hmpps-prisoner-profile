@@ -6,6 +6,7 @@ import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsApiClient,
   PersonCommunicationNeedsReferenceDataDomain,
+  SecondaryLanguageRequest,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
 
@@ -48,6 +49,35 @@ export default class LanguagesService {
 
     this.metricsService.trackPersonCommunicationNeedsUpdate({
       fieldsUpdated: ['language-preferences'],
+      prisonerNumber,
+      user,
+    })
+  }
+
+  async updateOtherLanguage(
+    clientToken: string,
+    user: PrisonUser,
+    prisonerNumber: string,
+    secondaryLanguageRequest: SecondaryLanguageRequest,
+  ) {
+    const personCommunicationNeedsApiClient = this.personCommunicationNeedsApiClientBuilder(clientToken)
+
+    await personCommunicationNeedsApiClient.updateSecondaryLanguage(prisonerNumber, secondaryLanguageRequest)
+
+    this.metricsService.trackPersonCommunicationNeedsUpdate({
+      fieldsUpdated: ['secondary-language'],
+      prisonerNumber,
+      user,
+    })
+  }
+
+  async deleteOtherLanguage(clientToken: string, user: PrisonUser, prisonerNumber: string, languageCode: string) {
+    const personCommunicationNeedsApiClient = this.personCommunicationNeedsApiClientBuilder(clientToken)
+
+    await personCommunicationNeedsApiClient.deleteSecondaryLanguage(prisonerNumber, languageCode)
+
+    this.metricsService.trackPersonCommunicationNeedsUpdate({
+      fieldsUpdated: ['secondary-language'],
       prisonerNumber,
       user,
     })

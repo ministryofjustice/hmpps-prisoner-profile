@@ -109,9 +109,7 @@ describe('personCommunicationNeedsApiRestClient', () => {
 
   describe('getReferenceDataCodes', () => {
     it('should return reference data codes', async () => {
-      fakePersonCommunicationNeedsApi
-        .get('/v1/core-person-record/reference-data/domain/LANG/codes')
-        .reply(200, LanguageRefDataMock)
+      fakePersonCommunicationNeedsApi.get('/v1/reference-data/domains/LANG/codes').reply(200, LanguageRefDataMock)
 
       const output = await personCommunicationNeedsApiClient.getReferenceDataCodes(
         PersonCommunicationNeedsReferenceDataDomain.language,
