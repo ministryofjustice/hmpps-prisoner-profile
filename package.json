@@ -161,6 +161,7 @@
     "@typescript-eslint/parser": "^7.18.0",
     "audit-ci": "^6.6.1",
     "aws-sdk-client-mock": "^4.1.0",
+    "cheerio": "^1.0.0",
     "concurrently": "^8.2.2",
     "cookie-session": "^2.1.0",
     "cypress": "^13.17.0",

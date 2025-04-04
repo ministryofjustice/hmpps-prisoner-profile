@@ -1,7 +1,7 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
-const stubGetPlpAllGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
@@ -42,7 +42,7 @@ const stubGetPlpAllGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
     },
   })
 
-const stubGetPlpAllGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
@@ -57,7 +57,7 @@ const stubGetPlpAllGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): S
     },
   })
 
-const stubGetPlpAllGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
@@ -76,7 +76,7 @@ const stubGetPlpAllGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentReque
     },
   })
 
-const stubGetPlpAllGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
@@ -96,8 +96,8 @@ const stubGetPlpAllGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): Sup
   })
 
 export default {
-  stubGetPlpAllGoals,
-  stubGetPlpAllGoalsForPrisonerWithNoGoals,
-  stubGetPlpAllGoals500Error,
-  stubGetPlpAllGoalsPrisonerHasNoPlanYet,
+  stubGetLwpAllGoals,
+  stubGetLwpAllGoalsForPrisonerWithNoGoals,
+  stubGetLwpAllGoals500Error,
+  stubGetLwpAllGoalsPrisonerHasNoPlanYet,
 }

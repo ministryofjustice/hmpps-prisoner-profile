@@ -85,11 +85,11 @@ export default class WorkAndSkillsPage extends Page {
   // Goals card
   GoalsInfo = (): PageElement => cy.get('[data-qa="goals-info-text"]')
 
-  PlpGoalsSummary = (): PageElement => cy.getDataQa('plp-goals')
+  LwpGoalsSummary = (): PageElement => cy.getDataQa('lwp-goals')
 
   Vc2GoalsSummary = (): PageElement => cy.getDataQa('vc2-goals')
 
-  PlpVc2GoalsSummary = (): PageElement => cy.getDataQa('plp-vc2-goals')
+  LwpVc2GoalsSummary = (): PageElement => cy.getDataQa('lwp-vc2-goals')
 
   NoGoalsSummary = (): PageElement => cy.getDataQa('no-goals')
 
