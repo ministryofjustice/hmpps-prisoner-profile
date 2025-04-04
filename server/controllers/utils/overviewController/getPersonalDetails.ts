@@ -2,7 +2,7 @@ import Prisoner from '../../../data/interfaces/prisonerSearchApi/Prisoner'
 import InmateDetail from '../../../data/interfaces/prisonApi/InmateDetail'
 import PrisonerDetail from '../../../data/interfaces/prisonApi/PrisonerDetail'
 import OverviewPageData from '../../interfaces/OverviewPageData'
-import { calculateAge, convertToTitleCase } from '../../../utils/utils'
+import { calculateAge } from '../../../utils/utils'
 import { formatDate } from '../../../utils/dateHelpers'
 
 export default function getPersonalDetails(
@@ -12,7 +12,6 @@ export default function getPersonalDetails(
 ): OverviewPageData['personalDetails'] {
   return {
     personalDetailsMain: {
-      preferredName: prisonerData.firstName ? `${convertToTitleCase(prisonerData.firstName)}` : null,
       dateOfBirth: prisonerData.dateOfBirth ? formatDate(prisonerData.dateOfBirth, 'short') : null,
       age: prisonerData.dateOfBirth ? calculateAge(prisonerData.dateOfBirth) : null,
       nationality: prisonerData.nationality,

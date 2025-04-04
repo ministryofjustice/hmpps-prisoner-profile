@@ -194,9 +194,8 @@ context('Overview Page', () => {
     })
 
     context('Personal details', () => {
-      it('Displays the prisoner presonal details', () => {
+      it('Displays the prisoner personal details', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.personalDetails().perferredName().should('include.text', 'John')
         overviewPage.personalDetails().dateOfBirth().should('include.text', '12/10/1990')
         const expectedAge = calculateAge('1990-10-12')
         overviewPage
