@@ -359,25 +359,27 @@ export default class PersonalPageService {
     prisonerData: Prisoner,
     flashMessage: { fieldName: string },
   ) => {
-    if (flashMessage?.fieldName === 'full-name' || flashMessage?.fieldName === 'aliases') {
+    if (flashMessage?.fieldName === 'fullName' || flashMessage?.fieldName === 'aliases') {
       try {
         logger.debug('Retrieving aliases from Person Integration API after update')
 
         const pseudonyms = await personIntegrationApiClient.getPseudonyms(prisonerData.prisonerNumber)
         return pseudonyms
           .filter(pseudonym => !pseudonym.isWorkingName)
-          .map(({ firstName, middleName1, middleName2, lastName, dateOfBirth }) => ({
+          .map(({ firstName, middleName1, middleName2, lastName, dateOfBirth, sex }) => ({
             alias: formatName(firstName, [middleName1, middleName2].join(' ').trim(), lastName),
             dateOfBirth: formatDate(dateOfBirth, 'short'),
+            sex: sex.description,
           }))
       } catch (error) {
         logger.error('Failed to retrieve aliases from Person Integration API', error)
       }
     }
 
-    return prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth }) => ({
+    return prisonerData.aliases?.map(({ firstName, middleNames, lastName, dateOfBirth, gender }) => ({
       alias: formatName(firstName, middleNames, lastName),
       dateOfBirth: formatDate(dateOfBirth, 'short'),
+      sex: gender,
     }))
   }
 

@@ -24,6 +24,7 @@ context('Add new alias', () => {
       })
     },
     editUrl: `prisoner/${prisonerNumber}/personal/enter-alias-details`,
+    personalPageHref: 'personal/enter-alias-details',
     editPageWithTitle: EditPage,
     editPageTitle: 'Enter alias details',
     successfulFlashMessage: 'Alias added',
