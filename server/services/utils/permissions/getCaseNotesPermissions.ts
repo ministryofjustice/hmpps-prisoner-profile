@@ -6,7 +6,7 @@ import getCaseNotesAccessStatusCode from './access/getCaseNotesAccessStatusCode'
 
 export default function getCaseNotesPermissions(user: HmppsUser, prisoner: Prisoner): PermissionItem {
   return {
-    edit: canUserAccessCaseNoteForPrisoner(user, prisoner),
+    edit: canAddCaseNotes(user, prisoner),
     view: canViewCaseNotes(user, prisoner),
   }
 }
