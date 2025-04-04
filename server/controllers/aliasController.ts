@@ -13,6 +13,12 @@ import {
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { dateToIsoDate } from '../utils/dateHelpers'
 
+interface DateOfBirthForm {
+  'dateOfBirth-year': string
+  'dateOfBirth-month': string
+  'dateOfBirth-day': string
+}
+
 export default class AliasController {
   constructor(
     private readonly aliasService: AliasService,
@@ -111,7 +117,7 @@ export default class AliasController {
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
-      const formValues = requestBodyFromFlash<Name>(req) || {
+      const formValues = requestBodyFromFlash<DateOfBirthForm | { sex: string }>(req) || {
         'dateOfBirth-year': currentWorkingName.dateOfBirth?.split('-')[0],
         'dateOfBirth-month': currentWorkingName.dateOfBirth?.split('-')[1],
         'dateOfBirth-day': currentWorkingName.dateOfBirth?.split('-')[2],
@@ -204,7 +210,7 @@ export default class AliasController {
       const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
-      const formValues = requestBodyFromFlash<Name>(req) || {
+      const formValues = requestBodyFromFlash<DateOfBirthForm>(req) || {
         'dateOfBirth-year': currentWorkingName.dateOfBirth?.split('-')[0],
         'dateOfBirth-month': currentWorkingName.dateOfBirth?.split('-')[1],
         'dateOfBirth-day': currentWorkingName.dateOfBirth?.split('-')[2],
