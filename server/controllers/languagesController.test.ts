@@ -7,6 +7,7 @@ import { FlashMessageType } from '../data/enums/flashMessageType'
 import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
+  SecondaryLanguageRequest,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import {
   CommunicationNeedsDtoMock,
@@ -28,6 +29,8 @@ describe('LanguagesController', () => {
       getCommunicationNeeds: jest.fn().mockReturnValue(CommunicationNeedsDtoMock),
       getReferenceData: jest.fn().mockReturnValue(LanguageRefDataMock),
       updateMainLanguage: jest.fn(),
+      updateOtherLanguage: jest.fn(),
+      deleteOtherLanguage: jest.fn(),
     } as Partial<LanguagesService> as LanguagesService
 
     auditService = auditServiceMock()
@@ -251,6 +254,200 @@ describe('LanguagesController', () => {
         preferredWrittenLanguageCode: 'ENG',
         interpreterRequired: undefined,
       })
+    })
+  })
+
+  describe('displayUpdateOtherLanguages', () => {
+    beforeEach(() => {
+      req.flash = jest.fn().mockImplementation(key => {
+        if (key === 'errors') return []
+        return null
+      })
+    })
+
+    it('should render the update other languages page with the correct data', async () => {
+      const handler = controller.displayUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(languagesService.getCommunicationNeeds).toHaveBeenCalledWith(clientToken, prisonerNumber)
+      expect(languagesService.getReferenceData).toHaveBeenCalledWith(clientToken, [
+        PersonCommunicationNeedsReferenceDataDomain.language,
+      ])
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: res.locals.user,
+        prisonerNumber,
+        prisonId: PrisonerMockDataA.prisonId,
+        correlationId: req.id,
+        page: Page.EditOtherLanguages,
+      })
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/languages/updateOtherLanguages',
+        expect.objectContaining({
+          title: 'Other languages',
+          pageTitle: 'Other languages - Prisoner personal details',
+          languageLabel: `Which other languages does John Saunders use?`,
+          formValues: {
+            language: undefined,
+            canRead: undefined,
+            canWrite: undefined,
+            canSpeak: undefined,
+          },
+          miniBannerData: {
+            prisonerNumber,
+            prisonerName: 'Saunders, John',
+          },
+          errors: [],
+          languageOptions: [
+            { text: '', value: undefined },
+            { text: 'English', value: 'ENG' },
+            { text: 'French', value: 'FRE' },
+            { text: 'Spanish', value: 'SPA' },
+          ],
+          mainLanguage: CommunicationNeedsDtoMock.languagePreferences,
+          otherLanguages: CommunicationNeedsDtoMock.secondaryLanguages,
+        }),
+      )
+    })
+
+    it('should use form values from flash if available', async () => {
+      const flashValues: SecondaryLanguageRequest = {
+        language: 'SPA',
+        canRead: true,
+        canWrite: true,
+        canSpeak: true,
+      }
+
+      req.flash = jest.fn().mockImplementation(key => {
+        if (key === 'errors') return []
+        if (key === 'requestBody') return [JSON.stringify(flashValues)]
+        return null
+      })
+
+      const handler = controller.displayUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'pages/languages/updateOtherLanguages',
+        expect.objectContaining({
+          formValues: flashValues,
+        }),
+      )
+    })
+  })
+
+  describe('submitUpdateOtherLanguages', () => {
+    const formValues: SecondaryLanguageRequest = {
+      language: 'ARA',
+      canRead: true,
+      canWrite: true,
+      canSpeak: true,
+    }
+
+    beforeEach(() => {
+      req.body = {
+        language: 'ARA',
+        languageSkills: ['canRead', 'canWrite', 'canSpeak'],
+      }
+      req.flash = jest.fn()
+    })
+
+    it('should update the other language and redirect to the personal page', async () => {
+      const handler = controller.submitUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(languagesService.updateOtherLanguage).toHaveBeenCalledWith(
+        clientToken,
+        res.locals.user,
+        prisonerNumber,
+        formValues,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Languages updated',
+        type: FlashMessageType.success,
+        fieldName: 'languages',
+      })
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+        user: res.locals.user,
+        prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditOtherLanguages,
+        details: { formValues },
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
+    })
+
+    it('should validate that language is not in main or secondary languages', async () => {
+      req.body = {
+        language: 'ENG',
+        languageSkills: ['canRead', 'canWrite', 'canSpeak'],
+      }
+
+      const handler = controller.submitUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(req.flash).toHaveBeenCalledWith(
+        'requestBody',
+        JSON.stringify({
+          language: 'ENG',
+          canSpeak: true,
+          canWrite: true,
+          canRead: true,
+        }),
+      )
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'Language must be different from the saved languages',
+          href: '#language',
+        },
+      ])
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/other-languages`)
+    })
+
+    it('should handle validation errors from the request', async () => {
+      req.errors = [
+        {
+          text: 'This is an error',
+          href: '#someField',
+        },
+      ]
+
+      const handler = controller.submitUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', req.errors)
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/other-languages`)
+    })
+
+    it('should delete the other language if no language is selected', async () => {
+      req.body = {
+        language: '',
+        languageSkills: [],
+      }
+      const languageCode = 'ARA'
+      req.params = { languageCode }
+
+      const handler = controller.submitUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(languagesService.deleteOtherLanguage).toHaveBeenCalledWith(
+        clientToken,
+        res.locals.user,
+        prisonerNumber,
+        languageCode,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Languages updated',
+        type: FlashMessageType.success,
+        fieldName: 'languages',
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal#personal-details`)
     })
   })
 })

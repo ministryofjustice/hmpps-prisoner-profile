@@ -76,7 +76,11 @@ export default class EditPage extends Page {
     })
   }
 
-  submit = () => {
-    cy.get('button[type="submit"]').click()
+  submit = (id?: string) => {
+    if (id) {
+      cy.get(`button[data-qa=${id}]`).click()
+    } else {
+      cy.get('button[type="submit"]').click()
+    }
   }
 }

@@ -3,6 +3,7 @@ import {
   LanguagePreferencesRequest,
   PersonCommunicationNeedsApiClient,
   PersonCommunicationNeedsReferenceDataDomain,
+  SecondaryLanguageRequest,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import MetricsService from './metrics/metricsService'
 import ReferenceDataService from './referenceData/referenceDataService'
@@ -104,6 +105,57 @@ describe('LanguagesService', () => {
 
       expect(metricsService.trackPersonCommunicationNeedsUpdate).toHaveBeenCalledWith({
         fieldsUpdated: ['language-preferences'],
+        prisonerNumber,
+        user,
+      })
+    })
+  })
+
+  describe('updateOtherLanguage', () => {
+    const secondaryLanguageRequest: SecondaryLanguageRequest = {
+      language: 'SPA',
+      canSpeak: true,
+      canWrite: false,
+      canRead: true,
+    }
+
+    it('should call the API client with the correct parameters', async () => {
+      await languagesService.updateOtherLanguage(clientToken, user, prisonerNumber, secondaryLanguageRequest)
+
+      expect(personCommunicationNeedsApiClient.updateSecondaryLanguage).toHaveBeenCalledWith(
+        prisonerNumber,
+        secondaryLanguageRequest,
+      )
+    })
+
+    it('should track the update in metrics', async () => {
+      await languagesService.updateOtherLanguage(clientToken, user, prisonerNumber, secondaryLanguageRequest)
+
+      expect(metricsService.trackPersonCommunicationNeedsUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['secondary-language'],
+        prisonerNumber,
+        user,
+      })
+    })
+  })
+
+  describe('deleteOtherLanguage', () => {
+    const languageCode = 'SPA'
+
+    it('should call the API client with the correct parameters', async () => {
+      await languagesService.deleteOtherLanguage(clientToken, user, prisonerNumber, languageCode)
+
+      expect(personCommunicationNeedsApiClient.deleteSecondaryLanguage).toHaveBeenCalledWith(
+        prisonerNumber,
+        languageCode,
+      )
+    })
+
+    it('should track the update in metrics', async () => {
+      await languagesService.deleteOtherLanguage(clientToken, user, prisonerNumber, languageCode)
+
+      expect(metricsService.trackPersonCommunicationNeedsUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['secondary-language'],
         prisonerNumber,
         user,
       })

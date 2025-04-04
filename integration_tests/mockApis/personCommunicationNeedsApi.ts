@@ -1,4 +1,4 @@
-import { stubGetWithBody, stubPutWithResponse } from './utils'
+import { stubDeleteWithResponse, stubGetWithBody, stubPutWithResponse } from './utils'
 import { SecondaryLanguageDto } from '../../server/data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { ReferenceDataCodeDto } from '../../server/data/interfaces/referenceData'
 
@@ -36,6 +36,18 @@ export default {
       responseBody: null,
     }),
 
+  stubPersonCommunicationNeedsUpdateSecondaryLanguage: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubPutWithResponse<void>({
+      path: `${baseUrl}/v1/prisoner/${prisonerNumber}/secondary-language`,
+      responseBody: null,
+    }),
+
+  stubPersonCommunicationNeedsDeleteSecondaryLanguage: ({ prisonerNumber }: { prisonerNumber: string }) =>
+    stubDeleteWithResponse<void>({
+      path: `${baseUrl}/v1/prisoner/${prisonerNumber}/secondary-language/.*`,
+      responseBody: null,
+    }),
+
   stubPersonCommunicationNeedsGetReferenceData: ({
     domain,
     referenceData,
@@ -44,7 +56,7 @@ export default {
     referenceData: ReferenceDataCodeDto[]
   }) =>
     stubGetWithBody({
-      path: `${baseUrl}/v1/core-person-record/reference-data/domain/${domain}/codes`,
+      path: `${baseUrl}/v1/reference-data/domains/${domain}/codes`,
       body: referenceData,
     }),
 }

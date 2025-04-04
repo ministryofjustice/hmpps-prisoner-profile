@@ -31,6 +31,7 @@ export function editPageTests<TPage extends EditPage>(options: {
   }[]
   redirectAnchor: string
   personalPageHref?: string
+  submitButtonId?: string
 }) {
   const {
     editUrl,
@@ -44,6 +45,7 @@ export function editPageTests<TPage extends EditPage>(options: {
     successfulFlashMessage,
     invalidInputs,
     redirectAnchor,
+    submitButtonId,
   } = options
 
   let page: TPage
@@ -121,7 +123,7 @@ export function editPageTests<TPage extends EditPage>(options: {
           it(`Can submit a valid input (${index + 1} of ${validInputs.length})`, () => {
             page = getPage()
             fillWithInputs(validInput)
-            page.submit()
+            page.submit(submitButtonId)
 
             cy.location('pathname').should('eq', '/prisoner/G6123VU/personal')
             cy.location('hash').should('eq', `#${redirectAnchor}`)
@@ -142,7 +144,7 @@ export function editPageTests<TPage extends EditPage>(options: {
                 cy.intercept('POST', url, req => {
                   req.headers.Referrer = url
                 })
-                page.submit()
+                page.submit(submitButtonId)
                 errorMessages.forEach(message => {
                   page.errorMessage().should('include.text', message)
                 })
