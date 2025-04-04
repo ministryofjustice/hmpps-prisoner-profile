@@ -80,4 +80,37 @@ describe('AliasService', () => {
       await expect(attemptUpdate).rejects.toThrow('Existing working name not found')
     })
   })
+
+  describe('updateDateOfBirth', () => {
+    const dateOfBirth = '1999-02-01'
+    it('should update date of birth', async () => {
+      const result = await aliasService.updateDateOfBirth(clientToken, user, prisonerNumber, dateOfBirth)
+
+      expect(personIntegrationApiClient.updatePseudonym).toHaveBeenCalledWith(PseudonymResponseMock.sourceSystemId, {
+        ...PseudonymRequestMock,
+        dateOfBirth,
+      })
+
+      expect(metricsService.trackPersonIntegrationUpdate).toHaveBeenCalledWith({
+        fieldsUpdated: ['dateOfBirth'],
+        prisonerNumber,
+        user,
+      })
+
+      expect(result).toEqual(PseudonymResponseMock)
+    })
+
+    it('should throw not found exception if no working name', async () => {
+      personIntegrationApiClient.getPseudonyms = jest.fn(async () => [
+        {
+          ...PseudonymResponseMock,
+          isWorkingName: false,
+        },
+      ])
+
+      const attemptUpdate = async () => aliasService.updateDateOfBirth(clientToken, user, prisonerNumber, dateOfBirth)
+
+      await expect(attemptUpdate).rejects.toThrow('Existing working name not found')
+    })
+  })
 })
