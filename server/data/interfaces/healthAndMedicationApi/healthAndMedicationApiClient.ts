@@ -1,3 +1,5 @@
+import { ReferenceDataValue } from '../ReferenceDataValue'
+
 // eslint-disable-next-line no-shadow
 export enum HealthAndMedicationReferenceDataDomain {
   foodAllergy = 'FOOD_ALLERGY',
@@ -26,12 +28,6 @@ export interface ReferenceDataCode {
   lastModifiedBy?: string
   deactivatedAt?: string
   deactivatedBy?: string
-}
-
-export interface ReferenceDataValue {
-  id: string
-  code: string
-  description: string
 }
 
 export interface ReferenceDataSelection {

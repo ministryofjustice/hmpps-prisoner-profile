@@ -31,14 +31,19 @@ import {
   EnglandCountryReferenceDataCodeMock,
   MilitaryRecordsMock,
 } from '../data/localMockData/personIntegrationApiReferenceDataMock'
-import { HealthAndMedicationApiClient } from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
+import {
+  HealthAndMedicationApiClient,
+  ValueWithMetadata,
+} from '../data/interfaces/healthAndMedicationApi/healthAndMedicationApiClient'
 import {
   dietAndAllergyMock,
   healthAndMedicationMock,
 } from '../data/localMockData/healthAndMedicationApi/healthAndMedicationMock'
 import { corePersonPhysicalAttributesMock } from '../data/localMockData/physicalAttributesMock'
-import agenciesMock from '../data/localMockData/agenciesDetails'
+import { ReferenceDataValue } from '../data/interfaces/ReferenceDataValue'
 import { personIntegrationApiClientMock } from '../../tests/mocks/personIntegrationApiClientMock'
+import PrisonService from './prisonService'
+import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
 
 jest.mock('./metrics/metricsService')
 jest.mock('./referenceData/referenceDataService')
@@ -49,6 +54,7 @@ describe('PersonalPageService', () => {
   let personIntegrationApiClient: PersonIntegrationApiClient
   let healthAndMedicationApiClient: HealthAndMedicationApiClient
   let referenceDataService: ReferenceDataService
+  let prisonService: PrisonService
   let metricsService: MetricsService
 
   beforeEach(() => {
@@ -76,6 +82,9 @@ describe('PersonalPageService', () => {
     referenceDataService = new ReferenceDataService(null, null) as jest.Mocked<ReferenceDataService>
     referenceDataService.getReferenceData = jest.fn(async () => EnglandCountryReferenceDataCodeMock)
 
+    prisonService = new PrisonService(null, null) as jest.Mocked<PrisonService>
+    prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonId: 'STI', prisonName: 'Styal (HMP)' }))
+
     metricsService = new MetricsService(null) as jest.Mocked<MetricsService>
   })
 
@@ -86,6 +95,7 @@ describe('PersonalPageService', () => {
       () => personIntegrationApiClient,
       () => healthAndMedicationApiClient,
       referenceDataService,
+      prisonService,
       metricsService,
       () => Promise.resolve({ curiousApiToken: 'token' }),
     )
@@ -139,16 +149,24 @@ describe('PersonalPageService', () => {
 
         it('Maps multiple aliases', async () => {
           const response = await getResponseWithAliases([
-            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: '' },
-            { dateOfBirth: '2023-01-01', firstName: 'First', middleNames: 'Middle', lastName: 'Last', gender: '' },
+            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name', gender: 'Male' },
+            {
+              dateOfBirth: '2023-01-01',
+              firstName: 'First',
+              middleNames: 'Middle',
+              lastName: 'Last',
+              gender: 'Female',
+            },
           ])
           expect(response.personalDetails.aliases[0]).toEqual({
             alias: 'First Name Last Name',
             dateOfBirth: '01/01/2022',
+            sex: 'Male',
           })
           expect(response.personalDetails.aliases[1]).toEqual({
             alias: 'First Middle Last',
             dateOfBirth: '01/01/2023',
+            sex: 'Female',
           })
         })
       })
@@ -157,7 +175,7 @@ describe('PersonalPageService', () => {
         const getResponseWithPseudonyms = async (pseudonyms: PseudonymResponseDto[]) => {
           personIntegrationApiClient.getPseudonyms = jest.fn(async () => pseudonyms)
           const service = constructService()
-          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'full-name' })
+          return service.get('token', PrisonerMockDataA, false, false, null, { fieldName: 'fullName' })
         }
 
         it('Handles no pseudonyms', async () => {
@@ -173,14 +191,23 @@ describe('PersonalPageService', () => {
         })
 
         it('Maps multiple pseudonyms', async () => {
+          const male = { description: 'Male' } as ReferenceDataValue
+          const female = { description: 'Female' } as ReferenceDataValue
+
           const response = await getResponseWithPseudonyms([
             { firstName: 'Ignore Working Name', isWorkingName: true } as PseudonymResponseDto,
-            { dateOfBirth: '2022-01-01', firstName: 'First name', lastName: 'Last name' } as PseudonymResponseDto,
+            {
+              dateOfBirth: '2022-01-01',
+              firstName: 'First name',
+              lastName: 'Last name',
+              sex: male,
+            } as PseudonymResponseDto,
             {
               dateOfBirth: '2023-01-01',
               firstName: 'First',
               middleName1: 'Middleone',
               lastName: 'Last',
+              sex: female,
             } as PseudonymResponseDto,
             {
               dateOfBirth: '2023-01-01',
@@ -188,19 +215,24 @@ describe('PersonalPageService', () => {
               middleName1: 'Middleone',
               middleName2: 'Middletwo',
               lastName: 'Last',
+              sex: female,
             } as PseudonymResponseDto,
           ])
+
           expect(response.personalDetails.aliases[0]).toEqual({
             alias: 'First Name Last Name',
             dateOfBirth: '01/01/2022',
+            sex: 'Male',
           })
           expect(response.personalDetails.aliases[1]).toEqual({
             alias: 'First Middleone Last',
             dateOfBirth: '01/01/2023',
+            sex: 'Female',
           })
           expect(response.personalDetails.aliases[2]).toEqual({
             alias: 'First Middleone Middletwo Last',
             dateOfBirth: '01/01/2023',
+            sex: 'Female',
           })
         })
 
@@ -311,7 +343,7 @@ describe('PersonalPageService', () => {
         ])(
           'Maps the lastModifiedAt field to the latest timestamp (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
-            prisonApiClient.getAgencyDetails = jest.fn(async () => agenciesMock)
+            prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: 'Moorland (HMP & YOI)' }) as Prison)
             const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
             expect(response.personalDetails.dietAndAllergy.lastModifiedAt).toEqual(expectedValue)
           },
@@ -323,7 +355,7 @@ describe('PersonalPageService', () => {
         ])(
           'Maps the lastModifiedPrison field (Prison person enabled: %s)',
           async (dietAndAllergiesEnabled, expectedValue) => {
-            prisonApiClient.getAgencyDetails = jest.fn(async () => agenciesMock)
+            prisonService.getPrisonByPrisonId = jest.fn(async () => ({ prisonName: expectedValue }) as Prison)
             const response = await constructService().get('token', PrisonerMockDataA, dietAndAllergiesEnabled, false)
             expect(response.personalDetails.dietAndAllergy.lastModifiedPrison).toEqual(expectedValue)
           },
@@ -745,6 +777,24 @@ describe('PersonalPageService', () => {
       expect(personalDetails.dietAndAllergy.personalisedDietaryRequirements).toEqual([
         { description: 'Vegan', id: 'PERSONALISED_DIET_VEGAN' },
       ])
+      expect(personalDetails.dietAndAllergy.cateringInstructions).toEqual('Some catering instructions.')
+      expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('2 July 2024')
+      expect(personalDetails.dietAndAllergy.lastModifiedPrison).toEqual('Styal (HMP)')
+    })
+
+    it('Handles missing dietAndAllergy fields', async () => {
+      healthAndMedicationApiClient.getHealthAndMedication = jest.fn(async () => ({
+        dietAndAllergy: {
+          ...dietAndAllergyMock,
+          cateringInstructions: undefined as ValueWithMetadata<string>,
+        },
+      }))
+
+      const { personalDetails } = await constructService().get('token', PrisonerMockDataA, true, false)
+
+      expect(personalDetails.dietAndAllergy.cateringInstructions).toBeFalsy()
+      expect(personalDetails.dietAndAllergy.lastModifiedAt).toEqual('1 July 2024')
+      expect(personalDetails.dietAndAllergy.lastModifiedPrison).toEqual('Styal (HMP)')
     })
 
     it('Does not get the data from the API when diet and allergy is disabled', async () => {

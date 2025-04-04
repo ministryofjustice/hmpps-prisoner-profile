@@ -1,5 +1,6 @@
 interface Options {
   changeLinkEnabled?: boolean
+  changeText?: string
   changeHref?: string
   rowUpdated?: boolean
   hiddenText?: string
@@ -8,6 +9,7 @@ interface Options {
   dataQa?: string
   html?: boolean
   mergeKeyDown?: boolean
+  classes?: string[]
 }
 
 const defaultOptions: Options = {
@@ -15,6 +17,7 @@ const defaultOptions: Options = {
   rowUpdated: false,
   hideIfEmpty: true,
   mergeKeyDown: false,
+  classes: [],
 }
 
 export const listToSummaryListRows = (
@@ -57,7 +60,7 @@ const summaryListRowWithOptionalChangeLink = (
       ? [
           {
             href: options.changeHref,
-            text: 'Change',
+            text: options.changeText || 'Change',
             visuallyHiddenText: options.hiddenText || key,
             classes: 'govuk-link--no-visited-state',
           },
@@ -69,6 +72,7 @@ const summaryListRowWithOptionalChangeLink = (
     options.rowUpdated ? 'row-updated' : '',
     rowHidden ? 'govuk-summary-list__row--hidden' : '',
     options.mergeKeyDown ? 'hmpps-merged-key-summary-list-row' : '',
+    ...options.classes,
   ].join(' ')
 
   const keyResult = options.dataQa

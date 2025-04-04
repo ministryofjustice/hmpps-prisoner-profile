@@ -174,7 +174,7 @@ describe('Alias Controller', () => {
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
         type: FlashMessageType.success,
-        fieldName: 'full-name',
+        fieldName: 'fullName',
       })
     })
 
@@ -314,7 +314,7 @@ describe('Alias Controller', () => {
       expect(req.flash).toHaveBeenCalledWith('flashMessage', {
         text: 'Name updated',
         type: FlashMessageType.success,
-        fieldName: 'full-name',
+        fieldName: 'fullName',
       })
     })
 
