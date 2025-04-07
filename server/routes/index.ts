@@ -119,7 +119,7 @@ export default function routes(services: Services): Router {
       const workAndActivities12MonthLinkUrl = `${config.serviceUrls.digitalPrison}/prisoner/${prisonerData.prisonerNumber}/work-activities`
       const workAndActivities7DayLinkUrl = `/prisoner/${prisonerData.prisonerNumber}/schedule`
       const vc2goalsUrl = `/prisoner/${prisonerData.prisonerNumber}/vc2-goals`
-      const canEditEducationWorkPlan = userHasRoles([Role.EditEducationWorkPlan], res.locals.user.userRoles)
+      const canEditLearningAndWorkPlan = userHasRoles([Role.LearningAndWorkProgressManager], res.locals.user.userRoles)
 
       const { curiousGoals } = workAndSkillsPageData
       const hasVc2Goals =
@@ -157,7 +157,7 @@ export default function routes(services: Services): Router {
         workAndActivities12MonthLinkUrl,
         workAndActivities7DayLinkUrl,
         vc2goalsUrl,
-        canEditEducationWorkPlan,
+        canEditLearningAndWorkPlan,
         hasVc2Goals,
         hasPlpGoals,
         problemRetrievingPrisonerGoalData,
