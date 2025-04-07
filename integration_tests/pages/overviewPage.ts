@@ -71,7 +71,6 @@ export default class OverviewPage extends Page {
   personalDetails = () => {
     const card = (): PageElement => cy.getDataQa('personal-details')
     return {
-      perferredName: (): PageElement => card().findDataQa('preferred-name'),
       dateOfBirth: (): PageElement => card().findDataQa('date-of-birth'),
       age: (): PageElement => card().findDataQa('age'),
       nationality: (): PageElement => card().findDataQa('nationality'),
