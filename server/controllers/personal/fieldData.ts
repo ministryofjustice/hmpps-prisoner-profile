@@ -194,7 +194,7 @@ export const religionFieldData: FieldData = {
 }
 
 export const sexualOrientationFieldData: RadioFieldData = {
-  url: 'edit/sexual-orientation',
+  url: 'sexual-orientation',
   fieldName: 'sexualOrientation',
   pageTitle: 'Sexual orientation',
   auditEditPageLoad: Page.EditSexualOrientation,

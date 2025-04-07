@@ -28,7 +28,6 @@ export default class PersonalPage extends Page {
           proficiency: (): PageElement => cardData('languages').find(`[data-qa=other-language-${language}]`),
         }),
       }),
-      preferredName: (): PageElement => cardData('preferred-name'),
       dateOfBirth: () => cardData('date-of-birth'),
       cityOrTownOfBirth: () => cardData('city-or-town-of-birth'),
       countryOfBirth: () => cardData('country-of-birth'),
