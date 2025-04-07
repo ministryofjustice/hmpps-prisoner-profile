@@ -24,7 +24,7 @@ context('Edit sexual orientation', () => {
         referenceData: SexualOrientationReferenceDataCodesMock,
       })
     },
-    editUrl: `prisoner/${prisonerNumber}/personal/edit/sexual-orientation`,
+    editUrl: `prisoner/${prisonerNumber}/personal/sexual-orientation`,
     editPageWithTitle: EditPage,
     editPageTitle: 'Which of the following best describes John Saunders’ sexual orientation?',
     successfulFlashMessage: 'Sexual orientation updated',

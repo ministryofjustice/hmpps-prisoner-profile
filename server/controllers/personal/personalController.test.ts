@@ -2788,7 +2788,7 @@ describe('PersonalController', () => {
         await action(validRequest, res)
 
         expect(validRequest.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
-        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/edit/sexual-orientation')
+        expect(res.redirect).toHaveBeenCalledWith('/prisoner/A1234BC/personal/sexual-orientation')
       })
 
       it('Sends a post success audit event', async () => {
