@@ -515,4 +515,145 @@ describe('Alias Controller', () => {
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
   })
+
+  describe('Change date of birth', () => {
+    it('should render the change date of birth page', async () => {
+      await controller.displayChangeDateOfBirth()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/edit/alias/changeDateOfBirth', {
+        pageTitle: `Date of birth - Prisoner personal details`,
+        warningText: 'This will become their date of birth in DPS and NOMIS.',
+        errors: [],
+        formValues: {
+          'dateOfBirth-day': PseudonymResponseMock.dateOfBirth.split('-')[2],
+          'dateOfBirth-month': PseudonymResponseMock.dateOfBirth.split('-')[1],
+          'dateOfBirth-year': PseudonymResponseMock.dateOfBirth.split('-')[0],
+        },
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+        },
+      })
+    })
+
+    it('Populates the errors from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          if (key === 'errors') return ['error']
+          return []
+        },
+      } as any
+
+      await controller.displayChangeDateOfBirth()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+    })
+
+    it('Populates the field value from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          return key === 'requestBody' ? [JSON.stringify({ 'dateOfBirth-day': '01' })] : []
+        },
+      } as any
+
+      await controller.displayChangeDateOfBirth()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ formValues: { 'dateOfBirth-day': '01' } }),
+      )
+    })
+
+    it('Sends a page view audit event', async () => {
+      await controller.displayChangeDateOfBirth()(req, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonId: PrisonerMockDataA.prisonId,
+        correlationId: req.id,
+        page: Page.EditDateOfBirth,
+      })
+    })
+
+    it('submits the date of birth change', async () => {
+      req = {
+        ...req,
+        body: {
+          'dateOfBirth-day': '01',
+          'dateOfBirth-month': '02',
+          'dateOfBirth-year': '1999',
+        },
+      } as unknown as Request
+
+      aliasService.updateWorkingName = jest.fn().mockResolvedValue({
+        ...PseudonymResponseMock,
+        dateOfBirth: '1999-02-01',
+      })
+
+      await controller.submitChangeDateOfBirth()(req, res, next)
+
+      expect(aliasService.updateDateOfBirth).toHaveBeenCalledWith(
+        expect.anything(),
+        prisonUserMock,
+        PrisonerMockDataA.prisonerNumber,
+        '1999-02-01',
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Date of birth updated',
+        type: FlashMessageType.success,
+        fieldName: 'dateOfBirth',
+      })
+    })
+
+    it('Submission handles API errors', async () => {
+      aliasService.updateDateOfBirth = async () => {
+        throw new Error()
+      }
+
+      await controller.submitChangeDateOfBirth()(req, res, next)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/date-of-birth`)
+    })
+
+    it('Sends a post success audit event', async () => {
+      req = {
+        ...req,
+        body: {
+          'dateOfBirth-day': '01',
+          'dateOfBirth-month': '02',
+          'dateOfBirth-year': '1999',
+        },
+      } as unknown as Request
+
+      aliasService.updateDateOfBirth = jest.fn().mockResolvedValue({
+        ...PseudonymResponseMock,
+        dateOfBirth: '1999-02-01',
+      })
+
+      await controller.submitChangeDateOfBirth()(req, res, next)
+
+      const expectedAuditEvent = {
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditDateOfBirth,
+        details: {
+          fieldName: 'dateOfBirth',
+          previous: '1990-10-12',
+          updated: '1999-02-01',
+        },
+      }
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+    })
+  })
 })

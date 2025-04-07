@@ -2,7 +2,6 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { mapHeaderData } from '../mappers/headerMappers'
 import CaseNotesService from '../services/caseNotesService'
 import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
-import { canAddCaseNotes } from '../utils/roleHelpers'
 import { formatLocation, formatName } from '../utils/utils'
 import { RestClientBuilder } from '../data'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -44,7 +43,7 @@ export default class CaseNotesController {
       if (req.query.endDate) queryParams.endDate = req.query.endDate as string
       if (req.query.showAll) queryParams.showAll = Boolean(req.query.showAll)
 
-      const addCaseNoteLinkUrl = canAddCaseNotes(res.locals.user, prisonerData)
+      const addCaseNoteLinkUrl = permissions.caseNotes.edit
         ? `/prisoner/${prisonerData.prisonerNumber}/add-case-note`
         : undefined
 
@@ -69,7 +68,7 @@ export default class CaseNotesController {
       if (!caseNotesPageData.isFulfilled()) {
         return res.render('pages/caseNotes/caseNotesPage', {
           pageTitle: 'Case notes',
-          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+          ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, permissions, res.locals.user, 'case-notes'),
           caseNotesApiUnavailable: true,
         })
       }
@@ -95,7 +94,7 @@ export default class CaseNotesController {
       // Render page
       return res.render('pages/caseNotes/caseNotesPage', {
         pageTitle: 'Case notes',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'case-notes'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, permissions, res.locals.user, 'case-notes'),
         ...caseNotesPageData.getOrThrow(),
         types,
         subTypes,

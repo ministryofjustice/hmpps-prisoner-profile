@@ -57,7 +57,7 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPage', {
         pageTitle: `Picture of ${prisonerData.prisonerNumber}`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, req.middleware.permissions, res.locals.user),
         miniBannerData: {
           prisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
             style: NameFormatStyle.firstLast,
@@ -100,7 +100,7 @@ export default function imageRouter(services: Services): Router {
 
       return res.render('pages/photoPageAll', {
         pageTitle: `All facial images`,
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, req.middleware.permissions, res.locals.user),
         miniBannerData: {
           prisonerName: formatName(prisonerData.firstName, '', prisonerData.lastName, {
             style: NameFormatStyle.firstLast,
