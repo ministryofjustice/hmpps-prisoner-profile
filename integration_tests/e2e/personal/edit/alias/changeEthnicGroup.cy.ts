@@ -73,7 +73,7 @@ context('Change ethnic group', () => {
     })
   })
 
-  context('Allows no ethnicity group to be selected', () => {
+  context('Allows no ethnic group to be selected', () => {
     it('redirects back to personal page if nothing selected', () => {
       // Prepopulates with existing ethnicity:
       cy.task('stubGetPseudonyms', { prisonerNumber, response: [{ ...PseudonymResponseMock, ethnicity: undefined }] })

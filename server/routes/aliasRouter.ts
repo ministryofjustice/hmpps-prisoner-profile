@@ -39,8 +39,8 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     aliasController.submitChangeDateOfBirth(),
   )
 
-  get('/ethnic-group', editProfileChecks(), aliasController.displayChangeEthnicityGroup())
-  post('/ethnic-group', editProfileChecks(), aliasController.submitChangeEthnicityGroup())
+  get('/ethnic-group', editProfileChecks(), aliasController.displayChangeEthnicGroup())
+  post('/ethnic-group', editProfileChecks(), aliasController.submitChangeEthnicGroup())
   ;['white', 'mixed', 'asian', 'black', 'other'].forEach(group => {
     get(`/${group}`, editProfileChecks(), aliasController.displayChangeEthnicBackground(group))
     post(`/${group}`, editProfileChecks(), aliasController.submitChangeEthnicBackground(group))

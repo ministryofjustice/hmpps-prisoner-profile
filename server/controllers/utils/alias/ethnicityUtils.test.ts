@@ -1,15 +1,15 @@
 import { ReferenceDataCodeDto } from '../../../data/interfaces/referenceData'
-import { getEthnicBackgroundRadioOptions, getEthnicityGroupRadioOptions } from './ethnicityUtils'
+import { getEthnicBackgroundRadioOptions, getEthnicGroupRadioOptions } from './ethnicityUtils'
 import { RadioOption } from '../../../utils/utils'
 
 describe('ethnicityUtils', () => {
-  describe('Get ethnicity group radio options', () => {
+  describe('Get ethnic group radio options', () => {
     it('Returns empty when no matching active reference codes', () => {
-      expect(getEthnicityGroupRadioOptions([])).toEqual([])
+      expect(getEthnicGroupRadioOptions([])).toEqual([])
     })
 
-    it('Returns all ethnicity group options when all codes match active reference codes', () => {
-      expect(getEthnicityGroupRadioOptions(allActiveEthnicityReferenceCodes())).toEqual([
+    it('Returns all ethnic group options when all codes match active reference codes', () => {
+      expect(getEthnicGroupRadioOptions(allActiveEthnicityReferenceCodes())).toEqual([
         { value: 'white', text: 'White' },
         { value: 'mixed', text: 'Mixed or multiple ethnic groups' },
         { value: 'asian', text: 'Asian or Asian British' },
@@ -20,27 +20,27 @@ describe('ethnicityUtils', () => {
       ])
     })
 
-    it('Returns an ethnicity group option when one or more code is active', () => {
-      expect(getEthnicityGroupRadioOptions([])).toEqual([])
-      expect(getEthnicityGroupRadioOptions([referenceCode('W1')])).toEqual([{ value: 'white', text: 'White' }])
-      expect(getEthnicityGroupRadioOptions([referenceCode('W1'), referenceCode('W2')])).toEqual([
+    it('Returns an ethnic group option when one or more code is active', () => {
+      expect(getEthnicGroupRadioOptions([])).toEqual([])
+      expect(getEthnicGroupRadioOptions([referenceCode('W1')])).toEqual([{ value: 'white', text: 'White' }])
+      expect(getEthnicGroupRadioOptions([referenceCode('W1'), referenceCode('W2')])).toEqual([
         { value: 'white', text: 'White' },
       ])
     })
 
     it('Only matches active reference codes', () => {
-      expect(getEthnicityGroupRadioOptions([referenceCode('W1', false), referenceCode('O2', true)])).toEqual([
+      expect(getEthnicGroupRadioOptions([referenceCode('W1', false), referenceCode('O2', true)])).toEqual([
         { value: 'other', text: 'Other ethnic group' },
       ])
     })
 
     it('Handles unknown reference codes', () => {
-      expect(getEthnicityGroupRadioOptions([referenceCode('??')])).toEqual([])
-      expect(getEthnicityGroupRadioOptions([referenceCode('W123')])).toEqual([])
+      expect(getEthnicGroupRadioOptions([referenceCode('??')])).toEqual([])
+      expect(getEthnicGroupRadioOptions([referenceCode('W123')])).toEqual([])
     })
 
     it('Sets on option to checked when passing in a selected code', () => {
-      expect(getEthnicityGroupRadioOptions(allActiveEthnicityReferenceCodes(), 'W1')).toEqual([
+      expect(getEthnicGroupRadioOptions(allActiveEthnicityReferenceCodes(), 'W1')).toEqual([
         { value: 'white', text: 'White', checked: true },
         { value: 'mixed', text: 'Mixed or multiple ethnic groups' },
         { value: 'asian', text: 'Asian or Asian British' },

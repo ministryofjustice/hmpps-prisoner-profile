@@ -1,22 +1,22 @@
 import { ReferenceDataCodeDto } from '../../../data/interfaces/referenceData'
 import { objectToRadioOptions, RadioOption } from '../../../utils/utils'
 
-export function getEthnicityGroupRadioOptions(
+export function getEthnicGroupRadioOptions(
   ethnicityReferenceCodes: ReferenceDataCodeDto[],
   selectedEthnicityCode: string = null,
 ): (RadioOption | { divider: string })[] {
   const allowPreferNotToSay = isActive('NS', ethnicityReferenceCodes)
 
-  const activeEthnicityGroups = ethnicityGroups.filter(group =>
+  const activeEthnicGroups = ethnicGroups.filter(group =>
     group.backgrounds.some(background => isActive(background.code, ethnicityReferenceCodes)),
   )
 
-  const checkedGroup = ethnicityGroups.find(group =>
+  const checkedGroup = ethnicGroups.find(group =>
     group.backgrounds.map(background => background.code).includes(selectedEthnicityCode),
   )?.group
 
   return [
-    ...objectToRadioOptions(activeEthnicityGroups, 'group', 'description', checkedGroup),
+    ...objectToRadioOptions(activeEthnicGroups, 'group', 'description', checkedGroup),
     ...(allowPreferNotToSay ? [{ divider: 'or' }] : []),
     ...(allowPreferNotToSay
       ? [
@@ -31,28 +31,28 @@ export function getEthnicityGroupRadioOptions(
 }
 
 export function getEthnicBackgroundRadioOptions(
-  ethnicityGroup: string,
+  ethnicGroup: string,
   ethnicityReferenceCodes: ReferenceDataCodeDto[],
   selectedEthnicityCode: string = null,
 ): RadioOption[] {
   const activeEthnicBackgrounds =
-    findEthnicityGroup(ethnicityGroup)?.backgrounds?.filter(background =>
+    findEthnicGroup(ethnicGroup)?.backgrounds?.filter(background =>
       isActive(background.code, ethnicityReferenceCodes),
     ) || []
 
   return objectToRadioOptions(activeEthnicBackgrounds, 'code', 'description', selectedEthnicityCode)
 }
 
-export function getEthnicityGroupDescription(ethnicityGroup: string): string {
-  return ethnicityGroups.find(group => group.group === ethnicityGroup)?.description
+export function getEthnicGroupDescription(ethnicGroup: string): string {
+  return ethnicGroups.find(group => group.group === ethnicGroup)?.description
 }
 
-export function getEthnicityGroupDescriptionForHeading(ethnicityGroup: string): string {
-  return ethnicityGroups.find(group => group.group === ethnicityGroup)?.headingDescription
+export function getEthnicGroupDescriptionForHeading(ethnicGroup: string): string {
+  return ethnicGroups.find(group => group.group === ethnicGroup)?.headingDescription
 }
 
-function findEthnicityGroup(ethnicGroup: string): EthnicityGroup {
-  return ethnicityGroups.find(group => group.group === ethnicGroup)
+function findEthnicGroup(ethnicGroup: string): EthnicGroup {
+  return ethnicGroups.find(group => group.group === ethnicGroup)
 }
 
 function isActive(background: string, ethnicityReferenceCodes: ReferenceDataCodeDto[]) {
@@ -67,14 +67,14 @@ interface EthnicBackground {
   description: string
 }
 
-interface EthnicityGroup {
+interface EthnicGroup {
   group: string
   description: string
   headingDescription: string
   backgrounds: EthnicBackground[]
 }
 
-const ethnicityGroups: EthnicityGroup[] = [
+const ethnicGroups: EthnicGroup[] = [
   {
     group: 'white',
     description: 'White',

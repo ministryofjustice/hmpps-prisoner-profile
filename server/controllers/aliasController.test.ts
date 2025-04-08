@@ -659,9 +659,9 @@ describe('Alias Controller', () => {
     })
   })
 
-  describe('Change ethnicity group', () => {
-    it('should render the change ethnicity group page', async () => {
-      await controller.displayChangeEthnicityGroup()(req, res, next)
+  describe('Change ethnic group', () => {
+    it('should render the change ethnic group page', async () => {
+      await controller.displayChangeEthnicGroup()(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
         pageTitle: `Ethnic group - Prisoner personal details`,
@@ -692,7 +692,7 @@ describe('Alias Controller', () => {
         prisonerNumber: PrisonerMockDataA.prisonerNumber,
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
-        page: Page.EditEthnicityGroup,
+        page: Page.EditEthnicGroup,
       })
     })
 
@@ -704,20 +704,20 @@ describe('Alias Controller', () => {
       ['black', 'personal/black'],
       ['other', 'personal/other'],
       ['NS', 'personal#personal-details'],
-    ])('for choice %s should redirect to %s page', async (ethnicityGroup: string, redirect: string) => {
-      req = { ...req, body: { radioField: ethnicityGroup } } as unknown as Request
+    ])('for choice %s should redirect to %s page', async (ethnicGroup: string, redirect: string) => {
+      req = { ...req, body: { radioField: ethnicGroup } } as unknown as Request
 
-      await controller.submitChangeEthnicityGroup()(req, res, next)
+      await controller.submitChangeEthnicGroup()(req, res, next)
 
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/${redirect}`)
 
-      if (ethnicityGroup) {
+      if (ethnicGroup) {
         expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
           user: prisonUserMock,
           prisonerNumber: PrisonerMockDataA.prisonerNumber,
           correlationId: req.id,
-          action: PostAction.EditEthnicityGroup,
-          details: { ethnicityGroup },
+          action: PostAction.EditEthnicGroup,
+          details: { ethnicGroup },
         })
       }
     })
@@ -729,7 +729,7 @@ describe('Alias Controller', () => {
         ethnicity: { code: 'NS' },
       })
 
-      await controller.submitChangeEthnicityGroup()(req, res, next)
+      await controller.submitChangeEthnicGroup()(req, res, next)
 
       expect(aliasService.updateEthnicity).toHaveBeenCalledWith(
         expect.anything(),

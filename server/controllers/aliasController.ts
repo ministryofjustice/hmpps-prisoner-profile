@@ -15,9 +15,9 @@ import {
 import { dateToIsoDate } from '../utils/dateHelpers'
 import {
   getEthnicBackgroundRadioOptions,
-  getEthnicityGroupDescription,
-  getEthnicityGroupDescriptionForHeading,
-  getEthnicityGroupRadioOptions,
+  getEthnicGroupDescription,
+  getEthnicGroupDescriptionForHeading,
+  getEthnicGroupRadioOptions,
 } from './utils/alias/ethnicityUtils'
 import ReferenceDataService from '../services/referenceData/referenceDataService'
 
@@ -302,7 +302,7 @@ export default class AliasController {
     }
   }
 
-  public displayChangeEthnicityGroup(): RequestHandler {
+  public displayChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
       const errors = req.flash('errors')
@@ -320,7 +320,7 @@ export default class AliasController {
           prisonerNumber,
           prisonId,
           correlationId: req.id,
-          page: Page.EditEthnicityGroup,
+          page: Page.EditEthnicGroup,
         })
         .catch(error => logger.error(error))
 
@@ -329,7 +329,7 @@ export default class AliasController {
         formTitle: `What is ${apostrophe(titlePrisonerName)} ethnic group?`,
         hintText: `Choose the group which best describes this person’s ethnic group. You'll need to select a more detailed ethnic group on the next page.`,
         submitButtonText: 'Continue',
-        options: getEthnicityGroupRadioOptions(ethnicityReferenceDataCodes, currentWorkingName.ethnicity?.code),
+        options: getEthnicGroupRadioOptions(ethnicityReferenceDataCodes, currentWorkingName.ethnicity?.code),
         errors,
         prisonerNumber,
         breadcrumbPrisonerName: prisonerName,
@@ -341,12 +341,12 @@ export default class AliasController {
     }
   }
 
-  public submitChangeEthnicityGroup(): RequestHandler {
+  public submitChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { prisonerNumber } = this.getCommonRequestData(req)
-      const { radioField: ethnicityGroup } = req.body
+      const { radioField: ethnicGroup } = req.body
 
-      if (!ethnicityGroup) {
+      if (!ethnicGroup) {
         return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
       }
 
@@ -355,16 +355,16 @@ export default class AliasController {
           user: res.locals.user,
           prisonerNumber,
           correlationId: req.id,
-          action: PostAction.EditEthnicityGroup,
-          details: { ethnicityGroup },
+          action: PostAction.EditEthnicGroup,
+          details: { ethnicGroup },
         })
         .catch(error => logger.error(error))
 
-      if (ethnicityGroup === 'NS') {
+      if (ethnicGroup === 'NS') {
         return this.submitChangeEthnicBackground('ethnic-group')(req, res, next)
       }
 
-      return res.redirect(`/prisoner/${prisonerNumber}/personal/${ethnicityGroup}`)
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/${ethnicGroup}`)
     }
   }
 
@@ -392,8 +392,8 @@ export default class AliasController {
         .catch(error => logger.error(error))
 
       return res.render('pages/edit/radioField', {
-        pageTitle: `${getEthnicityGroupDescription(group)} - Prisoner personal details`,
-        formTitle: `Which of the following best describes ${apostrophe(titlePrisonerName)} ${getEthnicityGroupDescriptionForHeading(group)} background?`,
+        pageTitle: `${getEthnicGroupDescription(group)} - Prisoner personal details`,
+        formTitle: `Which of the following best describes ${apostrophe(titlePrisonerName)} ${getEthnicGroupDescriptionForHeading(group)} background?`,
         backLink: `/prisoner/${prisonerNumber}/personal/ethnic-group`,
         options: getEthnicBackgroundRadioOptions(
           group,
