@@ -8,10 +8,10 @@
 }
 
 .photo-feedback-banner {
-  @include govuk-font(19);
+  @include govuk-font(16);
   display: inline-block;
   border: 1px solid #594D00;
-  padding: 10px 10px 8px;
+  padding: 8px 8px 6px;
   margin-bottom: 15px;
   background: #FFF7BF;
   color: #594D00;
