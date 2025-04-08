@@ -1,5 +1,6 @@
 {% extends "../../partials/layout.njk" %}
 {% from "../../macros/summaryCardMacro.njk" import summaryCard %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
@@ -30,6 +31,14 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">{{ miniBanner(miniBannerData) }}</div>
   </div>
+
+  {% if backLink %}
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink,
+      classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-6"
+    }) }}
+  {% endif %}
 
   {% if errors.length > 0 %}
     {{
@@ -68,7 +77,7 @@
         <div class="govuk-button-group">
           {{
           govukButton({
-            text: "Save",
+            text: submitButtonText or "Save",
             type: "submit",
             preventDoubleClick: true,
             attributes: { "data-qa": "edit-submit-button" }

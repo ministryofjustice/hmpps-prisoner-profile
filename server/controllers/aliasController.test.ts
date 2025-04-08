@@ -8,12 +8,15 @@ import AliasService, { Name } from '../services/aliasService'
 import { aliasServiceMock } from '../../tests/mocks/aliasServiceMock'
 import { PseudonymResponseMock } from '../data/localMockData/personIntegrationApiReferenceDataMock'
 import { FlashMessageType } from '../data/enums/flashMessageType'
+import ReferenceDataService from '../services/referenceData/referenceDataService'
+import { ethnicityCodesMock } from '../data/localMockData/personIntegrationApi/referenceDataMocks'
 
 describe('Alias Controller', () => {
   let req: Request
   let res: Response
   let next: NextFunction
   let aliasService: AliasService
+  let referenceDataService: ReferenceDataService
   let auditService: AuditService
   let controller: AliasController
 
@@ -36,7 +39,11 @@ describe('Alias Controller', () => {
 
     auditService = auditServiceMock()
     aliasService = aliasServiceMock() as AliasService
-    controller = new AliasController(aliasService, auditService)
+    referenceDataService = {
+      getActiveReferenceDataCodes: jest.fn().mockImplementation(() => Promise.resolve(ethnicityCodesMock)),
+    } as unknown as ReferenceDataService
+
+    controller = new AliasController(aliasService, referenceDataService, auditService)
   })
 
   describe('Change name purpose page', () => {
@@ -654,6 +661,44 @@ describe('Alias Controller', () => {
       }
 
       expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
+    })
+  })
+
+  describe('Change ethnicity group', () => {
+    it('should render the change ethnicity group page', async () => {
+      await controller.displayChangeEthnicityGroup()(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+        pageTitle: `Ethnic group - Prisoner personal details`,
+        formTitle: `What is John Saunders’ ethnic group?`,
+        hintText:
+          "Choose the group which best describes this person’s ethnic group. You'll need to select a more detailed ethnic group on the next page.",
+        breadcrumbPrisonerName: 'Saunders, John',
+        prisonerNumber: 'G6123VU',
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+        },
+        options: [
+          { text: 'White', value: 'white', checked: true },
+          { text: 'Mixed or multiple ethnic groups', value: 'mixed' },
+          { text: 'Asian or Asian British', value: 'asian' },
+          { text: 'Black, Black British, Caribbean or African', value: 'black' },
+          { text: 'Other ethnic group', value: 'other' },
+          { divider: 'or' },
+          { text: 'They prefer not to say', value: 'NS', checked: false },
+        ],
+        submitButtonText: 'Continue',
+        errors: [],
+      })
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonId: PrisonerMockDataA.prisonId,
+        correlationId: req.id,
+        page: Page.EditEthnicityGroup,
+      })
     })
   })
 })

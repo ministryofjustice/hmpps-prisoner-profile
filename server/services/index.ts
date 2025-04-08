@@ -223,6 +223,7 @@ export const services = () => {
     photoService,
     aliasService,
     languagesService,
+    referenceDataService,
   }
 }
 
