@@ -766,12 +766,16 @@ describe('Alias Controller', () => {
     ['asian', 'A2'],
     ['black', 'B2'],
     ['other', 'O2'],
-  ])('Change ethnic background for group: %s', (ethnicGroup: string, ethicityCodeSubmitted: string) => {
+  ])('Change ethnic background for group: %s', (ethnicGroup: string, ethnicityCodeSubmitted: string) => {
     const description = getEthnicGroupDescription(ethnicGroup)
     const headingDescription = getEthnicGroupDescriptionForHeading(ethnicGroup)
 
+    beforeEach(() => {
+      req.params.group = ethnicGroup
+    })
+
     it('should render the change ethnic background page', async () => {
-      await controller.displayChangeEthnicBackground(ethnicGroup)(req, res, next)
+      await controller.displayChangeEthnicBackground()(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
         pageTitle: `${description} - Prisoner personal details`,
@@ -798,13 +802,13 @@ describe('Alias Controller', () => {
         },
       } as any
 
-      await controller.displayChangeEthnicBackground(ethnicGroup)(req, res, next)
+      await controller.displayChangeEthnicBackground()(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
     })
 
     it('Sends a page view audit event', async () => {
-      await controller.displayChangeEthnicBackground(ethnicGroup)(req, res, next)
+      await controller.displayChangeEthnicBackground()(req, res, next)
 
       expect(auditService.sendPageView).toHaveBeenCalledWith({
         user: prisonUserMock,
@@ -816,15 +820,15 @@ describe('Alias Controller', () => {
     })
 
     it('submits the ethnicity change', async () => {
-      req = { ...req, body: { radioField: ethicityCodeSubmitted } } as unknown as Request
+      req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
-      await controller.submitChangeEthnicBackground(ethnicGroup)(req, res, next)
+      await controller.submitChangeEthnicBackground()(req, res, next)
 
       expect(aliasService.updateEthnicity).toHaveBeenCalledWith(
         expect.anything(),
         prisonUserMock,
         PrisonerMockDataA.prisonerNumber,
-        ethicityCodeSubmitted,
+        ethnicityCodeSubmitted,
       )
 
       expect(res.redirect).toHaveBeenCalledWith(
@@ -839,27 +843,27 @@ describe('Alias Controller', () => {
     })
 
     it('Submission handles API errors', async () => {
-      req = { ...req, body: { radioField: ethicityCodeSubmitted } } as unknown as Request
+      req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
       aliasService.updateEthnicity = async () => {
         throw new Error()
       }
 
-      await controller.submitChangeEthnicBackground(ethnicGroup)(req, res, next)
+      await controller.submitChangeEthnicBackground()(req, res, next)
 
       expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/${ethnicGroup}`)
     })
 
     it('Sends a post success audit event', async () => {
-      req = { ...req, body: { radioField: ethicityCodeSubmitted } } as unknown as Request
+      req = { ...req, body: { radioField: ethnicityCodeSubmitted } } as unknown as Request
 
       aliasService.updateEthnicity = jest.fn().mockResolvedValue({
         ...PseudonymResponseMock,
-        ethnicity: { code: ethicityCodeSubmitted },
+        ethnicity: { code: ethnicityCodeSubmitted },
       })
 
-      await controller.submitChangeEthnicBackground(ethnicGroup)(req, res, next)
+      await controller.submitChangeEthnicBackground()(req, res, next)
 
       const expectedAuditEvent = {
         user: prisonUserMock,
@@ -869,7 +873,7 @@ describe('Alias Controller', () => {
         details: {
           fieldName: 'ethnicity',
           previous: 'W1',
-          updated: ethicityCodeSubmitted,
+          updated: ethnicityCodeSubmitted,
         },
       }
 

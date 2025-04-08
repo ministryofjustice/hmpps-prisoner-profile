@@ -122,8 +122,8 @@ export default class AliasController {
 
   public displayAddNewAlias(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
       const formValues = requestBodyFromFlash<DateOfBirthForm | { sex: string }>(req) || {
@@ -215,8 +215,8 @@ export default class AliasController {
 
   public displayChangeDateOfBirth(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
       const formValues = requestBodyFromFlash<DateOfBirthForm>(req) || {
@@ -304,13 +304,13 @@ export default class AliasController {
 
   public displayChangeEthnicGroup(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
       const errors = req.flash('errors')
       const [currentWorkingName, ethnicityReferenceDataCodes] = await Promise.all([
-        this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber),
+        this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber),
         this.referenceDataService.getActiveReferenceDataCodes(
           CorePersonRecordReferenceDataDomain.ethnicity,
-          req.middleware.clientToken,
+          clientToken,
         ),
       ])
 
@@ -361,23 +361,25 @@ export default class AliasController {
         .catch(error => logger.error(error))
 
       if (ethnicGroup === 'NS') {
-        return this.submitChangeEthnicBackground('ethnic-group')(req, res, next)
+        req.params.group = 'NS'
+        return this.submitChangeEthnicBackground()(req, res, next)
       }
 
       return res.redirect(`/prisoner/${prisonerNumber}/personal/${ethnicGroup}`)
     }
   }
 
-  public displayChangeEthnicBackground(group: string): RequestHandler {
+  public displayChangeEthnicBackground(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { group } = req.params
       const errors = req.flash('errors')
 
       const [currentWorkingName, ethnicityReferenceDataCodes] = await Promise.all([
-        this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber),
+        this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber),
         this.referenceDataService.getActiveReferenceDataCodes(
           CorePersonRecordReferenceDataDomain.ethnicity,
-          req.middleware.clientToken,
+          clientToken,
         ),
       ])
 
@@ -411,9 +413,10 @@ export default class AliasController {
     }
   }
 
-  public submitChangeEthnicBackground(group: string): RequestHandler {
+  public submitChangeEthnicBackground(): RequestHandler {
     return async (req: Request, res: Response) => {
       const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { group } = req.params
       const { radioField: ethnicBackground } = req.body
 
       if (!ethnicBackground) {
