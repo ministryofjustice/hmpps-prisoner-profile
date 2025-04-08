@@ -595,11 +595,6 @@ describe('Alias Controller', () => {
         },
       } as unknown as Request
 
-      aliasService.updateWorkingName = jest.fn().mockResolvedValue({
-        ...PseudonymResponseMock,
-        dateOfBirth: '1999-02-01',
-      })
-
       await controller.submitChangeDateOfBirth()(req, res, next)
 
       expect(aliasService.updateDateOfBirth).toHaveBeenCalledWith(
@@ -698,6 +693,70 @@ describe('Alias Controller', () => {
         prisonId: PrisonerMockDataA.prisonId,
         correlationId: req.id,
         page: Page.EditEthnicityGroup,
+      })
+    })
+
+    it.each([
+      [undefined, 'personal#personal-details'],
+      ['white', 'personal/white'],
+      ['mixed', 'personal/mixed'],
+      ['asian', 'personal/asian'],
+      ['black', 'personal/black'],
+      ['other', 'personal/other'],
+      ['NS', 'personal#personal-details'],
+    ])('for choice %s should redirect to %s page', async (ethnicityGroup: string, redirect: string) => {
+      req = { ...req, body: { radioField: ethnicityGroup } } as unknown as Request
+
+      await controller.submitChangeEthnicityGroup()(req, res, next)
+
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/G6123VU/${redirect}`)
+
+      if (ethnicityGroup) {
+        expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+          user: prisonUserMock,
+          prisonerNumber: PrisonerMockDataA.prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditEthnicityGroup,
+          details: { ethnicityGroup },
+        })
+      }
+    })
+
+    it(`Saves ethnicity as 'They prefer not to say'`, async () => {
+      req = { ...req, body: { radioField: 'NS' } } as unknown as Request
+      aliasService.updateEthnicity = jest.fn().mockResolvedValue({
+        ...PseudonymResponseMock,
+        ethnicity: { code: 'NS' },
+      })
+
+      await controller.submitChangeEthnicityGroup()(req, res, next)
+
+      expect(aliasService.updateEthnicity).toHaveBeenCalledWith(
+        expect.anything(),
+        prisonUserMock,
+        PrisonerMockDataA.prisonerNumber,
+        'NS',
+      )
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Ethnic group updated',
+        type: FlashMessageType.success,
+        fieldName: 'ethnicity',
+      })
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditEthnicBackground,
+        details: {
+          fieldName: 'ethnicity',
+          previous: 'W1',
+          updated: 'NS',
+        },
       })
     })
   })
