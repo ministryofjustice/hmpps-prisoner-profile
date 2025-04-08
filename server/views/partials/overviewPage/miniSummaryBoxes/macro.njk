@@ -9,18 +9,15 @@
           </p>
         {% endif %}
         {% if miniSummary.topContent !== undefined %}
-          <p
-            class="govuk-body hmpps-mini-card__{{ miniSummary.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.topClass === 'small' }}"
-          >
+          <p class="govuk-body hmpps-mini-card__{{ miniSummary.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.topClass === 'small' }}">
             {{ miniSummary.topContent if miniSummary.topContent !== undefined else '&nbsp;' | safe }}
           </p>
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
         {% endif %}
         <p class="govuk-body card-label">
           {{ miniSummary.bottomLabel }}
         </p>
-        <p
-          class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}"
-        >
+        <p class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}">
             {% if miniSummary.bottomContentLine1Href %}
                 <a href="{{ miniSummary.bottomContentLine1Href }}" class="govuk-link govuk-link--no-visited-state">
                     {{ miniSummary.bottomContentLine1 }}
@@ -30,9 +27,7 @@
             {% endif %}
         </p>
         {% if miniSummary.bottomContentLine2 !== undefined %}
-        <p
-          class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}"
-        >
+        <p class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}">
             {{ miniSummary.bottomContentLine2 }}
         </p>
         {% endif %}

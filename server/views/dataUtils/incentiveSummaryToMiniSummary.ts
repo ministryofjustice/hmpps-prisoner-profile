@@ -12,7 +12,8 @@ export default (
   // if all values of incentiveSummary object are null return no data message
   if (!Object.values(incentiveSummary).some(value => value !== null))
     return {
-      heading: 'Incentives: since last review',
+      heading: 'Incentives',
+      label: 'Since last review',
       items: [
         {
           text: `${prisonerDisplayName} has no incentive level history`,
@@ -25,7 +26,8 @@ export default (
   // if api call failed. Will be replaced with Result logic
   if (isIncentiveSummaryError(incentiveSummary))
     return {
-      heading: 'Incentives: since last review',
+      heading: 'Incentives',
+      label: 'Since last review',
       items: [
         {
           text: 'We cannot show these details right now',
@@ -38,13 +40,15 @@ export default (
   const { positiveBehaviourCount, negativeBehaviourCount, nextReviewDate, daysOverdue } = incentiveSummary
 
   return {
-    heading: 'Incentives: since last review',
+    heading: 'Incentives',
+    label: 'Since last review',
     items: [
       {
         text: `Positive behaviours: ${positiveBehaviourCount}`,
       },
       {
         text: `Negative behaviours: ${negativeBehaviourCount}`,
+        classes: 'govuk-!-margin-bottom-3',
       },
       {
         text: `Next review by: ${formatDate(nextReviewDate, 'short')}`,

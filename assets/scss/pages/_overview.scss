@@ -1,10 +1,21 @@
 .staff-contacts-card {
   dl {
+    margin-top: 0;
     margin-bottom: 8px;
+  }
+
+  dt {
+    @include govuk-responsive-margin(1, 'bottom');
+    @include govuk-font($size: 19, $weight: 'bold');
+  }
+
+  dd {
+    margin-left: 0;
+    @include govuk-responsive-margin(2, 'bottom');
   }
 }
 
-.non-association-summary {
+.external-contacts-summary {
   height: calc(100% - 15px);
 
   div.govuk-summary-list__row--no-border {
@@ -38,20 +49,21 @@
       flex: 1 1 auto;
     }
   }
+}
 
-  .mini-card--categories {
-    --mini-card-lines: 4;
-  }
+.mini-card--categories {
+  --mini-card-lines: 4;
+}
 
-  .mini-card--incentives {
-    --mini-card-lines: 6;
-  }
+.mini-card--incentives {
+  height: 100%;
+  --mini-card-lines: 6;
+}
 
-  .mini-card--csra {
-    --mini-card-lines: 4;
-  }
+.mini-card--csra {
+  --mini-card-lines: 4;
+}
 
-  .mini-card--csip {
-    --mini-card-lines: 6;
-  }
+.mini-card--csip {
+  --mini-card-lines: 6;
 }

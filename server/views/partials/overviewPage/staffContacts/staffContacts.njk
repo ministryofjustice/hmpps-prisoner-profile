@@ -6,7 +6,7 @@
     <div class="govuk-grid-column-full">
 
       {% set keyWorkerHtml %}
-        <p class="govuk-body" data-qa="keyworker-details">
+        <dd class="govuk-body" data-qa="keyworker-details">
           {% if staffContacts.keyWorker.status === 'fulfilled' %}
             {% set keyWorker = staffContacts.keyWorker.value %}
             {{ keyWorker.name }}
@@ -18,7 +18,7 @@
           {% else %}
              {{ standardApiErrorText() }}
           {% endif %}
-        </p>
+        </dd>
       {% endset %}
 
       {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
@@ -39,49 +39,16 @@
         {% set coworkingPrisonOffenderManager = standardApiErrorText() %}
       {% endif %}
 
-      {{ govukSummaryList({
-          classes: 'govuk-summary-list--no-border',
-          rows: [
-            {
-              key: {
-                text: "Key worker"
-              },
-              value: {
-                html: keyWorkerHtml
-              }
-            },
-            {
-              key: {
-                text: "Prison Offender Manager"
-              },
-              value: {
-                text: prisonOffenderManager,
-                attributes: {
-                    "data-qa": "primary-pom-name"
-                }
-              }
-            },
-            {
-              key: {
-                text: "Co-working Prison Offender Manager"
-              },
-              value: {
-                text: coworkingPrisonOffenderManager,
-                attributes: {
-                    "data-qa": "secondary-pom-name"
-                }
-              }
-            },
-            {
-              key: {
-                text: "Community Offender Manager"
-              },
-              value: {
-                text: communityOffenderManager
-              }
-            }
-          ] | summaryListOneHalfWidth
-        }) }}
+      <dl>
+          <dt data-qa="keyworker-label">Key worker</dt>
+          {{ keyWorkerHtml | safe }}
+          <dt data-qa="primary-pom-label">Prison Offender Manager</dt>
+          <dd data-qa="primary-pom-name">{{ prisonOffenderManager }}</dd>
+          <dt data-qa="secondary-pom-label">Co-working Prison Offender Manager</dt>
+          <dd data-qa="secondary-pom-name">{{ coworkingPrisonOffenderManager }}</dd>
+          <dt data-qa="com-label">Community Offender Manager</dt>
+          <dd data-qa="com-name">{{ communityOffenderManager }}</dd>
+      </dl>
     </div>
   </div>
   <div class="govuk-grid-row">

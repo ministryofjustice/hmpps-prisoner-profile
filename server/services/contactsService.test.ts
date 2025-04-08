@@ -4,24 +4,21 @@ import {
   PersonalRelationshipType,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import ContactsService from './contactsService'
-import { personalRelationshipsMock } from '../data/localMockData/personalRelationshipsApiMock'
+import { personalRelationshipsSocialMock } from '../data/localMockData/personalRelationshipsApiMock'
 
 describe('ContactsService', () => {
   let clientToken: string
   let prisonerNumber: string
   let personalRelationshipsApiClient: PersonalRelationshipsApiClient
   let contactsService: ContactsService
-  let apiErrorCallback: (error: Error) => void
 
   beforeEach(() => {
     clientToken = 'CLIENT_TOKEN'
     prisonerNumber = 'A1234AA'
 
     personalRelationshipsApiClient = {
-      getContacts: jest.fn(async () => personalRelationshipsMock),
+      getContacts: jest.fn(async () => personalRelationshipsSocialMock),
     }
-
-    apiErrorCallback = jest.fn()
 
     const personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient> = jest
       .fn()
@@ -36,46 +33,27 @@ describe('ContactsService', () => {
 
   describe('getContactsCount', () => {
     it('should call the API client with the correct parameters', async () => {
-      personalRelationshipsApiClient.getContacts = jest.fn(async () => personalRelationshipsMock)
+      personalRelationshipsApiClient.getContacts = jest.fn(async () => personalRelationshipsSocialMock)
+      const expected = {
+        social: 1,
+        official: 1,
+      }
 
-      const result = await contactsService.getContactsCount(clientToken, prisonerNumber, apiErrorCallback)
+      const result = await contactsService.getExternalContactsCount(clientToken, prisonerNumber)
 
       expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(
         prisonerNumber,
         PersonalRelationshipType.Official,
+        0,
         1,
       )
       expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(
         prisonerNumber,
         PersonalRelationshipType.Social,
+        0,
         1,
       )
-      expect(result.social.isFulfilled()).toBeTruthy()
-      expect(result.social.getOrNull()).toEqual(1)
-      expect(result.official.isFulfilled()).toBeTruthy()
-      expect(result.official.getOrNull()).toEqual(1)
+      expect(result).toEqual(expected)
     })
-  })
-
-  it('should handle personal relationship API failure', async () => {
-    const error = Error('some error')
-    personalRelationshipsApiClient.getContacts = jest.fn(async () => Promise.reject(error))
-
-    const result = await contactsService.getContactsCount(clientToken, prisonerNumber, apiErrorCallback)
-
-    expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(
-      prisonerNumber,
-      PersonalRelationshipType.Official,
-      1,
-    )
-    expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(
-      prisonerNumber,
-      PersonalRelationshipType.Social,
-      1,
-    )
-    expect(result.social.isFulfilled()).toBeFalsy()
-    expect(result.social.getOrHandle(e => e)).toEqual(error)
-    expect(result.official.isFulfilled()).toBeFalsy()
-    expect(result.official.getOrHandle(e => e)).toEqual(error)
   })
 })

@@ -3,11 +3,10 @@ import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipType,
 } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
-import { Result } from '../utils/result/result'
 
-interface ContactsCount {
-  official: Result<number>
-  social: Result<number>
+export interface ExternalContactsCount {
+  official: number
+  social: number
 }
 
 export default class ContactsService {
@@ -15,27 +14,23 @@ export default class ContactsService {
     private readonly personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
   ) {}
 
-  async getContactsCount(
-    clientToken: string,
-    prisonerNumber: string,
-    apiErrorCallback: (error: Error) => void = () => null,
-  ): Promise<ContactsCount> {
+  async getExternalContactsCount(clientToken: string, prisonerNumber: string): Promise<ExternalContactsCount> {
+    const firstPage = 0
     const minimalPageSize = 1
     const personalRelationshipsApi = this.personalRelationshipsApiClientBuilder(clientToken)
 
     const [officialContactInfo, socialContactInfo] = await Promise.all([
-      Result.wrap(
-        personalRelationshipsApi.getContacts(prisonerNumber, PersonalRelationshipType.Official, minimalPageSize),
-        apiErrorCallback,
+      personalRelationshipsApi.getContacts(
+        prisonerNumber,
+        PersonalRelationshipType.Official,
+        firstPage,
+        minimalPageSize,
       ),
-      Result.wrap(
-        personalRelationshipsApi.getContacts(prisonerNumber, PersonalRelationshipType.Social, minimalPageSize),
-        apiErrorCallback,
-      ),
+      personalRelationshipsApi.getContacts(prisonerNumber, PersonalRelationshipType.Social, firstPage, minimalPageSize),
     ])
     return {
-      official: officialContactInfo.map(info => info.page.totalElements ?? 0),
-      social: socialContactInfo.map(info => info.page.totalElements ?? 0),
+      official: officialContactInfo?.page?.totalElements ?? 0,
+      social: socialContactInfo?.page?.totalElements ?? 0,
     }
   }
 }

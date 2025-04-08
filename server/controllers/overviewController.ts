@@ -82,6 +82,7 @@ export default class OverviewController {
       offencesOverview,
       nonAssociationSummary,
       currentCsipDetail,
+      externalContactsSummary,
     ] = await Promise.all([
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
@@ -114,6 +115,10 @@ export default class OverviewController {
       isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), res.locals.apiErrorCallback)
         : null,
+      Result.wrap(
+        this.contactsService.getExternalContactsCount(clientToken, prisonerNumber),
+        res.locals.apiErrorCallback,
+      ),
     ])
 
     const overviewActions = buildOverviewActions(
@@ -163,6 +168,7 @@ export default class OverviewController {
         conditionalReleaseDate: prisonerData.conditionalReleaseDate,
       },
       nonAssociationSummary,
+      externalContactsSummary,
       options: {
         showCourtCaseSummary,
       },
