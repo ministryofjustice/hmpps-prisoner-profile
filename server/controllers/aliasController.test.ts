@@ -10,6 +10,12 @@ import { PseudonymResponseMock } from '../data/localMockData/personIntegrationAp
 import { FlashMessageType } from '../data/enums/flashMessageType'
 import ReferenceDataService from '../services/referenceData/referenceDataService'
 import { ethnicityCodesMock } from '../data/localMockData/personIntegrationApi/referenceDataMocks'
+import {
+  getEthnicBackgroundRadioOptions,
+  getEthnicGroupDescription,
+  getEthnicGroupDescriptionForHeading,
+  getEthnicGroupRadioOptions,
+} from './utils/alias/ethnicityUtils'
 
 describe('Alias Controller', () => {
   let req: Request
@@ -674,15 +680,7 @@ describe('Alias Controller', () => {
           prisonerNumber: 'G6123VU',
           prisonerName: 'Saunders, John',
         },
-        options: [
-          { text: 'White', value: 'white', checked: true },
-          { text: 'Mixed or multiple ethnic groups', value: 'mixed' },
-          { text: 'Asian or Asian British', value: 'asian' },
-          { text: 'Black, Black British, Caribbean or African', value: 'black' },
-          { text: 'Other ethnic group', value: 'other' },
-          { divider: 'or' },
-          { text: 'They prefer not to say', value: 'NS', checked: false },
-        ],
+        options: getEthnicGroupRadioOptions(ethnicityCodesMock, 'W1'),
         submitButtonText: 'Continue',
         errors: [],
       })
@@ -758,6 +756,123 @@ describe('Alias Controller', () => {
           updated: 'NS',
         },
       })
+    })
+  })
+
+  describe.each([
+    ['white', 'W2'],
+    ['mixed', 'M2'],
+    ['asian', 'A2'],
+    ['black', 'B2'],
+    ['other', 'O2'],
+  ])('Change ethnic background for group: %s', (ethnicGroup: string, ethicityCodeSubmitted: string) => {
+    const description = getEthnicGroupDescription(ethnicGroup)
+    const headingDescription = getEthnicGroupDescriptionForHeading(ethnicGroup)
+
+    it('should render the change ethnic background page', async () => {
+      await controller.displayChangeEthnicBackground(ethnicGroup)(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/edit/radioField', {
+        pageTitle: `${description} - Prisoner personal details`,
+        backLink: '/prisoner/G6123VU/personal/ethnic-group',
+        formTitle: `Which of the following best describes John Saunders’ ${headingDescription} background?`,
+        breadcrumbPrisonerName: 'Saunders, John',
+        prisonerNumber: 'G6123VU',
+        miniBannerData: {
+          prisonerNumber: 'G6123VU',
+          prisonerName: 'Saunders, John',
+        },
+        // This is tested separately in `ethnicityUtils.test.ts`:
+        options: getEthnicBackgroundRadioOptions(ethnicGroup, ethnicityCodesMock, 'W1'),
+        errors: [],
+      })
+    })
+
+    it('Populates the errors from the flash', async () => {
+      req = {
+        ...req,
+        flash: (key: string): any => {
+          if (key === 'errors') return ['error']
+          return []
+        },
+      } as any
+
+      await controller.displayChangeEthnicBackground(ethnicGroup)(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ errors: ['error'] }))
+    })
+
+    it('Sends a page view audit event', async () => {
+      await controller.displayChangeEthnicBackground(ethnicGroup)(req, res, next)
+
+      expect(auditService.sendPageView).toHaveBeenCalledWith({
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        prisonId: PrisonerMockDataA.prisonId,
+        correlationId: req.id,
+        page: Page.EditEthnicBackground,
+      })
+    })
+
+    it('submits the ethnicity change', async () => {
+      req = { ...req, body: { radioField: ethicityCodeSubmitted } } as unknown as Request
+
+      await controller.submitChangeEthnicBackground(ethnicGroup)(req, res, next)
+
+      expect(aliasService.updateEthnicity).toHaveBeenCalledWith(
+        expect.anything(),
+        prisonUserMock,
+        PrisonerMockDataA.prisonerNumber,
+        ethicityCodeSubmitted,
+      )
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/prisoner/${PrisonerMockDataA.prisonerNumber}/personal#personal-details`,
+      )
+
+      expect(req.flash).toHaveBeenCalledWith('flashMessage', {
+        text: 'Ethnic group updated',
+        type: FlashMessageType.success,
+        fieldName: 'ethnicity',
+      })
+    })
+
+    it('Submission handles API errors', async () => {
+      req = { ...req, body: { radioField: ethicityCodeSubmitted } } as unknown as Request
+
+      aliasService.updateEthnicity = async () => {
+        throw new Error()
+      }
+
+      await controller.submitChangeEthnicBackground(ethnicGroup)(req, res, next)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', [{ text: expect.anything() }])
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${PrisonerMockDataA.prisonerNumber}/personal/${ethnicGroup}`)
+    })
+
+    it('Sends a post success audit event', async () => {
+      req = { ...req, body: { radioField: ethicityCodeSubmitted } } as unknown as Request
+
+      aliasService.updateEthnicity = jest.fn().mockResolvedValue({
+        ...PseudonymResponseMock,
+        ethnicity: { code: ethicityCodeSubmitted },
+      })
+
+      await controller.submitChangeEthnicBackground(ethnicGroup)(req, res, next)
+
+      const expectedAuditEvent = {
+        user: prisonUserMock,
+        prisonerNumber: PrisonerMockDataA.prisonerNumber,
+        correlationId: req.id,
+        action: PostAction.EditEthnicBackground,
+        details: {
+          fieldName: 'ethnicity',
+          previous: 'W1',
+          updated: ethicityCodeSubmitted,
+        },
+      }
+
+      expect(auditService.sendPostSuccess).toHaveBeenCalledWith(expectedAuditEvent)
     })
   })
 })
