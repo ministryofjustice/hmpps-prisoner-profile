@@ -80,6 +80,34 @@ export default class AliasService {
     return response
   }
 
+  async updateEthnicity(clientToken: string, user: PrisonUser, prisonerNumber: string, ethnicity: string) {
+    const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
+    const existingWorkingName = await this.getWorkingNameAlias(clientToken, prisonerNumber)
+
+    if (!existingWorkingName) throw new NotFoundError('Existing working name not found')
+
+    const response = personIntegrationApiClient.updatePseudonym(existingWorkingName.sourceSystemId, {
+      isWorkingName: true,
+      firstName: existingWorkingName.firstName,
+      middleName1: existingWorkingName.middleName1,
+      middleName2: existingWorkingName.middleName2,
+      lastName: existingWorkingName.lastName,
+      sex: existingWorkingName.sex?.code,
+      nameType: existingWorkingName.nameType?.code,
+      title: existingWorkingName.title?.code,
+      dateOfBirth: existingWorkingName.dateOfBirth,
+      ethnicity,
+    })
+
+    this.metricsService.trackPersonIntegrationUpdate({
+      fieldsUpdated: ['ethnicity'],
+      prisonerNumber,
+      user,
+    })
+
+    return response
+  }
+
   async createNewWorkingName(clientToken: string, user: PrisonUser, prisonerNumber: string, name: Name) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
     const existingWorkingName = await this.getWorkingNameAlias(clientToken, prisonerNumber)

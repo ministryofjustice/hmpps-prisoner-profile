@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { apostrophe, formatName } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
@@ -8,10 +8,18 @@ import AliasService, { Name } from '../services/aliasService'
 import { requestBodyFromFlash } from '../utils/requestBodyFromFlash'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import {
+  CorePersonRecordReferenceDataDomain,
   PseudonymRequestDto,
   PseudonymResponseDto,
 } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
 import { dateToIsoDate } from '../utils/dateHelpers'
+import {
+  getEthnicBackgroundRadioOptions,
+  getEthnicGroupDescription,
+  getEthnicGroupDescriptionForHeading,
+  getEthnicGroupRadioOptions,
+} from './utils/alias/ethnicityUtils'
+import ReferenceDataService from '../services/referenceData/referenceDataService'
 
 interface DateOfBirthForm {
   'dateOfBirth-year': string
@@ -22,6 +30,7 @@ interface DateOfBirthForm {
 export default class AliasController {
   constructor(
     private readonly aliasService: AliasService,
+    private readonly referenceDataService: ReferenceDataService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -113,8 +122,8 @@ export default class AliasController {
 
   public displayAddNewAlias(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
       const formValues = requestBodyFromFlash<DateOfBirthForm | { sex: string }>(req) || {
@@ -206,8 +215,8 @@ export default class AliasController {
 
   public displayChangeDateOfBirth(): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const currentWorkingName = await this.aliasService.getWorkingNameAlias(req.middleware.clientToken, prisonerNumber)
+      const { clientToken, prisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const currentWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
       const errors = req.flash('errors')
 
       const formValues = requestBodyFromFlash<DateOfBirthForm>(req) || {
@@ -289,6 +298,166 @@ export default class AliasController {
         req.flash('errors', [{ text: 'There was an error please try again' }])
         req.flash('requestBody', JSON.stringify(req.body))
         return res.redirect(`/prisoner/${prisonerNumber}/personal/date-of-birth`)
+      }
+    }
+  }
+
+  public displayChangeEthnicGroup(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const errors = req.flash('errors')
+      const [currentWorkingName, ethnicityReferenceDataCodes] = await Promise.all([
+        this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber),
+        this.referenceDataService.getActiveReferenceDataCodes(
+          CorePersonRecordReferenceDataDomain.ethnicity,
+          clientToken,
+        ),
+      ])
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditEthnicGroup,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/radioField', {
+        pageTitle: `Ethnic group - Prisoner personal details`,
+        formTitle: `What is ${apostrophe(titlePrisonerName)} ethnic group?`,
+        hintText: `Choose the group which best describes this person’s ethnic group. You'll need to select a more detailed ethnic group on the next page.`,
+        submitButtonText: 'Continue',
+        options: getEthnicGroupRadioOptions(ethnicityReferenceDataCodes, currentWorkingName.ethnicity?.code),
+        errors,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerName,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+        },
+      })
+    }
+  }
+
+  public submitChangeEthnicGroup(): RequestHandler {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const { prisonerNumber } = this.getCommonRequestData(req)
+      const { radioField: ethnicGroup } = req.body
+
+      if (!ethnicGroup) {
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      }
+
+      this.auditService
+        .sendPostSuccess({
+          user: res.locals.user,
+          prisonerNumber,
+          correlationId: req.id,
+          action: PostAction.EditEthnicGroup,
+          details: { ethnicGroup },
+        })
+        .catch(error => logger.error(error))
+
+      if (ethnicGroup === 'NS') {
+        req.params.group = 'NS'
+        return this.submitChangeEthnicBackground()(req, res, next)
+      }
+
+      return res.redirect(`/prisoner/${prisonerNumber}/personal/${ethnicGroup}`)
+    }
+  }
+
+  public displayChangeEthnicBackground(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { group } = req.params
+      const errors = req.flash('errors')
+
+      const [currentWorkingName, ethnicityReferenceDataCodes] = await Promise.all([
+        this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber),
+        this.referenceDataService.getActiveReferenceDataCodes(
+          CorePersonRecordReferenceDataDomain.ethnicity,
+          clientToken,
+        ),
+      ])
+
+      this.auditService
+        .sendPageView({
+          user: res.locals.user,
+          prisonerNumber,
+          prisonId,
+          correlationId: req.id,
+          page: Page.EditEthnicBackground,
+        })
+        .catch(error => logger.error(error))
+
+      return res.render('pages/edit/radioField', {
+        pageTitle: `${getEthnicGroupDescription(group)} - Prisoner personal details`,
+        formTitle: `Which of the following best describes ${apostrophe(titlePrisonerName)} ${getEthnicGroupDescriptionForHeading(group)} background?`,
+        backLink: `/prisoner/${prisonerNumber}/personal/ethnic-group`,
+        options: getEthnicBackgroundRadioOptions(
+          group,
+          ethnicityReferenceDataCodes,
+          currentWorkingName.ethnicity?.code,
+        ),
+        errors,
+        prisonerNumber,
+        breadcrumbPrisonerName: prisonerName,
+        miniBannerData: {
+          prisonerNumber,
+          prisonerName,
+        },
+      })
+    }
+  }
+
+  public submitChangeEthnicBackground(): RequestHandler {
+    return async (req: Request, res: Response) => {
+      const { clientToken, prisonerNumber } = this.getCommonRequestData(req)
+      const { group } = req.params
+      const { radioField: ethnicBackground } = req.body
+
+      if (!ethnicBackground) {
+        req.flash('errors', [{ href: '#radio', text: `Select an ethnic group` }])
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${group}`)
+      }
+
+      try {
+        const previousWorkingName = await this.aliasService.getWorkingNameAlias(clientToken, prisonerNumber)
+        const result = await this.aliasService.updateEthnicity(
+          clientToken,
+          res.locals.user as PrisonUser,
+          prisonerNumber,
+          ethnicBackground,
+        )
+
+        req.flash('flashMessage', {
+          text: 'Ethnic group updated',
+          type: FlashMessageType.success,
+          fieldName: 'ethnicity',
+        })
+
+        this.auditService
+          .sendPostSuccess({
+            user: res.locals.user,
+            prisonerNumber,
+            correlationId: req.id,
+            action: PostAction.EditEthnicBackground,
+            details: {
+              fieldName: 'ethnicity',
+              previous: previousWorkingName.ethnicity?.code,
+              updated: result.ethnicity?.code,
+            },
+          })
+          .catch(error => logger.error(error))
+
+        return res.redirect(`/prisoner/${prisonerNumber}/personal#personal-details`)
+      } catch (e) {
+        req.flash('errors', [{ text: 'There was an error please try again' }])
+        req.flash('requestBody', JSON.stringify(req.body))
+        return res.redirect(`/prisoner/${prisonerNumber}/personal/${group}`)
       }
     }
   }

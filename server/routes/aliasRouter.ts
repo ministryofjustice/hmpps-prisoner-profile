@@ -11,7 +11,13 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
   const get = getRequest(router)
   const post = postRequest(router)
 
-  const aliasController = new AliasController(services.aliasService, services.auditService)
+  const ethnicGroups = ['white', 'mixed', 'asian', 'black', 'other'].join('|')
+
+  const aliasController = new AliasController(
+    services.aliasService,
+    services.referenceDataService,
+    services.auditService,
+  )
 
   get('/change-name', editProfileChecks(), aliasController.displayChangeNamePurpose())
   post('/change-name', editProfileChecks(), aliasController.submitChangeNamePurpose())
@@ -34,6 +40,11 @@ export default function aliasRouter(services: Services, editProfileChecks: () =>
     ),
     aliasController.submitChangeDateOfBirth(),
   )
+
+  get('/ethnic-group', editProfileChecks(), aliasController.displayChangeEthnicGroup())
+  post('/ethnic-group', editProfileChecks(), aliasController.submitChangeEthnicGroup())
+  get(`/:group(${ethnicGroups})`, editProfileChecks(), aliasController.displayChangeEthnicBackground())
+  post(`/:group(${ethnicGroups})`, editProfileChecks(), aliasController.submitChangeEthnicBackground())
 
   get('/enter-corrected-name', editProfileChecks(), aliasController.displayChangeNameCorrection())
   post(
