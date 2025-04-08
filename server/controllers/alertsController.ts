@@ -25,13 +25,13 @@ export default class AlertsController {
 
   public async displayAlerts(req: Request, res: Response, next: NextFunction, isActive: boolean) {
     // Get data from middleware
-    const { prisonerData, inmateDetail, alertSummaryData, permissions } = req.middleware
+    const { prisonerData, inmateDetail, alertSummaryData } = req.middleware
 
     if (alertSummaryData.apiUnavailable) {
       // Render banner
       return res.render('pages/alerts/alertsPage', {
         pageTitle: 'Alerts',
-        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, permissions, res.locals.user, 'alerts'),
+        ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
       })
     }
 
@@ -97,7 +97,7 @@ export default class AlertsController {
     // Render page
     return res.render('pages/alerts/alertsPage', {
       pageTitle: 'Alerts',
-      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, permissions, res.locals.user, 'alerts'),
+      ...mapHeaderData(prisonerData, inmateDetail, alertSummaryData, res.locals.user, 'alerts'),
       ...alertsPageData,
       alertsList,
       showingAll,
