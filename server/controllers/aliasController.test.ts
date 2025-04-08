@@ -680,6 +680,7 @@ describe('Alias Controller', () => {
           prisonerNumber: 'G6123VU',
           prisonerName: 'Saunders, John',
         },
+        // This is tested separately in `ethnicityUtils.test.ts`:
         options: getEthnicGroupRadioOptions(ethnicityCodesMock, 'W1'),
         submitButtonText: 'Continue',
         errors: [],

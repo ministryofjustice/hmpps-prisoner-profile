@@ -34,7 +34,7 @@ context('Change ethnic group', () => {
   })
 
   context('Permissions', () => {
-    it('Shows change name link on the personal page if they have permissions', () => {
+    it('Shows edit link on the personal page if they have permissions', () => {
       cy.signIn({ failOnStatusCode: false, redirectPath: '/prisoner/G6123VU/personal' })
       cy.get(`a[href="personal/ethnic-group"]`).should('exist')
     })
@@ -54,7 +54,7 @@ context('Change ethnic group', () => {
     })
   })
 
-  context("Can select a reason for changing the prisoner's name", () => {
+  context('Can select an ethnic group', () => {
     beforeEach(() => {
       page = visitChangeEthnicGroupPage()
     })
