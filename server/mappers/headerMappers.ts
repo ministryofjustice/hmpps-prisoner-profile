@@ -11,10 +11,10 @@ import {
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import config from '../config'
 import { Role } from '../data/enums/role'
+import { canViewCaseNotes } from '../utils/roleHelpers'
 import InmateDetail from '../data/interfaces/prisonApi/InmateDetail'
 import { HmppsUser } from '../interfaces/HmppsUser'
 import { AlertSummaryData } from '../data/interfaces/alertsApi/Alert'
-import { Permissions } from '../services/permissionsService'
 
 export function mapProfileBannerTopLinks(prisonerData: Prisoner, inmateDetail: InmateDetail, user: HmppsUser) {
   const { userRoles } = user
@@ -89,12 +89,11 @@ export function mapHeaderData(
   prisonerData: Prisoner,
   inmateDetail: InmateDetail,
   alertSummaryData: AlertSummaryData,
-  permissions: Permissions,
   user?: HmppsUser,
   pageId?: string,
   hideBanner?: boolean,
 ) {
-  const tabs = tabLinks(prisonerData.prisonerNumber, permissions.caseNotes?.view)
+  const tabs = tabLinks(prisonerData.prisonerNumber, canViewCaseNotes(user, prisonerData))
 
   if (pageId && tabs.find(tab => tab.id === pageId)) {
     tabs.find(tab => tab.id === pageId).active = true

@@ -28,13 +28,13 @@ describe('getCaseNotesAccessStatusCode.ts', () => {
     ${userMDI} | ${prisonerOUT}           | ${[]}                                | ${HmppsStatusCode.PRISONER_IS_RELEASED}
     ${userMDI} | ${prisonerOUT}           | ${[Role.InactiveBookings]}           | ${HmppsStatusCode.OK}
     ${userMDI} | ${prisonerTRN}           | ${[]}                                | ${HmppsStatusCode.PRISONER_IS_TRANSFERRING}
-    ${userMDI} | ${prisonerTRN}           | ${[Role.GlobalSearch]}               | ${HmppsStatusCode.PRISONER_IS_TRANSFERRING}
-    ${userMDI} | ${prisonerTRN}           | ${[Role.GlobalSearch]}               | ${HmppsStatusCode.PRISONER_IS_TRANSFERRING}
+    ${userMDI} | ${prisonerTRN}           | ${[Role.GlobalSearch]}               | ${HmppsStatusCode.OK}
+    ${userMDI} | ${prisonerTRN}           | ${[Role.GlobalSearch]}               | ${HmppsStatusCode.OK}
     ${userMDI} | ${prisonerTRN}           | ${[Role.InactiveBookings]}           | ${HmppsStatusCode.OK}
     ${userLEI} | ${prisonerMDI}           | ${[]}                                | ${HmppsStatusCode.NOT_IN_CASELOAD}
     ${userLEI} | ${prisonerMDI}           | ${[Role.GlobalSearch]}               | ${HmppsStatusCode.NOT_IN_CASELOAD}
     ${userLEI} | ${prisonerMDI}           | ${[Role.PomUser]}                    | ${HmppsStatusCode.NOT_IN_CASELOAD}
-    ${userLEI} | ${prisonerMDI}           | ${[Role.PomUser, Role.GlobalSearch]} | ${HmppsStatusCode.NOT_IN_CASELOAD}
+    ${userLEI} | ${prisonerMDI}           | ${[Role.PomUser, Role.GlobalSearch]} | ${HmppsStatusCode.OK}
     ${userMDI} | ${prisonerMDI}           | ${[]}                                | ${HmppsStatusCode.OK}
   `(' User should receive correct access code', ({ user, prisoner, roles, expected }) => {
     const accessCode = getCaseNotesAccessStatusCode({ ...user, userRoles: [...roles, Role.PrisonUser] }, prisoner)

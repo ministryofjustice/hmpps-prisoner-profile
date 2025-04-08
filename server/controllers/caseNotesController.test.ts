@@ -65,7 +65,6 @@ describe('Case Notes Controller', () => {
             edit: false,
             delete: false,
           },
-          caseNotes: { view: true },
         },
       },
       path: 'case-notes',
@@ -118,7 +117,6 @@ describe('Case Notes Controller', () => {
         PrisonerMockDataA,
         inmateDetailMock,
         req.middleware.alertSummaryData,
-        req.middleware.permissions,
         res.locals.user,
         'case-notes',
       )
@@ -157,7 +155,6 @@ describe('Case Notes Controller', () => {
               edit: false,
               delete: false,
             },
-            caseNotes: { view: true },
           },
         },
       }

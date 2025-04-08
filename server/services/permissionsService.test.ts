@@ -261,13 +261,11 @@ describe('permissionsService', () => {
     it('should retrieve the sensitive case notes permissions if access code is HmppsStatusCode.OK', () => {
       ;(getCaseNotesAccessStatusCode as jest.Mock).mockReturnValue(HmppsStatusCode.OK)
       ;(getSensitiveCaseNotesPermissions as jest.Mock).mockReturnValue('sensitive case notes')
-      ;(getCaseNotesPermissions as jest.Mock).mockReturnValue('case notes')
 
       const permissions = service.getCaseNotesPermissions(prisonUserMock, PrisonerMockDataA)
 
       expect(permissions).toEqual({
         accessCode: HmppsStatusCode.OK,
-        caseNotes: 'case notes',
         sensitiveCaseNotes: 'sensitive case notes',
       })
     })
