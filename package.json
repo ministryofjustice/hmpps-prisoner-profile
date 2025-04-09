@@ -117,6 +117,7 @@
     "connect-flash": "^0.1.1",
     "connect-redis": "^7.1.1",
     "contentful": "^10.15.2",
+    "cropperjs": "^2.0.0",
     "csurf": "^1.11.0",
     "date-fns": "^3.6.0",
     "eslint-plugin-no-only-tests": "^3.3.0",
