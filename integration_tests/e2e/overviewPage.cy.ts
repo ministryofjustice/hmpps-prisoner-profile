@@ -230,6 +230,10 @@ context('Overview Page', () => {
         overviewPage.externalContacts().official().should('have.text', '2')
         overviewPage.externalContacts().socialHeading().should('have.text', 'Social')
         overviewPage.externalContacts().social().should('have.text', '1')
+        overviewPage
+          .externalContacts()
+          .link()
+          .contains('a[href="/prisoner/G6123VU/contacts/list"]', 'Social and official contacts')
       })
     })
 
@@ -813,6 +817,33 @@ context('Overview Page', () => {
         .externalContacts()
         .card()
         .should('contain.text', 'We cannot show these details right now. Try again later.')
+    })
+  })
+
+  context('Given external contacts is not yet enabled in the prison', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        prisonerDataOverrides: { prisonId: 'WYI' },
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'WYI',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
+      })
+      visitOverviewPage()
+    })
+
+    it('Does not display the external contacts summary', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.externalContacts().card().should('not.exist')
     })
   })
 })

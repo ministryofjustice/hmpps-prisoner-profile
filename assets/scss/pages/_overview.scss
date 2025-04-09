@@ -1,17 +1,6 @@
 .staff-contacts-card {
   dl {
-    margin-top: 0;
     margin-bottom: 8px;
-  }
-
-  dt {
-    @include govuk-responsive-margin(1, 'bottom');
-    @include govuk-font($size: 19, $weight: 'bold');
-  }
-
-  dd {
-    margin-left: 0;
-    @include govuk-responsive-margin(2, 'bottom');
   }
 }
 
@@ -42,12 +31,6 @@
 
   > .mini-card {
     flex: 1 1 260px;
-  }
-
-  &:has(> .mini-card:nth-of-type(3):last-child) {
-    > .mini-card {
-      flex: 1 1 auto;
-    }
   }
 }
 

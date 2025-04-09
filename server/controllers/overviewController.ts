@@ -30,6 +30,7 @@ import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
 import ContactsService from '../services/contactsService'
+import { externalContactsEnabled } from '../utils/featureToggles'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -115,10 +116,12 @@ export default class OverviewController {
       isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), res.locals.apiErrorCallback)
         : null,
-      Result.wrap(
-        this.contactsService.getExternalContactsCount(clientToken, prisonerNumber),
-        res.locals.apiErrorCallback,
-      ),
+      externalContactsEnabled(prisonId)
+        ? Result.wrap(
+            this.contactsService.getExternalContactsCount(clientToken, prisonerNumber),
+            res.locals.apiErrorCallback,
+          )
+        : null,
     ])
 
     const overviewActions = buildOverviewActions(

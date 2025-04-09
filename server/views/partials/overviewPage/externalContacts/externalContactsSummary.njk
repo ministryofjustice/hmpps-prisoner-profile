@@ -15,14 +15,14 @@
                 <div class="govuk-!-padding-top-3">
                     <dt class="govuk-!-font-weight-bold govuk-!-margin-bottom-2" data-qa="external-contacts-official">Official</dt>
                     <dd class="govuk-!-font-size-36 govuk-!-margin-left-0 govuk-!-margin-bottom-4" data-qa="external-contacts-official-count">{{ summary.official }}</dd>
-                    <dd class="govuk-!-margin-left-0" data-qa="external-contacts-link"><a href="{{ config.serviceUrls.nonAssociations }}/prisoner/{{ prisonerNumber }}/non-associations" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Social and official contacts</a></dd>
+                    <dd class="govuk-!-margin-left-0" data-qa="external-contacts-link"><a href="/prisoner/{{ prisonerNumber }}/contacts/list" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Social and official contacts</a></dd>
                 </div>
             </div>
         </dl>
     {% else %}
         <div class="hmpps-summary-card__unavailable-body" data-qa="external-contacts-summary-unavailable">
             <div class="hmpps-summary-card__unavailable-message">{{ standardApiErrorText() }}</div>
-            <div><a href="{{ config.serviceUrls.nonAssociations }}/prisoner/{{ prisonerNumber }}/non-associations" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Social and official contacts</a></div>
+            <div><a href="/prisoner/{{ prisonerNumber }}/contacts/list" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">Social and official contacts</a></div>
         </div>
     {% endif %}
 

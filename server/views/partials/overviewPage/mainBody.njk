@@ -1,6 +1,9 @@
 {% from "./macros/statusListMacro.njk" import statusList %}
 {% from "./miniSummaryBoxes/macro.njk" import  miniSummaryMacro %}
 {% from "../../components/miniCard/miniCard.njk" import  miniCard %}
+
+{% set showExternalContacts = externalContactsEnabled(prisonId) %}
+
 <div class="govuk-grid-row">
   <section class="govuk-grid-column-full" aria-label="Status List">
     {{ statusList(statuses) }}
@@ -35,10 +38,12 @@
   </div>
 </div>
 <div class="govuk-grid-row hmpps-miniSummaryWrapper">
-  <div class="govuk-grid-column-one-third">
-    {% include "./externalContacts/externalContactsSummary.njk" %}
-  </div>
-  <div class="govuk-grid-column-two-thirds hmpps-full-width-print">
+  {% if showExternalContacts %}
+    <div class="govuk-grid-column-one-third">
+      {% include "./externalContacts/externalContactsSummary.njk" %}
+    </div>
+  {% endif %}
+  <div class="hmpps-full-width-print govuk-grid-column-{% if showExternalContacts %}two-thirds{% else %}full{% endif %}">
     {% if isYouthPrisoner %}
       {% include "./staffContacts/staffContactsYouthEstate.njk" %}
     {% else %}

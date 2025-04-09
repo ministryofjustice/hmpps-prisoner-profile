@@ -91,14 +91,15 @@ export default class OverviewPage extends Page {
       official: (): PageElement => card().findDataQa('external-contacts-official-count'),
       socialHeading: (): PageElement => card().findDataQa('external-contacts-social'),
       social: (): PageElement => card().findDataQa('external-contacts-social-count'),
+      link: (): PageElement => card().findDataQa('external-contacts-link'),
     }
   }
 
   staffContacts = (): PageElement => cy.get('[data-qa=staff-contacts]')
 
-  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dd[data-qa=primary-pom-name]')
+  primaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(2) dd')
 
-  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dd[data-qa=secondary-pom-name]')
+  secondaryPomName = (): PageElement => cy.get('[data-qa=staff-contacts] dl div:nth-child(3) dd')
 
   schedule = () => ({
     morning: () => ({

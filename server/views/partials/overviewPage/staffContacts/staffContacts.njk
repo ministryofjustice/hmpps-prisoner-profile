@@ -2,60 +2,93 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- call summaryCard({title: "Staff contacts"}) -%}
 
-  <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
+        <div class="govuk-grid-column-full">
 
-      {% set keyWorkerHtml %}
-        <dd class="govuk-body" data-qa="keyworker-details">
-          {% if staffContacts.keyWorker.status === 'fulfilled' %}
-            {% set keyWorker = staffContacts.keyWorker.value %}
-            {{ keyWorker.name }}
-            {% if(keyWorker.lastSession) %}
-              - last session: {{ keyWorker.lastSession  }}
+            {% set keyWorkerHtml %}
+                <p class="govuk-body" data-qa="keyworker-details">
+                    {% if staffContacts.keyWorker.status === 'fulfilled' %}
+                        {% set keyWorker = staffContacts.keyWorker.value %}
+                        {{ keyWorker.name }}
+                        {% if(keyWorker.lastSession) %}
+                            - last session: {{ keyWorker.lastSession  }}
+                        {% else %}
+                            - No previous session
+                        {% endif %}
+                    {% else %}
+                        {{ standardApiErrorText() }}
+                    {% endif %}
+                </p>
+            {% endset %}
+
+            {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
+                {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
             {% else %}
-               - No previous session
+                {% set communityOffenderManager = standardApiErrorText() %}
             {% endif %}
-          {% else %}
-             {{ standardApiErrorText() }}
-          {% endif %}
-        </dd>
-      {% endset %}
 
-      {% if staffContacts.communityOffenderManager.status === 'fulfilled' %}
-        {% set communityOffenderManager = staffContacts.communityOffenderManager.value %}
-      {% else %}
-        {% set communityOffenderManager = standardApiErrorText() %}
-      {% endif %}
+            {% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
+                {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
+            {% else %}
+                {% set prisonOffenderManager = standardApiErrorText() %}
+            {% endif %}
 
-      {% if staffContacts.prisonOffenderManager.status === 'fulfilled' %}
-        {% set prisonOffenderManager = staffContacts.prisonOffenderManager.value or 'Not assigned' %}
-      {% else %}
-        {% set prisonOffenderManager = standardApiErrorText() %}
-      {% endif %}
+            {% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
+                {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
+            {% else %}
+                {% set coworkingPrisonOffenderManager = standardApiErrorText() %}
+            {% endif %}
 
-      {% if staffContacts.coworkingPrisonOffenderManager.status === 'fulfilled' %}
-        {% set coworkingPrisonOffenderManager = staffContacts.coworkingPrisonOffenderManager.value or 'Not assigned' %}
-      {% else %}
-        {% set coworkingPrisonOffenderManager = standardApiErrorText() %}
-      {% endif %}
-
-      <dl>
-          <dt data-qa="keyworker-label">Key worker</dt>
-          {{ keyWorkerHtml | safe }}
-          <dt data-qa="primary-pom-label">Prison Offender Manager</dt>
-          <dd data-qa="primary-pom-name">{{ prisonOffenderManager }}</dd>
-          <dt data-qa="secondary-pom-label">Co-working Prison Offender Manager</dt>
-          <dd data-qa="secondary-pom-name">{{ coworkingPrisonOffenderManager }}</dd>
-          <dt data-qa="com-label">Community Offender Manager</dt>
-          <dd data-qa="com-name">{{ communityOffenderManager }}</dd>
-      </dl>
+            {{ govukSummaryList({
+                classes: 'govuk-summary-list--no-border',
+                rows: [
+                    {
+                        key: {
+                        text: "Key worker"
+                    },
+                        value: {
+                        html: keyWorkerHtml
+                    }
+                    },
+                    {
+                        key: {
+                        text: "Prison Offender Manager"
+                    },
+                        value: {
+                        text: prisonOffenderManager,
+                        attributes: {
+                            "data-qa": "primary-pom-name"
+                        }
+                    }
+                    },
+                    {
+                        key: {
+                        text: "Co-working Prison Offender Manager"
+                    },
+                        value: {
+                        text: coworkingPrisonOffenderManager,
+                        attributes: {
+                            "data-qa": "secondary-pom-name"
+                        }
+                    }
+                    },
+                    {
+                        key: {
+                        text: "Community Offender Manager"
+                    },
+                        value: {
+                        text: communityOffenderManager
+                    }
+                    }
+                ] | summaryListOneHalfWidth
+            }) }}
+        </div>
     </div>
-  </div>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <p class="govuk-body">
-        <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/professional-contacts">Professional contacts</a>
-      </p>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <p class="govuk-body">
+                <a class="govuk-link--no-visited-state govuk-!-display-none-print" href="/prisoner/{{ prisonerNumber }}/professional-contacts">Professional contacts</a>
+            </p>
+        </div>
     </div>
-  </div>
 {%- endcall -%}

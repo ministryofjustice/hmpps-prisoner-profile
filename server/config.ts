@@ -366,5 +366,7 @@ export default {
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
+    externalContactsEnabled: toBoolean(get('EXTERNAL_CONTACTS_ENABLED', 'false')),
+    externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
   },
 }
