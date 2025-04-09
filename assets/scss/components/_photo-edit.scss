@@ -37,6 +37,13 @@
       max-width: 250px;
     }
   }
+
+  &__photo-preview {
+    img {
+      width: 427px;
+      height: 570px;
+    }
+  }
 }
 
 .hmpps-withheld-photo {
