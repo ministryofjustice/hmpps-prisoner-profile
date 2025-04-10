@@ -48,7 +48,7 @@
 
                 <form id="otherLanguagesForm" method="post" novalidate="novalidate" autocomplete="off">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-                    <input type="hidden" id="languageError" name="languageError" value="" />
+                    <input type="hidden" id="languageError" name="languageError" value="{{ invalidInput }}" />
 
                     {{ govukSelect({
                         id: "language",

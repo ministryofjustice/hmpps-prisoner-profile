@@ -5,10 +5,8 @@ import logger from '../../logger'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
 import LanguagesService from '../services/languagesService'
 import {
-  LanguagePreferencesDto,
   LanguagePreferencesRequest,
   PersonCommunicationNeedsReferenceDataDomain,
-  SecondaryLanguageDto,
   SecondaryLanguageRequest,
 } from '../data/interfaces/personCommunicationNeedsApi/personCommunicationNeedsApiClient'
 import { PrisonUser } from '../interfaces/HmppsUser'
@@ -27,6 +25,8 @@ export default class LanguagesController {
       const { prisonerName, naturalPrisonerName, prisonerNumber, prisonId, clientToken } =
         this.getCommonRequestData(req)
       const errors = req.flash('errors')
+      const spokenInvalidInput = req.flash('spokenInvalidInput')
+      const writtenInvalidInput = req.flash('writtenInvalidInput')
       const requestBodyFlash = requestBodyFromFlash<LanguagePreferencesRequest>(req)
 
       const [communicationNeeds, languageReferenceCodes] = await Promise.all([
@@ -39,6 +39,10 @@ export default class LanguagesController {
         preferredWrittenLanguageCode: communicationNeeds.languagePreferences?.preferredWrittenLanguage?.code,
         interpreterRequired: communicationNeeds.languagePreferences?.interpreterRequired,
       }
+
+      languageReferenceCodes.language = languageReferenceCodes.language?.filter(
+        lang => !communicationNeeds.secondaryLanguages.some(secLang => secLang.language.code === lang.code),
+      )
 
       const preferredSpokenLanguageOptions = [
         { value: undefined, text: '' },
@@ -75,6 +79,8 @@ export default class LanguagesController {
         mainLanguageLabel: `What is ${apostrophe(naturalPrisonerName)} main spoken language?`,
         formValues,
         errors,
+        spokenInvalidInput,
+        writtenInvalidInput,
         miniBannerData: {
           prisonerNumber,
           prisonerName,
@@ -109,13 +115,13 @@ export default class LanguagesController {
 
       const errors = req.errors || []
 
-      const { secondaryLanguages } = await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
-
-      this.validateLanguagePreferencesRequest(formValues, secondaryLanguages, errors)
+      const { spokenInvalidInput, writtenInvalidInput } = this.validateLanguagePreferencesRequest(formValues, errors)
 
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(formValues))
         req.flash('errors', errors)
+        req.flash('spokenInvalidInput', spokenInvalidInput)
+        req.flash('writtenInvalidInput', writtenInvalidInput)
         return res.redirect(`/prisoner/${prisonerNumber}/personal/main-language`)
       }
 
@@ -156,12 +162,21 @@ export default class LanguagesController {
         this.getCommonRequestData(req)
       const { languageCode } = req.params
       const errors = req.flash('errors')
+      const invalidInput = req.flash('invalidInput')
       const requestBodyFlash = requestBodyFromFlash<SecondaryLanguageRequest>(req)
 
       const [communicationNeeds, languageReferenceCodes] = await Promise.all([
         this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber),
         this.languagesService.getReferenceData(clientToken, [PersonCommunicationNeedsReferenceDataDomain.language]),
       ])
+
+      languageReferenceCodes.language = languageReferenceCodes.language?.filter(
+        lang =>
+          lang.code === languageCode ||
+          (!communicationNeeds.secondaryLanguages.some(secLang => secLang.language.code === lang.code) &&
+            lang.code !== communicationNeeds.languagePreferences?.preferredSpokenLanguage?.code &&
+            lang.code !== communicationNeeds.languagePreferences?.preferredWrittenLanguage?.code),
+      )
 
       const languageDto =
         languageCode && communicationNeeds.secondaryLanguages.find(lang => lang.language.code === languageCode)
@@ -194,6 +209,7 @@ export default class LanguagesController {
         languageLabel: `Which other languages does ${naturalPrisonerName} use?`,
         formValues,
         errors,
+        invalidInput,
         miniBannerData: {
           prisonerNumber,
           prisonerName,
@@ -222,21 +238,12 @@ export default class LanguagesController {
 
       const errors = req.errors || []
 
-      const communicationNeeds = await this.languagesService.getCommunicationNeeds(clientToken, prisonerNumber)
-      const secondaryLanguages = communicationNeeds.secondaryLanguages.filter(
-        lang => lang.language.code !== languageCode,
-      )
-
-      this.validateSecondaryLanguageRequest(
-        formValues,
-        communicationNeeds.languagePreferences,
-        secondaryLanguages,
-        errors,
-      )
+      const invalidInput = this.validateSecondaryLanguageRequest(formValues, languageCode, errors)
 
       if (errors.length) {
         req.flash('requestBody', JSON.stringify(formValues))
         req.flash('errors', errors)
+        req.flash('invalidInput', invalidInput)
         return res.redirect(
           `/prisoner/${prisonerNumber}/personal/other-languages${languageCode ? `/${languageCode}` : ''}`,
         )
@@ -294,15 +301,17 @@ export default class LanguagesController {
       preferredSpokenLanguageCodeError?: string
       preferredWrittenLanguageCodeError?: string
     },
-    secondaryLanguages: SecondaryLanguageDto[],
     errors: HmppsError[],
   ) {
-    if (secondaryLanguages.some(lang => lang.language.code === formValues.preferredSpokenLanguageCode)) {
+    const [spokenErrorType, spokenInvalidInput] = formValues.preferredSpokenLanguageCodeError?.split(':') ?? []
+    const [writtenErrorType, writtenInvalidInput] = formValues.preferredWrittenLanguageCodeError?.split(':') ?? []
+
+    if (spokenErrorType === 'DUPLICATE') {
       errors.push({
         text: 'Language must be different from the saved languages',
         href: '#preferredSpokenLanguageCode',
       })
-    } else if (formValues.preferredSpokenLanguageCodeError) {
+    } else if (spokenErrorType === 'INVALID') {
       errors.push({
         text: 'This is not a valid language',
         href: '#preferredSpokenLanguageCode',
@@ -314,42 +323,45 @@ export default class LanguagesController {
         href: '#interpreterRequired',
       })
     }
-    if (secondaryLanguages.some(lang => lang.language.code === formValues.preferredWrittenLanguageCode)) {
+    if (writtenErrorType === 'DUPLICATE') {
       errors.push({
         text: 'Language must be different from the saved languages',
         href: '#preferredWrittenLanguageCode',
       })
-    } else if (formValues.preferredWrittenLanguageCodeError) {
+    } else if (writtenErrorType === 'INVALID') {
       errors.push({
         text: 'This is not a valid language',
         href: '#preferredWrittenLanguageCode',
       })
     }
+    return { spokenInvalidInput, writtenInvalidInput }
   }
 
   private validateSecondaryLanguageRequest(
     formValues: SecondaryLanguageRequest & {
       languageError?: string
     },
-    languagePreferences: LanguagePreferencesDto,
-    secondaryLanguages: SecondaryLanguageDto[],
+    languageCode: string,
     errors: HmppsError[],
   ) {
-    if (
-      languagePreferences.preferredSpokenLanguage?.code === formValues.language ||
-      languagePreferences.preferredWrittenLanguage?.code === formValues.language ||
-      secondaryLanguages.some(lang => lang.language.code === formValues.language)
-    ) {
+    const [errorType, invalidInput] = formValues.languageError?.split(':') ?? []
+    if (errorType === 'DUPLICATE') {
       errors.push({
         text: 'Language must be different from the saved languages',
         href: '#language',
       })
-    } else if (formValues.languageError) {
+    } else if (errorType === 'INVALID') {
       errors.push({
         text: 'This is not a valid language',
         href: '#language',
       })
+    } else if (!languageCode && !formValues.language) {
+      errors.push({
+        text: 'Select a language',
+        href: '#language',
+      })
     }
+    return invalidInput
   }
 
   private getCommonRequestData(req: Request) {
