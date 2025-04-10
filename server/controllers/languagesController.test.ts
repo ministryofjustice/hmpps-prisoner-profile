@@ -206,11 +206,23 @@ describe('LanguagesController', () => {
         preferredSpokenLanguageCode: 'FRE',
         preferredWrittenLanguageCode: 'FRE',
         interpreterRequired: 'false',
+        preferredSpokenLanguageCodeError: 'DUPLICATE:French',
+        preferredWrittenLanguageCodeError: 'DUPLICATE:French',
       }
 
       const handler = controller.submitUpdateMainLanguage()
       await handler(req, res, null)
 
+      expect(req.flash).toHaveBeenCalledWith(
+        'requestBody',
+        JSON.stringify({
+          preferredSpokenLanguageCode: 'FRE',
+          preferredWrittenLanguageCode: 'FRE',
+          interpreterRequired: false,
+          preferredSpokenLanguageCodeError: 'DUPLICATE:French',
+          preferredWrittenLanguageCodeError: 'DUPLICATE:French',
+        }),
+      )
       expect(req.flash).toHaveBeenCalledWith('errors', [
         {
           text: 'Language must be different from the saved languages',
@@ -221,6 +233,45 @@ describe('LanguagesController', () => {
           href: '#preferredWrittenLanguageCode',
         },
       ])
+      expect(req.flash).toHaveBeenCalledWith('spokenInvalidInput', 'French')
+      expect(req.flash).toHaveBeenCalledWith('writtenInvalidInput', 'French')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/main-language`)
+    })
+
+    it('should validate that main language is a valid languages', async () => {
+      req.body = {
+        preferredSpokenLanguageCode: 'FRE',
+        preferredWrittenLanguageCode: 'FRE',
+        interpreterRequired: 'false',
+        preferredSpokenLanguageCodeError: 'INVALID:Klingon',
+        preferredWrittenLanguageCodeError: 'INVALID:Klingon',
+      }
+
+      const handler = controller.submitUpdateMainLanguage()
+      await handler(req, res, null)
+
+      expect(req.flash).toHaveBeenCalledWith(
+        'requestBody',
+        JSON.stringify({
+          preferredSpokenLanguageCode: 'FRE',
+          preferredWrittenLanguageCode: 'FRE',
+          interpreterRequired: false,
+          preferredSpokenLanguageCodeError: 'INVALID:Klingon',
+          preferredWrittenLanguageCodeError: 'INVALID:Klingon',
+        }),
+      )
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'This is not a valid language',
+          href: '#preferredSpokenLanguageCode',
+        },
+        {
+          text: 'This is not a valid language',
+          href: '#preferredWrittenLanguageCode',
+        },
+      ])
+      expect(req.flash).toHaveBeenCalledWith('spokenInvalidInput', 'Klingon')
+      expect(req.flash).toHaveBeenCalledWith('writtenInvalidInput', 'Klingon')
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/main-language`)
     })
 
@@ -301,8 +352,6 @@ describe('LanguagesController', () => {
           errors: [],
           languageOptions: [
             { text: '', value: undefined },
-            { text: 'English', value: 'ENG' },
-            { text: 'French', value: 'FRE' },
             { text: 'Spanish', value: 'SPA' },
           ],
           mainLanguage: CommunicationNeedsDtoMock.languagePreferences,
@@ -385,6 +434,7 @@ describe('LanguagesController', () => {
       req.body = {
         language: 'ENG',
         languageSkills: ['canRead', 'canWrite', 'canSpeak'],
+        languageError: 'DUPLICATE:English',
       }
 
       const handler = controller.submitUpdateOtherLanguages()
@@ -397,6 +447,7 @@ describe('LanguagesController', () => {
           canSpeak: true,
           canWrite: true,
           canRead: true,
+          languageError: 'DUPLICATE:English',
         }),
       )
       expect(req.flash).toHaveBeenCalledWith('errors', [
@@ -405,6 +456,37 @@ describe('LanguagesController', () => {
           href: '#language',
         },
       ])
+      expect(req.flash).toHaveBeenCalledWith('invalidInput', 'English')
+      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/other-languages`)
+    })
+
+    it('should validate that language is a valid language', async () => {
+      req.body = {
+        language: 'ENG',
+        languageSkills: ['canRead', 'canWrite', 'canSpeak'],
+        languageError: 'INVALID:Klingon',
+      }
+
+      const handler = controller.submitUpdateOtherLanguages()
+      await handler(req, res, null)
+
+      expect(req.flash).toHaveBeenCalledWith(
+        'requestBody',
+        JSON.stringify({
+          language: 'ENG',
+          canSpeak: true,
+          canWrite: true,
+          canRead: true,
+          languageError: 'INVALID:Klingon',
+        }),
+      )
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'This is not a valid language',
+          href: '#language',
+        },
+      ])
+      expect(req.flash).toHaveBeenCalledWith('invalidInput', 'Klingon')
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${prisonerNumber}/personal/other-languages`)
     })
 
