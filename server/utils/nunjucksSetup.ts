@@ -51,8 +51,7 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { bvlsMasteredVlpmFeatureToggleEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
-import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
+import { bvlsMasteredVlpmFeatureToggleEnabled, militaryHistoryEnabled } from './featureToggles'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -104,7 +103,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('standardApiErrorText', () => apiErrorMessage)
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
-  njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
   njkEnv.addGlobal('bvlsMasteredVlpmFeatureToggleEnabled', bvlsMasteredVlpmFeatureToggleEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
@@ -178,7 +176,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('addressToSummaryItems', addressToSummaryItems)
   njkEnv.addFilter('toMoneySummaryDisplay', moneySummaryToMiniSummary)
   njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
-  njkEnv.addFilter('toNonAssociationSummaryDisplay', nonAssociationSummaryToMiniSummary)
   njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
   njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
   njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)

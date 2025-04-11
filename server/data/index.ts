@@ -43,7 +43,6 @@ import HealthAndMedicationApiRestClient from './healthAndMedicationApiRestClient
 import OsPlacesApiRestClient from './osPlacesApiRestClient'
 import PersonCommunicationNeedsApiRestClient from './personCommunicationNeedsApiRestClient'
 import PrisonerProfileApiRestClient from './prisonerProfileApiClient'
-import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
 
 initialiseAppInsights()
 const telemetryClient = buildAppInsightsClient(applicationInfo())
@@ -90,7 +89,6 @@ export const dataAccess = {
   telemetryClient,
   osPlacesApiClient: new OsPlacesApiRestClient(),
   personCommunicationNeedsApiClientBuilder: (token: string) => new PersonCommunicationNeedsApiRestClient(token),
-  personalRelationshipsApiClientBuilder: (token: string) => new PersonalRelationshipsApiRestClient(token),
   prisonerProfileApiClientBuilder: (token: string) => new PrisonerProfileApiRestClient(token),
 }
 

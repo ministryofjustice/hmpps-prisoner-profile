@@ -76,7 +76,6 @@ generic-service:
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-dev.hmpps.service.justice.gov.uk"
     CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
     PERSON_COMMUNICATION_NEEDS_API_URL: "https://communication-needs-api-dev.hmpps.service.justice.gov.uk"
-    PERSONAL_RELATIONSHIPS_API_URL: "https://personal-relationships-api-dev.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -93,8 +92,6 @@ generic-service:
     EDIT_PROFILE_ENABLED: "true"
     EDIT_PROFILE_ENABLED_PRISONS: "KMI"
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-14T15:00:00"
-    EXTERNAL_CONTACTS_ENABLED: "true"
-    EXTERNAL_CONTACTS_ENABLED_PRISONS: "KMI"
 
   scheduledDowntime:
     enabled: true

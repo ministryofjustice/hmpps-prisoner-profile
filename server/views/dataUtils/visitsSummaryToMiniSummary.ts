@@ -21,7 +21,7 @@ export default (visitSummary: VisitsOverviewSummary, prisonerNumber: string): Mi
     bottomLabel: 'Remaining visits',
     bottomContentLine1: remainingVo ? String(remainingVo) : '0',
     bottomContentLine3: getPrivilegedVisitsDescription(remainingPvo, remainingVo),
-    bottomClass: 'big',
+    bottomClass: remainingVo ? 'small' : 'big',
     linkLabel: 'Visits details',
     linkHref: `/prisoner/${prisonerNumber}/visits-details`,
   }

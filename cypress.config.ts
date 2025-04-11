@@ -32,7 +32,6 @@ import bookAVideoLinkApi from './integration_tests/mockApis/bookAVideoLinkApi'
 import healthAndMedicationApi from './integration_tests/mockApis/healthAndMedication'
 import osPlacesApi from './integration_tests/mockApis/osPlacesApi'
 import personCommunicationNeedsApi from './integration_tests/mockApis/personCommunicationNeedsApi'
-import personalRelationshipsApi from './integration_tests/mockApis/personalRelationshipsApi'
 
 export default defineConfig({
   viewportWidth: 1152,
@@ -84,7 +83,6 @@ export default defineConfig({
         ...healthAndMedicationApi,
         ...osPlacesApi,
         ...personCommunicationNeedsApi,
-        ...personalRelationshipsApi,
       })
     },
     baseUrl: 'http://localhost:3007',
