@@ -362,8 +362,11 @@ export default {
     courCasesSummaryEnabled: toBoolean(get('COURT_CASES_SUMMARY_ENABLED', 'false')),
     editProfileEnabled: toBoolean(get('EDIT_PROFILE_ENABLED', 'false')),
     editProfileEnabledPrisons: get('EDIT_PROFILE_ENABLED_PRISONS', []),
-    dietAndAllergyEnabled: toBoolean(get('DIET_AND_ALLERGY_ENABLED', 'false')),
+
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
+    dietAndAllergyEnabledPrisonsByDate: get('DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE', []),
+    dietAndAllergyEnabledPrisonsFrom: get('DIET_AND_ALLERGY_ENABLED_FROM', '2099-01-01T00:00:00'),
+
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
     externalContactsEnabled: toBoolean(get('EXTERNAL_CONTACTS_ENABLED', 'false')),
