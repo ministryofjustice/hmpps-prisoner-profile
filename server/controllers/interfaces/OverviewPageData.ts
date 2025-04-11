@@ -11,6 +11,7 @@ import FullStatus from '../../data/interfaces/prisonApi/FullStatus'
 import NonAssociationSummary from '../../services/interfaces/offenderService/NonAssociationSummary'
 import { Result } from '../../utils/result/result'
 import CurrentCsipDetail from '../../data/interfaces/csipApi/csip'
+import { ExternalContactsCount } from '../../services/contactsService'
 
 export default interface OverviewPageData {
   pageTitle: string
@@ -41,6 +42,7 @@ export default interface OverviewPageData {
     confirmedReleaseDate: string
   }
   nonAssociationSummary: Result<NonAssociationSummary>
+  externalContactsSummary: Result<ExternalContactsCount>
   options: {
     showCourtCaseSummary: boolean
   }

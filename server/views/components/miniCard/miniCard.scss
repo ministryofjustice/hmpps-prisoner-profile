@@ -4,15 +4,32 @@
   flex-direction: column;
   flex-wrap: nowrap;
   justify-items: flex-start;
-  padding: 10px 15px;
   border: 1px solid govuk-colour('dark-grey');
   box-shadow: 0 5px govuk-colour('mid-grey');
   min-height: calc(30px * var(--mini-card-lines, 4)); // can be overridden for each usage of .mini-card
 
+  &__heading {
+    background-color: #f3f2f1;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 10px;
+  }
+
+  &__body {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
   h2 {
-    font-size: 19px;
+    line-height: 50px;
+    font-size: 24px;
     font-weight: bold;
-    margin: 0 0 5px 0;
+    margin: 0;
+  }
+
+  &__label {
+    @include govuk-responsive-margin(1, 'bottom');
+    @include govuk-font($size: 19, $weight: 'bold');
   }
 
   &__item {
@@ -22,6 +39,8 @@
 
   &__link {
     font-size: 19px;
-    margin: auto 0 2px 0;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: auto 0 12px 0;
   }
 }

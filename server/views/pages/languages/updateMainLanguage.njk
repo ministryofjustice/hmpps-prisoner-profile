@@ -52,8 +52,8 @@
 
                 <form id="mainLanguageForm" method="post" novalidate="novalidate" autocomplete="off">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-                    <input type="hidden" id="preferredSpokenLanguageCodeError" name="preferredSpokenLanguageCodeError" value="" />
-                    <input type="hidden" id="preferredWrittenLanguageCodeError" name="preferredWrittenLanguageCodeError" value="" />
+                    <input type="hidden" id="preferredSpokenLanguageCodeError" name="preferredSpokenLanguageCodeError" value="{{ spokenInvalidInput }}" />
+                    <input type="hidden" id="preferredWrittenLanguageCodeError" name="preferredWrittenLanguageCodeError" value="{{ writtenInvalidInput }}" />
 
                     {{ govukSelect({
                         id: "preferredSpokenLanguageCode",
@@ -131,6 +131,7 @@
                     </aside>
                 {% endif %}
             </div>
+        </div>
     {% endblock %}
 {% endblock %}
 

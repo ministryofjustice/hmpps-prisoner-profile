@@ -42,6 +42,7 @@ import { ReferenceDataSourceFactory } from './referenceData/referenceDataSourceF
 import PhotoService from './photoService'
 import AliasService from './aliasService'
 import LanguagesService from './languagesService'
+import ContactsService from './contactsService'
 
 export const services = () => {
   const {
@@ -67,6 +68,7 @@ export const services = () => {
     csipApiClientBuilder,
     healthAndMedicationApiClientBuilder,
     personCommunicationNeedsApiClientBuilder,
+    personalRelationshipsApiClientBuilder,
     prisonRegisterStore,
     referenceDataStore,
     featureToggleStore,
@@ -168,6 +170,7 @@ export const services = () => {
     referenceDataService,
     metricsService,
   )
+  const contactsService = new ContactsService(personalRelationshipsApiClientBuilder)
 
   const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
@@ -224,6 +227,7 @@ export const services = () => {
     aliasService,
     languagesService,
     referenceDataService,
+    contactsService,
   }
 }
 

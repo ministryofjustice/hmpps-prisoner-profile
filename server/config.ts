@@ -311,9 +311,17 @@ export default {
       url: get('PERSON_COMMUNICATION_NEEDS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
         response: Number(get('PERSON_COMMUNICATION_NEEDS_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('PRISON_COMMUNICATION_NEEDS_TIMEOUT_DEADLINE', 10000)),
+        deadline: Number(get('PERSON_COMMUNICATION_NEEDS_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(Number(get('PERSON_COMMUNICATION_NEEDS_TIMEOUT_DEADLINE', 10000))),
+    },
+    personalRelationshipsApi: {
+      url: get('PERSONAL_RELATIONSHIPS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('PERSONAL_RELATIONSHIPS_TIMEOUT_DEADLINE', 10000))),
     },
   },
   serviceUrls: {
@@ -358,5 +366,7 @@ export default {
     dietAndAllergyEnabledPrisons: get('DIET_AND_ALLERGY_ENABLED_PRISONS', []),
     militaryHistoryEnabledFrom: get('MILITARY_HISTORY_ENABLED_FROM', '2099-01-01T00:00:00'),
     bvlsMasteredVlpmFeatureToggleEnabled: toBoolean(get('BVLS_MASTERED_VLPM_FEATURE_TOGGLE_ENABLED', 'false')),
+    externalContactsEnabled: toBoolean(get('EXTERNAL_CONTACTS_ENABLED', 'false')),
+    externalContactsEnabledPrisons: get('EXTERNAL_CONTACTS_ENABLED_PRISONS', []),
   },
 }

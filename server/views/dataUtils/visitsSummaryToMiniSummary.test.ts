@@ -18,7 +18,7 @@ describe('visitsSummaryToMiniSummary', () => {
       bottomLabel: 'Remaining visits',
       bottomContentLine1: '3',
       bottomContentLine3: 'Including 4 privileged visits',
-      bottomClass: 'small',
+      bottomClass: 'big',
       linkLabel: 'Visits details',
       linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     })
@@ -62,7 +62,7 @@ describe('visitsSummaryToMiniSummary', () => {
       bottomLabel: 'Remaining visits',
       bottomContentLine1: '3',
       bottomContentLine3: 'No privileged visits',
-      bottomClass: 'small',
+      bottomClass: 'big',
       linkLabel: 'Visits details',
       linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     })
