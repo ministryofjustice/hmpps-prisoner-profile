@@ -5,8 +5,9 @@ export const editProfileEnabled = (activeCaseLoadId: string) =>
   config.featureToggles.editProfileEnabled && config.featureToggles.editProfileEnabledPrisons.includes(activeCaseLoadId)
 
 export const dietAndAllergyEnabled = (activeCaseLoadId: string) =>
-  config.featureToggles.dietAndAllergyEnabled &&
-  config.featureToggles.dietAndAllergyEnabledPrisons.includes(activeCaseLoadId)
+  config.featureToggles.dietAndAllergyEnabledPrisons.includes(activeCaseLoadId) ||
+  (isAfter(Date.now(), config.featureToggles.dietAndAllergyEnabledPrisonsFrom) &&
+    config.featureToggles.dietAndAllergyEnabledPrisonsByDate.includes(activeCaseLoadId))
 
 export const militaryHistoryEnabled = () =>
   config.featureToggles.militaryHistoryEnabledFrom &&
