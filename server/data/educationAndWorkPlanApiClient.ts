@@ -14,12 +14,9 @@ export default class EducationAndWorkPlanApiRestClient implements EducationAndWo
     this.restClient = new RestClient('Education And Work Plan API', config.apis.educationAndWorkPlanApi, token)
   }
 
-  getActiveGoals(prisonerNumber: string): Promise<GetGoalsResponse> {
+  getAllGoals(prisonerNumber: string): Promise<GetGoalsResponse> {
     return this.restClient.get<ActionPlanResponse>({
       path: `/action-plans/${prisonerNumber}/goals`,
-      query: {
-        status: 'ACTIVE',
-      },
     })
   }
 }

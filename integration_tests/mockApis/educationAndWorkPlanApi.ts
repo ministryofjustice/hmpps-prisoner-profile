@@ -1,14 +1,11 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
-const stubGetPlpActiveGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
       urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
-      queryParameters: {
-        status: { equalTo: 'ACTIVE' },
-      },
     },
     response: {
       status: 200,
@@ -45,14 +42,11 @@ const stubGetPlpActiveGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
     },
   })
 
-const stubGetPlpActiveGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
       urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
-      queryParameters: {
-        status: { equalTo: 'ACTIVE' },
-      },
     },
     response: {
       status: 200,
@@ -63,14 +57,11 @@ const stubGetPlpActiveGoalsForPrisonerWithNoGoals = (prisonerNumber = 'G6123VU')
     },
   })
 
-const stubGetPlpActiveGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
       urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
-      queryParameters: {
-        status: { equalTo: 'ACTIVE' },
-      },
     },
     response: {
       status: 500,
@@ -85,14 +76,11 @@ const stubGetPlpActiveGoals500Error = (prisonerNumber = 'G6123VU'): SuperAgentRe
     },
   })
 
-const stubGetPlpActiveGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
+const stubGetLwpAllGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): SuperAgentRequest =>
   stubFor({
     request: {
       method: 'GET',
       urlPathPattern: `/plpApi/action-plans/${prisonerNumber}/goals`,
-      queryParameters: {
-        status: { equalTo: 'ACTIVE' },
-      },
     },
     response: {
       status: 404,
@@ -108,8 +96,8 @@ const stubGetPlpActiveGoalsPrisonerHasNoPlanYet = (prisonerNumber = 'G6123VU'): 
   })
 
 export default {
-  stubGetPlpActiveGoals,
-  stubGetPlpActiveGoalsForPrisonerWithNoGoals,
-  stubGetPlpActiveGoals500Error,
-  stubGetPlpActiveGoalsPrisonerHasNoPlanYet,
+  stubGetLwpAllGoals,
+  stubGetLwpAllGoalsForPrisonerWithNoGoals,
+  stubGetLwpAllGoals500Error,
+  stubGetLwpAllGoalsPrisonerHasNoPlanYet,
 }

@@ -1,8 +1,8 @@
-{# Goals summary card content for when the prisoner only has PLP goals #}
+{# Goals summary card content for when the prisoner has no VC2 goals and has at least 1 in progress (active) LWP goal #}
 
-<div data-qa="plp-goals">
+<div data-qa="lwp-goals">
   <p class="govuk-body" data-qa="goals-info-text">The careers information, advice and guidance (CIAG) team set these goals. They do not include sentence plan targets.</p>
-  {% for goal in personalLearningPlanActionPlan.goals | sort(attribute = 'targetCompletionDate') %}
+  {% for goal in personalLearningPlanActionPlan.activeGoals | sort(attribute = 'targetCompletionDate') %}
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Achieve goal by {{ goal.targetCompletionDate | formatDate }}</h3>
     <div class="hmpps-goal-container">
       <p class="govuk-body app-u-multiline-text">{{ goal.title }}</p>

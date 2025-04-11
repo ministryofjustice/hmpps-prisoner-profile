@@ -1,0 +1,10 @@
+{# Goals summary card content for when the prisoner has VC2 goals, and some LWP goals none of which are active #}
+
+<div data-qa="no-active-lwp-vc2-goals">
+  {% include './_vc2Goals.njk' %}
+
+  <p class="govuk-body govuk-!-margin-top-6">{{ workAndSkillsPrisonerName }} has no goals in progress recorded in DPS.</p>
+  {% if canEditLearningAndWorkPlan %}
+    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print" href="{{ config.serviceUrls.learningAndWorkProgress }}/plan/{{ prisonerNumber }}/view/overview">Add goals in the Learning and work progress service</a></p>
+  {% endif %}
+</div>

@@ -130,7 +130,11 @@ export default function routes(services: Services): Router {
           curiousGoals.getOrNull()?.shortTermGoals?.length > 0 ||
           curiousGoals.getOrNull()?.longTermGoals?.length > 0)
 
-      const hasPlpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.goals?.length > 0
+      const hasAnyLwpGoals =
+        workAndSkillsPageData.personalLearningPlanActionPlan?.activeGoals?.length > 0 ||
+        workAndSkillsPageData.personalLearningPlanActionPlan?.archivedGoals?.length > 0 ||
+        workAndSkillsPageData.personalLearningPlanActionPlan?.completedGoals?.length > 0
+      const hasActiveLwpGoals = workAndSkillsPageData.personalLearningPlanActionPlan?.activeGoals?.length > 0
 
       const problemRetrievingPrisonerGoalData =
         !curiousGoals.isFulfilled() || workAndSkillsPageData.personalLearningPlanActionPlan?.problemRetrievingData
@@ -153,7 +157,8 @@ export default function routes(services: Services): Router {
         vc2goalsUrl,
         canEditLearningAndWorkPlan,
         hasVc2Goals,
-        hasPlpGoals,
+        hasAnyLwpGoals,
+        hasActiveLwpGoals,
         problemRetrievingPrisonerGoalData,
       })
     },
