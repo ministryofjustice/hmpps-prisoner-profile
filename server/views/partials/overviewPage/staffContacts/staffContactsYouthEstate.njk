@@ -4,58 +4,58 @@
   <div class="govuk-grid-row staff-contacts-card" data-qa="staff-contacts">
     <div class="govuk-grid-column-full">
       {{ govukSummaryList({
-          classes: 'govuk-summary-list--no-border',
-          rows: [
-            {
-              key: {
-                text: "CuSP Officer"
-              },
-              value: {
-                text: staffContacts.cuspOfficer or 'Not assigned'
-              }
-            },
-            {
-              key: {
-                text: "CuSP Officer (backup)"
-              },
-              value: {
-                text: staffContacts.cuspOfficerBackup or 'Not assigned'
-              }
-            },
-            {
-              key: {
-                text: "Youth Justice Worker"
-              },
-              value: {
-                text: staffContacts.youthJusticeWorker or 'Not assigned'
-              }
-            },
-            {
-              key: {
-                text: "Resettlement Practitioner"
-              },
-              value: {
-                text: staffContacts.resettlementPractitioner or 'Not assigned'
-              }
-            },
-            {
-              key: {
-                text: "Youth Justice Service"
-              },
-              value: {
-                text: staffContacts.youthJusticeService or 'Not assigned'
-              }
-            },
-            {
-              key: {
-                text: "Youth Justice Service Case Manager"
-              },
-              value: {
-                text: staffContacts.youthJusticeServiceCaseManager or 'Not assigned'
-              }
-            }
-          ] | summaryListOneHalfWidth
-        }) }}
+        classes: 'govuk-summary-list--no-border',
+        rows: [
+          {
+            key: {
+            text: "CuSP Officer"
+          },
+            value: {
+            text: staffContacts.cuspOfficer or 'Not assigned'
+          }
+          },
+          {
+            key: {
+            text: "CuSP Officer (backup)"
+          },
+            value: {
+            text: staffContacts.cuspOfficerBackup or 'Not assigned'
+          }
+          },
+          {
+            key: {
+            text: "Youth Justice Worker"
+          },
+            value: {
+            text: staffContacts.youthJusticeWorker or 'Not assigned'
+          }
+          },
+          {
+            key: {
+            text: "Resettlement Practitioner"
+          },
+            value: {
+            text: staffContacts.resettlementPractitioner or 'Not assigned'
+          }
+          },
+          {
+            key: {
+            text: "Youth Justice Service"
+          },
+            value: {
+            text: staffContacts.youthJusticeService or 'Not assigned'
+          }
+          },
+          {
+            key: {
+            text: "Youth Justice Service Case Manager"
+          },
+            value: {
+            text: staffContacts.youthJusticeServiceCaseManager or 'Not assigned'
+          }
+          }
+        ] | summaryListOneHalfWidth
+      }) }}
     </div>
   </div>
   <div class="govuk-grid-row">

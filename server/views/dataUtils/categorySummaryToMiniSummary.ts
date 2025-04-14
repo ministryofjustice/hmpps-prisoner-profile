@@ -15,6 +15,7 @@ export default (
     items: [
       {
         text: codeDescription,
+        classes: 'hmpps-mini-card__big',
       },
       ...(nextReviewDate
         ? [

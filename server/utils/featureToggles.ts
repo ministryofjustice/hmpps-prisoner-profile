@@ -13,4 +13,8 @@ export const militaryHistoryEnabled = () =>
   config.featureToggles.militaryHistoryEnabledFrom &&
   isAfter(Date.now(), config.featureToggles.militaryHistoryEnabledFrom)
 
+export const externalContactsEnabled = (activeCaseLoadId: string) =>
+  config.featureToggles.externalContactsEnabled &&
+  config.featureToggles.externalContactsEnabledPrisons.includes(activeCaseLoadId)
+
 export const bvlsMasteredVlpmFeatureToggleEnabled = () => config.featureToggles.bvlsMasteredVlpmFeatureToggleEnabled

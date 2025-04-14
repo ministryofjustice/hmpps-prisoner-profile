@@ -96,12 +96,12 @@ context('Overview Page', () => {
     context('Mini Summary A', () => {
       it('Mini summary list is displayed', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.moneyVisitsAdjudicationsGroup().should('exist')
+        overviewPage.moneyVisitsNonAssociationsGroup().should('exist')
       })
 
       it('Mini summary Group A should display the macro header', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.moneyVisitsAdjudicationsGroup_MacroHeader().should('exist')
+        overviewPage.moneyVisitsNonAssociationsGroup_MacroHeader().should('exist')
       })
 
       it('Mini summary Group A should contain Money card with correct data', () => {
@@ -114,21 +114,6 @@ context('Overview Page', () => {
         overviewPage.moneyCard().contains('a', 'Transactions and savings')
       })
 
-      it('Mini summary Group A should contain Adjudications card with correct data', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.adjudicationsCard().contains('h2', 'Adjudications')
-        overviewPage.adjudicationsCard().contains('p', 'Proven in last 3 months')
-        overviewPage.adjudicationsCard().contains('p', '4')
-        overviewPage.adjudicationsCard().contains('p', 'Active')
-        overviewPage.adjudicationsCard().contains('p', 'No active punishments')
-        overviewPage
-          .adjudicationsCard()
-          .contains(
-            'a[href="http://localhost:3000/adjudications/adjudication-history/G6123VU"]',
-            'Adjudication history',
-          )
-      })
-
       it('Mini summary Group A should contain Visits card with correct data', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.visitsCard().contains('h2', 'Visits')
@@ -139,17 +124,31 @@ context('Overview Page', () => {
         overviewPage.visitsCard().contains('p', 'Including 2 privileged visits')
         overviewPage.visitsCard().contains('a', 'Visits details')
       })
+
+      it('Mini summary Group A should contain Non-associations card with correct data', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.nonAssociationsCard().contains('h2', 'Non-associations')
+        overviewPage.nonAssociationsCard().contains('p', 'In Moorland (HMP & YOI)')
+        overviewPage.nonAssociationsCard().contains('p', 'In other establishments')
+        overviewPage.nonAssociationsCard().contains('p', '1')
+        overviewPage
+          .nonAssociationsCard()
+          .contains(
+            'a[href="http://localhost:9091/nonassociationsui/prisoner/G6123VU/non-associations"]',
+            'Non-associations',
+          )
+      })
     })
 
     context('Mini Summary B', () => {
       it('Mini summary list is displayed', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.categoryIncentiveCsraGroup().should('exist')
+        overviewPage.categoryCsraCsipGroup().should('exist')
       })
 
       it('Mini summary Group B should hide the macro header', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.categoryIncentiveCsraGroup_MacroHeader().should('not.exist')
+        overviewPage.categoryCsraCsipGroup_MacroHeader().should('not.exist')
       })
 
       it('Mini summary Group B should contain Category card with correct data', () => {
@@ -158,15 +157,6 @@ context('Overview Page', () => {
         overviewPage.categoryCard().contains('.mini-card__item', 'B')
         overviewPage.categoryCard().contains('.mini-card__item', 'Next review: 19/02/2023')
         overviewPage.categoryCard().contains('a', 'Category')
-      })
-
-      it('Mini summary Group B should contain Incentives card with correct data', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.incentivesCard().contains('h2', 'Incentives: since last review')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 1')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Negative behaviours: 1')
-        overviewPage.incentivesCard().contains('.mini-card__item', 'Next review by: 01/01/2024')
-        overviewPage.incentivesCard().contains('a', 'Incentive level details')
       })
 
       it('Mini summary Group B should contain CSRA card with correct data', () => {
@@ -212,6 +202,52 @@ context('Overview Page', () => {
         overviewPage.personalDetails().religionOrBelief().should('include.text', 'Celestial Church of God')
         overviewPage.personalDetails().croNumber().should('include.text', '400862/08W')
         overviewPage.personalDetails().pncNumber().should('include.text', '08/359381C')
+      })
+    })
+
+    context('Adjudications', () => {
+      it('Displays the adjudications summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.adjudicationsSummary().contains('h2', 'Adjudications')
+        overviewPage.adjudicationsSummary().contains('p', 'Proven in last 3 months')
+        overviewPage.adjudicationsSummary().contains('p', '4')
+        overviewPage.adjudicationsSummary().contains('p', 'Active')
+        overviewPage.adjudicationsSummary().contains('p', 'No active punishments')
+        overviewPage
+          .adjudicationsSummary()
+          .contains(
+            'a[href="http://localhost:3000/adjudications/adjudication-history/G6123VU"]',
+            'Adjudication history',
+          )
+      })
+    })
+
+    context('External contacts', () => {
+      it('Displays the external contacts summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.externalContacts().card().should('exist')
+        overviewPage.externalContacts().officialHeading().should('have.text', 'Official')
+        overviewPage.externalContacts().official().should('have.text', '2')
+        overviewPage.externalContacts().socialHeading().should('have.text', 'Social')
+        overviewPage.externalContacts().social().should('have.text', '1')
+        overviewPage
+          .externalContacts()
+          .link()
+          .contains('a[href="/prisoner/G6123VU/contacts/list"]', 'Social and official contacts')
+      })
+    })
+
+    context('Incentives', () => {
+      it('Displays the incentives summary', () => {
+        const overviewPage = Page.verifyOnPage(OverviewPage)
+        overviewPage.incentivesCard().contains('h2', 'Incentives')
+        overviewPage.incentivesCard().contains('p', 'Since last review')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Positive behaviours: 1')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Negative behaviours: 1')
+        overviewPage.incentivesCard().contains('.mini-card__item', 'Next review by: 01/01/2024')
+        overviewPage
+          .incentivesCard()
+          .contains('a[href="http://localhost:3001/incentive-reviews/prisoner/G6123VU"]', 'Incentive level details')
       })
     })
 
@@ -302,20 +338,6 @@ context('Overview Page', () => {
       it('should not display soc profile link', () => {
         const overviewPage = Page.verifyOnPage(OverviewPage)
         overviewPage.socProfileInfoLink().should('not.exist')
-      })
-    })
-
-    context('Non-association summary', () => {
-      it('Displays non-association summary', () => {
-        const overviewPage = Page.verifyOnPage(OverviewPage)
-        overviewPage.nonAssociationSummary().prisonName().should('have.text', 'In Moorland (HMP & YOI)')
-        overviewPage.nonAssociationSummary().prisonCount().should('have.text', '1')
-        overviewPage.nonAssociationSummary().otherPrisonsCount().should('have.text', '1')
-        overviewPage.nonAssociationSummary().nonAssociationsLink().should('have.text', 'Non-associations')
-        overviewPage
-          .nonAssociationSummary()
-          .nonAssociationsLink()
-          .should('have.attr', 'href', 'http://localhost:9091/nonassociationsui/prisoner/G6123VU/non-associations')
       })
     })
   })
@@ -749,12 +771,10 @@ context('Overview Page', () => {
       overviewPage.apiErrorBanner().should('exist')
       overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
 
-      overviewPage.nonAssociationSummary().error().should('exist')
       overviewPage
-        .nonAssociationSummary()
-        .error()
+        .nonAssociationsCard()
         .should('contain.text', 'We cannot show these details right now. Try again later.')
-      overviewPage.nonAssociationSummary().error().find('a').should('contain.text', 'Non-associations')
+      overviewPage.nonAssociationsCard().contains('a', 'Non-associations')
     })
   })
 
@@ -775,6 +795,55 @@ context('Overview Page', () => {
 
       overviewPage.primaryPomName().should('contain.text', 'We cannot show these details right now. Try again later.')
       overviewPage.secondaryPomName().should('contain.text', 'We cannot show these details right now. Try again later.')
+    })
+  })
+
+  context('Given API call to get external contacts count fails', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({ prisonerNumber: 'G6123VU', bookingId: 1102484 })
+      cy.task('stubPersonalRelationshipsCountError', { prisonerNumber: 'G6123VU' })
+      visitOverviewPage()
+    })
+
+    it('Displays a page error banner and highlights the failure in the card', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+
+      overviewPage.apiErrorBanner().should('exist')
+      overviewPage.apiErrorBanner().contains('p', 'Sorry, there is a problem with the service')
+
+      overviewPage
+        .externalContacts()
+        .card()
+        .should('contain.text', 'We cannot show these details right now. Try again later.')
+    })
+  })
+
+  context('Given external contacts is not yet enabled in the prison', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.setupUserAuth()
+      cy.setupOverviewPageStubs({
+        prisonerNumber: 'G6123VU',
+        bookingId: 1102484,
+        prisonerDataOverrides: { prisonId: 'WYI' },
+        caseLoads: [
+          {
+            caseloadFunction: '',
+            caseLoadId: 'WYI',
+            currentlyActive: true,
+            description: '',
+            type: '',
+          },
+        ],
+      })
+      visitOverviewPage()
+    })
+
+    it('Does not display the external contacts summary', () => {
+      const overviewPage = Page.verifyOnPage(OverviewPage)
+      overviewPage.externalContacts().card().should('not.exist')
     })
   })
 })
