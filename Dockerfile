@@ -41,7 +41,12 @@ RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 ENV NODE_ENV='production'
 
 COPY . .
+RUN npm run postinstall
 RUN npm run build
+
+RUN export BUILD_NUMBER=${BUILD_NUMBER} && \
+        export GIT_REF=${GIT_REF} && \
+        npm run record-build-info
 
 RUN npm prune --no-audit --omit=dev
 
@@ -52,6 +57,12 @@ COPY --from=build --chown=appuser:appgroup \
         /app/package.json \
         /app/package-lock.json \
         ./
+
+COPY --from=build --chown=appuser:appgroup \
+        /app/build-info.json ./dist/build-info.json
+
+COPY --from=build --chown=appuser:appgroup \
+        /app/assets ./assets
 
 COPY --from=build --chown=appuser:appgroup \
         /app/dist ./dist
