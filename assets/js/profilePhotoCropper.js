@@ -106,10 +106,12 @@ function toggleCrop(e) {
   if (cropping) {
     document.getElementById('photo-preview-container').style.display = 'block'
     document.getElementById('image-cropper-container').style.display = 'none'
+    document.getElementById('rotate-button-group').style.display = 'none'
     cropping = false
   } else {
     document.getElementById('photo-preview-container').style.display = 'none'
     document.getElementById('image-cropper-container').style.display = 'block'
+    document.getElementById('rotate-button-group').style.display = 'block'
     cropping = true
     if (!croppingInit) {
       document.querySelector('cropper-selection').$reset().$render()
@@ -153,7 +155,7 @@ function resetSelectionLocation() {
 function rotateImage(degrees) {
   const cropperImage = document.querySelector('cropper-image')
   // ="Picture" initial-center-size="contain" rotatable skewable scalable translatable></cropper-image>
-  cropperImage.rotateable = true
+  cropperImage.rotatable = true
   cropperImage.scalable = true
   cropperImage.translatable = true
   cropperImage.skewable = true
@@ -162,7 +164,7 @@ function rotateImage(degrees) {
 
   cropperImage.$rotate(`${degrees}deg`).$center('contain')
 
-  cropperImage.rotateable = false
+  cropperImage.rotatable = false
   cropperImage.scalable = false
   cropperImage.translatable = false
   cropperImage.skewable = false
