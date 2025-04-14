@@ -41,11 +41,60 @@
         action="/prisoner/{{ prisonerNumber }}/image/submit?_csrf={{ csrfToken }}">
         <input type="file" id="js-cropped-image-input" name="file" hidden/>
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm facial image</h1>
-        <div class="hmpps-photo-container govuk-!-margin-bottom-4">
-          <div class="hmpps-photo-container__photo">
-            <img src='{{ imgSrc }}' class='' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id="uploaded-photo"/>
-            <p class="govuk-body">This page is a placeholder for now</p>
+        <div class="hmpps-photo-container govuk-!-margin-bottom-4" id="photo-preview-container">
+          <div class="hmpps-photo-container__photo-preview">
+            <img src='{{ imgSrc }}' data-file-name='{{ fileName }}' data-file-type='{{ fileType }}' id='photo-preview'/>
           </div>
+        </div>
+        <div class="hmpps-photo-container govuk-!-margin-bottom-4 hmpps-photo-cropper-container" id="image-cropper-container">
+          <div class="hmpps-photo-container__photo">
+            <div class='cropper-container'>
+              <cropper-canvas background>
+                <cropper-image src='{{ imgSrc }}' alt="Picture" initial-center-size="contain" rotatable="false" skewable="false" scalable="false" translatable="false"></cropper-image>
+                <cropper-shade hidden></cropper-shade>
+                <cropper-selection
+                  id="cropperSelection"
+                  initial-coverage="0.75"
+                  aspect-ratio="0.74912280701"
+                  movable
+                  resizable
+                  outlined
+                  keyboard>
+                  <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>
+                  <cropper-handle action="n-resize"></cropper-handle>
+                  <cropper-handle action="e-resize"></cropper-handle>
+                  <cropper-handle action="s-resize"></cropper-handle>
+                  <cropper-handle action="w-resize"></cropper-handle>
+                  <cropper-handle action="ne-resize"></cropper-handle>
+                  <cropper-handle action="nw-resize"></cropper-handle>
+                  <cropper-handle action="se-resize"></cropper-handle>
+                  <cropper-handle action="sw-resize"></cropper-handle>
+                </cropper-selection>
+              </cropper-canvas>
+            </div>
+          </div>
+        </div>
+        <div class="govuk-button-group">
+          {{ govukButton({
+              text: "Toggle crop",
+              type: "button",
+              id: "toggle-crop-button",
+              preventDoubleClick: true
+            }) }}
+        </div>
+        <div class="govuk-button-group" id="rotate-button-group">
+          {{ govukButton({
+              text: "Rotate clockwise",
+              type: "button",
+              id: "rotate-clockwise",
+              preventDoubleClick: true
+            }) }}
+          {{ govukButton({
+              text: "Rotate anti-clockwise",
+              type: "button",
+              id: "rotate-anti-clockwise",
+              preventDoubleClick: true
+            }) }}
         </div>
         <div class="govuk-button-group">
           {{ govukButton({
@@ -54,7 +103,10 @@
             preventDoubleClick: true,
             attributes: { "data-qa": "submit-button" }
             }) }}
-          <a href="/prisoner/{{ prisonerNumber }}/image" class="govuk-link govuk-link--no-visited-state" data-qa="edit-cancel-button">
+          <a
+            href="/prisoner/{{ prisonerNumber }}/image"
+            class="govuk-link govuk-link--no-visited-state"
+            data-qa="edit-cancel-button">
             Cancel</a>
         </div>
       </form>
@@ -62,5 +114,5 @@
   </div>
 {% endblock %}
 {% block pageScripts %}
-  <script src="/assets/js/profilePhotoCropper.js" nonce="{{ cspNonce }}"></script>
+  <script type="module" src="/assets/js/profilePhotoCropper.js" nonce="{{ cspNonce }}"></script>
 {% endblock %}
