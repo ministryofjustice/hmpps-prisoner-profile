@@ -44,3 +44,32 @@
     margin: auto 0 12px 0;
   }
 }
+
+// Old overview page layout - delete this once fully moved over to the new layout
+.mini-card-v1 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-items: flex-start;
+  padding: 10px 15px;
+  border: 1px solid govuk-colour('dark-grey');
+  box-shadow: 0 5px govuk-colour('mid-grey');
+  min-height: calc(30px * var(--mini-card-lines, 4)); // can be overridden for each usage of .mini-card
+
+  h2 {
+    font-size: 19px;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+  }
+
+  &__item {
+    font-size: 19px;
+    margin: 0 0 5px 0;
+  }
+
+  &__link {
+    font-size: 19px;
+    margin: auto 0 2px 0;
+  }
+}

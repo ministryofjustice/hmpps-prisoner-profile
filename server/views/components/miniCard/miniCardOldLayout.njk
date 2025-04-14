@@ -1,0 +1,19 @@
+{% macro miniCardOldLayout(content, classes) %}
+    <div class="mini-card-v1 {{ classes }}">
+        {% if content.heading %}
+            <h2>{{ content.heading }}</h2>
+        {% endif %}
+        {% for item in content.items %}
+            <div class="mini-card-v1__item {{ item.classes }}">
+                {{ item.text }}
+            </div>
+        {% endfor %}
+        {% if content.linkHref %}
+            <div class="mini-card-v1__link">
+                <a href="{{ content.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
+                    {{ content.linkLabel }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}

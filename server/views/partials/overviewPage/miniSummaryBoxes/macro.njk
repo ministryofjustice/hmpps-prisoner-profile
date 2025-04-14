@@ -12,7 +12,7 @@
           <p class="govuk-body hmpps-mini-card__{{ miniSummary.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.topClass === 'small' }}">
             {{ miniSummary.topContent if miniSummary.topContent !== undefined else '&nbsp;' | safe }}
           </p>
-          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">
+          {% if useNewOverviewPageLayout() %}<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-3">{% endif %}
         {% endif %}
         <p class="govuk-body card-label">
           {{ miniSummary.bottomLabel }}

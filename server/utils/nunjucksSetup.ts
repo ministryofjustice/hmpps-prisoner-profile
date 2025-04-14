@@ -51,8 +51,16 @@ import groupDistinguishingMarks, {
 import distinguishingMarkBodyPartsToDisplay from '../views/dataUtils/distinguishingMarkBodyPartsToDisplay'
 import getDistinguishingFeatureDetailsFormData from '../views/dataUtils/getDistinguishingMarkDetailsFormConfig'
 import currentCsipDetailToMiniCardContent from '../views/dataUtils/currentCsipDetailToMiniCardContent'
-import { bvlsMasteredVlpmFeatureToggleEnabled, externalContactsEnabled, militaryHistoryEnabled } from './featureToggles'
+import {
+  bvlsMasteredVlpmFeatureToggleEnabled,
+  externalContactsEnabled,
+  militaryHistoryEnabled,
+  newOverviewPageLayoutEnabled,
+} from './featureToggles'
 import nonAssociationSummaryToMiniSummary from '../views/dataUtils/nonAssociationSummaryToMiniSummary'
+import categorySummaryToMiniSummaryOldLayout from '../views/dataUtils/categorySummaryToMiniSummaryOldLayout'
+import incentiveSummaryToMiniSummaryOldLayout from '../views/dataUtils/incentiveSummaryToMiniSummaryOldLayout'
+import visitsSummaryToMiniSummaryOldLayout from '../views/dataUtils/visitsSummaryToMiniSummaryOldLayout'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -105,6 +113,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addGlobal('toSummaryListRows', listToSummaryListRows)
   njkEnv.addGlobal('militaryHistoryEnabled', militaryHistoryEnabled)
   njkEnv.addGlobal('externalContactsEnabled', externalContactsEnabled)
+  njkEnv.addGlobal('useNewOverviewPageLayout', newOverviewPageLayoutEnabled)
   njkEnv.addGlobal('bvlsMasteredVlpmFeatureToggleEnabled', bvlsMasteredVlpmFeatureToggleEnabled)
   njkEnv.addGlobal('currentTimeMillis', () => Date.now().toString())
 
@@ -180,10 +189,13 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('toAdjudicationsSummaryDisplay', adjudicationsSummaryToMiniSummary)
   njkEnv.addFilter('toNonAssociationSummaryDisplay', nonAssociationSummaryToMiniSummary)
   njkEnv.addFilter('toVisitsSummaryDisplay', visitsSummaryToMiniSummary)
+  njkEnv.addFilter('toVisitsSummaryDisplayOldLayout', visitsSummaryToMiniSummaryOldLayout)
   njkEnv.addFilter('toCsraSummaryDisplay', csraSummaryToMiniSummary)
   njkEnv.addFilter('toCsipMiniCardContent', currentCsipDetailToMiniCardContent)
   njkEnv.addFilter('toCategorySummaryDisplay', categorySummaryToMiniSummary)
+  njkEnv.addFilter('toCategorySummaryDisplayOldLayout', categorySummaryToMiniSummaryOldLayout)
   njkEnv.addFilter('toIncentiveSummaryDisplay', incentiveSummaryToMiniSummary)
+  njkEnv.addFilter('toIncentiveSummaryDisplayOldLayout', incentiveSummaryToMiniSummaryOldLayout)
   njkEnv.addFilter('summaryListRowWithOptionalChangeLink', summaryListRowWithOptionalChangeLink)
   njkEnv.addFilter('checkboxFieldDataToInputs', checkboxFieldDataToInputs)
   njkEnv.addFilter('groupDistinguishingMarks', groupDistinguishingMarks)

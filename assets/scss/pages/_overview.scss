@@ -32,6 +32,11 @@
   > .mini-card {
     flex: 1 1 260px;
   }
+
+  // Old overview page layout - delete this once fully moved over to the new layout
+  > .mini-card-v1 {
+    flex: 1 1 260px;
+  }
 }
 
 .mini-card--categories {

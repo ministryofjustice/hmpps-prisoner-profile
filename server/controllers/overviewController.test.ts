@@ -734,13 +734,16 @@ describe('overviewController', () => {
   })
 
   describe('External contacts', () => {
+    beforeAll(() => {
+      config.featureToggles.newOverviewPageLayoutEnabled = true
+    })
+
     afterAll(() => {
-      config.featureToggles.externalContactsEnabled = false
+      config.featureToggles.newOverviewPageLayoutEnabled = false
       config.featureToggles.externalContactsEnabledPrisons = []
     })
 
     it('Returns the external contacts counts from the contacts service', async () => {
-      config.featureToggles.externalContactsEnabled = true
       config.featureToggles.externalContactsEnabledPrisons = ['MDI']
       contactsService.getExternalContactsCount = jest.fn().mockResolvedValue({
         official: 1,
@@ -764,7 +767,6 @@ describe('overviewController', () => {
     })
 
     it('Does not request the external contacts count when toggled off', async () => {
-      config.featureToggles.externalContactsEnabled = false
       config.featureToggles.externalContactsEnabledPrisons = []
       contactsService.getExternalContactsCount = jest.fn()
 
