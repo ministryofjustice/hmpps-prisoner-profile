@@ -5,7 +5,6 @@ export interface MiniCardDataItem {
 
 export interface MiniCardData {
   heading: string
-  label?: string
   items: MiniCardDataItem[]
   linkHref?: string
   linkLabel?: string

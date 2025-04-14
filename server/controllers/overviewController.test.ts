@@ -44,9 +44,6 @@ import { scheduledTransfersMock } from '../data/localMockData/scheduledTransfers
 import CsipService from '../services/csipService'
 import { csipServiceMock } from '../../tests/mocks/csipServiceMock'
 import { PrisonerPrisonSchedule } from '../data/interfaces/prisonApi/PrisonerSchedule'
-import ContactsService from '../services/contactsService'
-import { contactsServiceMock } from '../../tests/mocks/contactsServiceMock'
-import config from '../config'
 
 const getResLocals = ({
   userRoles = ['CELL_MOVE'],
@@ -84,7 +81,6 @@ describe('overviewController', () => {
   let offenderService: OffenderService
   let professionalContactsService: ProfessionalContactsService
   let csipService: CsipService
-  let contactsService: ContactsService
 
   beforeEach(() => {
     req = {
@@ -127,7 +123,6 @@ describe('overviewController', () => {
     offenderService = offenderServiceMock() as OffenderService
     professionalContactsService = professionalContactsServiceMock() as ProfessionalContactsService
     csipService = csipServiceMock() as CsipService
-    contactsService = contactsServiceMock() as ContactsService
 
     controller = new OverviewController(
       () => pathfinderApiClient,
@@ -143,7 +138,6 @@ describe('overviewController', () => {
       offenderService,
       professionalContactsService,
       csipService,
-      contactsService,
     )
 
     offenderService.getPrisoner = jest.fn().mockResolvedValue(inmateDetailMock)
@@ -728,53 +722,6 @@ describe('overviewController', () => {
             status: 'rejected',
             reason: 'Server Error',
           }),
-        }),
-      )
-    })
-  })
-
-  describe('External contacts', () => {
-    afterAll(() => {
-      config.featureToggles.externalContactsEnabled = false
-      config.featureToggles.externalContactsEnabledPrisons = []
-    })
-
-    it('Returns the external contacts counts from the contacts service', async () => {
-      config.featureToggles.externalContactsEnabled = true
-      config.featureToggles.externalContactsEnabledPrisons = ['MDI']
-      contactsService.getExternalContactsCount = jest.fn().mockResolvedValue({
-        official: 1,
-        social: 2,
-      })
-
-      await controller.displayOverview(req, res)
-
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          externalContactsSummary: expect.objectContaining({
-            status: 'fulfilled',
-            value: {
-              official: 1,
-              social: 2,
-            },
-          }),
-        }),
-      )
-    })
-
-    it('Does not request the external contacts count when toggled off', async () => {
-      config.featureToggles.externalContactsEnabled = false
-      config.featureToggles.externalContactsEnabledPrisons = []
-      contactsService.getExternalContactsCount = jest.fn()
-
-      await controller.displayOverview(req, res)
-
-      expect(contactsService.getExternalContactsCount).not.toHaveBeenCalled()
-      expect(res.render).toHaveBeenCalledWith(
-        'pages/overviewPage',
-        expect.objectContaining({
-          externalContactsSummary: null,
         }),
       )
     })
