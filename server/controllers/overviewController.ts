@@ -29,8 +29,6 @@ import getCsraSummary from './utils/overviewController/getCsraSummary'
 import getCategorySummary from './utils/overviewController/getCategorySummary'
 import CsipService from '../services/csipService'
 import { isServiceEnabled } from '../utils/isServiceEnabled'
-import ContactsService from '../services/contactsService'
-import { externalContactsEnabled } from '../utils/featureToggles'
 
 /**
  * Parse request for overview page and orchestrate response
@@ -50,7 +48,6 @@ export default class OverviewController {
     private readonly offenderService: OffenderService,
     private readonly professionalContactsService: ProfessionalContactsService,
     private readonly csipService: CsipService,
-    private readonly contactsService: ContactsService,
   ) {}
 
   public async displayOverview(req: Request, res: Response) {
@@ -83,7 +80,6 @@ export default class OverviewController {
       offencesOverview,
       nonAssociationSummary,
       currentCsipDetail,
-      externalContactsSummary,
     ] = await Promise.all([
       pathfinderApiClient.getNominal(prisonerNumber),
       manageSocCasesApiClient.getNominal(prisonerNumber),
@@ -115,12 +111,6 @@ export default class OverviewController {
       ),
       isServiceEnabled('csipUI', res.locals.feComponents?.sharedData) && permissions.csip?.view
         ? Result.wrap(this.csipService.getCurrentCsip(clientToken, prisonerNumber), res.locals.apiErrorCallback)
-        : null,
-      externalContactsEnabled(prisonId)
-        ? Result.wrap(
-            this.contactsService.getExternalContactsCount(clientToken, prisonerNumber),
-            res.locals.apiErrorCallback,
-          )
         : null,
     ])
 
@@ -171,7 +161,6 @@ export default class OverviewController {
         conditionalReleaseDate: prisonerData.conditionalReleaseDate,
       },
       nonAssociationSummary,
-      externalContactsSummary,
       options: {
         showCourtCaseSummary,
       },

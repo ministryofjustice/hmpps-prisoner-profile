@@ -7,7 +7,7 @@
 {%- call summaryCard({title: "Personal"}) -%}
   <div class="govuk-grid-row" data-qa="personal-details">
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
-      <dl class="govuk-summary-list govuk-summary-list--no-border">
+      <dl class="govuk-summary-list">
         {{ summaryListRow("Preferred name", personalDetails.personalDetailsMain.preferredName or 'Not entered', "preferred-name") }}
         {{ summaryListRow("Date of birth", personalDetails.personalDetailsMain.dateOfBirth or 'Not entered', "date-of-birth") }}
         {{ summaryListRow("Age", age, "age") }}
@@ -16,7 +16,7 @@
       </dl>
     </div>
     <div class="govuk-grid-column-one-half hmpps-full-width-print">
-      <dl class="govuk-summary-list govuk-summary-list--no-border">
+      <dl class="govuk-summary-list">
         {{ summaryListRow("Ethnic group", personalDetails.personalDetailsSide.ethnicGroup or 'Not entered', "ethnic-group") }}
         {{ summaryListRow("Religion or belief", personalDetails.personalDetailsSide.religionOrBelief or 'Not entered', "religion-or-belief") }}
         {{ summaryListRow("CRO number", personalDetails.personalDetailsSide.croNumber or 'Not entered', "cro-number") }}

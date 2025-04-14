@@ -4,7 +4,7 @@
   }
 }
 
-.external-contacts-summary {
+.non-association-summary {
   height: calc(100% - 15px);
 
   div.govuk-summary-list__row--no-border {
@@ -32,21 +32,26 @@
   > .mini-card {
     flex: 1 1 260px;
   }
-}
 
-.mini-card--categories {
-  --mini-card-lines: 4;
-}
+  &:has(> .mini-card:nth-of-type(3):last-child) {
+    > .mini-card {
+      flex: 1 1 auto;
+    }
+  }
 
-.mini-card--incentives {
-  height: 100%;
-  --mini-card-lines: 6;
-}
+  .mini-card--categories {
+    --mini-card-lines: 4;
+  }
 
-.mini-card--csra {
-  --mini-card-lines: 4;
-}
+  .mini-card--incentives {
+    --mini-card-lines: 6;
+  }
 
-.mini-card--csip {
-  --mini-card-lines: 6;
+  .mini-card--csra {
+    --mini-card-lines: 4;
+  }
+
+  .mini-card--csip {
+    --mini-card-lines: 6;
+  }
 }
