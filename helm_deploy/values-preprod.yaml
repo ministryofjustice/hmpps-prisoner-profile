@@ -75,6 +75,7 @@ generic-service:
     HEALTH_AND_MEDICATION_API_URL: "https://health-and-medication-api-preprod.hmpps.service.justice.gov.uk"
     CONTENTFUL_HOST: "https://graphql.eu.contentful.com"
     PERSON_COMMUNICATION_NEEDS_API_URL: "https://communication-needs-api-preprod.hmpps.service.justice.gov.uk"
+    PERSONAL_RELATIONSHIPS_API_URL: "https://personal-relationships-api-preprod.hmpps.service.justice.gov.uk"
 
     # Feature flags
     AUDIT_ENABLED: "true"
@@ -91,6 +92,8 @@ generic-service:
     DIET_AND_ALLERGY_ENABLED_PRISONS_BY_DATE: "DHI,NMI,RNI,WYI"
     DIET_AND_ALLERGY_ENABLED_FROM: "2025-04-14T02:00:00"
     MILITARY_HISTORY_ENABLED_FROM: "2025-03-17T12:00:00"
+    EXTERNAL_CONTACTS_ENABLED_PRISONS: ""
+    NEW_OVERVIEW_PAGE_LAYOUT_ENABLED: "false"
 
   allowlist:
     sscl-blackpool: 31.121.5.27/32

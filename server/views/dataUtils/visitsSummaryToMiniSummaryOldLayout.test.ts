@@ -1,7 +1,7 @@
-import visitsSummaryToMiniSummary from './visitsSummaryToMiniSummary'
 import VisitsOverviewSummary from '../../services/interfaces/visitsService/VisitsOverviewSummary'
+import visitsSummaryToMiniSummaryOldLayout from './visitsSummaryToMiniSummaryOldLayout'
 
-describe('visitsSummaryToMiniSummary', () => {
+describe('visitsSummaryToMiniSummaryOldLayout', () => {
   it('should return a mini summary object', () => {
     const visitsSummary: VisitsOverviewSummary = {
       startDate: '2021-01-01',
@@ -9,7 +9,7 @@ describe('visitsSummaryToMiniSummary', () => {
       remainingPvo: 4,
     }
     const prisonerNumber = 'A1234BC'
-    const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
+    const miniSummary = visitsSummaryToMiniSummaryOldLayout(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
       topLabel: 'Next visit date',
@@ -18,7 +18,7 @@ describe('visitsSummaryToMiniSummary', () => {
       bottomLabel: 'Remaining visits',
       bottomContentLine1: '3',
       bottomContentLine3: 'Including 4 privileged visits',
-      bottomClass: 'big',
+      bottomClass: 'small',
       linkLabel: 'Visits details',
       linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     })
@@ -31,7 +31,7 @@ describe('visitsSummaryToMiniSummary', () => {
       remainingPvo: 0,
     }
     const prisonerNumber = 'A1234BC'
-    const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
+    const miniSummary = visitsSummaryToMiniSummaryOldLayout(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
       topLabel: 'Next visit date',
@@ -53,7 +53,7 @@ describe('visitsSummaryToMiniSummary', () => {
       remainingPvo: 0,
     }
     const prisonerNumber = 'A1234BC'
-    const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
+    const miniSummary = visitsSummaryToMiniSummaryOldLayout(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
       topLabel: 'Next visit date',
@@ -62,7 +62,7 @@ describe('visitsSummaryToMiniSummary', () => {
       bottomLabel: 'Remaining visits',
       bottomContentLine1: '3',
       bottomContentLine3: 'No privileged visits',
-      bottomClass: 'big',
+      bottomClass: 'small',
       linkLabel: 'Visits details',
       linkHref: `/prisoner/${prisonerNumber}/visits-details`,
     })
@@ -75,7 +75,7 @@ describe('visitsSummaryToMiniSummary', () => {
       remainingPvo: 0,
     }
     const prisonerNumber = 'A1234BC'
-    const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
+    const miniSummary = visitsSummaryToMiniSummaryOldLayout(visitsSummary, prisonerNumber)
     expect(miniSummary).toEqual({
       heading: 'Visits',
       topLabel: 'Next visit date',
@@ -97,7 +97,7 @@ describe('visitsSummaryToMiniSummary', () => {
       remainingPvo: 0,
     }
     const prisonerNumber = 'A1234BC'
-    const miniSummary = visitsSummaryToMiniSummary(visitsSummary, prisonerNumber)
+    const miniSummary = visitsSummaryToMiniSummaryOldLayout(visitsSummary, prisonerNumber)
     expect(miniSummary.bottomContentLine1).toEqual('0')
   })
 })

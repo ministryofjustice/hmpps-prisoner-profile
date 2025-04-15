@@ -21,30 +21,31 @@ export default class OverviewPage extends Page {
 
   // Mini Summary
 
-  moneyVisitsAdjudicationsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
+  moneyVisitsNonAssociationsGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-a]')
 
-  moneyVisitsAdjudicationsGroup_MacroHeader = (): PageElement =>
+  moneyVisitsNonAssociationsGroup_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=summary-header]')
 
   moneyCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(1)')
 
-  adjudicationsCard = (): PageElement =>
+  visitsCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(2)')
 
-  visitsCard = (): PageElement =>
+  nonAssociationsCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-a] [data-qa=mini-summary-list-macro] > div:nth-child(3)')
 
-  categoryIncentiveCsraGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
+  categoryCsraCsipGroup = (): PageElement => cy.get('[data-qa=overview-mini-summary-group-b]')
 
-  categoryIncentiveCsraGroup_MacroHeader = (): PageElement =>
+  categoryCsraCsipGroup_MacroHeader = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=summary-header]')
 
   categoryCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--categories')
 
-  incentivesCard = (): PageElement =>
-    cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--incentives')
+  adjudicationsSummary = (): PageElement => cy.get('[data-qa=adjudications-summary] > .hmpps-summary-card')
+
+  incentivesCard = (): PageElement => cy.get('.mini-card--incentives')
 
   csraCard = (): PageElement =>
     cy.get('[data-qa=overview-mini-summary-group-b] [data-qa=mini-summary-list-macro] > .mini-card--csra')
@@ -79,6 +80,18 @@ export default class OverviewPage extends Page {
       religionOrBelief: (): PageElement => card().findDataQa('religion-or-belief'),
       croNumber: (): PageElement => card().findDataQa('cro-number'),
       pncNumber: (): PageElement => card().findDataQa('pnc-number'),
+    }
+  }
+
+  externalContacts = () => {
+    const card = (): PageElement => cy.get('#external-contacts')
+    return {
+      card,
+      officialHeading: (): PageElement => card().findDataQa('external-contacts-official'),
+      official: (): PageElement => card().findDataQa('external-contacts-official-count'),
+      socialHeading: (): PageElement => card().findDataQa('external-contacts-social'),
+      social: (): PageElement => card().findDataQa('external-contacts-social-count'),
+      link: (): PageElement => card().findDataQa('external-contacts-link'),
     }
   }
 
@@ -187,15 +200,6 @@ export default class OverviewPage extends Page {
   alertModalBody = (): PageElement => this.alertModal().get('[data-modal-body]')
 
   alertModalClose = (): PageElement => this.alertModal().get('[data-modal-hide]')
-
-  // Alerts summary
-  nonAssociationSummary = () => ({
-    prisonName: (): PageElement => cy.get('[data-qa=overview-na-prison-name]'),
-    prisonCount: (): PageElement => cy.get('[data-qa=overview-na-prison-count]'),
-    otherPrisonsCount: (): PageElement => cy.get('[data-qa=overview-na-other-prisons-count]'),
-    nonAssociationsLink: (): PageElement => cy.get('[data-qa=overview-non-associations-link] a'),
-    error: (): PageElement => cy.get('[data-qa=non-association-summary-unavailable]'),
-  })
 
   courtCasesAndReleaseDates = () => ({
     card: (): PageElement => cy.get('[data-qa="court-cases-release-dates"]'),

@@ -15,7 +15,11 @@
 
   <div class="govuk-grid-row hmpps-three-quarters-responsive">
     <div class="govuk-grid-column-three-quarters hmpps-full-width-print">
-      {% include "../partials/overviewPage/mainBody.njk" %}
+      {% if useNewOverviewPageLayout() %}
+        {% include "../partials/overviewPage/mainBody.njk" %}
+      {% else %}
+        {% include "../partials/overviewPage/mainBodyOldLayout.njk" %}
+      {% endif %}
     </div>
     <div class="govuk-grid-column-one-quarter govuk-!-display-none-print">
       {%- call conditionallyShow({condition: isInUsersCaseLoad(prisonId, user), id: 'overview-side-bar'}) -%}
