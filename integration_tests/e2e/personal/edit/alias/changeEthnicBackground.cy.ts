@@ -24,7 +24,7 @@ changeEthnicBackground({
 
 changeEthnicBackground({
   group: 'black',
-  pageTitle: `Which of the following best describes John Saunders’ Black, Black British, Caribbean or African background?`,
+  pageTitle: `Which of the following best describes John Saunders’ Black, African, Caribbean or Black British background?`,
   validInputs: [{ radioInputs: { radioField: 'B1' } }],
 })
 
