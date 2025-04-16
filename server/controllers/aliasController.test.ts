@@ -109,7 +109,12 @@ describe('Alias Controller', () => {
         formTitle: `Enter John Saunders’ correct name`,
         warningText: 'This will become their main name in DPS and NOMIS.',
         errors: [],
-        formValues: {},
+        formValues: {
+          firstName: 'John',
+          lastName: 'Saunders',
+          middleName1: 'Middle',
+          middleName2: 'Names',
+        },
         miniBannerData: {
           prisonerNumber: 'G6123VU',
           prisonerName: 'Saunders, John',
@@ -143,7 +148,14 @@ describe('Alias Controller', () => {
 
       expect(res.render).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ formValues: { firstName: 'first' } }),
+        expect.objectContaining({
+          formValues: {
+            firstName: 'first',
+            lastName: 'Saunders',
+            middleName1: 'Middle',
+            middleName2: 'Names',
+          },
+        }),
       )
     })
 
