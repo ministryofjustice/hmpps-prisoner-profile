@@ -4,6 +4,8 @@ import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContactQueryParams,
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
+  PersonalRelationshipsNumberOfChildrenUpdateRequest,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import { mapToQueryString } from '../utils/utils'
 
@@ -19,5 +21,16 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto> {
     return this.restClient.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) })
+  }
+
+  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto> {
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/number-of-children` })
+  }
+
+  updateNumberOfChildren(
+    prisonerNumber: string,
+    updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
+  ): Promise<PersonalRelationshipsNumberOfChildrenDto> {
+    return this.restClient.put({ path: `/prisoner/${prisonerNumber}/number-of-children`, data: updateRequest })
   }
 }

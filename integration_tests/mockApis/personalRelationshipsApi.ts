@@ -6,6 +6,7 @@ import {
 } from '../../server/data/localMockData/personalRelationshipsApiMock'
 import {
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
   PersonalRelationshipType,
 } from '../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
@@ -101,9 +102,47 @@ const stubPersonalRelationshipsContacts = (params: {
     },
   })
 
+const stubPersonalRelationshipsGetNumberOfChildren = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsNumberOfChildrenDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/number-of-children`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
+const stubPersonalRelationshipsUpdateNumberOfChildren = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsNumberOfChildrenDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/number-of-children`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
 export default {
   stubOfficialRelationshipsCount,
   stubSocialRelationshipsCount,
   stubPersonalRelationshipsCountError,
   stubPersonalRelationshipsContacts,
+  stubPersonalRelationshipsGetNumberOfChildren,
+  stubPersonalRelationshipsUpdateNumberOfChildren,
 }

@@ -68,6 +68,19 @@ export interface PersonalRelationshipsPaginationDto {
   totalPages?: number
 }
 
+export interface PersonalRelationshipsNumberOfChildrenDto {
+  id: number
+  numberOfChildren?: string
+  active: boolean
+  createdTime?: string
+  createdBy?: string
+}
+
+export interface PersonalRelationshipsNumberOfChildrenUpdateRequest {
+  numberOfChildren: number
+  requestedBy?: string
+}
+
 export interface PersonalRelationshipsContactQueryParams extends QueryParams {
   emergencyContactOrNextOfKin?: boolean
   isRelationshipActive?: boolean
@@ -81,4 +94,11 @@ export interface PersonalRelationshipsApiClient {
     prisonerNumber: string,
     queryParams?: PersonalRelationshipsContactQueryParams,
   ): Promise<PersonalRelationshipsContactsDto>
+
+  getNumberOfChildren(prisonerNumber: string): Promise<PersonalRelationshipsNumberOfChildrenDto>
+
+  updateNumberOfChildren(
+    prisonerNumber: string,
+    updateRequest: PersonalRelationshipsNumberOfChildrenUpdateRequest,
+  ): Promise<PersonalRelationshipsNumberOfChildrenDto>
 }

@@ -34,6 +34,7 @@ import {
   heightFieldData,
   heightImperialFieldData,
   nationalityFieldData,
+  numberOfChildrenFieldData,
   PhysicalAttributesTextFieldData,
   RadioFieldData,
   religionFieldData,
@@ -1238,6 +1239,7 @@ export default class PersonalController {
           currentReasonForChange,
           currentReasonForChangeUnknown,
           breadcrumbPrisonerName: prisonerBannerName,
+          redirectAnchor,
           errors,
           options: [
             ...objectToRadioOptions(religionOptions, 'code', 'description', fieldValue),
@@ -1370,6 +1372,79 @@ export default class PersonalController {
           },
           fieldData: sexualOrientationFieldData,
           auditDetails: { fieldName, previous: previousValue, updated: radioField },
+        })
+      },
+    }
+  }
+
+  numberOfChildren() {
+    const { pageTitle, fieldName, auditEditPageLoad, redirectAnchor } = numberOfChildrenFieldData
+
+    return {
+      edit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerData, clientToken } = req.middleware
+        const { firstName, lastName, cellLocation } = prisonerData
+        const { prisonerNumber } = req.params
+        const prisonerName = formatName(firstName, null, lastName, { style: NameFormatStyle.firstLast })
+        const prisonerBannerName = formatName(firstName, null, lastName, { style: NameFormatStyle.lastCommaFirst })
+        const requestBodyFlash = requestBodyFromFlash<{ hasChildren: string; numberOfChildren?: number }>(req)
+        const errors = req.flash('errors')
+
+        const currentNumberOfChildren =
+          requestBodyFlash?.numberOfChildren ??
+          (await this.personalPageService.getNumberOfChildren(clientToken, prisonerNumber))?.numberOfChildren
+        const radioFieldValue =
+          (requestBodyFlash?.hasChildren ?? (currentNumberOfChildren && currentNumberOfChildren !== '0')) ? 'YES' : 'NO'
+
+        await this.auditService.sendPageView({
+          user: res.locals.user,
+          prisonerNumber: prisonerData.prisonerNumber,
+          prisonId: prisonerData.prisonId,
+          correlationId: req.id,
+          page: auditEditPageLoad,
+        })
+
+        res.render('pages/edit/children', {
+          pageTitle: `${pageTitle} - Prisoner personal details`,
+          formTitle: `Does ${prisonerName} have any children?`,
+          prisonerNumber,
+          breadcrumbPrisonerName: prisonerBannerName,
+          radioFieldValue,
+          currentNumberOfChildren,
+          errors,
+          redirectAnchor,
+          miniBannerData: {
+            prisonerName: prisonerBannerName,
+            prisonerNumber,
+            cellLocation: formatLocation(cellLocation),
+          },
+        })
+      },
+
+      submit: async (req: Request, res: Response, next: NextFunction) => {
+        const { prisonerNumber } = req.params
+        const { clientToken } = req.middleware
+        const user = res.locals.user as PrisonUser
+        const { hasChildren, numberOfChildren } = req.body
+        const previousValue = (await this.personalPageService.getNumberOfChildren(clientToken, prisonerNumber))
+          ?.numberOfChildren
+
+        const parsedNumberOfChildren = hasChildren === 'YES' ? Number(numberOfChildren) : 0
+
+        return this.submit({
+          req,
+          res,
+          prisonerNumber,
+          submit: async () => {
+            await this.personalPageService.updateNumberOfChildren(
+              clientToken,
+              user,
+              prisonerNumber,
+              parsedNumberOfChildren,
+            )
+          },
+          fieldData: numberOfChildrenFieldData,
+          auditDetails: { fieldName, previous: previousValue, updated: numberOfChildren },
         })
       },
     }
