@@ -1,10 +1,11 @@
 import RestClient from './restClient'
 import config from '../config'
 import {
-  ContactsDto,
   PersonalRelationshipsApiClient,
-  PersonalRelationshipType,
+  PersonalRelationshipsContactQueryParams,
+  PersonalRelationshipsContactsDto,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { mapToQueryString } from '../utils/utils'
 
 export default class PersonalRelationshipsApiRestClient implements PersonalRelationshipsApiClient {
   private readonly restClient: RestClient
@@ -15,17 +16,8 @@ export default class PersonalRelationshipsApiRestClient implements PersonalRelat
 
   getContacts(
     prisonerNumber: string,
-    relationshipType?: PersonalRelationshipType,
-    page?: number,
-    size?: number,
-  ): Promise<ContactsDto> {
-    return this.restClient.get({
-      path: `/prisoner/${prisonerNumber}/contact`,
-      query: {
-        relationshipType,
-        page,
-        size,
-      },
-    })
+    queryParams?: PersonalRelationshipsContactQueryParams,
+  ): Promise<PersonalRelationshipsContactsDto> {
+    return this.restClient.get({ path: `/prisoner/${prisonerNumber}/contact`, query: mapToQueryString(queryParams) })
   }
 }

@@ -111,6 +111,7 @@ export const services = () => {
     prisonService,
     metricsService,
     curiousApiToken,
+    personalRelationshipsApiClientBuilder,
   )
   const curiousService = new CuriousService(curiousApiClientBuilder, prisonService, curiousApiToken)
   const workAndSkillsPageService = new WorkAndSkillsPageService(

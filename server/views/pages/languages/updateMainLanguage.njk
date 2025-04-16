@@ -59,7 +59,8 @@
                         id: "preferredSpokenLanguageCode",
                         name: "preferredSpokenLanguageCode",
                         label: {
-                            text: mainLanguageLabel
+                            text: mainLanguageLabel,
+                            classes: 'govuk-label--s'
                         },
                         items: preferredSpokenLanguageOptions,
                         errorMessage: errors | findError("preferredSpokenLanguageCode"),
@@ -97,7 +98,8 @@
                         id: "preferredWrittenLanguageCode",
                         name: "preferredWrittenLanguageCode",
                         label: {
-                            text: 'What is their main written language?'
+                            text: 'What is their main written language?',
+                            classes: 'govuk-label--s'
                         },
                         items: preferredWrittenLanguageOptions,
                         errorMessage: errors | findError("preferredWrittenLanguageCode"),

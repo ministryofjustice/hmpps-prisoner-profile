@@ -1,8 +1,8 @@
 import nock from 'nock'
 import config from '../config'
 import {
-  ContactsDto,
   PersonalRelationshipsApiClient,
+  PersonalRelationshipsContactsDto,
   PersonalRelationshipType,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
@@ -25,7 +25,7 @@ describe('personalRelationshipsApiRestClient', () => {
 
   const prisonerNumber = 'A1234BC'
 
-  const contacts: ContactsDto = {
+  const contacts: PersonalRelationshipsContactsDto = {
     content: [
       {
         prisonerContactId: 1,
@@ -77,7 +77,7 @@ describe('personalRelationshipsApiRestClient', () => {
           .query({ relationshipType })
           .reply(200, contacts)
 
-        const output = await personalRelationshipsApiClient.getContacts(prisonerNumber, relationshipType)
+        const output = await personalRelationshipsApiClient.getContacts(prisonerNumber, { relationshipType })
         expect(output).toEqual(contacts)
       },
     )
@@ -91,7 +91,7 @@ describe('personalRelationshipsApiRestClient', () => {
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, contacts)
 
-      const output = await personalRelationshipsApiClient.getContacts(prisonerNumber, undefined, page, size)
+      const output = await personalRelationshipsApiClient.getContacts(prisonerNumber, { page, size })
       expect(output).toEqual(contacts)
     })
   })

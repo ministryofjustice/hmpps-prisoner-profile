@@ -3,6 +3,15 @@
     {% if params.title %}
       <div class="hmpps-summary-card__header" data-qa="summary-header">
         <h2>{{ params.title }}</h2>
+        {% if params.actions.length > 0 %}
+        <ul class="hmpps-summary-card__actions">
+          {% for action in params.actions %}
+          <li class="hmpps-summary-card__action">
+              <a class="govuk-link" href="{{ action.href }}">{{ action.text }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
       </div>
     {% endif %}
     <div class="hmpps-summary-card__body">
