@@ -1,6 +1,6 @@
-import { ContactsDto } from '../interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import { PersonalRelationshipsContactsDto } from '../interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
-export const personalRelationshipsOfficialMock: ContactsDto = {
+export const personalRelationshipsOfficialMock: PersonalRelationshipsContactsDto = {
   content: [
     {
       prisonerContactId: 1,
@@ -32,7 +32,7 @@ export const personalRelationshipsOfficialMock: ContactsDto = {
   },
 }
 
-export const personalRelationshipsSocialMock: ContactsDto = {
+export const personalRelationshipsSocialMock: PersonalRelationshipsContactsDto = {
   content: [
     {
       prisonerContactId: 1,
@@ -62,4 +62,85 @@ export const personalRelationshipsSocialMock: ContactsDto = {
     totalPages: 1,
     totalElements: 1,
   },
+}
+
+export const PersonalRelationshipsContactsDtoMock: PersonalRelationshipsContactsDto = {
+  content: [
+    {
+      prisonerContactId: 7248919,
+      contactId: 20000052,
+      prisonerNumber: 'G4790GH',
+      lastName: 'Doe',
+      firstName: 'Rick',
+      middleNames: 'William',
+      dateOfBirth: '1987-10-25',
+      relationshipTypeCode: 'S',
+      relationshipTypeDescription: 'Social',
+      relationshipToPrisonerCode: 'BRO',
+      relationshipToPrisonerDescription: 'Brother',
+      property: '99',
+      street: 'Acacia Avenue',
+      cityCode: '27073',
+      cityDescription: 'Newcastle Upon Tyne',
+      postcode: 'S13 4FH',
+      primaryAddress: false,
+      mailAddress: false,
+      phoneType: 'HOME',
+      phoneTypeDescription: 'Home',
+      phoneNumber: '01234567890',
+      isApprovedVisitor: false,
+      isNextOfKin: false,
+      isEmergencyContact: true,
+      isRelationshipActive: true,
+      currentTerm: true,
+      restrictionSummary: { active: [], totalActive: 0, totalExpired: 0 },
+    },
+    {
+      prisonerContactId: 7248917,
+      contactId: 20000050,
+      prisonerNumber: 'G4790GH',
+      lastName: 'Doe',
+      firstName: 'Bill',
+      relationshipTypeCode: 'S',
+      relationshipTypeDescription: 'Social',
+      relationshipToPrisonerCode: 'FRI',
+      relationshipToPrisonerDescription: 'Friend',
+      flat: '2B',
+      property: 'Mansion House',
+      street: 'Acacia Avenue',
+      cityCode: '27073',
+      cityDescription: 'Newcastle Upon Tyne',
+      postcode: 'S13 4FH',
+      primaryAddress: false,
+      mailAddress: false,
+      isApprovedVisitor: false,
+      isNextOfKin: true,
+      isEmergencyContact: false,
+      isRelationshipActive: true,
+      currentTerm: true,
+      restrictionSummary: { active: [], totalActive: 0, totalExpired: 0 },
+    },
+    {
+      prisonerContactId: 7248914,
+      contactId: 20000047,
+      prisonerNumber: 'G4790GH',
+      lastName: 'Doe',
+      firstName: 'John',
+      relationshipTypeCode: 'S',
+      relationshipTypeDescription: 'Social',
+      relationshipToPrisonerCode: 'FRI',
+      relationshipToPrisonerDescription: 'Friend',
+      phoneType: 'HOME',
+      phoneTypeDescription: 'Home',
+      phoneNumber: '+44 1234567890',
+      dateOfBirth: '1980-01-01',
+      isApprovedVisitor: false,
+      isNextOfKin: true,
+      isEmergencyContact: true,
+      isRelationshipActive: true,
+      currentTerm: true,
+      restrictionSummary: { active: [], totalActive: 0, totalExpired: 0 },
+    },
+  ],
+  page: { size: 10, number: 0, totalElements: 3, totalPages: 1 },
 }

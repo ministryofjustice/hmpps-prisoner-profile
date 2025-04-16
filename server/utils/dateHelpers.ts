@@ -225,3 +225,14 @@ export const formatDateToPattern = (isoDate: string, pattern: string, emptyRetur
 
   return format(isoDate, pattern)
 }
+
+export const formatDateWithAge = (
+  isoDate: string,
+  style: 'short' | 'full' | 'long' | 'medium' = 'long',
+  emptyReturnValue: string = '',
+) => {
+  if (!isoDate) return emptyReturnValue
+
+  const formattedDate = formatDate(isoDate, style, emptyReturnValue)
+  return `${formattedDate} (${ageAsString(isoDate)})`
+}

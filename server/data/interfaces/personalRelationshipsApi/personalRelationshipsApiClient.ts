@@ -1,15 +1,17 @@
+import { QueryParams } from '../../../interfaces/QueryParams'
+
 // eslint-disable-next-line no-shadow
 export enum PersonalRelationshipType {
   Official = 'O',
   Social = 'S',
 }
 
-export interface ContactsDto {
-  content: ContactDto[]
-  page?: PaginationDto
+export interface PersonalRelationshipsContactsDto {
+  content: PersonalRelationshipsContact[]
+  page?: PersonalRelationshipsPaginationDto
 }
 
-export interface ContactDto {
+export interface PersonalRelationshipsContact {
   prisonerContactId: number
   contactId: number
   prisonerNumber: string
@@ -45,32 +47,38 @@ export interface ContactDto {
   isRelationshipActive: boolean
   currentTerm: boolean
   comments?: string
-  restrictionSummary: RestrictionSummaryDto
+  restrictionSummary: PersonalRelationshipsRestrictionSummary
 }
 
-export interface RestrictionSummaryDto {
-  active: RestrictionDto[]
+export interface PersonalRelationshipsRestrictionSummary {
+  active: PersonalRelationshipsRestriction[]
   totalActive: number
   totalExpired: number
 }
 
-export interface RestrictionDto {
+export interface PersonalRelationshipsRestriction {
   restrictionType: string
   restrictionTypeDescription: string
 }
 
-export interface PaginationDto {
+export interface PersonalRelationshipsPaginationDto {
   size?: number
   number?: number
   totalElements?: number
   totalPages?: number
 }
 
+export interface PersonalRelationshipsContactQueryParams extends QueryParams {
+  emergencyContactOrNextOfKin?: boolean
+  isRelationshipActive?: boolean
+  relationshipType?: PersonalRelationshipType
+  page?: number
+  size?: number
+}
+
 export interface PersonalRelationshipsApiClient {
   getContacts(
     prisonerNumber: string,
-    relationshipType?: PersonalRelationshipType,
-    page?: number,
-    size?: number,
-  ): Promise<ContactsDto>
+    queryParams?: PersonalRelationshipsContactQueryParams,
+  ): Promise<PersonalRelationshipsContactsDto>
 }

@@ -8,9 +8,11 @@ import {
   addressToSummaryItems,
   apiErrorMessage,
   apostrophe,
+  contactAddressToHtml,
   findError,
   formatMoney,
   formatName,
+  formatPhoneNumber,
   formatScheduleItem,
   initialiseName,
   isInUsersCaseLoad,
@@ -28,7 +30,14 @@ import {
 } from './utils'
 import { checkboxFieldDataToInputs } from './checkboxUtils'
 import { pluralise } from './pluralise'
-import { formatAddressDate, formatDate, formatDateTime, formatDateToPattern, timeFormat } from './dateHelpers'
+import {
+  formatAddressDate,
+  formatDate,
+  formatDateTime,
+  formatDateToPattern,
+  formatDateWithAge,
+  timeFormat,
+} from './dateHelpers'
 import config from '../config'
 import releaseDatesToSummaryRows from '../views/dataUtils/releaseDatesToSummaryRows'
 import mapCsraReviewToSummaryList from '../mappers/csraReviewToSummaryListMapper'
@@ -127,6 +136,7 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   njkEnv.addFilter('filterNot', (l: any[], iteratee: string, eq: unknown) => l.filter(o => o[iteratee] !== eq))
   njkEnv.addFilter('addressToLines', addressToLines)
+  njkEnv.addFilter('contactAddressToHtml', contactAddressToHtml)
   njkEnv.addFilter('find', (l: never[], iteratee: string, eq: unknown) => l.find(o => o[iteratee] === eq))
   njkEnv.addFilter('findError', findError)
   njkEnv.addFilter('addDefaultSelectedValue', addDefaultSelectedValue)
@@ -208,4 +218,6 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('latestImageId', latestImageId)
   njkEnv.addFilter('lengthOfService', lengthOfService)
   njkEnv.addFilter('formatDateToPattern', formatDateToPattern)
+  njkEnv.addFilter('formatDateWithAge', formatDateWithAge)
+  njkEnv.addFilter('formatPhoneNumber', formatPhoneNumber)
 }

@@ -6,6 +6,7 @@ import {
   MilitaryRecord,
   PersonIntegrationDistinguishingMark,
 } from '../../../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PersonalRelationshipsContact } from '../../../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 export default interface PersonalPage {
   personalDetails: PersonalDetails
@@ -13,7 +14,9 @@ export default interface PersonalPage {
   property: PropertyItem[]
   addresses: Addresses
   addressSummary: GovSummaryItem[]
-  nextOfKin: NextOfKin[]
+  nextOfKinAndEmergencyContacts: PersonalRelationshipsContact[]
+  hasNextOfKin: boolean
+  hasEmergencyContact: boolean
   physicalCharacteristics: PhysicalCharacteristics
   security: Security
   learnerNeurodivergence: Result<LearnerNeurodivergence[]>

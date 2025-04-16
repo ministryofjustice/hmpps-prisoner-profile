@@ -41,18 +41,16 @@ describe('ContactsService', () => {
 
       const result = await contactsService.getExternalContactsCount(clientToken, prisonerNumber)
 
-      expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(
-        prisonerNumber,
-        PersonalRelationshipType.Official,
-        0,
-        1,
-      )
-      expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(
-        prisonerNumber,
-        PersonalRelationshipType.Social,
-        0,
-        1,
-      )
+      expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(prisonerNumber, {
+        relationshipType: PersonalRelationshipType.Official,
+        page: 0,
+        size: 1,
+      })
+      expect(personalRelationshipsApiClient.getContacts).toHaveBeenCalledWith(prisonerNumber, {
+        relationshipType: PersonalRelationshipType.Social,
+        page: 0,
+        size: 1,
+      })
       expect(result).toEqual(expected)
     })
   })

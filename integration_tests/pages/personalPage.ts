@@ -101,21 +101,20 @@ export default class PersonalPage extends Page {
   }
 
   contacts = () => {
-    const cardData = () => cy.getDataQa('next-of-kin')
+    const cardData = () => cy.get('#next-of-kin')
     return {
       contact: contactNumber => {
-        const contactData = () => cardData().find('[data-qa=emergency-contact]').eq(contactNumber)
-        const details = () => contactData().find('[data-qa=contact-details]').find('.govuk-summary-list__value')
+        const contactData = () => cardData().find('[data-qa=contact-item]').eq(contactNumber)
 
         return {
+          nextOfKin: () => contactData().find('[data-qa=next-of-kin]'),
+          emergencyContact: () => contactData().find('[data-qa=emergency-contact]'),
           name: () => contactData().find('[data-qa=contact-name]'),
           relationship: () => contactData().find('[data-qa=contact-relationship]'),
-          emergencyContact: () => contactData().find('[data-qa=contact-emergency-contact]'),
-          phones: () => contactData().find('[data-qa=contact-numbers]'),
-          address: () => details().eq(0),
-          addressTypes: () => details().eq(1),
-          addressPhones: () => details().eq(2),
-          emails: () => details().eq(3),
+          phoneNumber: () => contactData().find('[data-qa=contact-phone]'),
+          additionalDetails: () => contactData().find('.govuk-details__summary-text'),
+          dateOfBirth: () => contactData().find('.govuk-summary-list > :nth-child(1) > .govuk-summary-list__value'),
+          address: () => contactData().find('.govuk-summary-list > :nth-child(2) > .govuk-summary-list__value'),
         }
       },
     }

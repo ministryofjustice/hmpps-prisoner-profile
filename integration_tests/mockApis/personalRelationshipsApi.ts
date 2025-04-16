@@ -4,7 +4,10 @@ import {
   personalRelationshipsOfficialMock,
   personalRelationshipsSocialMock,
 } from '../../server/data/localMockData/personalRelationshipsApiMock'
-import { PersonalRelationshipType } from '../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
+import {
+  PersonalRelationshipsContactsDto,
+  PersonalRelationshipType,
+} from '../../server/data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 const baseUrl = '/personalRelationships'
 
@@ -80,4 +83,27 @@ const stubPersonalRelationshipsCountError = (params: { prisonerNumber: string })
     },
   })
 
-export default { stubOfficialRelationshipsCount, stubSocialRelationshipsCount, stubPersonalRelationshipsCountError }
+const stubPersonalRelationshipsContacts = (params: {
+  prisonerNumber: string
+  resp: PersonalRelationshipsContactsDto
+}): SuperAgentRequest =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `${baseUrl}/prisoner/${params.prisonerNumber}/contact\\?.*`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: params.resp,
+    },
+  })
+
+export default {
+  stubOfficialRelationshipsCount,
+  stubSocialRelationshipsCount,
+  stubPersonalRelationshipsCountError,
+  stubPersonalRelationshipsContacts,
+}
