@@ -113,7 +113,7 @@ const ethnicGroups: EthnicGroup[] = [
   {
     group: 'black',
     description: 'Black, Black British, Caribbean or African',
-    headingDescription: 'Black, Black British, Caribbean or African',
+    headingDescription: 'Black, African, Caribbean or Black British',
     backgrounds: [
       { code: 'B2', description: 'African' },
       { code: 'B1', description: 'Caribbean' },
