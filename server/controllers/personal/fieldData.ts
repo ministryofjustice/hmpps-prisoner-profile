@@ -203,7 +203,7 @@ export const sexualOrientationFieldData: RadioFieldData = {
 }
 
 export const numberOfChildrenFieldData: RadioFieldData = {
-  url: 'number-of-children',
+  url: 'children',
   fieldName: 'numberOfChildren',
   pageTitle: 'Children',
   auditEditPageLoad: Page.EditNumberOfChildren,

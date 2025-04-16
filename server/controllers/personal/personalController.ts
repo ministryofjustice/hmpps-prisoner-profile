@@ -1390,9 +1390,11 @@ export default class PersonalController {
         const requestBodyFlash = requestBodyFromFlash<{ hasChildren: string; numberOfChildren?: number }>(req)
         const errors = req.flash('errors')
 
-        const radioFieldValue = requestBodyFlash?.hasChildren
-        // TODO Get this from the personal relationships API or profile details
-        const currentNumberOfChildren = requestBodyFlash?.numberOfChildren ?? '1'
+        const currentNumberOfChildren =
+          requestBodyFlash?.numberOfChildren ??
+          (await this.personalPageService.getNumberOfChildren(clientToken, prisonerNumber))?.numberOfChildren
+        const radioFieldValue =
+          (requestBodyFlash?.hasChildren ?? (currentNumberOfChildren && currentNumberOfChildren !== '0')) ? 'YES' : 'NO'
 
         await this.auditService.sendPageView({
           user: res.locals.user,
@@ -1401,9 +1403,6 @@ export default class PersonalController {
           correlationId: req.id,
           page: auditEditPageLoad,
         })
-
-        // TODO Populate number of children field only if the number is > 0
-        // TODO If user selects NO, send 0 to API
 
         res.render('pages/edit/children', {
           pageTitle: `${pageTitle} - Prisoner personal details`,
@@ -1426,14 +1425,24 @@ export default class PersonalController {
         const { prisonerNumber } = req.params
         const { clientToken } = req.middleware
         const user = res.locals.user as PrisonUser
-        const { numberOfChildren } = req.body
-        const previousValue = '0' // Get this
+        const { hasChildren, numberOfChildren } = req.body
+        const previousValue = (await this.personalPageService.getNumberOfChildren(clientToken, prisonerNumber))
+          ?.numberOfChildren
+
+        const parsedNumberOfChildren = hasChildren === 'YES' ? Number(numberOfChildren) : 0
 
         return this.submit({
           req,
           res,
           prisonerNumber,
-          submit: async () => {},
+          submit: async () => {
+            await this.personalPageService.updateNumberOfChildren(
+              clientToken,
+              user,
+              prisonerNumber,
+              parsedNumberOfChildren,
+            )
+          },
           fieldData: numberOfChildrenFieldData,
           auditDetails: { fieldName, previous: previousValue, updated: numberOfChildren },
         })
