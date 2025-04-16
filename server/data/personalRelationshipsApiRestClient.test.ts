@@ -3,6 +3,8 @@ import config from '../config'
 import {
   PersonalRelationshipsApiClient,
   PersonalRelationshipsContactsDto,
+  PersonalRelationshipsNumberOfChildrenDto,
+  PersonalRelationshipsNumberOfChildrenUpdateRequest,
   PersonalRelationshipType,
 } from './interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 import PersonalRelationshipsApiRestClient from './personalRelationshipsApiRestClient'
@@ -27,39 +29,39 @@ describe('personalRelationshipsApiRestClient', () => {
 
   const contactCount = { offical: 1, social: 1 }
 
-  const contacts: PersonalRelationshipsContactsDto = {
-    content: [
-      {
-        prisonerContactId: 1,
-        contactId: 2,
-        prisonerNumber,
-        firstName: 'John',
-        lastName: 'Smith',
-        relationshipTypeCode: 'S',
-        relationshipTypeDescription: 'Friend',
-        relationshipToPrisonerCode: 'FRI',
-        relationshipToPrisonerDescription: 'Friend',
-        isApprovedVisitor: true,
-        isEmergencyContact: false,
-        isNextOfKin: false,
-        isRelationshipActive: true,
-        currentTerm: true,
-        restrictionSummary: {
-          active: [],
-          totalActive: 0,
-          totalExpired: 0,
-        },
-      },
-    ],
-    page: {
-      size: 20,
-      number: 0,
-      totalPages: 1,
-      totalElements: 1,
-    },
-  }
-
   describe('getContacts', () => {
+    const contacts: PersonalRelationshipsContactsDto = {
+      content: [
+        {
+          prisonerContactId: 1,
+          contactId: 2,
+          prisonerNumber,
+          firstName: 'John',
+          lastName: 'Smith',
+          relationshipTypeCode: 'S',
+          relationshipTypeDescription: 'Friend',
+          relationshipToPrisonerCode: 'FRI',
+          relationshipToPrisonerDescription: 'Friend',
+          isApprovedVisitor: true,
+          isEmergencyContact: false,
+          isNextOfKin: false,
+          isRelationshipActive: true,
+          currentTerm: true,
+          restrictionSummary: {
+            active: [],
+            totalActive: 0,
+            totalExpired: 0,
+          },
+        },
+      ],
+      page: {
+        size: 20,
+        number: 0,
+        totalPages: 1,
+        totalElements: 1,
+      },
+    }
+
     it('should return data from api', async () => {
       fakePersonalRelationshipsApi
         .get(`/prisoner/${prisonerNumber}/contact`)
@@ -107,6 +109,47 @@ describe('personalRelationshipsApiRestClient', () => {
 
       const output = await personalRelationshipsApiClient.getContactCount(prisonerNumber)
       expect(output).toEqual(contactCount)
+    })
+  })
+
+  describe('getNumberOfChildren', () => {
+    const numberOfChildren: PersonalRelationshipsNumberOfChildrenDto = {
+      id: 1,
+      numberOfChildren: '2',
+      active: true,
+    }
+
+    it('should return data from api', async () => {
+      fakePersonalRelationshipsApi
+        .get(`/prisoner/${prisonerNumber}/number-of-children`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, numberOfChildren)
+
+      const output = await personalRelationshipsApiClient.getNumberOfChildren(prisonerNumber)
+      expect(output).toEqual(numberOfChildren)
+    })
+  })
+
+  describe('updateNumberOfChildren', () => {
+    const updatedNumberOfChildren: PersonalRelationshipsNumberOfChildrenDto = {
+      id: 1,
+      numberOfChildren: '3',
+      active: true,
+      createdBy: 'test-user',
+    }
+    const request: PersonalRelationshipsNumberOfChildrenUpdateRequest = {
+      numberOfChildren: 3,
+      requestedBy: 'test-user',
+    }
+
+    it('should return data from api', async () => {
+      fakePersonalRelationshipsApi
+        .put(`/prisoner/${prisonerNumber}/number-of-children`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, updatedNumberOfChildren)
+
+      const output = await personalRelationshipsApiClient.updateNumberOfChildren(prisonerNumber, request)
+      expect(output).toEqual(updatedNumberOfChildren)
     })
   })
 })

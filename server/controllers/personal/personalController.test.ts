@@ -49,6 +49,7 @@ import {
 import { corePersonPhysicalAttributesMock } from '../../data/localMockData/physicalAttributesMock'
 import { objectToRadioOptions } from '../../utils/utils'
 import { CorePersonPhysicalAttributes } from '../../services/interfaces/corePerson/corePersonPhysicalAttributes'
+import { PersonalRelationshipsNumberOfChildrenMock } from '../../data/localMockData/personalRelationshipsApiMock'
 
 describe('PersonalController', () => {
   let personalPageService: PersonalPageService
@@ -84,11 +85,6 @@ describe('PersonalController', () => {
           resultValue: 'Heterosexual / Straight',
           type: ProfileInformationType.SexualOrientation,
         },
-        {
-          question: 'Number of children',
-          resultValue: '1',
-          type: ProfileInformationType.NumberOfChildren,
-        },
       ],
     } as InmateDetail,
   }
@@ -121,6 +117,7 @@ describe('PersonalController', () => {
     personalPageService.updateSmokerOrVaper = jest.fn()
     auditService = auditServiceMock()
     careNeedsService = careNeedsServiceMock() as CareNeedsService
+    personalPageService.getNumberOfChildren = jest.fn(async () => PersonalRelationshipsNumberOfChildrenMock)
 
     controller = new PersonalController(personalPageService, careNeedsService, auditService)
     res = { locals: defaultLocals, render: jest.fn(), redirect: jest.fn() } as any
@@ -2841,8 +2838,8 @@ describe('PersonalController', () => {
             prisonerName: 'Last, First',
             prisonerNumber: 'ABC123',
           },
-          radioFieldValue: undefined,
-          currentNumberOfChildren: '1',
+          radioFieldValue: 'YES',
+          currentNumberOfChildren: '2',
         })
       })
 
@@ -2863,7 +2860,7 @@ describe('PersonalController', () => {
         const req = {
           params: { prisonerNumber: 'ABC123' },
           flash: (key: string): any => {
-            return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '2' })] : []
+            return key === 'requestBody' ? [JSON.stringify({ hasChildren: 'YES', numberOfChildren: '4' })] : []
           },
           middleware: defaultMiddleware,
         } as any
@@ -2872,7 +2869,7 @@ describe('PersonalController', () => {
           expect.anything(),
           expect.objectContaining({
             radioFieldValue: 'YES',
-            currentNumberOfChildren: '2',
+            currentNumberOfChildren: '4',
           }),
         )
       })
@@ -2909,20 +2906,27 @@ describe('PersonalController', () => {
           id: '1',
           middleware: defaultMiddleware,
           params: { prisonerNumber: 'A1234BC' },
-          body: { hasChildren: 'YES', numberOfChildren: '2' },
+          body: { hasChildren: 'YES', numberOfChildren: '5' },
           flash: jest.fn(),
         } as any
+
+        personalPageService.updateNumberOfChildren = jest.fn()
       })
 
-      // TODO Update this
-      xit('Updates the number of children', async () => {
+      it('Updates the number of children', async () => {
         await action(validRequest, res)
-        expect(personalPageService.updateSexualOrientation).toHaveBeenCalledWith(
-          'token',
-          prisonUserMock,
-          'A1234BC',
-          'HET',
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 5)
+      })
+
+      it(`Updates the number of children to 0 if 'NO' selected as answer`, async () => {
+        await action(
+          {
+            ...validRequest,
+            body: { hasChildren: 'NO' },
+          },
+          res,
         )
+        expect(personalPageService.updateNumberOfChildren).toHaveBeenCalledWith('token', prisonUserMock, 'A1234BC', 0)
       })
 
       it('Redirects to the personal page #personal-details on success', async () => {
@@ -2940,9 +2944,8 @@ describe('PersonalController', () => {
         })
       })
 
-      // TODO Update this
-      xit('Handles API errors', async () => {
-        personalPageService.updateSexualOrientation = async () => {
+      it('Handles API errors', async () => {
+        personalPageService.updateNumberOfChildren = async () => {
           throw new Error()
         }
 
@@ -2953,13 +2956,13 @@ describe('PersonalController', () => {
       })
 
       it('Sends a post success audit event', async () => {
-        const request = { ...validRequest, id: 1, body: { hasChildren: 'YES', numberOfChildren: '2' } }
+        const request = { ...validRequest, id: 1, body: { hasChildren: 'YES', numberOfChildren: '5' } }
         const expectedAuditEvent = {
           user: prisonUserMock,
           prisonerNumber: 'A1234BC',
           correlationId: request.id,
           action: PostAction.EditNumberOfChildren,
-          details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '0', updated: '2' },
+          details: { fieldName: numberOfChildrenFieldData.fieldName, previous: '2', updated: '5' },
         }
 
         await action(request, res)
