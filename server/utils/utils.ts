@@ -20,6 +20,7 @@ import logger from '../../logger'
 import { QueryParams, QueryParamValue } from '../interfaces/QueryParams'
 import { pluralise } from './pluralise'
 import { PersonIntegrationDistinguishingMarkImageDetail } from '../data/interfaces/personIntegrationApi/personIntegrationApiClient'
+import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -343,6 +344,20 @@ export const addressToLines = ({
   const addressArray = [lineOne, town, county, postalCode, country].filter(s => s)
   if (addressArray.length !== 1 || !country) return addressArray
   return []
+}
+
+export const contactAddressToHtml = (address: Partial<PersonalRelationshipsContact>): string => {
+  const { flat, property, street, cityDescription, postcode } = address || {}
+  let lineOne = [property, street]
+    .filter(s => s)
+    .join(' ')
+    .trim()
+  if (flat) {
+    lineOne = [`Flat ${flat}`, lineOne].filter(Boolean).join(', ')
+  }
+  const addressArray = [lineOne, cityDescription, postcode].filter(s => s)
+  if (addressArray.length) return addressArray.join('<br/>')
+  return 'Not entered'
 }
 
 /**
@@ -798,4 +813,15 @@ export const lengthOfService = (startDate: string, endDate: string): string => {
 export const requestStringToBoolean = (value: string): boolean => {
   if (value === undefined) return undefined
   return value === 'true'
+}
+
+export const formatPhoneNumber = (phoneNumber: string): string => {
+  if (!phoneNumber?.trim()) return null
+
+  // If 11 digits after spaces and non-numeric characters have been removed, format as 01234 567890
+  const cleanedNumber = phoneNumber.replace(/[^0-9]/g, '')
+  if (cleanedNumber.length === 11) {
+    return `${cleanedNumber.slice(0, 5)} ${cleanedNumber.slice(5)}`
+  }
+  return phoneNumber.trim()
 }

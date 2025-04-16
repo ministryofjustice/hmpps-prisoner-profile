@@ -90,8 +90,8 @@ export const dataAccess = {
   telemetryClient,
   osPlacesApiClient: new OsPlacesApiRestClient(),
   personCommunicationNeedsApiClientBuilder: (token: string) => new PersonCommunicationNeedsApiRestClient(token),
-  personalRelationshipsApiClientBuilder: (token: string) => new PersonalRelationshipsApiRestClient(token),
   prisonerProfileApiClientBuilder: (token: string) => new PrisonerProfileApiRestClient(token),
+  personalRelationshipsApiClientBuilder: (token: string) => new PersonalRelationshipsApiRestClient(token),
 }
 
 export type DataAccess = typeof dataAccess

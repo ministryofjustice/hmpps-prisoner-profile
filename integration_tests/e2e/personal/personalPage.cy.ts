@@ -11,6 +11,7 @@ import { onlyPastCareNeedsMock, pastCareNeedsMock } from '../../../server/data/l
 import { MilitaryRecordsMock } from '../../../server/data/localMockData/personIntegrationApiReferenceDataMock'
 import { corePersonPhysicalAttributesDtoMock } from '../../../server/data/localMockData/physicalAttributesMock'
 import { distinguishingMarkMultiplePhotosMock } from '../../../server/data/localMockData/distinguishingMarksMock'
+import { PersonalRelationshipsContactsDtoMock } from '../../../server/data/localMockData/personalRelationshipsApiMock'
 
 const visitPersonalDetailsPage = ({ failOnStatusCode = true } = {}) => {
   cy.signIn({ failOnStatusCode, redirectPath: 'prisoner/G6123VU/personal' })
@@ -64,6 +65,10 @@ context('When signed in', () => {
       cy.task('stubGetDistinguishingMarksForPrisoner', { prisonerNumber: 'G6123VU' })
       cy.task('stubPersonIntegrationGetMilitaryRecords', MilitaryRecordsMock)
       cy.task('stubPersonIntegrationGetPhysicalAttributes', corePersonPhysicalAttributesDtoMock)
+      cy.task('stubPersonalRelationshipsContacts', {
+        prisonerNumber: 'G6123VU',
+        resp: PersonalRelationshipsContactsDtoMock,
+      })
       visitPersonalDetailsPage()
     })
 
@@ -277,46 +282,39 @@ context('When signed in', () => {
       it('Displays the contacts', () => {
         const page = Page.verifyOnPage(PersonalPage)
 
-        const addressShouldIncludeCorrectText = contact => {
-          contact.address().should('include.text', 'Flat 7, premises address, street field')
-          contact.address().should('include.text', 'Leeds')
-          contact.address().should('include.text', 'LS1 AAA')
-          contact.address().should('include.text', 'England')
-
-          contact.addressTypes().should('include.text', 'Discharge - Permanent Housing')
-          contact.addressTypes().should('include.text', 'HDC Address')
-          contact.addressTypes().should('include.text', 'Other')
-
-          contact.addressPhones().should('include.text', '4444555566')
-          contact.addressPhones().should('include.text', '0113444444')
-          contact.addressPhones().should('include.text', '0113 333444')
-          contact.addressPhones().should('include.text', '0800 222333')
-        }
-
         const firstContact = page.contacts().contact(0)
-        addressShouldIncludeCorrectText(firstContact)
-        firstContact.name().should('include.text', 'First Name Middle Name Surname')
-        firstContact.emergencyContact().should('be.visible')
-        firstContact.relationship().should('include.text', 'Grandson')
-        firstContact.emails().should('include.text', 'Not entered')
+        firstContact.name().should('include.text', 'Bill Doe')
+        firstContact.nextOfKin().should('be.visible')
+        firstContact.emergencyContact().should('not.exist')
+        firstContact.relationship().should('include.text', 'Friend')
+        firstContact.phoneNumber().should('include.text', 'Phone number not entered')
+        firstContact.additionalDetails().click()
+        firstContact.dateOfBirth().should('include.text', 'Not entered')
+        firstContact.address().should('include.text', 'Flat 2B, Mansion House Acacia Avenue')
+        firstContact.address().should('include.text', 'Newcastle Upon Tyne')
+        firstContact.address().should('include.text', 'S13 4FH')
 
         const secondContact = page.contacts().contact(1)
-        addressShouldIncludeCorrectText(secondContact)
-        secondContact.name().should('include.text', 'First Name Middle Name Bob')
+        secondContact.name().should('include.text', 'John Doe')
+        secondContact.nextOfKin().should('be.visible')
         secondContact.emergencyContact().should('be.visible')
-        secondContact.relationship().should('include.text', 'Cousin')
-        secondContact.emails().should('include.text', 'Not entered')
-        secondContact.phones().should('include.text', '555555 6666666')
+        secondContact.relationship().should('include.text', 'Friend')
+        secondContact.phoneNumber().should('include.text', '+44 1234567890')
+        secondContact.additionalDetails().click()
+        secondContact.dateOfBirth().should('include.text', '1 January 1980 (45 years old)')
+        secondContact.address().should('include.text', 'Not entered')
 
         const thirdContact = page.contacts().contact(2)
-        addressShouldIncludeCorrectText(thirdContact)
-        thirdContact.name().should('include.text', 'Dom Bull')
-        thirdContact.relationship().should('include.text', 'Grandfather')
-        thirdContact.emails().should('include.text', 'email@addressgoeshere.com')
-        thirdContact.emails().should('include.text', 'email2@address.com')
-        thirdContact.phones().should('include.text', '0113222333')
-        thirdContact.phones().should('include.text', '0113333444')
-        thirdContact.phones().should('include.text', '07711333444')
+        thirdContact.name().should('include.text', 'Rick William Doe')
+        thirdContact.nextOfKin().should('not.exist')
+        thirdContact.emergencyContact().should('be.visible')
+        thirdContact.relationship().should('include.text', 'Brother')
+        thirdContact.phoneNumber().should('include.text', '01234 567890')
+        thirdContact.additionalDetails().click()
+        thirdContact.dateOfBirth().should('include.text', '25 October 1987 (37 years old)')
+        thirdContact.address().should('include.text', '99 Acacia Avenue')
+        thirdContact.address().should('include.text', 'Newcastle Upon Tyne')
+        thirdContact.address().should('include.text', 'S13 4FH')
       })
     })
 

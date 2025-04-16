@@ -8,6 +8,7 @@ import {
   formatDateTime,
   formatDateTimeISO,
   formatDateToPattern,
+  formatDateWithAge,
   formatDateWithTime,
   isRealDate,
   parseDate,
@@ -210,4 +211,21 @@ describe('formatDateToPattern', () => {
   ])('should format %s with pattern %s and return %s', (isoDate, pattern, emptyReturnValue, expected) => {
     expect(formatDateToPattern(isoDate, pattern, emptyReturnValue)).toEqual(expected)
   })
+})
+
+describe('formatDateWithAge', () => {
+  it.each([
+    ['1985-06-15', 'long', '', '15 June 1985 (39 years old)'],
+    ['1990-12-01', 'long', '', '1 December 1990 (34 years old)'],
+    ['2000-05-20', 'short', '', '20/05/2000 (24 years old)'],
+    ['1975-03-10', 'full', '', 'Monday 10 March 1975 (50 years old)'],
+    ['1995-09-25', 'medium', '', '25 Sept 1995 (29 years old)'],
+    [null, 'long', 'Not entered', 'Not entered'],
+    [undefined, 'long', 'Not entered', 'Not entered'],
+  ])(
+    'should format %s with style %s and emptyReturnValue %s, expect %s',
+    (isoDate: string, style: 'short' | 'full' | 'long' | 'medium', emptyReturnValue: string, expected: string) => {
+      expect(formatDateWithAge(isoDate, style, emptyReturnValue)).toEqual(expected)
+    },
+  )
 })

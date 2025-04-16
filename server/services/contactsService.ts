@@ -20,13 +20,16 @@ export default class ContactsService {
     const personalRelationshipsApi = this.personalRelationshipsApiClientBuilder(clientToken)
 
     const [officialContactInfo, socialContactInfo] = await Promise.all([
-      personalRelationshipsApi.getContacts(
-        prisonerNumber,
-        PersonalRelationshipType.Official,
-        firstPage,
-        minimalPageSize,
-      ),
-      personalRelationshipsApi.getContacts(prisonerNumber, PersonalRelationshipType.Social, firstPage, minimalPageSize),
+      personalRelationshipsApi.getContacts(prisonerNumber, {
+        relationshipType: PersonalRelationshipType.Official,
+        page: firstPage,
+        size: minimalPageSize,
+      }),
+      personalRelationshipsApi.getContacts(prisonerNumber, {
+        relationshipType: PersonalRelationshipType.Social,
+        page: firstPage,
+        size: minimalPageSize,
+      }),
     ])
     return {
       official: officialContactInfo?.page?.totalElements ?? 0,

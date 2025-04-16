@@ -2,7 +2,6 @@ import { PrisonApiClient } from '../data/interfaces/prisonApi/prisonApiClient'
 import PersonalPage, {
   Addresses,
   IdentityNumbers,
-  NextOfKin,
   PersonalDetails,
   PhysicalCharacteristics,
   PropertyItem,
@@ -33,7 +32,6 @@ import { getMostRecentAddress } from '../utils/getMostRecentAddress'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { CuriousRestClientBuilder, RestClientBuilder } from '../data'
 import CuriousApiClient from '../data/interfaces/curiousApi/curiousApiClient'
-import { OffenderContacts } from '../data/interfaces/prisonApi/OffenderContact'
 import { PrisonUser } from '../interfaces/HmppsUser'
 import MetricsService from './metrics/metricsService'
 import { Result } from '../utils/result/result'
@@ -61,6 +59,10 @@ import { CorePersonPhysicalAttributes } from './interfaces/corePerson/corePerson
 import logger from '../../logger'
 import PrisonService from './prisonService'
 import { Prison } from './interfaces/prisonService/PrisonServicePrisons'
+import {
+  PersonalRelationshipsApiClient,
+  PersonalRelationshipsContact,
+} from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 export default class PersonalPageService {
   constructor(
@@ -72,6 +74,7 @@ export default class PersonalPageService {
     private readonly prisonService: PrisonService,
     private readonly metricsService: MetricsService,
     private readonly curiousApiTokenBuilder: () => Promise<CuriousApiToken>,
+    private readonly personalRelationshipsApiClientBuilder: RestClientBuilder<PersonalRelationshipsApiClient>,
   ) {}
 
   async getHealthAndMedication(token: string, prisonerNumber: string): Promise<HealthAndMedication> {
@@ -160,6 +163,7 @@ export default class PersonalPageService {
   ): Promise<PersonalPage> {
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(token)
+    const personalRelationsipsApiClient = this.personalRelationshipsApiClientBuilder(token)
 
     const { bookingId, prisonerNumber, prisonId } = prisonerData
     const [
@@ -168,7 +172,6 @@ export default class PersonalPageService {
       secondaryLanguages,
       property,
       addressList,
-      contacts,
       identifiers,
       beliefs,
       distinguishingMarks,
@@ -176,13 +179,13 @@ export default class PersonalPageService {
       healthAndMedication,
       militaryRecords,
       physicalAttributes,
+      personalRelationshipContacts,
     ] = await Promise.all([
       prisonApiClient.getInmateDetail(bookingId),
       prisonApiClient.getPrisoner(prisonerNumber),
       prisonApiClient.getSecondaryLanguages(bookingId),
       prisonApiClient.getProperty(bookingId),
       prisonApiClient.getAddresses(prisonerNumber),
-      prisonApiClient.getOffenderContacts(prisonerNumber),
       prisonApiClient.getIdentifiers(prisonerNumber),
       prisonApiClient.getBeliefHistory(prisonerNumber),
       editProfileEnabled ? this.getDistinguishingMarks(token, prisonerNumber) : null,
@@ -190,7 +193,14 @@ export default class PersonalPageService {
       dietAndAllergyIsEnabled ? this.getHealthAndMedication(token, prisonerNumber) : null,
       militaryHistoryEnabled() ? this.getMilitaryRecords(token, prisonerNumber) : null,
       this.getPhysicalAttributes(token, prisonerNumber),
+      personalRelationsipsApiClient.getContacts(prisonerNumber, {
+        isRelationshipActive: true,
+        emergencyContactOrNextOfKin: true,
+        size: 100,
+      }),
     ])
+
+    const nextOfKinAndEmergencyContacts = personalRelationshipContacts.content.sort(this.nextOfKinSorter)
 
     const addresses: Addresses = this.addresses(addressList)
     const countryOfBirth =
@@ -214,7 +224,9 @@ export default class PersonalPageService {
       property: this.property(property),
       addresses,
       addressSummary: this.addressSummary(addresses),
-      nextOfKin: await this.nextOfKin(contacts, prisonApiClient),
+      nextOfKinAndEmergencyContacts,
+      hasNextOfKin: nextOfKinAndEmergencyContacts.some(contact => contact.isNextOfKin),
+      hasEmergencyContact: nextOfKinAndEmergencyContacts.some(contact => contact.isEmergencyContact),
       physicalCharacteristics: this.physicalCharacteristics(inmateDetail, physicalAttributes),
       security: {
         interestToImmigration: getProfileInformationValue(
@@ -501,39 +513,6 @@ export default class PersonalPageService {
     }
   }
 
-  private async nextOfKin(contacts: OffenderContacts, prisonApiClient: PrisonApiClient): Promise<NextOfKin[]> {
-    const activeNextOfKinContacts = contacts.offenderContacts?.filter(contact => contact.active && contact.nextOfKin)
-    let contactAddresses: { personId: number; addresses: Address[] }[] = []
-    if (activeNextOfKinContacts) {
-      contactAddresses = await Promise.all(
-        activeNextOfKinContacts.map(contact => this.addressForPerson(contact.personId, prisonApiClient)),
-      )
-    }
-
-    return contacts.offenderContacts
-      ?.filter(contact => contact.nextOfKin && contact.active)
-      .map(contact => {
-        const personAddresses = contactAddresses.find(address => address.personId === contact.personId)
-        return {
-          address: this.addresses(personAddresses.addresses),
-          emails: contact.emails?.map(({ email }) => email) || [],
-          emergencyContact: contact.emergencyContact,
-          name: formatName(contact.firstName, contact.middleName, contact.lastName),
-          nextOfKin: contact.nextOfKin,
-          phones: contact.phones?.map(({ number }) => number),
-          relationship: contact.relationshipDescription,
-        }
-      })
-  }
-
-  private async addressForPerson(
-    personId: number,
-    prisonApiClient: PrisonApiClient,
-  ): Promise<{ personId: number; addresses: Address[] }> {
-    const addresses = await prisonApiClient.getAddressesForPerson(personId)
-    return { personId, addresses }
-  }
-
   private physicalCharacteristics(
     inmateDetail: InmateDetail,
     physicalAttributes: CorePersonPhysicalAttributes,
@@ -688,5 +667,21 @@ export default class PersonalPageService {
   async getMilitaryRecords(clientToken: string, prisonerNumber: string) {
     const personIntegrationApiClient = this.personIntegrationApiClientBuilder(clientToken)
     return personIntegrationApiClient.getMilitaryRecords(prisonerNumber)
+  }
+
+  private nextOfKinSorter(a: PersonalRelationshipsContact, b: PersonalRelationshipsContact): number {
+    const getPriority = (contact: PersonalRelationshipsContact): number => {
+      if (contact.isNextOfKin && !contact.isEmergencyContact) return 1
+      if (contact.isNextOfKin && contact.isEmergencyContact) return 2
+      if (!contact.isNextOfKin && contact.isEmergencyContact) return 3
+      return 4 // fallback for any other cases
+    }
+
+    const priorityOrder = getPriority(a) - getPriority(b)
+    if (priorityOrder !== 0) {
+      return priorityOrder
+    }
+
+    return a.firstName.localeCompare(b.firstName)
   }
 }

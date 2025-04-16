@@ -6,6 +6,7 @@ import {
   arrayToQueryString,
   calculateAge,
   camelToSnakeCase,
+  contactAddressToHtml,
   convertNameCommaToHuman,
   convertToTitleCase,
   extractLocation,
@@ -18,6 +19,7 @@ import {
   formatMoney,
   formatName,
   formatNamePart,
+  formatPhoneNumber,
   formatPomName,
   formatScheduleItem,
   formatWeight,
@@ -65,6 +67,7 @@ import { Addresses } from '../services/interfaces/personalPageService/PersonalPa
 import Address from '../data/interfaces/prisonApi/Address'
 import GovSummaryItem from '../interfaces/GovSummaryItem'
 import { ExternalUser, PrisonUser, ProbationUser } from '../interfaces/HmppsUser'
+import { PersonalRelationshipsContact } from '../data/interfaces/personalRelationshipsApi/personalRelationshipsApiClient'
 
 describe('utils', () => {
   describe('convert to title case', () => {
@@ -1002,6 +1005,119 @@ describe('utils', () => {
       expect(lengthOfService('2020-01-01', '2020-04-01')).toEqual('3 months')
       expect(lengthOfService('2020-01-01', '2020-02-01')).toEqual('1 month')
       expect(lengthOfService('2020-01-01', '2020-01-01')).toEqual('0 years')
+    })
+  })
+
+  describe('formatPhoneNumber', () => {
+    it.each([
+      ['Valid UK number no spaces', '01234567890', '01234 567890'],
+      ['Valid UK number 5+6', '01234 567890', '01234 567890'],
+      ['Valid UK number padded', '  0123 456 7890  ', '01234 567890'],
+      ['Number with +XX country code', '+441234567890', '+441234567890'],
+      ['Number with 00 country code', '00441234567890', '00441234567890'],
+      ['Number with varying country code length', '+123456789012', '+123456789012'],
+      ['Number with brackets and > 11 digits', '(01234) 5678901', '(01234) 5678901'],
+      ['Number with brackets', '(01234) 567890', '01234 567890'],
+      ['Number with dashes', '01234-567-890', '01234 567890'],
+      ['Number with dashes and > 11 digits', '01234-567-8901', '01234-567-8901'],
+      ['Number with spaces', '01234 567 890', '01234 567890'],
+      ['Number with spaces and > 11 digits', '01234 567 8901', '01234 567 8901'],
+      ['Empty string', '', null],
+      ['Whitespace only', '   ', null],
+      ['Null input', null, null],
+      ['Short number', '12345', '12345'],
+      ['Non-numeric characters', 'abc123', 'abc123'],
+    ])('%s: formatPhoneNumber(%s)', (_: string, input: string, expected: string) => {
+      expect(formatPhoneNumber(input)).toEqual(expected)
+    })
+  })
+
+  describe('contactAddressToHtml', () => {
+    it.each([
+      [
+        'Full address with flat',
+        {
+          flat: '7',
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Flat 7, Building Name Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Full address without flat',
+        {
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Building Name Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Address without property',
+        {
+          street: 'Street Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Street Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Address without street',
+        {
+          property: 'Building Name',
+          cityDescription: 'City',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Building Name<br/>City<br/>AB1 2CD',
+      ],
+      [
+        'Address without city',
+        {
+          flat: '7',
+          property: 'Building Name',
+          street: 'Street Name',
+          postcode: 'AB1 2CD',
+        } as PersonalRelationshipsContact,
+        'Flat 7, Building Name Street Name<br/>AB1 2CD',
+      ],
+      [
+        'Address without postcode',
+        {
+          flat: '7',
+          property: 'Building Name',
+          street: 'Street Name',
+          cityDescription: 'City',
+        } as PersonalRelationshipsContact,
+        'Flat 7, Building Name Street Name<br/>City',
+      ],
+      [
+        'Address with only flat',
+        {
+          flat: '7',
+        } as PersonalRelationshipsContact,
+        'Flat 7',
+      ],
+      [
+        'Address with only property and street',
+        {
+          property: 'Building Name',
+          street: 'Street Name',
+        } as PersonalRelationshipsContact,
+        'Building Name Street Name',
+      ],
+      ['Empty address', {} as PersonalRelationshipsContact, 'Not entered'],
+      [
+        'Non address properties',
+        { dateOfBirth: '2000-01-01', comments: 'Comment' } as PersonalRelationshipsContact,
+        'Not entered',
+      ],
+      ['Undefined address', undefined, 'Not entered'],
+      ['Null address', null, 'Not entered'],
+    ])('%s', (_: string, address: PersonalRelationshipsContact, expected: string) => {
+      expect(contactAddressToHtml(address)).toEqual(expected)
     })
   })
 })
