@@ -30,6 +30,7 @@ import { Role } from '../data/enums/role'
 import { nationalityValidator } from '../validators/personal/nationalityValidator'
 import aliasRouter from './aliasRouter'
 import languagesRouter from './languagesRouter'
+import { numberOfChildrenValidator } from '../validators/personal/numberOfChildrenValidator'
 
 export default function personalRouter(services: Services): Router {
   const router = Router()
@@ -414,6 +415,22 @@ export default function personalRouter(services: Services): Router {
     submit: {
       audit: Page.PostEditSexualOrientation,
       method: personalController.sexualOrientation().submit,
+    },
+  })
+
+  editRoute({
+    path: 'children',
+    edit: {
+      audit: Page.EditNumberOfChildren,
+      method: personalController.numberOfChildren().edit,
+    },
+    submit: {
+      audit: Page.PostEditNumberOfChildren,
+      method: personalController.numberOfChildren().submit,
+      validation: {
+        validators: [numberOfChildrenValidator],
+        redirectBackOnError: true,
+      },
     },
   })
 

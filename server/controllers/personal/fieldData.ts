@@ -201,3 +201,12 @@ export const sexualOrientationFieldData: RadioFieldData = {
   auditEditPostAction: PostAction.EditSexualOrientation,
   redirectAnchor: 'personal-details',
 }
+
+export const numberOfChildrenFieldData: RadioFieldData = {
+  url: 'number-of-children',
+  fieldName: 'numberOfChildren',
+  pageTitle: 'Children',
+  auditEditPageLoad: Page.EditNumberOfChildren,
+  auditEditPostAction: PostAction.EditNumberOfChildren,
+  redirectAnchor: 'personal-details',
+}
