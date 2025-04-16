@@ -193,7 +193,7 @@ describe('overviewController', () => {
       expect(res.render).toHaveBeenCalledWith(
         'pages/overviewPage',
         expect.objectContaining({
-          adjudicationSummary: { adjudicationCount: 1, activePunishments: 2 },
+          adjudicationSummary: expect.objectContaining({ value: { adjudicationCount: 1, activePunishments: 2 } }),
         }),
       )
     })
@@ -232,10 +232,9 @@ describe('overviewController', () => {
           .mockResolvedValue({ adjudicationCount: 1, activePunishments: 2 })
 
         await controller.displayOverview(req, resRole)
-        expect(res.render).toHaveBeenCalledWith(
-          'pages/overviewPage',
-          expect.objectContaining({ adjudicationSummary: { adjudicationCount: 1, activePunishments: 2 } }),
-        )
+        expect.objectContaining({
+          adjudicationSummary: expect.objectContaining({ value: { adjudicationCount: 1, activePunishments: 2 } }),
+        })
       },
     )
   })

@@ -22,7 +22,7 @@ export default interface OverviewPageData {
   prisonerInCaseLoad: boolean
   bookingId: number
   moneySummary: AccountBalances | null
-  adjudicationSummary: AdjudicationsOverviewSummary | null
+  adjudicationSummary: Result<AdjudicationsOverviewSummary>
   visitsSummary: VisitsOverviewSummary | null
   schedule: OverviewSchedule
   csraSummary: CsraSummary
