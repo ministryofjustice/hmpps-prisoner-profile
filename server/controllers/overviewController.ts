@@ -92,7 +92,10 @@ export default class OverviewController {
       showCourtCaseSummary ? this.offencesService.getLatestReleaseCalculation(clientToken, prisonerNumber) : null,
       permissions.money?.view ? this.moneyService.getAccountBalances(clientToken, bookingId) : null,
       permissions.adjudications?.view
-        ? this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId)
+        ? Result.wrap(
+            this.adjudicationsService.getAdjudicationsOverview(clientToken, bookingId),
+            res.locals.apiErrorCallback,
+          )
         : null,
       permissions.visits?.view ? this.visitsService.getVisitsOverview(clientToken, bookingId, prisonerNumber) : null,
       this.prisonerScheduleService.getScheduleOverview(clientToken, bookingId),
