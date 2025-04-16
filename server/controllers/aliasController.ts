@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import { apostrophe, formatName } from '../utils/utils'
+import { apostrophe, formatName, formatNamePart } from '../utils/utils'
 import { AuditService, Page, PostAction } from '../services/auditService'
 import logger from '../../logger'
 import { NameFormatStyle } from '../data/enums/nameFormatStyle'
@@ -92,6 +92,7 @@ export default class AliasController {
       formTitle: (titlePrisonerName: string) => `Enter ${apostrophe(titlePrisonerName)} correct name`,
       warningText: 'This will become their main name in DPS and NOMIS.',
       auditPage: Page.EditNameCorrection,
+      prepopulateFields: true,
     })
   }
 
@@ -109,6 +110,7 @@ export default class AliasController {
       formTitle: (titlePrisonerName: string) => `Enter ${apostrophe(titlePrisonerName)} new name`,
       warningText: 'This will become their main name in DPS and NOMIS. The previous name will be recorded as an alias.',
       auditPage: Page.EditNameLegal,
+      prepopulateFields: false,
     })
   }
 
@@ -467,17 +469,33 @@ export default class AliasController {
     formTitle,
     warningText,
     auditPage,
+    prepopulateFields,
   }: {
     pageTitle: string
     formTitle: (titlePrisonerName: string) => string
     warningText: string
     auditPage: Page
+    prepopulateFields: boolean
   }): RequestHandler {
     return async (req: Request, res: Response) => {
-      const { prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
-      const errors = req.flash('errors')
+      const { clientToken, prisonerName, titlePrisonerName, prisonerNumber, prisonId } = this.getCommonRequestData(req)
+      const { firstName, middleName1, middleName2, lastName } = await this.aliasService.getWorkingNameAlias(
+        clientToken,
+        prisonerNumber,
+      )
 
-      const formValues = requestBodyFromFlash<Name>(req) || {}
+      const errors = req.flash('errors')
+      const formValues: Name = {
+        ...(prepopulateFields
+          ? {
+              firstName: firstName && formatNamePart(firstName),
+              middleName1: middleName1 && formatNamePart(middleName1),
+              middleName2: middleName2 && formatNamePart(middleName2),
+              lastName: lastName && formatNamePart(lastName),
+            }
+          : {}),
+        ...requestBodyFromFlash<Name>(req),
+      }
 
       this.auditService
         .sendPageView({
