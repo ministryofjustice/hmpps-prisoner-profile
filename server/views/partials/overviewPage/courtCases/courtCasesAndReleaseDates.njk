@@ -40,26 +40,31 @@
 
     <div data-qa="overview-latest-calculation" class="govuk-grid-column-full">
       <h3 class="card-subheading govuk-!-margin-top-2 govuk-!-margin-bottom-1">Latest calculation</h3>
-      {% if courtCaseSummary.latestCalculation %}
-        {{ govukSummaryList({
-          classes: 'govuk-summary-list--no-border',
-          rows: [
-            {
-              key: { text: "Date of calculation" },
-              value: { text: courtCaseSummary.latestCalculation.calculationDate | formatDate('long') }
-            },
-            {
-              key: { text: "Establishment" },
-              value: { text: courtCaseSummary.latestCalculation.establishment or "Not entered"  }
-            },
-            {
-              key: { text: "Calculation reason" },
-              value: { text: courtCaseSummary.latestCalculation.reason }
-            }
-          ]
-        }) }}
+      {% if courtCaseSummary.latestCalculation.status === 'fulfilled' %}
+        {% set latestCalculation = courtCaseSummary.latestCalculation.value %}
+        {% if latestCalculation %}
+          {{ govukSummaryList({
+            classes: 'govuk-summary-list--no-border',
+            rows: [
+              {
+                key: { text: "Date of calculation" },
+                value: { text: latestCalculation.calculationDate | formatDate('long') }
+              },
+              {
+                key: { text: "Establishment" },
+                value: { text: latestCalculation.establishment or "Not entered"  }
+              },
+              {
+                key: { text: "Calculation reason" },
+                value: { text: latestCalculation.reason }
+              }
+            ]
+          }) }}
+        {% else %}
+          <p>There are no release dates calculated for {{ prisonerDisplayName }}</p>
+        {% endif %}
       {% else %}
-        <p>There are no release dates calculated for {{ prisonerDisplayName }}</p>
+        <p>{{ standardApiErrorText() }}</p>
       {% endif %}
     </div>
 

@@ -2,11 +2,12 @@ import { CourtCaseSummary } from '../../interfaces/OverviewPageData'
 import CourtAppearanceSummary from '../../../services/interfaces/offencesService/CourtAppearanceSummary'
 import config from '../../../config'
 import LatestCalculationSummary from '../../../services/interfaces/offencesService/LatestCalculationSummary'
+import { Result } from '../../../utils/result/result'
 
 export default function mapCourtCaseSummary(
   nextCourtCaseAppearance: CourtAppearanceSummary,
   activeCourtCasesCount: number,
-  latestCalculation: LatestCalculationSummary | null,
+  latestCalculation: Result<LatestCalculationSummary>,
   userCanEdit: boolean,
   prisonerNumber: string,
 ): CourtCaseSummary | null {
